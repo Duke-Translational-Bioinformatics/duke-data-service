@@ -1,0 +1,299 @@
+FORMAT: 1A
+HOST: http://data-services.duke.edu/
+
+# Duke Data Services
+
+The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data. 
+
+The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance 
+usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing 
+their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support 
+SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are 
+tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple 
+APIs, whether some business logic be pushed to the users, etc.
+
+Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) 
+requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each 
+response header, among others.
+
+## Group API Usage
+
+Client API Key
+--------------
+Should we have an API key for the MVP that verifies the API is being accessed by an authorized 
+client platform/developer?
+
+User Authentication
+--------------
+Platform users will be required to authenticate by providing a `username/password` via client applications.  Upon 
+successful authentication, a JSON Web Token (JWT) will be returned to the client.  The token must be included in 
+request header as follows: `Authorization: token <jwt_token>`
+
+* What will be our token expiration policy?  When will users/clients be required to re-authenticate?
+
+Collection Pagination
+--------------
+For endpoints that return a collection of resources/objects.  The number of objects returned can be 
+controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads 
+will have the following structure to facilitate client pagination:
+
+    {
+        "count": 100, 
+        "next": "https://data-services.duke.edu/projects?page=3", 
+        "previous": "https://data-services.duke.edu/projects?page=1", 
+        "results": [
+            { <resource_object> },
+            { <resource_object> },
+            ...
+        ]
+    }
+    
+Example payloads herein for resource specific collections will only include `"results": []` structure.
+
+Audit Object
+--------------
+Some resource payloads may include a composite audit object. An example structure of that 
+object is represented here and will be referenced as `<audit_object>` in resource specific payloads.
+        
+    {
+        "created_on": "2015-01-01T12:00:00Z",
+        "created_by": { 
+            "id": "ce245d81-bae1-452b-8589-24f736ca7735",
+            "username": "mrgardner01",
+            "full_name": "Matthew Gardner"
+        },
+        "updated_on": "2015-01-01T13:00:00Z",
+        "updated_by": {
+            "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
+            "username": "jturner01",
+            "full_name": "Jon Turner"
+        }
+    }
+
+Clients Errors
+----------------
+Define here how client errors will be handled and represented.
+
+## Group Authentication
+Authentication rsource provides the means to verify identity of a platform user.
+
+## Authenticate [/authenticate/user_token]
+### Get a user authentication token - i.e. JSON Web Token [POST]
+* If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid 
+shibboleth identity to a JWT, so this API may take a different set of params to perform that translation.
+
+* I assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into 
+the platforms local user profile data store (i.e. table or tables).
+
+* We also need to think about how command line clients and software agents would authenticate to the API? - they 
+will not be using the Duke single sign-on Web interface.
+
++ Request (application/json)
+
+        { "username": "mrgardner01", "password": "pennState$grad" }
+        
++ Response 201 (application/json)
+
+        { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
+
+## Group Current User
+The current user resource represents the currently authenticated user.
+
+## Current User [/current_user]
+### View current users details [GET]
++ Response 200 (application/json)
+
+        {
+            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+            "username": "mrgardner01",
+            "first_name": "Matthew",
+            "last_name": "Gardner",
+            "full_name": "Matthew Gardner",
+            "auth_provider": {
+                "source": "duke_shibboleth",
+                "properties": { 
+                    <key>: <value>,
+                    <key>: <value>,
+                    ...
+                }
+            },
+            "last_accessed_on": "2015-01-01T12:00:00Z",
+            "audit": <audit_object>
+        }
+        
+## Current Users Projects [/current_user/projects]
+### List projects for which current user is a member [GET]
++ Response 200 (application/json)
+
+        "results": [
+            <project_object>,
+            <project_object>,
+            ...
+        ]
+        
+
+## Group Users
+A user resource represents a platform end user.  In our case for the MVP, this is a Duke employee
+or affiliate with a valid Duke NetID.
+
+## Users collection [/users]
+### List all platform users [GET]
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "auth_provider": {
+                    "source": "duke_shibboleth",
+                    "properties": { 
+                        <key>: <value>,
+                        <key>: <value>,
+                        ...
+                    }
+                },
+                "last_accessed_on": "2015-01-01T12:00:00Z",
+                "audit": <audit_object>
+            },
+            ...
+        ]
+
+## Group Projects
+A project resource is a container for storing, organizing, retrieving and sharing research data files.
+
+## Projects collection [/projects]
+### List all projects [GET]
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)",
+                "description": "Goal of generating a targeted knockout mutation...",
+                "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
+                "file_permissions": [ "file_create", "file_download", ... ] // Project level file permissions
+                "current_user": {
+                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. has ALL possible file permissions)
+                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
+                },
+                "audit": <audit_object>
+            },
+            ...
+        ]
+        
+### Create a project [POST]
+* Assumes that platform user who creates project becomes an "Admin Owner" of the project?
+
++ Request (application/json)
+
+        {
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation...",
+            "admin_owners": [
+                { "id": "d73f20fd-c2ba-4f24-bec5-f7b0171eabef" }, 
+                { "id": "f59eec9e-5b55-4d74-935b-180b5da0cdd7" },
+                ...
+            ],
+            "file_permissions": [ "file_create", "file_download", ... ] // Project level file permissions
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation...",
+            "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
+            "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
+            "current_user": {
+                    "is_admin_owner": true, // Is current user Admin Owner (has ALL possible file permissions)
+                    "file_permissions":  [ "file_create", "file_download", ... ] // Inherited from project level for MVP
+            },
+            "audit": <audit_object>
+        }
+
+
+## Project [/projects/{project_id}]
+<!--+ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project to perform action with.
+-->
+### View poject details [GET]
++ Response 200 (application/json)
+
+        {
+            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation...",
+            "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
+            "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
+            "current_user": {
+                    "is_admin_owner": true, // Is current user Admin Owner (has ALL possible file permissions)
+                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
+            },
+            "audit": <audit_object>
+        }
+        
+### Delete a project [DELETE]
+* We need to decise what happens for this use case? Is the project logically deleted and then after X months system 
+purges files from disk?  What is the policy?
+
++ Response 204 
+
+## Project Members collection [/projects/{project_id}/members]
+### List all members for a project [GET]
++ Response 200 (application/json)
+
+        "results": [
+            {
+                user_members: [
+                    { "id": "af4e4ffc-cdf3-4673-a0b4-df187f6e8df0",
+                      "user": <user_object>, 
+                      "is_admin_owner": false, 
+                      "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP 
+                    },
+                    ...
+                ],
+                group_members: [] // Not implemented for the MVP
+            }
+        ]
+        
+### Associate a user/group to a project [POST]
+* Assumes only admin owners can associate and remove project members.
++ Request (application/json)
+
+         {
+            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
+            "is_admin_owner": true
+         }
+
++ Response 201 (application/json)
+
+         {
+            "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
+            "user": <user_object>,
+            "is_admin_owner": true, 
+            "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP 
+         }
+         
+
+## Project Member [/project_members/{project_member_id}]
+<!--+ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member to perform action with.
+-->
+### Remove a user/group from a project [DELETE]
++ Response 204
+
+## Project File Permissions collection [/projects/{project_id}/file_permissions]
+### Set the project level file permissions [POST]
+
++ Request (application/json)
+
+        "file_permissions": [ "file_create", "file_download", ... ]
+
++ Response 201 (application/json)
+
+        { <project_object> }
+
