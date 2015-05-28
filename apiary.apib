@@ -33,12 +33,13 @@ request header as follows: `Authorization: token <jwt_token>`
 
 Collection Pagination
 --------------
-For endpoints that return a collection of resources/objects.  The number of objects returned can be 
+For endpoints that return a collection of resources/objects, the number of objects returned can be 
 controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads 
 will have the following structure to facilitate client pagination:
 
     {
-        "count": 100, 
+        "count": 100,
+        "limit": 25,
         "next": "https://data-services.duke.edu/projects?page=3", 
         "previous": "https://data-services.duke.edu/projects?page=1", 
         "results": [
@@ -109,15 +110,16 @@ The current user resource represents the currently authenticated user.
             "first_name": "Matthew",
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
+            "email": "mrgardner01@duke.edu",
             "auth_provider": {
                 "source": "duke_shibboleth",
                 "properties": { 
-                    <key>: <value>,
+                    <key>: <value>,   // Properties returned from auth provider
                     <key>: <value>,
                     ...
                 }
             },
-            "last_accessed_on": "2015-01-01T12:00:00Z",
+            "last_login_on": "2015-01-01T12:00:00Z",
             "audit": <audit_object>
         }
         
@@ -126,7 +128,7 @@ The current user resource represents the currently authenticated user.
 + Response 200 (application/json)
 
         "results": [
-            <project_object>,
+            <project_object>, // See /projects/{project_id} endpoint 
             <project_object>,
             ...
         ]
@@ -147,10 +149,11 @@ or affiliate with a valid Duke NetID.
                 "first_name": "Matthew",
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
                 "auth_provider": {
                     "source": "duke_shibboleth",
                     "properties": { 
-                        <key>: <value>,
+                        <key>: <value>,   
                         <key>: <value>,
                         ...
                     }
@@ -176,7 +179,9 @@ A project resource is a container for storing, organizing, retrieving and sharin
                 "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
                 "file_permissions": [ "file_create", "file_download", ... ] // Project level file permissions
                 "current_user": {
-                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. has ALL possible file permissions)
+                    "is_member": true, // Is current user a member?
+                    "roles": [ "admin_owner", ..., ... ], // Project roles for current user
+                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
                     "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
                 },
                 "audit": <audit_object>
@@ -209,8 +214,10 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
             "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
             "current_user": {
-                    "is_admin_owner": true, // Is current user Admin Owner (has ALL possible file permissions)
-                    "file_permissions":  [ "file_create", "file_download", ... ] // Inherited from project level for MVP
+                    "is_member": true, // Is current user a member?
+                    "roles": [ "admin_owner", ... ], // Project roles for current user
+                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
+                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
             },
             "audit": <audit_object>
         }
@@ -229,8 +236,10 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "description": "Goal of generating a targeted knockout mutation...",
             "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
             "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
-            "current_user": {
-                    "is_admin_owner": true, // Is current user Admin Owner (has ALL possible file permissions)
+             "current_user": {
+                    "is_member": true, // Is current user a member?
+                    "roles": [ "admin_owner", ... ], // Project roles for current user
+                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
                     "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
             },
             "audit": <audit_object>
@@ -242,25 +251,23 @@ purges files from disk?  What is the policy?
 
 + Response 204 
 
-## Project Members collection [/projects/{project_id}/members]
-### List all members for a project [GET]
+## Project Users collection [/projects/{project_id}/users]
+### List all users for a project [GET]
 + Response 200 (application/json)
 
         "results": [
-            {
-                user_members: [
-                    { "id": "af4e4ffc-cdf3-4673-a0b4-df187f6e8df0",
-                      "user": <user_object>, 
-                      "is_admin_owner": false, 
-                      "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP 
-                    },
-                    ...
-                ],
-                group_members: [] // Not implemented for the MVP
-            }
+            { 
+                "id": "af4e4ffc-cdf3-4673-a0b4-df187f6e8df0",
+                "project": <project_object>,
+                "user": <user_object>, 
+                "roles": [], // Project roles for member,
+                "is_admin_owner": false, // Is member Admin Owner?
+                "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP 
+            },
+            ...
         ]
         
-### Associate a user/group to a project [POST]
+### Associate a user to a project [POST]
 * Assumes only admin owners can associate and remove project members.
 + Request (application/json)
 
@@ -273,17 +280,19 @@ purges files from disk?  What is the policy?
 
          {
             "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
+            "project": <project_object>,
             "user": <user_object>,
-            "is_admin_owner": true, 
-            "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP 
+            "roles": ["admin_owner", ... ], // Project roles for member,
+            "is_admin_owner": false, // Is member Admin Owner?
+            "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP  
          }
          
 
-## Project Member [/project_members/{project_member_id}]
+## Project User [/project_users/{project_user_id}]
 <!--+ Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member to perform action with.
 -->
-### Remove a user/group from a project [DELETE]
+### Remove a user from a project [DELETE]
 + Response 204
 
 ## Project File Permissions collection [/projects/{project_id}/file_permissions]
