@@ -251,6 +251,9 @@ purges files from disk?  What is the policy?
 
 + Response 204 
 
+## Group Project Users
+The project users resource represents platform users that are members of a project.
+
 ## Project Users collection [/projects/{project_id}/users]
 ### List all users for a project [GET]
 + Response 200 (application/json)
@@ -294,6 +297,11 @@ purges files from disk?  What is the policy?
 -->
 ### Remove a user from a project [DELETE]
 + Response 204
+
+## Group Project File Permissions
+The project file permissions resource represents the set of file permissions that will be granted
+to all project members (i.e. project users or project groups).  The currently defined set includes:
+"file_create", "file_update", "file_download", "file_delete", "file_share", ...?
 
 ## Project File Permissions collection [/projects/{project_id}/file_permissions]
 ### Set the project level file permissions [POST]
