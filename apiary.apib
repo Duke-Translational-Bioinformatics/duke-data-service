@@ -158,7 +158,7 @@ or affiliate with a valid Duke NetID.
                         ...
                     }
                 },
-                "last_accessed_on": "2015-01-01T12:00:00Z",
+                "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
             },
             ...
@@ -260,7 +260,7 @@ purges files from disk?  What is the policy?
                 "id": "af4e4ffc-cdf3-4673-a0b4-df187f6e8df0",
                 "project": <project_object>,
                 "user": <user_object>, 
-                "roles": [], // Project roles for member,
+                "roles": [], // Project roles for member
                 "is_admin_owner": false, // Is member Admin Owner?
                 "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP 
             },
@@ -282,8 +282,8 @@ purges files from disk?  What is the policy?
             "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
             "project": <project_object>,
             "user": <user_object>,
-            "roles": ["admin_owner", ... ], // Project roles for member,
-            "is_admin_owner": false, // Is member Admin Owner?
+            "roles": ["admin_owner", ... ], // Project roles for member
+            "is_admin_owner": true, // Is member Admin Owner?
             "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP  
          }
          
@@ -305,5 +305,5 @@ purges files from disk?  What is the policy?
 
 + Response 201 (application/json)
 
-        { <project_object> }
+        <project_object>
 
