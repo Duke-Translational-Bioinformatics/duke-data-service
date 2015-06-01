@@ -29,10 +29,10 @@ only after UA Testing has approved changes to the code.
 Here are steps for new developers to follow:
 1. Git clone the project
 2. git fetch origin develop
-2. git checkout --track origin/develop
-3. develop on develop.  As a precaution, you should always create
+3. git checkout --track origin/develop
+4. develop on develop.  As a precaution, you should always create
 branches off of develop explicitly, e.g.:
 ```bash
 $ git branch -b try_foo develop
 ```
-4. git push/pull (this will push to and pull from develop)
+5. git push/pull (this will push to and pull from develop)
