@@ -96,6 +96,27 @@ will not be using the Duke single sign-on Web interface.
 + Response 201 (application/json)
 
         { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
+        
+## Group Authorization Roles
+The authorization roles resource represents the set of permissions that can be 
+enforced for a platform user.  The following is the list of granular permissions that can
+be aggregated into system roles.  This set will expand as we move beyond the MVP...
+
+| Permissions | Description |
+|:------------|:------------|
+| **create_project** | Can create new project |
+| **update_project** | Can update project header details |
+| **delete_project** | Can delete project |
+| **create_project_member** | Can associate (i.e.invite) users to project
+| **delete_project_member** | Can remove users from project |
+| **view_project_member** | Can view project members and their roles |
+| **create_file** | Can upload new file |
+| **update_file** | Can upload new version of existing file |
+| **download_file** | Can download file |
+| **delete_file** | Can delete a file |
+| **share_file** | Can share file with another project/user |
+
+
 
 ## Group Current User
 The current user resource represents the currently authenticated user.
