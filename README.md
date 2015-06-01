@@ -36,4 +36,6 @@ branches off of develop explicitly, e.g.:
   ```
   $ git branch -b try_foo develop
   ```
+you should then merge branches back into devlop. You might consider
+deleting the master branch from your local repository.
 1. git push/pull (this will push to and pull from develop)
