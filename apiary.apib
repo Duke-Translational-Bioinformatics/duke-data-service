@@ -99,7 +99,7 @@ will not be using the Duke single sign-on Web interface.
         
 ## Group Authorization Roles
 The authorization roles resource defines the system operations a platfom user may perform.  Each authorization
-role is a collection of discrete systems permissions.  
+role is a set of discrete systems permissions.  
 
 The following is a list of **Permissions** defined to date... this will expand once we move beyond the MVP... 
 
@@ -136,7 +136,7 @@ The following is a defined list of **Authorization Roles** to date...
                 "name": "System Admin",
                 "description": "Can perform all system operations",
                 "permissions": [ "*" ], // ALL permissions across ALL projects...
-                "contexts": [ "global" ] // Defines context in which role is relevant
+                "contexts": [ "global" ] // Defines contexts in which role is relevant (i.e. "global", "project_member", etc.)
             },
             { 
                 "id": "344ca0a7-aa9d-4195-a78b-674a12d33204",
@@ -150,16 +150,22 @@ The following is a defined list of **Authorization Roles** to date...
                 "name": "Viewer",
                 "description": "Can download files",
                 "permissions": [ "download_file" ],
-                "contexts": [ "project" ]
+                "contexts": [ "project_member" ]
             },    
-             { 
+            { 
                 "id": "5c75e16d-07cc-49b8-b2bc-e14af4ad8852",
                 "name": "Editor",
                 "description": "Can create, update and delete files",
                 "permissions": [ "create_file", "update_file", "delete_file" ],
-                "contexts": [ "project" ]
+                "contexts": [ "project_member" ]
             },        
-            ... 
+            { 
+                "id": "5cg66666-07cc-49b8-b2bc-e14af4ad8852",
+                "name": "Sharer",
+                "description": "Can create, update and delete files",
+                "permissions": [ "share_file" ],
+                "contexts": [ "project_member" ]
+            }       
         ]
 
 ## Group Current User
