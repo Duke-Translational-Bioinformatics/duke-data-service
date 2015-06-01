@@ -98,25 +98,71 @@ will not be using the Duke single sign-on Web interface.
         { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
         
 ## Group Authorization Roles
-The authorization roles resource represents the set of permissions that can be 
-enforced for a platform user.  The following is the list of granular permissions that can
-be aggregated into system roles.  This set will expand as we move beyond the MVP...
+The authorization roles resource defines the system operations a platfom user may perform.  Each authorization
+role is a collection of discrete systems permissions.  
+
+The following is a list of **Permissions** defined to date... this will expand once we move upon the MVP... 
 
 | Permissions | Description |
 |:------------|:------------|
 | **create_project** | Can create new project |
 | **update_project** | Can update project header details |
 | **delete_project** | Can delete project |
-| **create_project_member** | Can associate (i.e.invite) users to project
-| **delete_project_member** | Can remove users from project |
-| **view_project_member** | Can view project members and their roles |
+| **manage_project_member** | Can associate/delete (i.e.invite) users to/from project and grant/revoke roles
 | **create_file** | Can upload new file |
 | **update_file** | Can upload new version of existing file |
 | **download_file** | Can download file |
 | **delete_file** | Can delete a file |
 | **share_file** | Can share file with another project/user |
 
+The following is a defined list of **Authorization Roles** to date...
 
+| Name | Description | Permission(s) |
+|:-----|:------------|:--------------|
+| System Admin | Can perform all system operations | \[*\] (i.e. ALL roles across ALL projects) |
+| Platform User | Can create new projects (granted to all registered users for MVP) | create_project |
+| Project Admin | Modify project and manage membership  | update_project, delete_project, manage_project_member |
+| Viewer | Can download files | download_file |
+| Editor | Can create, update and delete files | create_file, update_file, delete_file |
+| Sharer | Can share files | share_file |
+
+
+## Authorization Roles [/auth_roles]
+### List all defined roles [GET]
++ Response 200 (application/json)
+
+        "results": [
+            { 
+                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "name": "System Admin",
+                "description": "Can perform all system operations",
+                "permissions": [ "*" ], // ALL roles across ALL projects...
+                "contexts": [ "global" ]
+            },
+            { 
+                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "name": "Platform User",
+                "description": "Can create new projects (granted to all registered users for MVP)",
+                "permissions": [ "create_project" ], 
+                "contexts": [ "global" ]
+            },
+            { 
+                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "name": "Viewer",
+                "description": "Can download files",
+                "permissions": [ "download_file" ],
+                "contexts": [ "project" ]
+            },    
+             { 
+                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "name": "Editor",
+                "description": "Can create, update and delete files",
+                "permissions": [ "create_file", "update_file", "delete_file" ],
+                "contexts": [ "project" ]
+            },        
+            
+    
+        ]
 
 ## Group Current User
 The current user resource represents the currently authenticated user.
