@@ -33,7 +33,7 @@ Here are steps for new developers to follow:
 1. git checkout --track origin/develop
 1. develop on develop.  As a precaution, you should always create
 branches off of develop explicitly, e.g.:
-  ```bash
+  ```
   $ git branch -b try_foo develop
   ```
 1. git push/pull (this will push to and pull from develop)
