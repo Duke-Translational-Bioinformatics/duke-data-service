@@ -107,18 +107,18 @@ role is a set of discrete systems permissions.
 
 The following is a list of **Authorization Roles** defined to date... this will expand once we move beyond the MVP... 
 
-| Name | Description | Permission(s) |
-|:-----|:------------|:--------------|
-| System Admin | Can perform all system operations | \[*\] (i.e. ALL permissions across ALL projects) |
-| Platform User | Can create new projects (granted to all registered users for MVP) | create_project |
-| Project Admin | Modify project and manage membership  | update_project, delete_project, manage_project_member |
-| File Viewer | Can download files | download_file |
-| File Editor | Can create, update and delete files | create_file, update_file, delete_file, download_file |
-| File Sharer | Can share files | share_file |
+| Role | Name | Description | Permission(s) |
+|:-----|:-----|:------------|:--------------|
+| **system_admin** | System Admin | Can perform all system operations | \[*\] (i.e. ALL permissions across ALL projects) |
+| **platform_user** | Platform User | Can create new projects (granted to all registered users for MVP) | create_project |
+| **project_admin** | Project Admin | Modify project and manage membership  | update_project, delete_project, manage_project_member |
+| **file_viewer** | File Viewer | Can download files | download_file |
+| **file_editor** | File Editor | Can create, update and delete files | create_file, update_file, delete_file, download_file |
+| **file_sharer** | File Sharer | Can share files | share_file |
 
 The following is a list of **Permissions** defined to date... 
 
-| Permissions | Description |
+| Permission | Description |
 |:------------|:------------|
 | **create_project** | Can create new project |
 | **update_project** | Can update project header details |
@@ -309,7 +309,7 @@ The project users resource represents platform users that are members of a proje
 ## Project Users collection [/projects/{id}/users]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
-    
+
 ### Associate a user to a project [POST]
 * Assumes only user with Project Admin role (i.e. "project_admin") can associate and remove project members.
 
