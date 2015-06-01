@@ -21,15 +21,18 @@ response header, among others.
 Client API Key
 --------------
 Should we have an API key for the MVP that verifies the API is being accessed by an authorized 
-client platform/developer?
+client platform/developer?  Perhaps allow authorized users to generate a secret API key via the Web 
+interface (liken to Google API key provisioning model).
 
 User Authentication
 --------------
 Platform users will be required to authenticate by providing a `username/password` via client applications.  Upon 
-successful authentication, a JSON Web Token (JWT) will be returned to the client.  The token must be included in 
-request header as follows: `Authorization: token <jwt_token>`
+successful authentication, a JSON Web Token (JWT) will be generated.  The token must be included in 
+the request header for subsequent API calls that require authentication.
 
 * What will be our token expiration policy?  When will users/clients be required to re-authenticate?
+* For Duke MVP, JWT token will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
+service.  This token will be supplied in header for subsequent API calls.
 
 Collection Pagination
 --------------
@@ -48,8 +51,9 @@ will have the following structure to facilitate client pagination:
             ...
         ]
     }
-    
-Example payloads herein for resource specific collections will only include `"results": []` structure.
+
+* This structure is only an example, may change based on specific grape/rails framework plug-in for pagination.   
+* Example payloads herein for resource specific collections will only include `"results": []` structure.
 
 Audit Object
 --------------
@@ -76,15 +80,15 @@ Clients Errors
 Define here how client errors will be handled and represented.
 
 ## Group Authentication
-Authentication rsource provides the means to verify identity of a platform user.
+Authentication resource provides the means to verify identity of a platform user.
 
 ## Authenticate [/authenticate/user_token]
 ### Get a user authentication token - i.e. JSON Web Token [POST]
 * If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid 
 shibboleth identity to a JWT, so this API may take a different set of params to perform that translation.
 
-* I assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into 
-the platforms local user profile data store (i.e. table or tables).
+* Assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into 
+the platforms local user data store (i.e. user table or tables).
 
 * We also need to think about how command line clients and software agents would authenticate to the API? - they 
 will not be using the Duke single sign-on Web interface.
@@ -101,30 +105,30 @@ will not be using the Duke single sign-on Web interface.
 The authorization roles resource defines the system operations a platfom user may perform.  Each authorization
 role is a set of discrete systems permissions.  
 
-The following is a list of **Permissions** defined to date... this will expand once we move beyond the MVP... 
-
-| Permissions | Description |
-|:------------|:------------|
-| **create_project** | Can create new project |
-| **update_project** | Can update project header details |
-| **delete_project** | Can delete project |
-| **manage_project_member** | Can associate/delete (i.e.invite) users to/from project and grant/revoke roles
-| **create_file** | Can upload new file |
-| **update_file** | Can upload new version of existing file |
-| **download_file** | Can download file |
-| **delete_file** | Can delete a file |
-| **share_file** | Can share file with another project/user |
-
-The following is a list of **Authorization Roles** defined to date...
+The following is a list of **Authorization Roles** defined to date... this will expand once we move beyond the MVP... 
 
 | Name | Description | Permission(s) |
 |:-----|:------------|:--------------|
 | System Admin | Can perform all system operations | \[*\] (i.e. ALL permissions across ALL projects) |
 | Platform User | Can create new projects (granted to all registered users for MVP) | create_project |
 | Project Admin | Modify project and manage membership  | update_project, delete_project, manage_project_member |
-| Viewer | Can download files | download_file |
-| Editor | Can create, update and delete files | create_file, update_file, delete_file |
-| Sharer | Can share files | share_file |
+| File Viewer | Can download files | download_file |
+| File Editor | Can create, update and delete files | create_file, update_file, delete_file, download_file |
+| File Sharer | Can share files | share_file |
+
+The following is a list of **Permissions** defined to date... 
+
+| Permissions | Description |
+|:------------|:------------|
+| **create_project** | Can create new project |
+| **update_project** | Can update project header details |
+| **delete_project** | Can delete project |
+| **manage_project_member** | Can associate (i.e.invite)/remove users to/from project and grant/revoke roles
+| **create_file** | Can upload new file |
+| **update_file** | Can upload new version of existing file |
+| **download_file** | Can download file |
+| **delete_file** | Can delete a file |
+| **share_file** | Can share file with another project/user |
 
 ## Authorization Roles [/auth_roles]
 ### List all defined roles [GET]
@@ -132,36 +136,43 @@ The following is a list of **Authorization Roles** defined to date...
 
         "results": [
             { 
-                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "id": "system_admin",
                 "name": "System Admin",
                 "description": "Can perform all system operations",
                 "permissions": [ "*" ], // ALL permissions across ALL projects...
                 "contexts": [ "global" ] // Defines contexts in which role is relevant (i.e. "global", "project_member", etc.)
             },
             { 
-                "id": "344ca0a7-aa9d-4195-a78b-674a12d33204",
+                "id": "platform_user",
                 "name": "Platform User",
                 "description": "Can create new projects (granted to all registered users for MVP)",
                 "permissions": [ "create_project" ], 
                 "contexts": [ "global" ]
             },
             { 
-                "id": "b3b3f866-d8f8-4b94-95a3-0c421bab8437",
-                "name": "Viewer",
+                "id": "project_admin",
+                "name": "Project Admin",
+                "description": "Can update project details, delete project, and manage members",
+                "permissions": [ "update_project", "delete_project", "manage_project_members" ],
+                "contexts": [ "project_user" ]
+            },    
+            { 
+                "id": "file_viewer",
+                "name": "File Viewer",
                 "description": "Can download files",
                 "permissions": [ "download_file" ],
                 "contexts": [ "project_user" ]
             },    
             { 
-                "id": "5c75e16d-07cc-49b8-b2bc-e14af4ad8852",
-                "name": "Editor",
-                "description": "Can create, update and delete files",
-                "permissions": [ "create_file", "update_file", "delete_file" ],
+                "id": "file_editor",
+                "name": "File Editor",
+                "description": "Can create, update, delete and download files",
+                "permissions": [ "create_file", "update_file", "delete_file", "download_file" ],
                 "contexts": [ "project_user" ]
             },        
             { 
-                "id": "5cg66666-07cc-49b8-b2bc-e14af4ad8852",
-                "name": "Sharer",
+                "id": "file_sharer",
+                "name": "File Sharer",
                 "description": "Can share file with another project/user",
                 "permissions": [ "share_file" ],
                 "contexts": [ "project_user" ]
@@ -182,10 +193,11 @@ The current user resource represents the currently authenticated user.
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
+            "auth_roles": [ "system_admin", ... ], // Global roles for currently authenticated user
             "auth_provider": {
                 "source": "duke_shibboleth",
                 "properties": { 
-                    <key>: <value>,   // Properties returned from auth provider
+                    <key>: <value>, // Properties from auth provider (i.e. Duke specific user properties)
                     <key>: <value>,
                     ...
                 }
@@ -199,11 +211,10 @@ The current user resource represents the currently authenticated user.
 + Response 200 (application/json)
 
         "results": [
-            <project_object>, // See /projects/{project_id} endpoint 
+            <project_object>,  // See `/projects/{id}` endpoint 
             <project_object>,
             ...
-        ]
-        
+        ]  
 
 ## Group Users
 A user resource represents a platform end user.  In our case for the MVP, this is a Duke employee
@@ -220,17 +231,7 @@ or affiliate with a valid Duke NetID.
                 "first_name": "Matthew",
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
-                "email": "mrgardner01@duke.edu",
-                "auth_provider": {
-                    "source": "duke_shibboleth",
-                    "properties": { 
-                        <key>: <value>,   
-                        <key>: <value>,
-                        ...
-                    }
-                },
-                "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": <audit_object>
+                "email": "mrgardner01@duke.edu"
             },
             ...
         ]
@@ -239,6 +240,31 @@ or affiliate with a valid Duke NetID.
 A project resource is a container for storing, organizing, retrieving and sharing research data files.
 
 ## Projects collection [/projects]
+### Create a project [POST]
+* Assume platform user who creates project is assigned the Project Admin ("project_admin") role.
+
++ Request (application/json)
+
+        {
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation...",
+            "principal_investigator": { "id": "d73f20fd-c2ba-4f24-bec5-f7b0171eabef" }
+        }
+
++ Response 201 (application/json)
+
+        
+        {
+            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation...",
+            "principal_investigator": <user_object>,
+            "current_user": {
+                "auth_roles": [ "project_admin", ... ] // Project specific roles for currently authenticated user
+            },
+            "audit": <audit_object>
+        }
+
 ### List all projects [GET]
 + Response 200 (application/json)
 
@@ -247,57 +273,19 @@ A project resource is a container for storing, organizing, retrieving and sharin
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
-                "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
-                "file_permissions": [ "file_create", "file_download", ... ] // Project level file permissions
+                "principal_investigator": <user_object>,
                 "current_user": {
-                    "is_member": true, // Is current user a member?
-                    "roles": [ "admin_owner", ..., ... ], // Project roles for current user
-                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
-                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
+                    "auth_roles": [ "project_admin", ... ] // Project specific roles for currently authenticated user
                 },
                 "audit": <audit_object>
             },
             ...
         ]
-        
-### Create a project [POST]
-* Assumes that platform user who creates project becomes an "Admin Owner" of the project?
 
-+ Request (application/json)
+## Project [/projects/{id}]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
-        {
-            "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            "admin_owners": [
-                { "id": "d73f20fd-c2ba-4f24-bec5-f7b0171eabef" }, 
-                { "id": "f59eec9e-5b55-4d74-935b-180b5da0cdd7" },
-                ...
-            ],
-            "file_permissions": [ "file_create", "file_download", ... ] // Project level file permissions
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-            "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
-            "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
-            "current_user": {
-                    "is_member": true, // Is current user a member?
-                    "roles": [ "admin_owner", ... ], // Project roles for current user
-                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
-                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
-            },
-            "audit": <audit_object>
-        }
-
-
-## Project [/projects/{project_id}]
-<!--+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project to perform action with.
--->
 ### View project details [GET]
 + Response 200 (application/json)
 
@@ -305,28 +293,46 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "admin_owners": [ <user_object>, <user_object>, ... ], // Admin Owners
-            "file_permissions": [ "file_create", "file_download", ... ], // Project level file permissions
-             "current_user": {
-                    "is_member": true, // Is current user a member?
-                    "roles": [ "admin_owner", ... ], // Project roles for current user
-                    "is_admin_owner": true, // Is current user Admin Owner? (i.e. Has ALL possible file permissions)
-                    "file_permissions": [ "file_create", "file_download", ... ] // Inherited from project level for MVP
-            },
+            "principal_investigator": <user_object>,
             "audit": <audit_object>
         }
         
 ### Delete a project [DELETE]
-* We need to decise what happens for this use case? Is the project logically deleted and then after X months system 
-purges files from disk?  What is the policy?
+* We need to decide what happens for this use case? Is the project logically deleted and then after X months system 
+permanently purges files from disk?  What is the policy?
 
 + Response 204 
 
 ## Group Project Users
 The project users resource represents platform users that are members of a project.
 
-## Project Users collection [/projects/{project_id}/users]
-### List all users for a project [GET]
+## Project Users collection [/projects/{id}/users]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
+    
+### Associate a user to a project [POST]
+* Assumes only user with Project Admin role (i.e. "project_admin") can associate and remove project members.
+
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
+
++ Request (application/json)
+
+        {
+            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
+            "auth_roles": [ "file_editor", ... ]  // Project specific roles for member
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
+            "project": <project_object>,
+            "user": <user_object>,
+            "auth_roles": [ "file_editor", ... ]
+        }
+
+### List all users of a project [GET]
 + Response 200 (application/json)
 
         "results": [
@@ -334,39 +340,15 @@ The project users resource represents platform users that are members of a proje
                 "id": "af4e4ffc-cdf3-4673-a0b4-df187f6e8df0",
                 "project": <project_object>,
                 "user": <user_object>, 
-                "roles": [], // Project roles for member
-                "is_admin_owner": false, // Is member Admin Owner?
-                "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP 
+                "auth_roles": [ "project_admin", ... ]
             },
             ...
-        ]
-        
-### Associate a user to a project [POST]
-* Assumes only admin owners can associate and remove project members.
-+ Request (application/json)
+        ]       
 
-         {
-            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
-            "is_admin_owner": true
-         }
+## Project User [/project_users/{id}]
++ Parameters
+    + id (required, string, `af4e4ffc-cdf3-4673-a0b4-df187f6e8df0`) ... Globally unique `id` of the project user.
 
-+ Response 201 (application/json)
-
-         {
-            "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
-            "project": <project_object>,
-            "user": <user_object>,
-            "roles": ["admin_owner", ... ], // Project roles for member
-            "is_admin_owner": true, // Is member Admin Owner?
-            "file_permissions": [ "file_create", "file_download", ... ], // Inherited from project level for MVP  
-         }
-         
-
-## Project User [/project_users/{project_user_id}]
-<!--+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member to perform action with.
--->
 ### Remove a user from a project [DELETE]
 + Response 204
-
 
