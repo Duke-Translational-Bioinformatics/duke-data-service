@@ -101,7 +101,7 @@ will not be using the Duke single sign-on Web interface.
 The authorization roles resource defines the system operations a platfom user may perform.  Each authorization
 role is a collection of discrete systems permissions.  
 
-The following is a list of **Permissions** defined to date... this will expand once we move upon the MVP... 
+The following is a list of **Permissions** defined to date... this will expand once we move beyond the MVP... 
 
 | Permissions | Description |
 |:------------|:------------|
@@ -119,13 +119,12 @@ The following is a defined list of **Authorization Roles** to date...
 
 | Name | Description | Permission(s) |
 |:-----|:------------|:--------------|
-| System Admin | Can perform all system operations | \[*\] (i.e. ALL roles across ALL projects) |
+| System Admin | Can perform all system operations | \[*\] (i.e. ALL permissions across ALL projects) |
 | Platform User | Can create new projects (granted to all registered users for MVP) | create_project |
 | Project Admin | Modify project and manage membership  | update_project, delete_project, manage_project_member |
 | Viewer | Can download files | download_file |
 | Editor | Can create, update and delete files | create_file, update_file, delete_file |
 | Sharer | Can share files | share_file |
-
 
 ## Authorization Roles [/auth_roles]
 ### List all defined roles [GET]
@@ -136,32 +135,31 @@ The following is a defined list of **Authorization Roles** to date...
                 "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
                 "name": "System Admin",
                 "description": "Can perform all system operations",
-                "permissions": [ "*" ], // ALL roles across ALL projects...
-                "contexts": [ "global" ]
+                "permissions": [ "*" ], // ALL permissions across ALL projects...
+                "contexts": [ "global" ] // Defines context in which role is relevant
             },
             { 
-                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "id": "344ca0a7-aa9d-4195-a78b-674a12d33204",
                 "name": "Platform User",
                 "description": "Can create new projects (granted to all registered users for MVP)",
                 "permissions": [ "create_project" ], 
                 "contexts": [ "global" ]
             },
             { 
-                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "id": "b3b3f866-d8f8-4b94-95a3-0c421bab8437",
                 "name": "Viewer",
                 "description": "Can download files",
                 "permissions": [ "download_file" ],
                 "contexts": [ "project" ]
             },    
              { 
-                "id": "109875b3-1e5b-4012-9b86-a26d63fd92bc",
+                "id": "5c75e16d-07cc-49b8-b2bc-e14af4ad8852",
                 "name": "Editor",
                 "description": "Can create, update and delete files",
                 "permissions": [ "create_file", "update_file", "delete_file" ],
                 "contexts": [ "project" ]
             },        
-            
-    
+            ... 
         ]
 
 ## Group Current User
@@ -365,20 +363,4 @@ The project users resource represents platform users that are members of a proje
 ### Remove a user from a project [DELETE]
 + Response 204
 
-## Group Project File Permissions
-The project file permissions resource represents the set of file permissions that will be granted
-to all project members (i.e. project users or project groups).  The currently defined set includes:
-"file_create", "file_update", "file_download", "file_delete", "file_share", ...?
-
-## Project File Permissions collection [/projects/{project_id}/file_permissions]
-### Set the project level file permissions [POST]
-* Assumes only admin owners can set project level file permissions.
-
-+ Request (application/json)
-
-        "file_permissions": [ "file_create", "file_download", ... ]
-
-+ Response 201 (application/json)
-
-        <project_object>
 
