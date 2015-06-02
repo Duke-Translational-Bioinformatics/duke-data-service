@@ -1,0 +1,20 @@
+webapp:
+  build: .
+  environment:
+    - RAILS_ENV=development
+  volumes:
+    - .:/var/www/app
+  ports:
+    - 3000:3000
+server:
+  extends:
+    service: webapp
+  links:
+    - db:postgres.db.host
+db:
+  build: ./config/docker/db
+  environment:
+    - POSTGRES_USER=duke-data-service
+    - POSTGRES_PASSWORD=abc123
+    - POSTGRES_DEV_DB=duke-data-service_development
+    - POSTGRES_TEST_DB=duke-data-service_test

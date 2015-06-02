@@ -1,0 +1,30 @@
+# To make this file default docker-compose file run the following (or add ~/.bash_profile):
+# export COMPOSE_FILE=dc-dev.utils.yml
+server:
+  extends:
+    file: docker-compose.yml
+    service: webapp
+  links:
+    - db:postgres.db.host
+db:
+  extends:
+    file: docker-compose.yml
+    service: db
+rails:
+  image: dukedataservice_server
+  volumes_from:
+    - server
+  entrypoint: rails
+rake:
+  image: dukedataservice_server
+  volumes_from:
+    - server
+  entrypoint: rake
+rspec:
+  image: dukedataservice_server
+  environment:
+    - RAILS_ENV=test
+  volumes_from:
+    - server
+  entrypoint: rspec
+  command: spec
