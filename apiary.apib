@@ -26,13 +26,13 @@ interface (liken to Google API key provisioning model).
 
 User Authentication
 --------------
-Platform users will be required to authenticate by providing a `username/password` via client applications.  Upon 
-successful authentication, a JSON Web Token (JWT) will be generated.  The token must be included in 
-the request header for subsequent API calls that require authentication.
+Platform users will be required to authenticate via a trusted authentication provider/service. (i.e. Duke Shibb for MVP)
 
+* For MVP, JWT token will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
+service.  This token must be supplied in header for subsequent API calls.  
 * What will be our token expiration policy?  When will users/clients be required to re-authenticate?
-* For Duke MVP, JWT token will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
-service.  This token will be supplied in header for subsequent API calls.
+* Assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into 
+the platforms user data store.
 
 Collection Pagination
 --------------
@@ -82,6 +82,7 @@ Define here how client errors will be handled and represented.
 ## Group Authentication
 Authentication resource provides the means to verify identity of a platform user.
 
+<!--
 ## Authenticate [/authenticate/user_token]
 ### Get a user authentication token - i.e. JSON Web Token [POST]
 * If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid 
@@ -100,6 +101,7 @@ will not be using the Duke single sign-on Web interface.
 + Response 201 (application/json)
 
         { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
+-->
         
 ## Group Authorization Roles
 The authorization roles resource defines the system operations a platfom user may perform.  Each authorization
@@ -241,7 +243,7 @@ A project resource is a container for storing, organizing, retrieving and sharin
 
 ## Projects collection [/projects]
 ### Create a project [POST]
-* Assume platform user who creates project is assigned the Project Admin ("project_admin") role.
+* Assumes platform user who creates project is assigned the Project Admin ("project_admin") role.
 
 + Request (application/json)
 
@@ -294,6 +296,9 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "principal_investigator": <user_object>,
+            "current_user": {
+                "auth_roles": [ "project_admin", ... ]
+            },
             "audit": <audit_object>
         }
         
