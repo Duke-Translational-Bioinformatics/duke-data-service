@@ -16,6 +16,9 @@ gem 'tilt'
 gem 'jquery-rails'
 gem 'turbolinks'
 
+# circle-ci metadata formatter
+gem 'rspec_junit_formatter', '0.2.2'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
