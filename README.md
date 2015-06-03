@@ -18,8 +18,11 @@ http://docs.dukedataservices.apiary.io
 ### waffle.io
 [![Stories in Ready](https://badge.waffle.io/Duke-Translational-Bioinformatics/duke-data-service.png?label=ready&title=Ready)](https://waffle.io/Duke-Translational-Bioinformatics/duke-data-service)
 
-### circleci
+### circleci production 
 [![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)
+
+### circleci development
+[![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service.png?circle-token=:circle-token)](https://circleci.com/)
 
 ### converse
 [![Join the chat at https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
