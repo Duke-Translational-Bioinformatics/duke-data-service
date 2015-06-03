@@ -15,16 +15,22 @@ rails:
   volumes_from:
     - server
   entrypoint: rails
+  links:
+    - db:postgres.db.host  
 rake:
   image: dukedataservice_server
   volumes_from:
     - server
   entrypoint: rake
+  links:
+    - db:postgres.db.host
 rspec:
   image: dukedataservice_server
   environment:
     - RAILS_ENV=test
   volumes_from:
     - server
+  links:
+    - db:postgres.db.host
   entrypoint: rspec
   command: spec
