@@ -16,13 +16,13 @@ WORKDIR /root/installs
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "libyaml", "libyaml-devel"]
 ENV LATEST_RUBY ruby-2.2.2
 ENV LATEST_RUBY_URL http://cache.ruby-lang.org/pub/ruby/2.2/${LATEST_RUBY}.tar.gz
-ADD install_ruby.sh /root/installs/install_ruby.sh
+ADD docker/includes/install_ruby.sh /root/installs/install_ruby.sh
 RUN ["chmod", "777", "/root/installs/install_ruby.sh"]
 RUN ["/root/installs/install_ruby.sh"]
 RUN ["/usr/local/bin/gem", "install", "bundler"]
 # ssl certs
-ADD install_ssl_cert.sh /root/installs/install_ssl_cert.sh
-ADD cert_config /root/installs/cert_config
+ADD docker/includes/install_ssl_cert.sh /root/installs/install_ssl_cert.sh
+ADD docker/includes/cert_config /root/installs/cert_config
 RUN ["chmod", "u+x", "/root/installs/install_ssl_cert.sh"]
 RUN ["/root/installs/install_ssl_cert.sh"]
 
