@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '2.2.2'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.1'
 # Use postgresql as the database for Active Record
@@ -18,6 +20,9 @@ gem 'turbolinks'
 
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'
+
+#heroku requires this
+gem 'rails_12factor', group: :production
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
