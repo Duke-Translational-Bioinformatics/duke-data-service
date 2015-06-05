@@ -18,6 +18,9 @@ gem 'tilt'
 gem 'jquery-rails'
 gem 'turbolinks'
 
+# use figaro to set heroku environment variables for secrets
+gem 'figaro'
+
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'
 

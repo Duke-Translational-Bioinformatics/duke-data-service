@@ -82,11 +82,4 @@ test:
 #
 production:
   <<: *default
-  adapter: postgresql
-  encoding: unicode
-  # For details on connection pooling, see rails configuration guide
-  # http://guides.rubyonrails.org/configuring.html#database-pooling
-  pool: 5
-  database: <%= ENV['DUKE-DATA-SERVICE_DATABASE_DB'] %>
-  username: <%= ENV['DUKE-DATA-SERVICE_DATABASE_USER'] %>
-  password: <%= ENV['DUKE-DATA-SERVICE_DATABASE_PASSWORD'] %>
+  database: <%= ENV['DUKE_DATA_SERVICE_DATABASE_DB'] %>

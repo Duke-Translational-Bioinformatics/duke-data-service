@@ -11,6 +11,6 @@
 /log/*
 !/log/.keep
 /tmp
-config/database.yml
-config/secrets.yml
 config/keystore
+# Ignore application configuration
+/config/application.yml
