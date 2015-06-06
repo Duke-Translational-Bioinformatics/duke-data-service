@@ -201,6 +201,9 @@ GEM
       coffee-rails
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    uglifier (2.7.1)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -237,6 +240,7 @@ DEPENDENCIES
   thin
   tilt
   turbolinks
+  uglifier
   web-console (~> 2.0)
 
 BUNDLED WITH
