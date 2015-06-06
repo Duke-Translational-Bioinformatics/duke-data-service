@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.2.2'
+ruby "2.2.2"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.1'
@@ -24,9 +24,6 @@ gem 'figaro'
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'
 
-#heroku requires this
-gem 'rails_12factor', group: :production
-
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
@@ -45,3 +42,6 @@ group :development, :test do
   gem 'shoulda-matchers', require: false
   gem 'spring-commands-rspec', group: :development
 end
+
+#heroku requires this
+gem 'rails_12factor', group: :production
