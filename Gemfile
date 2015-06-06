@@ -4,8 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.1'
 # Use postgresql as the database for Active Record
 gem 'pg'
-# Use thin as the webserver in development
-gem 'thin'
+# Use puma as the webserver in development
+gem 'puma'
 
 gem 'jwt'
 gem 'grape'
