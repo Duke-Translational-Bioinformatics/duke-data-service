@@ -26,6 +26,14 @@ ADD docker/includes/cert_config /root/installs/cert_config
 RUN ["chmod", "u+x", "/root/installs/install_ssl_cert.sh"]
 RUN ["/root/installs/install_ssl_cert.sh"]
 
+# Heroku integration
+RUN wget -qO- https://toolbelt.heroku.com/install.sh | sed 's/sudo //g' | sh
+RUN ln -s /usr/local/heroku/bin/heroku /usr/local/bin/heroku
+# user or deployments
+RUN ["/usr/sbin/userdel", "ftp"]
+RUN ["/usr/sbin/groupadd", "-g", "50", "staff"]
+RUN ["/usr/sbin/useradd", "-N", "-u", "1000", "-g", "50", "deployer"]
+
 #Postgresql client
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "postgresql","postgresql-devel"]
 
@@ -41,4 +49,4 @@ RUN ["bundle", "install"]
 
 # run the app by defualt
 EXPOSE 3000
-CMD ["thin", "start", "--ssl", "--ssl-disable-verify", "--ssl-key-file", "/etc/pki/tls/private/localhost.key", "--ssl-cert-file", "/etc/pki/tls/certs/localhost.crt"]
+CMD ["puma"]

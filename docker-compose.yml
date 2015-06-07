@@ -2,6 +2,7 @@ webapp:
   build: .
   environment:
     - RAILS_ENV=development
+    - LOCALDEV=true
   volumes:
     - .:/var/www/app
   ports:
