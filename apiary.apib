@@ -194,7 +194,7 @@ A member role resource represents a functional responsibilty (i.e. title) that m
 Once the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration 
 with that platforms Web services API. 
 
-**Member Roles** defined to date:
+**Member Roles defined to date:**
 
 | Role | Name | Description |
 |:-----|:-----|:------------|
@@ -429,6 +429,7 @@ A project resource is a container for storing, organizing, retrieving and sharin
 **Permissions required:** delete_project (for project)
 
 **Business Rules:**
+
 * Logically deletes project from the meta-data (i.e. sets "is_deleted": true).  For the MVP, the files
 associated to the project are not deleted from their physical storage location. 
 + Response 204 
@@ -446,7 +447,7 @@ The project permissions resource represents the authorization roles (i.e. permis
 
         {
             "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
-            "auth_roles": [ "file_editor", ... ]  // Authorization roles to grant user.  To revoke all permissions `"auth_roles": [ ]`.
+            "auth_roles": [ "file_editor", ... ]  // Authorization roles to grant user.  To revoke all permissions "auth_roles": [ ].
         }
 
 + Response 200 (application/json)
@@ -487,7 +488,7 @@ The project members resource represents the functional roles an individual (i.e.
 
         {
             "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
-            "member_roles": [ "principal_investigator", ... ]  // Member roles assigned to user.  To remove all assigned roles `"member_roles": [ ]`.
+            "member_roles": [ "principal_investigator", ... ]  // Member roles assigned to user.  To remove all assigned roles "member_roles": [ ].
         }
 
 + Response 200 (application/json)
