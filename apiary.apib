@@ -21,7 +21,7 @@ response header, among others.
 Client API Key
 --------------
 We will allow authorized users to generate a secret API key via the Web interface 
-- liken to Google API key provisioning model.  This will not be part of the initial release (i.e. MVP).  
+\- liken to Google API key provisioning model.  This will not be part of the initial release (i.e. MVP).  
 
 User Authentication
 --------------
@@ -105,7 +105,7 @@ will not be using the Duke single sign-on Web interface.
 ## Group Authorization Roles
 An authorization role resource represents a set of discrete permissions that may be granted to a user.  
 
-**Authorization Roles** defined to date:
+**Authorization Roles defined to date:**
 
 | Role | Name | Description | Permission(s) |
 |:-----|:-----|:------------|:--------------|
@@ -116,7 +116,7 @@ An authorization role resource represents a set of discrete permissions that may
 | **file_downloader** | File Downloader | Can download files | view_project, download_file |
 | **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
 
-**Permissions** defined to date:
+**Permissions defined to date:**
 
 | Permission | Description |
 |:------------|:------------|
@@ -153,11 +153,11 @@ An authorization role resource represents a set of discrete permissions that may
                 "contexts": [ "global" ],
                 "is_deprecated": false
             },
-            { 
+            {
                 "id": "project_admin",
                 "name": "Project Admin",
                 "description": "Can update project details, delete project, grant/revoke permissions, manage members and perform all file operations",
-                "permissions": [ "update_project", "delete_project", "manage_project_permissions", manage_project_members", "view_project", "download_file", "create_file", "update_file", "delete_file" ],
+                "permissions": [ "update_project", "delete_project", "manage_project_permissions", "manage_project_members", "view_project", "download_file", "create_file", "update_file", "delete_file" ],
                 "contexts": [ "project_user" ],
                 "is_deprecated": false
             }, 
@@ -173,7 +173,7 @@ An authorization role resource represents a set of discrete permissions that may
                 "id": "file_downloader",
                 "name": "File Downloader",
                 "description": "Can download files",
-                "permissions": [ "view_project", download_file" ],
+                "permissions": [ "view_project", "download_file" ],
                 "contexts": [ "project_user" ],
                 "is_deprecated": false
             },    
@@ -230,10 +230,11 @@ The current user resource represents the currently authenticated user.
 ## Current User [/current_user]
 ### Create/register user [POST]
 **Permissions required:** none
+
 **Business Rules:**
-1. Created user is granted the "platform_user" role by default. 
-2. The username defaults to auth_provider.uid, but can be overriden in UI.
-3. Unique constraints: username, email, (auth_provider.source + auth_provider.uid)
+* Created user is granted the "platform_user" role by default. 
+* The username defaults to auth_provider.uid, but can be overriden in UI.
+* Unique fields: username, email, (auth_provider.source + auth_provider.uid)
 + Request (application/json)
 
         {
@@ -328,9 +329,10 @@ A project resource is a container for storing, organizing, retrieving and sharin
 ## Projects collection [/projects]
 ### Create a project [POST]
 **Permissions required:** create_project
+
 **Business Rules:**
-1. User who creates project is granted "project_admin" role by default. 
-2. Unique constraints: name
+* User who creates project is granted "project_admin" role by default. 
+* Unique fields: name
 + Request (application/json)
 
         {
@@ -346,7 +348,6 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, // Has the project been logically deleted from meta data?
-            "principal_investigator": <user_object>,
             "current_user": {
                 "auth_roles": [ <auth_role_object>, ... ], // Auth roles for currently authenticated user 
                 "permissions": [ "update_project", "delete_project", ... ], // Permissions (ACL) for currently authenticated user 
@@ -357,9 +358,10 @@ A project resource is a container for storing, organizing, retrieving and sharin
 
 ### List all projects [GET]
 **Permissions required:** authenticated
+
 **Business Rules:**
-1. Lists projects for which the current user has been granted the "view_project" permission.
-2. Projects that have been logically deleted (i.e. "is_deleted": true) are not included in this listing.
+* Lists projects for which the current user has been granted the "view_project" permission.
+* Projects that have been logically deleted (i.e. "is_deleted": true) are not included in this listing.
 + Response 200 (application/json)
 
         "results": [
@@ -368,7 +370,6 @@ A project resource is a container for storing, organizing, retrieving and sharin
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false, // Has the project been logically deleted from meta-data?
-                "principal_investigator": <user_object>,
                 "current_user": {
                     "auth_roles": [ <auth_role_object>, ... ], // Auth roles for currently authenticated user 
                     "permissions": [ "update_project", "delete_project", ... ], // Permissions (ACL) for currently authenticated user 
@@ -392,7 +393,6 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
-            "principal_investigator": <user_object>,
             "current_user": {
                 "auth_roles": [ <auth_role_object>, ... ],  
                 "permissions": [ "update_project", "delete_project", ... ], 
@@ -417,7 +417,6 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
-            "principal_investigator": <user_object>,
             "current_user": {
                 "auth_roles": [ <auth_role_object>, ... ], 
                 "permissions": [ "update_project", "delete_project", ... ],  
@@ -428,8 +427,9 @@ A project resource is a container for storing, organizing, retrieving and sharin
         
 ### Delete a project [DELETE]
 **Permissions required:** delete_project (for project)
+
 **Business Rules:**
-1. Logically deletes project from the meta-data (i.e. sets "is_deleted": true).  For the MVP, the files
+* Logically deletes project from the meta-data (i.e. sets "is_deleted": true).  For the MVP, the files
 associated to the project are not deleted from their physical storage location. 
 + Response 204 
 
