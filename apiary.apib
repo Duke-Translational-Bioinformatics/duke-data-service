@@ -52,7 +52,7 @@ may have the following structure to facilitate client pagination:
         ]
     }
   
-**Example payloads herein for resource specific collections will only include `"results": [ ]` structure.**
+**Example payloads herein for resource specific collections will only include** `"results": [ ]` **structure.**
 
 Audit Object
 --------------
@@ -78,7 +78,7 @@ here and will be referenced as `<audit_object>` in resource specific payloads.
 
 Client Errors
 ----------------
-**Need to define here how client errors will be handled and represented**
+**Need to define here how client errors will be handled and represented.**
 
 <!-- DEPRECATED
 ## Group Authentication
@@ -232,7 +232,7 @@ The current user represents the currently authenticated user.
 **Business Rules:**
 * Created user is granted the "platform\_user" auth role by default. 
 * The username defaults to auth\_provider.uid, but can be overriden during user registration.
-* Unique fields: `username`, `email`, `(auth\_provider.source + auth\_provider.uid)`
+* Unique fields: `username`, `email`, `(auth_provider.source + auth_provider.uid)`
 + Request (application/json)
 
         {
@@ -260,7 +260,7 @@ The current user represents the currently authenticated user.
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
-            "auth_roles": [ <auth\_role\_object>, ... ], // Global auth roles for current user
+            "auth_roles": [ <auth_role_object>, ... ], // Global auth roles for current user
             "permissions": [ "create_project", ... ], // Global permissions (ACL) for current user
             "auth_provider": {
                 "source": "duke_shibboleth",
@@ -347,8 +347,8 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "is_deleted": false, // Has the project been logically deleted from meta-data?
             "current_user": {
                 "member_roles": [ ], // Project member roles for current user
-                "auth_roles": [ <auth\_role\_object>, ... ], // Project auth roles for current user 
-                "permissions": [ "view\_project", "update_project", ... ] // Project permissions (ACL) for current user 
+                "auth_roles": [ <auth_role_object>, ... ], // Project auth roles for current user 
+                "permissions": [ "view_project", "update_project", ... ] // Project permissions (ACL) for current user 
             },
             "audit": <audit_object>
         }
@@ -358,7 +358,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 
 **Business Rules:**
 * Lists projects for which the current user has the "view\_project" permission.
-* Projects that have been logically deleted (i.e. "is_deleted": true) are not included in this listing.
+* Projects that have been logically deleted (i.e. `"is_deleted": true`) are not included in this listing.
 + Response 200 (application/json)
 
         "results": [
@@ -416,8 +416,8 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "is_deleted": false, 
             "current_user": {
                 "member_roles": [ ], 
-                "auth_roles": [ <auth\_role_object>, ... ], 
-                "permissions": [ "view\_project", "update_project", ... ]  
+                "auth_roles": [ <auth_role_object>, ... ], 
+                "permissions": [ "view_project", "update_project", ... ]  
             },
             "audit": <audit_object>
         }
@@ -454,8 +454,8 @@ A project member represents an individual (i.e. user) that has an affiliation to
             "user": <user_object>,
             "project": <project_object>,
             "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth\_role\_object>, ... ],
-            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+            "auth_roles": [ <auth_role_object>, ... ],
+            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
         }
 
 ### List project members [GET]
@@ -468,8 +468,8 @@ A project member represents an individual (i.e. user) that has an affiliation to
                 "user": <user_object>,
                 "project": <project_object>,
                 "member_roles": [ <member_role_object>, ... ],
-                "auth_roles": [ <auth\_role\_object>, ... ],
-                "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+                "auth_roles": [ <auth_role_object>, ... ],
+                "permissions": [ "view_project", ... ] // Permissions (ACL) for member
             },
             ...
         ]  
@@ -486,11 +486,6 @@ A project member represents an individual (i.e. user) that has an affiliation to
 the only "project_admin" designated for the project.
 + Response 204 
 
-<!-- DEPRECATED
-## Group Member Permissions
-A member permission represents an authorization role (i.e. set of permissions) granted to a project member.
--->
-
 ## Member Roles collection [/project_member/{id}/roles]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
@@ -500,20 +495,18 @@ A member permission represents an authorization role (i.e. set of permissions) g
 + Request (application/json)
 
         {
-            "member_roles": [ "principal_investigator", ... ]  // Member roles to assign.  To remove all pass [ ].
+            "member_roles": [ "principal_investigator", ... ]  // Member roles to assign; to remove all pass [ ]
         }
 
-**To remove all member roles `"member_roles": [ ]`**
-
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
         {
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
             "user": <user_object>,
             "project": <project_object>,
             "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth\_role\_object>, ... ],
-            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+            "auth_roles": [ <auth_role_object>, ... ],
+            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
         }
 
 ## Member Permissions collection [/project_member/{id}/permissions]
@@ -529,10 +522,8 @@ they are the only "project_admin" designated for the project.
 + Request (application/json)
 
         {
-            "auth_roles": [ "project_admin", ... ]  // Auth roles to grant member.  To revoke all pass [ ].
+            "auth_roles": [ "project_admin", ... ]  // Auth roles to grant member; to revoke all pass [ ]
         }
-
-**To revoke all project permissions `"auth_roles": [ ]`**
 
 + Response 201 (application/json)
 
@@ -541,62 +532,6 @@ they are the only "project_admin" designated for the project.
             "user": <user_object>,
             "project": <project_object>,
             "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth\_role\_object>, ... ],
-            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+            "auth_roles": [ <auth_role_object>, ... ],
+            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
         }
-
-<!-- DEPRECATED
-### List all project permissions [GET]
-**Permissions required:** view_project (for project)
-+ Response 200 (application/json)
-
-        "results": [
-             {
-                "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
-                "project": <project_object>,
-                "user": <user_object>,
-                "auth_roles": [ <auth_role_object>, ... ],
-                "permissions": [ "view_project", "download_file", "create_file", ... ]
-            },
-            ...
-        ]       
-
-## Group Project Members
-The project members resource represents the functional roles an individual (i.e. user) plays in the context of a project.
-
-## Project Members collection [/projects/{id}/members]
-+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
-
-### Assign/remove project members [PUT]
-**Permissions required:** manage_project_member (for project)
-+ Request (application/json)
-
-        {
-            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
-            "member_roles": [ "principal_investigator", ... ]  // Member roles assigned to user.  To remove all assigned roles "member_roles": [ ].
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
-            "project": <project_object>,
-            "user": <user_object>,
-            "member_roles": [ <member_role_object>, ... ]
-        }
-
-### List project members [GET]
-**Permissions required:** view_project (for project) 
-+ Response 200 (application/json)
-
-        "results": [
-             {
-                "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
-                "project": <project_object>,
-                "user": <user_object>,
-                "member_roles": [ <member_role_object>, ... ]
-            },
-            ...
-        ]       
--->
