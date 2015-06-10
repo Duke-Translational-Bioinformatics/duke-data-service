@@ -490,7 +490,7 @@ the only "project_admin" designated for the project.
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
 
-### Assign/remove organizational roles for project member [PUT]
+### Set organizational roles for project member [PUT]
 **Permissions required:** manage\_project\_members (for project)
 + Request (application/json)
 
@@ -513,7 +513,7 @@ the only "project_admin" designated for the project.
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
 
-### Grant/revoke permissions for project member [PUT]
+### Set permissions for project member [PUT]
 **Permissions required:** manage\_project\_members (for project)
 
 **Business Rules:**
@@ -525,7 +525,7 @@ they are the only "project_admin" designated for the project.
             "auth_roles": [ "project_admin", ... ]  // Auth roles to grant member; to revoke all pass [ ]
         }
 
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
         {
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
