@@ -20,16 +20,17 @@ response header, among others.
 
 Client API Key
 --------------
-We will allow authorized users to generate a secret API key via the Web interface 
-\- liken to Google API key provisioning model.  This will not be part of the initial release (i.e. MVP).  
+Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning 
+model.  This will not be part of the initial product release (i.e. MVP).  
 
 User Authentication
 --------------
 Users will be required to authenticate via a trusted authentication provider. (i.e. Duke Shibboleth for MVP)
 
-* For MVP, a token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
-service.  This token must be supplied in header for subsequent RESTful API calls.  
-* What will be our token expiration policy?  When will users/clients be required to re-authenticate?
+**Some design assumptions for the MVP:**
+* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
+service.  This token must be supplied in header for subsequent API calls.  
+* Tokens will have an expiration policy of X hours/days.
 * When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will 
 be created in the platforms local user data store.
 
@@ -37,7 +38,7 @@ Collection Pagination
 --------------
 For endpoints that return a collection of resources/objects, the number of objects returned can be 
 controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads 
-will have the following structure to facilitate client pagination:
+may have the following structure to facilitate client pagination:
 
     {
         "count": 100,
@@ -45,18 +46,17 @@ will have the following structure to facilitate client pagination:
         "next": "https://data-services.duke.edu/projects?page=3", 
         "previous": "https://data-services.duke.edu/projects?page=1", 
         "results": [
-            { <resource_object> },
-            { <resource_object> },
+            <resource_object>,
+            <resource_object>,
             ...
         ]
     }
-
-* This structure is only an example, may change based on specific plug-in used for pagination.   
-* Example payloads herein for resource specific collections will only include `"results": [ ]` structure.
+  
+**Example payloads herein for resource specific collections will only include `"results": [ ]` structure.**
 
 Audit Object
 --------------
-Some resource payloads may include a composite audit object. An example structure of that object is represented 
+Resource payloads may include a composite audit object. An example structure of that object is represented 
 here and will be referenced as `<audit_object>` in resource specific payloads.
         
     {
@@ -76,9 +76,9 @@ here and will be referenced as `<audit_object>` in resource specific payloads.
         "deleted_by": null
     }
 
-Clients Errors
+Client Errors
 ----------------
-Need to define here how client errors will be handled and represented.
+**Need to define here how client errors will be handled and represented**
 
 <!-- DEPRECATED
 ## Group Authentication
@@ -103,33 +103,32 @@ will not be using the Duke single sign-on Web interface.
 -->
         
 ## Group Authorization Roles
-An authorization role resource represents a set of discrete permissions that may be granted to a user.  
+An authorization role represents a set of discrete permissions that may be granted to a user.  
 
 **Authorization Roles defined to date:**
 
 | Role | Name | Description | Permission(s) |
 |:-----|:-----|:------------|:--------------|
-| **system_admin** | System Admin | Can perform all system operations | \* (i.e. ALL permissions across ALL projects) |
-| **platform_user** | Platform User | Can create new projects - granted to all registered users | create_project |
-| **project_admin** | Project Admin | Can update project details, delete project, grant/revoke permissions, manage members and perform all file operations | update_project, delete_project, manage_project_permissions, manage_project_members, view_project, download_file, create_file, update_file, delete_file |
-| **project_viewer** | Project Viewer | Can view project and file meta-data | view_project |
-| **file_downloader** | File Downloader | Can download files | view_project, download_file |
-| **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
+| **system\_admin** | System Admin | Can perform all system operations | \* (i.e. ALL permissions across ALL projects) |
+| **platform\_user** | Platform User | Can create new projects | create\_project |
+| **project\_admin** | Project Admin | Can update project details, delete project, manage project members and perform all file operations | view\_project, update\_project, delete\_project, manage\_project\_members, download\_file, create\_file, update\_file, delete\_file |
+| **project\_viewer** | Project Viewer | Can only view project and file meta-data | view\_project |
+| **file\_downloader** | File Downloader | Can download files | view\_project, download\_file |
+| **file\_editor** | File Editor | Can view, download, create, update and delete files | view\_project, download\_file, create\_file, update\_file, delete\_file |
 
 **Permissions defined to date:**
 
 | Permission | Description |
 |:------------|:------------|
-| **create_project** | Can create new project |
-| **update_project** | Can update project header details |
-| **delete_project** | Can delete project |
-| **manage_project_permissions** | Can grant/revoke permissions |
-| **manage_project_members** | Can assign/remove project members |
-| **view_project** | Can view project and file meta-data |
-| **download_file** | Can download file |
-| **create_file** | Can upload new file |
-| **update_file** | Can upload new version of existing file |
-| **delete_file** | Can delete a file |
+| **view\_project** | Can view project and file meta-data |
+| **create\_project** | Can create new project |
+| **update\_project** | Can update project header details |
+| **delete\_project** | Can delete project |
+| **manage\_project_members** | Can associate/remove members and grant/revoke permissions |
+| **download\_file** | Can download file |
+| **create\_file** | Can upload new file |
+| **update\_file** | Can upload new version of existing file |
+| **delete\_file** | Can delete a file |
 
 ## Authorization Roles [/auth_roles]
 ### List authorization roles [GET]
@@ -142,13 +141,13 @@ An authorization role resource represents a set of discrete permissions that may
                 "name": "System Admin",
                 "description": "Can perform all system operations",
                 "permissions": [ "*" ], // ALL permissions across ALL projects...
-                "contexts": [ "global" ], // Contexts in which role is relevant (i.e. "global", "project_user", etc.),
-                "is_deprecated": false // If deprecated, cannot grant to user, but show for existing users who have this role
+                "contexts": [ "global" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.),
+                "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
             },
             { 
                 "id": "platform_user",
                 "name": "Platform User",
-                "description": "Can create new projects - granted to all registered users",
+                "description": "Can create new projects", // Granted to all registered users
                 "permissions": [ "create_project" ], 
                 "contexts": [ "global" ],
                 "is_deprecated": false
@@ -156,9 +155,9 @@ An authorization role resource represents a set of discrete permissions that may
             {
                 "id": "project_admin",
                 "name": "Project Admin",
-                "description": "Can update project details, delete project, grant/revoke permissions, manage members and perform all file operations",
-                "permissions": [ "update_project", "delete_project", "manage_project_permissions", "manage_project_members", "view_project", "download_file", "create_file", "update_file", "delete_file" ],
-                "contexts": [ "project_user" ],
+                "description": "Can update project details, delete project, manage members and perform all file operations",
+                "permissions": [ "view_project", "update_project", "delete_project", "manage_project_members", "download_file", "create_file", "update_file", "delete_file" ],
+                "contexts": [ "project_member" ],
                 "is_deprecated": false
             }, 
             { 
@@ -166,7 +165,7 @@ An authorization role resource represents a set of discrete permissions that may
                 "name": "File Viewer",
                 "description": "Can view project and file meta-data",
                 "permissions": [ "view_project" ],
-                "contexts": [ "project_user" ],
+                "contexts": [ "project_member" ],
                 "is_deprecated": false
             },       
             { 
@@ -174,7 +173,7 @@ An authorization role resource represents a set of discrete permissions that may
                 "name": "File Downloader",
                 "description": "Can download files",
                 "permissions": [ "view_project", "download_file" ],
-                "contexts": [ "project_user" ],
+                "contexts": [ "project_member" ],
                 "is_deprecated": false
             },    
             { 
@@ -182,24 +181,23 @@ An authorization role resource represents a set of discrete permissions that may
                 "name": "File Editor",
                 "description": "Can view, create, update, delete and download files",
                 "permissions": [ "view_project", "download_file", "create_file", "update_file", "delete_file" ],
-                "contexts": [ "project_user" ],
+                "contexts": [ "project_member" ],
                 "is_deprecated": false
             }
         ]
 
 ## Group Member Roles
-A member role resource represents a functional responsibilty (i.e. title) that may be assigned to an individual 
-(i.e. user).  These roles have no relationship to authorization roles/permissions.
+A member role represents an organizational responsibility that an individual (i.e. user) may assume.  These roles have no relationship to authorization roles.
 
-Once the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration 
+When the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration 
 with that platforms Web services API. 
 
 **Member Roles defined to date:**
 
 | Role | Name | Description |
 |:-----|:-----|:------------|
-| **principal_investigator** | Principal Investigator | Lead investigator for the research project |
-| **research_coordinator** | Research Coordinator | Coordinator for the research project |
+| **principal\_investigator** | Principal Investigator | Lead investigator for the research project |
+| **research\_coordinator** | Research Coordinator | Coordinator for the research project |
 
 ## Member Roles [/member_roles]
 ### List member roles [GET]
@@ -211,30 +209,30 @@ with that platforms Web services API.
                 "id": "principal_investigator",
                 "name": "Principal Investigator",
                 "description": "Lead investigator for the research project",
-                "contexts": [ "project_user" ], // Contexts in which role is relevant (i.e. "global", "project_user", etc.)
+                "contexts": [ "project_member" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.)
                 "is_deprecated": false
             },
             { 
                 "id": "research_coordinator",
                 "name": "Research Coordinator",
                 "description": "Coordinator for the research project",
-                "contexts": [ "project_user" ],
+                "contexts": [ "project_member" ],
                 "is_deprecated": false
             },
             ...
         ]
 
 ## Group Current User
-The current user resource represents the currently authenticated user.  
+The current user represents the currently authenticated user.  
 
 ## Current User [/current_user]
-### Create/register user [POST]
+### Create user [POST]
 **Permissions required:** none
 
 **Business Rules:**
-* Created user is granted the "platform_user" role by default. 
-* The username defaults to auth_provider.uid, but can be overriden in UI.
-* Unique fields: username, email, (auth_provider.source + auth_provider.uid)
+* Created user is granted the "platform\_user" auth role by default. 
+* The username defaults to auth\_provider.uid, but can be overriden during user registration.
+* Unique fields: `username`, `email`, `(auth\_provider.source + auth\_provider.uid)`
 + Request (application/json)
 
         {
@@ -244,8 +242,8 @@ The current user resource represents the currently authenticated user.
             "email": "mrgardner01@duke.edu", 
             "auth_provider": {
                 "source": "duke_shibboleth", 
-                "uid": "gardner100", // User ID in context of this auth provider
-                "properties": { // Other properties from auth provider (i.e. Duke Shibboleth)
+                "uid": "gardner100", // Unique user ID in context of this auth provider
+                "properties": { // Other user properties from auth provider (i.e. Duke Shibboleth)
                     <key>: <value>, 
                     <key>: <value>,
                     ...
@@ -262,8 +260,8 @@ The current user resource represents the currently authenticated user.
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
-            "auth_roles": [ <auth_role_object>, ... ], // Global roles for currently authenticated user
-            "permissions": [ 'create_project', ... ], // Current users global permissions (ACL). The alias permission `*` implies all permissions across all projects. (i.e. "system_admin" role)
+            "auth_roles": [ <auth\_role\_object>, ... ], // Global auth roles for current user
+            "permissions": [ "create_project", ... ], // Global permissions (ACL) for current user
             "auth_provider": {
                 "source": "duke_shibboleth",
                 "uid": "gardner100",
@@ -277,7 +275,7 @@ The current user resource represents the currently authenticated user.
             "audit": <audit_object>
         }
 
-### View current users details [GET]
+### View current user details [GET]
 **Permissions required:** authenticated
 + Response 200 (application/json)
 
@@ -289,7 +287,7 @@ The current user resource represents the currently authenticated user.
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
             "auth_roles": [ <auth_role_object>, ... ], 
-            "permissions": [ 'create_project', ... ], 
+            "permissions": [ "create_project", ... ], 
             "auth_provider": {
                 "source": "duke_shibboleth", 
                 "uid": "gardner100",
@@ -304,7 +302,7 @@ The current user resource represents the currently authenticated user.
         }
 
 ## Group Users
-A user resource represents a registered user.
+A user represents a registered user.
 
 ## Users collection [/users]
 ### List registered users [GET]
@@ -324,15 +322,15 @@ A user resource represents a registered user.
         ]
 
 ## Group Projects
-A project resource is a container for storing, organizing, retrieving and sharing research data files.
+A project is a container for storing, organizing, retrieving and sharing research data files.
 
 ## Projects collection [/projects]
 ### Create a project [POST]
 **Permissions required:** create_project
 
 **Business Rules:**
-* User who creates project is granted "project_admin" role by default. 
-* Unique fields: name
+* User who created project is granted "project\_admin" auth role by default. 
+* Unique fields: `name`
 + Request (application/json)
 
         {
@@ -341,17 +339,16 @@ A project resource is a container for storing, organizing, retrieving and sharin
         }
 
 + Response 201 (application/json)
-
-        
+    
         {
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false, // Has the project been logically deleted from meta data?
+            "is_deleted": false, // Has the project been logically deleted from meta-data?
             "current_user": {
-                "auth_roles": [ <auth_role_object>, ... ], // Auth roles for currently authenticated user 
-                "permissions": [ "update_project", "delete_project", ... ], // Permissions (ACL) for currently authenticated user 
-                "member_roles": [ ] // Member roles for currently authenticated user
+                "member_roles": [ ], // Project member roles for current user
+                "auth_roles": [ <auth\_role\_object>, ... ], // Project auth roles for current user 
+                "permissions": [ "view\_project", "update_project", ... ] // Project permissions (ACL) for current user 
             },
             "audit": <audit_object>
         }
@@ -360,7 +357,7 @@ A project resource is a container for storing, organizing, retrieving and sharin
 **Permissions required:** authenticated
 
 **Business Rules:**
-* Lists projects for which the current user has been granted the "view_project" permission.
+* Lists projects for which the current user has the "view\_project" permission.
 * Projects that have been logically deleted (i.e. "is_deleted": true) are not included in this listing.
 + Response 200 (application/json)
 
@@ -369,11 +366,11 @@ A project resource is a container for storing, organizing, retrieving and sharin
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
-                "is_deleted": false, // Has the project been logically deleted from meta-data?
+                "is_deleted": false, 
                 "current_user": {
-                    "auth_roles": [ <auth_role_object>, ... ], // Auth roles for currently authenticated user 
-                    "permissions": [ "update_project", "delete_project", ... ], // Permissions (ACL) for currently authenticated user 
-                    "member_roles": [ ] // Member roles for currently authenticated user
+                    "member_roles": [ ], 
+                    "auth_roles": [ <auth_role_object>, ... ], 
+                    "permissions": [ "view_project", "update_project", ... ]  
                 },
                 "audit": <audit_object>
             },
@@ -394,9 +391,9 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
             "current_user": {
-                "auth_roles": [ <auth_role_object>, ... ],  
-                "permissions": [ "update_project", "delete_project", ... ], 
-                "member_roles": [ ] 
+                "member_roles": [ ], 
+                "auth_roles": [ <auth_role_object>, ... ], 
+                "permissions": [ "view_project", "update_project", ... ]  
             },
             "audit": <audit_object>
         }
@@ -418,9 +415,9 @@ A project resource is a container for storing, organizing, retrieving and sharin
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
             "current_user": {
-                "auth_roles": [ <auth_role_object>, ... ], 
-                "permissions": [ "update_project", "delete_project", ... ],  
-                "member_roles": [ ] 
+                "member_roles": [ ], 
+                "auth_roles": [ <auth\_role_object>, ... ], 
+                "permissions": [ "view\_project", "update_project", ... ]  
             },
             "audit": <audit_object>
         }
@@ -429,37 +426,126 @@ A project resource is a container for storing, organizing, retrieving and sharin
 **Permissions required:** delete_project (for project)
 
 **Business Rules:**
-
-* Logically deletes project from the meta-data (i.e. sets "is_deleted": true).  For the MVP, the files
+* Logically deletes project from the meta-data (i.e. sets `"is\_deleted": true`).  For the MVP, the files
 associated to the project are not deleted from their physical storage location. 
 + Response 204 
 
-## Group Project Permissions
-The project permissions resource represents the authorization roles (i.e. permissions) granted to a platform user in the context of a project.
+## Group Project Members
+A project member represents an individual (i.e. user) that has an affiliation to a project.
 
-## Project Permissions collection [/projects/{id}/permissions]
+## Project Members collection [/projects/{id}/members]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
-### Grant/revoke permissions for a platform user [PUT]
-**Permissions required:** manage_project_permissions (for project)
+### Create project member [POST]
+**Permissions required:** manage\_project\_members (for project)
 + Request (application/json)
 
         {
             "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
-            "auth_roles": [ "file_editor", ... ]  // Authorization roles to grant user.  To revoke all permissions "auth_roles": [ ].
+            "member_roles": [ "principal_investigator", ... ],  // Optional member roles
+            "auth_roles": [ "project_viewer", ... ]  // Optional auth roles
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
-            "id": "a839b3bb-7b03-44de-b9cf-53152e4c7243",
-            "project": <project_object>,
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
             "user": <user_object>,
-            "auth_roles": [ <auth_role_object>, ... ],
-            "permissions": [ "view_project", "download_file", "create_file", ... ] // Permissions (ACL) for user
+            "project": <project_object>,
+            "member_roles": [ <member_role_object>, ... ],
+            "auth_roles": [ <auth\_role\_object>, ... ],
+            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
         }
 
+### List project members [GET]
+**Permissions required:** view_project (for project)
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "user": <user_object>,
+                "project": <project_object>,
+                "member_roles": [ <member_role_object>, ... ],
+                "auth_roles": [ <auth\_role\_object>, ... ],
+                "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+            },
+            ...
+        ]  
+
+## Project Member [/project_member/{id}]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.     
+
+### Delete a project member [DELETE]
+**Permissions required:** manage\_project\_members (for project)
+
+**Business Rules:**
+* Every project requires at least one member with "project_admin" auth role.  Cannot remove/delete member if they are
+the only "project_admin" designated for the project.
++ Response 204 
+
+<!-- DEPRECATED
+## Group Member Permissions
+A member permission represents an authorization role (i.e. set of permissions) granted to a project member.
+-->
+
+## Member Roles collection [/project_member/{id}/roles]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
+
+### Assign/remove organizational roles for project member [PUT]
+**Permissions required:** manage\_project\_members (for project)
++ Request (application/json)
+
+        {
+            "member_roles": [ "principal_investigator", ... ]  // Member roles to assign.  To remove all pass [ ].
+        }
+
+**To remove all member roles `"member_roles": [ ]`**
+
++ Response 201 (application/json)
+
+        {
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "user": <user_object>,
+            "project": <project_object>,
+            "member_roles": [ <member_role_object>, ... ],
+            "auth_roles": [ <auth\_role\_object>, ... ],
+            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+        }
+
+## Member Permissions collection [/project_member/{id}/permissions]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
+
+### Grant/revoke permissions for project member [PUT]
+**Permissions required:** manage\_project\_members (for project)
+
+**Business Rules:**
+* Every project requires at least one member with "project_admin" auth role.  Cannot revoke this role from member if
+they are the only "project_admin" designated for the project.
++ Request (application/json)
+
+        {
+            "auth_roles": [ "project_admin", ... ]  // Auth roles to grant member.  To revoke all pass [ ].
+        }
+
+**To revoke all project permissions `"auth_roles": [ ]`**
+
++ Response 201 (application/json)
+
+        {
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "user": <user_object>,
+            "project": <project_object>,
+            "member_roles": [ <member_role_object>, ... ],
+            "auth_roles": [ <auth\_role\_object>, ... ],
+            "permissions": [ "view\_project", "download\_file", "create\_file", ... ] // Permissions (ACL) for member
+        }
+
+<!-- DEPRECATED
 ### List all project permissions [GET]
 **Permissions required:** view_project (for project)
 + Response 200 (application/json)
@@ -513,3 +599,4 @@ The project members resource represents the functional roles an individual (i.e.
             },
             ...
         ]       
+-->
