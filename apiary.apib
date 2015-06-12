@@ -529,7 +529,7 @@ A research data file that is maintained in the context of a project (an optional
 ### Create file meta-data [POST]
 **Permissions required:** create_file (for project)
 
-The response returns a signed URL in the `Location` header that can be used to upload the file.  The URL contains the following parameters:  
+The response returns a signed URL in the `Location` header that can be used to upload the file.  The signed URL contains the following parameters:  
 > **file-meta** - The base64-encoded version of the file meta-data.  
 **signature** - A hashed, signed, and base64-encoded version of the file meta-data (verified by storage server).  
 **policy** - The base64-encoded expiration policy for the signed URL.
@@ -541,7 +541,7 @@ The response returns a signed URL in the `Location` header that can be used to u
             "folder": null, // Set to null for project root, otherwise a Folder ID { id: "dd29f7df-33ca-46dd-a015-92c46fdb6fd1" }
             "extension": "Rdata", // Extensions to use for file downloads (derived by server from name)
             "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client?)
-            "mime_type": "application/octet-stream", // Valid type per https://en.wikipedia.org/wiki/Internet_media_type (optionally provided by client)
+            "content_type": "application/octet-stream", // Valid type per https://en.wikipedia.org/wiki/Internet_media_type (optionally provided by client)
             "size": "5242880", // The size of file in bytes (optionally provided by client)?
             "storage_location": { id: "duke_isilon" } // Target storage location
         }
@@ -560,7 +560,7 @@ The response returns a signed URL in the `Location` header that can be used to u
                 "folder": null, 
                 "extension": "Rdata", 
                 "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // If client provided sha1, server computed sha1 must match
-                "mime_type": "application/octet-stream",
+                "content_type": "application/octet-stream",
                 "size": "5242880", // If client provided size, server computed size must match
                 "storage_location": { id: "duke_isilon" },
                 "upload_status": {
