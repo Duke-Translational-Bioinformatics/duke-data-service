@@ -562,7 +562,7 @@ The response returns a signed URL in the `Location` header that can be used to u
                 "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // If client provided sha1, server computed sha1 must match
                 "content_type": "application/octet-stream",
                 "size": "5242880", // If client provided size, server computed size must match
-                "storage_location": { id: "duke_isilon" },
+                "storage_location": { "id": "duke_isilon" },
                 "upload_status": {
                     "state": "pending", // Possible values [ "pending", "processing", "error", "completed" ]
                     "error_message": <upload_error_object>, // Populated when upload_status.state="error"
