@@ -5,34 +5,25 @@ HOST: http://data-services.duke.edu/
 
 The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data. 
 
-The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance 
-usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing 
-their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support 
-SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are 
-tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple 
-APIs, whether some business logic be pushed to the users, etc.
+The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) 
-requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each 
-response header, among others.
+requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
 ## Group API Usage
 
 Client API Key
 --------------
-Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning 
-model.  This will not be part of the initial product release (i.e. MVP).  
+Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning model.  This will not be part of the initial product release (i.e. MVP).  
 
 User Authentication
 --------------
 Users will be required to authenticate via a trusted authentication provider. (i.e. Duke Shibboleth for MVP)
 
 **Some design assumptions for the MVP:**
-* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on 
-service.  This token must be supplied in header for subsequent API calls.  
+* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.  
 * Tokens will have an expiration policy of X hours/days.
-* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will 
-be created in the platforms local user data store.
+* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will be created in the platforms local user data store.
 
 Collection Pagination
 --------------
@@ -86,12 +77,9 @@ Authentication resource provides the means to verify identity of a platform user
 
 ## Authenticate [/authenticate/user_token]
 ### Get a user authentication token - i.e. JSON Web Token [POST]
-* If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid 
-shibboleth identity to a JWT, so this API may take a different set of params to perform that translation.
-* Assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into 
-the platforms local user data store (i.e. user table or tables).
-* We also need to think about how command line clients and software agents would authenticate to the API? - they 
-will not be using the Duke single sign-on Web interface.
+* If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid shibboleth identity to a JWT, so this API may take a different set of params to perform that translation.
+* Assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into the platforms local user data store (i.e. user table or tables).
+* We also need to think about how command line clients and software agents would authenticate to the API? - they will not be using the Duke single sign-on Web interface.
 
 + Request (application/json)
 
@@ -426,8 +414,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 **Permissions required:** delete_project (for project)
 
 **Business Rules:**
-* Logically deletes project from the meta-data (i.e. sets `"is\_deleted": true`).  For the MVP, the files
-associated to the project are not deleted from their physical storage location. 
+* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  For the MVP, the files associated to the project are not deleted from their physical storage location. 
 + Response 204 
 
 ## Group Project Members
@@ -482,8 +469,7 @@ A project member represents an individual (i.e. user) that has an affiliation to
 **Permissions required:** manage\_project\_members (for project)
 
 **Business Rules:**
-* Every project requires at least one member with "project_admin" auth role.  Cannot remove/delete member if they are
-the only "project_admin" designated for the project.
+* Every project requires at least one member with "project\_admin" auth role.  Cannot remove/delete member if they are the only "project\_admin" designated for the project.
 + Response 204 
 
 ## Member Roles collection [/project_member/{id}/roles]
@@ -517,8 +503,7 @@ the only "project_admin" designated for the project.
 **Permissions required:** manage\_project\_members (for project)
 
 **Business Rules:**
-* Every project requires at least one member with "project_admin" auth role.  Cannot revoke this role from member if
-they are the only "project_admin" designated for the project.
+* Every project requires at least one member with "project\_admin" auth role.  Cannot revoke this role from member if they are the only "project\_admin" designated for the project.
 + Request (application/json)
 
         {
@@ -535,3 +520,55 @@ they are the only "project_admin" designated for the project.
             "auth_roles": [ <auth_role_object>, ... ],
             "permissions": [ "view_project", ... ] // Permissions (ACL) for member
         }
+
+## Group Files
+A research data file that is maintained in the context of a project (an optionally project folder).  A file resource represents the descriptive meta\-data about file including the physical storage location and access paths.
+
+## Files collection [/project/{id}/files]
+
+### Create file meta-data [POST]
+**Permissions required:** create_file (for project)
+
+The response returns a signed URL in the `Location` header that can be used to upload the file.  The URL contains the following parameters:  
+> **file-meta** - The base64-encoded version of the file meta-data.  
+**signature** - A hashed, signed, and base64-encoded version of the file meta-data (verified by storage server).  
+**policy** - The base64-encoded expiration policy for the signed URL.
+
++ Request (application/json)
+
+        {
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",  // Name of client file to upload
+            "folder": null, // Set to null for project root, otherwise a Folder ID { id: "dd29f7df-33ca-46dd-a015-92c46fdb6fd1" }
+            "extension": "Rdata", // Extensions to use for file downloads (derived by server from name)
+            "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client?)
+            "mime_type": "application/octet-stream", // Valid type per https://en.wikipedia.org/wiki/Internet_media_type (optionally provided by client)
+            "size": "5242880", // The size of file in bytes (optionally provided by client)?
+            "storage_location": { id: "duke_isilon" } // Target storage location
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: http://data-services-storage.duke.edu?file_meta=WrT7U9...&signature=Th88wF...&policy=Yui99h...
+
+    + Body
+
+            {   
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",  
+                "folder": null, 
+                "extension": "Rdata", 
+                "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // If client provided sha1, server computed sha1 must match
+                "mime_type": "application/octet-stream",
+                "size": "5242880", // If client provided size, server computed size must match
+                "storage_location": { id: "duke_isilon" },
+                "upload_status": {
+                    "state": "pending", // Possible values [ "pending", "processing", "error", "completed" ]
+                    "error_message": <upload_error_object>, // Populated when upload.status=error
+                    "started_on": null,
+                    "ended_on": null
+                },
+                <audit_object>
+            }
+
