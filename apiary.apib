@@ -540,10 +540,10 @@ The response returns a signed URL in the `Location` header that can be used to u
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",  // Name of client file to upload
             "folder": null, // Set to null for project root, otherwise a Folder ID { id: "dd29f7df-33ca-46dd-a015-92c46fdb6fd1" }
             "extension": "Rdata", // Extensions to use for file downloads (derived by server from name)
-            "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client?)
+            "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client)
             "content_type": "application/octet-stream", // Valid type per https://en.wikipedia.org/wiki/Internet_media_type (optionally provided by client)
-            "size": "5242880", // The size of file in bytes (optionally provided by client)?
-            "storage_location": { id: "duke_isilon" } // Target storage location
+            "size": "5242880", // The size of file in bytes (optionally provided by client)
+            "storage_location": { "id": "duke_isilon" } // Target storage location
         }
 
 + Response 201 (application/json)
@@ -565,7 +565,7 @@ The response returns a signed URL in the `Location` header that can be used to u
                 "storage_location": { id: "duke_isilon" },
                 "upload_status": {
                     "state": "pending", // Possible values [ "pending", "processing", "error", "completed" ]
-                    "error_message": <upload_error_object>, // Populated when upload.status=error
+                    "error_message": <upload_error_object>, // Populated when upload_status.state="error"
                     "started_on": null,
                     "ended_on": null
                 },
