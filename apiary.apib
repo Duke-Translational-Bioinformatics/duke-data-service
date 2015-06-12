@@ -525,12 +525,14 @@ A project member represents an individual (i.e. user) that has an affiliation to
 A research data file that is maintained in the context of a project (an optionally project folder).  A file resource represents the descriptive meta\-data about file including the physical storage location and access paths.
 
 ## Files collection [/project/{id}/files]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
 ### Create file meta-data [POST]
 **Permissions required:** create_file (for project)
 
 The response returns a signed URL in the `Location` header that can be used to upload the file.  The signed URL contains the following parameters:  
-> **file-meta** - The base64-encoded version of the file meta-data.  
+> **file_meta** - The base64-encoded version of the file meta-data.  
 **signature** - A hashed, signed, and base64-encoded version of the file meta-data (verified by storage server).  
 **policy** - The base64-encoded expiration policy for the signed URL.
 
