@@ -318,12 +318,14 @@ A project is a container for storing, organizing, retrieving and sharing researc
 
 **Business Rules:**
 * User who created project is granted "project\_admin" auth role by default. 
+* **Should principal_investigator be a required field at creation?**
 * Unique fields: `name`
 + Request (application/json)
 
         {
             "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation..."
+            "description": "Goal of generating a targeted knockout mutation...",
+            "principal_investigator": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" } // If specified, this creates a project_member with member role "principal_investigator"
         }
 
 + Response 201 (application/json)
@@ -334,7 +336,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, // Has the project been logically deleted from meta-data?
             "current_user": {
-                "member_roles": [ ], // Project member roles for current user
+                "member_roles": [ <member_role_object>, ... ], // Project member roles for current user
                 "auth_roles": [ <auth_role_object>, ... ], // Project auth roles for current user 
                 "permissions": [ "view_project", "update_project", ... ] // Project permissions (ACL) for current user 
             },
@@ -356,7 +358,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false, 
                 "current_user": {
-                    "member_roles": [ ], 
+                    "member_roles": [ <member_role_object>, ... ],
                     "auth_roles": [ <auth_role_object>, ... ], 
                     "permissions": [ "view_project", "update_project", ... ]  
                 },
@@ -379,7 +381,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
             "current_user": {
-                "member_roles": [ ], 
+                "member_roles": [ <member_role_object>, ... ], 
                 "auth_roles": [ <auth_role_object>, ... ], 
                 "permissions": [ "view_project", "update_project", ... ]  
             },
@@ -403,7 +405,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false, 
             "current_user": {
-                "member_roles": [ ], 
+                "member_roles": [ <member_role_object>, ... ], 
                 "auth_roles": [ <auth_role_object>, ... ], 
                 "permissions": [ "view_project", "update_project", ... ]  
             },
@@ -522,7 +524,7 @@ A project member represents an individual (i.e. user) that has an affiliation to
         }
 
 ## Group Files
-A research data file that is maintained in the context of a project (an optionally project folder).  A file resource represents the descriptive meta\-data about file including the physical storage location and access paths.
+A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents the descriptive meta\-data about file including the physical storage location and access paths.
 
 ## Files collection [/project/{id}/files]
 + Parameters
@@ -542,9 +544,9 @@ The response returns a signed URL in the `Location` header that can be used to u
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",  // Name of client file to upload
             "folder": null, // Set to null for project root, otherwise a Folder ID { id: "dd29f7df-33ca-46dd-a015-92c46fdb6fd1" }
             "extension": "Rdata", // Extensions to use for file downloads (derived by server from name)
-            "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client)
+            "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // The sha1 for the file content (optionally computed/provided by client?)
             "content_type": "application/octet-stream", // Valid type per https://en.wikipedia.org/wiki/Internet_media_type (optionally provided by client)
-            "size": "5242880", // The size of file in bytes (optionally provided by client)
+            "size": "5242880", // The size of file in bytes (optionally provided by client?)
             "storage_location": { "id": "duke_isilon" } // Target storage location
         }
 
@@ -566,7 +568,7 @@ The response returns a signed URL in the `Location` header that can be used to u
                 "size": "5242880", // If client provided size, server computed size must match
                 "storage_location": { "id": "duke_isilon" },
                 "upload_status": {
-                    "state": "pending", // Possible values [ "pending", "processing", "error", "completed" ]
+                    "state": "pending", // Possible state values: "pending", "processing", "error", "completed"
                     "error_message": <upload_error_object>, // Populated when upload_status.state="error"
                     "started_on": null,
                     "ended_on": null
