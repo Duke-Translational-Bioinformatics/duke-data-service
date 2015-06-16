@@ -1,5 +1,10 @@
 require 'rails_helper'
+require 'shoulda-matchers'
 
 RSpec.describe User, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  subject {FactoryGirl.create(:user)}
+
+  it 'should have_many user_authentication_services' do
+    should have_many :user_authentication_services
+  end
 end

@@ -1,8 +1,7 @@
 FactoryGirl.define do
   factory :user_authentication_service do
-    user_id 1
-authentication_service_id 1
-uid "MyString"
+    uid { "#{Faker::Name.first_name}_#{Faker::Number.number(3) }" }
+    user
+    authentication_service
   end
-
 end

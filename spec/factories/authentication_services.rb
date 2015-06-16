@@ -1,8 +1,7 @@
 FactoryGirl.define do
   factory :authentication_service do
-    uuid "MyString"
-base_uri "MyString"
-name "MyString"
+    uuid { SecureRandom.uuid }
+    base_uri { Faker::Internet.url }
+    name { Faker::Company.name }
   end
-
 end
