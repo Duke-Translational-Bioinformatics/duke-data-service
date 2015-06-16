@@ -318,14 +318,13 @@ A project is a container for storing, organizing, retrieving and sharing researc
 
 **Business Rules:**
 * User who created project is granted "project\_admin" auth role by default. 
-* **Should principal_investigator be a required field at creation?**
+* **Should principal investigator be required to create project?**
 * Unique fields: `name`
 + Request (application/json)
 
         {
             "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            "principal_investigator": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" } // If specified, this creates a project_member with member role "principal_investigator"
+            "description": "Goal of generating a targeted knockout mutation..."
         }
 
 + Response 201 (application/json)
