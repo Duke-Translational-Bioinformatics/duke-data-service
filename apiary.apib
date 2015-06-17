@@ -3,56 +3,56 @@ HOST: http://data-services.duke.edu/
 
 # Duke Data Services
 
-The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data. 
+The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data.
 
 The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
 
-Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) 
+Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design)
 requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
 ## Group API Usage
 
 Client API Key
 --------------
-Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning model.  This will not be part of the initial product release (i.e. MVP).  
+Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning model.  This will not be part of the initial product release (i.e. MVP).
 
 User Authentication
 --------------
 Users will be required to authenticate via a trusted authentication provider. (i.e. Duke Shibboleth for MVP)
 
 **Some design assumptions for the MVP:**
-* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.  
+* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.
 * Tokens will have an expiration policy of X hours/days.
 * When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will be created in the platforms local user data store.
 
 Collection Pagination
 --------------
-For endpoints that return a collection of resources/objects, the number of objects returned can be 
-controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads 
+For endpoints that return a collection of resources/objects, the number of objects returned can be
+controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads
 may have the following structure to facilitate client pagination:
 
     {
         "count": 100,
         "limit": 25,
-        "next": "https://data-services.duke.edu/projects?page=3", 
-        "previous": "https://data-services.duke.edu/projects?page=1", 
+        "next": "https://data-services.duke.edu/projects?page=3",
+        "previous": "https://data-services.duke.edu/projects?page=1",
         "results": [
             <resource_object>,
             <resource_object>,
             ...
         ]
     }
-  
+
 **Example payloads herein for resource specific collections will only include** `"results": [ ]` **structure.**
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented 
+Resource payloads may include a composite audit object. An example structure of that object is represented
 here and will be referenced as `<audit_object>` in resource specific payloads.
-        
+
     {
         "created_on": "2015-01-01T12:00:00Z",
-        "created_by": { 
+        "created_by": {
             "id": "ce245d81-bae1-452b-8589-24f736ca7735",
             "username": "mrgardner01",
             "full_name": "Matthew Gardner"
@@ -69,7 +69,43 @@ here and will be referenced as `<audit_object>` in resource specific payloads.
 
 Client Errors
 ----------------
-**Need to define here how client errors will be handled and represented.**
+We should respond with context appropriate error codes, especially for 400 class errors, using the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+
+400: no API token, validation errors
+401: bad API token
+403: user performing request which they do not have permission to perform
+404: user requesting resource that does not exist
+
+All error responses should include a JSON response that provides the
+HTTP status code, details of the error that occurred, and possible
+steps to address the problem. For example:
+
+    {
+        "error": "404",
+        "reason": "Project does not exist",
+        "suggestion": "You may have chosen the wrong ID."
+    }
+
+Validation errors require a field-level breakdown with an array of
+errors (even if multiple errors occur for the same field), each
+describing the field with the error, and message describing the error
+encountered.
+
+    {
+        "error": "400",
+        "reason": "validation failed",
+        "errors" : [
+        {
+           "field" : "name",
+           "message" : "Project needs a name"
+        },
+        {
+            "field" : "principal_investigator",
+            "message" : "Principal Investigator must be specified for each project."
+            }
+        ]
+    }
+
 
 <!-- DEPRECATED
 ## Group Authentication
@@ -84,14 +120,14 @@ Authentication resource provides the means to verify identity of a platform user
 + Request (application/json)
 
         { "username": "mrgardner01", "password": "pennState$grad" }
-        
+
 + Response 201 (application/json)
 
         { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
 -->
-        
+
 ## Group Authorization Roles
-An authorization role represents a set of discrete permissions that may be granted to a user.  
+An authorization role represents a set of discrete permissions that may be granted to a user.
 
 **Authorization Roles defined to date:**
 
@@ -124,7 +160,7 @@ An authorization role represents a set of discrete permissions that may be grant
 + Response 200 (application/json)
 
         "results": [
-            { 
+            {
                 "id": "system_admin",
                 "name": "System Admin",
                 "description": "Can perform all system operations",
@@ -132,11 +168,11 @@ An authorization role represents a set of discrete permissions that may be grant
                 "contexts": [ "global" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.),
                 "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
             },
-            { 
+            {
                 "id": "platform_user",
                 "name": "Platform User",
                 "description": "Can create new projects", // Granted to all registered users
-                "permissions": [ "create_project" ], 
+                "permissions": [ "create_project" ],
                 "contexts": [ "global" ],
                 "is_deprecated": false
             },
@@ -147,24 +183,24 @@ An authorization role represents a set of discrete permissions that may be grant
                 "permissions": [ "view_project", "update_project", "delete_project", "manage_project_members", "download_file", "create_file", "update_file", "delete_file" ],
                 "contexts": [ "project_member" ],
                 "is_deprecated": false
-            }, 
-            { 
+            },
+            {
                 "id": "project_viewer",
                 "name": "File Viewer",
                 "description": "Can view project and file meta-data",
                 "permissions": [ "view_project" ],
                 "contexts": [ "project_member" ],
                 "is_deprecated": false
-            },       
-            { 
+            },
+            {
                 "id": "file_downloader",
                 "name": "File Downloader",
                 "description": "Can download files",
                 "permissions": [ "view_project", "download_file" ],
                 "contexts": [ "project_member" ],
                 "is_deprecated": false
-            },    
-            { 
+            },
+            {
                 "id": "file_editor",
                 "name": "File Editor",
                 "description": "Can view, create, update, delete and download files",
@@ -177,8 +213,8 @@ An authorization role represents a set of discrete permissions that may be grant
 ## Group Member Roles
 A member role represents an organizational responsibility that an individual (i.e. user) may assume.  These roles have no relationship to authorization roles.
 
-When the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration 
-with that platforms Web services API. 
+When the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration
+with that platforms Web services API.
 
 **Member Roles defined to date:**
 
@@ -193,14 +229,14 @@ with that platforms Web services API.
 + Response 200 (application/json)
 
         "results": [
-            { 
+            {
                 "id": "principal_investigator",
                 "name": "Principal Investigator",
                 "description": "Lead investigator for the research project",
                 "contexts": [ "project_member" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.)
                 "is_deprecated": false
             },
-            { 
+            {
                 "id": "research_coordinator",
                 "name": "Research Coordinator",
                 "description": "Coordinator for the research project",
@@ -211,32 +247,32 @@ with that platforms Web services API.
         ]
 
 ## Group Current User
-The current user represents the currently authenticated user.  
+The current user represents the currently authenticated user.
 
 ## Current User [/current_user]
 ### Create user [POST]
 **Permissions required:** none
 
 **Business Rules:**
-* Created user is granted the "platform\_user" auth role by default. 
+* Created user is granted the "platform\_user" auth role by default.
 * The username defaults to auth\_provider.uid, but can be overriden during user registration.
 * Unique fields: `username`, `email`, `(auth_provider.source + auth_provider.uid)`
 + Request (application/json)
 
         {
-            "username": "mrgardner01", 
+            "username": "mrgardner01",
             "first_name": "Matthew",
             "last_name": "Gardner",
-            "email": "mrgardner01@duke.edu", 
+            "email": "mrgardner01@duke.edu",
             "auth_provider": {
-                "source": "duke_shibboleth", 
+                "source": "duke_shibboleth",
                 "uid": "gardner100", // Unique user ID in context of this auth provider
                 "properties": { // Other user properties from auth provider (i.e. Duke Shibboleth)
-                    <key>: <value>, 
+                    <key>: <value>,
                     <key>: <value>,
                     ...
                 }
-            }            
+            }
         }
 
 + Response 201 (application/json)
@@ -253,8 +289,8 @@ The current user represents the currently authenticated user.
             "auth_provider": {
                 "source": "duke_shibboleth",
                 "uid": "gardner100",
-                "properties": { 
-                    <key>: <value>, 
+                "properties": {
+                    <key>: <value>,
                     <key>: <value>,
                     ...
                 }
@@ -274,13 +310,13 @@ The current user represents the currently authenticated user.
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
-            "auth_roles": [ <auth_role_object>, ... ], 
-            "permissions": [ "create_project", ... ], 
+            "auth_roles": [ <auth_role_object>, ... ],
+            "permissions": [ "create_project", ... ],
             "auth_provider": {
-                "source": "duke_shibboleth", 
+                "source": "duke_shibboleth",
                 "uid": "gardner100",
-                "properties": { 
-                    <key>: <value>, 
+                "properties": {
+                    <key>: <value>,
                     <key>: <value>,
                     ...
                 }
@@ -317,7 +353,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 **Permissions required:** create_project
 
 **Business Rules:**
-* User who created project is granted "project\_admin" auth role by default. 
+* User who created project is granted "project\_admin" auth role by default.
 * **Should principal investigator be required to create project?**
 * Unique fields: `name`
 + Request (application/json)
@@ -328,7 +364,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
         }
 
 + Response 201 (application/json)
-    
+
         {
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
@@ -336,8 +372,8 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "is_deleted": false, // Has the project been logically deleted from meta-data?
             "current_user": {
                 "member_roles": [ <member_role_object>, ... ], // Project member roles for current user
-                "auth_roles": [ <auth_role_object>, ... ], // Project auth roles for current user 
-                "permissions": [ "view_project", "update_project", ... ] // Project permissions (ACL) for current user 
+                "auth_roles": [ <auth_role_object>, ... ], // Project auth roles for current user
+                "permissions": [ "view_project", "update_project", ... ] // Project permissions (ACL) for current user
             },
             "audit": <audit_object>
         }
@@ -355,11 +391,11 @@ A project is a container for storing, organizing, retrieving and sharing researc
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
-                "is_deleted": false, 
+                "is_deleted": false,
                 "current_user": {
                     "member_roles": [ <member_role_object>, ... ],
-                    "auth_roles": [ <auth_role_object>, ... ], 
-                    "permissions": [ "view_project", "update_project", ... ]  
+                    "auth_roles": [ <auth_role_object>, ... ],
+                    "permissions": [ "view_project", "update_project", ... ]
                 },
                 "audit": <audit_object>
             },
@@ -378,11 +414,11 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false, 
+            "is_deleted": false,
             "current_user": {
-                "member_roles": [ <member_role_object>, ... ], 
-                "auth_roles": [ <auth_role_object>, ... ], 
-                "permissions": [ "view_project", "update_project", ... ]  
+                "member_roles": [ <member_role_object>, ... ],
+                "auth_roles": [ <auth_role_object>, ... ],
+                "permissions": [ "view_project", "update_project", ... ]
             },
             "audit": <audit_object>
         }
@@ -397,26 +433,26 @@ A project is a container for storing, organizing, retrieving and sharing researc
         }
 
 + Response 200 (application/json)
-        
+
         {
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false, 
+            "is_deleted": false,
             "current_user": {
-                "member_roles": [ <member_role_object>, ... ], 
-                "auth_roles": [ <auth_role_object>, ... ], 
-                "permissions": [ "view_project", "update_project", ... ]  
+                "member_roles": [ <member_role_object>, ... ],
+                "auth_roles": [ <auth_role_object>, ... ],
+                "permissions": [ "view_project", "update_project", ... ]
             },
             "audit": <audit_object>
         }
-        
+
 ### Delete a project [DELETE]
 **Permissions required:** delete_project (for project)
 
 **Business Rules:**
-* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  For the MVP, the files associated to the project are not deleted from their physical storage location. 
-+ Response 204 
+* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  For the MVP, the files associated to the project are not deleted from their physical storage location.
++ Response 204
 
 ## Group Project Members
 A project member represents an individual (i.e. user) that has an affiliation to a project.
@@ -430,7 +466,7 @@ A project member represents an individual (i.e. user) that has an affiliation to
 + Request (application/json)
 
         {
-            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" }, 
+            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" },
             "member_roles": [ "principal_investigator", ... ],  // Optional member roles
             "auth_roles": [ "project_viewer", ... ]  // Optional auth roles
         }
@@ -460,18 +496,18 @@ A project member represents an individual (i.e. user) that has an affiliation to
                 "permissions": [ "view_project", ... ] // Permissions (ACL) for member
             },
             ...
-        ]  
+        ]
 
 ## Project Member [/project_member/{id}]
 + Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.     
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
 
 ### Delete a project member [DELETE]
 **Permissions required:** manage\_project\_members (for project)
 
 **Business Rules:**
 * Every project requires at least one member with "project\_admin" auth role.  Cannot remove/delete member if they are the only "project\_admin" designated for the project.
-+ Response 204 
++ Response 204
 
 ## Member Roles collection [/project_member/{id}/roles]
 + Parameters
@@ -532,9 +568,9 @@ A research data file that is maintained in the context of a project (and optiona
 ### Create file meta-data [POST]
 **Permissions required:** create_file (for project)
 
-The response returns a signed URL in the `Location` header that can be used to upload the file.  The signed URL contains the following parameters:  
-> **file_meta** - The base64-encoded version of the file meta-data.  
-**signature** - A hashed, signed, and base64-encoded version of the file meta-data (verified by storage server).  
+The response returns a signed URL in the `Location` header that can be used to upload the file.  The signed URL contains the following parameters:
+> **file_meta** - The base64-encoded version of the file meta-data.
+**signature** - A hashed, signed, and base64-encoded version of the file meta-data (verified by storage server).
 **policy** - The base64-encoded expiration policy for the signed URL.
 
 + Request (application/json)
@@ -557,11 +593,11 @@ The response returns a signed URL in the `Location` header that can be used to u
 
     + Body
 
-            {   
+            {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",  
-                "folder": null, 
-                "extension": "Rdata", 
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "folder": null,
+                "extension": "Rdata",
                 "sha1": "cf23df2207d99a74fbe169e3eba035e633b65d94", // If client provided sha1, server computed sha1 must match
                 "content_type": "application/octet-stream",
                 "size": "5242880", // If client provided size, server computed size must match
@@ -574,4 +610,3 @@ The response returns a signed URL in the `Location` header that can be used to u
                 },
                 <audit_object>
             }
-
