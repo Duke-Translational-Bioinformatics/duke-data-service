@@ -9,4 +9,13 @@ class UserAuthenticationService < ActiveRecord::Base
                                 message: 'your uid is not unique in the authentication service'
                               },
                   allow_blank: true
+
+  def api_token
+    JWT.encode({
+      'id' => user_id,
+      'authentication_service_id' => authentication_service_id,
+      'exp' => Time.now.to_i + 2.hours.to_i
+    }, Rails.application.secrets.secret_key_base)
+  end
+
 end
