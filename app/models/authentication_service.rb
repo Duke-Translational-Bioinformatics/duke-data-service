@@ -4,8 +4,4 @@ class AuthenticationService < ActiveRecord::Base
   validates :uuid, presence: true, uniqueness: true
   validates :name, presence: true
   validates :base_uri, presence: true
-
-  def token_info(token)
-    #TODO implement
-  end
 end
