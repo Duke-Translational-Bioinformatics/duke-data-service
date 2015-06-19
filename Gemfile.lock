@@ -152,6 +152,8 @@ GEM
       execjs
       rails (>= 3.1)
       react-source (~> 0.13)
+    react-router-rails (0.11.6.1)
+      railties (>= 3.1)
     react-source (0.13.3)
     rspec-core (3.3.1)
       rspec-support (~> 3.3.0)
@@ -217,6 +219,7 @@ DEPENDENCIES
   rails (= 4.2.1)
   rails_12factor
   react-rails
+  react-router-rails
   rspec-rails
   rspec_junit_formatter (= 0.2.2)
   shoulda-matchers
