@@ -6,6 +6,7 @@ gem 'rails', '4.2.1'
 gem 'pg'
 # Use puma as the webserver in development
 gem 'puma'
+gem 'rack', '1.6.4'
 
 gem 'jwt'
 gem 'grape'
