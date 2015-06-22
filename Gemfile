@@ -13,7 +13,6 @@ gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem "grape-active_model_serializers"
 gem 'react-rails'
-gem 'react-router-rails'
 gem 'tilt'
 gem 'jquery-rails'
 gem 'turbolinks'

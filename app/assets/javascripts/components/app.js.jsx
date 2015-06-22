@@ -3,7 +3,6 @@ var App = React.createClass({
     return (
       <div>
         <h1>App {this.props.foo}</h1>
-        <ReactRouter.RouteHandler/>
       </div>
     )
   }
