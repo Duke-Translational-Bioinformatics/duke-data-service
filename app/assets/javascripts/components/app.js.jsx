@@ -21,9 +21,9 @@ var App = React.createClass({
     }
     return (
       <div>
-        <h1>App {this.props.foo}</h1>
+        <h1>Duke Data Services</h1>
         <p>access_token: {this.state.access_token}</p>
-        <Child page={this.props.foo} />
+        <Child service_id={this.props.service_id} auth_service_name={this.props.auth_service_name} auth_service_uri={this.props.auth_service_uri} />
       </div>
     )
   }
