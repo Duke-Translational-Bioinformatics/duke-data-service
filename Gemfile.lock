@@ -94,7 +94,7 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
-    jwt (1.5.0)
+    jwt (1.5.1)
     loofah (2.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -220,8 +220,8 @@ DEPENDENCIES
   rack (= 1.6.4)
   rails (= 4.2.1)
   rails_12factor
-  react-rails
-  react-router-rails
+  react-rails (~> 1.0)
+  react-router-rails (= 0.13.3)
   rspec-rails
   rspec_junit_formatter (= 0.2.2)
   shoulda-matchers

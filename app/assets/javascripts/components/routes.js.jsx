@@ -1,6 +1,10 @@
-var Route = ReactRouter.Route;
+/** @jsx React.DOM */
+var Route = ReactRouter.Route,
+    DefaultRoute = ReactRouter.DefaultRoute;
+
 this.DDSRoutes = (
-  <Route handler={App} path='/'>
-    <Route name='splash' handler={Splash} path='splash' />
+  <Route handler={App}>
+    <DefaultRoute handler={Home} />
+    <Route handler={Splash} path='splash' />
   </Route>
 );
