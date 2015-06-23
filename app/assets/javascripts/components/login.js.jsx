@@ -1,7 +1,10 @@
 var Login = React.createClass({
   render: function() {
     return (
-      <div>Login Page</div>
+      <div>
+        Login Page
+        <p>{this.props.page}</p>
+      </div>
     )
   }
 });

@@ -23,7 +23,7 @@ var App = React.createClass({
       <div>
         <h1>App {this.props.foo}</h1>
         <p>access_token: {this.state.access_token}</p>
-        <Child />
+        <Child page={this.props.foo} />
       </div>
     )
   }
