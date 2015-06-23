@@ -1,7 +1,8 @@
 var App = React.createClass({
   getInitialState: function() {
     return {
-      access_token: ''
+      access_token: '',
+      api_token: ''
     };
   },
   componentDidMount: function() {
@@ -11,10 +12,18 @@ var App = React.createClass({
     }
   },
   render: function() {
+    var Child;
+    if (this.state.api_token.length > 0) {
+      Child = Home;
+    }
+    else {
+      Child = Login;
+    }
     return (
       <div>
         <h1>App {this.props.foo}</h1>
         <p>access_token: {this.state.access_token}</p>
+        <Child />
       </div>
     )
   }
