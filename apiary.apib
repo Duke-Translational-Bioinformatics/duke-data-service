@@ -720,6 +720,7 @@ view_project
 ### Create project affiliate [POST]
 >**Permission** 
 - - - - -
+update_project
 
 >**Rules**
 - - - - -
@@ -733,7 +734,7 @@ update_project
 + Request (application/json)
 
         {
-            "user: { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+            "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
             "external_person": null,
             "project_roles": [ { "id": "principal_investigator" }, ... ] 
         }
@@ -792,7 +793,7 @@ update_project
 + Request (application/json)
 
         {
-            "user: null,
+            "user": null,
             "external_person": {
                 "first_name": "Geddy",
                 "last_name": "Lee",
