@@ -19,8 +19,17 @@ module DDS
         named 'grant permissions'
         failure [401]
       end
+      params do
+        optional :auth_roles
+      end
       put '/system/permissions/:user_id', root: false do
-        {}
+        user_params = declared(params, include_missing: false)
+        user = User.find(params[:user_id])
+        user.update_attribute(:auth_roles, user_params[:auth_roles])
+        {
+          user: user.uuid,
+          auth_roles: JSON.parse(user.auth_roles)
+        }
       end
 
       desc 'View system permissions to user' do
