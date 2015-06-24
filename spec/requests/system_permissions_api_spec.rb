@@ -59,10 +59,12 @@ describe DDS::V1::SystemPermissionsAPI do
 
   describe 'Revoke system permissions for user' do
     it 'should delete all auth_roles for a given user' do
-      delete "/api/v1/system/permissions/#{user.id}", json_headers
+      delete "/api/v1/system/permissions/#{system_admin.id}", json_headers
       expect(response.status).to eq(204)
       expect(response.body).to be
       expect(response.body).not_to eq('null')
+      system_admin.reload
+      expect(system_admin.auth_roles).to be_nil
     end
   end
 end

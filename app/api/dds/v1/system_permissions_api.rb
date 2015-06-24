@@ -51,6 +51,8 @@ module DDS
         failure [401]
       end
       delete '/system/permissions/:user_id', root: false do
+        user = User.find(params[:user_id])
+        user.update_attribute(:auth_roles, nil)
         body false
       end
     end
