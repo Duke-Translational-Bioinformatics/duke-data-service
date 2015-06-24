@@ -28,7 +28,7 @@ module DDS
         user.update_attribute(:auth_roles, user_params[:auth_roles])
         {
           user: user.uuid,
-          auth_roles: JSON.parse(user.auth_roles)
+          auth_roles: user.auth_roles
         }
       end
 
@@ -41,7 +41,7 @@ module DDS
         user = User.find(params[:user_id])
         {
           user: user.uuid,
-          auth_roles: JSON.parse(user.auth_roles)
+          auth_roles: user.auth_roles
         }
       end
 

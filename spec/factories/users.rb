@@ -6,7 +6,7 @@ FactoryGirl.define do
     name { Faker::Name.name }
 
     trait :system_admin do
-      auth_roles ['system_admin']
+      auth_role_ids ['system_admin']
     end
   end
 end

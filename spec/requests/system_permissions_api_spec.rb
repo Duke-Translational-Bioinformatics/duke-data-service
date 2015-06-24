@@ -53,7 +53,7 @@ describe DDS::V1::SystemPermissionsAPI do
       expect(response_json['user']).to eq(system_admin.uuid)
       expect(response_json).to have_key('auth_roles')
       expect(response_json['auth_roles']).to be_a Array
-      expect(response_json['auth_roles']).to eq(JSON.parse(system_admin.auth_roles))
+      expect(response_json['auth_roles']).to eq(system_admin.auth_roles)
     end
   end
 
