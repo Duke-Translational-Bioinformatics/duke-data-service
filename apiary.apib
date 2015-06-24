@@ -294,7 +294,7 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has "system_admin" permission.
+                // Optional part of payload that is returned if the current user has system_admin permission.
                 "auth_provider": {
                     // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
@@ -323,7 +323,7 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has "system_admin" permission OR 
+                // Optional part of payload that is returned if the current user has system_admin permission OR 
                 // this is the current users profile.
                 "auth_provider": {
                     // The trusted authentication source for user (Duke Shibb for MVP).
@@ -352,7 +352,7 @@ A system permission represents system level authorization roles that have been g
 ### List system level permissions [GET]
 >**Permission**
 - - - - -
-system\_admin
+system_admin
 
 + Response 200 (application/json)
 
@@ -689,21 +689,20 @@ view_project
 
         "results": [
             {
+                // Internal affiliation (Duke employee)...
                 "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-                // Is this affiliation an external (non-Duke) person?
                 "is_external": false,
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                // Property "user" is "null" for external (non-Duke) affiliations.
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "full_name": "Matthew Gardner",
                     "email": "mrgardner001@duke.edu"
                 },
-                // Property "external_person" is "null" for internal (Duke) affiliations.
                 "external_person": null,
                 "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
             },
             {
+                // External affiliation (non-Duke employee)...
                 "id": "dd33f7df-33ca-46dd-a015-92c46fdbda44",
                 "is_external": true,
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
