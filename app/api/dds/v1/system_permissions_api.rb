@@ -38,7 +38,11 @@ module DDS
         failure [401]
       end
       get '/system/permissions/:user_id', root: false do
-        {}
+        user = User.find(params[:user_id])
+        {
+          user: user.uuid,
+          auth_roles: JSON.parse(user.auth_roles)
+        }
       end
 
       desc 'Revoke system permissions to user' do
