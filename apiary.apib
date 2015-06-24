@@ -5,31 +5,42 @@ HOST: http://data-services.duke.edu/
 
 The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data.
 
-The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
+The intent here is to create a strawman for the data service API. Key focuses are on API endpoints 
+that enhance usability for "shallow end of the pool" users, endpoints that support the needs of 
+investigators for managing their research groups, endpoints that accommodate shared resource and 
+core facility needs, endpoints that support SOM administration of data resources, and endpoints that 
+facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we 
+should consider whether the API might be broken up into multiple APIs, whether some business logic be 
+pushed to the users, etc.
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design)
-requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
+requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a 
+Request-id in each response header, among others.
 
 ## Group API Usage
 
 Client API Key
 --------------
-Authorized users may generate a secret API key via the Web interface \- liken to Google API key provisioning model.  This will not be part of the initial product release (i.e. MVP).
+Authorized users may generate a secret API key via the Web interface \- liken to Google API key 
+provisioning model.  This will not be part of the initial product release (i.e. MVP).
 
 User Authentication
 --------------
-Users will be required to authenticate via a trusted authentication provider. (i.e. Duke Shibboleth for MVP)
+Users will be required to authenticate via a trusted authentication provider. 
+(i.e. Duke Shibboleth for MVP)
 
 **Some design assumptions for the MVP:**
-* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.
+* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single 
+sign-on service.  This token must be supplied in header for subsequent API calls.
 * Tokens will have an expiration policy of X hours/days.
-* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will be created in the platforms local user data store.
+* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile 
+will be created in the platforms local user data store.
 
 Collection Pagination
 --------------
 For endpoints that return a collection of resources/objects, the number of objects returned can be
-controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection payloads
-may have the following structure to facilitate client pagination:
+controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection 
+payloads may have the following structure to facilitate client pagination:
 
     {
         "count": 100,
@@ -47,8 +58,8 @@ may have the following structure to facilitate client pagination:
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented
-here and will be referenced as `<audit_object>` in resource specific payloads.
+Resource payloads may include a composite audit object. An example structure of that object is 
+represented here and will be referenced as `<audit_object>` in resource specific payloads.
 
     {
         "created_on": "2015-01-01T12:00:00Z",
@@ -67,18 +78,18 @@ here and will be referenced as `<audit_object>` in resource specific payloads.
         "deleted_by": null
     }
 
-Client Errors
+API Errors
 ----------------
-We should respond with context appropriate error codes, especially for 400 class errors, using the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+We should respond with context appropriate error codes, especially for 400 class errors, using 
+the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
 400: no API token, validation errors
 401: bad API token
 403: user performing request which they do not have permission to perform
 404: user requesting resource that does not exist
 
-All error responses should include a JSON response that provides the
-HTTP status code, details of the error that occurred, and possible
-steps to address the problem. For example:
+All error responses should include a JSON response that provides the HTTP status code, details 
+of the error that occurred, and possible steps to address the problem. For example:
 
     {
         "error": "404",
@@ -86,178 +97,154 @@ steps to address the problem. For example:
         "suggestion": "You may have chosen the wrong ID."
     }
 
-Validation errors require a field-level breakdown with an array of
-errors (even if multiple errors occur for the same field), each
-describing the field with the error, and message describing the error
-encountered.
+Validation errors require a field-level breakdown with an array of errors (even if multiple errors 
+occur for the same field), each describing the field with the error, and message describing the 
+error encountered.
 
     {
         "error": "400",
         "reason": "validation failed",
-        "suggestion": "fix the following invalid fields and resubmit"
+        "suggestion": "Fix the following invalid fields and resubmit"
         "errors" : [
-        {
-           "field" : "name",
-           "message" : "Project needs a name"
-        },
-        {
-            "field" : "principal_investigator",
-            "message" : "Principal Investigator must be specified for each project."
+            {
+                "field" : "name",
+                "message" : "Project needs a name."
+            },
+            {
+                "field" : "principal_investigator",
+                "message" : "Principal Investigator must be specified for each project."
             }
         ]
     }
 
-
-<!-- DEPRECATED
-## Group Authentication
-Authentication resource provides the means to verify identity of a platform user.
-
-## Authenticate [/authenticate/user_token]
-### Get a user authentication token - i.e. JSON Web Token [POST]
-* If we use Duke single sign-on with muti-factor authetication, I assume we will need to translate the valid shibboleth identity to a JWT, so this API may take a different set of params to perform that translation.
-* Assume that when a Duke user authenticates successfully for the fist time, their profile would be registered into the platforms local user data store (i.e. user table or tables).
-* We also need to think about how command line clients and software agents would authenticate to the API? - they will not be using the Duke single sign-on Web interface.
-
-+ Request (application/json)
-
-        { "username": "mrgardner01", "password": "pennState$grad" }
-
-+ Response 201 (application/json)
-
-        { "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI......." }
--->
-
 ## Group Authorization Roles
 An authorization role represents a set of discrete permissions that may be granted to a user.
 
-**Authorization Roles defined to date:**
+**Authorization Roles:**
 
 | Role | Name | Description | Permission(s) |
 |:-----|:-----|:------------|:--------------|
-| **system\_admin** | System Admin | Can perform all system operations | \* (i.e. ALL permissions across ALL projects) |
-| **platform\_user** | Platform User | Can create new projects | create\_project |
-| **project\_admin** | Project Admin | Can update project details, delete project, manage project members and perform all file operations | view\_project, update\_project, delete\_project, manage\_project\_members, download\_file, create\_file, update\_file, delete\_file |
+| **system\_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system\_admin |
+| **project\_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view\_project, update\_project, delete\_project, manage\_project\_permissions, download\_file, create\_file, update\_file, delete\_file |
 | **project\_viewer** | Project Viewer | Can only view project and file meta-data | view\_project |
 | **file\_downloader** | File Downloader | Can download files | view\_project, download\_file |
 | **file\_editor** | File Editor | Can view, download, create, update and delete files | view\_project, download\_file, create\_file, update\_file, delete\_file |
+<!--DEPRECATED 
+| **platform\_user** | Platform User | Can create new projects | create\_project |
+-->
 
-**Permissions defined to date:**
+**Permissions:**
 
 | Permission | Description |
 |:------------|:------------|
+| **system\_admin** | Can manage system level permissions and perform all operations across all projects |
 | **view\_project** | Can view project and file meta-data |
-| **create\_project** | Can create new project |
-| **update\_project** | Can update project header details |
+| **update\_project** | Can update project header details and project affiliations |
 | **delete\_project** | Can delete project |
-| **manage\_project_members** | Can associate/remove members and grant/revoke permissions |
+| **manage\_project_permissions** | Can grant/revoke project level permissions |
 | **download\_file** | Can download file |
 | **create\_file** | Can upload new file |
 | **update\_file** | Can upload new version of existing file |
 | **delete\_file** | Can delete a file |
+<!--DEPRECATED
+| **create\_project** | Can create new projects |
+-->
 
-## Authorization Roles [/auth_roles]
+## Authorization Roles collection [/auth_roles{?context}]
++ Parameters
+    + context (optional, string, `project`) ... The `context` or scope in which permission can be granted;
+    valid values are "system" or "project".
+
 ### List authorization roles [GET]
-**Permissions required:** authenticated
+>**Permission** 
+- - - - -
+authenticated
+
 + Response 200 (application/json)
 
         "results": [
             {
                 "id": "system_admin",
                 "name": "System Admin",
-                "description": "Can perform all system operations",
-                "permissions": [ "*" ], // ALL permissions across ALL projects...
-                "contexts": [ "global" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.),
-                "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
-            },
-            {
-                "id": "platform_user",
-                "name": "Platform User",
-                "description": "Can create new projects", // Granted to all registered users
-                "permissions": [ "create_project" ],
-                "contexts": [ "global" ],
+                "description": "Can manage system level permissions and perform all operations across all projects",
+                "permissions": [ { "id": "system_admin" } ], 
+                // Contexts in which role is relevant (i.e. "system" or "project").
+                "contexts": [ "system" ],
+                // If deprecated, role cannot be granted, but show in UI for existing users that have role.
                 "is_deprecated": false
             },
             {
                 "id": "project_admin",
                 "name": "Project Admin",
-                "description": "Can update project details, delete project, manage members and perform all file operations",
-                "permissions": [ "view_project", "update_project", "delete_project", "manage_project_members", "download_file", "create_file", "update_file", "delete_file" ],
-                "contexts": [ "project_member" ],
-                "is_deprecated": false
-            },
-            {
-                "id": "project_viewer",
-                "name": "File Viewer",
-                "description": "Can view project and file meta-data",
-                "permissions": [ "view_project" ],
-                "contexts": [ "project_member" ],
-                "is_deprecated": false
-            },
-            {
-                "id": "file_downloader",
-                "name": "File Downloader",
-                "description": "Can download files",
-                "permissions": [ "view_project", "download_file" ],
-                "contexts": [ "project_member" ],
-                "is_deprecated": false
-            },
-            {
-                "id": "file_editor",
-                "name": "File Editor",
-                "description": "Can view, create, update, delete and download files",
-                "permissions": [ "view_project", "download_file", "create_file", "update_file", "delete_file" ],
-                "contexts": [ "project_member" ],
-                "is_deprecated": false
-            }
-        ]
-
-## Group Member Roles
-A member role represents an organizational responsibility that an individual (i.e. user) may assume.  These roles have no relationship to authorization roles.
-
-When the "Duke Enterprise Project Registry" application is live - these roles may be sourced via integration
-with that platforms Web services API.
-
-**Member Roles defined to date:**
-
-| Role | Name | Description |
-|:-----|:-----|:------------|
-| **principal\_investigator** | Principal Investigator | Lead investigator for the research project |
-| **research\_coordinator** | Research Coordinator | Coordinator for the research project |
-
-## Member Roles [/member_roles]
-### List member roles [GET]
-**Permissions required:** authenticated
-+ Response 200 (application/json)
-
-        "results": [
-            {
-                "id": "principal_investigator",
-                "name": "Principal Investigator",
-                "description": "Lead investigator for the research project",
-                "contexts": [ "project_member" ], // Contexts in which role is relevant (i.e. "global", "project_member", etc.)
-                "is_deprecated": false
-            },
-            {
-                "id": "research_coordinator",
-                "name": "Research Coordinator",
-                "description": "Coordinator for the research project",
-                "contexts": [ "project_member" ],
+                "description": "Can update project details, delete project, manage project level permissions and perform all file operations",
+                "permissions": [ { "id": "view_project" }, { "id": "update_project" }, ... ],
+                "contexts": [ "project" ],
                 "is_deprecated": false
             },
             ...
         ]
 
+## Authorization Role instance [/auth_roles/{id}]
++ Parameters
+    + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
+    
+### View authorization role details [GET]
+>**Permission** 
+- - - - -
+authenticated
+
++ Response 200 (application/json)
+
+        {
+            "id": "file_editor",
+            "name": "File Editor",
+            "description": "Can view, download, create, update and delete files",
+            "permissions": [ { "id": "view_project" }, { "id": "download_file" }, ... ],
+            "contexts": [ "project" ],
+            "is_deprecated": false
+        }
+        
+<!-- DEPRECATED
 ## Group Current User
 The current user represents the currently authenticated user.
 
-## Current User [/current_user]
-### Create user [POST]
-**Permissions required:** none
+## Current User instance [/current_user]
 
-**Business Rules:**
-* Created user is granted the "platform\_user" auth role by default.
-* The username defaults to auth\_provider.uid, but can be overriden during user registration.
++ Model (application/json)
+
+    + Body
+
+            {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                "auth_provider": {
+                    "source": "duke_shibboleth",
+                    "uid": "gardner100",
+                    "properties": {  // Other auth provider user properties
+                        <key>: <value>,
+                        <key>: <value>,
+                        ...
+                    }
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": <audit_object>
+            }
+            
+### Update the current user [PUT]
+**Permission:** authenticated
+
+**Rules:**
+- - - - - -
+* The user is created in the server tier via a successful auth provider callback; this
+endpoint allows user to update their profile from client applications.
+* The user is granted the "platform\_user" authorization role by default.
+* The username defaults to auth\_provider.uid, but can be overriden/updated by user.
 * Unique fields: `username`, `email`, `(auth_provider.source + auth_provider.uid)`
+
 + Request (application/json)
 
         {
@@ -276,62 +263,27 @@ The current user represents the currently authenticated user.
             }
         }
 
-+ Response 201 (application/json)
++ Response 200
 
-        {
-            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-            "username": "mrgardner01",
-            "first_name": "Matthew",
-            "last_name": "Gardner",
-            "full_name": "Matthew Gardner",
-            "email": "mrgardner01@duke.edu",
-            "auth_roles": [ <auth_role_object>, ... ], // Global auth roles for current user
-            "permissions": [ "create_project", ... ], // Global permissions (ACL) for current user
-            "auth_provider": {
-                "source": "duke_shibboleth",
-                "uid": "gardner100",
-                "properties": {
-                    <key>: <value>,
-                    <key>: <value>,
-                    ...
-                }
-            },
-            "last_login_on": "2015-01-01T12:00:00Z",
-            "audit": <audit_object>
-        }
+      [Current User instance][]
 
 ### View current user details [GET]
-**Permissions required:** authenticated
-+ Response 200 (application/json)
+>**Permission:** authenticated
 
-        {
-            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-            "username": "mrgardner01",
-            "first_name": "Matthew",
-            "last_name": "Gardner",
-            "full_name": "Matthew Gardner",
-            "email": "mrgardner01@duke.edu",
-            "auth_roles": [ <auth_role_object>, ... ],
-            "permissions": [ "create_project", ... ],
-            "auth_provider": {
-                "source": "duke_shibboleth",
-                "uid": "gardner100",
-                "properties": {
-                    <key>: <value>,
-                    <key>: <value>,
-                    ...
-                }
-            },
-            "last_login_on": "2015-01-01T12:00:00Z",
-            "audit": <audit_object>
-        }
++ Response 200
+
+      [Current User instance][]
+-->
 
 ## Group Users
 A user represents a registered user.
 
 ## Users collection [/users]
 ### List registered users [GET]
-**Permissions required:** authenticated
+>**Permission** 
+- - - - -
+authenticated
+
 + Response 200 (application/json)
 
         "results": [
@@ -341,22 +293,148 @@ A user represents a registered user.
                 "first_name": "Matthew",
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
-                "email": "mrgardner01@duke.edu"
+                "email": "mrgardner01@duke.edu",
+                // Optional part of payload that is returned if the current user has "system_admin" permission.
+                "auth_provider": {
+                    // The trusted authentication source for user (Duke Shibb for MVP).
+                    "source": "duke_shibboleth",
+                    // Unique user id in context of this authentication source. 
+                    "uid": "gardner100",
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": <audit_object>
+                // End optional part of payload.
             },
             ...
         ]
+        
+## User instance [/users/{id}]
++ Parameters
+    + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `id` for a user.
+    
++ Model (application/json)
+
+    + Body
+    
+            {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                // Optional part of payload that is returned if the current user has "system_admin" permission OR 
+                // this is the current users profile.
+                "auth_provider": {
+                    // The trusted authentication source for user (Duke Shibb for MVP).
+                    "source": "duke_shibboleth",
+                    // Unique user id in context of this authentication source. 
+                    "uid": "gardner100",
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": <audit_object>
+                // End optional part of payload.
+            }
+    
+### View registered user details [GET]
+>**Permission**
+- - - - -
+authenticated
+
++ Response 200 
+
+    [User instance][]
+    
+## Group System Permissions
+A system permission represents system level authorization roles that have been granted to a user.
+
+## System Permissions collection [/system/permissions]
+### List system level permissions [GET]
+>**Permission**
+- - - - -
+system\_admin
+
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ]
+            },
+            ...
+        ]
+
+## System Permission instance [/system/permissions/{user_id}]
++ Parameters
+    + user_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `user_id` of the user.
+
++ Model (application/json)
+
+    + Body
+    
+            {
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ]
+            },
+            
+### Grant system level permissions to user [PUT]
+>**Permission** 
+- - - - -
+system\_admin
+
+>**Rules**
+- - - - -
+* Revokes (deletes) any existing system level authorization roles for the user and grants new set.
+* The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
+
++ Request (application/json)
+
+        {
+            // Must specify at least one auth role - set cannot be empty.
+            "auth_roles": [ { "id": "system_admin" }, ... ] 
+        }
+        
++ Response 200
+
+    [System Permission instance][]
+    
+### View system level permissions for user [GET]
+>**Permission** 
+- - - - -
+system\_admin OR system permissions are for the current user
+
++ Response 200
+
+    [System Permission instance][]
+    
+### Revoke system level permissions for user [DELETE]
+>**Permission** 
+- - - - -
+system\_admin
+
++ Response 204
 
 ## Group Projects
 A project is a container for storing, organizing, retrieving and sharing research data files.
 
 ## Projects collection [/projects]
 ### Create a project [POST]
-**Permissions required:** create_project
+>**Permission** 
+- - - - -
+authenticated
 
-**Business Rules:**
-* User who created project is granted "project\_admin" auth role by default.
-* **Should principal investigator be required to create project?**
-* Unique fields: `name`
+>**Rules**
+- - - - -
+* User who creates project is granted "project\_admin" authorization role by default.
+
 + Request (application/json)
 
         {
@@ -370,21 +448,21 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false, // Has the project been logically deleted from meta-data?
-            "current_user": {
-                "member_roles": [ <member_role_object>, ... ], // Project member roles for current user
-                "auth_roles": [ <auth_role_object>, ... ], // Project auth roles for current user
-                "permissions": [ "view_project", "update_project", ... ] // Project permissions (ACL) for current user
-            },
+            // Has the project been logically deleted from meta-data?
+            "is_deleted": false, 
             "audit": <audit_object>
         }
 
-### List all projects [GET]
-**Permissions required:** authenticated
+### List projects [GET]
+>**Permission** 
+- - - - -
+authenticated
 
-**Business Rules:**
+>**Rules**
+- - - - -
 * Lists projects for which the current user has the "view\_project" permission.
-* Projects that have been logically deleted (i.e. `"is_deleted": true`) are not included in this listing.
+* Projects that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
+
 + Response 200 (application/json)
 
         "results": [
@@ -393,39 +471,41 @@ A project is a container for storing, organizing, retrieving and sharing researc
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false,
-                "current_user": {
-                    "member_roles": [ <member_role_object>, ... ],
-                    "auth_roles": [ <auth_role_object>, ... ],
-                    "permissions": [ "view_project", "update_project", ... ]
-                },
                 "audit": <audit_object>
             },
             ...
         ]
 
-## Project [/projects/{id}]
+## Project instance [/projects/{id}]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
-### View project details [GET]
-**Permissions required:** view_project (for project)
-+ Response 200 (application/json)
++ Model (application/json)
 
-        {
-            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-            "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false,
-            "current_user": {
-                "member_roles": [ <member_role_object>, ... ],
-                "auth_roles": [ <auth_role_object>, ... ],
-                "permissions": [ "view_project", "update_project", ... ]
-            },
-            "audit": <audit_object>
-        }
+    + Body
+    
+            {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)",
+                "description": "Goal of generating a targeted knockout mutation...",
+                "is_deleted": false,
+                "audit": <audit_object>
+            }
+            
+### View project details [GET]
+**Permission** 
+- - - - -
+view_project 
+
++ Response 200 
+
+    [Project instance][]
 
 ### Update a project [PUT]
-**Permissions required:** update_project (for project)
+**Permission:** 
+- - - - -
+update_project
+
 + Request (application/json)
 
         {
@@ -433,28 +513,318 @@ A project is a container for storing, organizing, retrieving and sharing researc
             "description": "Goal of generating a targeted knockout mutation..."
         }
 
++ Response 200 
+
+    [Project instance][]
+
+### Delete a project [DELETE]
+**Permission** 
+- - - - -
+delete_project
+
+**Rules**
+- - - - -
+* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  
+* For the MVP, the files associated to the project are not deleted from their physical storage location.
+
++ Response 204
+
+## Group Project Permissions
+A project permission represents project level authorization roles that have been granted to a user.
+
+## Project Permissions collection [/project/{id}/permissions]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
+    
+### List project level permissions [GET]
+>**Permission** 
+- - - - -
+view_project
+
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_roles": [ { "id": "project_admin", "name": "Project Admin" }, ... ]
+            },
+            ...
+        ]
+
+## Project Permission instance [/project/{project_id}/permissions/{user_id}]
++ Parameters
+    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
+    + user_id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `user_id` of the user.
+
++ Model (application/json)
+
+    + Body
+    
+            {
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_roles": [ { "id": "file_editor", "name": "File Editor" }, ... ]
+            }
+            
+### Grant project level permissions to user [PUT]
+>**Permission** 
+- - - - -
+manage_project_permissions
+
+>**Rules**
+- - - - -
+* Revokes (deletes) any existing project level authorization roles for the user and grants new set.
+* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot 
+revoke project level permissions for user if they are the only "project\_admin" designated for the project.
+* The roles specified must be project level authorization roles (i.e. "project" in `auth_role.contexts`).
+
++ Request (application/json)
+
+        {
+            // Must specify at least one auth role - set cannot be empty.
+            "auth_roles": [ { "id": "file_editor" }, ... ] 
+        }
+        
++ Response 200
+
+    [Project Permission instance][]
+    
+### View project level permissions for user [GET]
+>**Permission** 
+- - - - -
+view_project
+
++ Response 200
+
+    [Project Permission instance][]
+    
+### Revoke project level permissions for user [DELETE]
+>**Permission** 
+- - - - -
+manage_project_permissions
+
+>**Rules**
+- - - - -
+* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot 
+revoke project level permissions for user if they are the only "project\_admin" designated for the project.
+
++ Response 204
+
+## Group Project Roles
+A project role represents the part or responsibility that an individual (i.e. user) may assume in the
+context of a project.  These roles have no relationship to authorization roles.
+
+**Project Roles:**
+
+| Role | Name | Description |
+|:-----|:-----|:------------|
+| **principal\_investigator** | Principal Investigator | Lead investigator for the research project |
+| **research\_coordinator** | Research Coordinator | Coordinator for the research project |
+
+## Project Roles collection [/project_roles]
+### List project roles [GET]
+**Permissions required**
+- - - - -
+authenticated
+
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "id": "principal_investigator",
+                "name": "Principal Investigator",
+                "description": "Lead investigator for the research project",
+                "is_deprecated": false
+            },
+            {
+                "id": "research_coordinator",
+                "name": "Research Coordinator",
+                "description": "Coordinator for the research project",
+                "is_deprecated": false
+            },
+            ...
+        ]
+        
+## Project Role instance [/project_roles/{id}]
++ Parameters
+    + id (required, string, `principal_investigator`) ... The unique `id` for a project role.
+    
+### View project role details [GET]
+>**Permission** 
+- - - - -
+authenticated
+
 + Response 200 (application/json)
 
         {
-            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-            "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            "is_deleted": false,
-            "current_user": {
-                "member_roles": [ <member_role_object>, ... ],
-                "auth_roles": [ <auth_role_object>, ... ],
-                "permissions": [ "view_project", "update_project", ... ]
-            },
-            "audit": <audit_object>
+            "id": "principal_investigator",
+            "name": "Principal Investigator",
+            "description": "Lead investigator for the research project",
+            "is_deprecated": false
         }
+        
+### Group Project Affiliations
+An affiliate represents an individual that plays some project level role of interest for reporting or 
+project collaboration puposes.  The affilate may be internal or external (i.e. non-Duke employee).
 
-### Delete a project [DELETE]
-**Permissions required:** delete_project (for project)
+## Project Affiliates collection [/project/{id}/affiliates]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
+    
+### List project affiliations [GET]
+>**Permission** 
+- - - - -
+view_project
 
-**Business Rules:**
-* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  For the MVP, the files associated to the project are not deleted from their physical storage location.
++ Response 200 (application/json)
+
+        "results": [
+            {
+                "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+                // Is this affiliation an external (non-Duke) person?
+                "is_external": false,
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                // Property "user" is "null" for external (non-Duke) affiliations.
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner001@duke.edu"
+                },
+                // Property "external_person" is "null" for internal (Duke) affiliations.
+                external_person: null,
+                "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
+            },
+            {
+                "id": "dd33f7df-33ca-46dd-a015-92c46fdbda44",
+                "is_external": true,
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                // Property "user" is "null" for external (non-Duke) affiliations.
+                "user": null,
+                // Property "external_person" is "null" for internal (Duke) affiliations.
+                external_person: {
+                    "full_name": "Geddy Lee",
+                    "email": "geddy.lee@pennstate.edu"
+                },
+                "project_roles": [ { "id": "research_coordinator", "name": "Research Coordinator" }, ... ]
+            },
+            ...
+        ]
+        
+### Create project affiliate [POST]
+>**Permission** 
+- - - - -
+
+>**Rules**
+- - - - -
+* To create an "external" (i.e. non-Duke employee) affiliate pass `null` for "user" property and provide "external_person"
+properties.  See example of "external_person" in PUT (i.e. update) endpoint.
+* To create an "internal" (i.e. Duke employee) affiliate pass `null` for "external_person"
+property and provide user property as shown in example payload for this endpoint. 
+
+update_project
+
++ Request (application/json)
+
+        {
+            "user: { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+            "external_person": null,
+            "project_roles": [ { "id": "principal_investigator" }, ... ] 
+        }
+        
++ Response 201 (application/json)
+
+        {
+            "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+            "is_external": false,
+            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner001@duke.edu"
+            },
+            external_person: null,
+            "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
+        }
+        
+## Project Affiliate instance [/project/{project_id}/affiliates/{affiliate_id}]
++ Parameters
+    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
+    + affiliate_id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `affiliate_id` of the affiliate.
+
++ Model (application/json)
+
+    + Body
+    
+            {
+                "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+                "is_external": false,
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner001@duke.edu"
+                },
+                external_person: null,
+                "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
+            }
+            
+### View project affiliate detials [GET]
+>**Permission** 
+- - - - -
+view_project
+
++ Response 200
+
+    [Project Affiliate instance][]
+        
+### Update project affiliate [PUT]
+>**Permission** 
+- - - - -
+update_project
+
++ Request (application/json)
+
+        {
+            "user: null,
+            "external_person": {
+                "first_name": "Geddy",
+                "last_name": "Lee",
+                "email": "geddy.lee@pennstate.edu"
+            },
+            "project_roles": [ { "id": "research_coordinator" }, ... ] 
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "id": "dd33f7df-33ca-46dd-a015-92c46fdbda44",
+            "is_external": true,
+            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "user": null,
+            external_person: {
+                "full_name": "Geddy Lee",
+                "email": "geddy.lee@pennstate.edu"
+            },
+            "project_roles": [ { "id": "research_coordinator", "name": "Research Coordinator" }, ... ]
+        }
+        
+### Delete a project affiliate [DELETE]
+>**Permission** 
+- - - - -
+update_project
+
 + Response 204
 
+<!-- DEPRECATED
 ## Group Project Members
 A project member represents an individual (i.e. user) that has an affiliation to a project.
 
@@ -611,3 +981,4 @@ The response returns a signed URL in the `Location` header that can be used to u
                 },
                 <audit_object>
             }
+-->
