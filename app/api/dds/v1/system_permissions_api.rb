@@ -7,7 +7,11 @@ module DDS
         failure [401]
       end
       get '/system/permissions', root: false do
-        {}
+        {
+          results: User.all.collect {|u| 
+            {user: u.uuid, auth_roles: u.auth_roles}
+          }
+        }
       end
 
       desc 'Grant system permissions to user' do
