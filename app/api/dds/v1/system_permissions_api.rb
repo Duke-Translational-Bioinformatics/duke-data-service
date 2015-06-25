@@ -51,7 +51,7 @@ module DDS
         user = User.find(params[:user_id])
         {
           user: user.uuid,
-          auth_roles: user.auth_role_ids
+          auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
         }
       end
 

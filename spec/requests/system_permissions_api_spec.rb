@@ -69,11 +69,7 @@ describe DDS::V1::SystemPermissionsAPI do
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('user')
-      expect(response_json['user']).to eq(auth_user.uuid)
-      expect(response_json).to have_key('auth_roles')
-      expect(response_json['auth_roles']).to be_a Array
-      expect(response_json['auth_roles']).to eq(auth_user.auth_role_ids)
+      expect(response_json).to eq(user_role_hash)
     end
   end
 
