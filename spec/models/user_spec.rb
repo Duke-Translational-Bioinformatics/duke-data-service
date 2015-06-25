@@ -26,9 +26,13 @@ RSpec.describe User, type: :model do
   describe 'authorization roles' do
     subject {FactoryGirl.create(:user, :with_auth_role)}
 
-    it 'should have an auth_roles method' do
+    it 'should have an auth_roles method that returns AuthRole objects' do
       expect(subject).to respond_to(:auth_roles)
-      expect(subject.auth_roles).to eq(subject.auth_role_ids)
+      expect(subject.auth_roles).to be_a Array
+      subject.auth_role_ids.each do |role_id|
+        role = AuthRole.where(text_id: role_id).first
+        expect(subject.auth_roles).to include(role)
+      end
     end
 
     it 'should have an auth_roles= method' do

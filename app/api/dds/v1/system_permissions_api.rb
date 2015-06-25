@@ -9,7 +9,7 @@ module DDS
       get '/system/permissions', root: false do
         {
           results: User.all.collect {|u| 
-            {user: u.uuid, auth_roles: u.auth_roles}
+            {user: u.uuid, auth_roles: u.auth_role_ids}
           }
         }
       end
@@ -28,7 +28,7 @@ module DDS
         user.update_attribute(:auth_roles, user_params[:auth_roles])
         {
           user: user.uuid,
-          auth_roles: user.auth_roles
+          auth_roles: user.auth_role_ids
         }
       end
 
@@ -41,7 +41,7 @@ module DDS
         user = User.find(params[:user_id])
         {
           user: user.uuid,
-          auth_roles: user.auth_roles
+          auth_roles: user.auth_role_ids
         }
       end
 

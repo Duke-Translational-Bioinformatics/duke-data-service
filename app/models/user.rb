@@ -11,7 +11,9 @@ class User < ActiveRecord::Base
   end
 
   def auth_roles
-    auth_role_ids
+    auth_role_ids.collect do |role_id|
+      AuthRole.where(text_id: role_id).first
+    end
   end
 
   def auth_roles=(new_auth_role_ids)

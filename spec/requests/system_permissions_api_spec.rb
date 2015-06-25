@@ -11,7 +11,7 @@ describe DDS::V1::SystemPermissionsAPI do
     it 'should return a list of users and auth_roles' do
       user_role_hash = {
         user: auth_user.uuid,
-        auth_roles: auth_user.auth_roles
+        auth_roles: auth_user.auth_role_ids
       }.stringify_keys
       get '/api/v1/system/permissions', json_headers
       expect(response.status).to eq(200)
@@ -53,7 +53,7 @@ describe DDS::V1::SystemPermissionsAPI do
       expect(response_json['user']).to eq(auth_user.uuid)
       expect(response_json).to have_key('auth_roles')
       expect(response_json['auth_roles']).to be_a Array
-      expect(response_json['auth_roles']).to eq(auth_user.auth_roles)
+      expect(response_json['auth_roles']).to eq(auth_user.auth_role_ids)
     end
   end
 
@@ -64,7 +64,7 @@ describe DDS::V1::SystemPermissionsAPI do
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       auth_user.reload
-      expect(auth_user.auth_roles).to be_nil
+      expect(auth_user.auth_role_ids).to be_nil
     end
   end
 end
