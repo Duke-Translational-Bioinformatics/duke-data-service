@@ -15,6 +15,7 @@ module DDS
       end
 
       mount DDS::V1::UserAPI
+      mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
     end
   end
