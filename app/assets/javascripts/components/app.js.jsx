@@ -31,7 +31,8 @@ var App = React.createClass({
     }).then(
       function(data) {
         api_token = data['api_token'];
-        this.setState({api_token: api_token})
+        window.localStorage.api_token = api_token;
+        this.setState({api_token: api_token});
       }.bind(this),
       function(jqXHR, status, err) {
         console.log(jqXHR.responseText);
@@ -47,16 +48,18 @@ var App = React.createClass({
   },
 
   componentDidMount: function() {
-    if (window.location.href.indexOf('#access_token') > 0){
+    if (window.localStorage.api_token) {
+      this.setState({api_token: window.localStorage.api_token});
+      this.transitionTo('home');
+    }
+    else if (window.location.href.indexOf('#access_token') > 0){
       var parts = window.location.hash.split('&');
       var access_token = parts[0].split('=')[1];
-      this.setState({access_token: access_token});
       this.validateAccessToken(access_token);
+      this.transitionTo('home');
     }
     else {
-      if (!this.state.api_token) {
-        this.transitionTo('login');
-      }
+      this.replaceWith('login');
     }
   },
   render: function() {

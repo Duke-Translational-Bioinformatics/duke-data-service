@@ -4,7 +4,7 @@ var Route = ReactRouter.Route,
 
 this.DDSRoutes = (
   <Route handler={App}>
-    <DefaultRoute handler={Home} />
+    <DefaultRoute name='home' handler={Home} />
     <Route name='login' handler={Login} path='login' />
   </Route>
 );
