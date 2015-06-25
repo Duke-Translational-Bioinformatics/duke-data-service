@@ -7,8 +7,8 @@ FactoryGirl.define do
     contexts  { (0..Faker::Number.digit.to_i).collect { Faker::Internet.slug } }
     is_deprecated false
 
-    trait :deprectated do
-      is_deprectated true
+    trait :deprecated do
+      is_deprecated true
     end
   end
 
