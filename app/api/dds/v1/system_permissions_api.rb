@@ -10,7 +10,7 @@ module DDS
         {
           results: User.all.collect {|u| 
             {
-              user: u.uuid, 
+              user: UserSerializer.new(u), 
               auth_roles: u.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
             }
           }
@@ -30,7 +30,7 @@ module DDS
         user = User.find(params[:user_id])
         if user.update(auth_roles: user_params[:auth_roles])
           {
-            user: user.uuid,
+            user: UserSerializer.new(user),
             auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
           }
         else
@@ -50,7 +50,7 @@ module DDS
       get '/system/permissions/:user_id', root: false do
         user = User.find(params[:user_id])
         {
-          user: user.uuid,
+          user: UserSerializer.new(user),
           auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
         }
       end

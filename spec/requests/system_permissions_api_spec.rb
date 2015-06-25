@@ -7,7 +7,7 @@ describe DDS::V1::SystemPermissionsAPI do
   let(:user) { FactoryGirl.create(:user) }
   let(:auth_user) { FactoryGirl.create(:user, :with_auth_role) }
   let(:user_role_hash) {{
-    'user' => auth_user.uuid,
+    'user' => JSON.parse(UserSerializer.new(auth_user).to_json),
     'auth_roles' => auth_user.auth_roles.collect { |role| 
       JSON.parse(AuthRoleSerializer.new(role).to_json) 
     }
@@ -33,17 +33,16 @@ describe DDS::V1::SystemPermissionsAPI do
       payload = {
         auth_roles: [auth_role.text_id]
       }
-      expected_auth_roles = [JSON.parse(AuthRoleSerializer.new(auth_role).to_json)]
+      expected_result = {
+        user: JSON.parse(UserSerializer.new(user).to_json),
+        auth_roles: [JSON.parse(AuthRoleSerializer.new(auth_role).to_json)]
+      }.stringify_keys
       put "/api/v1/system/permissions/#{user.id}", payload.to_json, json_headers
       expect(response.status).to eq(200)
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('user')
-      expect(response_json['user']).to eq(user.uuid)
-      expect(response_json).to have_key('auth_roles')
-      expect(response_json['auth_roles']).to be_a Array
-      expect(response_json['auth_roles']).to eq(expected_auth_roles)
+      expect(response_json).to eq(expected_result)
     end
 
     it 'should return validation errors for non-existent roles' do
