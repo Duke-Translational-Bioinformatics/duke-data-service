@@ -6,22 +6,16 @@ describe DDS::V1::SystemPermissionsAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
   let(:user) { FactoryGirl.create(:user) }
   let(:auth_user) { FactoryGirl.create(:user, :with_auth_role) }
+  let(:user_role_hash) {{
+    'user' => auth_user.uuid,
+    'auth_roles' => auth_user.auth_roles.collect { |role| 
+      JSON.parse(AuthRoleSerializer.new(role).to_json) 
+    }
+  }}
 
   describe 'List system permissions' do
     it 'should return a list of users and auth_role objects' do
-      user_role_hash = {
-        user: auth_user.uuid
-      }
-      user_role_hash[:auth_roles] = auth_user.auth_roles.collect do |role|
-        {
-          id: role.text_id,
-          name: role.name,
-          description: role.description,
-          permissions: role.permissions,
-          contexts: role.contexts,
-          is_deprecated: role.is_deprecated
-        }.stringify_keys
-      end
+      expected_result = user_role_hash
       get '/api/v1/system/permissions', json_headers
       expect(response.status).to eq(200)
       expect(response.body).to be
@@ -29,7 +23,7 @@ describe DDS::V1::SystemPermissionsAPI do
       response_json = JSON.parse(response.body)
       expect(response_json).to have_key('results')
       expect(response_json['results']).to be_a Array
-      expect(response_json['results']).to include(user_role_hash.stringify_keys)
+      expect(response_json['results']).to include(expected_result)
     end
   end
 
