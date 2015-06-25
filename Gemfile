@@ -13,7 +13,7 @@ gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem "grape-active_model_serializers"
 gem 'react-rails', '~> 1.0'
-gem 'react-router-rails', '0.13.3'
+gem 'react-router-rails', github: 'mariopeixoto/react-router-rails', branch: 'v0.13.3p1'
 gem 'tilt'
 gem 'jquery-rails'
 gem 'turbolinks'

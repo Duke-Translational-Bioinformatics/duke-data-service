@@ -12,8 +12,7 @@ var App = React.createClass({
     return (
       <div>
         <h1>Duke Data Services</h1>
-        <p>service_id: {this.props.service_id}</p>
-        <RouteHandler />
+        <RouteHandler {...this.props}/>
       </div>
     )
   }

@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/mariopeixoto/react-router-rails.git
+  revision: a686996fb0f0d0a03042ab0e8f73209ba84eecc8
+  branch: v0.13.3p1
+  specs:
+    react-router-rails (0.13.3)
+      rails (>= 3.1)
+      react-rails (>= 0.12)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -152,9 +161,6 @@ GEM
       execjs
       rails (>= 3.1)
       react-source (~> 0.13)
-    react-router-rails (0.13.3)
-      rails (>= 3.1)
-      react-rails (>= 0.12)
     react-source (0.13.3)
     rspec-core (3.3.1)
       rspec-support (~> 3.3.0)
@@ -221,7 +227,7 @@ DEPENDENCIES
   rails (= 4.2.1)
   rails_12factor
   react-rails (~> 1.0)
-  react-router-rails (= 0.13.3)
+  react-router-rails!
   rspec-rails
   rspec_junit_formatter (= 0.2.2)
   shoulda-matchers
@@ -232,4 +238,4 @@ DEPENDENCIES
   uglifier
 
 BUNDLED WITH
-   1.10.4
+   1.10.5
