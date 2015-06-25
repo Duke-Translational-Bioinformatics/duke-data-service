@@ -1,1 +1,1 @@
-<%= react_router 'DDSRoutes', 'HistoryLocation', {foo: 'this is foo prop'}, { prerender_location: @location_path } %>
+<%= react_router 'DDSRoutes', 'HistoryLocation', {service_id: Rails.application.secrets.service_id, auth_service_name: @auth_service.name, auth_service_uri: @auth_service.base_uri}, { prerender_location: @location_path } %>

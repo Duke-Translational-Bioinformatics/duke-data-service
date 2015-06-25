@@ -1,22 +1,18 @@
 /** @jsx React.DOM */
-var RouteHandler = ReactRouter.RouteHandler,
-    Link = ReactRouter.Link;
+var RouteHandler = ReactRouter.RouteHandler;
 
 var App = React.createClass({
+  getInitialState: function() {
+    return {
+      api_token: ''
+    };
+  },
+
   render: function() {
     return (
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to='/'>Home</Link>
-            </li>
-            <li>
-              <Link to='/splash'>Splash Page</Link>
-            </li>
-          </ul>
-        </nav>
-        <h1>App {this.props.foo}</h1>
+        <h1>Duke Data Services</h1>
+        <p>service_id: {this.props.service_id}</p>
         <RouteHandler />
       </div>
     )

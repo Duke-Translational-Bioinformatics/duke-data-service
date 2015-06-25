@@ -5,6 +5,6 @@ var Route = ReactRouter.Route,
 this.DDSRoutes = (
   <Route handler={App}>
     <DefaultRoute handler={Home} />
-    <Route handler={Splash} path='splash' />
+    <Route handler={Login} path='login' />
   </Route>
 );
