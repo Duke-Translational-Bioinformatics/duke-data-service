@@ -12,7 +12,7 @@ RSpec.describe User, type: :model do
   end
 
   describe 'authorization roles' do
-    subject {FactoryGirl.create(:user, :system_admin)}
+    subject {FactoryGirl.create(:user, :with_auth_role)}
 
     it 'should have an auth_roles method' do
       expect(subject).to respond_to(:auth_roles)
