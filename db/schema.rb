@@ -11,10 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150624032853) do
+ActiveRecord::Schema.define(version: 20150624183941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "auth_roles", force: :cascade do |t|
+    t.string   "text_id"
+    t.string   "name"
+    t.string   "description"
+    t.jsonb    "permissions"
+    t.jsonb    "contexts"
+    t.boolean  "is_deprecated"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "auth_roles", ["contexts"], name: "index_auth_roles_on_contexts", using: :gin
+  add_index "auth_roles", ["permissions"], name: "index_auth_roles_on_permissions", using: :gin
 
   create_table "authentication_services", force: :cascade do |t|
     t.string   "uuid"
@@ -37,9 +51,11 @@ ActiveRecord::Schema.define(version: 20150624032853) do
     t.string   "etag"
     t.string   "email"
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text     "auth_roles"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.jsonb    "auth_role_ids"
   end
+
+  add_index "users", ["auth_role_ids"], name: "index_users_on_auth_role_ids", using: :gin
 
 end
