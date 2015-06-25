@@ -42,4 +42,21 @@ RSpec.describe User, type: :model do
       expect(subject.auth_role_ids).to eq(new_role_ids)
     end
   end
+
+  describe 'serialization' do
+    subject {FactoryGirl.create(:user)}
+
+    it 'should serialize to json' do
+      serializer = UserSerializer.new subject
+      payload = serializer.to_json
+      expect(payload).to be
+      parsed_json = JSON.parse(payload)
+      expect(parsed_json).to have_key('id')
+      expect(parsed_json).to have_key('name')
+      expect(parsed_json).to have_key('email')
+      expect(parsed_json['id']).to eq(subject.uuid)
+      expect(parsed_json['name']).to eq(subject.name)
+      expect(parsed_json['email']).to eq(subject.email)
+    end
+  end
 end
