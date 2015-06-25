@@ -20,7 +20,7 @@ module DDS
       desc 'Grant system permissions to user' do
         detail 'Sets the auth_roles for a given user'
         named 'grant permissions'
-        failure [401]
+        failure [400, 401]
       end
       params do
         optional :auth_roles
@@ -28,11 +28,18 @@ module DDS
       put '/system/permissions/:user_id', root: false do
         user_params = declared(params, include_missing: false)
         user = User.find(params[:user_id])
-        user.update_attribute(:auth_roles, user_params[:auth_roles])
-        {
-          user: user.uuid,
-          auth_roles: user.auth_role_ids
-        }
+        if user.update(auth_roles: user_params[:auth_roles])
+          {
+            user: user.uuid,
+            auth_roles: user.auth_role_ids
+          }
+        else
+          error!({
+            error: 400, 
+            reason: 'validation failed', 
+            errors: []
+          }, 400)
+        end
       end
 
       desc 'View system permissions to user' do

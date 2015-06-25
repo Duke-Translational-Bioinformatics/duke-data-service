@@ -12,6 +12,7 @@ describe DDS::V1::SystemPermissionsAPI do
       JSON.parse(AuthRoleSerializer.new(role).to_json) 
     }
   }}
+  let(:auth_role) { FactoryGirl.create(:auth_role) }
 
   describe 'List system permissions' do
     it 'should return a list of users and auth_role objects' do
@@ -30,7 +31,7 @@ describe DDS::V1::SystemPermissionsAPI do
   describe 'Grant system permissions to user' do
     it 'should set auth_roles for a given user' do
       payload = {
-        auth_roles: ['platform_user']
+        auth_roles: [auth_role.text_id]
       }
       put "/api/v1/system/permissions/#{user.id}", payload.to_json, json_headers
       expect(response.status).to eq(200)
@@ -42,6 +43,21 @@ describe DDS::V1::SystemPermissionsAPI do
       expect(response_json).to have_key('auth_roles')
       expect(response_json['auth_roles']).to be_a Array
       expect(response_json['auth_roles']).to eq(payload[:auth_roles])
+    end
+
+    it 'should return validation errors for non-existent roles' do
+      payload = {
+        auth_roles: ['platform_user']
+      }
+      put "/api/v1/system/permissions/#{user.id}", payload.to_json, json_headers
+      expect(response.status).to eq(400)
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('error')
+      expect(response_json['error']).to eq(400)
+      expect(response_json).to have_key('reason')
+      expect(response_json['reason']).to eq('validation failed')
     end
   end
 
