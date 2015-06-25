@@ -5,8 +5,8 @@ FactoryGirl.define do
     email { Faker::Internet.email }
     name { Faker::Name.name }
 
-    trait :system_admin do
-      auth_roles ['system_admin']
+    trait :with_auth_role do
+      auth_role_ids [FactoryGirl.create(:auth_role).text_id]
     end
   end
 end

@@ -9,7 +9,10 @@ module DDS
       get '/system/permissions', root: false do
         {
           results: User.all.collect {|u| 
-            {user: u.uuid, auth_roles: u.auth_roles}
+            {
+              user: u.uuid, 
+              auth_roles: u.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
+            }
           }
         }
       end
@@ -25,11 +28,18 @@ module DDS
       put '/system/permissions/:user_id', root: false do
         user_params = declared(params, include_missing: false)
         user = User.find(params[:user_id])
-        user.update_attribute(:auth_roles, user_params[:auth_roles])
-        {
-          user: user.uuid,
-          auth_roles: JSON.parse(user.auth_roles)
-        }
+        if user.update(auth_roles: user_params[:auth_roles])
+          {
+            user: user.uuid,
+            auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
+          }
+        else
+          error!({
+            error: 400, 
+            reason: 'validation failed', 
+            errors: []
+          }, 400)
+        end
       end
 
       desc 'View system permissions to user' do
@@ -41,7 +51,7 @@ module DDS
         user = User.find(params[:user_id])
         {
           user: user.uuid,
-          auth_roles: JSON.parse(user.auth_roles)
+          auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
         }
       end
 
