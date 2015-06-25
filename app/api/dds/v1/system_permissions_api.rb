@@ -9,7 +9,10 @@ module DDS
       get '/system/permissions', root: false do
         {
           results: User.all.collect {|u| 
-            {user: u.uuid, auth_roles: u.auth_role_ids}
+            {
+              user: u.uuid, 
+              auth_roles: u.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
+            }
           }
         }
       end
