@@ -23,7 +23,7 @@ module DDS
         failure [401]
       end
       params do
-        optional :auth_roles
+        required :auth_roles
       end
       put '/system/permissions/:user_id', root: false do
         user_params = declared(params, include_missing: false)
