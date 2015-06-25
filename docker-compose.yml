@@ -13,7 +13,7 @@ server:
   links:
     - db:postgres.db.host
 db:
-  build: ./config/docker/db
+  build: ./docker/builds/db
   environment:
     - POSTGRES_USER=duke-data-service
     - POSTGRES_PASSWORD=abc123
