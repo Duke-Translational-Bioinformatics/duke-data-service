@@ -7,8 +7,27 @@ var App = React.createClass({
       dataType: 'json'
     }).then(
       function(data) {
-        
-      },
+        signed_token = data['signed_info'];
+        this.setApiToken(signed_token);
+      }.bind(this),
+      function(jqXHR, status, err) {
+        console.log(jqXHR.responseText);
+        var errorMessage = JSON.parse(jqXHR.responseText);
+        console.log("ERROR "+errorMessage)
+      }.bind(this)
+    );
+  },
+  setApiToken: function(signed_token) {
+    var jqReq = $.ajax({
+      type: 'GET',
+      url: '/api/v1/user/api_token?access_token='+signed_token,
+      contentType: 'application/json',
+      dataType: 'json'
+    }).then(
+      function(data) {
+        api_token = data['api_token'];
+        this.setState({api_token: api_token})
+      }.bind(this),
       function(jqXHR, status, err) {
         console.log(jqXHR.responseText);
         var errorMessage = JSON.parse(jqXHR.responseText);
@@ -41,8 +60,7 @@ var App = React.createClass({
     return (
       <div>
         <h1>Duke Data Services</h1>
-        <p>access_token: {this.state.access_token}</p>
-        <Child service_id={this.props.service_id} auth_service_name={this.props.auth_service_name} auth_service_uri={this.props.auth_service_uri} />
+        <Child api_token={this.state.api_token} service_id={this.props.service_id} auth_service_name={this.props.auth_service_name} auth_service_uri={this.props.auth_service_uri} />
       </div>
     )
   }
