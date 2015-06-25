@@ -10,7 +10,7 @@ var Login = React.createClass({
   render: function() {
     return (
       <div>
-        <h2>Login with an Authentication Service</h2>
+        <h5>Please login with an Authentication Service</h5>
         <ul>
           <li><a href={this.props.auth_service_uri+"/authenticate?client_id="+this.props.service_id+"&state="+this.state.security_state+"&response_type=Bearer&scope=display_name mail uid"}>{this.props.auth_service_name}</a></li>
         </ul>
