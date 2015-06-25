@@ -8,9 +8,9 @@ module DDS
       end
       get '/system/permissions', root: false do
         {
-          results: User.all.collect {|u| 
+          results: User.all.collect {|u|
             {
-              user: UserSerializer.new(u), 
+              user: UserSerializer.new(u),
               auth_roles: u.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
             }
           }
@@ -23,7 +23,7 @@ module DDS
         failure [401]
       end
       params do
-        required :auth_roles
+        requires :auth_roles
       end
       put '/system/permissions/:user_id', root: false do
         user_params = declared(params, include_missing: false)
@@ -35,8 +35,8 @@ module DDS
           }
         else
           error!({
-            error: 400, 
-            reason: 'validation failed', 
+            error: 400,
+            reason: 'validation failed',
             errors: []
           }, 400)
         end
