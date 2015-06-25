@@ -20,7 +20,7 @@ module DDS
       desc 'Grant system permissions to user' do
         detail 'Sets the auth_roles for a given user'
         named 'grant permissions'
-        failure [400, 401]
+        failure [401]
       end
       params do
         optional :auth_roles
@@ -31,7 +31,7 @@ module DDS
         if user.update(auth_roles: user_params[:auth_roles])
           {
             user: user.uuid,
-            auth_roles: user.auth_role_ids
+            auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
           }
         else
           error!({
