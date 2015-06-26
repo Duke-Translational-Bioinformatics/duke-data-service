@@ -393,6 +393,8 @@ system\_admin
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing system level authorization roles for the user and grants new set.
+* The platform must have at leat one user with the system\_admin" authorization role.  Cannot 
+revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
 * The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
 
 + Request (application/json)
@@ -420,6 +422,11 @@ system\_admin OR system permissions are for the current user
 - - - - -
 system\_admin
 
+>**Rules**
+- - - - -
+* The platform must have at leat one user with the system\_admin" authorization role.  Cannot 
+revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
+
 + Response 204
 
 ## Group Projects
@@ -434,12 +441,22 @@ authenticated
 >**Rules**
 - - - - -
 * User who creates project is granted "project\_admin" authorization role by default.
+* An affiliate with a `project_role` of "principal_investigator" must be specified on create.
 
 + Request (application/json)
 
         {
             "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation..."
+            "description": "Goal of generating a targeted knockout mutation...",
+            // An affilite with a project_role of principal_investigator must specified.
+            "affiliates": [ 
+                {
+                    "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+                    "external_person": null,
+                    "project_roles": [ { "id": "principal_investigator" }, ... ]
+                },
+                ...
+            ]
         }
 
 + Response 201 (application/json)
@@ -448,6 +465,14 @@ authenticated
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
+            "affiliates": [ 
+                {
+                    "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+                    "external_person": null,
+                    "project_roles": [ { "id": "principal_investigator" }, ... ]
+                },
+                ...
+            ],
             // Has the project been logically deleted from meta-data?
             "is_deleted": false, 
             "audit": <audit_object>
@@ -470,6 +495,14 @@ authenticated
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
+                "affiliates": [ 
+                    {
+                        "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+                        "external_person": null,
+                        "project_roles": [ { "id": "principal_investigator" }, ... ]
+                    },
+                    ...
+                ]
                 "is_deleted": false,
                 "audit": <audit_object>
             },
@@ -488,6 +521,14 @@ authenticated
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
+                "affiliates": [ 
+                    {
+                        "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+                        "external_person": null,
+                        "project_roles": [ { "id": "principal_investigator" }, ... ]
+                    },
+                    ...
+                ],
                 "is_deleted": false,
                 "audit": <audit_object>
             }
@@ -696,7 +737,7 @@ view_project
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "full_name": "Matthew Gardner",
-                    "email": "mrgardner001@duke.edu"
+                    "email": "mrgardner01@duke.edu"
                 },
                 "external_person": null,
                 "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
@@ -747,7 +788,7 @@ update_project
             "user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "full_name": "Matthew Gardner",
-                "email": "mrgardner001@duke.edu"
+                "email": "mrgardner01@duke.edu"
             },
             "external_person": null,
             "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
@@ -769,7 +810,7 @@ update_project
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "full_name": "Matthew Gardner",
-                    "email": "mrgardner001@duke.edu"
+                    "email": "mrgardner01@duke.edu"
                 },
                 "external_person": null,
                 "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
@@ -818,6 +859,11 @@ update_project
 >**Permission** 
 - - - - -
 update_project
+
+>**Rules**
+- - - - -
+* Every project must have one and only one affiliate with a `project_role` of "principal_investigator"; this
+affiliate cannot be deleted.
 
 + Response 204
 
