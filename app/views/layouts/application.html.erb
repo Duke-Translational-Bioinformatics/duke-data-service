@@ -7,6 +7,7 @@
   <title>Duke Data Service</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+   <%= stylesheet_link_tag "layout_blue", :media => "all" %>
    <%= javascript_include_tag "ie10-viewport-bug-workaround" %>
 
    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -18,8 +19,6 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <div class="container-fluid">
     <%= yield %>
-  </div>
 </body>
 </html>
