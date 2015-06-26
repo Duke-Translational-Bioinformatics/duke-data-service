@@ -4,6 +4,10 @@ var Navigation = ReactRouter.Navigation;
 
 var App = React.createClass({
   mixins: [ Navigation ],
+  handleLogout: function() {
+    window.localStorage.removeItem('api_token');
+    this.replaceWith('login');
+  },
   validateAccessToken: function(access_token) {
     var jqReq = $.ajax({
       type: 'GET',
@@ -65,8 +69,10 @@ var App = React.createClass({
   render: function() {
     return (
       <div>
-        <h1>Duke Data Services</h1>
-        <RouteHandler {...this.props} api_token={this.state.api_token} />
+        <NavMenu {...this.props} api_token={this.state.api_token} handleLogout={this.handleLogout} />
+        <div className="container-fluid">
+          <RouteHandler {...this.props} api_token={this.state.api_token} />
+        </div>
       </div>
     )
   }
