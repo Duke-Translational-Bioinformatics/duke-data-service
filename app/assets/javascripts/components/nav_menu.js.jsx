@@ -4,7 +4,8 @@ var NavMenu = React.createClass({
   mixins: [ Navigation ],
 
   render: function() {
-    var displayStyle = this.props.api_token ? {display: 'block'} : {display: 'none'};
+    var isLoggedIn = this.props.api_token ? true : false;
+    var displayStyle = isLoggedIn ? {display: 'block'} : {display: 'none'};
     return (
       <div className="navbar navbar-default" role="navigation">
         <div className="container-fluid">
@@ -18,7 +19,7 @@ var NavMenu = React.createClass({
           <a href="/" title="Home"><p>Todo Logo</p><i className="fa fa-home fa-lg">Duke Data Services</i></a>
          </div>
          <div className="navbar-collapse collapse">
-          <ul id="user-control-menu" style={displayStyle} className="nav navbar-nav navbar-right">
+          <ul style={displayStyle} className="nav navbar-nav navbar-right">
             <li className="dropdown">
               <a href="#" className="dropdown-toggle" data-toggle="dropdown">
                 <i className='fa fa-user'></i>Darin London
@@ -34,6 +35,7 @@ var NavMenu = React.createClass({
               </ul>
             </li>
           </ul>
+          <SubMenu isLoggedIn={isLoggedIn} />
          </div>
         </div>
       </div>
