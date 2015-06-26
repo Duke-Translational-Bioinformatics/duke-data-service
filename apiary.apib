@@ -449,14 +449,11 @@ authenticated
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             // An affilite with a project_role of principal_investigator must specified.
-            "affiliates": [ 
-                {
-                    "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-                    "external_person": null,
-                    "project_roles": [ { "id": "principal_investigator" }, ... ]
-                },
-                ...
-            ]
+            "pi_affiliate": {
+                "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
+                "external_person": null,
+                "project_roles": [ { "id": "principal_investigator" }, ... ]
+            }
         }
 
 + Response 201 (application/json)
@@ -465,14 +462,6 @@ authenticated
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            "affiliates": [ 
-                {
-                    "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-                    "external_person": null,
-                    "project_roles": [ { "id": "principal_investigator" }, ... ]
-                },
-                ...
-            ],
             // Has the project been logically deleted from meta-data?
             "is_deleted": false, 
             "audit": <audit_object>
@@ -495,14 +484,6 @@ authenticated
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
-                "affiliates": [ 
-                    {
-                        "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-                        "external_person": null,
-                        "project_roles": [ { "id": "principal_investigator" }, ... ]
-                    },
-                    ...
-                ]
                 "is_deleted": false,
                 "audit": <audit_object>
             },
@@ -521,14 +502,6 @@ authenticated
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
-                "affiliates": [ 
-                    {
-                        "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-                        "external_person": null,
-                        "project_roles": [ { "id": "principal_investigator" }, ... ]
-                    },
-                    ...
-                ],
                 "is_deleted": false,
                 "audit": <audit_object>
             }
