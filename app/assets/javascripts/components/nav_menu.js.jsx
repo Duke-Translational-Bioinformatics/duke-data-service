@@ -1,11 +1,9 @@
-var Navigation = ReactRouter.Navigation;
+var Link = ReactRouter.Link;
 
 var NavMenu = React.createClass({
-  mixins: [ Navigation ],
 
   render: function() {
-    var isLoggedIn = this.props.api_token ? true : false;
-    var displayStyle = isLoggedIn ? {display: 'block'} : {display: 'none'};
+    var Child = this.props.isLoggedIn ? LogoutMenu : LoginMenu;
     return (
       <div className="navbar navbar-default" role="navigation">
         <div className="container-fluid">
@@ -18,27 +16,51 @@ var NavMenu = React.createClass({
           </button>
           <a href="/" title="Home"><p>Todo Logo</p><i className="fa fa-home fa-lg">Duke Data Services</i></a>
          </div>
-         <div className="navbar-collapse collapse">
-          <ul style={displayStyle} className="nav navbar-nav navbar-right">
-            <li className="dropdown">
-              <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-                <i className='fa fa-user'></i>Darin London
-                <b className="caret"></b>
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a href='' onClick={this.props.handleLogout}>
-                    <i className="fa fa-sign-out"></i>
-                    Logout
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <SubMenu isLoggedIn={isLoggedIn} />
-         </div>
+         <Child {...this.props} />
         </div>
       </div>
+    )
+  }
+});
+
+var LogoutMenu = React.createClass({
+
+  render: function() {
+    return (
+      <div className="navbar-collapse collapse">
+        <ul className="nav navbar-nav navbar-right">
+         <li className="dropdown">
+           <a href="#" className="dropdown-toggle" data-toggle="dropdown">
+             <i className='fa fa-user'></i>Darin London
+             <b className="caret"></b>
+           </a>
+           <ul className="dropdown-menu">
+             <li>
+               <a href='' onClick={this.props.handleLogout}>
+                 <i className="fa fa-sign-out"></i>
+                 Logout
+               </a>
+             </li>
+           </ul>
+         </li>
+        </ul>
+        <SubMenu isLoggedIn={this.props.isLoggedIn} />
+      </div>
+    )
+  }
+});
+
+var LoginMenu = React.createClass({
+
+  render: function() {
+    return (
+        <div>
+          <ul className="nav navbar-nav navbar-right">
+            <li className="dropdown">
+              <Link to="login">Login</Link>
+           </li>
+          </ul>
+        </div>
     )
   }
 });

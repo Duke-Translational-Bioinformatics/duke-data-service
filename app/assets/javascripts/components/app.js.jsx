@@ -4,9 +4,14 @@ var Navigation = ReactRouter.Navigation;
 
 var App = React.createClass({
   mixins: [ Navigation ],
+
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+
   handleLogout: function() {
     window.localStorage.removeItem('api_token');
-    this.replaceWith('login');
+    this.replaceWith('home');
   },
   validateAccessToken: function(access_token) {
     var jqReq = $.ajax({
@@ -36,7 +41,10 @@ var App = React.createClass({
       function(data) {
         api_token = data['api_token'];
         window.localStorage.api_token = api_token;
-        this.setState({api_token: api_token});
+        this.setState({
+          api_token: api_token,
+          isLoggedIn: true
+        });
       }.bind(this),
       function(jqXHR, status, err) {
         console.log(jqXHR.responseText);
@@ -47,31 +55,32 @@ var App = React.createClass({
   },
   getInitialState: function() {
     return {
-      api_token: ''
+      api_token: '',
+      isLoggedIn: false
     };
   },
 
   componentDidMount: function() {
     if (window.localStorage.api_token) {
-      this.setState({api_token: window.localStorage.api_token});
-      this.transitionTo('home');
-    }
-    else if (window.location.href.indexOf('#access_token') > 0){
-      var parts = window.location.hash.split('&');
-      var access_token = parts[0].split('=')[1];
-      this.validateAccessToken(access_token);
-      this.transitionTo('home');
+      this.setState({
+        api_token: window.localStorage.api_token,
+        isLoggedIn: true
+      });
     }
     else {
-      this.replaceWith('login');
+      if (window.location.href.indexOf('#access_token') > 0){
+        var parts = window.location.hash.split('&');
+        var access_token = parts[0].split('=')[1];
+        this.validateAccessToken(access_token);
+      }
     }
   },
   render: function() {
     return (
       <div>
-        <NavMenu {...this.props} api_token={this.state.api_token} handleLogout={this.handleLogout} />
+        <NavMenu {...this.props} isLoggedIn={this.state.isLoggedIn} handleLogout={this.handleLogout} />
         <div className="container-fluid">
-          <RouteHandler {...this.props} api_token={this.state.api_token} />
+          <RouteHandler {...this.props} {...this.state} />
         </div>
       </div>
     )
