@@ -244,7 +244,11 @@ docker-compose stop
 When a docker container stops for any reason, docker keeps it around in its
 system.  There are ways you can start and attach to a stopped container, but
 in many cases this is not useful. You should remove containers on a
-regular basis. You can list all running containers using the following command:
+regular basis. Note, because we do not persist the data in our postgres databases
+to the host file system, all of your databases are removed when you remove their
+stopped containers. When you start up the machines from scratch, you will need
+to run rake db:migrate, etc. to get the database ready.
+You can list all running containers using the following command:
 ```
 docker ps
 ```
