@@ -44,7 +44,9 @@ module DDS
                 uuid: SecureRandom.uuid,
                 etag: SecureRandom.hex,
                 email: access_token['email'],
-                name: access_token['display_name']
+                display_name: access_token['display_name'],
+                first_name: access_token['first_name'],
+                last_name: access_token['last_name']
               )
               authorized_user = auth_service.user_authentication_services.create(
                 uid: access_token['uid'],

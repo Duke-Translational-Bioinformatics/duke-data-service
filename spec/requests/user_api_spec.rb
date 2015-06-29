@@ -13,12 +13,17 @@ describe DDS::V1::UserAPI do
         {
           'service_id' => auth_service.uuid,
           'uid' => FactoryGirl.attributes_for(:user_authentication_service)[:uid],
-          'display_name' => user.name,
+          'display_name' => user.display_name,
+          'first_name' => user.first_name,
+          'last_name' => user.last_name,
           'email' => user.email,
         }
       }
       let (:access_token) {
-        JWT.encode(new_user_token, Rails.application.secrets.secret_key_base)
+        JWT.encode(
+          new_user_token,
+          Rails.application.secrets.secret_key_base
+        )
       }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
@@ -42,7 +47,9 @@ describe DDS::V1::UserAPI do
         expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
         created_user = User.where(id: decoded_token['id']).first
         expect(created_user).to be
-        expect(created_user.name).to eq(new_user_token['display_name'])
+        expect(created_user.display_name).to eq(new_user_token['display_name'])
+        expect(created_user.first_name).to eq(new_user_token['first_name'])
+        expect(created_user.last_name).to eq(new_user_token['last_name'])
         expect(created_user.email).to eq(new_user_token['email'])
         created_user_authentication_service = created_user.user_authentication_services.where(uid: new_user_token['uid']).first
         expect(created_user_authentication_service).to be
@@ -62,7 +69,9 @@ describe DDS::V1::UserAPI do
         {
           'service_id' => auth_service.uuid,
           'uid' => user_authentication_service.uid,
-          'display_name' => user.name,
+          'display_name' => user.display_name,
+          'first_name' => user.first_name,
+          'last_name' => user.last_name,
           'email' => user.email,
         }
       }
@@ -73,7 +82,9 @@ describe DDS::V1::UserAPI do
         JWT.encode({
           'service_id' => SecureRandom.uuid,
           'uid' => user_authentication_service.uid,
-          'display_name' => user.name,
+          'display_name' => user.display_name,
+          'first_name' => user.first_name,
+          'last_name' => user.last_name,
           'email' => user.email,
         }, Rails.application.secrets.secret_key_base)
       }
