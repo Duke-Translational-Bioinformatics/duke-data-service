@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'shoulda-matchers'
 
 RSpec.describe Permission, type: :model do
   describe 'validations' do
