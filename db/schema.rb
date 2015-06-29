@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150624183941) do
+ActiveRecord::Schema.define(version: 20150629140321) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,10 +50,12 @@ ActiveRecord::Schema.define(version: 20150624183941) do
     t.string   "uuid"
     t.string   "etag"
     t.string   "email"
-    t.string   "name"
+    t.string   "display_name"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.jsonb    "auth_role_ids"
+    t.string   "first_name"
+    t.string   "last_name"
   end
 
   add_index "users", ["auth_role_ids"], name: "index_users_on_auth_role_ids", using: :gin

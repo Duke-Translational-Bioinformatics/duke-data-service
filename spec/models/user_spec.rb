@@ -52,10 +52,14 @@ RSpec.describe User, type: :model do
       expect(payload).to be
       parsed_json = JSON.parse(payload)
       expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('name')
+      expect(parsed_json).to have_key('display_name')
+      expect(parsed_json).to have_key('first_name')
+      expect(parsed_json).to have_key('last_name')
       expect(parsed_json).to have_key('email')
       expect(parsed_json['id']).to eq(subject.uuid)
-      expect(parsed_json['name']).to eq(subject.name)
+      expect(parsed_json['display_name']).to eq(subject.display_name)
+      expect(parsed_json['first_name']).to eq(subject.first_name)
+      expect(parsed_json['last_name']).to eq(subject.last_name)
       expect(parsed_json['email']).to eq(subject.email)
     end
   end
