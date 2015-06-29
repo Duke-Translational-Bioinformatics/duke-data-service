@@ -13,18 +13,18 @@ RSpec.describe AuthRole, type: :model do
     it 'should require a name' do
       should validate_presence_of(:name)
     end
-    
+
     it 'should require a description' do
       should validate_presence_of(:description)
     end
-    
+
     it 'should require at least one permission' do
       should validate_presence_of(:permissions)
       should allow_value(['foo']).for(:permissions)
       should allow_value(['foo', 'bar']).for(:permissions)
       should_not allow_value([]).for(:permissions)
     end
-    
+
     it 'should require at least one context' do
       should validate_presence_of(:contexts)
       should allow_value(['foo']).for(:contexts)
@@ -37,7 +37,7 @@ RSpec.describe AuthRole, type: :model do
   #  "id": "system_admin",
   #  "name": "System Admin",
   #  "description": "Can perform all system operations across all projects",
-  #  "permissions": [ "system_admin" ], 
+  #  "permissions": [ "system_admin" ],
   #  "contexts": [ "system" ], // Contexts in which role is relevant (i.e. "system" or "project"),
   #  "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
   #},
