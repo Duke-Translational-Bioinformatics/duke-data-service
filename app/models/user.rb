@@ -4,9 +4,10 @@ class User < ActiveRecord::Base
   has_many :user_authentication_services
   accepts_nested_attributes_for :user_authentication_services
 
+  has_many :projects, foreign_key: "creator_id"
   validates_each :auth_role_ids do |record, attr, value|
     record.errors.add(attr, 'does not exist') if value &&
-      !value.empty? && 
+      !value.empty? &&
       value.count > AuthRole.where(text_id: value).count
   end
 
