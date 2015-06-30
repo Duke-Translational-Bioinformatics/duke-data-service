@@ -1,4 +1,4 @@
-class AuthRoleSerializer < ActiveModel::Serializer
+class PermissionSerializer < ActiveModel::Serializer
   self.root = false
   attributes :id, :description
 

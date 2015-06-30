@@ -4,8 +4,6 @@ class User < ActiveRecord::Base
   has_many :user_authentication_services
   accepts_nested_attributes_for :user_authentication_services
 
-  has_many :auth_roles
-  has_many :permissions, through: :auth_roles
   validates_each :auth_role_ids do |record, attr, value|
     record.errors.add(attr, 'does not exist') if value &&
       !value.empty? &&
