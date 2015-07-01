@@ -5,4 +5,8 @@ class ProjectSerializer < ActiveModel::Serializer
   def id
     object.uuid
   end
+
+  def is_deleted
+    object.is_deleted?
+  end
 end

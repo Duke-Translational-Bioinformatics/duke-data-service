@@ -20,6 +20,16 @@ describe DDS::V1::ProjectsAPI do
         expect(response.body).to be
         expect(response.body).not_to eq('null')
       }.to change{Project.count}.by(1)
+
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('id')
+      expect(response_json['id']).to be
+      expect(response_json).to have_key('name')
+      expect(response_json['name']).to eq(payload[:name])
+      expect(response_json).to have_key('description')
+      expect(response_json['description']).to eq(payload[:description])
+      expect(response_json).to have_key('is_deleted')
+      expect(response_json['is_deleted']).to eq(false)
     end
   end
 

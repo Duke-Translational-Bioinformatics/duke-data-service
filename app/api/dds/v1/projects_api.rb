@@ -14,12 +14,13 @@ module DDS
       post '/projects', root: false do
         project_params = declared(params, include_missing: false)
         project = Project.new({
+          uuid: SecureRandom.uuid,
           name: project_params[:name],
           description: project_params[:description],
           creator_id: 123
         })
         project.save
-        {}
+        project
       end
 
       desc 'List projects' do
