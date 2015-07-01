@@ -174,7 +174,7 @@ authenticated
 
 ## Authorization Role instance [/{context}/auth_roles/{id}]
 + Parameters
-    + context (required, string, `system`) ... The `context` or scope in which permission can be granted;
+    + context (required, string, `project`) ... The `context` or scope in which permission can be granted;
     valid values are "system" or "project".
     + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
 
@@ -233,12 +233,12 @@ A user represents a registered user.
 
 ## Users collection [/users/{?name_contains}]
 ### List registered users [GET]
-+ Parameters
-    + name_contains (optional, string, `geddy`) ... Returns user with for which their `full_name` contains the specified string.
-
 >**Permission**
 - - - - -
 authenticated
+
++ Parameters
+    + name_contains (optional, string, `gardner`) ... Returns users for which their `full_name` contains the specified string.
 
 + Response 200 (application/json)
 
@@ -396,7 +396,10 @@ authenticated
 >**Rules**
 - - - - -
 * User who creates project is granted "project\_admin" authorization role by default.
+
+<!--DEPRECATED
 * An affiliate with a `project_role` of "principal_investigator" must be specified on create.
+-->
 
 + Request (application/json)
 
@@ -782,118 +785,9 @@ update_project
 - - - - -
 update_project
 
->**Rules**
-- - - - -
-* Every project must have one and only one affiliate with a `project_role` of "principal_investigator"; this
-affiliate cannot be deleted.
-
 + Response 204
 
-<!-- DEPRECATED
-## Group Project Members
-A project member represents an individual (i.e. user) that has an affiliation to a project.
-
-## Project Members collection [/projects/{id}/members]
-+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
-
-### Create project member [POST]
-**Permissions required:** manage\_project\_members (for project)
-+ Request (application/json)
-
-        {
-            "user": { "id": "434cf35a-98e0-4c2e-9a17-7bc009f9bb23" },
-            "member_roles": [ "principal_investigator", ... ],  // Optional member roles
-            "auth_roles": [ "project_viewer", ... ]  // Optional auth roles
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "user": <user_object>,
-            "project": <project_object>,
-            "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth_role_object>, ... ],
-            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
-        }
-
-### List project members [GET]
-**Permissions required:** view_project (for project)
-+ Response 200 (application/json)
-
-        "results": [
-            {
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "user": <user_object>,
-                "project": <project_object>,
-                "member_roles": [ <member_role_object>, ... ],
-                "auth_roles": [ <auth_role_object>, ... ],
-                "permissions": [ "view_project", ... ] // Permissions (ACL) for member
-            },
-            ...
-        ]
-
-## Project Member [/project_member/{id}]
-+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
-
-### Delete a project member [DELETE]
-**Permissions required:** manage\_project\_members (for project)
-
-**Business Rules:**
-* Every project requires at least one member with "project\_admin" auth role.  Cannot remove/delete member if they are the only "project\_admin" designated for the project.
-+ Response 204
-
-## Member Roles collection [/project_member/{id}/roles]
-+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
-
-### Set organizational roles for project member [PUT]
-**Permissions required:** manage\_project\_members (for project)
-+ Request (application/json)
-
-        {
-            "member_roles": [ "principal_investigator", ... ]  // Member roles to assign; to remove all pass [ ]
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "user": <user_object>,
-            "project": <project_object>,
-            "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth_role_object>, ... ],
-            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
-        }
-
-## Member Permissions collection [/project_member/{id}/permissions]
-+ Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project member.
-
-### Set permissions for project member [PUT]
-**Permissions required:** manage\_project\_members (for project)
-
-**Business Rules:**
-* Every project requires at least one member with "project\_admin" auth role.  Cannot revoke this role from member if they are the only "project\_admin" designated for the project.
-+ Request (application/json)
-
-        {
-            "auth_roles": [ "project_admin", ... ]  // Auth roles to grant member; to revoke all pass [ ]
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "777be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "user": <user_object>,
-            "project": <project_object>,
-            "member_roles": [ <member_role_object>, ... ],
-            "auth_roles": [ <auth_role_object>, ... ],
-            "permissions": [ "view_project", ... ] // Permissions (ACL) for member
-        }
-
+<!--WIP
 ## Group Files
 A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents the descriptive meta\-data about file including the physical storage location and access paths.
 
