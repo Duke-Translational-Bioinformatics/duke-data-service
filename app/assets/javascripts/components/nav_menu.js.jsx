@@ -31,7 +31,7 @@ var LogoutMenu = React.createClass({
         <ul className="nav navbar-nav navbar-right">
          <li className="dropdown">
            <a href="#" className="dropdown-toggle" data-toggle="dropdown">
-             <i className='fa fa-user'></i>Darin London
+             <i className='fa fa-user'></i>{this.props.currentUser.display_name}
              <b className="caret"></b>
            </a>
            <ul className="dropdown-menu">
