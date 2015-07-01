@@ -29,7 +29,7 @@ module DDS
         failure [401]
       end
       get '/projects', root: false do
-        {}
+        Project.all
       end
 
       desc 'View project details' do
@@ -38,7 +38,7 @@ module DDS
         failure [401]
       end
       get '/projects/:id', root: false do
-        {}
+        Project.where(uuid: params[:id]).first
       end
 
       desc 'Update a project' do
@@ -51,7 +51,10 @@ module DDS
         optional :description
       end
       put '/projects/:id', root: false do
-        {}
+        project_params = declared(params, include_missing: false)
+        project = Project.where(uuid: params[:id]).first
+        project.update(project_params)
+        project
       end
 
       desc 'Delete a project' do
