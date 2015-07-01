@@ -6,7 +6,19 @@ module DDS
         named 'create project'
         failure [401]
       end
+      params do
+        requires :name
+        requires :description
+        optional :pi_affiliate
+      end
       post '/projects', root: false do
+        project_params = declared(params, include_missing: false)
+        project = Project.new({
+          name: project_params[:name],
+          description: project_params[:description],
+          creator_id: 123
+        })
+        project.save
         {}
       end
 
@@ -33,6 +45,10 @@ module DDS
         named 'update project'
         failure [401]
       end
+      params do
+        optional :name
+        optional :description
+      end
       put '/projects/:id', root: false do
         {}
       end
@@ -43,6 +59,8 @@ module DDS
         failure [401]
       end
       delete '/projects/:id', root: false do
+        project = Project.where(:uuid => params[:id]).first
+        project.update_attribute(:is_deleted, true)
         body false
       end
     end
