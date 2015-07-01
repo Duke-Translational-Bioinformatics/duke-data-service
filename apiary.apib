@@ -5,41 +5,41 @@ HOST: http://data-services.duke.edu/
 
 The Duke Data Service API allows Duke researchers to store, organize, retrieve and share data.
 
-The intent here is to create a strawman for the data service API. Key focuses are on API endpoints 
-that enhance usability for "shallow end of the pool" users, endpoints that support the needs of 
-investigators for managing their research groups, endpoints that accommodate shared resource and 
-core facility needs, endpoints that support SOM administration of data resources, and endpoints that 
-facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we 
-should consider whether the API might be broken up into multiple APIs, whether some business logic be 
+The intent here is to create a strawman for the data service API. Key focuses are on API endpoints
+that enhance usability for "shallow end of the pool" users, endpoints that support the needs of
+investigators for managing their research groups, endpoints that accommodate shared resource and
+core facility needs, endpoints that support SOM administration of data resources, and endpoints that
+facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we
+should consider whether the API might be broken up into multiple APIs, whether some business logic be
 pushed to the users, etc.
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design)
-requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a 
+requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a
 Request-id in each response header, among others.
 
 ## Group API Usage
 
 Client API Key
 --------------
-Authorized users may generate a secret API key via the Web interface \- liken to Google API key 
+Authorized users may generate a secret API key via the Web interface \- liken to Google API key
 provisioning model.  This will not be part of the initial product release (i.e. MVP).
 
 User Authentication
 --------------
-Users will be required to authenticate via a trusted authentication provider. 
+Users will be required to authenticate via a trusted authentication provider.
 (i.e. Duke Shibboleth for MVP)
 
 **Some design assumptions for the MVP:**
-* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single 
+* A token (i.e. JWT) will be generated via a successful HTTPS callback from Duke Shibboleth single
 sign-on service.  This token must be supplied in header for subsequent API calls.
 * Tokens will have an expiration policy of X hours/days.
-* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile 
+* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile
 will be created in the platforms local user data store.
 
 Collection Pagination
 --------------
 For endpoints that return a collection of resources/objects, the number of objects returned can be
-controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection 
+controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection
 payloads may have the following structure to facilitate client pagination:
 
     {
@@ -58,7 +58,7 @@ payloads may have the following structure to facilitate client pagination:
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is 
+Resource payloads may include a composite audit object. An example structure of that object is
 represented here and will be referenced as `<audit_object>` in resource specific payloads.
 
     {
@@ -80,7 +80,7 @@ represented here and will be referenced as `<audit_object>` in resource specific
 
 API Errors
 ----------------
-We should respond with context appropriate error codes, especially for 400 class errors, using 
+We should respond with context appropriate error codes, especially for 400 class errors, using
 the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
 400: no API token, validation errors
@@ -88,7 +88,7 @@ the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 403: user performing request which they do not have permission to perform
 404: user requesting resource that does not exist
 
-All error responses should include a JSON response that provides the HTTP status code, details 
+All error responses should include a JSON response that provides the HTTP status code, details
 of the error that occurred, and possible steps to address the problem. For example:
 
     {
@@ -97,8 +97,8 @@ of the error that occurred, and possible steps to address the problem. For examp
         "suggestion": "You may have chosen the wrong ID."
     }
 
-Validation errors require a field-level breakdown with an array of errors (even if multiple errors 
-occur for the same field), each describing the field with the error, and message describing the 
+Validation errors require a field-level breakdown with an array of errors (even if multiple errors
+occur for the same field), each describing the field with the error, and message describing the
 error encountered.
 
     {
@@ -129,7 +129,7 @@ An authorization role represents a set of discrete permissions that may be grant
 | **project\_viewer** | Project Viewer | Can only view project and file meta-data | view\_project |
 | **file\_downloader** | File Downloader | Can download files | view\_project, download\_file |
 | **file\_editor** | File Editor | Can view, download, create, update and delete files | view\_project, download\_file, create\_file, update\_file, delete\_file |
-<!--DEPRECATED 
+<!--DEPRECATED
 | **platform\_user** | Platform User | Can create new projects | create\_project |
 -->
 
@@ -156,7 +156,7 @@ An authorization role represents a set of discrete permissions that may be grant
     valid values are "system" or "project".
 
 ### List authorization roles [GET]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -167,7 +167,7 @@ authenticated
                 "id": "system_admin",
                 "name": "System Admin",
                 "description": "Can manage system level permissions and perform all operations across all projects",
-                "permissions": [ { "id": "system_admin" } ], 
+                "permissions": [ { "id": "system_admin" } ],
                 // Contexts in which role is relevant (i.e. "system" or "project").
                 "contexts": [ "system" ],
                 // If deprecated, role cannot be granted, but show in UI for existing users that have role.
@@ -187,9 +187,9 @@ authenticated
 ## Authorization Role instance [/auth_roles/{id}]
 + Parameters
     + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
-    
+
 ### View authorization role details [GET]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -203,7 +203,7 @@ authenticated
             "contexts": [ "project" ],
             "is_deprecated": false
         }
-        
+
 <!-- DEPRECATED
 ## Group Current User
 The current user represents the currently authenticated user.
@@ -233,7 +233,7 @@ The current user represents the currently authenticated user.
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
             }
-            
+
 ### Update the current user [PUT]
 **Permission:** authenticated
 
@@ -280,7 +280,7 @@ A user represents a registered user.
 
 ## Users collection [/users]
 ### List registered users [GET]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -298,7 +298,7 @@ authenticated
                 "auth_provider": {
                     // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source. 
+                    // Unique user id in context of this authentication source.
                     "uid": "gardner100",
                 },
                 "last_login_on": "2015-01-01T12:00:00Z",
@@ -307,15 +307,15 @@ authenticated
             },
             ...
         ]
-        
+
 ## User instance [/users/{id}]
 + Parameters
     + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `id` for a user.
-    
+
 + Model (application/json)
 
     + Body
-    
+
             {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
@@ -323,28 +323,62 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has system_admin permission OR 
+                // Optional part of payload that is returned if the current user has system_admin permission OR
                 // this is the current users profile.
                 "auth_provider": {
                     // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source. 
+                    // Unique user id in context of this authentication source.
                     "uid": "gardner100",
                 },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
                 // End optional part of payload.
             }
-    
+
 ### View registered user details [GET]
 >**Permission**
 - - - - -
 authenticated
 
-+ Response 200 
++ Response 200
 
     [User instance][]
-    
+
+## Current User instance [/current_user]
++ Model (application/json)
+
+    + Body
+
+            {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                // Optional part of payload that is returned if the current user has system_admin permission OR
+                // this is the current users profile.
+                "auth_provider": {
+                    // The trusted authentication source for user (Duke Shibb for MVP).
+                    "source": "duke_shibboleth",
+                    // Unique user id in context of this authentication source.
+                    "uid": "gardner100",
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": <audit_object>
+                // End optional part of payload.
+            }
+
+### View current user details [GET]
+>**Permission**
+- - - - -
+authenticated
+
++ Response 200
+
+    [User instance][]
+
 ## Group System Permissions
 A system permission represents system level authorization roles that have been granted to a user.
 
@@ -375,7 +409,7 @@ system_admin
 + Model (application/json)
 
     + Body
-    
+
             {
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
@@ -384,16 +418,16 @@ system_admin
                 },
                 "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ]
             },
-            
+
 ### Grant system level permissions to user [PUT]
->**Permission** 
+>**Permission**
 - - - - -
 system\_admin
 
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing system level authorization roles for the user and grants new set.
-* The platform must have at leat one user with the system\_admin" authorization role.  Cannot 
+* The platform must have at leat one user with the system\_admin" authorization role.  Cannot
 revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
 * The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
 
@@ -401,30 +435,30 @@ revoke system level permissions for user if they are the only "system\_admin" de
 
         {
             // Must specify at least one auth role - set cannot be empty.
-            "auth_roles": [ { "id": "system_admin" }, ... ] 
+            "auth_roles": [ { "id": "system_admin" }, ... ]
         }
-        
+
 + Response 200
 
     [System Permission instance][]
-    
+
 ### View system level permissions for user [GET]
->**Permission** 
+>**Permission**
 - - - - -
 system\_admin OR system permissions are for the current user
 
 + Response 200
 
     [System Permission instance][]
-    
+
 ### Revoke system level permissions for user [DELETE]
->**Permission** 
+>**Permission**
 - - - - -
 system\_admin
 
 >**Rules**
 - - - - -
-* The platform must have at leat one user with the system\_admin" authorization role.  Cannot 
+* The platform must have at leat one user with the system\_admin" authorization role.  Cannot
 revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
 
 + Response 204
@@ -434,7 +468,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 
 ## Projects collection [/projects]
 ### Create a project [POST]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -463,12 +497,12 @@ authenticated
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             // Has the project been logically deleted from meta-data?
-            "is_deleted": false, 
+            "is_deleted": false,
             "audit": <audit_object>
         }
 
 ### List projects [GET]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -497,7 +531,7 @@ authenticated
 + Model (application/json)
 
     + Body
-    
+
             {
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
@@ -505,18 +539,18 @@ authenticated
                 "is_deleted": false,
                 "audit": <audit_object>
             }
-            
-### View project details [GET]
-**Permission** 
-- - - - -
-view_project 
 
-+ Response 200 
+### View project details [GET]
+**Permission**
+- - - - -
+view_project
+
++ Response 200
 
     [Project instance][]
 
 ### Update a project [PUT]
-**Permission:** 
+**Permission:**
 - - - - -
 update_project
 
@@ -527,18 +561,18 @@ update_project
             "description": "Goal of generating a targeted knockout mutation..."
         }
 
-+ Response 200 
++ Response 200
 
     [Project instance][]
 
 ### Delete a project [DELETE]
-**Permission** 
+**Permission**
 - - - - -
 delete_project
 
 **Rules**
 - - - - -
-* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).  
+* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).
 * For the MVP, the files associated to the project are not deleted from their physical storage location.
 
 + Response 204
@@ -549,9 +583,9 @@ A project permission represents project level authorization roles that have been
 ## Project Permissions collection [/project/{id}/permissions]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
-    
+
 ### List project level permissions [GET]
->**Permission** 
+>**Permission**
 - - - - -
 view_project
 
@@ -578,7 +612,7 @@ view_project
 + Model (application/json)
 
     + Body
-    
+
             {
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "user": {
@@ -588,16 +622,16 @@ view_project
                 },
                 "auth_roles": [ { "id": "file_editor", "name": "File Editor" }, ... ]
             }
-            
+
 ### Grant project level permissions to user [PUT]
->**Permission** 
+>**Permission**
 - - - - -
 manage_project_permissions
 
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing project level authorization roles for the user and grants new set.
-* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot 
+* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot
 revoke project level permissions for user if they are the only "project\_admin" designated for the project.
 * The roles specified must be project level authorization roles (i.e. "project" in `auth_role.contexts`).
 
@@ -605,30 +639,30 @@ revoke project level permissions for user if they are the only "project\_admin" 
 
         {
             // Must specify at least one auth role - set cannot be empty.
-            "auth_roles": [ { "id": "file_editor" }, ... ] 
+            "auth_roles": [ { "id": "file_editor" }, ... ]
         }
-        
+
 + Response 200
 
     [Project Permission instance][]
-    
+
 ### View project level permissions for user [GET]
->**Permission** 
+>**Permission**
 - - - - -
 view_project
 
 + Response 200
 
     [Project Permission instance][]
-    
+
 ### Revoke project level permissions for user [DELETE]
->**Permission** 
+>**Permission**
 - - - - -
 manage_project_permissions
 
 >**Rules**
 - - - - -
-* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot 
+* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot
 revoke project level permissions for user if they are the only "project\_admin" designated for the project.
 
 + Response 204
@@ -667,13 +701,13 @@ authenticated
             },
             ...
         ]
-        
+
 ## Project Role instance [/project_roles/{id}]
 + Parameters
     + id (required, string, `principal_investigator`) ... The unique `id` for a project role.
-    
+
 ### View project role details [GET]
->**Permission** 
+>**Permission**
 - - - - -
 authenticated
 
@@ -685,17 +719,17 @@ authenticated
             "description": "Lead investigator for the research project",
             "is_deprecated": false
         }
-        
+
 ### Group Project Affiliates
-An affiliate represents an individual that plays some project level role of interest for reporting or 
+An affiliate represents an individual that plays some project level role of interest for reporting or
 project collaboration puposes.  The affilate may be internal or external (i.e. non-Duke employee).
 
 ## Project Affiliates collection [/project/{id}/affiliates]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
-    
+
 ### List project affiliations [GET]
->**Permission** 
+>**Permission**
 - - - - -
 view_project
 
@@ -729,9 +763,9 @@ view_project
             },
             ...
         ]
-        
+
 ### Create project affiliate [POST]
->**Permission** 
+>**Permission**
 - - - - -
 update_project
 
@@ -740,7 +774,7 @@ update_project
 * To create an "external" (i.e. non-Duke employee) affiliate pass `null` for "user" property and provide "external_person"
 properties.  See example of "external_person" in PUT (i.e. update) endpoint.
 * To create an "internal" (i.e. Duke employee) affiliate pass `null` for "external_person"
-property and provide user property as shown in example payload for this endpoint. 
+property and provide user property as shown in example payload for this endpoint.
 
 update_project
 
@@ -749,9 +783,9 @@ update_project
         {
             "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
             "external_person": null,
-            "project_roles": [ { "id": "principal_investigator" }, ... ] 
+            "project_roles": [ { "id": "principal_investigator" }, ... ]
         }
-        
+
 + Response 201 (application/json)
 
         {
@@ -766,7 +800,7 @@ update_project
             "external_person": null,
             "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
         }
-        
+
 ## Project Affiliate instance [/project/{project_id}/affiliates/{affiliate_id}]
 + Parameters
     + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
@@ -775,7 +809,7 @@ update_project
 + Model (application/json)
 
     + Body
-    
+
             {
                 "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
                 "is_external": false,
@@ -788,18 +822,18 @@ update_project
                 "external_person": null,
                 "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
             }
-            
+
 ### View project affiliate detials [GET]
->**Permission** 
+>**Permission**
 - - - - -
 view_project
 
 + Response 200
 
     [Project Affiliate instance][]
-        
+
 ### Update project affiliate [PUT]
->**Permission** 
+>**Permission**
 - - - - -
 update_project
 
@@ -811,9 +845,9 @@ update_project
                 "full_name": "Geddy Lee",
                 "email": "geddy.lee@pennstate.edu"
             },
-            "project_roles": [ { "id": "research_coordinator" }, ... ] 
+            "project_roles": [ { "id": "research_coordinator" }, ... ]
         }
-        
+
 + Response 200 (application/json)
 
         {
@@ -827,9 +861,9 @@ update_project
             },
             "project_roles": [ { "id": "research_coordinator", "name": "Research Coordinator" }, ... ]
         }
-        
+
 ### Delete a project affiliate [DELETE]
->**Permission** 
+>**Permission**
 - - - - -
 update_project
 
