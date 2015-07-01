@@ -128,10 +128,9 @@ An authorization role represents a set of discrete permissions that may be grant
 | **project\_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view\_project, update\_project, delete\_project, manage\_project\_permissions, download\_file, create\_file, update\_file, delete\_file |
 | **project\_viewer** | Project Viewer | Can only view project and file meta-data | view\_project |
 | **file\_downloader** | File Downloader | Can download files | view\_project, download\_file |
+| **file\_uploader** | File Uploader | Can upload files | view\_project, create\_file |
 | **file\_editor** | File Editor | Can view, download, create, update and delete files | view\_project, download\_file, create\_file, update\_file, delete\_file |
-<!--DEPRECATED
-| **platform\_user** | Platform User | Can create new projects | create\_project |
--->
+
 
 **Permissions:**
 
@@ -146,16 +145,13 @@ An authorization role represents a set of discrete permissions that may be grant
 | **create\_file** | Can upload new file |
 | **update\_file** | Can upload new version of existing file |
 | **delete\_file** | Can delete a file |
-<!--DEPRECATED
-| **create\_project** | Can create new projects |
--->
 
-## Authorization Roles collection [/auth_roles{?context}]
+## Authorization Roles collection [/{context}/auth_roles]
 + Parameters
-    + context (optional, string, `project`) ... The `context` or scope in which permission can be granted;
+    + context (required, string, `system`) ... The `context` or scope in which permission can be granted;
     valid values are "system" or "project".
 
-### List authorization roles [GET]
+### List authorization roles for a context [GET]
 >**Permission**
 - - - - -
 authenticated
@@ -173,19 +169,13 @@ authenticated
                 // If deprecated, role cannot be granted, but show in UI for existing users that have role.
                 "is_deprecated": false
             },
-            {
-                "id": "project_admin",
-                "name": "Project Admin",
-                "description": "Can update project details, delete project, manage project level permissions and perform all file operations",
-                "permissions": [ { "id": "view_project" }, { "id": "update_project" }, ... ],
-                "contexts": [ "project" ],
-                "is_deprecated": false
-            },
             ...
         ]
 
-## Authorization Role instance [/auth_roles/{id}]
+## Authorization Role instance [/{context}/auth_roles/{id}]
 + Parameters
+    + context (required, string, `system`) ... The `context` or scope in which permission can be granted;
+    valid values are "system" or "project".
     + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
 
 ### View authorization role details [GET]
@@ -204,7 +194,6 @@ authenticated
             "is_deprecated": false
         }
 
-<!-- DEPRECATED
 ## Group Current User
 The current user represents the currently authenticated user.
 
@@ -221,51 +210,16 @@ The current user represents the currently authenticated user.
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                "auth_provider": {
+                    // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    "uid": "gardner100",
-                    "properties": {  // Other auth provider user properties
-                        <key>: <value>,
-                        <key>: <value>,
-                        ...
-                    }
+                    // Unique user id in context of this authentication source.
+                    "uid": "gardner100"
                 },
+                // The system level roles that have been granted to the user.
+                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
             }
-
-### Update the current user [PUT]
-**Permission:** authenticated
-
-**Rules:**
-- - - - - -
-* The user is created in the server tier via a successful auth provider callback; this
-endpoint allows user to update their profile from client applications.
-* The user is granted the "platform\_user" authorization role by default.
-* The username defaults to auth\_provider.uid, but can be overriden/updated by user.
-* Unique fields: `username`, `email`, `(auth_provider.source + auth_provider.uid)`
-
-+ Request (application/json)
-
-        {
-            "username": "mrgardner01",
-            "first_name": "Matthew",
-            "last_name": "Gardner",
-            "email": "mrgardner01@duke.edu",
-            "auth_provider": {
-                "source": "duke_shibboleth",
-                "uid": "gardner100", // Unique user ID in context of this auth provider
-                "properties": { // Other user properties from auth provider (i.e. Duke Shibboleth)
-                    <key>: <value>,
-                    <key>: <value>,
-                    ...
-                }
-            }
-        }
-
-+ Response 200
-
-      [Current User instance][]
 
 ### View current user details [GET]
 >**Permission:** authenticated
@@ -273,13 +227,15 @@ endpoint allows user to update their profile from client applications.
 + Response 200
 
       [Current User instance][]
--->
 
 ## Group Users
 A user represents a registered user.
 
-## Users collection [/users]
+## Users collection [/users/{?name_contains}]
 ### List registered users [GET]
++ Parameters
+    + name_contains (optional, string, `geddy`) ... Returns user with for which their `full_name` contains the specified string.
+
 >**Permission**
 - - - - -
 authenticated
@@ -296,11 +252,11 @@ authenticated
                 "email": "mrgardner01@duke.edu",
                 // Optional part of payload that is returned if the current user has system_admin permission.
                 "auth_provider": {
-                    // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source.
                     "uid": "gardner100",
                 },
+                // The system level roles that have been granted to the user.
+                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
                 // End optional part of payload.
@@ -323,54 +279,19 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has system_admin permission OR
-                // this is the current users profile.
+                // Optional part of payload that is returned if the current user has system_admin permission 
                 "auth_provider": {
-                    // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source.
-                    "uid": "gardner100",
+                    "uid": "gardner100"
                 },
+                // The system level roles that have been granted to the user.
+                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
                 // End optional part of payload.
             }
 
 ### View registered user details [GET]
->**Permission**
-- - - - -
-authenticated
-
-+ Response 200
-
-    [User instance][]
-
-## Current User instance [/current_user]
-+ Model (application/json)
-
-    + Body
-
-            {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "username": "mrgardner01",
-                "first_name": "Matthew",
-                "last_name": "Gardner",
-                "full_name": "Matthew Gardner",
-                "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has system_admin permission OR
-                // this is the current users profile.
-                "auth_provider": {
-                    // The trusted authentication source for user (Duke Shibb for MVP).
-                    "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source.
-                    "uid": "gardner100",
-                },
-                "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": <audit_object>
-                // End optional part of payload.
-            }
-
-### View current user details [GET]
 >**Permission**
 - - - - -
 authenticated
@@ -481,13 +402,7 @@ authenticated
 
         {
             "name": "Knockout Mouse Project (KOMP)",
-            "description": "Goal of generating a targeted knockout mutation...",
-            // An affilite with a project_role of principal_investigator must specified.
-            "pi_affiliate": {
-                "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-                "external_person": null,
-                "project_roles": [ { "id": "principal_investigator" }, ... ]
-            }
+            "description": "Goal of generating a targeted knockout mutation..."
         }
 
 + Response 201 (application/json)
