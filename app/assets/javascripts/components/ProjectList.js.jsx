@@ -7,20 +7,9 @@ var ProjectList = React.createClass({
     });
 
     return (
-      <div className="projectList">
+      <ul className="list-group">
         {projectSummaries}
-      </div>
-    )
-  }
-});
-
-var ProjectSummary = React.createClass({
-  render: function() {
-    return (
-      <div className="projectSummary">
-        <p>Project {this.props.project.name}</p>
-        <p>Description {this.props.project.description}</p>
-      </div>
+      </ul>
     )
   }
 });
