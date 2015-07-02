@@ -63,6 +63,7 @@ module DDS
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
       mount DDS::V1::CurrentUserAPI
+      mount DDS::V1::ProjectsAPI
     end
   end
 end
