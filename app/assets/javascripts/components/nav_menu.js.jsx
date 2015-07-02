@@ -6,14 +6,11 @@ var NavMenu = React.createClass({
     var Child = this.props.isLoggedIn ? LogoutMenu : LoginMenu;
     return (
       <div className="navbar navbar-default navbar-fixed-top" role="navigation">
+       <div className="nav navbar-nav navbar-left">
+         <a>Todo Logo</a>
+       </div>
        <div className="navbar-header">
-        <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span className="sr-only">Toggle navigation</span>
-          <span className="icon-bar"></span>
-          <span className="icon-bar"></span>
-          <span className="icon-bar"></span>
-        </button>
-        <a href="/" title="Home"><p>Todo Logo</p><i className="fa fa-home fa-lg">Duke Data Services</i></a>
+        <Link to="home" title="Home"><i className="fa fa-home fa-lg">Duke Data Services</i></Link>
        </div>
        <Child {...this.props} />
       </div>
