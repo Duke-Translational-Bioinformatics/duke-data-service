@@ -1,7 +1,8 @@
 var Home = React.createClass({
   render: function() {
+    var Child = this.props.isLoggedIn ? ProjectDashboard : SplashPage;
     return (
-        <p>api_token: {this.props.api_token}</p>
+      <Child {...this.props} />
     )
   }
 });

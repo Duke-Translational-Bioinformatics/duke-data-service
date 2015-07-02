@@ -7,13 +7,26 @@ var App = React.createClass({
 
   handleLogout: function() {
     window.localStorage.removeItem('api_token');
-    this.replaceWith('home');
+    this.transitionTo('home');
   },
 
   handleExpiredToken: function(info) {
     //TODO display an error message
     console.log("Expired Token "+info["reason"]+" suggestion "+info["suggestion"]);
     this.handleLogout();
+    this.alertUser(info);
+  },
+
+  alertUser: function(alertInfo) {
+   React.render(
+     <div class="alert alert-warning alert-dismissible" role="alert">
+       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+         <span aria-hidden="true">&times;</span>
+       </button>
+       <strong>{alertInfo["reason"]}</strong>{alertInfo["suggestion"]}.
+     </div>
+     , document.getElementById('alerts')
+   );
   },
 
   handleInvalidAccessToken: function(jqXHR, status, err) {
@@ -118,6 +131,11 @@ var App = React.createClass({
           }.bind(this),
           this.handleInvalidAccessToken
         );
+        window.location.replace("#");
+        if (typeof window.history.replaceState == 'function') {
+          history.replaceState({}, '', window.location.href.slice(0, -1));
+        }
+        this.transitionTo('home');
       }
     }
   },
@@ -127,6 +145,7 @@ var App = React.createClass({
       <div>
         <NavMenu {...this.props} currentUser={this.state.currentUser} isLoggedIn={this.state.isLoggedIn} handleLogout={this.handleLogout} />
         <div className="container-fluid">
+          <div id="alerts" />
           <RouteHandler {...this.props} {...this.state} />
         </div>
       </div>

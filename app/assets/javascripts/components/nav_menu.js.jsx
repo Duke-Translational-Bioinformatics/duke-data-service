@@ -30,7 +30,7 @@ var LogoutMenu = React.createClass({
       <div className="navbar-collapse collapse">
         <ul className="nav navbar-nav navbar-right">
          <li className="dropdown">
-           <a href="#" className="dropdown-toggle" data-toggle="dropdown">
+           <a className="dropdown-toggle" data-toggle="dropdown">
              <i className='fa fa-user'></i>{this.props.currentUser.display_name}
              <b className="caret"></b>
            </a>
@@ -44,7 +44,6 @@ var LogoutMenu = React.createClass({
            </ul>
          </li>
         </ul>
-        <SubMenu isLoggedIn={this.props.isLoggedIn} />
       </div>
     )
   }
