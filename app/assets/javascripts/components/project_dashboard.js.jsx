@@ -34,20 +34,22 @@ var ProjectDashboard = React.createClass({
 
   render: function() {
     return (
-      <div className="container-fluid">
-        <div className="navbar navbar-default" role="navigation">
-          <ul className="nav navbar-nav">
+      <div>
+        <div className="navbar navbar-default">
+          <ul className="nav navbar-nav navbar-left">
             <MainMenu>
               <ProjectMenu />
             </MainMenu>
+            <form className="navbar-form navbar-left">
+              <div className="form-group">
+                <input type="text" class="form-control" placeholder="Search" />
+              </div>
+            </form>
+          </ul>
+          <ul className="nav navbar-nav navbar-right">
             <li>
-              <a className="navbar-brand">Projects</a>
+               <NewProjectButton label={''}/>
             </li>
-            <ul className="nav navbar-nav navbar-right">
-              <li>
-                 <NewProjectButton label={''}/>
-              </li>
-            </ul>
           </ul>
         </div>
         <AccountOverview projects={this.state.projects} />

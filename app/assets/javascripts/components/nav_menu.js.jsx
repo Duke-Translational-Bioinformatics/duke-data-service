@@ -5,7 +5,7 @@ var NavMenu = React.createClass({
   render: function() {
     var Child = this.props.isLoggedIn ? LogoutMenu : LoginMenu;
     return (
-      <div className="navbar navbar-default" role="navigation">
+      <div className="navbar navbar-default navbar-fixed-top" role="navigation">
        <div className="navbar-header">
         <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
           <span className="sr-only">Toggle navigation</span>
