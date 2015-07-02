@@ -12,12 +12,13 @@ module DDS
         optional :pi_affiliate
       end
       post '/projects', root: false do
+        authenticate!
         project_params = declared(params, include_missing: false)
         project = Project.new({
           uuid: SecureRandom.uuid,
           name: project_params[:name],
           description: project_params[:description],
-          creator_id: 123
+          creator_id: current_user.id
         })
         project.save
         project
@@ -29,6 +30,7 @@ module DDS
         failure [401]
       end
       get '/projects', root: false do
+        authenticate!
         Project.all
       end
 
@@ -38,6 +40,7 @@ module DDS
         failure [401]
       end
       get '/projects/:id', root: false do
+        authenticate!
         Project.where(uuid: params[:id]).first
       end
 
@@ -51,6 +54,7 @@ module DDS
         optional :description
       end
       put '/projects/:id', root: false do
+        authenticate!
         project_params = declared(params, include_missing: false)
         project = Project.where(uuid: params[:id]).first
         project.update(project_params)
@@ -63,6 +67,7 @@ module DDS
         failure [401]
       end
       delete '/projects/:id', root: false do
+        authenticate!
         project = Project.where(:uuid => params[:id]).first
         project.update_attribute(:is_deleted, true)
         body false
