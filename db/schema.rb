@@ -45,13 +45,6 @@ ActiveRecord::Schema.define(version: 20150701160133) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "permissions", force: :cascade do |t|
-    t.string   "title"
-    t.text     "description"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
   create_table "projects", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
