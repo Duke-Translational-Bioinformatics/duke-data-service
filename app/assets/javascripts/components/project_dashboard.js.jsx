@@ -50,6 +50,7 @@ var ProjectDashboard = React.createClass({
             </ul>
           </ul>
         </div>
+        <AccountOverview projects={this.state.projects} />
         <ProjectList projects={this.state.projects} />
       </div>
     )
