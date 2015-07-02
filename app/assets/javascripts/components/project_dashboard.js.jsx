@@ -34,18 +34,18 @@ var ProjectDashboard = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div className="container-fluid">
         <div className="navbar navbar-default" role="navigation">
           <ul className="nav navbar-nav">
+            <MainMenu>
+              <ProjectMenu />
+            </MainMenu>
             <li>
-              <a><i className="fa fa-bars fa-3x" /></a>
-            </li>
-            <li className="dropdown">
               <a className="navbar-brand">Projects</a>
             </li>
             <ul className="nav navbar-nav navbar-right">
-              <li className="dropdown">
-                <a><i className="fa fa-plus-circle fa-3x" /></a>
+              <li>
+                 <NewProjectButton label={''}/>
               </li>
             </ul>
           </ul>
@@ -55,3 +55,15 @@ var ProjectDashboard = React.createClass({
     )
   }
 });
+
+var ProjectMenu = React.createClass({
+  render: function() {
+    return (
+      <ul className="dropdown-menu">
+        <li>
+          <NewProjectButton label="New Project" />
+        </li>
+      </ul>
+    )
+  }
+})
