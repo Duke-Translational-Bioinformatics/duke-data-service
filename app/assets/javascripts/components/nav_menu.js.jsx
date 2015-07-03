@@ -5,7 +5,7 @@ var NavMenu = React.createClass({
   render: function() {
     var Child = this.props.isLoggedIn ? LogoutMenu : LoginMenu;
     return (
-      <div className="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div className="navbar navbar-default navbar-fixed-top NavMenu" role="navigation">
        <div className="nav navbar-nav navbar-left">
          <a>Todo Logo</a>
        </div>
@@ -22,7 +22,7 @@ var LogoutMenu = React.createClass({
 
   render: function() {
     return (
-      <div className="navbar-collapse collapse">
+      <div className="navbar-collapse collapse NavMenu">
         <ul className="nav navbar-nav navbar-right">
          <li className="dropdown">
            <a className="dropdown-toggle" data-toggle="dropdown">
@@ -49,7 +49,7 @@ var LoginMenu = React.createClass({
   render: function() {
     return (
         <div>
-          <ul className="nav navbar-nav navbar-right">
+          <ul className="nav navbar-nav navbar-right NavMenu">
             <li className="dropdown">
               <Link to="login">Login</Link>
            </li>

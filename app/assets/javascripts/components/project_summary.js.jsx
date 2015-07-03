@@ -1,7 +1,7 @@
 var ProjectSummary = React.createClass({
   render: function() {
     return (
-      <li className="list-group-item">
+      <li className="list-group-item ProjectSummary">
         <span className="fa-stack fa-2x pull-left">
           <i className="fa fa-square-o fa-stack-2x" />
           <i className="fa fa-folder fa-stack-1x" />

@@ -34,7 +34,7 @@ var ProjectDashboard = React.createClass({
 
   render: function() {
     return (
-      <div>
+      <div className="ProjectDashboard">
         <div className="navbar navbar-default">
           <ul className="nav navbar-nav navbar-left">
             <MainMenu>
@@ -62,7 +62,7 @@ var ProjectDashboard = React.createClass({
 var ProjectMenu = React.createClass({
   render: function() {
     return (
-      <ul className="dropdown-menu">
+      <ul className="dropdown-menu ProjectDashboard">
         <li>
           <NewProjectButton label="New Project" />
         </li>

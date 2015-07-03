@@ -142,7 +142,7 @@ var App = React.createClass({
 
   render: function() {
     return (
-      <div className="container-fluid">
+      <div className="container-fluid App">
         <NavMenu {...this.props} currentUser={this.state.currentUser} isLoggedIn={this.state.isLoggedIn} handleLogout={this.handleLogout} />
         <div id="alerts" />
         <div className="row">

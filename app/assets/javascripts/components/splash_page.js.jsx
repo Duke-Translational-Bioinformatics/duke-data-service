@@ -1,7 +1,7 @@
 var SplashPage = React.createClass({
   render: function() {
     return (
-      <div>
+      <div className="SplashPage">
         <div className="page-header">
           Duke Data Services
         </div>

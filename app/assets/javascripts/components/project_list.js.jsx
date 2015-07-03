@@ -7,7 +7,7 @@ var ProjectList = React.createClass({
     });
 
     return (
-      <ul className="list-group">
+      <ul className="list-group ProjectList">
         {projectSummaries}
       </ul>
     )
