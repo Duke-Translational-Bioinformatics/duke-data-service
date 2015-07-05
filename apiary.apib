@@ -802,7 +802,7 @@ authenticated
                 "id": "duke_isilon",
                 "name": "Duke Isilon Storage",
                 // Can storage provider accept new file uploads.
-                "is_deprecated": true
+                "is_deprecated": false
             },
             ...
         ]
@@ -822,14 +822,14 @@ authenticated
         {
             "id": "duke_isilon",
             "name": "Duke Isilon Storage",
-            "is_deprecated": true
+            "is_deprecated": false
         }
 
 ## Group Project Folder
 A folder represents a container for organizing files.  A folder is contained within the context of the
 project root or a project folder.  
 
-## Project Folders collection [projects/{id}/folders]
+## Project Folders collection [/projects/{id}/folders]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
@@ -842,13 +842,13 @@ create_file
 - - - - -
 * A folder is created within the context of the project root or a project folder.  A folder can have one
 and only one parent folder.
-* The `parent_folder` must be owned by the current project.
-* Specify "root" for the `parent_folder` to create folder in current project root.
+* The `parent_folder` must be a folder owned by the referenced project.
+* Specify alias "root" for the `parent_folder` to create a new folder in the project root.
 
 + Request (application/json)
 
         {
-            // Set parent_folder to "root" to create folder in project root.
+            // Specify root for parent_folder to create a new folder in project root.
             "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data"
         }
@@ -889,10 +889,10 @@ view_project
             ...
         ]
 
-## Project Folder instance [projects/{project_id}/folders/{folder_id}]
+## Project Folder instance [/projects/{project_id}/folders/{folder_id}]
 + Parameters
-    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
-    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `folder_id` of the folder.
+    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
+    + folder_id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `folder_id` of the folder.
 
 ### View project folder details [GET]
 >**Permission**
@@ -925,17 +925,17 @@ folders `project` context.
 
         {
             "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
-            "name": "Model Data"
+            "name": "Raw Data"
         }
 
 + Response 200 (application/json)
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "name": "Model Data",
+            "name": "Raw Data",
             "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-            "virtual_path": "/Sequencing Core/Normalized Data",
+            "virtual_path": "/Flow Core/Raw Data",
             "is_deleted": false,
             "audit": <audit_object>
         }
@@ -955,7 +955,7 @@ delete_file
 ## Group Folder Parent and Children
 Convenience endpoints for retrieval of folder parent and immediate children.
 
-## Folder Parent instance [project_folders/{id}/parent]
+## Folder Parent instance [/project_folders/{id}/parent]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -971,12 +971,12 @@ view_project
             "name": "Raw Data",
             "parent_folder": "root",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-            "virtual_path": "/Sequencing Core",
+            "virtual_path": "/Flow Core/Raw Data",
             "is_deleted": false,
             "audit": <audit_object>
         }
 
-## Folder Children collection [project_folders/{id}/children]
+## Folder Children collection [/project_folders/{id}/children]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -994,7 +994,7 @@ view_project
         results: [
             {    
                 "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "name": "Raw Data",
+                "name": "Aligned",
                 "parent_folder": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned",
