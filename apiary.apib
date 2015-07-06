@@ -720,7 +720,6 @@ update_project
 ## Project Affiliate instance [/project_affiliates/{id}]
 + Parameters
     + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `id` of the affiliate.
-<!--DEPRECATED + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project. -->
 
 + Model (application/json)
 
@@ -906,7 +905,6 @@ view_project
 ## Project Folder instance [/projects_folders/{id}]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
-<!--DEPRECATED + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project. -->
 
 ### View project folder details [GET]
 >**Permission**
@@ -981,7 +979,7 @@ create_file
 + Request (application/json)
 
         {
-            "name": { "Model Data" }
+            "name": "Model Data"
         }
 
 + Response 200 (application/json)
@@ -997,7 +995,7 @@ create_file
         }
 
 ## Group Folder Parent/Children
-Convenience endpoints for retrieval of a folder parent and immediate children.
+Convenience endpoints for retrieval of a parent folder and immediate children.
 
 ## Parent Folder instance [/project_folders/{id}/parent]
 + Parameters
