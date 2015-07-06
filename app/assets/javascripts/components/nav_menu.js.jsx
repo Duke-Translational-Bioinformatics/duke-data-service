@@ -54,13 +54,7 @@ var LoginMenu = React.createClass({
 
   render: function() {
     return (
-        <div>
-          <ul className="nav navbar-nav navbar-right NavMenu">
-            <li className="dropdown">
-              <Link to="login">Login</Link>
-           </li>
-          </ul>
-        </div>
+      <Link to="login">Login</Link>
     )
   }
 });
