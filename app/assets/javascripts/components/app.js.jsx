@@ -5,25 +5,27 @@ var Navigation = ReactRouter.Navigation;
 var App = React.createClass({
   mixins: [ Navigation ],
 
+  setMainMenuItems: function(menuItems) {
+    this.setState({menuItems: menuItems});
+  },
+
   handleLogout: function() {
     window.localStorage.removeItem('api_token');
     this.transitionTo('home');
   },
 
   handleExpiredToken: function(info) {
-    //TODO display an error message
-    console.log("Expired Token "+info["reason"]+" suggestion "+info["suggestion"]);
     this.handleLogout();
     this.alertUser(info);
   },
 
   alertUser: function(alertInfo) {
    React.render(
-     <div className="alert alert-warning alert-dismissible" role="alert">
+     <div className="alert alert-danger alert-dismissible" role="alert">
        <button type="button" className="close" data-dismiss="alert" aria-label="Close">
          <span aria-hidden="true">&times;</span>
        </button>
-       <strong>{alertInfo["reason"]}</strong>{alertInfo["suggestion"]}.
+       <strong>{alertInfo["reason"]}</strong> {alertInfo["suggestion"]}.
      </div>
      , document.getElementById('alerts')
    );
@@ -92,7 +94,8 @@ var App = React.createClass({
     return {
       api_token: '',
       isLoggedIn: false,
-      currentUser: ''
+      currentUser: '',
+      menuItems: []
     };
   },
 
@@ -143,10 +146,15 @@ var App = React.createClass({
   render: function() {
     return (
       <div className="container-fluid App">
-        <NavMenu {...this.props} currentUser={this.state.currentUser} isLoggedIn={this.state.isLoggedIn} handleLogout={this.handleLogout} />
+        <NavMenu
+           {...this.props}
+           currentUser={this.state.currentUser}
+           isLoggedIn={this.state.isLoggedIn}
+           handleLogout={this.handleLogout}
+           menuItems={this.state.menuItems} />
         <div id="alerts" />
-        <div className="row">
-          <RouteHandler {...this.props} {...this.state} />
+        <div>
+          <RouteHandler {...this.props} {...this.state} setMainMenuItems={this.setMainMenuItems} />
         </div>
       </div>
     )
