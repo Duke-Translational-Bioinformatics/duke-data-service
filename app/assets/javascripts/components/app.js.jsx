@@ -62,23 +62,29 @@ var App = React.createClass({
     })
   },
 
-  handleCurrentUserError: function(jqXHR, status, err) {
-    console.log("GOT status "+jqXHR.status);
+  handleAjaxError: function(jqXHR, status, err) {
     if (jqXHR.status == 401) {
       this.handleExpiredToken(JSON.parse(jqXHR.responseText));
     }
+    else {
+      console.log("Unexpected error: "+jqXHR.responseText);
+    }
+  },
+
+  getResourceWithToken: function(api_token, resourceUrl) {
+     return $.ajax({
+       type: 'GET',
+       url: resourceUrl,
+       beforeSend: function(xhr) {
+         xhr.setRequestHeader("Authorization", api_token);
+       },
+       contentType: 'application/json',
+       dataType: 'json'
+     })
   },
 
   getCurrentUser: function(api_token) {
-    return $.ajax({
-      type: 'GET',
-      url: '/api/v1/current_user',
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Authorization", api_token);
-      },
-      contentType: 'application/json',
-      dataType: 'json'
-    })
+    return this.getResourceWithToken(api_token, '/api/v1/current_user');
   },
 
   loadCurrentUser: function(data) {
@@ -107,7 +113,7 @@ var App = React.createClass({
       }
       this.getCurrentUser(api_token).then(
         this.loadCurrentUser,
-        this.handleCurrentUserError
+        this.handleAjaxError
       );
     }
     else {
@@ -126,7 +132,7 @@ var App = React.createClass({
                 }
                 this.getCurrentUser(api_token).then(
                   this.loadCurrentUser,
-                  this.handleCurrentUserError
+                  this.handleAjaxError
                 );
               }.bind(this),
               this.handleInvalidSignedToken
@@ -154,7 +160,12 @@ var App = React.createClass({
            menuItems={this.state.menuItems} />
         <div id="alerts" />
         <div>
-          <RouteHandler {...this.props} {...this.state} setMainMenuItems={this.setMainMenuItems} />
+          <RouteHandler {...this.props}
+                        {...this.state}
+                        setMainMenuItems={this.setMainMenuItems}
+                        getResourceWithToken={this.getResourceWithToken}
+                        handleAjaxError={this.handleAjaxError}
+                        />
         </div>
       </div>
     )

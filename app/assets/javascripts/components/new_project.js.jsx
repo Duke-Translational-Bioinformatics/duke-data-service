@@ -3,7 +3,7 @@ var NewProject = React.createClass({
     return (
       <div className="modal fade"
            id="newProjectModal"
-           tabindex="-1"
+           tabIndex="-1"
            role="dialog"
            aria-labelledby="newProjectModalLabel">
         <div className="modal-dialog"
