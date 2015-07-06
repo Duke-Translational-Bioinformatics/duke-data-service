@@ -717,10 +717,10 @@ update_project
             "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
         }
 
-## Project Affiliate instance [/project/{project_id}/affiliates/{affiliate_id}]
+## Project Affiliate instance [/project_affiliates/{id}]
 + Parameters
-    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
-    + affiliate_id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `affiliate_id` of the affiliate.
+    + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `id` of the affiliate.
+<!--DEPRECATED + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project. -->
 
 + Model (application/json)
 
@@ -801,7 +801,20 @@ authenticated
             {
                 "id": "duke_isilon",
                 "name": "Duke Isilon Storage",
-                // Can storage provider accept new file uploads.
+                "description": "A description of the storage service level would go here.",
+                // Deprecated implies that storage provide can no longer accept uploads.
+                "is_deprecated": false
+            },
+            {
+                "id": "amazon_s3_glacier",
+                "name": "Amazon S# Glacier",
+                "description": "A description of the storage service level would go here.",
+                "is_deprecated": false
+            },
+            {
+                "id": "google_cloud_nearline",
+                "name": "Google Cloud Nearline",
+                "description": "A description of the storage service level would go here.",
                 "is_deprecated": false
             },
             ...
@@ -822,6 +835,7 @@ authenticated
         {
             "id": "duke_isilon",
             "name": "Duke Isilon Storage",
+            "description": "A description of the storage service level would go here.",
             "is_deprecated": false
         }
 
@@ -857,8 +871,8 @@ and only one parent folder.
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "name": "Raw Data",
             "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "name": "Raw Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
@@ -879,8 +893,8 @@ view_project
         results: [
             {    
                 "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                "name": "Raw Data",
                 "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+                "name": "Raw Data",
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data",
                 "is_deleted": false,
@@ -889,10 +903,10 @@ view_project
             ...
         ]
 
-## Project Folder instance [/projects/{project_id}/folders/{folder_id}]
+## Project Folder instance [/projects_folders/{id}]
 + Parameters
-    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
-    + folder_id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `folder_id` of the folder.
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
+<!--DEPRECATED + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project. -->
 
 ### View project folder details [GET]
 >**Permission**
@@ -903,39 +917,10 @@ view_project
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "name": "Raw Data",
             "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "name": "Raw Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
-            "is_deleted": false,
-            "audit": <audit_object>
-        }
-
-### Update a project folder [PUT]
->**Permission**
-- - - - -
-create_file
-
->**Rules**
-- - - - -
-* To move a folder, set `parent_folder` to target folder loocation; the target folder must be in the source 
-folders `project` context.
-
-+ Request (application/json)
-
-        {
-            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
-            "name": "Raw Data"
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "name": "Raw Data",
-            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-            "virtual_path": "/Flow Core/Raw Data",
             "is_deleted": false,
             "audit": <audit_object>
         }
@@ -952,14 +937,73 @@ delete_file
 
 + Response 204
 
-## Group Folder Parent and Children
-Convenience endpoints for retrieval of folder parent and immediate children.
-
-## Folder Parent instance [/project_folders/{id}/parent]
+## Move a project folder to new parent [/projects_folders/{id}/move]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
-## View project folder parent details [GET]
+### Move a project folder [PUT]
+>**Permission**
+- - - - -
+create_file
+
+>**Rules**
+- - - - -
+* To move a folder, set `parent_folder` to target folder location; the target folder must be in the source 
+folders `project` context.
+
++ Request (application/json)
+
+        {
+            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "name": "Raw Data",
+            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "virtual_path": "/Flow Core/Raw Data",
+            "is_deleted": false,
+            "audit": <audit_object>
+        }
+
+## Rename a project folder [/projects_folders/{id}/rename]
++ Parameters
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
+
+### Rename a project folder [PUT]
+>**Permission**
+- - - - -
+create_file
+
++ Request (application/json)
+
+        {
+            "name": { "Model Data" }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "name": "Model Data",
+            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "virtual_path": "/Flow Core/Model Data",
+            "is_deleted": false,
+            "audit": <audit_object>
+        }
+
+## Group Folder Parent/Children
+Convenience endpoints for retrieval of a folder parent and immediate children.
+
+## Parent Folder instance [/project_folders/{id}/parent]
++ Parameters
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
+
+## View parent folder details [GET]
 >**Permission**
 - - - - -
 view_project
@@ -968,8 +1012,8 @@ view_project
 
         {
             "id": "f8416bbe-357a-4687-919d-3d13d4108dc1",
-            "name": "Flow Core",
             "parent_folder": "root",
+            "name": "Flow Core",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core",
             "is_deleted": false,
@@ -980,7 +1024,7 @@ view_project
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
-### List project folder children [GET]
+### List folder children [GET]
 >**Permission**
 - - - - -
 view_project
@@ -994,8 +1038,8 @@ view_project
         results: [
             {    
                 "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "name": "Aligned",
                 "parent_folder": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                "name": "Aligned",
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned",
                 "is_deleted": false,
