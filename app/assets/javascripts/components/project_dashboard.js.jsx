@@ -30,43 +30,15 @@ var ProjectDashboard = React.createClass({
 
   componentDidMount: function() {
     this.loadProjects();
+    this.props.setMainMenuItems([<NewProjectButton label="New Project" />]);
   },
 
   render: function() {
     return (
       <div className="ProjectDashboard">
-        <div className="navbar navbar-default">
-          <ul className="nav navbar-nav navbar-left">
-            <MainMenu>
-              <ProjectMenu />
-            </MainMenu>
-            <form className="navbar-form navbar-left">
-              <div className="form-group">
-                <input type="text" className="form-control" placeholder="Search" />
-              </div>
-            </form>
-          </ul>
-          <ul className="nav navbar-nav navbar-right">
-            <li>
-               <NewProjectButton label={''}/>
-            </li>
-          </ul>
-        </div>
         <AccountOverview projects={this.state.projects} />
         <ProjectList projects={this.state.projects} />
       </div>
     )
   }
 });
-
-var ProjectMenu = React.createClass({
-  render: function() {
-    return (
-      <ul className="dropdown-menu ProjectDashboard">
-        <li>
-          <NewProjectButton label="New Project" />
-        </li>
-      </ul>
-    )
-  }
-})
