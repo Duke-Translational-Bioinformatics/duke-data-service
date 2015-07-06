@@ -13,15 +13,14 @@ module DDS
       end
       post '/project/:project_id/affiliates', root: false do
         authenticate!
-#        project_params = declared(params, include_missing: false)
-#        project = Project.new({
-#          uuid: SecureRandom.uuid,
-#          name: project_params[:name],
-#          description: project_params[:description],
-#          creator_id: current_user.id
-#        })
-#        project.save
-#        project
+        membership_params = declared(params, include_missing: false)
+        project = Project.where(uuid: params[:project_id]).first
+        user = User.where(uuid: membership_params[:user][:id]).first
+        membership = project.memberships.build({
+          user_id: user.id
+        })
+        membership.save
+        #membership
         {
           id: "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
           is_external: false,
@@ -95,9 +94,7 @@ module DDS
       end
       delete '/project/:project_id/affiliates/:id', root: false do
         authenticate!
-#        project = Project.where(:uuid => params[:id]).first
-#        project.update_attribute(:is_deleted, true)
-#        body false
+        membership = Membership.find(params[:id]).destroy
         body false
       end
     end

@@ -7,9 +7,10 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let (:api_token) { user_auth.api_token }
   let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
 
+  let(:membership) { FactoryGirl.create(:membership) }
   let(:project) { FactoryGirl.create(:project) }
-  let(:serialized_project) { ProjectSerializer.new(project).to_json }
-  let(:project_stub) { FactoryGirl.build(:project) }
+  #let(:serialized_project) { ProjectSerializer.new(project).to_json }
+  #let(:project_stub) { FactoryGirl.build(:project) }
 
   describe 'Create a project' do
     let(:payload) {{
@@ -18,13 +19,12 @@ describe DDS::V1::ProjectAffiliatesAPI do
         project_roles: [{id: 'principal_investigator'}]
       }}
     it 'should store a project affiilation with the given payload' do
-      #TODO: Ensure affiliate stored in db
-      #expect {
+      expect {
         post "/api/v1/project/#{project.uuid}/affiliates", payload.to_json, json_headers_with_auth
         expect(response.status).to eq(201)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
-      #}.to change{ProjectAffiliate.count}.by(1)
+      }.to change{Membership.count}.by(1)
 
       response_json = JSON.parse(response.body)
       expect(response_json).to have_key('id')
@@ -43,11 +43,10 @@ describe DDS::V1::ProjectAffiliatesAPI do
     end
 
     it 'should require an auth token' do
-      #TODO: Ensure affiliate is not stored in db
-      #expect {
+      expect {
         post "/api/v1/project/#{project.uuid}/affiliates", payload.to_json, json_headers
         expect(response.status).to eq(400)
-      #}.not_to change{Project.count}
+      }.not_to change{Membership.count}
     end
   end
 
@@ -69,7 +68,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
   end
 
   describe 'View project affiliate details' do
-    let(:affiliate_uuid) { 123 }
+    let(:affiliate_uuid) { membership.id }
     it 'should return a json payload of the affiliate associated with id' do
       #TODO: Populate affiliate_uuid
       get "/api/v1/project/#{project.uuid}/affiliates/#{affiliate_uuid}", nil, json_headers_with_auth
@@ -88,7 +87,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
   describe 'Update a project affiliate' do
     let(:project_uuid) { project.uuid }
-    let(:affiliate_uuid) { 123 }
+    let(:affiliate_uuid) { membership.id }
     let(:payload) {{
         user: nil,
         external_person: {
@@ -131,16 +130,15 @@ describe DDS::V1::ProjectAffiliatesAPI do
   end
 
   describe 'Delete a project affiliate' do
-    let(:affiliate_uuid) { 123 }
+    let(:affiliate_uuid) { membership.id }
     it 'remove the project affiliation associated with id' do
-      #TODO: Ensure affiliate removed from db
-      #expect(project).to be_persisted
-      #expect {
+      expect(membership).to be_persisted
+      expect {
         delete "/api/v1/project/#{project.uuid}/affiliates/#{affiliate_uuid}", nil, json_headers_with_auth
         expect(response.status).to eq(204)
         expect(response.body).not_to eq('null')
         expect(response.body).to be
-      #}.to change{ProjectAffiliate.count}.by(-1)
+      }.to change{Membership.count}.by(-1)
     end
 
     it 'should require an auth token' do
