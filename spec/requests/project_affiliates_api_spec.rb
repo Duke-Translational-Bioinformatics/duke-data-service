@@ -86,14 +86,11 @@ describe DDS::V1::ProjectAffiliatesAPI do
   end
 
   describe 'Update a project affiliate' do
-    let(:project_uuid) { project.uuid }
+    let(:project_uuid) { membership.project.uuid }
     let(:affiliate_uuid) { membership.id }
     let(:payload) {{
-        user: nil,
-        external_person: {
-          full_name: Faker::Name.name, 
-          email: Faker::Internet.email
-        },
+        user: {id: user.uuid},
+        external_person: nil,
         project_roles: [{id: 'research_coordinator'}]
     }}
     it 'should update the project affiliate associated with id using the supplied payload' do
@@ -108,7 +105,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       expect(response_json).to have_key('is_external')
       expect(response_json['is_external']).to eq(false)
       expect(response_json).to have_key('project')
-      expect(response_json['project']).to eq({'id' => project.uuid})
+      expect(response_json['project']).to eq({'id' => project_uuid})
       expect(response_json).to have_key('user')
       #TODO: Check for serialized user and project_roles
       #expect(response_json['user']).to eq(payload[:user])
@@ -116,11 +113,10 @@ describe DDS::V1::ProjectAffiliatesAPI do
       expect(response_json['external_person']).to eq(nil)
       expect(response_json).to have_key('project_roles')
       #expect(response_json['project_roles']).to eq(payload[:project_roles])
-      #TODO: Reload affilate object to ensure db storage
-      #project.reload
-      #expect(project.uuid).to eq(project_uuid)
-      #expect(project.name).to eq(payload[:name])
-      #expect(project.description).to eq(payload[:description])
+      membership.reload
+      expect(membership.id).to eq(affiliate_uuid)
+      expect(membership.project.uuid).to eq(project_uuid)
+      #expect(membership.user.uuid).to eq(payload[:user][:id])
     end
 
     it 'should require an auth token' do

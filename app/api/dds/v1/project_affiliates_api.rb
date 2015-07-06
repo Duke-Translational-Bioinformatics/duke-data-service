@@ -69,18 +69,21 @@ module DDS
       end
       put '/project/:project_id/affiliates/:id', root: false do
         authenticate!
-#        project_params = declared(params, include_missing: false)
-#        project = Project.where(uuid: params[:id]).first
-#        project.update(project_params)
-#        project
+        membership_params = declared(params, include_missing: false)
+        user = User.where(uuid: membership_params[:user][:id]).first
+        membership = Membership.find(params[:id])
+        membership.update(
+          user: user
+        )
+        #membership
         {
-          id: "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+          id: membership.id,
           is_external: false,
-          project: { id: params[:project_id] },
+          project: { id: membership.project.uuid },
           user: {
-              id: "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-              full_name: "Matthew Gardner",
-              email: "mrgardner01@duke.edu"
+              id: membership.user.uuid,
+              full_name: membership.user.display_name,
+              email: membership.user.email
           },
           external_person: nil,
           project_roles: [{ id: "principal_investigator", name: "Principal Investigator" }]
