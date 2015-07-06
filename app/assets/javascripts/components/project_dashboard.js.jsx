@@ -36,6 +36,7 @@ var ProjectDashboard = React.createClass({
   render: function() {
     return (
       <div className="ProjectDashboard">
+        <NewProject />
         <AccountOverview projects={this.state.projects} />
         <ProjectList projects={this.state.projects} />
       </div>
