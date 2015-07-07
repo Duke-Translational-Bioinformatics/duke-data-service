@@ -15,6 +15,9 @@ http://docs.dukedataservices.apiary.io
 ## throughput graph
 [![Throughput Graph](https://graphs.waffle.io/duke-translational-bioinformatics/duke-data-service/throughput.svg)](https://waffle.io/duke-translational-bioinformatics/duke-data-service/metrics)
 
+## burndown app
+http://colab-sbx-97.oit.duke.edu:3838/sample-apps/dashboard/
+
 ### waffle.io
 [![Stories in Ready](https://badge.waffle.io/Duke-Translational-Bioinformatics/duke-data-service.png?label=ready&title=Ready)](https://waffle.io/Duke-Translational-Bioinformatics/duke-data-service)
 
