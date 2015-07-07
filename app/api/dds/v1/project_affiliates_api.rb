@@ -13,15 +13,14 @@ module DDS
       end
       post '/project/:project_id/affiliates', root: false do
         authenticate!
-#        project_params = declared(params, include_missing: false)
-#        project = Project.new({
-#          uuid: SecureRandom.uuid,
-#          name: project_params[:name],
-#          description: project_params[:description],
-#          creator_id: current_user.id
-#        })
-#        project.save
-#        project
+        membership_params = declared(params, include_missing: false)
+        project = Project.where(uuid: params[:project_id]).first
+        user = User.where(uuid: membership_params[:user][:id]).first
+        membership = project.memberships.build({
+          user_id: user.id
+        })
+        membership.save
+        #membership
         {
           id: "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
           is_external: false,
@@ -70,18 +69,21 @@ module DDS
       end
       put '/project/:project_id/affiliates/:id', root: false do
         authenticate!
-#        project_params = declared(params, include_missing: false)
-#        project = Project.where(uuid: params[:id]).first
-#        project.update(project_params)
-#        project
+        membership_params = declared(params, include_missing: false)
+        user = User.where(uuid: membership_params[:user][:id]).first
+        membership = Membership.find(params[:id])
+        membership.update(
+          user: user
+        )
+        #membership
         {
-          id: "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+          id: membership.id,
           is_external: false,
-          project: { id: params[:project_id] },
+          project: { id: membership.project.uuid },
           user: {
-              id: "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-              full_name: "Matthew Gardner",
-              email: "mrgardner01@duke.edu"
+              id: membership.user.uuid,
+              full_name: membership.user.display_name,
+              email: membership.user.email
           },
           external_person: nil,
           project_roles: [{ id: "principal_investigator", name: "Principal Investigator" }]
@@ -95,9 +97,7 @@ module DDS
       end
       delete '/project/:project_id/affiliates/:id', root: false do
         authenticate!
-#        project = Project.where(:uuid => params[:id]).first
-#        project.update_attribute(:is_deleted, true)
-#        body false
+        membership = Membership.find(params[:id]).destroy
         body false
       end
     end
