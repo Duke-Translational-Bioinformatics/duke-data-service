@@ -52,7 +52,7 @@ var NewProject = React.createClass({
                 <div id="descriptionField" className="form-group">
                   <label id="descriptionStatus" className="col-sm-2 control-label" for="inputDescription">Description</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="inputDescription" placeholder="Project Description" onChange={this.handleDescriptionChange} />
+                    <textarea className="form-control" id="inputDescription" placeholder="Project Description" onChange={this.handleDescriptionChange} />
                   </div>
                 </div>
               </div>
