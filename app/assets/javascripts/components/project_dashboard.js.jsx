@@ -1,25 +1,12 @@
 var ProjectDashboard = React.createClass({
-  loadProjects: function() {
-    this.setState({projects: [
-      {
-        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-        "name": "Knockout Mouse Project (KOMP)",
-        "description": "Goal of generating a targeted knockout mutation...",
-        "is_deleted": false
-      },
-      {
-        "id": "ac927ffd-ca33-dd46-0a51-c492db6fd16f",
-        "name": "Mouse RNASeq",
-        "description": "RNASeq of reverse transcriptase",
-        "is_deleted": false
-      },
-      {
-        "id": "92c46fdb6fd1-a015-46dd-33ca-ca29f7df",
-        "name": "Mouse Behavior",
-        "description": "Observations of Mouse behaviors",
-        "is_deleted": false
-      },
-    ]});
+  getProjects: function(api_token) {
+    return this.props.getResourceWithToken(api_token,'/api/v1/projects');
+  },
+
+  loadProjects: function(data) {
+    if (this.isMounted()) {
+      this.setState({projects: data});
+    }
   },
 
   getInitialState: function() {
@@ -29,16 +16,20 @@ var ProjectDashboard = React.createClass({
   },
 
   componentDidMount: function() {
-    this.loadProjects();
-    this.props.setMainMenuItems([<NewProjectButton label="New Project" />]);
+    this.props.setMainMenuItems([{content: <NewProjectButton label="New Project" />}]);
+    this.getProjects(this.props.api_token).then(
+      this.loadProjects,
+      this.props.handleAjaxError
+    );
   },
 
   render: function() {
+    var projects = this.state.projects;
     return (
       <div className="ProjectDashboard">
-        <NewProject />
-        <AccountOverview projects={this.state.projects} />
-        <ProjectList projects={this.state.projects} />
+        <NewProject handleCreateProject={this.handleCreateProject}/>
+        <AccountOverview projects={projects} />
+        <ProjectList projects={projects} />
       </div>
     )
   }

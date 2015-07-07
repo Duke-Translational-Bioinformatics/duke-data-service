@@ -7,5 +7,8 @@ this.DDSRoutes = (
     <DefaultRoute name='home' handler={Home} />
     <Route name='login' handler={Login} path='login' />
     <Route name='projects' handler={ProjectDashboard} path='projects' />
+    <Route name="project_detail" handler={ProjectDetail} path="/projects/:id" />
+    <Route name="project_folders" handler={ProjectFolders} path="/projects/:id/folders" />
+    <Route name="project_members" handler={ProjectMembers} path="/projects/:id/members" />
   </Route>
 );
