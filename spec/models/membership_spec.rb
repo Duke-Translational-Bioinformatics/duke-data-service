@@ -13,4 +13,23 @@ RSpec.describe Membership, type: :model do
       should validate_presence_of(:project_id)
     end
   end
+
+  describe 'serialization' do
+    subject {FactoryGirl.create(:membership)}
+
+    it 'should serialize to json' do
+      serializer = MembershipSerializer.new subject
+      payload = serializer.to_json
+      expect(payload).to be
+      parsed_json = JSON.parse(payload)
+      expect(parsed_json).to have_key('id')
+      expect(parsed_json).to have_key('project')
+      expect(parsed_json).to have_key('user')
+      expect(parsed_json).to have_key('project_roles')
+      expect(parsed_json['id']).to eq(subject.id)
+      expect(parsed_json['project']).to eq(subject.project_id)
+      expect(parsed_json['user']).to be_a(Hash)
+      expect(parsed_json['project_roles']).to eq(Array.new)
+    end
+  end
 end
