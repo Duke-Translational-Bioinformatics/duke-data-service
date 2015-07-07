@@ -16,7 +16,6 @@ var ProjectDashboard = React.createClass({
   },
 
   componentDidMount: function() {
-    this.loadProjects();
     this.props.setMainMenuItems([<NewProjectButton label="New Project" />]);
     this.getProjects(this.props.api_token).then(
       this.loadProjects,
@@ -25,11 +24,12 @@ var ProjectDashboard = React.createClass({
   },
 
   render: function() {
+    var projects = this.state.projects;
     return (
       <div className="ProjectDashboard">
-        <NewProject />
-        <AccountOverview projects={this.state.projects} />
-        <ProjectList projects={this.state.projects} />
+        <NewProject handleCreateProject={this.handleCreateProject}/>
+        <AccountOverview projects={projects} />
+        <ProjectList projects={projects} />
       </div>
     )
   }
