@@ -2,9 +2,24 @@ var NewProject = React.createClass({
 
   handleSubmit: function(e) {
     e.preventDefault();
-    var name = React.findDOMNode(this.refs.project_name).value.trim();
-    var description = React.findDOMNode(this.refs.project_description).value.trim();
+    var name = this.state.name;
+    var description = this.state.description;
+    console.log("GOT NAME "+name+" Description "+description);
+  },
 
+  handleNameChange: function(e) {
+    this.setState({name: event.target.value});
+  },
+
+  handleDescriptionChange: function(e) {
+    this.setState({description: event.target.value});
+  },
+
+  getInitialState: function() {
+     return {
+      name: '',
+      description: ''
+    }
   },
 
   render: function() {
@@ -31,13 +46,13 @@ var NewProject = React.createClass({
                 <div id="nameField" className="form-group">
                   <label id="nameStatus" className="col-sm-2 control-label" for="inputName">Name</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="inputName" placeholder="Project Name" ref="project_name" />
+                    <input type="text" className="form-control" id="inputName" placeholder="Project Name" onChange={this.handleNameChange} />
                   </div>
                 </div>
                 <div id="descriptionField" className="form-group">
                   <label id="descriptionStatus" className="col-sm-2 control-label" for="inputDescription">Description</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="inputDescription" placeholder="Project Description" ref="project_description" />
+                    <input type="text" className="form-control" id="inputDescription" placeholder="Project Description" onChange={this.handleDescriptionChange} />
                   </div>
                 </div>
               </div>
