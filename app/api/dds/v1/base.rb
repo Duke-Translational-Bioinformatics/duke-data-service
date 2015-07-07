@@ -57,6 +57,23 @@ module DDS
           User.find(decoded_token['id'])
         end
 
+        def validation_error!(object)
+          error_payload = {
+            error: '400',
+            reason: 'validation failed',
+            suggestion: 'Fix the following invalid fields and resubmit',
+            errors: []
+          }
+          object.errors.messages.each do |field, errors|
+            errors.each do |message|
+              error_payload[:errors] << {
+                field: field,
+                message: message
+              }
+            end
+          end
+          error!(error_payload, 400)
+        end
       end
 
       mount DDS::V1::UserAPI
