@@ -4,7 +4,7 @@ module DDS
       desc 'Create a project' do
         detail 'Creates a project for the given payload.'
         named 'create project'
-        failure [401]
+        failure [400,401]
       end
       params do
         requires :name
@@ -20,8 +20,11 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id
         })
-        project.save
-        project
+        if project.save
+          project
+        else
+          validation_error!(project)
+        end
       end
 
       desc 'List projects' do
@@ -57,8 +60,11 @@ module DDS
         authenticate!
         project_params = declared(params, include_missing: false)
         project = Project.where(uuid: params[:id]).first
-        project.update(project_params)
-        project
+        if project.update(project_params)
+          project
+        else
+          validation_error!(project)
+        end
       end
 
       desc 'Delete a project' do

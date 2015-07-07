@@ -14,38 +14,55 @@ describe DDS::V1::ProjectsAPI do
   let(:project_stub) { FactoryGirl.build(:project) }
 
   describe 'Create a project' do
-    let(:payload) {{
-        name: project_stub.name,
-        description: project_stub.description,
-        pi_affiliate: {}
-      }}
-    it 'should store a project with the given payload' do
-      expect {
-        post '/api/v1/projects', payload.to_json, json_headers_with_auth
-        expect(response.status).to eq(201)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-      }.to change{Project.count}.by(1)
+    context 'with valid payload' do
+      let(:payload) {{
+          name: project_stub.name,
+          description: project_stub.description,
+          pi_affiliate: {}
+        }}
+      it 'should store a project with the given payload' do
+        expect {
+          post '/api/v1/projects', payload.to_json, json_headers_with_auth
+          expect(response.status).to eq(201)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+        }.to change{Project.count}.by(1)
 
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('id')
-      expect(response_json['id']).to be
-      expect(response_json).to have_key('name')
-      expect(response_json['name']).to eq(payload[:name])
-      expect(response_json).to have_key('description')
-      expect(response_json['description']).to eq(payload[:description])
-      expect(response_json).to have_key('is_deleted')
-      expect(response_json['is_deleted']).to eq(false)
+        response_json = JSON.parse(response.body)
+        expect(response_json).to have_key('id')
+        expect(response_json['id']).to be
+        expect(response_json).to have_key('name')
+        expect(response_json['name']).to eq(payload[:name])
+        expect(response_json).to have_key('description')
+        expect(response_json['description']).to eq(payload[:description])
+        expect(response_json).to have_key('is_deleted')
+        expect(response_json['is_deleted']).to eq(false)
 
-      new_project = Project.where(uuid: response_json['id']).first
-      expect(new_project.creator_id).to eq(user.id)
+        new_project = Project.where(uuid: response_json['id']).first
+        expect(new_project.creator_id).to eq(user.id)
+      end
+
+      it 'should require an auth token' do
+        expect {
+          post '/api/v1/projects', payload.to_json, json_headers
+          expect(response.status).to eq(400)
+        }.not_to change{Project.count}
+      end
     end
 
-    it 'should require an auth token' do
-      expect {
-        post '/api/v1/projects', payload.to_json, json_headers
-        expect(response.status).to eq(400)
-      }.not_to change{Project.count}
+    context 'with invalid payload' do
+      let(:payload) {{
+          name: project.name,
+          description: nil,
+          pi_affiliate: {}
+        }}
+      before do
+        expect(project).to be_persisted
+        expect {
+          post '/api/v1/projects', payload.to_json, json_headers_with_auth
+        }.not_to change{Project.count}
+      end
+      it_behaves_like 'a validation failure'
     end
   end
 
@@ -82,34 +99,47 @@ describe DDS::V1::ProjectsAPI do
 
   describe 'Update a project' do
     let(:project_uuid) { project.uuid }
-    let(:payload) {{
-        name: project_stub.name,
-        description: project_stub.description
-    }}
-    it 'should update the project associated with id using the supplied payload' do
-      put "/api/v1/projects/#{project_uuid}", payload.to_json, json_headers_with_auth
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
+    context 'with a valid payload' do
+      let(:payload) {{
+          name: project_stub.name,
+          description: project_stub.description
+      }}
+      it 'should update the project associated with id using the supplied payload' do
+        put "/api/v1/projects/#{project_uuid}", payload.to_json, json_headers_with_auth
+        expect(response.status).to eq(200)
+        expect(response.body).to be
+        expect(response.body).not_to eq('null')
 
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('id')
-      expect(response_json['id']).to eq(project_uuid)
-      expect(response_json).to have_key('name')
-      expect(response_json['name']).to eq(payload[:name])
-      expect(response_json).to have_key('description')
-      expect(response_json['description']).to eq(payload[:description])
-      expect(response_json).to have_key('is_deleted')
-      expect(response_json['is_deleted']).to eq(project.is_deleted)
-      project.reload
-      expect(project.uuid).to eq(project_uuid)
-      expect(project.name).to eq(payload[:name])
-      expect(project.description).to eq(payload[:description])
+        response_json = JSON.parse(response.body)
+        expect(response_json).to have_key('id')
+        expect(response_json['id']).to eq(project_uuid)
+        expect(response_json).to have_key('name')
+        expect(response_json['name']).to eq(payload[:name])
+        expect(response_json).to have_key('description')
+        expect(response_json['description']).to eq(payload[:description])
+        expect(response_json).to have_key('is_deleted')
+        expect(response_json['is_deleted']).to eq(project.is_deleted)
+        project.reload
+        expect(project.uuid).to eq(project_uuid)
+        expect(project.name).to eq(payload[:name])
+        expect(project.description).to eq(payload[:description])
+      end
+
+      it 'should require an auth token' do
+        put "/api/v1/projects/#{project_uuid}", payload.to_json, json_headers
+        expect(response.status).to eq(400)
+      end
     end
-
-    it 'should require an auth token' do
-      put "/api/v1/projects/#{project_uuid}", payload.to_json, json_headers
-      expect(response.status).to eq(400)
+    
+    context 'with an invalid payload' do
+      let(:payload) {{
+          name: nil,
+          description: nil,
+      }}
+      before do
+        put "/api/v1/projects/#{project_uuid}", payload.to_json, json_headers_with_auth
+      end
+      it_behaves_like 'a validation failure'
     end
   end
 
