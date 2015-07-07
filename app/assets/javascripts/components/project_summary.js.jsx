@@ -1,13 +1,22 @@
+var Link = ReactRouter.Link;
+
 var ProjectSummary = React.createClass({
   render: function() {
     return (
       <li className="list-group-item ProjectSummary">
-        <span className="fa-stack fa-2x pull-left">
-          <i className="fa fa-square-o fa-stack-2x" />
-          <i className="fa fa-folder fa-stack-1x" />
-        </span>
-        <p>Project {this.props.project.name}</p>
-        <p>Description {this.props.project.description}</p>
+        <div className="row">
+          <div className="col-md-1">
+            <ul className="list-unstyled">
+              <li><Link to="project_detail" params={this.props.project}><i className="fa fa-eye" /></Link></li>
+              <li><Link to="project_folders" params={this.props.project}><i className="fa fa-folder-o" /></Link></li>
+              <li><Link to="project_members" params={this.props.project}><i className="fa fa-users" /></Link></li>
+            </ul>
+          </div>
+          <div className="col-md-11">
+            <p>Project {this.props.project.name}</p>
+            <p>Description {this.props.project.description}</p>
+          </div>
+        </div>
       </li>
     )
   }

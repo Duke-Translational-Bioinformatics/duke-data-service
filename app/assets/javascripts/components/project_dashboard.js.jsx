@@ -16,7 +16,7 @@ var ProjectDashboard = React.createClass({
   },
 
   componentDidMount: function() {
-    this.props.setMainMenuItems([<NewProjectButton label="New Project" />]);
+    this.props.setMainMenuItems([{content: <NewProjectButton label="New Project" />}]);
     this.getProjects(this.props.api_token).then(
       this.loadProjects,
       this.props.handleAjaxError

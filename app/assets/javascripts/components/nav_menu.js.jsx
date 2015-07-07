@@ -7,7 +7,9 @@ var NavMenu = React.createClass({
     return (
       <div className="navbar navbar-default navbar-fixed-top NavMenu" role="navigation">
        <ul className="nav navbar-nav navbar-left">
-         <MainMenu menuItems={this.props.menuItems} />
+         <MainMenu >
+           {this.props.children}
+         </MainMenu>
          <form className="navbar-form navbar-left">
            <div className="form-group">
              <input type="text" className="form-control" placeholder="Search" />

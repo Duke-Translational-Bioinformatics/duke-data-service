@@ -6,7 +6,12 @@ var App = React.createClass({
   mixins: [ Navigation ],
 
   setMainMenuItems: function(menuItems) {
-    this.setState({menuItems: menuItems});
+    this.setState({menuItems:
+      menuItems.concat([
+        {content: <a><i className="fa fa-info-circle fa-2x" /> About</a>},
+        {content: <a>Terms & Conditions</a>}
+      ])
+    });
   },
 
   handleLogout: function() {
@@ -150,14 +155,24 @@ var App = React.createClass({
   },
 
   render: function() {
+    var itemKey = 0;
     return (
       <div className="container-fluid App">
         <NavMenu
            {...this.props}
            currentUser={this.state.currentUser}
            isLoggedIn={this.state.isLoggedIn}
-           handleLogout={this.handleLogout}
-           menuItems={this.state.menuItems} />
+           handleLogout={this.handleLogout}>
+           {this.state.menuItems.map(function(menuItem) {
+             itemKey = itemKey + 1;
+             if (menuItem.link_to) {
+               return <li key={itemKey}><Link to={menuItem.link_to} params={menuItem.link_params}>{menuItem.content}</Link></li>
+             }
+             else {
+               return <li key={itemKey}>{menuItem.content}</li>
+             }
+           })}
+        </NavMenu>
         <div id="alerts" />
         <div>
           <RouteHandler {...this.props}
