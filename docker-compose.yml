@@ -1,21 +1,12 @@
-webapp:
-  build: .
-  environment:
-    - RAILS_ENV=development
-    - LOCALDEV=true
-  volumes:
-    - .:/var/www/app
-  ports:
-    - 3001:3000
+# To make this file default docker-compose file run the following (or add ~/.bash_profile):
+# export COMPOSE_FILE=dc-dev.utils.yml
 server:
   extends:
+    file: dc-base.yml
     service: webapp
   links:
     - db:postgres.db.host
 db:
-  build: ./docker/builds/db
-  environment:
-    - POSTGRES_USER=duke-data-service
-    - POSTGRES_PASSWORD=abc123
-    - POSTGRES_DEV_DB=duke-data-service_development
-    - POSTGRES_TEST_DB=duke-data-service_test
+  extends:
+    file: dc-base.yml
+    service: db

@@ -2,13 +2,13 @@
 # export COMPOSE_FILE=dc-dev.utils.yml
 server:
   extends:
-    file: docker-compose.yml
+    file: dc-base.yml
     service: webapp
   links:
     - db:postgres.db.host
 db:
   extends:
-    file: docker-compose.yml
+    file: dc-base.yml
     service: db
 rails:
   image: dukedataservice_server

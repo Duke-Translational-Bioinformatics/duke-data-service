@@ -383,6 +383,16 @@ docker-compose rake db:migrate
 docker-compose run authservice
 ```
 
+the above commands have been collected into shell scripts in the root of both.
+You can accomplish the same as above (regardless of whether your COMPOSE_FILE
+environment variable has been set) using:
+```
+cd PATHTO/duke-authentication-service
+./launch_application.sh
+cd PATHTO/duke-data-service
+./launch_application.sh
+```
+
 Troubleshooting Docker
 ----------------------
 If your docker command is not wired to communicate with your docker machine, or
