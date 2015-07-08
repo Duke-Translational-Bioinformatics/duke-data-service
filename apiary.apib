@@ -939,7 +939,7 @@ delete_file
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
-### Move a project folder [PUT]
+### Move a project folder to new parent [PUT]
 >**Permission**
 - - - - -
 create_file
@@ -1046,113 +1046,128 @@ view_project
             ...
         ]
 
-<!-- 
+
 ## Group Files
-A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents the descriptive meta\-data about file including the virtual path, as well as the physical storage location.
--->
+A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents 
+the descriptive meta\-data about file including the virtual path, as well as the physical storage location.
 
-<!--
 ## Group File Uploads
-All files must be uploaded using a mutipart/chunked upload process.  Althought this places more burden on client-side software to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following endpoints are used to manage the chunked upload process.
+All files must be uploaded using a mutipart/chunked upload process.  Althought this places more burden on client-side software to 
+divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to 
+be resent.  The following endpoints are used by the client to manage the chunked upload process.
 
-## Intitiate a chunked file upload [POST /projects/{id}/file_uploads]
-This is the first step in uploading a large file. A file meta-data object is created along with a composite upload_status object used to track the progress of the chunked upload.
+## File Upload collection [/projects/{id}/files/uploads]
++ Parameters
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
+
+### Intitiate a chunked file upload [POST]
+This is the first step in uploading a large file. A file meta-data object is created along with a composite upload_status object 
+used to track the progress of the chunked upload.
 
 >**Permission**
 - - - - -
 create_file
 
+>**Request/Response Payload Properties**
+- - - - -
++ name (string) - The name of the client file to upload.
++ folder (object) - The virtual destination folder - specifiy alias "root" for project root.
++ content\_type (string) - Valid type per [media types](https://en.wikipedia.org/wiki/Internet_media_type) 
+(optionally provided by client).
++ size (integer) - The size in bytes (computed by client).
++ hash.value (string) - The files hash computed by the client (optionally provided by client).
++ hash.algorithm (string) - The hash algorithm used (i.e. md5, sha256, etc.) - this must be the default algorithm supported by 
+storage provider.
++ storage\_provider (object) - The storage_provider selected by the client - must be an approved storage provider for the project.
+
+>**Response Payload Properties**
+- - - - -
++ id (string) - The globally unique id of the file meta-data object.
++ storage_location (object) - Object that contains file storage details specific to the file/storage provider.
++ upload_status (object) - Object used to track status of overall file upload. 
+
 + Request (application/json)
-    
-    + Attributes
-            + name (string) - The name of the client file to upload.
-            + folder (object) - The virtual destination folder - specifiy alias "root" for project root.
-            + content\_type (string) - Valid type per [media types](https://en.wikipedia.org/wiki/Internet_media_type) (optionally provided by client).
-            + size (integer) - The size in bytes (computed by client).
-            + hash.value (string) - The files hash computed by the client (optionally provided by client).
-            + hash.algorithm (string) - The hash algorithm used (i.e. md5, sha256, etc.) - this must be the default algorithm supported by storage provider.
-            + storage\_provider (object) - The storage_provider selected by the client - must be an approved storage provider for the project.
 
-    + Body
-
-            {
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
-                "content_type": "application/octet-stream", 
-                "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": "amazon_s3_standard" }
-            }
+        {
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "content_type": "application/octet-stream", 
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+            "storage_provider": { "id": "amazon_s3_standard" }
+        }
 
 
 + Response 201 (application/json)
+            
 
-     Attributes
-            + id (string) - The globally unique id of the upload object.
-            + storage_location (object) - Object that contains file storage details specific to the file/storage provider.
-            + upload_status (object) - Object used to track status of overall file upload. 
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+            "content_type": "application/octet-stream", 
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+            "storage_provider": { "id": "amazon_s3_standard" },
+            "storage_location": {
+                "Bucket": "duke_data_service_prod",
+                "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
+            },
+            "upload_status": {
+                "initiated_on": 2015-07-10T13:00:00Z,
+                "completed_on": null,
+                "error_on": null,
+                "error_message": null
+            },
+            <audit_object>
+        }
+        
 
-    + Body
+## Get pre-signed URL to upload next chunk [/project_files/{id}/uploads/next_chunk]
++ Parameters
+    + id (required, string, `xytu02a4-b9e6-473d-87c4-66f4c8815555`) ... Globally unique `id` of the file meta-data object.
 
-            {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "content_type": "application/octet-stream", 
-                "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": "amazon_s3_standard" },
-                "storage_location": {
-                    "Bucket": "duke_data_service_prod",
-                    "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-                },
-                "upload_status": {
-                    "initiated_on": 2015-07-10T13:00:00Z,
-                    "completed_on": null,
-                    "error_on": null,
-                    "error_message": null
-                },
-                <audit_object>
-            }
-
-## Get pre-signed URL to upload the next chunk [PUT /file_uploads/{id}/next_chunk]
-Generate a pre-signed URL that will be used to upload the next file chunk to the storage provider. This step is repeated for each chunk.
+### Get pre-signed URL to upload the next chunk [PUT]
+Generate a pre-signed URL that will be used to upload the next file chunk to the storage provider. This step is 
+repeated for each chunk.
 
 >**Permission**
 - - - - -
 create_file
 
+>**Request/Response Payload Properties**
+- - - - -
++ chunk.size (integer) - The size of the chunk in bytes that the client will upload using the pre-signed URL.
+
+>**Response Payload Properties**
+- - - - -
++ http_verb (string) - The http verb to use for uploading the next chunk.
++ host (string) - The storage provider host.
++ url (string) - The signed URL endpoint for uploading the next chunk to the storage provider.
++ http_headers (array) - Array of headers (key/value pairs) that must be included in the client upload request.
+
 + Request (application/json)
-    
-    + Attributes 
-            + this_chunk.size (integer) - The size of the chunk that the client will upload using the pre-signed URL.
 
-    + Body
-
-            { "this_chunk": { "size": 5024000 } } 
+        { "chunk": { "size": 5024000 } } 
 
 + Response 200 (application/json)
-    
-    + Attributes
-            + http_verb - The http verb to use for uploading the next chunk.
-            + host - The storage provider host.
-            + url - The signed URL endpoint for uploading the next chunk to the storage provider.
-            + http_headers - Headers that must be included in the client upload request.
 
-    + Body
+        {
+            "http_verb": "PUT",
+            "host": "duke_data_service_prod.s3.amazonaws.com",
+            "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
+            "http_headers": [
+                    { "Content-Length": "5024000" }
+            ]
+        }
 
-            {
-                "http_verb": "PUT",
-                "host": "duke_data_service_prod.s3.amazonaws.com",
-                "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
-                "http_headers": {
-                    "Content-Length": "5024000"
-                }
-            }
+## Complete the chunked file upload [/project_files/{id}/uploads/complete]
++ Parameters
+    + id (required, string, `xytu02a4-b9e6-473d-87c4-66f4c8815555`) ... Globally unique `id` of the file meta-data object.
 
-## Complete the chunked file upload [POST /file_uploads/{id}]
-This operation is called by the client after the last chunk has been successfully uploaded to the storage provider.  
+### Complete the chunked file upload [POST]    
+This operation is called by the client after the last file chunk has been successfully uploaded to the storage provider.  
 
 >**Permission**
 - - - - -
@@ -1160,33 +1175,35 @@ create_file
 
 >**Rules**
 - - - - -
-* If the storage provider requires the individula chunks to be assembled, such as Amazon S3, this operation will call the storage provider API to assemble the parts into a single file object.
-* If a client computed file hash was provided, it must equal the storage provider computed file hash, or an integrity exception is raised.
-* If the client reported file size (bytes) does not match the storage provider reported file size, an integrity exception is raised.
-* If there are no errors encountered or integrity exceptions, the `upload_status.complete_on` is set to the current timestamp.
+* If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call 
+the storage provider API to assemble the parts into a single file object.
+* If a client computed file hash was provided, it must equal the storage provider computed file hash, or an integrity 
+exception is raised.
+* If the client reported file size (bytes) does not match the storage provider reported file size, an integrity exception 
+is raised.
+* If there are no errors or integrity exceptions, the `upload_status.complete_on` is set to the current timestamp.
 
 + Response 201 (application/json)
 
         {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "content_type": "application/octet-stream", 
-                "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": "amazon_s3_standard" },
-                "storage_location": {
-                    "Bucket": "duke_data_service_prod",
-                    "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-                },
-                "upload_status": {
-                    "initiated_on": 2015-07-10T13:00:00Z,
-                    "completed_on": 2015-07-10T13:00:00Z,
-                    "error_on": null,
-                    "error_message": null
-                },
-                <audit_object>
-            }
--->
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+            "content_type": "application/octet-stream", 
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+            "storage_provider": { "id": "amazon_s3_standard" },
+            "storage_location": {
+                "Bucket": "duke_data_service_prod",
+                "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
+            },
+            "upload_status": {
+                "initiated_on": 2015-07-10T13:00:00Z,
+                "completed_on": 2015-07-10T13:00:00Z,
+                "error_on": null,
+                "error_message": null
+            },
+            <audit_object>
+        }
 
