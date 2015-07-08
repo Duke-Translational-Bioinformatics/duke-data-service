@@ -2,9 +2,31 @@ var NewProject = React.createClass({
 
   handleSubmit: function(e) {
     e.preventDefault();
-    var name = this.state.name;
-    var description = this.state.description;
-    console.log("GOT NAME "+name+" Description "+description);
+    var jqReq = $.ajax({
+      type: 'POST',
+      url: '/api/v1/projects',
+      beforeSend: function(xhr) {
+        // set header
+        xhr.setRequestHeader("Authorization", this.props.api_token);
+      }.bind(this),
+      data: JSON.stringify(this.state),
+      contentType: 'application/json',
+      dataType: 'json'
+    }).then(
+      this.handleSuccess,
+      this.props.handleAjaxError
+    );
+  },
+
+  handleSuccess: function(data) {
+    this.props.addToProjectList(data);
+    ['name','description'].map(function(field) {
+      $("#"+field+"Field").addClass('has-success');
+      $("#"+field+"Field").removeClass('has-error');
+      $("#"+field+"Alert").html("");
+      $("#"+field+"Input").val("");
+    });
+    $("#newProjectModal").modal('toggle');
   },
 
   handleNameChange: function(e) {
@@ -46,14 +68,16 @@ var NewProject = React.createClass({
                 <div id="nameField" className="form-group">
                   <label id="nameStatus" className="col-sm-2 control-label" for="inputName">Name</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="inputName" placeholder="Project Name" onChange={this.handleNameChange} />
+                    <input type="text" className="form-control" id="nameInput" placeholder="Project Name" onChange={this.handleNameChange} />
                   </div>
+                  <div id="nameAlert"></div>
                 </div>
                 <div id="descriptionField" className="form-group">
                   <label id="descriptionStatus" className="col-sm-2 control-label" for="inputDescription">Description</label>
                   <div className="col-sm-10">
-                    <textarea className="form-control" id="inputDescription" placeholder="Project Description" onChange={this.handleDescriptionChange} />
+                    <textarea className="form-control" id="descriptionInput" placeholder="Project Description" onChange={this.handleDescriptionChange} />
                   </div>
+                  <div id="descriptionAlert"></div>
                 </div>
               </div>
               <div className="modal-footer">
