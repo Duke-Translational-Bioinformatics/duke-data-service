@@ -8,7 +8,6 @@ module DDS
       end
       params do
         requires :user
-        requires :external_person
         requires :project_roles
       end
       post '/project/:project_id/affiliates', root: false do
@@ -20,19 +19,7 @@ module DDS
           user_id: user.id
         })
         membership.save
-        #membership
-        {
-          id: "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-          is_external: false,
-          project: { id: params[:project_id] },
-          user: {
-              id: "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-              full_name: "Matthew Gardner",
-              email: "mrgardner01@duke.edu"
-          },
-          external_person: nil,
-          project_roles: [{ id: "principal_investigator", name: "Principal Investigator" }]
-        }
+        membership
       end
 
       desc 'List project affiliates' do
@@ -42,8 +29,9 @@ module DDS
       end
       get '/project/:project_id/affiliates', root: false do
         authenticate!
-#        Project.all
-        {}
+        project = Project.where(uuid: params[:project_id]).first
+        #Membership.joins(:project).where(projects: {uuid: params[:project_id]})
+        project.memberships
       end
 
       desc 'View project affiliate details' do
@@ -53,8 +41,7 @@ module DDS
       end
       get '/project/:project_id/affiliates/:id', root: false do
         authenticate!
-#        Project.where(uuid: params[:id]).first
-        {}
+        Membership.find(params[:id])
       end
 
       desc 'Update a project affiliate' do
@@ -64,7 +51,6 @@ module DDS
       end
       params do
         requires :user
-        requires :external_person
         requires :project_roles
       end
       put '/project/:project_id/affiliates/:id', root: false do
