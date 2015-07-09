@@ -27,6 +27,7 @@ var NewProject = React.createClass({
       $("#"+field+"Input").val("");
     });
     $("#newProjectModal").modal('toggle');
+    this.props.alertUser({reason: '', suggestion: 'new project created'}, 'success');
   },
 
   handleNameChange: function(e) {

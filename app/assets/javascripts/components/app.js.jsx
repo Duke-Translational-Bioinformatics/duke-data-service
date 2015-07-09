@@ -24,9 +24,10 @@ var App = React.createClass({
     this.alertUser(info);
   },
 
-  alertUser: function(alertInfo) {
+  alertUser: function(alertInfo, alertType) {
+   var classString = alertType ? "alert alert-"+alertType+" alert-dismissible" : "alert alert-danger alert-dismissible"
    React.render(
-     <div className="alert alert-danger alert-dismissible" role="alert">
+     <div className={classString} role="alert">
        <button type="button" className="close" data-dismiss="alert" aria-label="Close">
          <span aria-hidden="true">&times;</span>
        </button>
@@ -209,6 +210,7 @@ var App = React.createClass({
                         setMainMenuItems={this.setMainMenuItems}
                         getResourceWithToken={this.getResourceWithToken}
                         handleAjaxError={this.handleAjaxError}
+                        alertUser={this.alertUser}
                         />
         </div>
       </div>
