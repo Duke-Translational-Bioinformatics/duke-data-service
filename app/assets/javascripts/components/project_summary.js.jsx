@@ -1,6 +1,11 @@
 var Link = ReactRouter.Link;
 
 var ProjectSummary = React.createClass({
+  updateProject: function(data) {
+    this.props.project = data;
+    this.forceUpdate();
+  },
+
   render: function() {
     return (
       <li className="list-group-item ProjectSummary">
@@ -8,6 +13,7 @@ var ProjectSummary = React.createClass({
           <div className="col-md-1">
             <ul className="list-unstyled">
               <li><Link to="project_detail" params={this.props.project}><i className="fa fa-eye" /></Link></li>
+              <li><EditProjectButton updateProject={this.updateProject} label='' {...this.props} /></li>
               <li><Link to="project_folders" params={this.props.project}><i className="fa fa-folder-o" /></Link></li>
               <li><Link to="project_members" params={this.props.project}><i className="fa fa-users" /></Link></li>
             </ul>
