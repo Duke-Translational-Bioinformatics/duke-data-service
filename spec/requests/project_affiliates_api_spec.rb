@@ -9,12 +9,13 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
   let(:membership) { FactoryGirl.create(:membership) }
   let(:project) { FactoryGirl.create(:project) }
-  #let(:serialized_project) { ProjectSerializer.new(project).to_json }
-  #let(:project_stub) { FactoryGirl.build(:project) }
+  let(:serialized_membership) { MembershipSerializer.new(membership).to_json }
 
   describe 'Create a project' do
     let(:payload) {{
-        user: {id: user.uuid},
+        user: {
+          id: user.uuid
+        },
         external_person: nil,
         project_roles: [{id: 'principal_investigator'}]
       }}
@@ -29,15 +30,13 @@ describe DDS::V1::ProjectAffiliatesAPI do
       response_json = JSON.parse(response.body)
       expect(response_json).to have_key('id')
       expect(response_json['id']).to be
-      expect(response_json).to have_key('is_external')
-      expect(response_json['is_external']).to eq(false)
       expect(response_json).to have_key('project')
       expect(response_json['project']).to eq({'id' => project.uuid})
       expect(response_json).to have_key('user')
       #TODO: Check for serialized user and project_roles
-      #expect(response_json['user']).to eq(payload[:user])
-      expect(response_json).to have_key('external_person')
-      expect(response_json['external_person']).to eq(nil)
+      expect(response_json['user']['id']).to eq(user.uuid)
+      expect(response_json['user']['full_name']).to eq(user.display_name)
+      expect(response_json['user']['email']).to eq(user.email)
       expect(response_json).to have_key('project_roles')
       #expect(response_json['project_roles']).to eq(payload[:project_roles])
     end
@@ -52,13 +51,13 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
   describe 'List project affiliates' do
     it 'should return a list of affiliates for a given project' do
-      expect(project).to be_persisted
-      get "/api/v1/project/#{project.uuid}/affiliates", nil, json_headers_with_auth
+      expect(membership).to be_persisted
+      get "/api/v1/project/#{membership.project.uuid}/affiliates", nil, json_headers_with_auth
       expect(response.status).to eq(200)
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       #TODO: Check for serialized affiliate
-      #expect(response.body).to include(serialized_affiliate)
+      expect(response.body).to include(serialized_membership)
     end
 
     it 'should require an auth token' do
@@ -76,7 +75,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       #TODO: Check for serialized affiliate
-      #expect(response.body).to include(serialized_affiliate)
+      expect(response.body).to include(serialized_membership)
     end
 
     it 'should require an auth token' do
@@ -108,15 +107,16 @@ describe DDS::V1::ProjectAffiliatesAPI do
       expect(response_json['project']).to eq({'id' => project_uuid})
       expect(response_json).to have_key('user')
       #TODO: Check for serialized user and project_roles
-      #expect(response_json['user']).to eq(payload[:user])
+      expect(response_json['user']['id']).to eq(user.uuid)
+      expect(response_json['user']['full_name']).to eq(user.display_name)
+      expect(response_json['user']['email']).to eq(user.email)
       expect(response_json).to have_key('external_person')
       expect(response_json['external_person']).to eq(nil)
       expect(response_json).to have_key('project_roles')
-      #expect(response_json['project_roles']).to eq(payload[:project_roles])
       membership.reload
       expect(membership.id).to eq(affiliate_uuid)
       expect(membership.project.uuid).to eq(project_uuid)
-      #expect(membership.user.uuid).to eq(payload[:user][:id])
+      expect(membership.user.uuid).to eq(payload[:user][:id])
     end
 
     it 'should require an auth token' do
