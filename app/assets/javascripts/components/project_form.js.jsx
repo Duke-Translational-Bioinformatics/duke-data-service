@@ -1,10 +1,17 @@
-var NewProject = React.createClass({
+var ProjectForm = React.createClass({
 
   handleSubmit: function(e) {
     e.preventDefault();
+    var resource_url = '/api/v1/projects';
+    var request_type = 'POST';
+    if (this.props.project && this.props.project.id) {
+      resource_url = resource_url + '/' + this.props.project.id;
+      request_type = 'PUT';
+    }
+
     var jqReq = $.ajax({
-      type: 'POST',
-      url: '/api/v1/projects',
+      type: request_type,
+      url: resource_url,
       beforeSend: function(xhr) {
         // set header
         xhr.setRequestHeader("Authorization", this.props.api_token);
@@ -18,16 +25,28 @@ var NewProject = React.createClass({
     );
   },
 
-  handleSuccess: function(data) {
-    this.props.addToProjectList(data);
+  handleClose: function(e) {
+    if (e) {
+      e.preventDefault();
+    }
     ['name','description'].map(function(field) {
-      $("#"+field+"Field").addClass('has-success');
       $("#"+field+"Field").removeClass('has-error');
       $("#"+field+"Alert").html("");
       $("#"+field+"Input").val("");
     });
-    $("#newProjectModal").modal('toggle');
-    this.props.alertUser({reason: '', suggestion: 'new project created'}, 'success');
+    $("#ProjectFormModal").modal('toggle');
+  },
+
+  handleSuccess: function(data) {
+    if (this.props.project.id) {
+      this.props.updateProject(data);
+    }
+    else {
+      this.props.addToProjectList(data);
+    }
+    this.handleClose();
+    var alert_suggestion = this.props.project ? 'project updated' : 'new project created';
+    this.props.alertUser({reason: '', suggestion: alert_suggestion}, 'success');
   },
 
   handleNameChange: function(e) {
@@ -45,38 +64,55 @@ var NewProject = React.createClass({
     }
   },
 
+  componentWillMount: function() {
+    if (this.props.project) {
+      this.setState({
+        name: this.props.project.name,
+        description: this.props.project.description
+      });
+    }
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({
+      name: nextProps.project ? nextProps.project.name : "",
+      description: nextProps.project ? nextProps.project.description : ""
+    });
+  },
+
   render: function() {
+    var formAction = this.props.project ? "Edit Project " : "New Project";
     return (
       <div className="modal fade"
-           id="newProjectModal"
+           id="ProjectFormModal"
            tabIndex="-1"
            role="dialog"
-           aria-labelledby="newProjectModalLabel">
+           aria-labelledby="ProjectFormModalLabel">
         <div className="modal-dialog"
              role="document">
           <div className="modal-content">
             <div className="modal-header">
               <button type="button"
                       className="close"
-                      data-dismiss="modal"
+                      onClick={this.handleClose}
                       aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
-              <h4 className="modal-title" id="newProjectModalLabel">New Project</h4>
+              <h4 className="modal-title" id="ProjectFormModalLabel">{formAction}</h4>
             </div>
             <form className="form-horizontal" onSubmit={this.handleSubmit}>
               <div className="modal-body">
                 <div id="nameField" className="form-group">
                   <label id="nameStatus" className="col-sm-2 control-label" for="inputName">Name</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="nameInput" placeholder="Project Name" onChange={this.handleNameChange} />
+                    <input type="text" className="form-control" id="nameInput" placeholder="Project Name" value={this.state.name} onChange={this.handleNameChange} />
                   </div>
                   <div id="nameAlert"></div>
                 </div>
                 <div id="descriptionField" className="form-group">
                   <label id="descriptionStatus" className="col-sm-2 control-label" for="inputDescription">Description</label>
                   <div className="col-sm-10">
-                    <textarea className="form-control" id="descriptionInput" placeholder="Project Description" onChange={this.handleDescriptionChange} />
+                    <textarea className="form-control" id="descriptionInput" placeholder="Project Description" value={this.state.description} onChange={this.handleDescriptionChange} />
                   </div>
                   <div id="descriptionAlert"></div>
                 </div>
@@ -84,7 +120,7 @@ var NewProject = React.createClass({
               <div className="modal-footer">
                 <button type="button"
                       className="btn btn-default"
-                      data-dismiss="modal">Close</button>
+                      onClick={this.handleClose}>Close</button>
                 <input className="btn btn-primary"
                      type="submit" value="Submit" />
               </div>

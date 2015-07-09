@@ -40,11 +40,9 @@ var ProjectDashboard = React.createClass({
     var projects = this.state.projects;
     return (
       <div className="ProjectDashboard">
-        <NewProject
-              {...this.props}
-              addToProjectList={this.addToProjectList}/>
+        <div id="projectFormTarget"></div>
         <AccountOverview projects={projects} />
-        <ProjectList projects={projects} />
+        <ProjectList {...this.props} addToProjectList={this.addToProjectList} projects={projects} />
       </div>
     )
   }
