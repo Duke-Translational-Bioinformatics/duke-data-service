@@ -16,10 +16,13 @@ module DDS
         project = Project.where(uuid: params[:project_id]).first
         user = User.where(uuid: membership_params[:user][:id]).first
         membership = project.memberships.build({
-          user_id: user.id
+          user: user
         })
-        membership.save
-        membership
+        if membership.save
+          membership
+        else
+          validation_error!(membership)
+        end
       end
 
       desc 'List project affiliates' do
@@ -58,22 +61,11 @@ module DDS
         membership_params = declared(params, include_missing: false)
         user = User.where(uuid: membership_params[:user][:id]).first
         membership = Membership.find(params[:id])
-        membership.update(
-          user: user
-        )
-        #membership
-        {
-          id: membership.id,
-          is_external: false,
-          project: { id: membership.project.uuid },
-          user: {
-              id: membership.user.uuid,
-              full_name: membership.user.display_name,
-              email: membership.user.email
-          },
-          external_person: nil,
-          project_roles: [{ id: "principal_investigator", name: "Principal Investigator" }]
-        }
+        if membership.update(user: user)
+          membership
+        else
+          validation_error!(membership)
+        end
       end
 
       desc 'Delete a project affiliate' do
