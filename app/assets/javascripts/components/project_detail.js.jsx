@@ -17,7 +17,7 @@ var ProjectDetail = React.createClass({
     }
   },
 
-  componentDidMount: function() {
+  componentWillMount: function() {
     this.props.setMainMenuItems([
       {
         link_to: "projects",
@@ -29,15 +29,33 @@ var ProjectDetail = React.createClass({
         content: <i className="fa fa-folder-o"> Project Folders</i>
       },
       {
-        link_to: "project_folders",
+        link_to: "project_members",
         link_params: {id: this.props.params.id},
         content: <i className="fa fa-users"> Project Members</i>
       }
     ]);
-    this.getProject(this.props.api_token, this.props.params.id).then(
-      this.loadProject,
-      this.props.handleAjaxError
-    );
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+    if (this.props.api_token) {
+      if (!this.state.project) {
+        if (nextState.project.id){
+          return true;
+        }
+        return true;
+      }
+      return false;
+    }
+    return false;
+  },
+
+  componentDidUpdate: function() {
+    if (this.props.api_token && !this.state.project){
+      this.getProject(this.props.api_token, this.props.params.id).then(
+        this.loadProject,
+        this.props.handleAjaxError
+      );
+    }
   },
 
   render: function() {
