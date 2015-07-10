@@ -1,8 +1,14 @@
 var ProjectList = React.createClass({
+
+ updateProject: function(project_index, data) {
+   this.props.projects[project_index] = data;
+   this.forceUpdate();
+ },
+
   render: function() {
-    var projectSummaries = this.props.projects.map(function(project) {
+    var projectSummaries = this.props.projects.map(function(project, i) {
       return (
-        <ProjectSummary key={project.id} project={project} {...this.props} />
+        <ProjectSummary key={i} project_index={i} updateProject={this.updateProject.bind(this, i)} project={project} {...this.props} />
       )
     }.bind(this));
 

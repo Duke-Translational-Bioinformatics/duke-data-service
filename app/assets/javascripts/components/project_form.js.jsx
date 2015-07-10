@@ -38,7 +38,7 @@ var ProjectForm = React.createClass({
   },
 
   handleSuccess: function(data) {
-    if (this.props.project.id) {
+    if (this.props.project && this.props.project.id) {
       this.props.updateProject(data);
     }
     else {
