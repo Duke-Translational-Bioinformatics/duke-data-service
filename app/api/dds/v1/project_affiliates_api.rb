@@ -33,7 +33,6 @@ module DDS
       get '/project/:project_id/affiliates', root: false do
         authenticate!
         project = Project.where(uuid: params[:project_id]).first
-        #Membership.joins(:project).where(projects: {uuid: params[:project_id]})
         project.memberships
       end
 
@@ -42,7 +41,7 @@ module DDS
         named 'view project affiliate'
         failure [401]
       end
-      get '/project/:project_id/affiliates/:id', root: false do
+      get '/project_affiliates/:id', root: false do
         authenticate!
         Membership.find(params[:id])
       end
@@ -56,7 +55,7 @@ module DDS
         requires :user
         requires :project_roles
       end
-      put '/project/:project_id/affiliates/:id', root: false do
+      put '/project_affiliates/:id', root: false do
         authenticate!
         membership_params = declared(params, include_missing: false)
         user = User.where(uuid: membership_params[:user][:id]).first
@@ -73,7 +72,7 @@ module DDS
         named 'delete project affiliation'
         failure [401]
       end
-      delete '/project/:project_id/affiliates/:id', root: false do
+      delete '/project_affiliates/:id', root: false do
         authenticate!
         membership = Membership.find(params[:id]).destroy
         body false
