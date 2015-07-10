@@ -1,4 +1,22 @@
 var ProjectDetail = React.createClass({
+
+  getInitialState: function() {
+    return {
+      project: ''
+    };
+  },
+
+  getProject: function(api_token, id) {
+    var resourceUrl = '/api/v1/projects/'+id;
+    return this.props.getResourceWithToken(api_token,'/api/v1/projects/'+id);
+  },
+
+  loadProject: function(data) {
+    if (this.isMounted()) {
+      this.setState({project: data});
+    }
+  },
+
   componentDidMount: function() {
     this.props.setMainMenuItems([
       {
@@ -16,12 +34,16 @@ var ProjectDetail = React.createClass({
         content: <i className="fa fa-users"> Project Members</i>
       }
     ]);
+    this.getProject(this.props.api_token, this.props.params.id).then(
+      this.loadProject,
+      this.props.handleAjaxError
+    );
   },
 
   render: function() {
     return (
       <div>
-        <p>Project {this.props.params.id} Details</p>
+        <p>Project {this.state.project.id} Details</p>
       </div>
     )
   }

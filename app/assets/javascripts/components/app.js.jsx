@@ -24,9 +24,10 @@ var App = React.createClass({
     this.alertUser(info);
   },
 
-  alertUser: function(alertInfo) {
+  alertUser: function(alertInfo, alertType) {
+   var classString = alertType ? "alert alert-"+alertType+" alert-dismissible" : "alert alert-danger alert-dismissible"
    React.render(
-     <div className="alert alert-danger alert-dismissible" role="alert">
+     <div className={classString} role="alert">
        <button type="button" className="close" data-dismiss="alert" aria-label="Close">
          <span aria-hidden="true">&times;</span>
        </button>
@@ -55,7 +56,7 @@ var App = React.createClass({
   handleInvalidSignedToken: function(jqXHR, status, err) {
     console.log(jqXHR.responseText);
     var errorMessage = JSON.parse(jqXHR.responseText);
-    console.log("ERROR "+errorMessage)
+    console.log("ERROR "+errorMessage);
   },
 
   getApiToken: function(signed_token) {
@@ -68,11 +69,40 @@ var App = React.createClass({
   },
 
   handleAjaxError: function(jqXHR, status, err) {
-    if (jqXHR.status == 401) {
+    switch(jqXHR.status) {
+    case 401:
       this.handleExpiredToken(JSON.parse(jqXHR.responseText));
+      break;
+    case 400:
+      this.handleValidationErrors(JSON.parse(jqXHR.responseText));
+      break;
+    default:
+      console.log("Unexpected error: "+jqXHR.responseText);
+      break;
+    }
+  },
+
+  handleValidationErrors: function(errorInfo) {
+    this.alertUser(errorInfo);
+    if (errorInfo["reason"] == "validation failed") {
+      errorInfo["errors"].map(function(validation_error) {
+        var invalid_field = validation_error["field"];
+        var message = validation_error["message"];
+        $("#"+invalid_field+"Field").addClass('has-error');
+        React.render(
+          <div className="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            {message}.
+          </div>
+          , document.getElementById(invalid_field+'Alert')
+        );
+
+      });
     }
     else {
-      console.log("Unexpected error: "+jqXHR.responseText);
+      console.log("Unexpected 400 Error "+JSON.stringify(errorInfo));
     }
   },
 
@@ -180,6 +210,7 @@ var App = React.createClass({
                         setMainMenuItems={this.setMainMenuItems}
                         getResourceWithToken={this.getResourceWithToken}
                         handleAjaxError={this.handleAjaxError}
+                        alertUser={this.alertUser}
                         />
         </div>
       </div>
