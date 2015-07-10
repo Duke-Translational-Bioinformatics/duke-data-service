@@ -1,0 +1,89 @@
+{
+  "name": "gulp-load-plugins",
+  "version": "0.9.0",
+  "description": "Automatically load any gulp plugins in your package.json",
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackfranklin/gulp-load-plugins"
+  },
+  "keywords": [
+    "gulpfriendly",
+    "gulp",
+    "require",
+    "load",
+    "plugins"
+  ],
+  "author": {
+    "name": "Jack Franklin"
+  },
+  "contributors": [
+    {
+      "name": "Pascal Hartig"
+    },
+    {
+      "name": "Ben Briggs"
+    },
+    {
+      "name": "kombucha"
+    },
+    {
+      "name": "Nicolas Froidure"
+    },
+    {
+      "name": "Sindre Sorhus"
+    },
+    {
+      "name": "Julien Fontanet",
+      "email": "julien.fontanet@vates.fr"
+    },
+    {
+      "name": "Callum Macrae"
+    },
+    {
+      "name": "Hutson Betts"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "findup-sync": "^0.2.1",
+    "multimatch": "2.0.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.5.1",
+    "mocha": "^2.1.0",
+    "proxyquire": "^1.0.1",
+    "sinon": "^1.9.1"
+  },
+  "gitHead": "1b2fc4688d68ad5c7da3d2a9f4b77bb06caa932e",
+  "bugs": {
+    "url": "https://github.com/jackfranklin/gulp-load-plugins/issues"
+  },
+  "homepage": "https://github.com/jackfranklin/gulp-load-plugins",
+  "_id": "gulp-load-plugins@0.9.0",
+  "_shasum": "7cadf75808f607c1bd6b032308332dd665d6e434",
+  "_from": "gulp-load-plugins@>=0.9.0 <0.10.0",
+  "_npmVersion": "2.6.0",
+  "_nodeVersion": "0.10.36",
+  "_npmUser": {
+    "name": "jackfranklin",
+    "email": "jack@jackfranklin.net"
+  },
+  "maintainers": [
+    {
+      "name": "jackfranklin",
+      "email": "jack@jackfranklin.net"
+    }
+  ],
+  "dist": {
+    "shasum": "7cadf75808f607c1bd6b032308332dd665d6e434",
+    "tarball": "http://registry.npmjs.org/gulp-load-plugins/-/gulp-load-plugins-0.9.0.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/gulp-load-plugins/-/gulp-load-plugins-0.9.0.tgz"
+}
