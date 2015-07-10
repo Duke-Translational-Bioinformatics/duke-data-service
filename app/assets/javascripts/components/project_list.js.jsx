@@ -2,9 +2,9 @@ var ProjectList = React.createClass({
   render: function() {
     var projectSummaries = this.props.projects.map(function(project) {
       return (
-        <ProjectSummary key={project.id} project={project} />
+        <ProjectSummary key={project.id} project={project} {...this.props} />
       )
-    });
+    }.bind(this));
 
     return (
       <div>
@@ -14,7 +14,10 @@ var ProjectList = React.createClass({
           </div>
           <div className="col-md-6">
             <div className="push-right">
-              <NewProjectButton label={''} />
+              <NewProjectButton
+                {...this.props}
+                addToProjectList={this.props.addToProjectList}
+                label={''} />
             </div>
           </div>
         </div>

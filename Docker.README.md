@@ -400,7 +400,7 @@ your docker-machine is not running, docker-compose will return the following
 response:
 Couldn't connect to Docker daemon - you might need to run `boot2docker up`.
 
-Do NOT run boot2docker up!  Docker machine takes care of this for you. Instead,
+To fix this, Do NOT run boot2docker up!  Docker machine takes care of this for you. Instead,
 check the following:
 1. Is your docker-machine running:
 ```
