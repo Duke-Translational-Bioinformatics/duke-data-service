@@ -2,7 +2,7 @@ var ProjectMembers = React.createClass({
 componentDidMount: function() {
   this.props.setMainMenuItems([
       {
-        link_to: "projects",
+        link_to: "home",
         content: <i className="fa fa-dashboard" > Project Dashboard</i>
       },
       {
