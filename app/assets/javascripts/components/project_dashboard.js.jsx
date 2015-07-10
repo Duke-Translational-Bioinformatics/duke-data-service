@@ -9,6 +9,14 @@ var ProjectDashboard = React.createClass({
     }
   },
 
+  addToProjectList: function(project) {
+    projects = this.state.projects
+    projects.push(project);
+    this.setState({
+      projects: projects
+    });
+  },
+
   getInitialState: function() {
     return {
       projects: []
@@ -16,7 +24,12 @@ var ProjectDashboard = React.createClass({
   },
 
   componentDidMount: function() {
-    this.props.setMainMenuItems([{content: <NewProjectButton label="New Project" />}]);
+    this.props.setMainMenuItems([{
+      content: <NewProjectButton
+                  {...this.props}
+                  label="New Project"
+                  addToProjectList={this.addToProjectList} />
+    }]);
     this.getProjects(this.props.api_token).then(
       this.loadProjects,
       this.props.handleAjaxError
@@ -27,9 +40,9 @@ var ProjectDashboard = React.createClass({
     var projects = this.state.projects;
     return (
       <div className="ProjectDashboard">
-        <NewProject handleCreateProject={this.handleCreateProject}/>
+        <div id="projectFormTarget"></div>
         <AccountOverview projects={projects} />
-        <ProjectList projects={projects} />
+        <ProjectList {...this.props} addToProjectList={this.addToProjectList} projects={projects} />
       </div>
     )
   }
