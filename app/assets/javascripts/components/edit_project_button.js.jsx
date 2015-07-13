@@ -8,7 +8,7 @@ var EditProjectButton = React.createClass({
 
   render: function() {
     return (
-      <a className="EditProjectButton" {...this.props} onClick={this.handleClick} >
+      <a className="EditProjectButton" onClick={this.handleClick} >
         <i className="fa fa-pencil" />{this.props.label}
       </a>
     )
