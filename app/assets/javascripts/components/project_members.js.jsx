@@ -1,7 +1,8 @@
 var ProjectMembers = React.createClass({
   getInitialState: function() {
     return {
-      project: ''
+      project: '',
+      project_members: []
     };
   },
 
@@ -13,7 +14,31 @@ var ProjectMembers = React.createClass({
   loadProject: function(data) {
     if (this.isMounted()) {
       this.setState({project: data});
+      this.getProjectMembers(this.props.api_token, data.id).then(
+        this.loadProjectMembers,
+        this.props.handleAjaxError
+      );
     }
+  },
+
+  getProjectMembers: function(api_token, project_id) {
+    return this.props.getResourceWithToken(api_token,'/api/v1/projects');/* /'+project_id+'/permissions'); */
+  },
+
+  loadProjectMembers: function(data) {
+    /*
+    if (this.isMounted()) {
+      this.setState({project_members: data});
+    }
+    */
+  },
+
+  addToProjectMemberList: function(project_member) {
+    project_members = this.state.project_members
+    project_members.push(project);
+    this.setState({
+      project_members: project_members
+    });
   },
 
   componentDidMount: function() {
@@ -60,7 +85,14 @@ var ProjectMembers = React.createClass({
   render: function() {
     return (
       <div>
-        <p>Project {this.state.project.id} Members</p>
+        <div className="panel panel-default">
+          <h3>Project {this.state.project.id} &gt; Members</h3>
+          <NewProjectMemberButton
+            {...this.props}
+            addToProjectMemberList={this.addToProjectMemberList} />
+        </div>
+        <div id="projectMemberFormTarget" />
+        <ProjectMemberList {...this.props} project={this.state.project} project_members={this.state.project_members} />
       </div>
     )
   }
