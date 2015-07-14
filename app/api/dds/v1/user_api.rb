@@ -63,6 +63,33 @@ module DDS
           end
         end
       end
+
+      desc 'users' do
+        detail 'This allows a client to get a list of users using a filter'
+        named 'users'
+        failure [400, 401]
+      end
+      params do
+        optional :last_name_begins_with
+        optional :first_name_begins_with
+      end
+      get '/users', root: false do
+        authenticate!
+        query_params = declared(params, include_missing: false)
+        users = []
+        if query_params[:last_name_begins_with]
+          users = User.where(
+            "last_name like ?",
+            "#{query_params[:last_name_begins_with]}%").all
+        elsif query_params[:first_name_begins_with]
+          users = User.where(
+            "first_name like ?",
+            "#{query_params[:first_name_begins_with]}%").all
+        else
+          users = User.all
+        end
+        {results: ActiveModel::ArraySerializer.new(users, each_serializer: UserSerializer) }
+      end
     end
   end
 end
