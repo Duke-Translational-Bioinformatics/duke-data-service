@@ -1,14 +1,24 @@
 var ProjectList = React.createClass({
 
- updateProject: function(project_index, data) {
+  updateProject: function(project_index, data) {
    this.props.projects[project_index] = data;
    this.forceUpdate();
- },
+  },
+
+  deleteProject: function(project_index) {
+   delete this.props.projects[project_index];
+   this.forceUpdate();
+  },
 
   render: function() {
     var projectSummaries = this.props.projects.map(function(project, i) {
       return (
-        <ProjectSummary key={i} project_index={i} updateProject={this.updateProject.bind(this, i)} project={project} {...this.props} />
+        <ProjectSummary
+          key={i}
+          project_index={i}
+          updateProject={this.updateProject.bind(this, i)}
+          deleteProject={this.deleteProject.bind(this, i)}
+          project={project} {...this.props} />
       )
     }.bind(this));
 
