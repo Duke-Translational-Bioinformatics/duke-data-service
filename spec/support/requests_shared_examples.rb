@@ -10,7 +10,7 @@ end
 shared_context 'with authentication' do
   include_context 'common headers'
   let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
-  let(:user) { user_auth.user }
+  let(:current_user) { user_auth.user }
   let (:api_token) { user_auth.api_token }
   let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
 end
@@ -28,6 +28,13 @@ end
 shared_examples 'a failed GET request' do
   it 'should require an auth token' do
     get url, nil, headers
+    expect(response.status).to eq(400)
+  end
+end
+
+shared_examples 'a failed PUT request' do
+  it 'should require an auth token' do
+    put url, payload.to_json, headers
     expect(response.status).to eq(400)
   end
 end
