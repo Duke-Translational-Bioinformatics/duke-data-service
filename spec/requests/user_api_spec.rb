@@ -153,4 +153,89 @@ describe DDS::V1::UserAPI do
       end
     end
   end
+
+  describe 'get /api/v1/users' do
+    let(:url) { "/api/v1/users" }
+    let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
+    let(:user) { user_auth.user }
+    let (:api_token) { user_auth.api_token }
+    let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
+    let(:last_name_begins_with) { 'Abc' }
+    let(:first_name_begins_with) { 'Xyz' }
+    let(:users_with_last_name) {
+      users = []
+      5.times do
+        nuser = FactoryGirl.create(
+          :user_authentication_service,
+          :populated)
+        nuser.user.update(
+          last_name: "#{last_name_begins_with}#{Faker::Name.last_name}")
+        users << nuser
+      end
+      users
+    }
+
+    let(:users_with_first_name) {
+      users = []
+      5.times do
+        nuser = FactoryGirl.create(
+          :user_authentication_service,
+          :populated)
+        nuser.user.update(
+          :first_name => "#{first_name_begins_with}#{Faker::Name.first_name}")
+        users << nuser
+      end
+      users
+    }
+
+    it 'should return all users when not provided a filter' do
+      expect(users_with_first_name.length + users_with_first_name.length).to be <= 10
+      get url, nil, json_headers_with_auth
+      expect(response.status).to eq(200);
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('results')
+      returned_users = response_json['results']
+      expect(returned_users.length).to eq(User.all.count)
+    end
+
+    it 'should return an list of users whose last_name_begins_with' do
+      expect(users_with_last_name.length).to be >= 5
+      get url, {last_name_begins_with: last_name_begins_with}, json_headers_with_auth
+      expect(response.status).to eq(200);
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).not_to be_empty
+      expect(response_json).to have_key('results')
+      returned_users = response_json['results']
+      expect(returned_users).not_to be_empty
+      expect(returned_users.length).to be >= users_with_last_name.length
+      returned_users.each do |ruser|
+        expect(ruser['last_name']).to start_with(last_name_begins_with)
+      end
+    end
+
+    it 'should return an list of users whose first_name_begins_with' do
+      expect(users_with_first_name.length).to be >= 5
+      get url, {first_name_begins_with: first_name_begins_with}, json_headers_with_auth
+      expect(response.status).to eq(200);
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('results')
+      returned_users = response_json['results']
+      expect(returned_users).not_to be_empty
+      expect(returned_users.length).to be >= users_with_first_name.length
+      returned_users.each do |ruser|
+        expect(ruser['first_name']).to start_with(first_name_begins_with)
+      end
+    end
+
+    it 'should require an auth token' do
+      get url, nil, json_headers
+      expect(response.status).to eq(400)
+    end
+  end
 end
