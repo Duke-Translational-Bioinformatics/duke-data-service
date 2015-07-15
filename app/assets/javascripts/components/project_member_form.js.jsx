@@ -2,21 +2,11 @@ var ProjectMemberForm = React.createClass({
 
   handleSubmit: function(e) {
     e.preventDefault();
-    var request_type = 'POST';
-    var jqReq = $.ajax({
-      type: 'POST',
-      url: '/api/v1/project/'+this.props.project.id+'/permissions',
-      beforeSend: function(xhr) {
-        // set header
-        xhr.setRequestHeader("Authorization", this.props.api_token);
-      }.bind(this),
-      data: JSON.stringify(this.state),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(
-      this.handleSuccess,
-      this.props.handleAjaxError
-    );
+    var submitOptions = {
+      member_id: this.state.member_id,
+      role: this.state.role
+    }
+    console.log("WOULD SUBMIT "+JSON.stringify(submitOptions));
   },
 
   handleClose: function(e) {
@@ -38,8 +28,45 @@ var ProjectMemberForm = React.createClass({
     this.props.alertUser({reason: '', suggestion: alert_suggestion}, 'success');
   },
 
+  handleMemberIdSelected: function(selectedOption) {
+    console.log("Selected "+JSON.stringify(selectedOption))
+    this.setState({member_id: selectedOption.id});
+  },
+
+  getUserSuggestions: function(last_name_begins_with) {
+    var usersUrl = '/api/v1/users?last_name_begins_with='+last_name_begins_with;
+    console.log("getting "+usersUrl+" with "+this.props.api_token);
+    return this.props.getResourceWithToken(this.props.api_token, usersUrl);
+  },
+
+  handleAjaxError: function(jqXHR, status, err) {
+    this.handleClose();
+    this.props.handleAjaxError(jqXHR, status, err);
+  },
+
+  loadUserSuggestions: function(data) {
+    console.log("Got UserSuggestions "+JSON.stringify(data));
+    this.setState({
+      typeaheadOptions: data['results']
+    });
+  },
+
   handleMemberIdChange: function(e) {
-    this.setState({member_id: event.target.value});
+    console.log("MemberID changed to "+event.target.value);
+    if ( event.target.value.length > 2 ) {
+      console.log("Setting options");
+      this.getUserSuggestions(event.target.value).then(
+        this.loadUserSuggestions,
+        this.handleAjaxError
+      )
+    }
+    else {
+      console.log("resetting");
+      this.setState({
+        member_id: '',
+        typeaheadOptions: []
+      })
+    }
   },
 
   handleRoleChange: function(e) {
@@ -49,11 +76,17 @@ var ProjectMemberForm = React.createClass({
   getInitialState: function() {
      return {
       member_id: '',
-      role: ''
+      role: '',
+      typeaheadOptions: []
     }
   },
 
+  last_first_name: function(option) {
+    return option.last_name+', '+option.first_name
+  },
+
   render: function() {
+    console.log("rendering");
     return (
       <div className="modal fade"
            id="ProjectMemberFormModal"
@@ -74,10 +107,24 @@ var ProjectMemberForm = React.createClass({
             </div>
             <form className="form-horizontal" onSubmit={this.handleSubmit}>
               <div className="modal-body">
-                <div id="nameField" className="form-group">
-                  <label id="memberIdStatus" className="col-sm-2 control-label" for="inputMemberId">Member</label>
+                <div id="memberField" className="form-group">
+                  <label id="memberIdStatus" className="col-sm-2 control-label">Member</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="memberIdInput" placeholder="Member" value={this.state.member_id} onChange={this.handleMemberIdChange} />
+                    <ReactTypeahead.Typeahead
+                      options={this.state.typeaheadOptions}
+                      maxVisible={5}
+                      displayOption={this.last_first_name}
+                      filterOption='last_name'
+                      customClasses={{
+                        input: "form-control"
+                      }}
+                      id="memberIdInput"
+                      placeholder="Member"
+                      onKeyUp={this.handleMemberIdChange}
+                      onOptionSelected={this.handleMemberIdSelected}
+                      inputProps={{
+                        value: this.state.member_id
+                      }} />
                   </div>
                   <div id="memberIdAlert"></div>
                 </div>
