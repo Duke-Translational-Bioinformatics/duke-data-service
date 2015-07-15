@@ -1,3 +1,37 @@
+shared_context 'common headers' do
+  let(:common_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
+end
+
+shared_context 'without authentication' do
+  include_context 'common headers'
+  let(:headers) { common_headers }
+end
+
+shared_context 'with authentication' do
+  include_context 'common headers'
+  let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
+  let(:user) { user_auth.user }
+  let (:api_token) { user_auth.api_token }
+  let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
+end
+
+shared_examples 'a listable resource' do
+  it 'should return a list that includes a serialized resource' do
+    get url, nil, headers
+    expect(response.status).to eq(200)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    expect(response.body).to include(resource_serializer.new(resource).to_json)
+  end
+end
+
+shared_examples 'a failed GET request' do
+  it 'should require an auth token' do
+    get url, nil, headers
+    expect(response.status).to eq(400)
+  end
+end
+
 shared_examples 'a validation failure' do
   it 'returns errors as a JSON payload' do
     expect(response.status).to eq(400)
