@@ -25,77 +25,72 @@ describe DDS::V1::ProjectPermissionsAPI do
     end
   end
 
-  describe 'Grant project level permissions to a user' do
+  describe 'Project Permission instance' do
     let!(:resource) { project_permission }
     let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions/#{resource.user.uuid}" }
-    let!(:payload) {{
-      auth_roles: auth_roles.collect {|r| r.text_id}
-    }}
     include_context 'with authentication'
+      
+    describe 'grant project level permissions to a user' do
+      let!(:payload) {{
+        auth_roles: auth_roles.collect {|r| r.text_id}
+      }}
 
-    context 'non-existent project permission' do
-      it 'should create a project permission' do
-        expected_resource = resource.clone
-        expected_resource.auth_roles = payload[:auth_roles]
-        resource.destroy
-        expect(resource).not_to be_persisted
+      context 'non-existent project permission' do
+        it 'should create a project permission' do
+          expected_resource = resource.clone
+          expected_resource.auth_roles = payload[:auth_roles]
+          resource.destroy
+          expect(resource).not_to be_persisted
+          expect {
+            put url, payload.to_json, headers
+            expect(response.status).to eq(200)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+          }.to change{resource_class.count}.by(1)
+          expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+        end
+      end
+
+      it 'should update the auth_roles' do
         expect {
           put url, payload.to_json, headers
           expect(response.status).to eq(200)
           expect(response.body).to be
           expect(response.body).not_to eq('null')
-        }.to change{resource_class.count}.by(1)
-        expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+        }.not_to change{resource_class.count}
+        resource.reload
+        expect(resource.auth_role_ids).to eq(payload[:auth_roles])
+        expect(response.body).to include(resource_serializer.new(resource).to_json)
+      end
+
+      it_behaves_like 'a validation failure' do
+        let!(:payload) {{
+          auth_roles: ['invalid_role']
+        }}
+        before do
+          put url, payload.to_json, headers
+        end
+      end
+
+      it_behaves_like 'a failed PUT request' do
+        include_context 'without authentication'
       end
     end
 
-    it 'should update the auth_roles' do
-      expect {
-        put url, payload.to_json, headers
-        expect(response.status).to eq(200)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-      }.not_to change{resource_class.count}
-      resource.reload
-      expect(resource.auth_role_ids).to eq(payload[:auth_roles])
-      expect(response.body).to include(resource_serializer.new(resource).to_json)
-    end
+    describe 'view project level permissions for a user' do
+      it_behaves_like 'a viewable resource'
 
-    it_behaves_like 'a validation failure' do
-      let!(:payload) {{
-        auth_roles: ['invalid_role']
-      }}
-      before do
-        put url, payload.to_json, headers
+      it_behaves_like 'a failed GET request' do
+        include_context 'without authentication'
       end
     end
 
-    it_behaves_like 'a failed PUT request' do
-      include_context 'without authentication'
-    end
-  end
+    describe 'revoke project level permissions for a user' do
+      it_behaves_like 'a removable resource'
 
-  describe 'View project level permissions for a user' do
-    let!(:resource) { project_permission }
-    let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions/#{resource.user.uuid}" }
-    include_context 'with authentication'
-    
-    it_behaves_like 'a viewable resource'
-
-    it_behaves_like 'a failed GET request' do
-      include_context 'without authentication'
-    end
-  end
-
-  describe 'Revoke project level permissions for a user' do
-    let!(:resource) { project_permission }
-    let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions/#{resource.user.uuid}" }
-    include_context 'with authentication'
-    
-    it_behaves_like 'a removable resource'
-
-    it_behaves_like 'a failed DELETE request' do
-      include_context 'without authentication'
+      it_behaves_like 'a failed DELETE request' do
+        include_context 'without authentication'
+      end
     end
   end
 end
