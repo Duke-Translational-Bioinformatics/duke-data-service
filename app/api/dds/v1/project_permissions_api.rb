@@ -45,6 +45,19 @@ module DDS
         user = User.where(uuid: params[:user_id]).first
         ProjectPermission.where(project: project, user: user).first
       end
+
+      desc 'Revoke project level permissions for user' do
+        detail 'Revoke project permissions'
+        named 'revoke project permissions'
+        failure [401]
+      end
+      delete '/projects/:project_id/permissions/:user_id', root: false do
+        authenticate!
+        project = Project.where(uuid: params[:project_id]).first
+        user = User.where(uuid: params[:user_id]).first
+        ProjectPermission.where(project: project, user: user).first.destroy
+        body false
+      end
     end
   end
 end

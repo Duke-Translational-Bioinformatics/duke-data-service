@@ -35,6 +35,25 @@ shared_examples 'a viewable resource' do
   end
 end
 
+shared_examples 'a removable resource' do
+  it 'remove the resource and return an empty 204 response' do
+    expect(resource).to be_persisted
+    expect {
+      delete url, nil, headers
+      expect(response.status).to eq(204)
+      expect(response.body).not_to eq('null')
+      expect(response.body).to be
+    }.to change{resource_class.count}.by(-1)
+  end
+end
+
+shared_examples 'a failed DELETE request' do
+  it 'should require an auth token' do
+    delete url, nil, headers
+    expect(response.status).to eq(400)
+  end
+end
+
 shared_examples 'a failed GET request' do
   it 'should require an auth token' do
     get url, nil, headers
