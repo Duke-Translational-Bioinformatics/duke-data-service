@@ -34,7 +34,7 @@ module DDS
       end
       get '/projects', root: false do
         authenticate!
-        Project.all
+        Project.where(is_deleted: false)
       end
 
       desc 'View project details' do

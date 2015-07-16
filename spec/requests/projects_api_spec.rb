@@ -10,7 +10,9 @@ describe DDS::V1::ProjectsAPI do
   let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
 
   let(:project) { FactoryGirl.create(:project) }
+  let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
   let(:serialized_project) { ProjectSerializer.new(project).to_json }
+  let(:serialized_deleted_project) { ProjectSerializer.new(deleted_project).to_json }
   let(:project_stub) { FactoryGirl.build(:project) }
 
   describe 'Create a project' do
@@ -74,6 +76,15 @@ describe DDS::V1::ProjectsAPI do
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       expect(response.body).to include(serialized_project)
+    end
+
+    it 'should not include deleted projects' do
+      expect(deleted_project).to be_persisted
+      get '/api/v1/projects', nil, json_headers_with_auth
+      expect(response.status).to eq(200)
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      expect(response.body).not_to include(serialized_deleted_project)
     end
 
     it 'should require an auth token' do
