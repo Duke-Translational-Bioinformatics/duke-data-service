@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150716162252) do
+ActiveRecord::Schema.define(version: 20150716201222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,12 +51,10 @@ ActiveRecord::Schema.define(version: 20150716162252) do
   create_table "project_permissions", force: :cascade do |t|
     t.string   "project_id"
     t.string   "user_id"
-    t.jsonb    "auth_role_ids"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+    t.integer  "auth_role_id"
   end
-
-  add_index "project_permissions", ["auth_role_ids"], name: "index_project_permissions_on_auth_role_ids", using: :gin
 
   create_table "projects", id: false, force: :cascade do |t|
     t.string   "id",          null: false
@@ -90,7 +88,6 @@ ActiveRecord::Schema.define(version: 20150716162252) do
   end
 
   create_table "users", id: false, force: :cascade do |t|
-    t.string   "id",            null: false
     t.string   "etag"
     t.string   "email"
     t.string   "display_name"
@@ -99,8 +96,7 @@ ActiveRecord::Schema.define(version: 20150716162252) do
     t.string   "last_name"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.string   "id"
   end
-
-  add_index "users", ["id"], name: "index_users_on_id", unique: true, using: :btree
 
 end
