@@ -4,12 +4,12 @@ class ProjectPermissionSerializer < ActiveModel::Serializer
 
   def user
     {
-      id: object.user.uuid,
+      id: object.user.id,
       full_name: object.user.display_name
     }
   end
 
   def project
-    { id: object.project.uuid }
+    { id: object.project.id }
   end
 end

@@ -38,7 +38,7 @@ describe DDS::V1::ProjectsAPI do
         expect(response_json).to have_key('is_deleted')
         expect(response_json['is_deleted']).to eq(false)
 
-        new_project = Project.where(uuid: response_json['id']).first
+        new_project = Project.find(response_json['id'])
         expect(new_project.creator_id).to eq(user.id)
       end
 
@@ -84,7 +84,7 @@ describe DDS::V1::ProjectsAPI do
 
   describe 'View project details' do
     it 'should return a json payload of the project associated with id' do
-      get "/api/v1/projects/#{project.uuid}", nil, json_headers_with_auth
+      get "/api/v1/projects/#{project.id}", nil, json_headers_with_auth
       expect(response.status).to eq(200)
       expect(response.body).to be
       expect(response.body).not_to eq('null')
@@ -92,13 +92,13 @@ describe DDS::V1::ProjectsAPI do
     end
 
     it 'should require an auth token' do
-      get "/api/v1/projects/#{project.uuid}", json_headers
+      get "/api/v1/projects/#{project.id}", json_headers
       expect(response.status).to eq(400)
     end
   end
 
   describe 'Update a project' do
-    let(:project_uuid) { project.uuid }
+    let(:project_uuid) { project.id }
     context 'with a valid payload' do
       let(:payload) {{
           name: project_stub.name,
@@ -120,7 +120,7 @@ describe DDS::V1::ProjectsAPI do
         expect(response_json).to have_key('is_deleted')
         expect(response_json['is_deleted']).to eq(project.is_deleted)
         project.reload
-        expect(project.uuid).to eq(project_uuid)
+        expect(project.id).to eq(project_uuid)
         expect(project.name).to eq(payload[:name])
         expect(project.description).to eq(payload[:description])
       end
@@ -130,7 +130,7 @@ describe DDS::V1::ProjectsAPI do
         expect(response.status).to eq(400)
       end
     end
-    
+
     context 'with an invalid payload' do
       let(:payload) {{
           name: nil,
@@ -147,7 +147,7 @@ describe DDS::V1::ProjectsAPI do
     it 'logically deletes the project associated with id' do
       expect(project).to be_persisted
       expect {
-        delete "/api/v1/projects/#{project.uuid}", nil, json_headers_with_auth
+        delete "/api/v1/projects/#{project.id}", nil, json_headers_with_auth
         expect(response.status).to eq(204)
         expect(response.body).not_to eq('null')
         expect(response.body).to be
@@ -157,7 +157,7 @@ describe DDS::V1::ProjectsAPI do
     end
 
     it 'should require an auth token' do
-      delete "/api/v1/projects/#{project.uuid}", json_headers
+      delete "/api/v1/projects/#{project.id}", json_headers
       expect(response.status).to eq(400)
     end
   end

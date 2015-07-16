@@ -8,7 +8,7 @@ module DDS
       end
       get '/projects/:project_id/permissions', root: false do
         authenticate!
-        project = Project.where(uuid: params[:project_id]).first
+        project = Project.find(params[:project_id])
         project.project_permissions
       end
 
@@ -23,8 +23,8 @@ module DDS
       put '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
         permission_params = declared(params)
-        project = Project.where(uuid: params[:project_id]).first
-        user = User.where(uuid: params[:user_id]).first
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
         permission = ProjectPermission.where(project: project, user: user).first || ProjectPermission.new(project: project, user: user)
         permission.attributes = permission_params
         if permission.save
@@ -41,8 +41,8 @@ module DDS
       end
       get '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
-        project = Project.where(uuid: params[:project_id]).first
-        user = User.where(uuid: params[:user_id]).first
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
         ProjectPermission.where(project: project, user: user).first
       end
 
@@ -53,8 +53,8 @@ module DDS
       end
       delete '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
-        project = Project.where(uuid: params[:project_id]).first
-        user = User.where(uuid: params[:user_id]).first
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
         ProjectPermission.where(project: project, user: user).first.destroy
         body false
       end

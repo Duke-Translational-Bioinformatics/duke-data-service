@@ -56,7 +56,7 @@ RSpec.describe User, type: :model do
       expect(parsed_json).to have_key('first_name')
       expect(parsed_json).to have_key('last_name')
       expect(parsed_json).to have_key('email')
-      expect(parsed_json['id']).to eq(subject.uuid)
+      expect(parsed_json['id']).to eq(subject.id)
       expect(parsed_json['display_name']).to eq(subject.display_name)
       expect(parsed_json['first_name']).to eq(subject.first_name)
       expect(parsed_json['last_name']).to eq(subject.last_name)
