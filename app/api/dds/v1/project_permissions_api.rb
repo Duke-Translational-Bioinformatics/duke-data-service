@@ -33,6 +33,18 @@ module DDS
           validation_error! permission
         end
       end
+
+      desc 'View project level permissions for a user' do
+        detail 'View project permissions.'
+        named 'view project permissions'
+        failure [401]
+      end
+      get '/projects/:project_id/permissions/:user_id', root: false do
+        authenticate!
+        project = Project.where(uuid: params[:project_id]).first
+        user = User.where(uuid: params[:user_id]).first
+        ProjectPermission.where(project: project, user: user).first
+      end
     end
   end
 end

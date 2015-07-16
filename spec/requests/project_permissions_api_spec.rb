@@ -74,4 +74,16 @@ describe DDS::V1::ProjectPermissionsAPI do
       include_context 'without authentication'
     end
   end
+
+  describe 'View project level permissions for a user' do
+    let!(:resource) { project_permission }
+    let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions/#{resource.user.uuid}" }
+    include_context 'with authentication'
+    
+    it_behaves_like 'a viewable resource'
+
+    it_behaves_like 'a failed GET request' do
+      include_context 'without authentication'
+    end
+  end
 end

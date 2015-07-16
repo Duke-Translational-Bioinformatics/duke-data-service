@@ -25,6 +25,16 @@ shared_examples 'a listable resource' do
   end
 end
 
+shared_examples 'a viewable resource' do
+  it 'should return a serialized resource' do
+    get url, nil, headers
+    expect(response.status).to eq(200)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    expect(response.body).to eq(resource_serializer.new(resource).to_json)
+  end
+end
+
 shared_examples 'a failed GET request' do
   it 'should require an auth token' do
     get url, nil, headers
