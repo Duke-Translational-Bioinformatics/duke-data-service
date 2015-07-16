@@ -29,13 +29,11 @@ var ProjectMemberForm = React.createClass({
   },
 
   handleMemberIdSelected: function(selectedOption) {
-    console.log("Selected "+JSON.stringify(selectedOption))
     this.setState({member_id: selectedOption.id});
   },
 
-  getUserSuggestions: function(last_name_begins_with) {
-    var usersUrl = '/api/v1/users?last_name_begins_with='+last_name_begins_with;
-    console.log("getting "+usersUrl+" with "+this.props.api_token);
+  getUserSuggestions: function(display_name_contains) {
+    var usersUrl = '/api/v1/users?display_name_contains='+display_name_contains;
     return this.props.getResourceWithToken(this.props.api_token, usersUrl);
   },
 
@@ -45,23 +43,19 @@ var ProjectMemberForm = React.createClass({
   },
 
   loadUserSuggestions: function(data) {
-    console.log("Got UserSuggestions "+JSON.stringify(data));
     this.setState({
       typeaheadOptions: data['results']
     });
   },
 
   handleMemberIdChange: function(e) {
-    console.log("MemberID changed to "+event.target.value);
     if ( event.target.value.length > 2 ) {
-      console.log("Setting options");
       this.getUserSuggestions(event.target.value).then(
         this.loadUserSuggestions,
         this.handleAjaxError
       )
     }
     else {
-      console.log("resetting");
       this.setState({
         member_id: '',
         typeaheadOptions: []
@@ -86,7 +80,6 @@ var ProjectMemberForm = React.createClass({
   },
 
   render: function() {
-    console.log("rendering");
     return (
       <div className="modal fade"
            id="ProjectMemberFormModal"
@@ -114,7 +107,7 @@ var ProjectMemberForm = React.createClass({
                       options={this.state.typeaheadOptions}
                       maxVisible={5}
                       displayOption={this.last_first_name}
-                      filterOption='last_name'
+                      filterOption='display_name'
                       customClasses={{
                         input: "form-control"
                       }}
