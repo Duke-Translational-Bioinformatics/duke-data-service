@@ -6,31 +6,29 @@ var ProjectMembers = React.createClass({
     };
   },
 
-  getProject: function(api_token, id) {
+  getProject: function(id) {
     var resourceUrl = '/api/v1/projects/'+id;
-    return this.props.getResourceWithToken(api_token,'/api/v1/projects/'+id);
+    return this.props.getResourceWithToken(this.props.api_token,'/api/v1/projects/'+id);
   },
 
   loadProject: function(data) {
     if (this.isMounted()) {
       this.setState({project: data});
-      this.getProjectMembers(this.props.api_token, data.id).then(
+      this.getProjectMembers(data.id).then(
         this.loadProjectMembers,
         this.props.handleAjaxError
       );
     }
   },
 
-  getProjectMembers: function(api_token, project_id) {
-    return this.props.getResourceWithToken(api_token,'/api/v1/projects');/* /'+project_id+'/permissions'); */
+  getProjectMembers: function(project_id) {
+    return this.props.getResourceWithToken(this.props.api_token,'/api/v1/projects/'+project_id+'/permissions');
   },
 
   loadProjectMembers: function(data) {
-    /*
     if (this.isMounted()) {
       this.setState({project_members: data});
     }
-    */
   },
 
   addToProjectMemberList: function(project_member) {
@@ -75,7 +73,7 @@ var ProjectMembers = React.createClass({
 
   componentDidUpdate: function() {
     if (this.props.api_token && !this.state.project){
-      this.getProject(this.props.api_token, this.props.params.id).then(
+      this.getProject(this.props.params.id).then(
         this.loadProject,
         this.props.handleAjaxError
       );

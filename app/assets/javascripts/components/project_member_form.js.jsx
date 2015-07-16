@@ -1,5 +1,10 @@
 var ProjectMemberForm = React.createClass({
 
+  handleAjaxError: function(jqXHR, status, err) {
+    this.handleClose();
+    this.props.handleAjaxError(jqXHR, status, err);
+  },
+
   handleSubmit: function(e) {
     e.preventDefault();
     var submitOptions = {
@@ -37,11 +42,6 @@ var ProjectMemberForm = React.createClass({
     return this.props.getResourceWithToken(this.props.api_token, usersUrl);
   },
 
-  handleAjaxError: function(jqXHR, status, err) {
-    this.handleClose();
-    this.props.handleAjaxError(jqXHR, status, err);
-  },
-
   loadUserSuggestions: function(data) {
     this.setState({
       typeaheadOptions: data['results']
@@ -58,20 +58,22 @@ var ProjectMemberForm = React.createClass({
     else {
       this.setState({
         member_id: '',
-        typeaheadOptions: []
+        typeaheadOptions: [],
+        roleOptions: []
       })
     }
   },
 
-  handleRoleChange: function(e) {
-    this.setState({description: event.target.value});
+  handleSelectedRole: function(eventKey, href, target) {
+    console.log("GOT eventKey "+JSON.stringify(eventKey)+" href "+href+" target "+target);
   },
 
   getInitialState: function() {
      return {
       member_id: '',
       role: '',
-      typeaheadOptions: []
+      typeaheadOptions: [],
+      roleOptions: []
     }
   },
 
@@ -124,7 +126,7 @@ var ProjectMemberForm = React.createClass({
                 <div id="roleField" className="form-group">
                   <label id="roleStatus" className="col-sm-2 control-label" for="inputDescription">Role</label>
                   <div className="col-sm-10">
-                    <input type='text' className="form-control" id="roleInput" placeholder="Role" value={this.state.role} onChange={this.handleRoleChange} />
+                    <ProjectMemberRoleChooser onSelect={this.handleSelectedRole} />
                   </div>
                   <div id="roleAlert"></div>
                 </div>
