@@ -9,7 +9,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
   describe 'List project level permissions' do
     let!(:resource) { project_permission }
-    let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions" }
+    let(:url) { "/api/v1/projects/#{resource.project.id}/permissions" }
     include_context 'with authentication'
     
     it_behaves_like 'a listable resource'
@@ -27,7 +27,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
   describe 'Project Permission instance' do
     let!(:resource) { project_permission }
-    let(:url) { "/api/v1/projects/#{resource.project.uuid}/permissions/#{resource.user.uuid}" }
+    let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/#{resource.user.id}" }
     include_context 'with authentication'
       
     describe 'grant project level permissions to a user' do

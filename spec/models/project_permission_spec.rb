@@ -61,10 +61,10 @@ RSpec.describe ProjectPermission, type: :model do
       expect(parsed_json).to have_key('project')
       expect(parsed_json).to have_key('auth_roles')
       expect(parsed_json['user']).to eq({
-        'id' => subject.user.uuid, 
+        'id' => subject.user.id, 
         'full_name' => subject.user.display_name
       })
-      expect(parsed_json['project']).to eq({'id' => subject.project.uuid})
+      expect(parsed_json['project']).to eq({'id' => subject.project.id})
       expect(parsed_json['auth_roles']).to be_a Array
     end
   end
