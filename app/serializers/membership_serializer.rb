@@ -3,12 +3,12 @@ class MembershipSerializer < ActiveModel::Serializer
   attributes :id, :project, :user, :project_roles
 
   def project
-    {id: object.project.uuid}
+    {id: object.project_id}
   end
 
   def user
     {
-      id: object.user.uuid,
+      id: object.user_id,
       full_name: object.user.display_name,
       email: object.user.email
     }

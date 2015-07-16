@@ -41,7 +41,7 @@ module DDS
             authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
             if authorized_user.nil?
               new_user = User.create(
-                uuid: SecureRandom.uuid,
+                id: SecureRandom.uuid,
                 etag: SecureRandom.hex,
                 email: access_token['email'],
                 display_name: access_token['display_name'],

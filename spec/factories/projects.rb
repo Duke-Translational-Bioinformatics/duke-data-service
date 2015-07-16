@@ -2,8 +2,7 @@ FactoryGirl.define do
   factory :project do
     name { Faker::Team.name }
     description { Faker::Hacker.say_something_smart }
-    uuid { SecureRandom.uuid }
-    creator_id { Faker::Number.number(8) }
+    creator_id { SecureRandom.uuid }
     etag { SecureRandom.hex }
     is_deleted false
 

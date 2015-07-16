@@ -15,7 +15,7 @@ module DDS
         authenticate!
         project_params = declared(params, include_missing: false)
         project = Project.new({
-          uuid: SecureRandom.uuid,
+          id: SecureRandom.uuid,
           name: project_params[:name],
           description: project_params[:description],
           creator_id: current_user.id
@@ -44,7 +44,7 @@ module DDS
       end
       get '/projects/:id', root: false do
         authenticate!
-        Project.where(uuid: params[:id]).first
+        Project.where(id: params[:id]).first
       end
 
       desc 'Update a project' do
@@ -59,7 +59,7 @@ module DDS
       put '/projects/:id', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
-        project = Project.where(uuid: params[:id]).first
+        project = Project.where(id: params[:id]).first
         if project.update(project_params)
           project
         else
@@ -74,7 +74,7 @@ module DDS
       end
       delete '/projects/:id', root: false do
         authenticate!
-        project = Project.where(:uuid => params[:id]).first
+        project = Project.where(:id => params[:id]).first
         project.update_attribute(:is_deleted, true)
         body false
       end

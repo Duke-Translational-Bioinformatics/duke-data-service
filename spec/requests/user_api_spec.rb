@@ -45,7 +45,7 @@ describe DDS::V1::UserAPI do
           expect(decoded_token).to have_key(expected_key)
         end
         expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
-        created_user = User.where(id: decoded_token['id']).first
+        created_user = User.find(decoded_token['id'])
         expect(created_user).to be
         expect(created_user.display_name).to eq(new_user_token['display_name'])
         expect(created_user.first_name).to eq(new_user_token['first_name'])
@@ -108,7 +108,7 @@ describe DDS::V1::UserAPI do
         end
         expect(decoded_token['id']).to eq(user.id)
         expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
-        existing_user = User.where(id: decoded_token['id']).first
+        existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
         expect(existing_user.id).to eq(user.id)
       end

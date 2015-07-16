@@ -27,8 +27,8 @@ RSpec.describe Membership, type: :model do
       expect(parsed_json).to have_key('user')
       expect(parsed_json).to have_key('project_roles')
       expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['project']).to eq({'id' => subject.project.uuid})
-      expect(parsed_json['user']).to eq({'id' => subject.user.uuid,
+      expect(parsed_json['project']).to eq({'id' => subject.project_id})
+      expect(parsed_json['user']).to eq({'id' => subject.user_id,
                                          'full_name' => subject.user.display_name,
                                          'email' => subject.user.email})
       expect(parsed_json['project_roles']).to eq(Array.new)
