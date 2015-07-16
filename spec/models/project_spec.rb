@@ -31,7 +31,7 @@ RSpec.describe Project, type: :model do
       expect(parsed_json).to have_key('name')
       expect(parsed_json).to have_key('description')
       expect(parsed_json).to have_key('is_deleted')
-      expect(parsed_json['id']).to eq(subject.uuid)
+      expect(parsed_json['id']).to eq(subject.id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['description']).to eq(subject.description)
       expect(parsed_json['is_deleted']).to eq(subject.is_deleted)

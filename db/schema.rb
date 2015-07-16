@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701160133) do
+ActiveRecord::Schema.define(version: 20150716023613) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,18 +38,28 @@ ActiveRecord::Schema.define(version: 20150701160133) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "memberships", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "project_id"
+  create_table "memberships", id: false, force: :cascade do |t|
+    t.string   "id",         null: false
+    t.string   "user_id"
+    t.string   "project_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "projects", force: :cascade do |t|
+  add_index "memberships", ["id"], name: "index_memberships_on_id", unique: true, using: :btree
+
+  create_table "permissions", force: :cascade do |t|
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  create_table "projects", id: false, force: :cascade do |t|
+    t.string   "id",          null: false
     t.string   "name"
     t.string   "description"
-    t.string   "uuid"
-    t.integer  "creator_id"
+    t.string   "creator_id"
     t.string   "etag"
     t.boolean  "is_deleted"
     t.datetime "deleted_at"
@@ -57,8 +67,10 @@ ActiveRecord::Schema.define(version: 20150701160133) do
     t.datetime "updated_at",  null: false
   end
 
+  add_index "projects", ["id"], name: "index_projects_on_id", unique: true, using: :btree
+
   create_table "storage_folders", force: :cascade do |t|
-    t.integer  "project_id"
+    t.string   "project_id"
     t.string   "name"
     t.text     "description"
     t.string   "storage_service_uuid"
@@ -67,25 +79,25 @@ ActiveRecord::Schema.define(version: 20150701160133) do
   end
 
   create_table "user_authentication_services", force: :cascade do |t|
-    t.integer  "user_id"
+    t.string   "user_id"
     t.integer  "authentication_service_id"
     t.string   "uid"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string   "uuid"
+  create_table "users", id: false, force: :cascade do |t|
+    t.string   "id",            null: false
     t.string   "etag"
     t.string   "email"
     t.string   "display_name"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
     t.jsonb    "auth_role_ids"
     t.string   "first_name"
     t.string   "last_name"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
-  add_index "users", ["auth_role_ids"], name: "index_users_on_auth_role_ids", using: :gin
+  add_index "users", ["id"], name: "index_users_on_id", unique: true, using: :btree
 
 end

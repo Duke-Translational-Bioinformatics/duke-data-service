@@ -13,8 +13,8 @@ module DDS
       post '/project/:project_id/affiliates', root: false do
         authenticate!
         membership_params = declared(params, include_missing: false)
-        project = Project.where(uuid: params[:project_id]).first
-        user = User.where(uuid: membership_params[:user][:id]).first
+        project = Project.find(params[:project_id])
+        user = User.where(id: membership_params[:user][:id]).first
         membership = project.memberships.build({
           user: user
         })
@@ -32,7 +32,7 @@ module DDS
       end
       get '/project/:project_id/affiliates', root: false do
         authenticate!
-        project = Project.where(uuid: params[:project_id]).first
+        project = Project.find(params[:project_id])
         project.memberships
       end
 
@@ -58,7 +58,7 @@ module DDS
       put '/project_affiliates/:id', root: false do
         authenticate!
         membership_params = declared(params, include_missing: false)
-        user = User.where(uuid: membership_params[:user][:id]).first
+        user = User.where(id: membership_params[:user][:id]).first
         membership = Membership.find(params[:id])
         if membership.update(user: user)
           membership
