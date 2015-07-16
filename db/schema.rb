@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150701160133) do
+ActiveRecord::Schema.define(version: 20150710203243) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,16 @@ ActiveRecord::Schema.define(version: 20150701160133) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "project_permissions", force: :cascade do |t|
+    t.integer  "project_id"
+    t.integer  "user_id"
+    t.jsonb    "auth_role_ids"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "project_permissions", ["auth_role_ids"], name: "index_project_permissions_on_auth_role_ids", using: :gin
 
   create_table "projects", force: :cascade do |t|
     t.string   "name"

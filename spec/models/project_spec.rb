@@ -2,9 +2,23 @@ require 'rails_helper'
 require 'shoulda-matchers'
 
 RSpec.describe Project, type: :model do
-  describe 'validations' do
-    subject {FactoryGirl.create(:project)}
+  subject {FactoryGirl.create(:project)}
 
+  describe 'associations' do
+    it 'should have many project permissions' do
+      should have_many(:project_permissions)
+    end
+
+    it 'should have many memberships' do
+      should have_many(:memberships)
+    end
+
+    it 'should have many storage folders' do
+      should have_many(:storage_folders)
+    end
+  end
+
+  describe 'validations' do
     it 'should have a unique project name' do
       should validate_presence_of(:name)
       should validate_uniqueness_of(:name)
@@ -20,8 +34,6 @@ RSpec.describe Project, type: :model do
   end
 
   describe 'serialization' do
-    subject {FactoryGirl.create(:project)}
-
     it 'should serialize to json' do
       serializer = ProjectSerializer.new subject
       payload = serializer.to_json
