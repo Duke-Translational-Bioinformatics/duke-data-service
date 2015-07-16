@@ -72,6 +72,7 @@ module DDS
       params do
         optional :last_name_begins_with
         optional :first_name_begins_with
+        optional :display_name_contains
       end
       get '/users', root: false do
         authenticate!
@@ -81,6 +82,10 @@ module DDS
           users = User.where(
             "last_name like ?",
             "#{query_params[:last_name_begins_with]}%").all
+        elsif query_params[:display_name_contains]
+          users = User.where(
+            "display_name like ?",
+            "%#{query_params[:display_name_contains]}%").all
         elsif query_params[:first_name_begins_with]
           users = User.where(
             "first_name like ?",

@@ -162,6 +162,7 @@ describe DDS::V1::UserAPI do
     let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
     let(:last_name_begins_with) { 'Abc' }
     let(:first_name_begins_with) { 'Xyz' }
+    let(:display_name_contains) { 'aso' }
     let(:users_with_last_name) {
       users = []
       5.times do
@@ -185,6 +186,31 @@ describe DDS::V1::UserAPI do
           :first_name => "#{first_name_begins_with}#{Faker::Name.first_name}")
         users << nuser
       end
+      users
+    }
+
+    let(:users_with_display_name) {
+      users = []
+      auser = FactoryGirl.create(:user_authentication_service, :populated)
+      auser.user.update(
+        :display_name => "#{Faker::Name.first_name}#{display_name_contains} #{Faker::Name.last_name}"
+      )
+      users << auser
+      buser = FactoryGirl.create(:user_authentication_service, :populated)
+      buser.user.update(
+        :display_name => "#{Faker::Name.first_name} #{display_name_contains}#{Faker::Name.last_name}"
+      )
+      users << buser
+      cuser = FactoryGirl.create(:user_authentication_service, :populated)
+      cuser.user.update(
+        :display_name => "#{display_name_contains}#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      )
+      users << cuser
+      duser = FactoryGirl.create(:user_authentication_service, :populated)
+      duser.user.update(
+        :display_name => "#{Faker::Name.first_name} #{Faker::Name.last_name}#{display_name_contains}"
+      )
+      users << duser
       users
     }
 
@@ -230,6 +256,22 @@ describe DDS::V1::UserAPI do
       expect(returned_users.length).to be >= users_with_first_name.length
       returned_users.each do |ruser|
         expect(ruser['first_name']).to start_with(first_name_begins_with)
+      end
+    end
+
+    it 'should return an list of users whose display_name_contains' do
+      expect(users_with_display_name.length).to be >= 4
+      get url, {display_name_contains: display_name_contains}, json_headers_with_auth
+      expect(response.status).to eq(200);
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('results')
+      returned_users = response_json['results']
+      expect(returned_users).not_to be_empty
+      expect(returned_users.length).to be >= users_with_display_name.length
+      returned_users.each do |ruser|
+        expect(ruser['display_name']).to match(display_name_contains)
       end
     end
 
