@@ -1,6 +1,6 @@
 class ProjectPermissionSerializer < ActiveModel::Serializer
   self.root = false
-  attributes :project, :user, :auth_roles
+  attributes :project, :user, :auth_role
 
   def user
     {
@@ -11,5 +11,13 @@ class ProjectPermissionSerializer < ActiveModel::Serializer
 
   def project
     { id: object.project.id }
+  end
+
+  def auth_role
+    {
+      id: object.auth_role.text_id,
+      name: object.auth_role.name,
+      description: object.auth_role.description
+    }
   end
 end

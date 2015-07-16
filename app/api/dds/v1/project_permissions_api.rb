@@ -18,7 +18,7 @@ module DDS
         failure [401]
       end
       params do
-        requires :auth_roles
+        requires :auth_role
       end
       put '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
@@ -26,7 +26,7 @@ module DDS
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
         permission = ProjectPermission.where(project: project, user: user).first || ProjectPermission.new(project: project, user: user)
-        permission.attributes = permission_params
+        permission.auth_role = AuthRole.where(text_id: permission_params[:auth_role]).first
         if permission.save
           permission
         else
