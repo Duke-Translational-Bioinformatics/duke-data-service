@@ -3,7 +3,7 @@ require 'rails_helper'
 describe DDS::V1::ProjectPermissionsAPI do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:other_permission) { FactoryGirl.create(:project_permission) }
-  let(:auth_roles) { FactoryGirl.create_list(:auth_role, 2) }
+  let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
 
@@ -32,13 +32,13 @@ describe DDS::V1::ProjectPermissionsAPI do
       
     describe 'grant project level permissions to a user' do
       let!(:payload) {{
-        auth_roles: auth_roles.collect {|r| r.text_id}
+        auth_role: auth_role.text_id
       }}
 
       context 'non-existent project permission' do
         it 'should create a project permission' do
           expected_resource = resource.clone
-          expected_resource.auth_roles = payload[:auth_roles]
+          expected_resource.auth_role = auth_role
           resource.destroy
           expect(resource).not_to be_persisted
           expect {
@@ -51,7 +51,7 @@ describe DDS::V1::ProjectPermissionsAPI do
         end
       end
 
-      it 'should update the auth_roles' do
+      it 'should update the auth_role' do
         expect {
           put url, payload.to_json, headers
           expect(response.status).to eq(200)
@@ -59,13 +59,13 @@ describe DDS::V1::ProjectPermissionsAPI do
           expect(response.body).not_to eq('null')
         }.not_to change{resource_class.count}
         resource.reload
-        expect(resource.auth_role_ids).to eq(payload[:auth_roles])
+        expect(resource.auth_role).to eq(auth_role)
         expect(response.body).to include(resource_serializer.new(resource).to_json)
       end
 
       it_behaves_like 'a validation failure' do
         let!(:payload) {{
-          auth_roles: ['invalid_role']
+          auth_role: 'invalid_role'
         }}
         before do
           put url, payload.to_json, headers
