@@ -1,6 +1,5 @@
 FactoryGirl.define do
   factory :project do
-    id { SecureRandom.uuid }
     name { Faker::Team.name }
     description { Faker::Hacker.say_something_smart }
     creator_id { SecureRandom.uuid }
