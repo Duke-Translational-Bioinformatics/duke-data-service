@@ -162,6 +162,7 @@ describe DDS::V1::UserAPI do
     let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
     let(:last_name_begins_with) { 'Abc' }
     let(:first_name_begins_with) { 'Xyz' }
+    let(:display_name_contains) { 'aso' }
     let(:users_with_last_name) {
       users = []
       5.times do
@@ -185,6 +186,31 @@ describe DDS::V1::UserAPI do
           :first_name => "#{first_name_begins_with}#{Faker::Name.first_name}")
         users << nuser
       end
+      users
+    }
+
+    let(:users_with_display_name) {
+      users = []
+      auser = FactoryGirl.create(:user_authentication_service, :populated)
+      auser.user.update(
+        :display_name => "#{Faker::Name.first_name}#{display_name_contains} #{Faker::Name.last_name}"
+      )
+      users << auser
+      buser = FactoryGirl.create(:user_authentication_service, :populated)
+      buser.user.update(
+        :display_name => "#{Faker::Name.first_name} #{display_name_contains}#{Faker::Name.last_name}"
+      )
+      users << buser
+      cuser = FactoryGirl.create(:user_authentication_service, :populated)
+      cuser.user.update(
+        :display_name => "#{display_name_contains}#{Faker::Name.first_name} #{Faker::Name.last_name}"
+      )
+      users << cuser
+      duser = FactoryGirl.create(:user_authentication_service, :populated)
+      duser.user.update(
+        :display_name => "#{Faker::Name.first_name} #{Faker::Name.last_name}#{display_name_contains}"
+      )
+      users << duser
       users
     }
 
