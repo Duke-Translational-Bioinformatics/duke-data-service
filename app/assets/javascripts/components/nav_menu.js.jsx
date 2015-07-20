@@ -10,11 +10,7 @@ var NavMenu = React.createClass({
          <MainMenu >
            {this.props.children}
          </MainMenu>
-         <form className="navbar-form navbar-left">
-           <div className="form-group">
-             <input type="text" className="form-control" placeholder="Search" />
-           </div>
-         </form>
+         <div className="navbar-form navbar-left" id="search_menu" />
        </ul>
        <ul className="nav navbar-nav navbar-right">
          <li>

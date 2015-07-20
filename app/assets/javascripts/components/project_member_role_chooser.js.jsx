@@ -27,14 +27,25 @@ var ProjectMemberRoleChooser = React.createClass({
   },
 
   render: function() {
+    var default_title = 'Role';
     var roleOptions = this.state.role_options.map(
       function(result, i) {
-       return (
-         <ReactBootstrap.MenuItem key={i} eventKey={result}>{result['name']}</ReactBootstrap.MenuItem>
-       )
+       console.log("Checking "+this.props.auth_role.id+" vs "+result.id);
+       if (this.props.auth_role && this.props.auth_role.id == result.id) {
+         default_title = result.id;
+         return (
+           <ReactBootstrap.MenuItem key={i} active={true} eventKey={result}>{result['name']}</ReactBootstrap.MenuItem>
+         )
+       }
+       else {
+         return (
+           <ReactBootstrap.MenuItem key={i} active={false} eventKey={result}>{result['name']}</ReactBootstrap.MenuItem>
+         )
+       }
     }.bind(this));
+
     return (
-      <ReactBootstrap.DropdownButton title="Role" onSelect={this.props.onSelect}>
+      <ReactBootstrap.DropdownButton title={default_title} onSelect={this.props.onSelect}>
        {roleOptions}
       </ReactBootstrap.DropdownButton>
     )
