@@ -8,5 +8,6 @@ then
 else
   docker-compose up -d server
   docker-compose run rake db:migrate
+  docker-compose run rake db:seed
   docker-compose run authservice
 fi
