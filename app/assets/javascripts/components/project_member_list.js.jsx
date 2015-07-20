@@ -6,11 +6,11 @@ var ProjectMemberList = React.createClass({
   },
 
   render: function() {
+    console.log("RENDERING "+JSON.stringify(this.props.project_members));
     var projectMemberSummaries = this.props.project_members.map(function(project_member, i) {
       return (
         <ProjectMemberSummary
           key={i}
-          project_member_index={i}
           deleteProjectMember={this.deleteProjectMember.bind(this, i)}
           project_member={project_member} {...this.props} />
       )
