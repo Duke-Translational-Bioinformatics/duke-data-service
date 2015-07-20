@@ -233,6 +233,22 @@ describe DDS::V1::UserAPI do
       end
     end
 
+    it 'should return an list of users whose display_name_contains' do
+      expect(users_with_display_name.length).to be >= 4
+      get url, {display_name_contains: display_name_contains}, json_headers_with_auth
+      expect(response.status).to eq(200);
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('results')
+      returned_users = response_json['results']
+      expect(returned_users).not_to be_empty
+      expect(returned_users.length).to be >= users_with_display_name.length
+      returned_users.each do |ruser|
+        expect(ruser['full_name']).to match(display_name_contains)
+      end
+    end
+
     it 'should require an auth token' do
       get url, nil, json_headers
       expect(response.status).to eq(400)
