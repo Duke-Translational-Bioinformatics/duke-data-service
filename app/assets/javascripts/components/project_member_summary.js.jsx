@@ -2,8 +2,6 @@ var ProjectMemberSummary = React.createClass({
 
   handleSelectedRole: function(role, href, target) {
     payload = JSON.stringify({auth_role: role.id});
-    console.log("Submitting role"+payload);
-    console.log("ProjectMember "+JSON.stringify(this.props.project_member));
     var jqReq = $.ajax({
       type: 'PUT',
       url: '/api/v1/projects/'+this.props.project_member.project.id+'/permissions/'+this.props.project_member.user.id,
