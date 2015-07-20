@@ -1,22 +1,17 @@
 var ProjectMemberForm = React.createClass({
 
+  handleAjaxError: function(jqXHR, status, err) {
+    this.handleClose();
+    this.props.handleAjaxError(jqXHR, status, err);
+  },
+
   handleSubmit: function(e) {
     e.preventDefault();
-    var request_type = 'POST';
-    var jqReq = $.ajax({
-      type: 'POST',
-      url: '/api/v1/project/'+this.props.project.id+'/permissions',
-      beforeSend: function(xhr) {
-        // set header
-        xhr.setRequestHeader("Authorization", this.props.api_token);
-      }.bind(this),
-      data: JSON.stringify(this.state),
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then(
-      this.handleSuccess,
-      this.props.handleAjaxError
-    );
+    var submitOptions = {
+      member_id: this.state.member_id,
+      role: this.state.role
+    }
+    console.log("WOULD SUBMIT "+JSON.stringify(submitOptions));
   },
 
   handleClose: function(e) {
@@ -38,19 +33,52 @@ var ProjectMemberForm = React.createClass({
     this.props.alertUser({reason: '', suggestion: alert_suggestion}, 'success');
   },
 
-  handleMemberIdChange: function(e) {
-    this.setState({member_id: event.target.value});
+  handleMemberIdSelected: function(selectedOption) {
+    this.setState({member_id: selectedOption.id});
   },
 
-  handleRoleChange: function(e) {
-    this.setState({description: event.target.value});
+  getUserSuggestions: function(display_name_contains) {
+    var usersUrl = '/api/v1/users?display_name_contains='+display_name_contains;
+    return this.props.getResourceWithToken(this.props.api_token, usersUrl);
+  },
+
+  loadUserSuggestions: function(data) {
+    this.setState({
+      typeaheadOptions: data['results']
+    });
+  },
+
+  handleMemberIdChange: function(e) {
+    if ( event.target.value.length > 2 ) {
+      this.getUserSuggestions(event.target.value).then(
+        this.loadUserSuggestions,
+        this.handleAjaxError
+      )
+    }
+    else {
+      this.setState({
+        member_id: '',
+        typeaheadOptions: [],
+        roleOptions: []
+      })
+    }
+  },
+
+  handleSelectedRole: function(eventKey, href, target) {
+    console.log("GOT eventKey "+JSON.stringify(eventKey)+" href "+href+" target "+target);
   },
 
   getInitialState: function() {
      return {
       member_id: '',
-      role: ''
+      role: '',
+      typeaheadOptions: [],
+      roleOptions: []
     }
+  },
+
+  last_first_name: function(option) {
+    return option.last_name+', '+option.first_name
   },
 
   render: function() {
@@ -74,17 +102,31 @@ var ProjectMemberForm = React.createClass({
             </div>
             <form className="form-horizontal" onSubmit={this.handleSubmit}>
               <div className="modal-body">
-                <div id="nameField" className="form-group">
-                  <label id="memberIdStatus" className="col-sm-2 control-label" for="inputMemberId">Member</label>
+                <div id="memberField" className="form-group">
+                  <label id="memberIdStatus" className="col-sm-2 control-label">Member</label>
                   <div className="col-sm-10">
-                    <input type="text" className="form-control" id="memberIdInput" placeholder="Member" value={this.state.member_id} onChange={this.handleMemberIdChange} />
+                    <ReactTypeahead.Typeahead
+                      options={this.state.typeaheadOptions}
+                      maxVisible={5}
+                      displayOption={this.last_first_name}
+                      filterOption='display_name'
+                      customClasses={{
+                        input: "form-control"
+                      }}
+                      id="memberIdInput"
+                      placeholder="Member"
+                      onKeyUp={this.handleMemberIdChange}
+                      onOptionSelected={this.handleMemberIdSelected}
+                      inputProps={{
+                        value: this.state.member_id
+                      }} />
                   </div>
                   <div id="memberIdAlert"></div>
                 </div>
                 <div id="roleField" className="form-group">
                   <label id="roleStatus" className="col-sm-2 control-label" for="inputDescription">Role</label>
                   <div className="col-sm-10">
-                    <input type='text' className="form-control" id="roleInput" placeholder="Role" value={this.state.role} onChange={this.handleRoleChange} />
+                    <ProjectMemberRoleChooser onSelect={this.handleSelectedRole} />
                   </div>
                   <div id="roleAlert"></div>
                 </div>

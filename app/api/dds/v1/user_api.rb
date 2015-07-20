@@ -72,6 +72,7 @@ module DDS
       params do
         optional :last_name_begins_with
         optional :first_name_begins_with
+        optional :display_name_contains
       end
       get '/users', root: false do
         authenticate!
@@ -80,13 +81,17 @@ module DDS
         if query_params[:last_name_begins_with]
           users = User.where(
             "last_name like ?",
-            "#{query_params[:last_name_begins_with]}%").all
+            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc).all
+        elsif query_params[:display_name_contains]
+          users = User.where(
+            "display_name like ?",
+            "%#{query_params[:display_name_contains]}%").order(last_name: :asc).all
         elsif query_params[:first_name_begins_with]
           users = User.where(
             "first_name like ?",
-            "#{query_params[:first_name_begins_with]}%").all
+            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc).all
         else
-          users = User.all
+          users = User.order(last_name: :asc).all
         end
         {results: ActiveModel::ArraySerializer.new(users, each_serializer: UserSerializer) }
       end

@@ -190,6 +190,7 @@ var App = React.createClass({
       <div className="container-fluid App">
         <NavMenu
            {...this.props}
+           SearchMenu={SearchMenu}
            currentUser={this.state.currentUser}
            isLoggedIn={this.state.isLoggedIn}
            handleLogout={this.handleLogout}>
