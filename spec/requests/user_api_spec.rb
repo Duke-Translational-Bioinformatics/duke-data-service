@@ -271,7 +271,7 @@ describe DDS::V1::UserAPI do
       expect(returned_users).not_to be_empty
       expect(returned_users.length).to be >= users_with_display_name.length
       returned_users.each do |ruser|
-        expect(ruser['display_name']).to match(display_name_contains)
+        expect(ruser['full_name']).to match(display_name_contains)
       end
     end
 
