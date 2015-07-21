@@ -44,7 +44,7 @@ module DDS
       end
       get '/projects/:id', root: false do
         authenticate!
-        Project.where(id: params[:id]).first
+        Project.find(params[:id])
       end
 
       desc 'Update a project' do
@@ -59,7 +59,7 @@ module DDS
       put '/projects/:id', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
-        project = Project.where(id: params[:id]).first
+        project = Project.find(params[:id])
         if project.update(project_params)
           project
         else
@@ -74,7 +74,7 @@ module DDS
       end
       delete '/projects/:id', root: false do
         authenticate!
-        project = Project.where(:id => params[:id]).first
+        project = Project.find(params[:id])
         project.update_attribute(:is_deleted, true)
         body false
       end
