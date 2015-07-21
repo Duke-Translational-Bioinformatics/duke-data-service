@@ -20,6 +20,15 @@ ADD docker/includes/install_ruby.sh /root/installs/install_ruby.sh
 RUN ["chmod", "777", "/root/installs/install_ruby.sh"]
 RUN ["/root/installs/install_ruby.sh"]
 RUN ["/usr/local/bin/gem", "install", "bundler"]
+
+# Node binary
+ENV LATEST_NODE node-v0.12.7-linux-x64
+ENV LATEST_NODE_URL https://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
+ADD docker/includes/install_node.sh /root/installs/install_node.sh
+RUN ["chmod", "777", "/root/installs/install_node.sh"]
+RUN ["/root/installs/install_node.sh"]
+RUN ["npm","install","-g","bower"]
+
 # ssl certs
 ADD docker/includes/install_ssl_cert.sh /root/installs/install_ssl_cert.sh
 ADD docker/includes/cert_config /root/installs/cert_config
@@ -39,7 +48,7 @@ RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "postgresql","postgresql-d
 
 #miscellaneous
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "epel-release"]
-RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "nodejs", "git", "libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
+RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "git", "libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
 RUN ["mkdir","-p","/var/www/app"]
 WORKDIR /var/www/app
 ADD Gemfile /var/www/app/Gemfile
