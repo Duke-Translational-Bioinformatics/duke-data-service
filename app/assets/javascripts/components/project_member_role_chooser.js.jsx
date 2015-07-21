@@ -30,7 +30,6 @@ var ProjectMemberRoleChooser = React.createClass({
     var default_title = 'Role';
     var roleOptions = this.state.role_options.map(
       function(result, i) {
-       console.log("Checking "+this.props.auth_role.id+" vs "+result.id);
        if (this.props.auth_role && this.props.auth_role.id == result.id) {
          default_title = result.id;
          return (

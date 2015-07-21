@@ -13,7 +13,6 @@ var ProjectMembers = React.createClass({
 
   loadProject: function(data) {
     if (this.isMounted()) {
-      console.log("Setting Project "+data);
       this.setState({project: data});
       this.getProjectMembers(data.id).then(
         this.loadProjectMembers,
@@ -24,12 +23,10 @@ var ProjectMembers = React.createClass({
 
   getProjectMembers: function(project_id) {
     var pmUrl = '/api/v1/projects/'+project_id+'/permissions';
-    console.log("getProjectMembers "+pmUrl);
     return this.props.getResourceWithToken(this.props.api_token,pmUrl);
   },
 
   loadProjectMembers: function(data) {
-    console.log("loading ProjectMembers");
     if (this.isMounted()) {
       this.setState({project_members: data});
     }
@@ -123,7 +120,6 @@ var ProjectMembers = React.createClass({
   },
 
   handleSearchChange: function(event) {
-    console.log("event "+event.target.value);
     if (event.target.value){
       this.getUserSuggestions(event.target.value).then(
         this.loadUserSuggestions,
