@@ -6,9 +6,9 @@ describe DDS::V1::ProjectPermissionsAPI do
   let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
+  let!(:resource) { project_permission }
 
   describe 'List project level permissions' do
-    let!(:resource) { project_permission }
     let(:url) { "/api/v1/projects/#{resource.project.id}/permissions" }
     include_context 'with authentication'
     
@@ -26,7 +26,6 @@ describe DDS::V1::ProjectPermissionsAPI do
   end
 
   describe 'Project Permission instance' do
-    let!(:resource) { project_permission }
     let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/#{resource.user.id}" }
     include_context 'with authentication'
       
