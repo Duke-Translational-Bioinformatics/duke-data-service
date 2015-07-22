@@ -22,7 +22,7 @@ class Project < ActiveRecord::Base
   private
   def add_project_admin_role_to_user
     user = self.creator
-    user.update(auth_role_ids: user.auth_roles=(['project_admin']))
+    user.update(auth_role_ids: user.auth_roles=(['project_admin'])) if user
   end
 
 end
