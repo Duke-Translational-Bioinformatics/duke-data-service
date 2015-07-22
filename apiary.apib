@@ -636,11 +636,11 @@ authenticated
             "is_deprecated": false
         }
 
-### Group Project Affiliates
+### Group Affiliates
 An affiliate represents an individual that plays some project level role of interest for reporting or
 project collaboration puposes.  The affilate may be internal or external (i.e. non-Duke employee).
 
-## Project Affiliates collection [/project/{id}/affiliates]
+## Affiliates collection [/project/{id}/affiliates]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
@@ -717,7 +717,7 @@ update_project
             "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
         }
 
-## Project Affiliate instance [/project_affiliates/{id}]
+## Affiliate instance [/affiliates/{id}]
 + Parameters
     + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `id` of the affiliate.
 
@@ -842,7 +842,7 @@ authenticated
 A folder represents a container for organizing files.  A folder is contained within the context of the
 project root or a project folder.
 
-## Project Folders collection [/projects/{id}/folders]
+## Folders collection [/projects/{id}/folders]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
@@ -902,7 +902,7 @@ view_project
             ...
         ]
 
-## Project Folder instance [/project_folders/{id}]
+## Project Folder instance [/folders/{id}]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -935,7 +935,7 @@ delete_file
 
 + Response 204
 
-## Move a project folder to new parent [/project_folders/{id}/move]
+## Move a project folder to new parent [/folders/{id}/move]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -967,7 +967,7 @@ folders `project` context.
             "audit": <audit_object>
         }
 
-## Rename a project folder [/project_folders/{id}/rename]
+## Rename a project folder [/folders/{id}/rename]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -997,7 +997,7 @@ create_file
 ## Group Folder Parent/Children
 Convenience endpoints for retrieval of a parent folder and immediate children.
 
-## Parent Folder instance [/project_folders/{id}/parent]
+## Parent Folder instance [/folders/{id}/parent]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
@@ -1018,7 +1018,7 @@ view_project
             "audit": <audit_object>
         }
 
-## Folder Children collection [/project_folders/{id}/children]
+## Folder Children collection [/folders/{id}/children]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
