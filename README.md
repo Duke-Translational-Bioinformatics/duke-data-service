@@ -9,6 +9,9 @@ This is an open source project for building a "data service" for researchers tha
 5. Integrate with containerization technology for managing research computing environments
 6. Manage research data workflows
 
+Please also look at repository `develop` branches to see commits that have not yet been merged into `master`.
+
+
 ## sub-repositories
 * https://github.com/Duke-Translational-Bioinformatics/duke-data-service-portal
 * https://github.com/Duke-Translational-Bioinformatics/duke-authentication-service
