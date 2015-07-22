@@ -3,7 +3,7 @@ require 'shoulda-matchers'
 
 RSpec.describe Project, type: :model do
   let(:user) { FactoryGirl.create(:user) }
-  subject { FactoryGirl.create(:project, {creator_id: user.id}) }
+  subject { FactoryGirl.create(:project) }
 
   describe 'associations' do
     it 'should have many project permissions' do

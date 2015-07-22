@@ -3,6 +3,7 @@ FactoryGirl.define do
     name { Faker::Team.name }
     description { Faker::Hacker.say_something_smart }
     creator_id { SecureRandom.uuid }
+    association :creator, factory: :user
     etag { SecureRandom.hex }
 
     trait :deleted do
