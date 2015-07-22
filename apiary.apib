@@ -1091,7 +1091,6 @@ storage provider.
 
         {
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
@@ -1104,7 +1103,7 @@ storage provider.
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
@@ -1139,7 +1138,7 @@ create_file
         results: [
                 {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "project": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
                     "size": 30024000,
@@ -1180,7 +1179,7 @@ create_file
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
@@ -1204,7 +1203,7 @@ create_file
             <audit_object>
         }
 
-## Get pre-signed URL to upload next chunk [/uploads/{id}/chunks]
+## Get pre-signed URL to upload a chunk [/uploads/{id}/chunks]
 + Parameters
     + id (required, string, `xytu02a4-b9e6-473d-87c4-66f4c8815555`) ... Globally unique `id` of the upload object.
 
@@ -1238,6 +1237,7 @@ storage provider.
             "number": 1,
             "size: "size": 5024000,
             "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
+        }
 
 + Response 200 (application/json)
 
@@ -1246,7 +1246,8 @@ storage provider.
             "host": "duke_data_service_prod.s3.amazonaws.com",
             "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
             "http_headers": [
-                    { "Content-Length": "5024000" }
+                    { "Content-Length": "5024000" },
+                    ...
             ]
         }
 
@@ -1275,7 +1276,7 @@ is raised.
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
