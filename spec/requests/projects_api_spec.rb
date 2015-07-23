@@ -73,6 +73,8 @@ describe DDS::V1::ProjectsAPI do
     let(:url) { "/api/v1/projects/#{resource.id}" }
 
     describe 'view project details' do
+      subject { get(url, nil, headers) }
+      
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'a failed GET request' do

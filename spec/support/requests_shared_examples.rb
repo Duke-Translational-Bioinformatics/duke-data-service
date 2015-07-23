@@ -42,7 +42,7 @@ end
 
 shared_examples 'a viewable resource' do
   it 'should return a serialized resource' do
-    get url, nil, headers
+    is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
     expect(response.body).not_to eq('null')

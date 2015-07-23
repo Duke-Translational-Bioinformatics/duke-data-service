@@ -75,6 +75,8 @@ describe DDS::V1::ProjectPermissionsAPI do
     end
 
     describe 'view project level permissions for a user' do
+      subject { get(url, nil, headers) }
+      
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'a failed GET request' do
