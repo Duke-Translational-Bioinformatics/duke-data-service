@@ -1,11 +1,7 @@
 require 'rails_helper'
 
 describe DDS::V1::ProjectAffiliatesAPI do
-  let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
-  let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
-  let(:user) { user_auth.user }
-  let (:api_token) { user_auth.api_token }
-  let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
+  include_context 'with authentication'
 
   let(:membership) { FactoryGirl.create(:membership) }
   let(:project) { FactoryGirl.create(:project) }
@@ -17,7 +13,6 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let!(:resource) { membership }
 
   describe 'Project Affiliate collection' do
-    include_context 'with authentication'
     let(:url) { "/api/v1/project/#{project.id}/affiliates" }
 
     describe 'GET' do
@@ -38,15 +33,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
         project_roles: [{id: 'principal_investigator'}]
       }}
 
-      it_behaves_like 'a creatable resource' do
-        it 'should return a serialized object' do
-          is_expected.to eq(201)
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('id')
-          new_object = resource_class.find(response_json['id'])
-          expect(response.body).to include(resource_serializer.new(new_object).to_json)
-        end
-      end
+      it_behaves_like 'a creatable resource'
 
       it_behaves_like 'a validated resource' do
         let(:payload) {{
@@ -68,7 +55,6 @@ describe DDS::V1::ProjectAffiliatesAPI do
   end
 
   describe 'Project Affiliate instance' do
-    include_context 'with authentication'
     let(:url) { "/api/v1/project_affiliates/#{resource.id}" }
 
     describe 'GET' do

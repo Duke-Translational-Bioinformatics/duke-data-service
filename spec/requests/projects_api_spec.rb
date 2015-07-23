@@ -26,35 +26,32 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an authenticated resource'
     end
 
-    describe 'create a project' do
+    describe 'POST' do
       subject { post(url, payload.to_json, headers) }
-      context 'with valid payload' do
+      let(:payload) {{
+        name: resource.name,
+        description: resource.description,
+        pi_affiliate: {}
+      }}
+      it_behaves_like 'a creatable resource' do
         let(:resource) { project_stub }
-        let(:payload) {{
-            name: resource.name,
-            description: resource.description,
-            pi_affiliate: {}
-          }}
-        it_behaves_like 'a creatable resource' do
-          it 'should return a serialized object' do
-            is_expected.to eq(201)
-            response_json = JSON.parse(response.body)
-            expect(response_json).to have_key('id')
-            new_object = resource_class.find(response_json['id'])
-            expect(response.body).to include(resource_serializer.new(new_object).to_json)
-            expect(new_object.creator_id).to eq(current_user.id)
-          end
+        it 'should set creator to current_user' do
+          is_expected.to eq(201)
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('id')
+          new_object = resource_class.find(response_json['id'])
+          expect(new_object.creator_id).to eq(current_user.id)
         end
-
-        it_behaves_like 'an authenticated resource'
       end
+
+      it_behaves_like 'an authenticated resource'
 
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
-            name: resource.name,
-            description: nil,
-            pi_affiliate: {}
-          }}
+          name: resource.name,
+          description: nil,
+          pi_affiliate: {}
+        }}
         it 'should not persist changes' do
           expect(resource).to be_persisted
           expect {
@@ -68,7 +65,7 @@ describe DDS::V1::ProjectsAPI do
   describe 'Project instance' do
     let(:url) { "/api/v1/projects/#{resource.id}" }
 
-    describe 'view project details' do
+    describe 'GET' do
       subject { get(url, nil, headers) }
       
       it_behaves_like 'a viewable resource'
@@ -76,7 +73,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an authenticated resource'
     end
 
-    describe 'update a project' do
+    describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let(:payload) {{
         name: project_stub.name,

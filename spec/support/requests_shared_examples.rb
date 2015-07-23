@@ -38,6 +38,14 @@ shared_examples 'a creatable resource' do
       is_expected.to eq(201)
     }.to change{resource_class.count}.by(1)
   end
+
+  it 'should return a serialized object' do
+    is_expected.to eq(201)
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('id')
+    new_object = resource_class.find(response_json['id'])
+    expect(response.body).to include(resource_serializer.new(new_object).to_json)
+  end
 end
 
 shared_examples 'a viewable resource' do
