@@ -18,6 +18,7 @@ gem 'tilt'
 gem 'jquery-rails'
 gem 'turbolinks'
 gem 'uglifier'
+gem 'pundit'
 
 # use figaro to set heroku environment variables for secrets
 gem 'figaro'

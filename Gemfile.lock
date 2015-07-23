@@ -118,6 +118,8 @@ GEM
     pg (0.18.2)
     puma (2.11.3)
       rack (>= 1.1, < 2.0)
+    pundit (1.0.1)
+      activesupport (>= 3.0.0)
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -223,6 +225,7 @@ DEPENDENCIES
   jwt
   pg
   puma
+  pundit
   rack (= 1.6.4)
   rails (= 4.2.1)
   rails_12factor
