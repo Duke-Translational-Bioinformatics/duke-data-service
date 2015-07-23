@@ -23,9 +23,7 @@ describe DDS::V1::ProjectsAPI do
         end
       end
 
-      it_behaves_like 'a failed GET request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'create a project' do
@@ -48,9 +46,7 @@ describe DDS::V1::ProjectsAPI do
           end
         end
 
-        it_behaves_like 'a failed POST request' do
-          include_context 'without authentication'
-        end
+        it_behaves_like 'an authenticated resource'
       end
 
       it_behaves_like 'a validated resource' do
@@ -77,9 +73,7 @@ describe DDS::V1::ProjectsAPI do
       
       it_behaves_like 'a viewable resource'
 
-      it_behaves_like 'a failed GET request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'update a project' do
@@ -96,9 +90,7 @@ describe DDS::V1::ProjectsAPI do
         }}
       end
 
-      it_behaves_like 'a failed PUT request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'DELETE' do
@@ -114,9 +106,7 @@ describe DDS::V1::ProjectsAPI do
         end
       end
 
-      it_behaves_like 'a failed DELETE request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

@@ -21,9 +21,7 @@ describe DDS::V1::ProjectPermissionsAPI do
       expect(response.body).not_to include(resource_serializer.new(other_permission).to_json)
     end
 
-    it_behaves_like 'a failed GET request' do
-      include_context 'without authentication'
-    end
+    it_behaves_like 'an authenticated resource'
   end
 
   describe 'Project Permission instance' do
@@ -69,9 +67,7 @@ describe DDS::V1::ProjectPermissionsAPI do
         }}
       end
 
-      it_behaves_like 'a failed PUT request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'view project level permissions for a user' do
@@ -79,18 +75,14 @@ describe DDS::V1::ProjectPermissionsAPI do
       
       it_behaves_like 'a viewable resource'
 
-      it_behaves_like 'a failed GET request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'revoke project level permissions for a user' do
       subject { delete(url, nil, headers) }
       it_behaves_like 'a removable resource'
 
-      it_behaves_like 'a failed DELETE request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

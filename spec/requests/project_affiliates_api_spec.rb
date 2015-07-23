@@ -26,9 +26,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a listable resource'
 
-      it_behaves_like 'a failed GET request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'POST' do
@@ -65,9 +63,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
         end
       end
 
-      it_behaves_like 'a failed POST request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
   end
 
@@ -80,9 +76,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a viewable resource'
 
-      it_behaves_like 'a failed GET request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'PUT' do
@@ -99,18 +93,14 @@ describe DDS::V1::ProjectAffiliatesAPI do
         }}
       end
 
-      it_behaves_like 'a failed PUT request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       it_behaves_like 'a removable resource'
 
-      it_behaves_like 'a failed DELETE request' do
-        include_context 'without authentication'
-      end
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

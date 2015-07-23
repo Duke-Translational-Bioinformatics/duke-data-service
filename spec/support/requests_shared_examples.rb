@@ -90,33 +90,12 @@ shared_examples 'a removable resource' do
   end
 end
 
-shared_examples 'a failed DELETE request' do
-  it 'should require an auth token' do
-    delete url, nil, headers
-    expect(response.status).to eq(400)
-  end
-end
+shared_examples 'an authenticated resource' do
+  include_context 'without authentication'
 
-shared_examples 'a failed GET request' do
-  it 'should require an auth token' do
-    get url, nil, headers
+  it 'should return a 400 error response' do
+    is_expected.to eq(400)
     expect(response.status).to eq(400)
-  end
-end
-
-shared_examples 'a failed PUT request' do
-  it 'should require an auth token' do
-    put url, payload.to_json, headers
-    expect(response.status).to eq(400)
-  end
-end
-
-shared_examples 'a failed POST request' do
-  it 'should require an auth token' do
-    expect {
-      post url, payload.to_json, headers
-      expect(response.status).to eq(400)
-    }.not_to change{resource_class.count}
   end
 end
 
