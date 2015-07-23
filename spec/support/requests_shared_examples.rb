@@ -16,8 +16,6 @@ shared_context 'with authentication' do
 end
 
 shared_examples 'a listable resource' do
-  subject { get url, nil, headers }
-
   it 'should return a list that includes a serialized resource' do
     is_expected.to eq(200)
     expect(response.status).to eq(200)
@@ -28,8 +26,6 @@ shared_examples 'a listable resource' do
 end
 
 shared_examples 'a creatable resource' do
-  subject { post url, payload.to_json, headers }
-
   it 'should return success' do
     is_expected.to eq(201)
     expect(response.status).to eq(201)
@@ -39,7 +35,7 @@ shared_examples 'a creatable resource' do
 
   it 'should be persisted' do
     expect {
-      subject
+      is_expected.to eq(201)
     }.to change{resource_class.count}.by(1)
   end
 end
@@ -55,8 +51,6 @@ shared_examples 'a viewable resource' do
 end
 
 shared_examples 'an updatable resource' do
-  subject {put url, payload.to_json, headers}
-
   it 'should return success' do
     is_expected.to eq(200)
     expect(response.status).to eq(200)
@@ -80,7 +74,6 @@ shared_examples 'an updatable resource' do
 end
 
 shared_examples 'a removable resource' do
-  subject { delete url, nil, headers }
   let(:resource_counter) { resource_class }
 
   it 'should return an empty 204 response' do
@@ -124,6 +117,34 @@ shared_examples 'a failed POST request' do
       post url, payload.to_json, headers
       expect(response.status).to eq(400)
     }.not_to change{resource_class.count}
+  end
+end
+
+shared_examples 'a validated resource' do
+  it 'returns a failed response' do
+    is_expected.to eq(400)
+    expect(response.status).to eq(400)
+  end
+
+  it 'returns errors as a JSON payload' do
+    is_expected.to eq(400)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('400')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq('validation failed')
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq('Fix the following invalid fields and resubmit')
+    expect(response_json).to have_key('errors')
+    expect(response_json['errors']).to be_a(Array)
+    expect(response_json['errors']).not_to be_empty
+    response_json['errors'].each do |error|
+      expect(error).to have_key('field')
+      expect(error).to have_key('message')
+    end
   end
 end
 
