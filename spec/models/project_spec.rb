@@ -2,7 +2,8 @@ require 'rails_helper'
 require 'shoulda-matchers'
 
 RSpec.describe Project, type: :model do
-  subject {FactoryGirl.create(:project)}
+  let(:user) { FactoryGirl.create(:user) }
+  subject { FactoryGirl.create(:project) }
 
   describe 'associations' do
     it 'should have many project permissions' do
@@ -15,6 +16,10 @@ RSpec.describe Project, type: :model do
 
     it 'should have many storage folders' do
       should have_many(:storage_folders)
+    end
+
+    it 'should have a creator' do
+      should belong_to(:creator)
     end
   end
 
@@ -30,6 +35,18 @@ RSpec.describe Project, type: :model do
 
     it 'should have a creator_id' do
       should validate_presence_of(:creator_id)
+    end
+  end
+
+  describe 'assign project admin' do
+    let!(:auth_role) {FactoryGirl.create(:auth_role, {text_id: 'project_admin'})}
+    it 'should give the project creator a project_admin permission' do
+      expect(subject).to be_persisted
+      updated_user = User.find(subject.creator_id)
+      expect(updated_user.auth_role_ids).to be
+      expect(updated_user.auth_role_ids).not_to eq('null')
+      expect(updated_user.auth_role_ids).to eq(['project_admin'])
+      expect(updated_user.auth_roles).to include(auth_role)
     end
   end
 

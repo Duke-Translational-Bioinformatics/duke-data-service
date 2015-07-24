@@ -17,7 +17,7 @@ end
 
 shared_examples 'a listable resource' do
   it 'should return a list that includes a serialized resource' do
-    get url, nil, headers
+    is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -25,9 +25,32 @@ shared_examples 'a listable resource' do
   end
 end
 
+shared_examples 'a creatable resource' do
+  it 'should return success' do
+    is_expected.to eq(201)
+    expect(response.status).to eq(201)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+  end
+
+  it 'should be persisted' do
+    expect {
+      is_expected.to eq(201)
+    }.to change{resource_class.count}.by(1)
+  end
+
+  it 'should return a serialized object' do
+    is_expected.to eq(201)
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('id')
+    new_object = resource_class.find(response_json['id'])
+    expect(response.body).to include(resource_serializer.new(new_object).to_json)
+  end
+end
+
 shared_examples 'a viewable resource' do
   it 'should return a serialized resource' do
-    get url, nil, headers
+    is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -35,42 +58,63 @@ shared_examples 'a viewable resource' do
   end
 end
 
+shared_examples 'an updatable resource' do
+  it 'should return success' do
+    is_expected.to eq(200)
+    expect(response.status).to eq(200)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+  end
+  it 'should persist changes to resource' do
+    resource.reload
+    original_attributes = resource.attributes
+    expect {
+      is_expected.to eq(200)
+    }.not_to change{resource_class.count}
+    resource.reload
+    expect(resource.attributes).not_to eq(original_attributes)
+  end
+  it 'should return a serialized resource' do
+    is_expected.to eq(200)
+    resource.reload
+    expect(response.body).to include(resource_serializer.new(resource).to_json)
+  end
+end
+
 shared_examples 'a removable resource' do
-  it 'remove the resource and return an empty 204 response' do
+  let(:resource_counter) { resource_class }
+
+  it 'should return an empty 204 response' do
+    is_expected.to eq(204)
+    expect(response.status).to eq(204)
+    expect(response.body).not_to eq('null')
+    expect(response.body).to be
+  end
+  it 'should remove the resource' do
     expect(resource).to be_persisted
     expect {
-      delete url, nil, headers
-      expect(response.status).to eq(204)
-      expect(response.body).not_to eq('null')
-      expect(response.body).to be
-    }.to change{resource_class.count}.by(-1)
+      is_expected.to eq(204)
+    }.to change{resource_counter.count}.by(-1)
   end
 end
 
-shared_examples 'a failed DELETE request' do
-  it 'should require an auth token' do
-    delete url, nil, headers
+shared_examples 'an authenticated resource' do
+  include_context 'without authentication'
+
+  it 'should return a 400 error response' do
+    is_expected.to eq(400)
     expect(response.status).to eq(400)
   end
 end
 
-shared_examples 'a failed GET request' do
-  it 'should require an auth token' do
-    get url, nil, headers
+shared_examples 'a validated resource' do
+  it 'returns a failed response' do
+    is_expected.to eq(400)
     expect(response.status).to eq(400)
   end
-end
 
-shared_examples 'a failed PUT request' do
-  it 'should require an auth token' do
-    put url, payload.to_json, headers
-    expect(response.status).to eq(400)
-  end
-end
-
-shared_examples 'a validation failure' do
   it 'returns errors as a JSON payload' do
-    expect(response.status).to eq(400)
+    is_expected.to eq(400)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
 
