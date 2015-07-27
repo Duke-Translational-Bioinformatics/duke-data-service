@@ -1050,13 +1050,13 @@ view_project
 A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents
 the descriptive meta\-data about file including the virtual path.
 
-## Files collection [project/{id}/files]
+## Files collection [/project/{id}/files]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
 
-### Create a file meta-data object
+### Create a file meta-data object [POST]
 Creates a file meta-data object; The client-side software is responsible for the creation of this object after confirming the associated physical 
-file has been successfully upladed to a storage provider. (see `Uploads` endpoints)
+file has been successfully upladed to a storage provider. (see `Uploads`)
 
 >**Permission**
 - - - - -
@@ -1071,8 +1071,8 @@ create_file
 
 >**Request/Response Payload Properties**
 - - - - -
++ folder.id (string) - The globally unique id of the virtual destination folder - specifiy alias "root" for project root.
 + name (string) - The name of the file (optionally provided) - defaults to the `upload.name` if not provided.
-+ folder.id - The globally unique id of the virtual destination folder - specifiy alias "root" for project root.
 + upload.id (string) - The globally unique id of the upload object.
 
 + Request (application/json)
