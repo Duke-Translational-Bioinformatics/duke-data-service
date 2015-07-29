@@ -6,6 +6,7 @@ machine:
       2.2.2
 
 deployment:
+  #Deploy from these branches to heroku apps
   development:
     branch: develop
     heroku:
