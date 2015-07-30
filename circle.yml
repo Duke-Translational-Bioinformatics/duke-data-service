@@ -5,9 +5,9 @@ machine:
     version:
       2.2.2
 
-deployment:
+#deployment:
   #Deploy from these branches to heroku apps
-  development:
-    branch: develop
-    heroku:
-      appname: warm-journey-5070
+#  development:
+#    branch: develop
+#    heroku:
+#      appname: warm-journey-5070
