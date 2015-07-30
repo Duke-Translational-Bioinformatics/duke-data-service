@@ -22,7 +22,7 @@ http://colab-sbx-97.oit.duke.edu:3838/sample-apps/dashboard/
 [![Stories in Ready](https://badge.waffle.io/Duke-Translational-Bioinformatics/duke-data-service.png?label=ready&title=Ready)](https://waffle.io/Duke-Translational-Bioinformatics/duke-data-service)
 
 ### circleci development 
-[![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)
+[![Development Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)
 
 ### circleci production
 [![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service.png?circle-token=:circle-token)](https://circleci.com/)

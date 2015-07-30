@@ -7,9 +7,14 @@ module DDS
       end
       get '/app/status', root: false do
         begin
+          auth_roles = AuthRole.all.count
+          if auth_roles < 1
+            logger.error("database not seeded")
+            raise 'database not seeded'
+          end
           {status: 'ok'}
-        rescue
-          error!('problem encountered',503)
+        rescue Exception => e
+          error!({status: 'error', message: e.message},503)
         end
       end
     end

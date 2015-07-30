@@ -4,3 +4,9 @@ machine:
   ruby:
     version:
       2.2.2
+
+deployment:
+  development:
+    branch: develop
+    heroku:
+      appname: warm-journey-5070
