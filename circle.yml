@@ -9,6 +9,6 @@ deployment:
   development:
     branch: develop
     commands:
-      - git push git@heroku.com:lit-springs-9176.git $CIRCLE_SHA1:refs/heads/develop
+      - git push git@heroku.com:lit-springs-9176.git $CIRCLE_SHA1:master
       - heroku run rake db:migrate --app 'lit-springs-9176'
       - heroku run rake db:seed --app 'lit-springs-9176'
