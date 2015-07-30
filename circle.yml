@@ -5,9 +5,11 @@ machine:
     version:
       2.2.2
 
-#deployment:
-  #Deploy from these branches to heroku apps
-#  development:
-#    branch: develop
-#    heroku:
-#      appname: warm-journey-5070
+deployment:
+  commands:
+    heroku run rake db:migrate --app ‘lit-springs-9176'
+    heroku run rake db:seed --app ‘lit-springs-9176’
+  development:
+    branch: develop
+    heroku:
+      appname: lit-springs-9176
