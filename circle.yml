@@ -6,10 +6,10 @@ machine:
       2.2.2
 
 deployment:
-  commands:
-    heroku run rake db:migrate --app ‘lit-springs-9176'
-    heroku run rake db:seed --app ‘lit-springs-9176’
   development:
     branch: develop
+    commands:
+      heroku run rake db:migrate --app ‘lit-springs-9176'
+      heroku run rake db:seed --app ‘lit-springs-9176’  
     heroku:
       appname: lit-springs-9176
