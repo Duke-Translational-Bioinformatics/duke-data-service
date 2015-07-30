@@ -18,6 +18,7 @@ describe DDS::V1::ProjectsAPI do
       subject { get(url, nil, headers) }
       it_behaves_like 'a listable resource' do
         it 'should not include deleted projects' do
+          expect(deleted_project).to be_persisted
           is_expected.to eq(200)
           expect(response.body).not_to include(resource_serializer.new(deleted_project).to_json)
         end

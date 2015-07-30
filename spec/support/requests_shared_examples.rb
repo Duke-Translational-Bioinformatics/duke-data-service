@@ -17,6 +17,7 @@ end
 
 shared_examples 'a listable resource' do
   it 'should return a list that includes a serialized resource' do
+    expect(resource).to be_persisted
     is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
@@ -59,6 +60,9 @@ shared_examples 'a viewable resource' do
 end
 
 shared_examples 'an updatable resource' do
+  before do
+    expect(resource).to be_persisted
+  end
   it 'should return success' do
     is_expected.to eq(200)
     expect(response.status).to eq(200)
