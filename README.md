@@ -9,9 +9,6 @@ This is an open source project for building a "data service" for researchers tha
 5. Integrate with containerization technology for managing research computing environments
 6. Manage research data workflows
 
-Please also look at repository `develop` branches to see commits that have not yet been merged into `master`.
-
-
 ## sub-repositories
 * https://github.com/Duke-Translational-Bioinformatics/duke-data-service-portal
 * https://github.com/Duke-Translational-Bioinformatics/duke-authentication-service
@@ -29,6 +26,12 @@ http://colab-sbx-97.oit.duke.edu:3838/sample-apps/dashboard/
 
 ### waffle.io
 [![Stories in Ready](https://badge.waffle.io/Duke-Translational-Bioinformatics/duke-data-service.png?label=ready&title=Ready)](https://waffle.io/Duke-Translational-Bioinformatics/duke-data-service)
+
+### circleci development 
+[![Development Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)
+
+### circleci production
+[![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service.png?circle-token=:circle-token)](https://circleci.com/)
 
 ### converse
 [![Join the chat at https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
