@@ -121,6 +121,7 @@ GEM
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
+    rack-cors (0.4.0)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
     rack-test (0.6.3)
@@ -224,6 +225,7 @@ DEPENDENCIES
   pg
   puma
   rack (= 1.6.4)
+  rack-cors
   rails (= 4.2.1)
   rails_12factor
   react-rails (~> 1.0)
@@ -238,4 +240,4 @@ DEPENDENCIES
   uglifier
 
 BUNDLED WITH
-   1.10.5
+   1.10.6
