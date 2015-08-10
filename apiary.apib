@@ -349,7 +349,7 @@ system\_admin
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing system level authorization role for the user and grants new role.
-* The platform must have at least one user with the system\_admin" authorization role.
+* The platform must have at least one user with the "system\_admin" authorization role.
 * The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
 
 + Request (application/json)
@@ -378,7 +378,7 @@ system\_admin
 
 >**Rules**
 - - - - -
-* The platform must have at least one user with the system\_admin" authorization role.
+* The platform must have at least one user with the "system\_admin" authorization role.
 
 + Response 204
 
@@ -1117,7 +1117,7 @@ storage provider.
             },
             // End optional part of payload.
             "status": {
-                "initiated_on": 2015-07-10T13:00:00Z,
+                "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 0,
                 "completed_on": null,
                 "error_on": null,
@@ -1152,7 +1152,7 @@ create_file
                     },
                     // End optional part of payload.
                     "status": {
-                        "initiated_on": 2015-07-10T13:00:00Z,
+                        "initiated_on": "2015-07-10T13:00:00Z",
                         "percent_complete": 0,
                         "completed_on": null,
                         "error_on": null,
@@ -1193,7 +1193,7 @@ create_file
             },
             // End optional part of payload.
             "status": {
-                "initiated_on": 2015-07-10T13:00:00Z,
+                "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 0,
                 "completed_on": null,
                 "error_on": null,
@@ -1302,9 +1302,9 @@ is raised.
             },
             // End optional part of payload.
             "upload_status": {
-                "initiated_on": 2015-07-10T13:00:00Z,
+                "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 100,
-                "completed_on": 2015-07-10T13:00:00Z,
+                "completed_on": "2015-07-10T13:00:00Z",
                 "error_on": null,
                 "error_message": null
             },
