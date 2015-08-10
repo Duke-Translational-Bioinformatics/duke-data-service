@@ -495,7 +495,7 @@ delete_project
 ## Group Project Permissions
 A project permission represents project level authorization roles that have been granted to a user.
 
-## Project Permissions collection [/project/{id}/permissions]
+## Project Permissions collection [/projects/{id}/permissions]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
@@ -519,7 +519,7 @@ view_project
             ...
         ]
 
-## Project Permission instance [/project/{project_id}/permissions/{user_id}]
+## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
 + Parameters
     + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
     + user_id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `user_id` of the user.
@@ -546,7 +546,7 @@ manage_project_permissions
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing project level authorization roles for the user and grants new set.
-* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot
+* Every project must have at least one user with the "project\_admin" authorization role.  Cannot
 revoke project level permissions for user if they are the only "project\_admin" designated for the project.
 * The roles specified must be project level authorization roles (i.e. "project" in `auth_role.contexts`).
 
@@ -637,8 +637,9 @@ authenticated
         }
 
 ### Group Affiliates
-An affiliate represents an individual that plays some project level role of interest for reporting or
-project collaboration puposes.  The affilate may be internal or external (i.e. non-Duke employee).
+An affiliate represents an individual that plays some project level role of interest from a reporting or
+project collaboration perspective.  The affilate may be internal (i.e. a DDS user) or external (i.e. non-DDS user).  
+For the MVP, we will assume all affiliates must be a DDS user.
 
 ## Affiliates collection [/projects/{id}/affiliates]
 + Parameters
@@ -653,131 +654,67 @@ view_project
 
         "results": [
             {
-                // Internal affiliate (Duke employee)...
                 "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-                "is_external": false,
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "full_name": "Matthew Gardner",
                     "email": "mrgardner01@duke.edu"
                 },
-                "external_person": null,
-                "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
-            },
-            {
-                // External affiliate (non-Duke employee)...
-                "id": "dd33f7df-33ca-46dd-a015-92c46fdbda44",
-                "is_external": true,
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "user": null,
-                "external_person": {
-                    "full_name": "Geddy Lee",
-                    "email": "geddy.lee@pennstate.edu"
-                },
-                "project_roles": [ { "id": "research_coordinator", "name": "Research Coordinator" }, ... ]
+                "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
             },
             ...
         ]
 
-### Create project affiliate [POST]
+## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
++ Parameters
+    + project_id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `project_id` of the project.
+    + user_id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `user_id` of the user.
+
++ Model (application/json)
+
+    + Body
+
+           {
+                "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu"
+                },
+                "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
+            }
+
+### Associate affiliate to a project [PUT]
 >**Permission**
 - - - - -
 update_project
 
 >**Rules**
 - - - - -
-* To create an "external" (i.e. non-Duke employee) affiliate pass `null` for "user" property and provide "external_person"
-properties.  See example of "external_person" in PUT (i.e. update) endpoint.
-* To create an "internal" (i.e. Duke employee) affiliate pass `null` for "external_person"
-property and provide user property as shown in example payload for this endpoint.
-
-update_project
+* Deletes any existing project role for the user and assigns new role.
 
 + Request (application/json)
 
         {
-            "user": { "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb" },
-            "external_person": null,
-            "project_roles": [ { "id": "principal_investigator" }, ... ]
+            "project_role": { "id": "principal_investigator" }
         }
 
-+ Response 201 (application/json)
++ Response 200
 
-        {
-            "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-            "is_external": false,
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-            "user": {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "full_name": "Matthew Gardner",
-                "email": "mrgardner01@duke.edu"
-            },
-            "external_person": null,
-            "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
-        }
+    [Affiliation instance][]
 
-## Affiliate instance [/affiliates/{id}]
-+ Parameters
-    + id (required, string, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... Globally unique `id` of the affiliate.
-
-+ Model (application/json)
-
-    + Body
-
-            {
-                "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-                "is_external": false,
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "user": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "full_name": "Matthew Gardner",
-                    "email": "mrgardner01@duke.edu"
-                },
-                "external_person": null,
-                "project_roles": [ { "id": "principal_investigator", "name": "Principal Investigator" }, ... ]
-            }
-
-### View project affiliate detials [GET]
+### View project level affiliation for a user [GET]
 >**Permission**
 - - - - -
 view_project
 
 + Response 200
 
-    [Affiliate instance][]
+    [Affiliation instance][]
 
-### Update project affiliate [PUT]
->**Permission**
-- - - - -
-update_project
-
-+ Request (application/json)
-
-        {
-            "user": null,
-            "external_person": {
-                "full_name": "Geddy Lee",
-                "email": "geddy.lee@pennstate.edu"
-            },
-            "project_roles": [ { "id": "research_coordinator" }, ... ]
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "dd33f7df-33ca-46dd-a015-92c46fdbda44",
-            "is_external": true,
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-            "user": null,
-            "external_person": {
-                "full_name": "Geddy Lee",
-                "email": "geddy.lee@pennstate.edu"
-            },
-            "project_roles": [ { "id": "research_coordinator", "name": "Research Coordinator" }, ... ]
-        }
-
-### Delete a project affiliate [DELETE]
+### Delete project affiliate [DELETE]
 >**Permission**
 - - - - -
 update_project
@@ -1071,7 +1008,7 @@ view_project
 A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents
 the descriptive meta\-data about file including the virtual path.
 
-## Files collection [/project/{id}/files]
+## Files collection [/projects/{id}/files]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
 
