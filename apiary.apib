@@ -775,13 +775,13 @@ create_file
 - - - - -
 * A folder is created within the context of the project root or a project folder.  A folder can have one
 and only one parent folder.
-* The `parent_folder` must be a folder owned by the referenced project.
-* Specify alias "root" for the `parent_folder` to create a new folder in the project root.
+* The `parent` must be a folder owned by the referenced project.
+* Specify alias "root" for the `parent` to create a new folder in the project root.
 
 + Request (application/json)
 
         {
-            "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data"
         }
 
@@ -789,7 +789,7 @@ and only one parent folder.
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
@@ -811,7 +811,7 @@ view_project
         results: [
             {
                 "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+                "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
                 "name": "Raw Data",
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data",
@@ -834,7 +834,7 @@ view_project
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
@@ -865,20 +865,20 @@ create_file
 
 >**Rules**
 - - - - -
-* To move a folder, set `parent_folder` to target folder location; the target folder must be in the source
+* To move a folder, set `parent` to target folder location; the target folder must be in the source
 folders `project` context.
 
 + Request (application/json)
 
         {
-            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" }
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" }
         }
 
 + Response 200 (application/json)
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "Raw Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Raw Data",
@@ -905,7 +905,7 @@ create_file
 
         {
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent_folder": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "Model Data",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Model Data",
@@ -929,7 +929,7 @@ view_project
 
         {
             "id": "f8416bbe-357a-4687-919d-3d13d4108dc1",
-            "parent_folder": "root",
+            "parent": "root",
             "name": "Flow Core",
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core",
@@ -960,7 +960,7 @@ view_project
             {
                 "kind": "folder",
                 "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "parent_folder": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                 "name": "Aligned",
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned",
@@ -970,7 +970,7 @@ view_project
             {
                 "kind": "file",
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
                 "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                 "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                 "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1011,14 +1011,14 @@ create_file
 
 >**Request/Response Payload Properties**
 - - - - -
-+ folder.id (string) - The globally unique id of the virtual destination folder - specifiy alias "root" for project root.
++ parent.id (string) - The globally unique id of the virtual destination folder - specifiy alias "root" for project root.
 + name (string) - The name of the file (optionally provided) - defaults to the `upload.name` if not provided.
 + upload.id (string) - The globally unique id of the upload object.
 
 + Request (application/json)
 
         {
-            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
             "name": null,
             "upload": { "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23" }
         }
@@ -1027,7 +1027,7 @@ create_file
 
         {
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+            "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1051,7 +1051,7 @@ create_file
 
             {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
                 "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                 "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
