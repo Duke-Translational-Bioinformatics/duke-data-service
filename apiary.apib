@@ -349,8 +349,7 @@ system\_admin
 >**Rules**
 - - - - -
 * Revokes (deletes) any existing system level authorization role for the user and grants new role.
-* The platform must have at leat one user with the system\_admin" authorization role.  Cannot
-revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
+* The platform must have at least one user with the system\_admin" authorization role.
 * The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
 
 + Request (application/json)
@@ -379,8 +378,7 @@ system\_admin
 
 >**Rules**
 - - - - -
-* The platform must have at leat one user with the system\_admin" authorization role.  Cannot
-revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
+* The platform must have at least one user with the system\_admin" authorization role.
 
 + Response 204
 
@@ -514,7 +512,7 @@ view_project
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "project_admin", "name": "Project Admin", "description", "Description of ..." }
+                "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
             },
             ...
         ]
@@ -528,14 +526,14 @@ view_project
 
     + Body
 
-            {
+             {
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "project_admin", "name": "Project Admin", "description", "Description of ..." }
+                "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
             }
 
 ### Grant project level permissions to user [PUT]
@@ -545,15 +543,13 @@ manage_project_permissions
 
 >**Rules**
 - - - - -
-* Revokes (deletes) any existing project level authorization roles for the user and grants new set.
-* Every project must have at least one user with the "project\_admin" authorization role.  Cannot
-revoke project level permissions for user if they are the only "project\_admin" designated for the project.
+* Revokes (deletes) any existing project level authorization role for the user and grants new role.
+* Every project must have at least one user with the "project\_admin" authorization role.
 * The roles specified must be project level authorization roles (i.e. "project" in `auth_role.contexts`).
 
 + Request (application/json)
 
         {
-            // Must specify at least one auth role - set cannot be empty.
             "auth_role": { "id": "file_editor" }
         }
 
@@ -577,8 +573,7 @@ manage_project_permissions
 
 >**Rules**
 - - - - -
-* Every project must have at leat one user with the "project\_admin" authorization role.  Cannot
-revoke project level permissions for user if they are the only "project\_admin" designated for the project.
+* Every project must have at least one user with the "project\_admin" authorization role.
 
 + Response 204
 
