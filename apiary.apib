@@ -304,6 +304,7 @@ authenticated
 A system permission represents system level authorization roles that have been granted to a user.
 
 ## System Permissions collection [/system/permissions]
+
 ### List system level permissions [GET]
 >**Permission**
 - - - - -
@@ -318,7 +319,7 @@ system_admin
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ]
+                "auth_role": { "id": "system_admin", "name": "System Admin" }
             },
             ...
         ]
@@ -337,8 +338,8 @@ system_admin
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ]
-            },
+                "auth_role": { "id": "system_admin", "name": "System Admin" }
+            }
 
 ### Grant system level permissions to user [PUT]
 >**Permission**
@@ -347,7 +348,7 @@ system\_admin
 
 >**Rules**
 - - - - -
-* Revokes (deletes) any existing system level authorization roles for the user and grants new set.
+* Revokes (deletes) any existing system level authorization role for the user and grants new role.
 * The platform must have at leat one user with the system\_admin" authorization role.  Cannot
 revoke system level permissions for user if they are the only "system\_admin" designated for the platform.
 * The roles specified must be system level authorization roles (i.e. "system" in `auth_role.contexts`).
@@ -355,8 +356,7 @@ revoke system level permissions for user if they are the only "system\_admin" de
 + Request (application/json)
 
         {
-            // Must specify at least one auth role - set cannot be empty.
-            "auth_roles": [ { "id": "system_admin" }, ... ]
+            "auth_role": { "id": "system_admin" }
         }
 
 + Response 200
