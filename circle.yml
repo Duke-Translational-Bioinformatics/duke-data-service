@@ -5,9 +5,10 @@ machine:
     version:
       2.2.2
 
-#deployment:
-  #Deploy from these branches to heroku apps
-#  development:
-#    branch: develop
-#    heroku:
-#      appname: warm-journey-5070
+deployment:
+  development:
+    branch: develop
+    commands:
+      - git push git@heroku.com:duke-data-service-dev.git $CIRCLE_SHA1:refs/heads/master
+      - heroku run rake db:migrate --app 'duke-data-service-dev'
+      - heroku run rake db:seed --app 'duke-data-service-dev'

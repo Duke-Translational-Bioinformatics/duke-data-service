@@ -7,6 +7,9 @@ gem 'pg'
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4'
+gem 'rack-cors', :require => 'rack/cors'
+gem 'grape-swagger'
+gem 'grape-swagger-rails'
 
 gem 'jwt'
 gem 'grape'
