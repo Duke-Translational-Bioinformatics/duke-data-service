@@ -164,9 +164,7 @@ authenticated
                 "name": "System Admin",
                 "description": "Can manage system level permissions and perform all operations across all projects",
                 "permissions": [ { "id": "system_admin" } ],
-                // Contexts in which role is relevant (i.e. "system" or "project").
                 "contexts": [ "system" ],
-                // If deprecated, role cannot be granted, but show in UI for existing users that have role.
                 "is_deprecated": false
             },
             ...
@@ -210,13 +208,10 @@ The current user represents the currently authenticated user.
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                    // The trusted authentication source for user (Duke Shibb for MVP).
                     "source": "duke_shibboleth",
-                    // Unique user id in context of this authentication source.
                     "uid": "gardner100"
                 },
-                // The system level roles that have been granted to the user.
-                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
+                "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
             }
@@ -250,16 +245,13 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has system_admin permission.
                 "auth_provider": {
                     "source": "duke_shibboleth",
                     "uid": "gardner100",
                 },
-                // The system level roles that have been granted to the user.
-                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
+                "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
-                // End optional part of payload.
             },
             ...
         ]
@@ -279,16 +271,13 @@ authenticated
                 "last_name": "Gardner",
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
-                // Optional part of payload that is returned if the current user has system_admin permission
                 "auth_provider": {
                     "source": "duke_shibboleth",
                     "uid": "gardner100"
                 },
-                // The system level roles that have been granted to the user.
-                "auth_roles": [ { "id": "system_admin", "name": "System Admin" }, ... ],
+                "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": <audit_object>
-                // End optional part of payload.
             }
 
 ### View registered user details [GET]
@@ -409,7 +398,6 @@ authenticated
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
-            // Has the project been logically deleted from meta-data?
             "is_deleted": false,
             "audit": <audit_object>
         }
@@ -733,7 +721,6 @@ authenticated
                 "id": "duke_isilon",
                 "name": "Duke Isilon Storage",
                 "description": "A description of the storage service level would go here.",
-                // Deprecated implies that storage provide can no longer accept uploads.
                 "is_deprecated": false
             },
             {
@@ -793,7 +780,6 @@ and only one parent folder.
 + Request (application/json)
 
         {
-            // Specify root for parent_folder to create a new folder in project root.
             "parent_folder": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data"
         }
@@ -1109,13 +1095,11 @@ storage provider.
             "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
             "chunks": [ ],
             "storage_provider": { "id": "amazon_s3_standard" },
-            // Optional part of payload only returned to users granted system_admin permission.
             "storage_location": {
                 "Bucket": "duke_data_service_prod",
                 "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
             },
-            // End optional part of payload.
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 0,
@@ -1144,13 +1128,11 @@ create_file
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                     "chunks": [ ],
                     "storage_provider": { "id": "amazon_s3_standard" },
-                    // Optional part of payload only returned to users granted system_admin permission.
                     "storage_location": {
-                    "Bucket": "duke_data_service_prod",
-                    "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
+                        "Bucket": "duke_data_service_prod",
+                        "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
                     },
-                    // End optional part of payload.
                     "status": {
                         "initiated_on": "2015-07-10T13:00:00Z",
                         "percent_complete": 0,
@@ -1185,13 +1167,11 @@ create_file
             "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
             "chunks": [ ],
             "storage_provider": { "id": "amazon_s3_standard" },
-            // Optional part of payload only returned to users granted system_admin permission.
             "storage_location": {
                 "Bucket": "duke_data_service_prod",
                 "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
             },
-            // End optional part of payload.
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 0,
@@ -1294,13 +1274,11 @@ is raised.
                 ...
             ],
             "storage_provider": { "id": "amazon_s3_standard" },
-            // Optional part of payload only returned to users granted system_admin permission.
             "storage_location": {
                 "Bucket": "duke_data_service_prod",
                 "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
             },
-            // End optional part of payload.
             "upload_status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "percent_complete": 100,
