@@ -994,9 +994,9 @@ the descriptive meta\-data about file including the virtual path.
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
 
-### Create a file meta-data object [POST]
-Creates a file meta-data object; The client-side software is responsible for the creation of this object after confirming the associated physical 
-file has been successfully upladed to a storage provider. (see `Uploads`)
+### Create a file [POST]
+Creates a file meta-data object; The client is responsible for the creation of this object after confirming the associated physical 
+file has been successfully uploaded to a storage provider. (see `Uploads` endpoints)
 
 >**Permission**
 - - - - -
@@ -1040,6 +1040,51 @@ create_file
             },
             <audit_object>
         }
+
+## File instance [/files/{id}]
++ Parameters
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file meta-data object.
+
++ Model (application/json)
+
+    + Body
+
+            {
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                "folder": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                    "storage_provider": { "id": "amazon_s3_standard" }
+                },
+                <audit_object>
+            }
+
+### View file meta-data object details [GET]
+>**Permission**
+- - - - -
+view_project
+
++ Response 200
+
+    [File instance][]
+
+### Delete a file meta-data object [DELETE]
+>**Permission**
+- - - - -
+delete_file
+
+>**Rules**
+- - - - -
+* Logically deletes file from the meta-data (i.e. sets `"is_deleted": true`).
+* For the MVP, the file is not deleted from physical storage location.
+
++ Response 204
 
 ## Group Uploads
 All files must be uploaded using a mutipart/chunked upload process.  Althought this places more burden on client-side software to
