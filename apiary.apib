@@ -214,7 +214,7 @@ The current user represents the currently authenticated user.
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": <audit_object>
+                "audit": { ... }
             }
 
 ### View current user details [GET]
@@ -252,7 +252,7 @@ authenticated
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": <audit_object>
+                "audit": { ... }
             },
             ...
         ]
@@ -278,7 +278,7 @@ authenticated
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": <audit_object>
+                "audit": { ... }
             }
 
 ### View registered user details [GET]
@@ -400,7 +400,7 @@ authenticated
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ### List projects [GET]
@@ -421,7 +421,7 @@ authenticated
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false,
-                "audit": <audit_object>
+                "audit": { ... }
             },
             ...
         ]
@@ -439,7 +439,7 @@ authenticated
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false,
-                "audit": <audit_object>
+                "audit": { ... }
             }
 
 ### View project details [GET]
@@ -794,7 +794,7 @@ and only one parent folder.
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ### List project folders [GET]
@@ -816,7 +816,7 @@ view_project
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data",
                 "is_deleted": false,
-                "audit": <audit_object>
+                "audit": { ... }
             },
             ...
         ]
@@ -839,7 +839,7 @@ view_project
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ### Delete a project folder [DELETE]
@@ -883,7 +883,7 @@ folders `project` context.
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Raw Data",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ## Rename a project folder [/folders/{id}/rename]
@@ -910,7 +910,7 @@ create_file
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Model Data",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ## Group Parent/Children
@@ -934,7 +934,7 @@ view_project
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core",
             "is_deleted": false,
-            "audit": <audit_object>
+            "audit": { ... }
         }
 
 ## Project/Folder Children collection [/{context}/{id}/children]
@@ -965,7 +965,7 @@ view_project
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned",
                 "is_deleted": false,
-                "audit": <audit_object>
+                "audit": { ... }
             },
             {
                 "kind": "file",
@@ -981,7 +981,7 @@ view_project
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                     "storage_provider": { "id": "amazon_s3_standard" }
                 },
-                <audit_object>
+                "audit": { ... }
             },
             ...
         ]
@@ -1038,7 +1038,7 @@ create_file
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                 "storage_provider": { "id": "amazon_s3_standard" }
             },
-            <audit_object>
+            "audit": { ... }
         }
 
 ## File instance [/files/{id}]
@@ -1062,7 +1062,7 @@ create_file
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                     "storage_provider": { "id": "amazon_s3_standard" }
                 },
-                <audit_object>
+                "audit": { ... }
             }
 
 ### View file meta-data object details [GET]
@@ -1081,7 +1081,7 @@ delete_file
 
 >**Rules**
 - - - - -
-* Logically deletes file from the meta-data (i.e. sets `"is_deleted": true`).
+* Logically deletes file meta-data object (i.e. sets `"is_deleted": true`).
 * For the MVP, the file is not deleted from physical storage location.
 
 + Response 204
@@ -1153,7 +1153,7 @@ storage provider.
                 "error_on": null,
                 "error_message": null
             },
-            <audit_object>
+            "audit": { ... }
         }
 
 ### List file uploads for a project [GET]
@@ -1186,11 +1186,10 @@ create_file
                         "error_on": null,
                         "error_message": null
                     },
-                    <audit_object>
+                    "audit": { ... }
                 },
                 ...
         ]
-
 
 ## Upload instance [/uploads/{id}]
 + Parameters
@@ -1225,7 +1224,7 @@ create_file
                 "error_on": null,
                 "error_message": null
             },
-            <audit_object>
+            "audit": { ... }
         }
 
 ## Get pre-signed URL to upload a chunk [/uploads/{id}/chunks]
@@ -1332,5 +1331,5 @@ is raised.
                 "error_on": null,
                 "error_message": null
             },
-            <audit_object>
+            "audit": { ... }
         }
