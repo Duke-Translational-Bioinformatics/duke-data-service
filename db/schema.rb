@@ -67,13 +67,6 @@ ActiveRecord::Schema.define(version: 20150807155544) do
 
   add_index "memberships", ["id"], name: "index_memberships_on_id", unique: true, using: :btree
 
-  create_table "permissions", force: :cascade do |t|
-    t.string   "title"
-    t.text     "description"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
   create_table "project_permissions", force: :cascade do |t|
     t.string   "project_id"
     t.string   "user_id"
