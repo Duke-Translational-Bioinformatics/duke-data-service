@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150716201222) do
+ActiveRecord::Schema.define(version: 20150811181219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "uuid-ossp"
 
   create_table "auth_roles", force: :cascade do |t|
     t.string   "text_id"
@@ -36,6 +37,16 @@ ActiveRecord::Schema.define(version: 20150716201222) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "chunks", force: :cascade do |t|
+    t.uuid     "upload_id"
+    t.integer  "number"
+    t.integer  "size"
+    t.string   "fingerprint_value"
+    t.string   "fingerprint_algorithm"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   create_table "memberships", id: false, force: :cascade do |t|
@@ -77,6 +88,31 @@ ActiveRecord::Schema.define(version: 20150716201222) do
     t.string   "storage_service_uuid"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+  end
+
+  create_table "storage_providers", force: :cascade do |t|
+    t.string   "name"
+    t.string   "url_root"
+    t.string   "provider_version"
+    t.string   "auth_uri"
+    t.string   "service_user"
+    t.string   "service_pass"
+    t.string   "primary_key"
+    t.string   "secondary_key"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "project_id"
+    t.string   "name"
+    t.string   "content_type"
+    t.integer  "size"
+    t.string   "fingerprint_value"
+    t.string   "fingerprint_algorithm"
+    t.integer  "storage_provider_id"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   create_table "user_authentication_services", force: :cascade do |t|
