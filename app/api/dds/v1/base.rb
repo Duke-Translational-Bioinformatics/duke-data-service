@@ -84,6 +84,7 @@ module DDS
       mount DDS::V1::ProjectAffiliatesAPI
       mount DDS::V1::AuthRolesAPI
       mount DDS::V1::ProjectPermissionsAPI
+      mount DDS::V1::FolderAPI
     end
   end
 end

@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150716201222) do
+ActiveRecord::Schema.define(version: 20150807155544) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "uuid-ossp"
 
   create_table "auth_roles", force: :cascade do |t|
     t.string   "text_id"
@@ -38,6 +39,15 @@ ActiveRecord::Schema.define(version: 20150716201222) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "folders", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.uuid     "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string   "project_id"
+    t.boolean  "is_deleted"
+  end
+
   create_table "memberships", id: false, force: :cascade do |t|
     t.string   "id",         null: false
     t.string   "user_id"
@@ -47,6 +57,13 @@ ActiveRecord::Schema.define(version: 20150716201222) do
   end
 
   add_index "memberships", ["id"], name: "index_memberships_on_id", unique: true, using: :btree
+
+  create_table "permissions", force: :cascade do |t|
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "project_permissions", force: :cascade do |t|
     t.string   "project_id"
