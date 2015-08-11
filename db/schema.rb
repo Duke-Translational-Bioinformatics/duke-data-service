@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20150807155544) do
     t.datetime "updated_at", null: false
   end
 
+<<<<<<< HEAD
   create_table "folders", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.uuid     "parent_id"
@@ -46,6 +47,16 @@ ActiveRecord::Schema.define(version: 20150807155544) do
     t.datetime "updated_at", null: false
     t.string   "project_id"
     t.boolean  "is_deleted"
+=======
+  create_table "chunks", force: :cascade do |t|
+    t.uuid     "upload_id"
+    t.integer  "number"
+    t.integer  "size"
+    t.string   "fingerprint_value"
+    t.string   "fingerprint_algorithm"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+>>>>>>> upstream/develop
   end
 
   create_table "memberships", id: false, force: :cascade do |t|
@@ -94,6 +105,31 @@ ActiveRecord::Schema.define(version: 20150807155544) do
     t.string   "storage_service_uuid"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+  end
+
+  create_table "storage_providers", force: :cascade do |t|
+    t.string   "name"
+    t.string   "url_root"
+    t.string   "provider_version"
+    t.string   "auth_uri"
+    t.string   "service_user"
+    t.string   "service_pass"
+    t.string   "primary_key"
+    t.string   "secondary_key"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "project_id"
+    t.string   "name"
+    t.string   "content_type"
+    t.integer  "size"
+    t.string   "fingerprint_value"
+    t.string   "fingerprint_algorithm"
+    t.integer  "storage_provider_id"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   create_table "user_authentication_services", force: :cascade do |t|

@@ -1,3 +1,5 @@
+require 'grape-swagger'
+
 module DDS
   module V1
     class Base < Grape::API
@@ -85,6 +87,10 @@ module DDS
       mount DDS::V1::AuthRolesAPI
       mount DDS::V1::ProjectPermissionsAPI
       mount DDS::V1::FolderAPI
+      add_swagger_documentation(
+        api_version: 'v1',
+        hide_format: true
+      )
     end
   end
 end
