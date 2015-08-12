@@ -48,6 +48,18 @@ module DDS
         authenticate!
         Upload.find(params[:id])
       end
+
+      desc 'Complete the chunked file upload' do
+        detail 'Complete the chunked file upload'
+        named 'complete upload'
+        failure [401]
+      end
+      put '/uploads/:id/complete', root: false do
+        authenticate!
+        upload = Upload.find(params[:id])
+        upload.touch
+        upload
+      end
     end
   end
 end

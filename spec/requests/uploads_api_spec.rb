@@ -71,4 +71,14 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authenticated resource'
     end
   end
+
+  describe 'Complete the chunked file upload' do
+    let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
+
+    describe 'PUT' do
+      subject { put(url, nil, headers) }
+      it_behaves_like 'an updatable resource'
+      it_behaves_like 'an authenticated resource'
+    end
+  end
 end
