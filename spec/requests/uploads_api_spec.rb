@@ -4,9 +4,11 @@ describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
 
   let(:upload) { FactoryGirl.create(:upload) }
+  let(:chunk) { FactoryGirl.create(:chunk) }
   let(:project) { FactoryGirl.create(:project) }
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload) }
+  let(:chunk_stub) { FactoryGirl.build(:chunk) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
@@ -68,6 +70,30 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a viewable resource'
 
+      it_behaves_like 'an authenticated resource'
+    end
+  end
+
+  describe 'Get pre-signed URL to upload a chunk' do
+    let(:resource_class) { Chunk }
+    let(:resource_serializer) { ChunkSerializer }
+    let!(:resource) { chunk }
+    let(:url) { "/api/v1/uploads/#{upload.id}/chunks" }
+
+    describe 'PUT' do
+      subject { put(url, payload.to_json, headers) }
+      let!(:payload) {{
+        number: chunk_stub.number,
+        size: chunk_stub.size,
+        hash: {
+          value: chunk_stub.fingerprint_value,
+          algorithm: chunk_stub.fingerprint_algorithm
+        }
+      }}
+      it_behaves_like 'a creatable resource' do
+        let(:expected_response_status) {200}
+        let(:new_object) { resource_class.last }
+      end
       it_behaves_like 'an authenticated resource'
     end
   end

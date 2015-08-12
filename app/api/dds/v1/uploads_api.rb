@@ -49,6 +49,24 @@ module DDS
         Upload.find(params[:id])
       end
 
+      desc 'Get pre-signed URL to upload the next chunk' do
+        detail 'Get pre-signed URL to upload the next chunk'
+        named 'create chunk'
+        failure [401]
+      end
+      params do
+        requires :number
+        requires :size
+        requires :hash, type: Hash do
+          requires :value
+          requires :algorithm
+        end
+      end
+      put '/uploads/:id/chunks', root: false do
+        authenticate!
+        Chunk.create()
+      end
+
       desc 'Complete the chunked file upload' do
         detail 'Complete the chunked file upload'
         named 'complete upload'
