@@ -86,6 +86,7 @@ module DDS
       mount DDS::V1::ProjectAffiliatesAPI
       mount DDS::V1::AuthRolesAPI
       mount DDS::V1::ProjectPermissionsAPI
+      mount DDS::V1::FolderAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true
