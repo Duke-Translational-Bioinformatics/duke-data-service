@@ -3,7 +3,7 @@ require 'shoulda-matchers'
 
 RSpec.describe Chunk, type: :model do
   let(:project) { FactoryGirl.create(:project)}
-  let(:storage_provider) { FactoryGirl.create(:storage_provider, :swift_env)}
+  let(:storage_provider) { FactoryGirl.create(:storage_provider)}
   let(:upload) { FactoryGirl.create(:upload, project_id: project.id, storage_provider_id: storage_provider.id)}
   subject { FactoryGirl.create(:chunk, upload_id: upload.id) }
 

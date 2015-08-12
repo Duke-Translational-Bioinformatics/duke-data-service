@@ -3,7 +3,7 @@ require 'shoulda-matchers'
 
 RSpec.describe Upload, type: :model do
   let(:project) { FactoryGirl.create(:project)}
-  let(:storage_provider) { FactoryGirl.create(:storage_provider, :swift_env)}
+  let(:storage_provider) { FactoryGirl.create(:storage_provider)}
   subject { FactoryGirl.create(:upload, project_id: project.id, storage_provider_id: storage_provider.id)}
 
   it 'should belong_to a project' do
