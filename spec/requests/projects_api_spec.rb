@@ -13,7 +13,7 @@ describe DDS::V1::ProjectsAPI do
 
   describe 'Project collection' do
     let(:url) { "/api/v1/projects" }
-    
+
     describe 'GET' do
       subject { get(url, nil, headers) }
       it_behaves_like 'a listable resource' do
@@ -68,7 +68,7 @@ describe DDS::V1::ProjectsAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      
+
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
@@ -95,7 +95,7 @@ describe DDS::V1::ProjectsAPI do
       subject { delete(url, nil, headers) }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
-        
+
         it 'should be marked as deleted' do
           expect(resource).to be_persisted
           is_expected.to eq(204)
