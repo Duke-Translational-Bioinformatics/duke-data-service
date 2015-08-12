@@ -59,4 +59,16 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authenticated resource'
     end
   end
+
+  describe 'Upload instance' do
+    let(:url) { "/api/v1/uploads/#{resource.id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
+
+      it_behaves_like 'an authenticated resource'
+    end
+  end
 end

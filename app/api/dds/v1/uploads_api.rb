@@ -38,6 +38,16 @@ module DDS
         authenticate!
         Upload.all
       end
+
+      desc 'View upload details/status' do
+        detail 'View upload details/status'
+        named 'show upload'
+        failure [401]
+      end
+      get '/uploads/:id/', root: false do
+        authenticate!
+        Upload.find(params[:id])
+      end
     end
   end
 end
