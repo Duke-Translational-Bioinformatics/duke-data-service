@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20150807155544) do
     t.datetime "updated_at", null: false
     t.string   "project_id"
     t.boolean  "is_deleted"
+  end
 
   create_table "chunks", force: :cascade do |t|
     t.uuid     "upload_id"
