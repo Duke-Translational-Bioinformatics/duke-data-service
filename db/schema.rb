@@ -112,7 +112,7 @@ ActiveRecord::Schema.define(version: 20150813145323) do
     t.datetime "updated_at",       null: false
   end
 
-  create_table "uploads", id: :uuid, default: nil, force: :cascade do |t|
+  create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "project_id"
     t.string   "name"
     t.string   "content_type"
