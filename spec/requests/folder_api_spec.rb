@@ -142,6 +142,7 @@ describe DDS::V1::FolderAPI do
       let(:resource) { FactoryGirl.create(:folder, parent_id: child_and_parent.id) }
       #Add deleted folder to ensure it isn't included in listable result
       let(:deleted_foler) { FactoryGirl.create(:folder, :deleted, parent_id: child_and_parent.id) }
+
       it_behaves_like 'a listable resource' do
         it 'should not include deleted folders' do
           is_expected.to eq(200)
