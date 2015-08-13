@@ -71,6 +71,7 @@ module DDS
         folder_params = declared(params, include_missing: false)
         new_parent = folder_params[:parent][:id]
         folder = Folder.find(params[:id])
+        #TODO: validate that parent exists
         if folder.update(parent_id: new_parent)
           folder
         else

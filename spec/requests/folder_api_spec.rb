@@ -89,6 +89,7 @@ describe DDS::V1::FolderAPI do
   describe 'Move a Project Folder to a New Parent' do
     let(:url) { "/api/v1/folders/#{resource.id}/move" }
     let(:new_parent) { FactoryGirl.create(:folder) }
+
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let!(:payload) {{
