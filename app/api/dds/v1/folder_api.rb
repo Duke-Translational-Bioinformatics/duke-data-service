@@ -101,6 +101,35 @@ module DDS
           validation_error!(folder)
         end
       end
+
+      desc 'View parent folder' do
+        detail 'Returns the folder details for the parent of a given folder.'
+        named 'view parent folder'
+        failure [401]
+      end
+      get '/folders/:id/parent', root: false do
+        authenticate!
+        #parent_id = Folder.find(params[:id]).parent_id
+        #Folder.find(parent_id)
+        folder = Folder.find(params[:id])
+        folder.parent
+      end
+
+      desc 'View children folder details' do
+        detail 'Returns the folder details of children folders.'
+        named 'view children '
+        failure [401]
+      end
+      get '/folders/:id/children', root: false do
+        authenticate!
+        #results = []
+        #Folder.where(parent_id: params[:id]).find_each do |folder|
+        #  results.push(folder)
+        #end
+        #results
+        folder = Folder.find(params[:id])
+        folder.children
+      end
     end
   end
 end

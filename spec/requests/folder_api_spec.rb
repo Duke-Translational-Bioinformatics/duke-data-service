@@ -4,7 +4,9 @@ describe DDS::V1::FolderAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }
-  let(:folder) { FactoryGirl.create(:folder, project_id: project.id) }
+  let(:folder) { FactoryGirl.create(:folder) }
+  let(:child_folder) { FactoryGirl.create(:child_folder) }
+  let(:child_and_parent) { FactoryGirl.create(:child_and_parent) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted) }
   let(:folder_stub) { FactoryGirl.build(:folder) }
   let(:serialized_folder) { FolderSerializer.new(folder).to_json }
@@ -18,6 +20,8 @@ describe DDS::V1::FolderAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+      let(:project) { resource.project }
+
       it_behaves_like 'a listable resource' do
         it 'should not include deleted folders' do
           is_expected.to eq(200)
@@ -115,4 +119,37 @@ describe DDS::V1::FolderAPI do
     end
   end
 
+  describe 'Parent folder instance' do
+    let(:url) { "/api/v1/folders/#{child_folder.id}/parent" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+      let(:parent) { child_folder.parent }
+      let(:resource) { parent }
+
+      it_behaves_like 'a viewable resource'
+
+      it_behaves_like 'an authenticated resource'
+    end
+  end
+
+  describe 'Folder children collection' do
+    let(:url) { "/api/v1/folders/#{child_and_parent.id}/children" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+      #Adding resource to the list of factory-generated children allows testing for its inclusion
+      let(:resource) { FactoryGirl.create(:folder, parent_id: child_and_parent.id) }
+      #Add deleted folder to ensure it isn't included in listable result
+      let(:delted_foler) { FactoryGirl.create(:folder, :delted, parent_id: child_and_parent.id) }
+      it_behaves_like 'a listable resource' do
+        it 'should not include deleted folders' do
+          is_expected.to eq(200)
+          expect(response.body).not_to include(resource_serializer.new(deleted_folder).to_json)
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
+    end
+  end
 end
