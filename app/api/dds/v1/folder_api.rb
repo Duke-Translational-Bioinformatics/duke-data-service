@@ -33,11 +33,7 @@ module DDS
       end
       get '/projects/:id/folders', root: false do
         authenticate!
-        results = []
-        Folder.where(project_id: params[:id]).find_each do |folder|
-          results.push(folder)
-        end
-        results
+        Folder.where(project_id: params[:id]).all
       end
 
       desc 'View folder details' do
