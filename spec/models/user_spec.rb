@@ -41,6 +41,15 @@ RSpec.describe User, type: :model do
       subject.auth_roles = new_role_ids
       expect(subject.auth_role_ids).to eq(new_role_ids)
     end
+
+    describe 'without roles' do
+      subject {FactoryGirl.create(:user)}
+      
+      it 'should have an auth_roles method that returns AuthRole objects' do
+        expect(subject).to respond_to(:auth_roles)
+        expect(subject.auth_roles).to be_a Array
+      end
+    end
   end
 
   describe 'serialization' do
