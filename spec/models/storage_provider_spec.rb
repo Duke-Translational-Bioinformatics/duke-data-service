@@ -124,7 +124,7 @@ RSpec.describe StorageProvider, type: :model do
         @chunks = []
         10.times do |i|
           chunk_number = i + 1
-          chunk_data = Faker::Lorem.characters(1048576)
+          chunk_data = Faker::Lorem.characters(100)
           @chunk_data << chunk_data
           chunk = FactoryGirl.create(:chunk,
             upload_id: @existing_upload.id,
