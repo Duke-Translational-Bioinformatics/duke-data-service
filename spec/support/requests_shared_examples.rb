@@ -27,24 +27,28 @@ shared_examples 'a listable resource' do
 end
 
 shared_examples 'a creatable resource' do
+  let(:expected_response_status) {201}
+  let(:new_object) {
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('id')
+    resource_class.find(response_json['id'])
+  }
   it 'should return success' do
-    is_expected.to eq(201)
-    expect(response.status).to eq(201)
+    is_expected.to eq(expected_response_status)
+    expect(response.status).to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
   end
 
   it 'should be persisted' do
     expect {
-      is_expected.to eq(201)
+      is_expected.to eq(expected_response_status)
     }.to change{resource_class.count}.by(1)
   end
 
   it 'should return a serialized object' do
-    is_expected.to eq(201)
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key('id')
-    new_object = resource_class.find(response_json['id'])
+    is_expected.to eq(expected_response_status)
+    expect(new_object).to be
     expect(response.body).to include(resource_serializer.new(new_object).to_json)
   end
 end
