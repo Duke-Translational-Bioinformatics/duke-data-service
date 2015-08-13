@@ -31,6 +31,7 @@ RSpec.describe StorageProvider, type: :model do
             "#{@auth_resp['x-storage-url']}/#{@project.id}/#{obj}",
             headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
         end
+        User.destroy_all
       end
 
       HTTParty.delete(
