@@ -17,4 +17,14 @@ RSpec.describe Upload, type: :model do
   it 'should have_many chunks' do
     should have_many :chunks
   end
+
+  it 'should have a temporary_url method' do
+    # see StorageProviderSpec get_signed_url(upload)
+    should respond_to 'temporary_url'
+  end
+
+  it 'should have a create_manifest method' do
+    # see StorageProviderSpec create_slo_manifest
+    should respond_to 'create_manifest'
+  end
 end

@@ -1,10 +1,9 @@
 FactoryGirl.define do
   factory :chunk do
-    upload_id ""
-number 1
-size 1
-fingerprint_value "MyString"
-fingerprint_algorithm "MyString"
+    upload_id { SecureRandom.uuid }
+    number 1
+    size 1
+    fingerprint_value { SecureRandom.hex(32) }
+    fingerprint_algorithm "md5"
   end
-
 end

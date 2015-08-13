@@ -10,4 +10,9 @@ RSpec.describe Chunk, type: :model do
   it 'should belong_to an upload' do
     should belong_to :upload
   end
+
+  it 'should have a temporary_url method' do
+    # see StorageProviderSpec get_signed_url(chunk, 'POST')
+    should respond_to 'temporary_url'
+  end
 end
