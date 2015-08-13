@@ -8,6 +8,7 @@ class Project < ActiveRecord::Base
 
   belongs_to :creator, class_name: "User"
   has_many :memberships
+  has_many :folders
   has_many :storage_folders
   has_many :project_permissions
 
