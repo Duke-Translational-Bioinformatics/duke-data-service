@@ -14,19 +14,10 @@ class StorageProvider < ActiveRecord::Base
     end
   end
 
-  def get_signed_url(object, method = 'GET')
+  def get_signed_url(object)
+    method = object.is_a?(Chunk) ? 'PUT' : 'GET'
     duration_in_seconds = 60*5 # 5 minutes
     expires = Time.now + duration_in_seconds
-    if method == 'PUT'
-      # we only support GET upload PUT chunk
-      unless object.is_a? Chunk
-        raise StorageProviderException, "PUT method is only supported for Chunk objects"
-      end
-    else
-      unless object.is_a? Upload
-        raise StorageProviderException, "GET method is only supported for Upload objects"
-      end
-    end
 
     subpath = (method == 'GET') ?
       [object.project.id, object.id].join('/') :
