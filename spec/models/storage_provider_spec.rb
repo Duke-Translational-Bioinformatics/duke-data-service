@@ -98,10 +98,10 @@ RSpec.describe StorageProvider, type: :model do
         expect(resp.body).to eq(@existingobject)
       end
 
-      it 'should take a chunk and method PUT and return a signed tempoary url to PUT data for the chunk object' do
+      it 'should take a chunk and return a signed tempoary url to PUT data for the chunk object' do
         new_data = Faker::Lorem.characters(100)
         expect(@subject).to respond_to('get_signed_url')
-        url = @subject.get_signed_url(@new_chunk, 'PUT')
+        url = @subject.get_signed_url(@new_chunk)
         expect(url).to match([
           @subject.provider_version,
           @subject.name,
