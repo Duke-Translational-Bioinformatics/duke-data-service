@@ -1,5 +1,3 @@
-require 'faker'
-require 'factory_girl_rails'
 namespace :storage_provider do
   desc "creates a storage_provider using ENV[SWIFT_ACCT,SWIFT_URL_ROOT,SWIFT_VERSION,SWIFT_AUTH_URI,SWIFT_USER,SWIFT_PASS,SWIFT_PRIMARY_KEY,SWIFT_SECONDARY_KEY]"
   task create: :environment do
@@ -8,7 +6,16 @@ namespace :storage_provider do
       exit
     end
     unless StorageProvider.where(name: ENV['SWIFT_ACCT']).exists?
-      FactoryGirl.create(:storage_provider, :swift_env)
+      StorageProvider.create(
+        name: ENV['SWIFT_ACCT'],
+        url_root: ENV['SWIFT_URL_ROOT'],
+        provider_version: ENV['SWIFT_VERSION'],
+        auth_uri: ENV['SWIFT_AUTH_URI'],
+        service_user: ENV["SWIFT_USER"],
+        service_pass: ENV['SWIFT_PASS'],
+        primary_key: ENV['SWIFT_PRIMARY_KEY'],
+        secondary_key: ENV['SWIFT_SECONDARY_KEY']
+      )
     end
   end
 
