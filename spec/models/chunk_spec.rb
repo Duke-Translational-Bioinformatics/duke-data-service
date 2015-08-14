@@ -31,6 +31,7 @@ RSpec.describe Chunk, type: :model do
 
     it 'should have a host method' do
       should respond_to :host
+      expect(subject.host).to eq storage_provider.url_root
     end
 
     it 'should have a http_headers method' do
@@ -40,7 +41,7 @@ RSpec.describe Chunk, type: :model do
 
     it 'should have a url method' do
       should respond_to :url
-      expect(subject.url).to eq storage_provider.get_signed_url(subject)
+      expect(subject.url).not_to be_empty
     end
   end
 
@@ -54,7 +55,10 @@ RSpec.describe Chunk, type: :model do
       expect(parsed_json).to have_key('host')
       expect(parsed_json).to have_key('url')
       expect(parsed_json).to have_key('http_headers')
-      expect(parsed_json['http_headers']).to eq([])
+      expect(parsed_json['http_verb']).to eq(subject.http_verb)
+      expect(parsed_json['host']).to eq(subject.host)
+      expect(parsed_json['http_headers']).to eq(subject.http_headers)
+      expect(parsed_json['url']).to eq(subject.url)
     end
   end
 end

@@ -3,7 +3,12 @@ class Upload < ActiveRecord::Base
   belongs_to :storage_provider
   has_many :chunks
 
+  validates :project_id, presence: true
   validates :name, presence: true
+  validates :size, presence: true
+  validates :fingerprint_value, presence: true
+  validates :fingerprint_algorithm, presence: true
+  validates :storage_provider_id, presence: true
 
   def temporary_url
     storage_provider.get_signed_url(self)

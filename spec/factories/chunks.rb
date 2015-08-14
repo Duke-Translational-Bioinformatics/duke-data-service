@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :chunk do
-    upload_id { SecureRandom.uuid }
+    upload
     number 1
     size 1
     fingerprint_value { SecureRandom.hex(32) }
