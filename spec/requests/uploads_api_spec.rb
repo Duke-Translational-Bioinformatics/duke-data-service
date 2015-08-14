@@ -16,7 +16,7 @@ describe DDS::V1::UploadsAPI do
   let!(:resource) { upload }
 
   describe 'Uploads collection' do
-    let(:url) { "/api/v1/project/#{project.id}/uploads" }
+    let(:url) { "/api/v1/projects/#{project.id}/uploads" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }

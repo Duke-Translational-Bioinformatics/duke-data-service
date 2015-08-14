@@ -15,7 +15,7 @@ module DDS
           requires :algorithm
         end
       end
-      post '/project/:project_id/uploads', root: false do
+      post '/projects/:project_id/uploads', root: false do
         authenticate!
         upload_params = declared(params, include_missing: false)
         #TODO: Check that project actually exists and throw an error
@@ -42,7 +42,7 @@ module DDS
         named 'list uploads'
         failure [401]
       end
-      get '/project/:project_id/uploads', root: false do
+      get '/projects/:project_id/uploads', root: false do
         authenticate!
         Upload.all
       end
