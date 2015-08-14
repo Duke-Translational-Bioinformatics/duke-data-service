@@ -1,4 +1,13 @@
 class StorageProvider < ActiveRecord::Base
+  validates :name, presence: true
+  validates :url_root, presence: true
+  validates :provider_version, presence: true
+  validates :auth_uri, presence: true
+  validates :service_user, presence: true
+  validates :service_pass, presence: true
+  validates :primary_key, presence: true
+  validates :secondary_key, presence: true
+
   def register_keys
     authenticate
     resp = HTTParty.post(

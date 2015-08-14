@@ -1,13 +1,13 @@
 FactoryGirl.define do
   factory :storage_provider do
-    name "MyString"
-    url_root "MyString"
-    provider_version "MyString"
-    auth_uri "MyString"
-    service_user "MyString"
-    service_pass "MyString"
-    primary_key "MyString"
-    secondary_key "MyString"
+    name { Faker::Name.name }
+    url_root { Faker::Internet.domain_name }
+    provider_version { Faker::App.version }
+    auth_uri { Faker::Internet.url }
+    service_user { Faker::Internet.user_name }
+    service_pass { Faker::Internet.password }
+    primary_key { SecureRandom.hex }
+    secondary_key { SecureRandom.hex }
 
     trait :swift_env do
       name { ENV['SWIFT_ACCT'] }

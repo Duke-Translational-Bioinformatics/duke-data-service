@@ -155,4 +155,20 @@ RSpec.describe StorageProvider, type: :model do
       end
     end
   end
+
+  describe 'validations' do
+    it 'should require attributes' do
+      should validate_presence_of :name
+      should validate_presence_of :url_root
+      should validate_presence_of :provider_version
+      should validate_presence_of :auth_uri
+      should validate_presence_of :service_user
+      should validate_presence_of :service_pass
+      should validate_presence_of :primary_key
+      should validate_presence_of :secondary_key
+    end
+  end
+
+  describe 'serialization' do
+  end
 end

@@ -6,6 +6,7 @@ describe DDS::V1::UploadsAPI do
   let(:upload) { FactoryGirl.create(:upload) }
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:project) { FactoryGirl.create(:project) }
+  let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload) }
   let(:chunk_stub) { FactoryGirl.build(:chunk) }
@@ -78,7 +79,7 @@ describe DDS::V1::UploadsAPI do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
-    let(:url) { "/api/v1/uploads/#{upload.id}/chunks" }
+    let!(:url) { "/api/v1/uploads/#{upload.id}/chunks" }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -94,6 +95,24 @@ describe DDS::V1::UploadsAPI do
         let(:expected_response_status) {200}
         let(:new_object) { resource_class.last }
       end
+
+      it_behaves_like 'a validated resource' do
+        let(:payload) {{
+          number: nil,
+          size: nil,
+          hash: {
+            value: nil,
+            algorithm: nil
+          }
+        }}
+        it 'should not persist changes' do
+          expect(resource).to be_persisted
+          expect {
+            is_expected.to eq(400)
+          }.not_to change{resource_class.count}
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
     end
   end

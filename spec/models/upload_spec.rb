@@ -6,16 +6,32 @@ RSpec.describe Upload, type: :model do
   let(:storage_provider) { FactoryGirl.create(:storage_provider)}
   subject { FactoryGirl.create(:upload, project_id: project.id, storage_provider_id: storage_provider.id)}
 
-  it 'should belong_to a project' do
-    should belong_to :project
+  describe 'associations' do
+    it 'should belong_to a project' do
+      should belong_to :project
+    end
+
+    it 'should belong_to a storage_provider' do
+      should belong_to :storage_provider
+    end
+
+    it 'should have_many chunks' do
+      should have_many :chunks
+    end
   end
 
-  it 'should belong_to a storage_provider' do
-    should belong_to :storage_provider
+  describe 'validations' do
+    it 'should require attributes' do
+      should validate_presence_of :project_id
+      should validate_presence_of :name
+      should validate_presence_of :size
+      should validate_presence_of :fingerprint_value
+      should validate_presence_of :fingerprint_algorithm
+      should validate_presence_of :storage_provider_id
+    end
   end
 
-  it 'should have_many chunks' do
-    should have_many :chunks
+  describe 'serialization' do
   end
 
   it 'should have a temporary_url method' do

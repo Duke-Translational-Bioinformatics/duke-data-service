@@ -18,9 +18,17 @@ module DDS
       post '/project/:project_id/uploads', root: false do
         authenticate!
         upload_params = declared(params, include_missing: false)
-        project = Project.find(params[:project_id])
+        #TODO: Check that project actually exists and throw an error
+        # if it doesn't
+        #project = Project.find(params[:project_id])
+        storage_provider = StorageProvider.first
         upload = Upload.new({
-          name: upload_params[:name]
+          project_id: params[:project_id],
+          name: upload_params[:name],
+          size: upload_params[:size],
+          fingerprint_value: upload_params[:hash][:value],
+          fingerprint_algorithm: upload_params[:hash][:algorithm],
+          storage_provider_id: storage_provider.id
         })
         if upload.save
           upload
@@ -64,7 +72,20 @@ module DDS
       end
       put '/uploads/:id/chunks', root: false do
         authenticate!
-        Chunk.create()
+        chunk_params = declared(params, include_missing: false)
+        upload = Upload.find(params[:id])
+        chunk = Chunk.new({
+          upload_id: upload.id,
+          number: chunk_params[:number],
+          size: chunk_params[:size],
+          fingerprint_value: chunk_params[:hash][:value],
+          fingerprint_algorithm: chunk_params[:hash][:algorithm]
+        })
+        if chunk.save
+          chunk
+        else
+          validation_error!(chunk)
+        end
       end
 
       desc 'Complete the chunked file upload' do
