@@ -26,6 +26,8 @@ rake:
   entrypoint: ['rake']
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
 authservice:
   image: dukedataservice_server
   environment:
