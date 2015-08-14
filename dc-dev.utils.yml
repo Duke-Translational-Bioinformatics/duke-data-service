@@ -17,6 +17,8 @@ rails:
   entrypoint: ['rails']
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
 rake:
   image: dukedataservice_server
   volumes_from:
@@ -44,6 +46,8 @@ rspec:
     - server
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
   entrypoint: ['rspec']
   command: spec
 heroku:
