@@ -1,6 +1,5 @@
 class Project < ActiveRecord::Base
 
-  before_create :create_string_id
   after_save :add_project_admin_role_to_user
   after_initialize :init
 
