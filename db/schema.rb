@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150813145323) do
+ActiveRecord::Schema.define(version: 20150817150440) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,51 +52,44 @@ ActiveRecord::Schema.define(version: 20150813145323) do
   create_table "folders", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.uuid     "parent_id"
-    t.string   "project_id"
     t.boolean  "is_deleted"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid     "project_id"
   end
 
-  create_table "memberships", id: false, force: :cascade do |t|
-    t.string   "id",         null: false
-    t.string   "user_id"
-    t.string   "project_id"
+  create_table "memberships", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "user_id"
+    t.uuid     "project_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  add_index "memberships", ["id"], name: "index_memberships_on_id", unique: true, using: :btree
-
   create_table "project_permissions", force: :cascade do |t|
-    t.string   "project_id"
-    t.string   "user_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
     t.integer  "auth_role_id"
+    t.uuid     "user_id"
+    t.uuid     "project_id"
   end
 
-  create_table "projects", id: false, force: :cascade do |t|
-    t.string   "id",          null: false
+  create_table "projects", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
-    t.string   "creator_id"
+    t.uuid     "creator_id"
     t.string   "etag"
     t.boolean  "is_deleted"
-    t.datetime "deleted_at"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
 
-  add_index "projects", ["id"], name: "index_projects_on_id", unique: true, using: :btree
-
   create_table "storage_folders", force: :cascade do |t|
-    t.string   "project_id"
     t.string   "name"
     t.text     "description"
     t.string   "storage_service_uuid"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+    t.uuid     "project_id"
   end
 
   create_table "storage_providers", force: :cascade do |t|
@@ -125,15 +118,14 @@ ActiveRecord::Schema.define(version: 20150813145323) do
   end
 
   create_table "user_authentication_services", force: :cascade do |t|
-    t.string   "user_id"
     t.integer  "authentication_service_id"
     t.string   "uid"
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.uuid     "user_id"
   end
 
-  create_table "users", id: false, force: :cascade do |t|
-    t.string   "id",            null: false
+  create_table "users", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "etag"
     t.string   "email"
     t.string   "display_name"
@@ -143,7 +135,5 @@ ActiveRecord::Schema.define(version: 20150813145323) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
   end
-
-  add_index "users", ["id"], name: "index_users_on_id", unique: true, using: :btree
 
 end

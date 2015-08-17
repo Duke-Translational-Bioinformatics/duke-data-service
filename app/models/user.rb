@@ -1,10 +1,7 @@
 require 'jwt'
 
 class User < ActiveRecord::Base
-  include StringIdCreator
 
-  before_create :create_string_id
-  self.primary_key = 'id'
   has_many :user_authentication_services
   accepts_nested_attributes_for :user_authentication_services
 

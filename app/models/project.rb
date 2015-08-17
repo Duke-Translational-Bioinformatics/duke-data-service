@@ -1,6 +1,4 @@
 class Project < ActiveRecord::Base
-  include StringIdCreator
-  self.primary_key = 'id'
 
   before_create :create_string_id
   after_save :add_project_admin_role_to_user
