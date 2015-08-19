@@ -23,6 +23,11 @@ class StorageProvider < ActiveRecord::Base
     end
   end
 
+  def build_chunk_url(chunk)
+    path = [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/')
+    "#{path}?temp_url_sig&temp_url_expires"
+  end
+
   def get_signed_url(object)
     method = object.is_a?(Chunk) ? 'PUT' : 'GET'
     duration_in_seconds = 60*5 # 5 minutes

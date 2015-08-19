@@ -1,6 +1,10 @@
 require 'rails_helper'
+require 'shoulda-matchers'
 
 RSpec.describe StorageProvider, type: :model do
+  let(:chunk) { FactoryGirl.create(:chunk) }
+  let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+
   describe "swift access method", :if => ENV['SWIFT_USER'] do
     # these tests only run if the SWIFT ENV variables are set
     # to allow it to communicate with a SWIFT backend
@@ -152,6 +156,40 @@ RSpec.describe StorageProvider, type: :model do
           headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
         expect(resp.response.code.to_i).to eq(200)
         expect(resp.body).to eq(@chunk_data.join(''))
+      end
+    end
+  end
+
+  describe 'methods for uploading chunks' do
+    subject { storage_provider }
+    it 'should respond to build_chunk_url' do
+      is_expected.to respond_to :build_chunk_url
+    end
+
+    describe 'build_chunk_url' do
+      subject { storage_provider.build_chunk_url(chunk) }
+      let(:parsed_url) { URI.parse(subject) }
+      let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
+
+      it 'should return a valid url with query params' do
+        is_expected.to be_a String
+        expect { parsed_url }.not_to raise_error
+        expect(parsed_url.query).not_to be_empty
+        expect { decoded_query }.not_to raise_error
+        expect(decoded_query).to be_a Array
+      end
+
+      it 'should include a chunk path in the url' do
+        expected_path = [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/')
+        expect(parsed_url.path).to eq expected_path
+      end
+
+      it 'should have temp_url_sig in query' do
+        expect(decoded_query.assoc('temp_url_sig')).not_to be_nil
+      end
+
+      it 'should have temp_url_expires in query' do
+        expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
       end
     end
   end
