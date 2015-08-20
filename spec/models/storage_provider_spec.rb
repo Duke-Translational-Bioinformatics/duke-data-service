@@ -202,6 +202,11 @@ RSpec.describe StorageProvider, type: :model do
 
       it 'should have temp_url_sig in query' do
         expect(decoded_query.assoc('temp_url_sig')).not_to be_nil
+        path = parsed_url.path
+        expiry = decoded_query.assoc('temp_url_expires').last
+        body = [chunk.http_verb, expiry, path].join("\n")
+        expected_signature = storage_provider.build_signature(body)
+        expect(decoded_query.assoc('temp_url_sig').last).to eq(expected_signature)
       end
 
       it 'should have temp_url_expires in query' do

@@ -27,7 +27,8 @@ class StorageProvider < ActiveRecord::Base
     path = [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/')
     expiry = chunk.updated_at.to_i + chunk_duration
     hmac_body = [chunk.http_verb, expiry, path].join("\n")
-    "#{path}?temp_url_sig&temp_url_expires=#{expiry}"
+    signature = build_signature(hmac_body)
+    "#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}"
   end
 
   def chunk_duration
