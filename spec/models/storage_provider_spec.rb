@@ -160,27 +160,26 @@ RSpec.describe StorageProvider, type: :model do
     end
   end
 
-  describe 'methods for uploading chunks' do
+  describe 'methods for building signed urls' do
     subject { storage_provider }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
-    let(:expected_path) { [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/') }
-    let(:expected_expiry) { (chunk.updated_at.to_i + storage_provider.chunk_duration).to_s }
-    let(:expected_hmac_body) { [chunk.http_verb, expected_expiry, expected_path].join("\n") }
-    let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
     
     it 'should respond to chunk_duration' do
       is_expected.to respond_to :chunk_duration
       expect(subject.chunk_duration).to eq(300)
     end
+
     it 'should respond to root_path' do
       is_expected.to respond_to :root_path
       expect(subject.root_path).to eq(expected_root_path)
     end
+
     it 'should respond to digest' do
       is_expected.to respond_to :digest
       expect(subject.digest).to be_a OpenSSL::Digest
       expect(subject.digest.name).to eq('SHA1')
     end
+
     it 'should respond to build_signature' do
       is_expected.to respond_to :build_signature
       body = ['PUT', 1234, '/foo'].join('\n')
