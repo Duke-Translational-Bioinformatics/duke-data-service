@@ -25,7 +25,21 @@ class StorageProvider < ActiveRecord::Base
 
   def build_chunk_url(chunk)
     path = [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/')
-    "#{path}?temp_url_sig&temp_url_expires"
+    expiry = chunk.updated_at.to_i + chunk_duration
+    hmac_body = [chunk.http_verb, expiry, path].join("\n")
+    "#{path}?temp_url_sig&temp_url_expires=#{expiry}"
+  end
+
+  def chunk_duration
+    60*5 # 5 minutes
+  end
+
+  def digest
+    @digest ||= OpenSSL::Digest.new('sha1')
+  end
+
+  def build_signature(hmac_body, key = primary_key)
+    OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
   end
 
   def get_signed_url(object)
