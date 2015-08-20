@@ -162,21 +162,19 @@ RSpec.describe StorageProvider, type: :model do
 
   describe 'methods for uploading chunks' do
     subject { storage_provider }
+    let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
     let(:expected_path) { [chunk.upload.project_id,chunk.upload_id,chunk.number].join('/') }
     let(:expected_expiry) { (chunk.updated_at.to_i + storage_provider.chunk_duration).to_s }
     let(:expected_hmac_body) { [chunk.http_verb, expected_expiry, expected_path].join("\n") }
     let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
     
-    it 'should respond to build_chunk_url' do
-      is_expected.to respond_to :build_chunk_url
-    end
     it 'should respond to chunk_duration' do
       is_expected.to respond_to :chunk_duration
       expect(subject.chunk_duration).to eq(300)
     end
-    it 'should respond to build_chunk_path' do
-      is_expected.to respond_to :build_chunk_path
-      expect(subject.build_chunk_path(chunk)).to eq(expected_path)
+    it 'should respond to root_path' do
+      is_expected.to respond_to :root_path
+      expect(subject.root_path).to eq(expected_root_path)
     end
     it 'should respond to digest' do
       is_expected.to respond_to :digest
@@ -189,34 +187,6 @@ RSpec.describe StorageProvider, type: :model do
       expected_signature = OpenSSL::HMAC.hexdigest(subject.digest, subject.primary_key, body)
       expect(subject.build_signature(body, subject.primary_key)).to eq(expected_signature)
       expect(subject.build_signature(body)).to eq(expected_signature)
-    end
-
-    describe 'build_chunk_url' do
-      subject { storage_provider.build_chunk_url(chunk) }
-      let(:parsed_url) { URI.parse(subject) }
-      let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
-
-      it 'should return a valid url with query params' do
-        is_expected.to be_a String
-        expect { parsed_url }.not_to raise_error
-        expect(parsed_url.query).not_to be_empty
-        expect { decoded_query }.not_to raise_error
-        expect(decoded_query).to be_a Array
-      end
-
-      it 'should include a chunk path in the url' do
-        expect(parsed_url.path).to eq expected_path
-      end
-
-      it 'should have temp_url_sig in query' do
-        expect(decoded_query.assoc('temp_url_sig')).not_to be_nil
-        expect(decoded_query.assoc('temp_url_sig').last).to eq(expected_signature)
-      end
-
-      it 'should have temp_url_expires in query' do
-        expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
-        expect(decoded_query.assoc('temp_url_expires').last).to eq(expected_expiry)
-      end
     end
   end
 
