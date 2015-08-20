@@ -42,6 +42,13 @@ class StorageProvider < ActiveRecord::Base
     OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
   end
 
+  def build_signed_url(http_verb, sub_path, expiry)
+    path = [root_path, sub_path].join('/')
+    hmac_body = [http_verb, expiry, path].join("\n")
+    signature = build_signature(hmac_body)
+    URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
+  end
+
   def get_signed_url(object)
     method = object.is_a?(Chunk) ? 'PUT' : 'GET'
     duration_in_seconds = 60*5 # 5 minutes

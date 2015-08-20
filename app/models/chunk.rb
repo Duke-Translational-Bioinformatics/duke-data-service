@@ -15,30 +15,22 @@ class Chunk < ActiveRecord::Base
   end
 
   def host
-    upload.storage_provider.url_root
+    storage_provider.url_root
   end
 
   def http_headers
     []
   end
 
-  def path
-    [storage_provider.root_path, project_id, upload_id, number].join('/')
+  def sub_path
+    [project_id, upload_id, number].join('/')
   end
 
   def expiry
     updated_at.to_i + storage_provider.chunk_duration
   end
 
-  def hmac_body
-    [http_verb, expiry, path].join("\n")
-  end
-
-  def signature
-    storage_provider.build_signature(hmac_body)
-  end
-
   def url
-    URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
+    storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 end

@@ -187,6 +187,48 @@ RSpec.describe StorageProvider, type: :model do
       expect(subject.build_signature(body, subject.primary_key)).to eq(expected_signature)
       expect(subject.build_signature(body)).to eq(expected_signature)
     end
+
+    it 'should respond to build_signed_url' do
+      is_expected.to respond_to :build_signed_url
+    end
+  end
+
+  describe 'a signed url' do
+    subject { storage_provider }
+
+    # build_signed_url parameters
+    let(:http_verb) { 'PUT' }
+    let(:sub_path) { Faker::Internet.slug }
+    let(:expiry) { Faker::Number.number(10) }
+
+    let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry) }
+    let(:parsed_url) { URI.parse(signed_url) }
+    let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
+    let(:expected_path) { "#{subject.root_path}/#{sub_path}" }
+    let(:expected_hmac_body) { [http_verb, expiry, expected_path].join("\n") }
+    let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
+
+    it 'should return a valid url with query params' do
+      expect(signed_url).to be_a String
+      expect { parsed_url }.not_to raise_error
+      expect(parsed_url.query).not_to be_empty
+      expect { decoded_query }.not_to raise_error
+      expect(decoded_query).to be_a Array
+    end
+
+    it 'should include the path in the url' do
+      expect(URI.decode(parsed_url.path)).to eq expected_path
+    end
+
+    it 'should have temp_url_sig in query' do
+      expect(decoded_query.assoc('temp_url_sig')).not_to be_nil
+      expect(decoded_query.assoc('temp_url_sig').last).to eq(expected_signature)
+    end
+
+    it 'should have temp_url_expires in query' do
+      expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
+      expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry)
+    end
   end
 
   describe 'validations' do
