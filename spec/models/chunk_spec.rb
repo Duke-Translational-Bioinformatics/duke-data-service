@@ -6,7 +6,7 @@ RSpec.describe Chunk, type: :model do
   let(:storage_provider) { subject.storage_provider }
 
   let(:expected_sub_path) { [subject.project_id, subject.upload_id, subject.number].join('/')}
-  let(:expected_expiry) { subject.updated_at.to_i + storage_provider.chunk_duration }
+  let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
   let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
 
 

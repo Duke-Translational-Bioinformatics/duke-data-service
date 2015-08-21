@@ -27,7 +27,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def expiry
-    updated_at.to_i + storage_provider.chunk_duration
+    updated_at.to_i + storage_provider.signed_url_duration
   end
 
   def url

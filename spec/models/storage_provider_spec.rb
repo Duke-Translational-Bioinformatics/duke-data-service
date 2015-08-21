@@ -164,9 +164,9 @@ RSpec.describe StorageProvider, type: :model do
     subject { storage_provider }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
     
-    it 'should respond to chunk_duration' do
-      is_expected.to respond_to :chunk_duration
-      expect(subject.chunk_duration).to eq(300)
+    it 'should respond to signed_url_duration' do
+      is_expected.to respond_to :signed_url_duration
+      expect(subject.signed_url_duration).to eq(300)
     end
 
     it 'should respond to root_path' do
