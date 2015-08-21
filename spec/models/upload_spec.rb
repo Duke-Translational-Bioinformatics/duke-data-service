@@ -2,8 +2,6 @@ require 'rails_helper'
 require 'shoulda-matchers'
 
 RSpec.describe Upload, type: :model do
-  #let(:project) { FactoryGirl.create(:project)}
-  #let(:storage_provider) { FactoryGirl.create(:storage_provider)}
   subject { FactoryGirl.create(:upload)}
 
   describe 'associations' do
@@ -35,7 +33,6 @@ RSpec.describe Upload, type: :model do
   end
 
   it 'should have a temporary_url method' do
-    # see StorageProviderSpec get_signed_url(upload)
     is_expected.to respond_to :temporary_url
     expect(subject.temporary_url).to be_a String
   end
