@@ -87,9 +87,8 @@ RSpec.describe StorageProvider, type: :model do
       end
 
       it 'should take an upload and return a signed tempoary url to GET the upload object' do
-        expect(@subject).to respond_to('get_signed_url')
-        url = @subject.get_signed_url(@existing_upload)
-        expect(url).to match([
+        url = @existing_upload.temporary_url
+        expect(url).to match(['',
           @subject.provider_version,
           @subject.name,
           @project.id,
@@ -104,20 +103,18 @@ RSpec.describe StorageProvider, type: :model do
 
       it 'should take a chunk and return a signed tempoary url to PUT data for the chunk object' do
         new_data = Faker::Lorem.characters(100)
-        expect(@subject).to respond_to('get_signed_url')
-        url = @subject.get_signed_url(@new_chunk)
-        expect(url).to match([
+        url = @new_chunk.url
+        expect(url).to match(['',
           @subject.provider_version,
           @subject.name,
           @project.id,
           @new_upload.id,
-          @new_chunk.id,
           @new_chunk.number
         ].join('/'))
         resp = HTTParty.put("#{@subject.url_root}/#{url}", body: new_data)
         expect(resp.response.code.to_i).to eq(201)
         resp = HTTParty.get(
-            "#{@auth_resp['x-storage-url']}/#{@project.id}/#{@new_upload.id}/#{@new_chunk.id}/#{@new_chunk.number}",
+            "#{@auth_resp['x-storage-url']}/#{@project.id}/#{@new_upload.id}/#{@new_chunk.number}",
             headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
         expect(resp.body).to eq(new_data)
       end
@@ -157,6 +154,18 @@ RSpec.describe StorageProvider, type: :model do
         expect(resp.response.code.to_i).to eq(200)
         expect(resp.body).to eq(@chunk_data.join(''))
       end
+    end
+  end
+
+  describe 'insance methods' do
+    subject { storage_provider }
+
+    it 'should respond to auth_token' do
+      is_expected.to respond_to :auth_token
+    end
+
+    it 'should respond to storage_url' do
+      is_expected.to respond_to :storage_url
     end
   end
 

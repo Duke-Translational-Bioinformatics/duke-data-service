@@ -8,6 +8,12 @@ class StorageProvider < ActiveRecord::Base
   validates :primary_key, presence: true
   validates :secondary_key, presence: true
 
+  def auth_token
+  end
+
+  def storage_url
+  end
+
   def register_keys
     authenticate
     resp = HTTParty.post(
