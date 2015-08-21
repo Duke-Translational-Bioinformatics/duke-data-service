@@ -23,24 +23,30 @@ class StorageProvider < ActiveRecord::Base
     end
   end
 
-  def get_signed_url(object)
-    method = object.is_a?(Chunk) ? 'PUT' : 'GET'
-    duration_in_seconds = 60*5 # 5 minutes
-    expires = Time.now + duration_in_seconds
-
-    subpath = (method == 'GET') ?
-      [object.project.id, object.id].join('/') :
-      [object.upload.project.id, object.upload.id, object.id, object.number].join('/')
-    path = [
-      "/#{provider_version}",
-      name,
-      subpath
+  def root_path
+    root_path = ['',
+      provider_version,
+      name
     ].join('/')
-    key = [primary_key, secondary_key].sample
-    hmac_body = [method,expires.to_i,path].join("\n")
-    digest = OpenSSL::Digest.new('sha1')
-    signature = OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
-    return "#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expires.to_i}"
+  end
+
+  def signed_url_duration
+    60*5 # 5 minutes
+  end
+
+  def digest
+    @digest ||= OpenSSL::Digest.new('sha1')
+  end
+
+  def build_signature(hmac_body, key = primary_key)
+    OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
+  end
+
+  def build_signed_url(http_verb, sub_path, expiry)
+    path = [root_path, sub_path].join('/')
+    hmac_body = [http_verb, expiry, path].join("\n")
+    signature = build_signature(hmac_body)
+    URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
   end
 
   def create_slo_manifest(upload)

@@ -1,6 +1,10 @@
 require 'rails_helper'
+require 'shoulda-matchers'
 
 RSpec.describe StorageProvider, type: :model do
+  let(:chunk) { FactoryGirl.create(:chunk) }
+  let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+
   describe "swift access method", :if => ENV['SWIFT_USER'] do
     # these tests only run if the SWIFT ENV variables are set
     # to allow it to communicate with a SWIFT backend
@@ -153,6 +157,77 @@ RSpec.describe StorageProvider, type: :model do
         expect(resp.response.code.to_i).to eq(200)
         expect(resp.body).to eq(@chunk_data.join(''))
       end
+    end
+  end
+
+  describe 'methods for building signed urls' do
+    subject { storage_provider }
+    let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
+    
+    it 'should respond to signed_url_duration' do
+      is_expected.to respond_to :signed_url_duration
+      expect(subject.signed_url_duration).to eq(300)
+    end
+
+    it 'should respond to root_path' do
+      is_expected.to respond_to :root_path
+      expect(subject.root_path).to eq(expected_root_path)
+    end
+
+    it 'should respond to digest' do
+      is_expected.to respond_to :digest
+      expect(subject.digest).to be_a OpenSSL::Digest
+      expect(subject.digest.name).to eq('SHA1')
+    end
+
+    it 'should respond to build_signature' do
+      is_expected.to respond_to :build_signature
+      body = ['PUT', 1234, '/foo'].join('\n')
+      expected_signature = OpenSSL::HMAC.hexdigest(subject.digest, subject.primary_key, body)
+      expect(subject.build_signature(body, subject.primary_key)).to eq(expected_signature)
+      expect(subject.build_signature(body)).to eq(expected_signature)
+    end
+
+    it 'should respond to build_signed_url' do
+      is_expected.to respond_to :build_signed_url
+    end
+  end
+
+  describe 'a signed url' do
+    subject { storage_provider }
+
+    # build_signed_url parameters
+    let(:http_verb) { 'PUT' }
+    let(:sub_path) { Faker::Internet.slug }
+    let(:expiry) { Faker::Number.number(10) }
+
+    let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry) }
+    let(:parsed_url) { URI.parse(signed_url) }
+    let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
+    let(:expected_path) { "#{subject.root_path}/#{sub_path}" }
+    let(:expected_hmac_body) { [http_verb, expiry, expected_path].join("\n") }
+    let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
+
+    it 'should return a valid url with query params' do
+      expect(signed_url).to be_a String
+      expect { parsed_url }.not_to raise_error
+      expect(parsed_url.query).not_to be_empty
+      expect { decoded_query }.not_to raise_error
+      expect(decoded_query).to be_a Array
+    end
+
+    it 'should include the path in the url' do
+      expect(URI.decode(parsed_url.path)).to eq expected_path
+    end
+
+    it 'should have temp_url_sig in query' do
+      expect(decoded_query.assoc('temp_url_sig')).not_to be_nil
+      expect(decoded_query.assoc('temp_url_sig').last).to eq(expected_signature)
+    end
+
+    it 'should have temp_url_expires in query' do
+      expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
+      expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry)
     end
   end
 

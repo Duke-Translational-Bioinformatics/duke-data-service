@@ -11,7 +11,10 @@ class Upload < ActiveRecord::Base
   validates :storage_provider_id, presence: true
 
   def temporary_url
-    storage_provider.get_signed_url(self)
+    http_verb = 'GET'
+    sub_path = [project_id, id].join('/')
+    expiry = updated_at.to_i + storage_provider.signed_url_duration
+    storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 
   def create_manifest

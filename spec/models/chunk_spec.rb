@@ -2,14 +2,20 @@ require 'rails_helper'
 require 'shoulda-matchers'
 
 RSpec.describe Chunk, type: :model do
-  let(:project) { FactoryGirl.create(:project)}
-  let(:storage_provider) { FactoryGirl.create(:storage_provider)}
-  let(:upload) { FactoryGirl.create(:upload, project_id: project.id, storage_provider_id: storage_provider.id)}
-  subject { FactoryGirl.create(:chunk, upload_id: upload.id) }
+  subject { FactoryGirl.create(:chunk) }
+  let(:storage_provider) { subject.storage_provider }
+
+  let(:expected_sub_path) { [subject.project_id, subject.upload_id, subject.number].join('/')}
+  let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
+  let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
+
 
   describe 'associations' do
     it 'should belong_to an upload' do
       should belong_to :upload
+    end
+    it 'should have_one storage_provider via upload' do
+      should have_one(:storage_provider).through(:upload)
     end
   end
 
@@ -24,6 +30,11 @@ RSpec.describe Chunk, type: :model do
   end
 
   describe 'instance methods' do
+    it 'should delegate project_id to upload' do
+      should delegate_method(:project_id).to(:upload)
+      expect(subject.project_id).to eq(subject.upload.project_id)
+    end
+
     it 'should have a http_verb method' do
       should respond_to :http_verb
       expect(subject.http_verb).to eq 'PUT'
@@ -41,10 +52,22 @@ RSpec.describe Chunk, type: :model do
 
     it 'should have a url method' do
       should respond_to :url
-      expect(subject.url).not_to be_empty
+      expect(subject.url).to eq expected_url
     end
   end
 
+  describe 'methods used to build a signed url' do
+    it 'should have a sub_path method' do
+      should respond_to :sub_path
+      expect(subject.sub_path).to eq expected_sub_path
+    end
+
+    it 'should have an expiry method' do
+      should respond_to :expiry
+      expect(subject.expiry).to eq expected_expiry
+    end
+  end
+  
   describe 'serialization' do
     it 'should serialize to json' do
       serializer = ChunkSerializer.new subject
