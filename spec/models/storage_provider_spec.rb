@@ -4,8 +4,9 @@ require 'shoulda-matchers'
 RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+  let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift_env) }
 
-  describe "swift access method", :if => ENV['SWIFT_USER'] do
+  describe "swift access method", :if => false && ENV['SWIFT_USER'] do
     # these tests only run if the SWIFT ENV variables are set
     # to allow it to communicate with a SWIFT backend
     before(:all) do
@@ -135,7 +136,7 @@ RSpec.describe StorageProvider, type: :model do
             number: chunk_number
            )
            HTTParty.put(
-             "#{@auth_resp['x-storage-url']}/#{chunk.upload.project.id}/#{chunk.upload.id}/#{chunk.id}/#{chunk.number}",
+             "#{@auth_resp['x-storage-url']}/#{chunk.upload.project.id}/#{chunk.upload.id}/#{chunk.number}",
              body: chunk_data,
              headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
            @chunks << chunk
@@ -157,15 +158,26 @@ RSpec.describe StorageProvider, type: :model do
     end
   end
 
-  describe 'insance methods' do
-    subject { storage_provider }
+  describe 'methods that call swift api', :vcr do
+    subject { swift_storage_provider }
 
     it 'should respond to auth_token' do
       is_expected.to respond_to :auth_token
+      expect { subject.auth_token }.not_to raise_error
+      expect(subject.auth_token).to be_a String
     end
 
     it 'should respond to storage_url' do
       is_expected.to respond_to :storage_url
+      expect { subject.storage_url }.not_to raise_error
+      expect(subject.storage_url).to be_a String
+    end
+
+    let(:register_keys) { subject.register_keys }
+    it 'should respond to register_keys' do
+      is_expected.to respond_to :register_keys
+      expect { register_keys }.not_to raise_error
+      expect(register_keys).to be_truthy
     end
   end
 

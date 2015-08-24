@@ -9,24 +9,23 @@ class StorageProvider < ActiveRecord::Base
   validates :secondary_key, presence: true
 
   def auth_token
+    call_auth_uri['x-auth-token']
   end
 
   def storage_url
+    call_auth_uri['x-storage-url']
   end
 
   def register_keys
-    authenticate
     resp = HTTParty.post(
-            @storage_url,
-              headers:{
-                "X-Auth-Token" => @auth_token,
-                'X-Account-Meta-Temp-URL-Key' => primary_key,
-                'X-Account-Meta-Temp-URL-Key-2' => secondary_key
-              }
+      storage_url,
+      headers:{
+        'X-Auth-Token' => auth_token,
+        'X-Account-Meta-Temp-URL-Key' => primary_key,
+        'X-Account-Meta-Temp-URL-Key-2' => secondary_key
+      }
     )
-    unless resp.response.code.to_i == 204
-      raise StorageProviderException, resp.body
-    end
+    (resp.response.code.to_i == 204) || raise(StorageProviderException, resp.body)
   end
 
   def root_path
@@ -58,7 +57,7 @@ class StorageProvider < ActiveRecord::Base
   def create_slo_manifest(upload)
     manifest_document = upload.chunks.map {|chunk|
       {
-        "path" => [upload.project.id, upload.id, chunk.id, chunk.number].join('/'),
+        "path" => [upload.project.id, upload.id, chunk.number].join('/'),
         "etag" => chunk.fingerprint_value,
         "size_bytes" => chunk.size
       }
@@ -80,6 +79,20 @@ class StorageProvider < ActiveRecord::Base
   end
 
   private
+  def call_auth_uri
+    @auth_uri_resp ||= HTTParty.get(
+        "#{url_root}#{auth_uri}",
+        headers: {
+          'X-Auth-User' => service_user,
+          'X-Auth-Key' => service_pass
+        }
+    )
+    unless @auth_uri_resp.response.code.to_i == 200
+      raise StorageProviderException, "Auth Failure: #{ @auth_uri_resp.body }"
+    end
+    @auth_uri_resp
+  end
+
   def authenticate
     return if @auth_token
     auth_resp = HTTParty.get(
