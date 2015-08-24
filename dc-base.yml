@@ -16,3 +16,11 @@ db:
     - POSTGRES_PASSWORD=abc123
     - POSTGRES_DEV_DB=duke-data-service_development
     - POSTGRES_TEST_DB=duke-data-service_test
+swiftvol:
+  image: busybox
+  volumes:
+    - /srv
+swift:
+  build: ./docker/builds/swift
+  ports:
+    - 12345:8080

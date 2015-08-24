@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 if [ "$POSTGRES_DEV_DB" ]; then
-			gosu postgres postgres --single -jE <<-EODSQL
+			psql --username $POSTGRES_USER <<-EODSQL
 				CREATE DATABASE "$POSTGRES_DEV_DB" ;
 			EODSQL
 			echo
@@ -18,7 +18,7 @@ WARNING: No POSTGRES_DEV_DB has been set.
 NODEVWARN
 fi
 if [ "$POSTGRES_TEST_DB" ]; then
-			gosu postgres postgres --single -jE <<-EOTSQL
+			psql --username $POSTGRES_USER <<-EOTSQL
 				CREATE DATABASE "$POSTGRES_TEST_DB" ;
 			EOTSQL
 			echo
