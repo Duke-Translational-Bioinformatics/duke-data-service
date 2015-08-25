@@ -78,6 +78,16 @@ class StorageProvider < ActiveRecord::Base
     end
   end
 
+  def put_manifest(sub_path, manifest_hash)
+    resp = HTTParty.put(
+      "#{storage_url}/#{sub_path}?multipart-manifest=put",
+      body: manifest_hash.to_json,
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([201,202].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
   private
   def call_auth_uri
     @auth_uri_resp ||= HTTParty.get(

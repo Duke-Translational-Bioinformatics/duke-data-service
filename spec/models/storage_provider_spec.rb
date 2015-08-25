@@ -4,7 +4,7 @@ require 'shoulda-matchers'
 RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
-  let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift_env) }
+  let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
 
   describe "swift access method", :if => false && ENV['SWIFT_USER'] do
     # these tests only run if the SWIFT ENV variables are set
@@ -160,6 +160,17 @@ RSpec.describe StorageProvider, type: :model do
 
   describe 'methods that call swift api', :vcr do
     subject { swift_storage_provider }
+    let(:container_name) { 'the_container' }
+    let(:object_name) { 'the_object' }
+    let(:container_url) { [subject.storage_url, container_name].join('/') }
+    let(:object_path) { [container_name, object_name].join('/') }
+    let(:manifest_hash) { [
+      {path: object_path, etag: chunk.fingerprint_value, size_bytes: chunk.size}
+    ] }
+    let(:put_container) { HTTParty.put(
+      container_url,
+      headers:{"X-Auth-Token" => subject.auth_token}
+    ) }
 
     it 'should respond to auth_token' do
       is_expected.to respond_to :auth_token
@@ -178,6 +189,13 @@ RSpec.describe StorageProvider, type: :model do
       is_expected.to respond_to :register_keys
       expect { register_keys }.not_to raise_error
       expect(register_keys).to be_truthy
+    end
+
+    let(:put_manifest) { subject.put_manifest(container_name, manifest_hash) }
+    it 'should respond to put_manifest' do
+      is_expected.to respond_to :put_manifest
+      expect { put_manifest }.not_to raise_error
+      expect(put_manifest).to be_truthy
     end
   end
 
