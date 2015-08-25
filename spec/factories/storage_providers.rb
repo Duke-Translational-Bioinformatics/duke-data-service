@@ -9,6 +9,11 @@ FactoryGirl.define do
     primary_key { SecureRandom.hex }
     secondary_key { SecureRandom.hex }
 
+    trait :swift do
+      url_root { ENV['SWIFT_URL_ROOT'] || 'http://192.168.99.100:12345' }
+      auth_uri { ENV['SWIFT_AUTH_URI'] || '/auth/v1.0' }
+    end
+
     trait :swift_env do
       name { ENV['SWIFT_ACCT'] }
       url_root { ENV['SWIFT_URL_ROOT'] }

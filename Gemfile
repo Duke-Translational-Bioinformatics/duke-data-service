@@ -40,6 +40,8 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'shoulda-matchers', require: false
   gem 'spring-commands-rspec', group: :development
+  gem 'vcr'
+  gem 'webmock'
 end
 
 #heroku requires this

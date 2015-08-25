@@ -3,6 +3,7 @@ require 'shoulda-matchers'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload)}
+  let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
 
   describe 'associations' do
     it 'should belong_to a project' do
@@ -30,6 +31,11 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'serialization' do
+  end
+
+  it 'should have a sub_path method' do
+    should respond_to :sub_path
+    expect(subject.sub_path).to eq expected_sub_path
   end
 
   it 'should have a temporary_url method' do
