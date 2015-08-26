@@ -69,6 +69,7 @@
       window.localStorage.removeItem('api_token');
       $('#current_user_info').hide();
       $('#authentication').show();
+      removeApiKeyAuthorization();
     }
 
     function addApiKeyAuthorization(){
@@ -85,12 +86,8 @@
     }
 
     function removeApiKeyAuthorization(){
-      key = window.localStorage.api_token;
-      if(key && key.trim() != "") {
-        var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", key, "header");
-        window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
-        console.log("added key " + key);
-      }
+      window.swaggerUi.api.clientAuthorizations.remove("Authorization");
+      console.log("removed key");
     }
 
     function getCurrentUser() {
