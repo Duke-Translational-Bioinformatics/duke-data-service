@@ -6,7 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Duke Data Service API Doc</title>
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
-  <%= stylesheet_link_tag    'swaggerui', media: 'all', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/typography.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/reset.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/screen.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/reset.css', media: 'print', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/print.css', media: 'print', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'swaggerui', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
   <script type="text/javascript">
