@@ -1,0 +1,10 @@
+//= require ./swaggerui/jquery-1.8.0.min.js
+//= require ./swaggerui/jquery.slideto.min.js
+//= require ./swaggerui/jquery.wiggle.min.js
+//= require ./swaggerui/jquery.ba-bbq.min.js
+//= require ./swaggerui/handlebars-2.0.0.js
+//= require ./swaggerui/marked.js
+//= require ./swaggerui/underscore-min.js
+//= require ./swaggerui/backbone-min.js
+//= require ./swaggerui/swagger-ui.min.js
+//= require ./swaggerui/highlight.7.3.pack.js
