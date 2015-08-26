@@ -10,9 +10,12 @@ class Upload < ActiveRecord::Base
   validates :fingerprint_algorithm, presence: true
   validates :storage_provider_id, presence: true
 
+  def sub_path 
+    [project_id, id].join('/')
+  end
+
   def temporary_url
     http_verb = 'GET'
-    sub_path = [project_id, id].join('/')
     expiry = updated_at.to_i + storage_provider.signed_url_duration
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end

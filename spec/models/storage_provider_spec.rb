@@ -4,8 +4,9 @@ require 'shoulda-matchers'
 RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+  let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
 
-  describe "swift access method", :if => ENV['SWIFT_USER'] do
+  describe "swift access method", :if => false && ENV['SWIFT_USER'] do
     # these tests only run if the SWIFT ENV variables are set
     # to allow it to communicate with a SWIFT backend
     before(:all) do
@@ -87,9 +88,8 @@ RSpec.describe StorageProvider, type: :model do
       end
 
       it 'should take an upload and return a signed tempoary url to GET the upload object' do
-        expect(@subject).to respond_to('get_signed_url')
-        url = @subject.get_signed_url(@existing_upload)
-        expect(url).to match([
+        url = @existing_upload.temporary_url
+        expect(url).to match(['',
           @subject.provider_version,
           @subject.name,
           @project.id,
@@ -104,20 +104,18 @@ RSpec.describe StorageProvider, type: :model do
 
       it 'should take a chunk and return a signed tempoary url to PUT data for the chunk object' do
         new_data = Faker::Lorem.characters(100)
-        expect(@subject).to respond_to('get_signed_url')
-        url = @subject.get_signed_url(@new_chunk)
-        expect(url).to match([
+        url = @new_chunk.url
+        expect(url).to match(['',
           @subject.provider_version,
           @subject.name,
           @project.id,
           @new_upload.id,
-          @new_chunk.id,
           @new_chunk.number
         ].join('/'))
         resp = HTTParty.put("#{@subject.url_root}/#{url}", body: new_data)
         expect(resp.response.code.to_i).to eq(201)
         resp = HTTParty.get(
-            "#{@auth_resp['x-storage-url']}/#{@project.id}/#{@new_upload.id}/#{@new_chunk.id}/#{@new_chunk.number}",
+            "#{@auth_resp['x-storage-url']}/#{@project.id}/#{@new_upload.id}/#{@new_chunk.number}",
             headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
         expect(resp.body).to eq(new_data)
       end
@@ -138,7 +136,7 @@ RSpec.describe StorageProvider, type: :model do
             number: chunk_number
            )
            HTTParty.put(
-             "#{@auth_resp['x-storage-url']}/#{chunk.upload.project.id}/#{chunk.upload.id}/#{chunk.id}/#{chunk.number}",
+             "#{@auth_resp['x-storage-url']}/#{chunk.upload.project.id}/#{chunk.upload.id}/#{chunk.number}",
              body: chunk_data,
              headers:{"X-Auth-Token" => @auth_resp['x-auth-token']})
            @chunks << chunk
@@ -157,6 +155,47 @@ RSpec.describe StorageProvider, type: :model do
         expect(resp.response.code.to_i).to eq(200)
         expect(resp.body).to eq(@chunk_data.join(''))
       end
+    end
+  end
+
+  describe 'methods that call swift api', :vcr do
+    subject { swift_storage_provider }
+    let(:container_name) { 'the_container' }
+    let(:object_name) { 'the_object' }
+    let(:container_url) { [subject.storage_url, container_name].join('/') }
+    let(:object_path) { [container_name, object_name].join('/') }
+    let(:manifest_hash) { [
+      {path: object_path, etag: chunk.fingerprint_value, size_bytes: chunk.size}
+    ] }
+    let(:put_container) { HTTParty.put(
+      container_url,
+      headers:{"X-Auth-Token" => subject.auth_token}
+    ) }
+
+    it 'should respond to auth_token' do
+      is_expected.to respond_to :auth_token
+      expect { subject.auth_token }.not_to raise_error
+      expect(subject.auth_token).to be_a String
+    end
+
+    it 'should respond to storage_url' do
+      is_expected.to respond_to :storage_url
+      expect { subject.storage_url }.not_to raise_error
+      expect(subject.storage_url).to be_a String
+    end
+
+    let(:register_keys) { subject.register_keys }
+    it 'should respond to register_keys' do
+      is_expected.to respond_to :register_keys
+      expect { register_keys }.not_to raise_error
+      expect(register_keys).to be_truthy
+    end
+
+    let(:put_manifest) { subject.put_manifest(container_name, manifest_hash) }
+    it 'should respond to put_manifest' do
+      is_expected.to respond_to :put_manifest
+      expect { put_manifest }.not_to raise_error
+      expect(put_manifest).to be_truthy
     end
   end
 
