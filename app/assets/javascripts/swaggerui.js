@@ -1,4 +1,4 @@
-//= require ./swaggerui/jquery-1.8.0.min.js
+//= require jquery
 //= require jquery_ujs
 //= require ./swaggerui/jquery.slideto.min.js
 //= require ./swaggerui/jquery.wiggle.min.js

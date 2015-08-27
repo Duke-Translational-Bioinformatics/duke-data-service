@@ -15,17 +15,19 @@
   <%= stylesheet_link_tag "layout_blue", :media => "all" %>
   <%= javascript_include_tag "ie10-viewport-bug-workaround" %>
   <%= stylesheet_link_tag "font-awesome", :media => "all" %>
+  <%= javascript_include_tag 'swaggerui', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag "bootstrap.min.js" %>
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
     <%= javascript_include_tag "html5" %>
     <%= javascript_include_tag "respond" %>
   <![endif]-->
-  <%= javascript_include_tag 'swaggerui', 'data-turbolinks-track' => true %>
+
   <%= csrf_meta_tags %>
   <script type="text/javascript">
 	$(function () {
-    $('a#logoutButton').click(function(event) {
+    $('#logoutButton').click(function(event) {
       event.preventDefault();
       handleLogout();
       return false;
@@ -35,11 +37,11 @@
     loadSwaggerUi();
 
     if (window.localStorage.api_token) {
-      $('#authentication').hide();
+      $('#login').hide();
       addApiKeyAuthorization();
     }
     else if (window.location.href.indexOf('#access_token') > 0){
-      $('#authentication').hide();
+      $('#login').hide();
       var parts = window.location.hash.split('&');
       var access_token = parts[0].split('=')[1];
       validateAccessToken(access_token).then(
@@ -62,13 +64,13 @@
       );
     }
     else {
-      $('#authentication').show();
+      $('#login').show();
     }
 
     function handleLogout() {
       window.localStorage.removeItem('api_token');
       $('#current_user_info').hide();
-      $('#authentication').show();
+      $('#login').show();
       removeApiKeyAuthorization();
     }
 
@@ -190,30 +192,37 @@
 </script>
 </head>
 
-<body class="swagger-section">
-<div id="authentication">
-  <div class="swagger-ui-wrap">
-    <span class="label label-danger">You need to login</span>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid"><%= @auth_service.name -%></a>
-      </li>
-    </ul>
+<body class="swagger-section container-fluid" id="basic_content">
+  <div id="authentication" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="swagger-ui-wrap">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid"><%= @auth_service.name -%></a>
+            </li>
+          </ul>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Skip Authentication</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div id="current_user_info">
-  <div class="swagger-ui-wrap">
-    <span id="current_user" class="label label-info" ></span>
-    <a href="#" id="logoutButton">Logout</a>
+  <div id="login">
+    <div class="swagger-ui-wrap">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#authentication">Authenticate</button>
+    </div>
   </div>
-</div>
-<div id="message-bar" class="swagger-ui-wrap">
-  &nbsp;
-</div>
+  <div id="current_user_info">
+    <div class="swagger-ui-wrap">
+      <span id="current_user" class="label label-info" ></span>
+      <button type="button" class="btn btn-default" id="logoutButton">Logout</button>
+    </div>
+  </div>
+  <div id="message-bar" class="swagger-ui-wrap">
+    &nbsp;
+  </div>
 
-<div id="swagger-ui-container" class="swagger-ui-wrap">
-
-</div>
-
+  <div id="swagger-ui-container" class="swagger-ui-wrap">
+  </div>
 </body>
 </html>
