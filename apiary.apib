@@ -126,7 +126,7 @@ An authorization role represents a set of discrete permissions that may be grant
 |:-----|:-----|:------------|:--------------|
 | **system\_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system\_admin |
 | **project\_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view\_project, update\_project, delete\_project, manage\_project\_permissions, download\_file, create\_file, update\_file, delete\_file |
-| **project\_viewer** | Project Viewer | Can only view project and file meta-data | view\_project |
+| **project\_viewer** | Project Viewer | Can only view project and file metadata | view\_project |
 | **file\_downloader** | File Downloader | Can download files | view\_project, download\_file |
 | **file\_uploader** | File Uploader | Can upload files | view\_project, create\_file |
 | **file\_editor** | File Editor | Can view, download, create, update and delete files | view\_project, download\_file, create\_file, update\_file, delete\_file |
@@ -137,7 +137,7 @@ An authorization role represents a set of discrete permissions that may be grant
 | Permission | Description |
 |:------------|:------------|
 | **system\_admin** | Can manage system level permissions and perform all operations across all projects |
-| **view\_project** | Can view project and file meta-data |
+| **view\_project** | Can view project and file metadata |
 | **update\_project** | Can update project header details and project affiliations |
 | **delete\_project** | Can delete project |
 | **manage\_project_permissions** | Can grant/revoke project level permissions |
@@ -474,7 +474,7 @@ delete_project
 
 **Rules**
 - - - - -
-* Logically deletes project from the meta-data (i.e. sets `"is_deleted": true`).
+* Logically deletes project from the metadata (i.e. sets `"is_deleted": true`).
 * For the MVP, the files associated to the project are not deleted from their physical storage location.
 
 + Response 204
@@ -849,7 +849,7 @@ delete_file
 
 **Rules**
 - - - - -
-* Logically deletes project folder from the meta-data (i.e. sets `"is_deleted": true`).
+* Logically deletes project folder from the metadata (i.e. sets `"is_deleted": true`).
 * For the MVP, the files associated to the project folder are not deleted from their physical storage location.
 
 + Response 204
@@ -995,7 +995,7 @@ the descriptive meta\-data about file including the virtual path.
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
 
 ### Create a file [POST]
-Creates a file meta-data object; The client is responsible for the creation of this object after confirming the associated physical 
+Creates a file metadata object; The client is responsible for the creation of this object after confirming the associated physical 
 file has been successfully uploaded to a storage provider. (see `Uploads` endpoints)
 
 >**Permission**
@@ -1043,7 +1043,7 @@ create_file
 
 ## File instance [/files/{id}]
 + Parameters
-    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file meta-data object.
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
 
 + Model (application/json)
 
@@ -1065,7 +1065,7 @@ create_file
                 "audit": { ... }
             }
 
-### View file meta-data object details [GET]
+### View file metadata object details [GET]
 >**Permission**
 - - - - -
 view_project
@@ -1074,17 +1074,88 @@ view_project
 
     [File instance][]
 
-### Delete a file meta-data object [DELETE]
+### Delete a file metadata object [DELETE]
 >**Permission**
 - - - - -
 delete_file
 
 >**Rules**
 - - - - -
-* Logically deletes file meta-data object (i.e. sets `"is_deleted": true`).
+* Logically deletes file metadata object (i.e. sets `"is_deleted": true`).
 * For the MVP, the file is not deleted from physical storage location.
 
 + Response 204
+
+## Move a file metatdata object to a new parent [/files/{id}/move]
++ Parameters
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
+
+### Move a file metadata object to a new parent [PUT]
+>**Permission**
+- - - - -
+create_file
+
+>**Rules**
+- - - - -
+* To move a file, set `parent` to target folder location; the target folder must be in the source
+folders `project` context.
+
++ Request (application/json)
+
+        {
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                "storage_provider": { "id": "amazon_s3_standard" }
+            },
+            "audit": { ... }
+        }
+
+## Rename a file metadata object [/files/{id}/rename]
++ Parameters
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file.
+
+### Rename a file metadata object [PUT]
+>**Permission**
+- - - - -
+create_file
+
++ Request (application/json)
+
+        {
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+            "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "name": ""RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                "storage_provider": { "id": "amazon_s3_standard" }
+            },
+            "audit": { ... }
+        }
 
 ## Group Uploads
 All files must be uploaded using a mutipart/chunked upload process.  Althought this places more burden on client-side software to
