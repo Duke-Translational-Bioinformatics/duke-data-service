@@ -46,15 +46,13 @@
       var access_token = parts[0].split('=')[1];
       validateAccessToken(access_token).then(
         function(data) {
-          console.log("parsing the validated access token");
           signed_token = data['signed_info'];
           getApiToken(signed_token).then(
             function(data) {
-              console.log("storing the api_token");
               api_token = data['api_token'];
               window.localStorage.api_token = api_token;
-              console.log("STORED "+window.localStorage.api_token);
-              loadSwaggerUi(api_token);
+              $('#login').hide();
+              addApiKeyAuthorization();
               window.location.replace("#");
             },
             handleInvalidSignedToken
@@ -79,7 +77,6 @@
       if(key && key.trim() != "") {
         var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", key, "header");
         window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
-        console.log("added key " + key);
       }
       getCurrentUser().then(
         loadCurrentUser,
@@ -89,12 +86,11 @@
 
     function removeApiKeyAuthorization(){
       window.swaggerUi.api.clientAuthorizations.remove("Authorization");
-      console.log("removed key");
+      $('#current_user').html('');
     }
 
     function getCurrentUser() {
       var api_token = window.localStorage.api_token;
-      console.log("Getting Current User with "+api_token);
       return $.ajax({
         type: 'GET',
         url: '/api/v1/current_user',
@@ -107,8 +103,7 @@
     }
 
     function loadCurrentUser(data) {
-      console.log("Loading User "+JSON.stringify(data));
-      $('#current_user').html(data['full_name'])
+      $('#current_user').html(data['full_name']);
       $('#current_user_info').show();
     }
 
@@ -122,16 +117,24 @@
     }
 
     function handleInvalidAccessToken(jqXHR, status, err) {
-      console.log(jqXHR.responseText);
+      if ('console' in window) {
+        console.log(jqXHR.responseText);
+      }
       var errorMessage = JSON.parse(jqXHR.responseText);
-      console.log("ERROR "+errorMessage)
+      if ('console' in window) {
+        console.log("ERROR "+errorMessage);
+      }
       handleLogout();
     }
 
     function handleInvalidSignedToken(jqXHR, status, err) {
-      console.log(jqXHR.responseText);
+      if ('console' in window) {
+        console.log(jqXHR.responseText);
+      }
       var errorMessage = JSON.parse(jqXHR.responseText);
-      console.log("ERROR "+errorMessage);
+      if ('console' in window) {
+        console.log("ERROR "+errorMessage);
+      }
     };
 
     function getApiToken(signed_token) {
@@ -145,7 +148,9 @@
 
     function handleValidationErrors(errorInfo) {
       handleLogout();
-      console.log("Authentication Error "+JSON.stringify(errorInfo));
+      if ('console' in window){
+        console.log("Authentication Error "+JSON.stringify(errorInfo));
+      }
     }
 
     function loadSwaggerUi() {
@@ -156,9 +161,6 @@
         supportHeaderParams: true,
         supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
         onComplete: function(swaggerApi, swaggerUi){
-          if('console' in window) {
-            console.log("Loaded SwaggerUI with api_token: "+window.localStorage.api_token)
-          }
           $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
           if (window.localStorage.api_token) {
             addApiKeyAuthorization();
@@ -180,11 +182,15 @@
     function handleAjaxError(jqXHR, status, err) {
       switch(jqXHR.status) {
       case 401:
-        console.log("Expired Token: "+JSON.parse(jqXHR.responseText));
+        if('console' in window) {
+          console.log("Expired Token: "+JSON.parse(jqXHR.responseText));
+        }
         handleLogout();
         break;
       default:
-        console.log("Unexpected Error: "+jqXHR.responseText);
+        if('console' in window) {
+          console.log("Unexpected Error: "+jqXHR.responseText);
+        }
         break;
       }
     }
