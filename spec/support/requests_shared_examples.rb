@@ -109,9 +109,9 @@ end
 shared_examples 'an authenticated resource' do
   include_context 'without authentication'
 
-  it 'should return a 400 error response' do
-    is_expected.to eq(400)
-    expect(response.status).to eq(400)
+  it 'should return a 401 error response' do
+    is_expected.to eq(401)
+    expect(response.status).to eq(401)
   end
 end
 
