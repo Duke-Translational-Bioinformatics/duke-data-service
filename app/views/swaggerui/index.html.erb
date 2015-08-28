@@ -87,6 +87,7 @@
     function removeApiKeyAuthorization(){
       window.swaggerUi.api.clientAuthorizations.remove("Authorization");
       $('#current_user').html('');
+      $('#current_user_token').html('');
     }
 
     function getCurrentUser() {
@@ -104,6 +105,7 @@
 
     function loadCurrentUser(data) {
       $('#current_user').html(data['full_name']);
+      $('#current_user_token').html(window.localStorage.api_token);
       $('#current_user_info').show();
     }
 
@@ -220,7 +222,17 @@
   </div>
   <div id="current_user_info">
     <div class="swagger-ui-wrap">
-      <span id="current_user" class="label label-info" ></span>
+      <div class="panel panel-info">
+        <div class="panel panel-heading">
+          <h3 id="current_user" class="panel-title" ></h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <p>Requests submitted with Request Header "Authorization":</p>
+            <code id="current_user_token" style="word-wrap: break-word;"></code>
+          </div>
+        </div>
+      </div>
       <button type="button" class="btn btn-default" id="logoutButton">Logout</button>
     </div>
   </div>
