@@ -162,15 +162,14 @@ RSpec.describe StorageProvider, type: :model do
     subject { swift_storage_provider }
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
-    let(:container_url) { [subject.storage_url, container_name].join('/') }
-    let(:object_path) { [container_name, object_name].join('/') }
-    let(:manifest_hash) { [
-      {path: object_path, etag: chunk.fingerprint_value, size_bytes: chunk.size}
-    ] }
-    let(:put_container) { HTTParty.put(
-      container_url,
-      headers:{"X-Auth-Token" => subject.auth_token}
-    ) }
+    let(:segment_name) { [object_name, 1].join('/') }
+    let(:segment_path) { [container_name, segment_name].join('/') }
+    let(:object_body) { 'This is the object body!' }
+    let(:manifest_hash) { [ {
+      path: segment_path, 
+      etag: Digest::MD5.hexdigest(object_body),
+      size_bytes: object_body.length
+    } ] }
 
     it 'should respond to auth_token' do
       is_expected.to respond_to :auth_token
@@ -184,6 +183,13 @@ RSpec.describe StorageProvider, type: :model do
       expect(subject.storage_url).to be_a String
     end
 
+    let(:get_account_info) { subject.get_account_info }
+    it 'should respond to get_account_info' do
+      is_expected.to respond_to :get_account_info
+      expect { get_account_info }.not_to raise_error
+      expect(get_account_info).to be_truthy
+    end
+
     let(:register_keys) { subject.register_keys }
     it 'should respond to register_keys' do
       is_expected.to respond_to :register_keys
@@ -191,11 +197,39 @@ RSpec.describe StorageProvider, type: :model do
       expect(register_keys).to be_truthy
     end
 
-    let(:put_manifest) { subject.put_manifest(container_name, manifest_hash) }
-    it 'should respond to put_manifest' do
-      is_expected.to respond_to :put_manifest
-      expect { put_manifest }.not_to raise_error
-      expect(put_manifest).to be_truthy
+    let(:put_container) { subject.put_container(container_name) }
+    it 'should respond to put_container' do
+      is_expected.to respond_to :put_container
+      expect { put_container }.not_to raise_error
+      expect(put_container).to be_truthy
+    end
+
+    let(:put_object) { subject.put_object(container_name, segment_name, object_body) }
+    it 'should respond to put_object' do
+      is_expected.to respond_to :put_object
+      expect { put_object }.not_to raise_error
+      expect(put_object).to be_truthy
+    end
+
+    let(:put_object_manifest) { subject.put_object_manifest(container_name, object_name, manifest_hash) }
+    it 'should respond to put_object_manifest' do
+      is_expected.to respond_to :put_object_manifest
+      expect { put_object_manifest }.not_to raise_error
+      expect(put_object_manifest).to be_truthy
+    end
+
+    let(:delete_object) { subject.delete_object(container_name, object_name) }
+    it 'should respond to delete_object' do
+      is_expected.to respond_to :delete_object
+      expect { delete_object }.not_to raise_error
+      expect(delete_object).to be_truthy
+    end
+
+    let(:delete_container) { subject.delete_container(container_name) }
+    it 'should respond to delete_container' do
+      is_expected.to respond_to :delete_container
+      expect { delete_container }.not_to raise_error
+      expect(delete_container).to be_truthy
     end
   end
 

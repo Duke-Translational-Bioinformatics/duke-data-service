@@ -78,13 +78,60 @@ class StorageProvider < ActiveRecord::Base
     end
   end
 
-  def put_manifest(sub_path, manifest_hash)
+  def get_account_info
+    resp = HTTParty.get(
+      "#{storage_url}",
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([200,204].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
+  def put_container(container)
     resp = HTTParty.put(
-      "#{storage_url}/#{sub_path}?multipart-manifest=put",
-      body: manifest_hash.to_json,
+      "#{storage_url}/#{container}",
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([201,202,204].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_container(container)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}",
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([204].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
+  def put_object(container, object, body)
+    resp = HTTParty.put(
+      "#{storage_url}/#{container}/#{object}",
+      body: body,
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([201].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
+  def put_object_manifest(container, object, manifest)
+    put_container(container)
+    resp = HTTParty.put(
+      "#{storage_url}/#{container}/#{object}?multipart-manifest=put",
+      body: manifest.to_json,
       headers:{"X-Auth-Token" => auth_token}
     )
     ([201,202].include?(resp.response.code.to_i)) || 
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_object(container, object)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([200,204].include?(resp.response.code.to_i)) || 
       raise(StorageProviderException, resp.body)
   end
 

@@ -27,7 +27,7 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx18c99511dce44ef9bf365-0055e0dd08
+      - txed65cc6b30114ef9a5ed3-0055e0dd08
       Date:
       - Fri, 28 Aug 2015 22:13:28 GMT
     body:
@@ -36,18 +36,14 @@ http_interactions:
     http_version: 
   recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
 - request:
-    method: post
+    method: get
     uri: http://192.168.99.100:12345/v1/AUTH_test
     body:
-      encoding: UTF-8
+      encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
       - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
-      X-Account-Meta-Temp-Url-Key:
-      - 83760998b8184ae83306821d5b3a7f07
-      X-Account-Meta-Temp-Url-Key-2:
-      - 12f5ed340fad93d80188b9deed434bfd
   response:
     status:
       code: 204
@@ -55,10 +51,24 @@ http_interactions:
     headers:
       Content-Length:
       - '0'
+      X-Account-Object-Count:
+      - '0'
+      X-Account-Meta-Temp-Url-Key-2:
+      - 441a024782804b40bdd3e15655292245
+      X-Timestamp:
+      - '1440799760.48848'
+      X-Account-Meta-Temp-Url-Key:
+      - f32c4144d37aa0f0656611f335716083
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '0'
       Content-Type:
-      - text/html; charset=UTF-8
+      - text/plain; charset=utf-8
+      Accept-Ranges:
+      - bytes
       X-Trans-Id:
-      - txf81ddb40fff542b18de69-0055e0dd08
+      - txd0768dd04cdf40cfa680b-0055e0dd08
       Date:
       - Fri, 28 Aug 2015 22:13:28 GMT
     body:
