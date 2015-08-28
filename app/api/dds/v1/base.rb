@@ -46,11 +46,11 @@ module DDS
             end
           else
             @auth_error = {
-              error: 400,
+              error: 401,
               reason: 'no api_token',
               suggestion: 'you might need to login through an authenticaton service'
             }
-            error!(@auth_error, 400)
+            error!(@auth_error, 401)
           end
           @current_user
         end
