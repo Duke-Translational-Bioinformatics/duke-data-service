@@ -1,5 +1,5 @@
-//= require jquery
-//= require jquery_ujs
+//= require ./swaggerui/jquery-1.11.3.min.js
+//= require ./swaggerui/jquery-migrate-1.0.0.js
 //= require ./swaggerui/jquery.slideto.min.js
 //= require ./swaggerui/jquery.wiggle.min.js
 //= require ./swaggerui/jquery.ba-bbq.min.js

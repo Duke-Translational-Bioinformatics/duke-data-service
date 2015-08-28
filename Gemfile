@@ -9,14 +9,11 @@ gem 'puma'
 gem 'rack', '1.6.4'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-swagger'
-gem 'grape-swagger-rails'
 
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem "grape-active_model_serializers"
-gem 'tilt'
-gem 'jquery-rails'
 gem 'turbolinks'
 gem 'uglifier'
 gem 'httparty'
