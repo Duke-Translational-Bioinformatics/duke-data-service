@@ -20,6 +20,20 @@ class Upload < ActiveRecord::Base
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 
+  def manifest
+    chunks.collect do |chunk|
+      {
+        path: chunk.sub_path, 
+        etag: chunk.fingerprint_value,
+        size_bytes: chunk.size
+      }
+    end
+  end
+
+  def save_manifest
+    storage_provider.put_object_manifest(project_id, id, manifest)
+  end
+
   def create_manifest
     storage_provider.create_slo_manifest(self)
   end

@@ -7,6 +7,13 @@ FactoryGirl.define do
     fingerprint_value { SecureRandom.hex(32) }
     fingerprint_algorithm "md5"
     storage_provider
-  end
 
+    trait :with_chunks do
+      chunks { build_list(:chunk, 1) }
+    end
+
+    trait :swift do
+      storage_provider { create(:storage_provider, :swift) }
+    end
+  end
 end
