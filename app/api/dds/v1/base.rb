@@ -78,6 +78,20 @@ module DDS
         end
       end
 
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        missing_object = ''
+        m = e.message.match(/find\s(\w+)\swith.*/)
+        if m
+          missing_object = m[1]
+        end
+        error_json = {
+          "error" => "404",
+          "reason" => "#{missing_object} Not Found",
+          "suggestion" => "you may have mistyped the #{missing_object} id"
+        }
+        error!(error_json, 404)
+      end
+
       mount DDS::V1::UserAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
