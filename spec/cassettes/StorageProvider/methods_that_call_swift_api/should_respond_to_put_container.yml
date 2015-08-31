@@ -19,47 +19,47 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4d611f4912944cc4a2e92fd6fd97ff9a
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4d611f4912944cc4a2e92fd6fd97ff9a
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx6ee67e4d08ed4f01a6af1-0055dcc11a
+      - tx8df21037eb9240f098fc0-0055e0dd08
       Date:
-      - Tue, 25 Aug 2015 19:25:14 GMT
+      - Fri, 28 Aug 2015 22:13:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 25 Aug 2015 19:25:14 GMT
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container?multipart-manifest=put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
     body:
       encoding: UTF-8
-      string: '[{"path":"the_container/the_object","etag":"6ae5dc9cb770483084e0670cad62bb6ee90bee5febc085b33cc94f28f504bbab","size_bytes":1}]'
+      string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4d611f4912944cc4a2e92fd6fd97ff9a
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
   response:
     status:
-      code: 202
-      message: Accepted
+      code: 201
+      message: Created
     headers:
       Content-Length:
-      - '76'
+      - '0'
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx412e936b834146e6a258c-0055dcc11a
+      - tx032d3fab4d704da18356c-0055e0dd08
       Date:
-      - Tue, 25 Aug 2015 19:25:14 GMT
+      - Fri, 28 Aug 2015 22:13:28 GMT
     body:
       encoding: UTF-8
-      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+      string: ''
     http_version: 
-  recorded_at: Tue, 25 Aug 2015 19:25:14 GMT
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
 recorded_with: VCR 2.9.3

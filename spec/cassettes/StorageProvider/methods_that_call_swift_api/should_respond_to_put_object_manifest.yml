@@ -27,7 +27,7 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx18c99511dce44ef9bf365-0055e0dd08
+      - tx58b897cfcbc14dd2803aa-0055e0dd08
       Date:
       - Fri, 28 Aug 2015 22:13:28 GMT
     body:
@@ -36,29 +36,56 @@ http_interactions:
     http_version: 
   recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
 - request:
-    method: post
-    uri: http://192.168.99.100:12345/v1/AUTH_test
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
       - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
-      X-Account-Meta-Temp-Url-Key:
-      - 83760998b8184ae83306821d5b3a7f07
-      X-Account-Meta-Temp-Url-Key-2:
-      - 12f5ed340fad93d80188b9deed434bfd
   response:
     status:
-      code: 204
-      message: No Content
+      code: 202
+      message: Accepted
     headers:
       Content-Length:
-      - '0'
+      - '76'
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txf81ddb40fff542b18de69-0055e0dd08
+      - txbf5e84947b614edd9ef70-0055e0dd08
+      Date:
+      - Fri, 28 Aug 2015 22:13:28 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+    http_version: 
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Fri, 28 Aug 2015 22:13:29 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"70f457e8bdf12b30ed18c5b110740c2e"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx0810ad641c664af2b3410-0055e0dd08
       Date:
       - Fri, 28 Aug 2015 22:13:28 GMT
     body:
