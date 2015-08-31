@@ -22,7 +22,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [404, 'Project or User Does not Exist']
+          [404, 'Project, User, or AuthRole Does not Exist']
         ]
       end
       params do
@@ -50,7 +50,11 @@ module DDS
       desc 'View project level permissions for a user' do
         detail 'View project permissions.'
         named 'view project permissions'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project or User Does not Exist']
+        ]
       end
       get '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
@@ -62,7 +66,12 @@ module DDS
       desc 'Revoke project level permissions for user' do
         detail 'Revoke project permissions'
         named 'revoke project permissions'
-        failure [401]
+        failure [
+          [200, 'this will never happen'],
+          [204, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project or User Does not Exist']
+        ]
       end
       delete '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
