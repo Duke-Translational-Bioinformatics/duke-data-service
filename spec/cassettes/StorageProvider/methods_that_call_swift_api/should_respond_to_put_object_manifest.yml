@@ -37,33 +37,6 @@ http_interactions:
   recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
-    body:
-      encoding: UTF-8
-      string: ''
-    headers:
-      X-Auth-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
-  response:
-    status:
-      code: 202
-      message: Accepted
-    headers:
-      Content-Length:
-      - '76'
-      Content-Type:
-      - text/html; charset=UTF-8
-      X-Trans-Id:
-      - txbf5e84947b614edd9ef70-0055e0dd08
-      Date:
-      - Fri, 28 Aug 2015 22:13:28 GMT
-    body:
-      encoding: UTF-8
-      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
-    http_version: 
-  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
-- request:
-    method: put
     uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=put
     body:
       encoding: UTF-8
