@@ -11,10 +11,10 @@ module DDS
         ]
       end
       params do
-        optional :parent, type: Hash do
+        optional :parent, desc: "Parent Folder ID", type: Hash do
           requires :id, type: String
         end
-        requires :name
+        requires :name, type: String, desc: "Folder Name"
       end
       post '/projects/:id/folders', root: false do
         authenticate!
