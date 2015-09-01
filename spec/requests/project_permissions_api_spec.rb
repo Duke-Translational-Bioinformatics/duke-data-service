@@ -94,6 +94,14 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:resource_class) {'User'}
+      end
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/#{other_permission.project.id}/permissions/#{resource.user.id}" }
+        let(:resource_class) {'ProjectPermission'}
+      end
     end
 
     describe 'DELETE' do
@@ -101,6 +109,10 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'a removable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:resource_class) {'User'}
+      end
     end
   end
 end
