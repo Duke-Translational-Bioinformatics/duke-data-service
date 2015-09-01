@@ -40,13 +40,13 @@ describe DDS::V1::CurrentUserAPI do
 
     it 'should respond with an error when not provided an api_token' do
       get '/api/v1/current_user', nil, json_headers
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(401)
       expect(response.body).to be
       error_response = JSON.parse(response.body)
       %w(error reason suggestion).each do |expected_key|
         expect(error_response).to have_key expected_key
       end
-      expect(error_response['error']).to eq(400)
+      expect(error_response['error']).to eq(401)
       expect(error_response['reason']).to eq('no api_token')
       expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')
     end

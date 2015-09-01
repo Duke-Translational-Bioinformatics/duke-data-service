@@ -4,6 +4,10 @@ module DDS
       desc 'app status' do
         detail 'this returns a health status'
         named 'app_storage'
+        failure [
+          [200,'Database functional, and seeded correctly'],
+          [503, 'database not seeded, or not functional']
+        ]
       end
       get '/app/status', root: false do
         begin

@@ -46,11 +46,11 @@ module DDS
             end
           else
             @auth_error = {
-              error: 400,
+              error: 401,
               reason: 'no api_token',
               suggestion: 'you might need to login through an authenticaton service'
             }
-            error!(@auth_error, 400)
+            error!(@auth_error, 401)
           end
           @current_user
         end
@@ -76,6 +76,20 @@ module DDS
           end
           error!(error_payload, 400)
         end
+      end
+
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        missing_object = ''
+        m = e.message.match(/find\s(\w+)\swith.*/)
+        if m
+          missing_object = m[1]
+        end
+        error_json = {
+          "error" => "404",
+          "reason" => "#{missing_object} Not Found",
+          "suggestion" => "you may have mistyped the #{missing_object} id"
+        }
+        error!(error_json, 404)
       end
 
       mount DDS::V1::UserAPI
