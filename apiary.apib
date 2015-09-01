@@ -225,9 +225,10 @@ The current user represents the currently authenticated user.
 ## Current Users Usage [/current_user/usage]
 
 ### View usage for current user [GET]
-View summary usage for the current user across all projects.
+View summary usage for current user across all projects.
 
 >**Permission:** view_project
+- - - - -
 
 >**Response Payload Properties**
 - - - - -
@@ -237,16 +238,16 @@ View summary usage for the current user across all projects.
 
 >**Rules**
 - - - - -
-* Deleted objects (i.e. `is_deleted: true`) should be excluded from all counts/totals.
+* Deleted objects (i.e. `"is_deleted": true`) should be excluded from all counts/totals.
 * Counts/totals are only for objects where user has the view_project permission.
 
 + Response 200 (application/json)
 
-    {
-        "project_count": 10,
-        "file_count": 126,
-        "storage_bytes": 3000000000000
-    }
+        {
+            "project_count": 10,
+            "file_count": 126,
+            "storage_bytes": 304006007009
+        }
 
 ## Group Users
 A user represents a registered user.
@@ -953,10 +954,11 @@ view_project
             "audit": { }
         }
 
-## Project/Folder Children collection [/{context}/{id}/children]
+## Project/Folder Children collection [/{context}/{id}/children{?name_contains}]
 + Parameters
     + context (required, string, `folder`) ... The parent `context` for children; valid values are "project" root or "folder".
-    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "project", globally unique `id` of the "project" or alias "all" for all projects; If `context` is "folder", globally unique `id` of "folder".
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "project", globally unique `id` of the "project" or alias `all` for all projects; 
+    If `context` is "folder", globally unique `id` of "folder".
     + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
 
 ### List folder children [GET]
@@ -970,7 +972,7 @@ view_project
 * Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 * The `kind` property can be used to determine if child object is a folder or a file.
 * If `/projects/all/children` is specified, this should return children for all projects where current user has view_project permission. 
-* The `name_contains` should recursively search the folder hierarchy.
+* The `name_contains` parameter should recursively search the folder hierarchy.
 
 + Response 200 (application/json)
 
