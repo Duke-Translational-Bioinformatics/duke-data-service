@@ -45,6 +45,11 @@ RSpec.describe Upload, type: :model do
       is_expected.to respond_to 'create_manifest'
     end
 
+    it 'should have a completed_at attribute' do
+      is_expected.to respond_to 'completed_at'
+      is_expected.to respond_to 'completed_at='
+    end
+
     it 'should have a manifest method' do
       is_expected.to respond_to 'manifest'
       expect(subject.manifest).to be_a Array
