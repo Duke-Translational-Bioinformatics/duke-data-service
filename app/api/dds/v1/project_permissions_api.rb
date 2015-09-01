@@ -60,7 +60,11 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        ProjectPermission.where(project: project, user: user).first
+        permission = ProjectPermission.where(project: project, user: user).first
+        unless permission
+          raise ActiveRecord::RecordNotFound.new(message: "Couldn't find ProjectPermission with project_id #{params[:project_id]} user #{params[:user_id]}")
+        end
+        permission
       end
 
       desc 'Revoke project level permissions for user' do
