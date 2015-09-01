@@ -31,8 +31,7 @@ describe DDS::V1::ProjectsAPI do
       subject { post(url, payload.to_json, headers) }
       let(:payload) {{
         name: resource.name,
-        description: resource.description,
-        pi_affiliate: {}
+        description: resource.description
       }}
       it_behaves_like 'a creatable resource' do
         let(:resource) { project_stub }
@@ -50,8 +49,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
           name: resource.name,
-          description: nil,
-          pi_affiliate: {}
+          description: nil
         }}
         it 'should not persist changes' do
           expect(resource).to be_persisted

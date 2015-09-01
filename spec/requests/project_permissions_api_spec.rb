@@ -5,7 +5,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:other_permission) { FactoryGirl.create(:project_permission) }
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
+  let!(:auth_role) { FactoryGirl.create(:auth_role) }
 
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
@@ -16,7 +16,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      
+
       it_behaves_like 'a listable resource'
 
       it 'should only include permissions for this project' do
@@ -26,16 +26,20 @@ describe DDS::V1::ProjectPermissionsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/notexists_projectid/permissions" }
+        let(:resource_class) {'Project'}
+      end
     end
   end
 
   describe 'Project Permission instance' do
     let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/#{resource.user.id}" }
-      
+
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let!(:payload) {{
-        auth_role: auth_role.text_id
+        auth_role: {id: auth_role.text_id}
       }}
 
       context 'non-existent project permission' do
@@ -67,18 +71,26 @@ describe DDS::V1::ProjectPermissionsAPI do
         expect(response.body).to include(resource_serializer.new(resource).to_json)
       end
 
-      it_behaves_like 'a validated resource' do
-        let!(:payload) {{
-          auth_role: 'invalid_role'
-        }}
-      end
-
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/notexists_projectid/permissions/#{resource.user.id}" }
+        let(:resource_class) {'Project'}
+      end
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:resource_class) {'User'}
+      end
+      it_behaves_like 'an identified resource' do
+        let!(:payload) {{
+          auth_role: {id: 'invalid_role'}
+        }}
+        let(:resource_class) {'AuthRole'}
+      end
     end
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      
+
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'

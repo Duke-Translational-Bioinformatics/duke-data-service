@@ -4,26 +4,28 @@ module DDS
       desc 'Initiate a chunked file upload for a project' do
         detail 'This is the first step in uploading a large file. An upload objects is created along with a composite status object used to track the progress of the chunked upload.'
         named 'create upload'
-        failure [401]
+        failure [
+          [200, 'This will never actually happen'],
+          [201, 'Created Successfully'],
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       params do
-        requires :name
-        requires :content_type
-        requires :size
+        requires :name, type: String, desc: "The name of the client file to upload."
+        requires :content_type, type: String, desc: "Valid Media Type"
+        requires :size, type: Integer, desc: "The size in bytes"
         requires :hash, type: Hash do
-          requires :value
-          requires :algorithm
+          requires :value, type: String, desc: "The files hash computed by the client."
+          requires :algorithm, type: String, desc: "The hash algorithm used (i.e. md5, sha256, sha1, etc.)"
         end
       end
       post '/projects/:project_id/uploads', root: false do
         authenticate!
         upload_params = declared(params, include_missing: false)
-        #TODO: Check that project actually exists and throw an error
-        # if it doesn't
-        #project = Project.find(params[:project_id])
+        project = Project.find(params[:project_id])
         storage_provider = StorageProvider.first
-        upload = Upload.new({
-          project_id: params[:project_id],
+        upload = project.uploads.build({
           name: upload_params[:name],
           size: upload_params[:size],
           fingerprint_value: upload_params[:hash][:value],
@@ -40,17 +42,26 @@ module DDS
       desc 'List file uploads for a project' do
         detail 'List file uploads for a project'
         named 'list uploads'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       get '/projects/:project_id/uploads', root: false do
         authenticate!
-        Upload.all
+        project = Project.find(params[:project_id])
+        project.uploads.all
       end
 
       desc 'View upload details/status' do
         detail 'View upload details/status'
         named 'show upload'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Upload Does not Exist']
+        ]
       end
       get '/uploads/:id/', root: false do
         authenticate!
@@ -60,7 +71,11 @@ module DDS
       desc 'Get pre-signed URL to upload the next chunk' do
         detail 'Get pre-signed URL to upload the next chunk'
         named 'create chunk'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Upload Does not Exist']
+        ]
       end
       params do
         requires :number
@@ -91,7 +106,11 @@ module DDS
       desc 'Complete the chunked file upload' do
         detail 'Complete the chunked file upload'
         named 'complete upload'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Upload Does not Exist']
+        ]
       end
       put '/uploads/:id/complete', root: false do
         authenticate!

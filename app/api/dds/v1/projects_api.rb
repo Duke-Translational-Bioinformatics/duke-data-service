@@ -4,12 +4,17 @@ module DDS
       desc 'Create a project' do
         detail 'Creates a project for the given payload.'
         named 'create project'
-        failure [400,401]
+        failure [
+          [200, 'This will never actually happen'],
+          [201, 'Created Successfully'],
+          [400, 'Project Name Already Exists'],
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       params do
-        requires :name
-        requires :description
-        optional :pi_affiliate
+        requires :name, type: String, desc: 'The Name of the Project'
+        requires :description, type: String, desc: 'The Description of the Project'
       end
       post '/projects', root: false do
         authenticate!
@@ -30,7 +35,9 @@ module DDS
       desc 'List projects' do
         detail 'Lists projects for which the current user has the "view_project" permission.'
         named 'list projects'
-        failure [401]
+        failure [
+          [401, 'Unauthorized']
+        ]
       end
       get '/projects', root: false do
         authenticate!
@@ -40,7 +47,10 @@ module DDS
       desc 'View project details' do
         detail 'Returns the project details for a given project uuid.'
         named 'view project'
-        failure [401]
+        failure [
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       get '/projects/:id', root: false do
         authenticate!
@@ -50,11 +60,15 @@ module DDS
       desc 'Update a project' do
         detail 'Update the project details for a given project uuid.'
         named 'update project'
-        failure [401]
+        failure [
+          [401, 'Unauthorized'],
+          [400, 'Project Name Already Exists'],
+          [404, 'Project Does not Exist']
+        ]
       end
       params do
-        optional :name
-        optional :description
+        optional :name, type: String, desc: 'The Name of the Project'
+        optional :description, type: String, desc: 'The Description of the Project'
       end
       put '/projects/:id', root: false do
         authenticate!
@@ -70,7 +84,11 @@ module DDS
       desc 'Delete a project' do
         detail 'Marks a project as being deleted.'
         named 'delete project'
-        failure [401]
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       delete '/projects/:id', root: false do
         authenticate!

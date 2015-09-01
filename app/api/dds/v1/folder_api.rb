@@ -4,11 +4,17 @@ module DDS
       desc 'Create a project folder' do
         detail 'Creates a project folder for the given payload.'
         named 'create project folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Project Does not Exist, Parent Folder does not exist in Project']
+        ]
       end
       params do
-        requires :parent
-        requires :name
+        optional :parent, desc: "Parent Folder ID", type: Hash do
+          requires :id, type: String
+        end
+        requires :name, type: String, desc: "Folder Name"
       end
       post '/projects/:id/folders', root: false do
         authenticate!
@@ -29,17 +35,26 @@ module DDS
       desc 'List folders' do
         detail 'Lists folders for a given project.'
         named 'list folders'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Project Does not Exist']
+        ]
       end
       get '/projects/:id/folders', root: false do
         authenticate!
-        Folder.where(project_id: params[:id]).all
+        project = Project.find(params[:id])
+        project.folders.all
       end
 
       desc 'View folder details' do
         detail 'Returns the folder details for a given uuid of a folder.'
         named 'view folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist']
+        ]
       end
       get '/folders/:id', root: false do
         authenticate!
@@ -49,7 +64,11 @@ module DDS
       desc 'Delete a folder' do
         detail 'Remove the folder for a given uuid.'
         named 'delete folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist']
+        ]
       end
       delete '/folders/:id', root: false do
         authenticate!
@@ -61,7 +80,11 @@ module DDS
       desc 'Move a folder' do
         detail 'Move a folder with a given uuid to a new parent.'
         named 'move folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist, Parent does not exist']
+        ]
       end
       params do
         requires :parent
@@ -82,7 +105,11 @@ module DDS
       desc 'Rename a folder' do
         detail 'Give a folder with a given uuid a new name.'
         named 'rename folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist']
+        ]
       end
       params do
         requires :name
@@ -102,7 +129,11 @@ module DDS
       desc 'View parent folder' do
         detail 'Returns the folder details for the parent of a given folder.'
         named 'view parent folder'
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist']
+        ]
       end
       get '/folders/:id/parent', root: false do
         authenticate!
@@ -115,7 +146,11 @@ module DDS
       desc 'View children folder details' do
         detail 'Returns the folder details of children folders.'
         named 'view children '
-        failure [401]
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist']
+        ]
       end
       get '/folders/:id/children', root: false do
         authenticate!

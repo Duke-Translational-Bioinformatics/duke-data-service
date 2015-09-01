@@ -277,7 +277,7 @@ describe DDS::V1::UserAPI do
 
     it 'should require an auth token' do
       get url, nil, json_headers
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(401)
     end
   end
 end

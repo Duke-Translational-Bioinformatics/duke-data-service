@@ -109,9 +109,9 @@ end
 shared_examples 'an authenticated resource' do
   include_context 'without authentication'
 
-  it 'should return a 400 error response' do
-    is_expected.to eq(400)
-    expect(response.status).to eq(400)
+  it 'should return a 401 error response' do
+    is_expected.to eq(401)
+    expect(response.status).to eq(401)
   end
 end
 
@@ -140,5 +140,20 @@ shared_examples 'a validated resource' do
       expect(error).to have_key('field')
       expect(error).to have_key('message')
     end
+  end
+end
+
+shared_examples 'an identified resource' do
+  it 'should return 404 with error when resource not found with id' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("#{resource_class} Not Found")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("you may have mistyped the #{resource_class} id")
   end
 end
