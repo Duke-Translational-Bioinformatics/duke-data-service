@@ -3,9 +3,9 @@ require 'rails_helper'
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
 
-  let(:upload) { FactoryGirl.create(:upload) }
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:project) { FactoryGirl.create(:project) }
+  let(:upload) { FactoryGirl.create(:upload, project_id: project.id) }
   let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload) }
@@ -25,6 +25,10 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a listable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
+        let(:resource_class) { 'Project' }
+      end
     end
 
     describe 'POST' do
@@ -60,6 +64,10 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
+        let(:resource_class) { 'Project' }
+      end
     end
   end
 
@@ -72,6 +80,9 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/uploads/notexists_resourceid" }
+      end
     end
   end
 
@@ -114,6 +125,10 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/uploads/notexists_resourceid/chunks" }
+        let(:resource_class) {"Upload"}
+      end
     end
   end
 
@@ -124,6 +139,9 @@ describe DDS::V1::UploadsAPI do
       subject { put(url, nil, headers) }
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
+      end
     end
   end
 end
