@@ -116,7 +116,6 @@ class StorageProvider < ActiveRecord::Base
   end
 
   def put_object_manifest(container, object, manifest)
-    put_container(container)
     resp = HTTParty.put(
       "#{storage_url}/#{container}/#{object}?multipart-manifest=put",
       body: manifest.to_json,

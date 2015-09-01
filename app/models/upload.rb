@@ -30,7 +30,7 @@ class Upload < ActiveRecord::Base
     end
   end
 
-  def save_manifest
+  def complete
     storage_provider.put_object_manifest(project_id, id, manifest)
   end
 
