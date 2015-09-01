@@ -48,9 +48,8 @@ payloads may have the following structure to facilitate client pagination:
         "next": "https://data-services.duke.edu/projects?page=3",
         "previous": "https://data-services.duke.edu/projects?page=1",
         "results": [
-            <resource_object>,
-            <resource_object>,
-            ...
+            { },
+            { },
         ]
     }
 
@@ -83,10 +82,10 @@ API Errors
 We should respond with context appropriate error codes, especially for 400 class errors, using
 the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
-400: no API token, validation errors
-401: bad API token
-403: user performing request which they do not have permission to perform
-404: user requesting resource that does not exist
+* 400: no API token, validation errors
+* 401: bad API token
+* 403: user performing request which they do not have permission to perform
+* 404: user requesting resource that does not exist
 
 All error responses should include a JSON response that provides the HTTP status code, details
 of the error that occurred, and possible steps to address the problem. For example:
@@ -167,7 +166,6 @@ authenticated
                 "contexts": [ "system" ],
                 "is_deprecated": false
             },
-            ...
         ]
 
 ## Authorization Role instance [/{context}/auth_roles/{id}]
@@ -187,7 +185,7 @@ authenticated
             "id": "file_editor",
             "name": "File Editor",
             "description": "Can view, download, create, update and delete files",
-            "permissions": [ { "id": "view_project" }, { "id": "download_file" }, ... ],
+            "permissions": [ { "id": "view_project" }, { "id": "download_file" }, ],
             "contexts": [ "project" ],
             "is_deprecated": false
         }
@@ -214,7 +212,7 @@ The current user represents the currently authenticated user.
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": { ... }
+                "audit": { }
             }
 
 ### View current user details [GET]
@@ -223,6 +221,32 @@ The current user represents the currently authenticated user.
 + Response 200
 
       [Current User instance][]
+
+## Current Users Usage [/current_user/usage]
+
+### View usage for current user [GET]
+View summary usage for the current user across all projects.
+
+>**Permission:** view_project
+
+>**Response Payload Properties**
+- - - - -
++ project_count (integer) - Total number of projects where the user has a granted project level authorization role.
++ file_count (integer) - Total number of files the user has created (i.e. uploaded) across all projects.
++ storage_bytes (integer) - Total bytes for files the user has created (i.e. uploaded) across all projects.
+
+>**Rules**
+- - - - -
+* Deleted objects (i.e. `is_deleted: true`) should be excluded from all counts/totals.
+* Counts/totals are only for objects where user has the view_project permission.
+
++ Response 200 (application/json)
+
+    {
+        "project_count": 10,
+        "file_count": 126,
+        "storage_bytes": 3000000000000
+    }
 
 ## Group Users
 A user represents a registered user.
@@ -234,7 +258,7 @@ A user represents a registered user.
 authenticated
 
 + Parameters
-    + name_contains (optional, string, `gardner`) ... Returns users for which their `full_name` contains the specified string.
+    + name_contains (optional, string, `gardner`) ... Returns users where their `full_name` contains the specified string.
 
 + Response 200 (application/json)
 
@@ -252,9 +276,8 @@ authenticated
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": { ... }
+                "audit": { }
             },
-            ...
         ]
 
 ## User instance [/users/{id}]
@@ -278,7 +301,7 @@ authenticated
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" },
                 "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": { ... }
+                "audit": { }
             }
 
 ### View registered user details [GET]
@@ -311,7 +334,6 @@ system_admin
                 },
                 "auth_role": { "id": "system_admin", "name": "System Admin" }
             },
-            ...
         ]
 
 ## System Permission instance [/system/permissions/{user_id}]
@@ -400,7 +422,7 @@ authenticated
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ### List projects [GET]
@@ -410,7 +432,7 @@ authenticated
 
 >**Rules**
 - - - - -
-* Lists projects for which the current user has the "view\_project" permission.
+* Lists projects where the current user has the "view\_project" permission.
 * Projects that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 
 + Response 200 (application/json)
@@ -421,9 +443,8 @@ authenticated
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false,
-                "audit": { ... }
+                "audit": { }
             },
-            ...
         ]
 
 ## Project instance [/projects/{id}]
@@ -439,7 +460,7 @@ authenticated
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
                 "is_deleted": false,
-                "audit": { ... }
+                "audit": { }
             }
 
 ### View project details [GET]
@@ -503,7 +524,6 @@ view_project
                 },
                 "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
             },
-            ...
         ]
 
 ## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
@@ -599,7 +619,6 @@ authenticated
                 "description": "Coordinator for the research project",
                 "is_deprecated": false
             },
-            ...
         ]
 
 ## Project Role instance [/project_roles/{id}]
@@ -647,7 +666,6 @@ view_project
                 },
                 "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
             },
-            ...
         ]
 
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
@@ -736,7 +754,6 @@ authenticated
                 "description": "A description of the storage service level would go here.",
                 "is_deprecated": false
             },
-            ...
         ]
 
 ## Storage Provider instance [/storage_providers/{id}]
@@ -794,7 +811,7 @@ and only one parent folder.
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ### List project folders [GET]
@@ -816,9 +833,8 @@ view_project
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data",
                 "is_deleted": false,
-                "audit": { ... }
+                "audit": { }
             },
-            ...
         ]
 
 ## Folder instance [/folders/{id}]
@@ -839,7 +855,7 @@ view_project
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ### Delete a project folder [DELETE]
@@ -883,7 +899,7 @@ folders `project` context.
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Raw Data",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Rename a project folder [/folders/{id}/rename]
@@ -910,7 +926,7 @@ create_file
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core/Model Data",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Group Parent/Children
@@ -934,14 +950,14 @@ view_project
             "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
             "virtual_path": "/Flow Core",
             "is_deleted": false,
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Project/Folder Children collection [/{context}/{id}/children]
 + Parameters
     + context (required, string, `folder`) ... The parent `context` for children; valid values are "project" root or "folder".
-    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "project", globally unique `id` of the "project"; If `context`
-    is "folder", globally unique `id` of "folder".
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "project", globally unique `id` of the "project" or alias "all" for all projects; If `context` is "folder", globally unique `id` of "folder".
+    + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
 
 ### List folder children [GET]
 List children (folders and files) of the project root or a specific project folder.
@@ -953,6 +969,8 @@ view_project
 - - - - -
 * Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 * The `kind` property can be used to determine if child object is a folder or a file.
+* If `/projects/all/children` is specified, this should return children for all projects where current user has view_project permission. 
+* The `name_contains` should recursively search the folder hierarchy.
 
 + Response 200 (application/json)
 
@@ -965,7 +983,7 @@ view_project
                 "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
                 "virtual_path": "/Sequencing Core/Raw Data/Aligned",
                 "is_deleted": false,
-                "audit": { ... }
+                "audit": { }
             },
             {
                 "kind": "file",
@@ -981,9 +999,8 @@ view_project
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                     "storage_provider": { "id": "amazon_s3_standard" }
                 },
-                "audit": { ... }
+                "audit": { }
             },
-            ...
         ]
 
 ## Group Files
@@ -1038,7 +1055,7 @@ create_file
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                 "storage_provider": { "id": "amazon_s3_standard" }
             },
-            "audit": { ... }
+            "audit": { }
         }
 
 ## File instance [/files/{id}]
@@ -1062,7 +1079,7 @@ create_file
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                     "storage_provider": { "id": "amazon_s3_standard" }
                 },
-                "audit": { ... }
+                "audit": { }
             }
 
 ### View file metadata object details [GET]
@@ -1085,6 +1102,19 @@ delete_file
 * For the MVP, the file is not deleted from physical storage location.
 
 + Response 204
+
+## Download a file [/files/{id}/download]
++ Parameters
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
+
+### Download a file [GET]
+Generate a storage provider specific pre-signed download URL for the file. Use a 307 temporary redirect to forward request to storage provider endpoint.
+
+>**Permission**
+- - - - -
+download_file
+
++ Response 304
 
 ## Move a file metatdata object to a new parent [/files/{id}/move]
 + Parameters
@@ -1121,7 +1151,7 @@ folders `project` context.
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                 "storage_provider": { "id": "amazon_s3_standard" }
             },
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Rename a file metadata object [/files/{id}/rename]
@@ -1154,7 +1184,7 @@ create_file
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                 "storage_provider": { "id": "amazon_s3_standard" }
             },
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Group Uploads
@@ -1224,7 +1254,7 @@ storage provider.
                 "error_on": null,
                 "error_message": null
             },
-            "audit": { ... }
+            "audit": { }
         }
 
 ### List file uploads for a project [GET]
@@ -1257,9 +1287,8 @@ create_file
                         "error_on": null,
                         "error_message": null
                     },
-                    "audit": { ... }
+                    "audit": { }
                 },
-                ...
         ]
 
 ## Upload instance [/uploads/{id}]
@@ -1295,7 +1324,7 @@ create_file
                 "error_on": null,
                 "error_message": null
             },
-            "audit": { ... }
+            "audit": { }
         }
 
 ## Get pre-signed URL to upload a chunk [/uploads/{id}/chunks]
@@ -1342,7 +1371,6 @@ storage provider.
             "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
             "http_headers": [
                     { "Content-Length": "5024000" },
-                    ...
             ]
         }
 
@@ -1387,7 +1415,6 @@ is raised.
                     "size": 5024000,
                     "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
                 },
-                ...
             ],
             "storage_provider": { "id": "amazon_s3_standard" },
             "storage_location": {
@@ -1402,5 +1429,5 @@ is raised.
                 "error_on": null,
                 "error_message": null
             },
-            "audit": { ... }
+            "audit": { }
         }
