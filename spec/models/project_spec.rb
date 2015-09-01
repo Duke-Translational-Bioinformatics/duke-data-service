@@ -21,6 +21,10 @@ RSpec.describe Project, type: :model do
     it 'should have a creator' do
       should belong_to(:creator)
     end
+
+    it 'should have many uploads' do
+      should have_many(:uploads)
+    end
   end
 
   describe 'validations' do
