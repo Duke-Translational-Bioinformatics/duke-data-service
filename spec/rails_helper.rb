@@ -53,4 +53,9 @@ VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
   c.hook_into :webmock
   c.configure_rspec_metadata!
+
+  c.register_request_matcher :uri_ignoring_uuids do |request_1, request_2|
+    uuid = /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/
+    request_1.uri.gsub(uuid, 'uuid') == request_2.uri.gsub(uuid, 'uuid')
+  end
 end

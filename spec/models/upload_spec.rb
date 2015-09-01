@@ -64,8 +64,11 @@ RSpec.describe Upload, type: :model do
   describe 'swift methods' do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
-    it 'should have a save_manifest method' do
-      is_expected.to respond_to 'save_manifest'
+    let(:complete) { subject.complete }
+    it 'should have a complete method', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+      is_expected.to respond_to 'complete'
+      expect { complete }.not_to raise_error
+      expect(complete).to be_truthy
     end
   end
 
