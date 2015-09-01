@@ -5,4 +5,12 @@ class Folder < ActiveRecord::Base
 
   validates :name, presence: true
   validates :project_id, presence: true
+
+  def virtual_path
+    if parent
+      [parent.virtual_path, self.name].join('/')
+    else
+      "/#{self.name}"
+    end
+  end
 end

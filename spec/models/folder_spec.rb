@@ -20,6 +20,10 @@ RSpec.describe Folder, type: :model do
     it 'should have a name' do
       should validate_presence_of(:name)
     end
+
+    it 'should have a project_id' do
+      should validate_presence_of(:project_id)
+    end
   end
 
   describe 'serialization' do
@@ -41,4 +45,17 @@ RSpec.describe Folder, type: :model do
     end
   end
 
+  describe 'instance methods' do
+    it 'should support virtual_path' do
+      expect(subject).to respond_to(:virtual_path)
+      if subject.parent
+        expect(subject.virtual_path).to eq([
+          subject.parent.virtual_path,
+          subject.name
+        ].join('/'))
+      else
+        expect(subject.virtual_path).to eq("/#{subject.name}")
+      end
+    end
+  end
 end
