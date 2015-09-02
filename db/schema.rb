@@ -127,6 +127,7 @@ ActiveRecord::Schema.define(version: 20150901192345) do
     t.integer  "storage_provider_id"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
+    t.datetime "completed_at"
   end
 
   create_table "user_authentication_services", force: :cascade do |t|

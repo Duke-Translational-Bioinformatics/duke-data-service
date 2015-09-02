@@ -31,7 +31,7 @@ class Upload < ActiveRecord::Base
   end
 
   def complete
-    storage_provider.put_object_manifest(project_id, id, manifest)
+    response = storage_provider.put_object_manifest(project_id, id, manifest)
   end
 
   def create_manifest
