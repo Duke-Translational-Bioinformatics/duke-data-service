@@ -333,7 +333,7 @@ system_admin
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "system_admin", "name": "System Admin" }
+                "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
             },
         ]
 
@@ -351,7 +351,7 @@ system_admin
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "system_admin", "name": "System Admin" }
+                "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
             }
 
 ### Grant system level permissions to user [PUT]
@@ -954,14 +954,14 @@ view_project
             "audit": { }
         }
 
-## Project/Folder Children collection [/{context}/{id}/children{?name_contains}]
+## Project or Folder Children collection [/{context}/{id}/children{?name_contains}]
 + Parameters
-    + context (required, string, `folder`) ... The parent `context` for children; valid values are "project" root or "folder".
-    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "project", globally unique `id` of the "project" or alias "all" for all projects; 
-    If `context` is "folder", globally unique `id` of "folder".
+    + context (required, string, `folders`) ... The parent `context` for children; valid values are "projects" root or "folders".
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "projects", globally unique `id` of the "project"; 
+    If `context` is "folders", globally unique `id` of "folder".
     + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
 
-### List folder children [GET]
+### List project or folder children [GET]
 List children (folders and files) of the project root or a specific project folder.
 >**Permission**
 - - - - -
@@ -971,7 +971,53 @@ view_project
 - - - - -
 * Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 * The `kind` property can be used to determine if child object is a folder or a file.
-* If `/projects/all/children` is specified, this should return children for all projects where current user has view_project permission. 
+* The `name_contains` parameter should recursively search the folder hierarchy.
+
++ Response 200 (application/json)
+
+        results: [
+            {
+                "kind": "folder",
+                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+                "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                "name": "Aligned",
+                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                "is_deleted": false,
+                "audit": { }
+            },
+            {
+                "kind": "file",
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                    "storage_provider": { "id": "amazon_s3_standard" }
+                },
+                "audit": { }
+            },
+        ]
+
+## Project(s) Children collection [/projects/children{?name_contains}]
++ Parameters
+    + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
+
+### List projects children [GET]
+List children (folders and files) for all projects where current user has view_project permission.
+>**Permission**
+- - - - -
+view_project
+
+>**Rules**
+- - - - -
+* Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
+* The `kind` property can be used to determine if child object is a folder or a file.
 * The `name_contains` parameter should recursively search the folder hierarchy.
 
 + Response 200 (application/json)
