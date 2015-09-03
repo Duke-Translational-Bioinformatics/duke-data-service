@@ -1176,13 +1176,13 @@ delete_file
     + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
 
 ### Download a file [GET]
-Generate a storage provider specific pre-signed download URL for the file. Use a 307 temporary redirect to forward request to storage provider endpoint.
+Generate a storage provider specific pre-signed download URL for the file. Use a 301 temporary redirect to forward request to storage provider endpoint.
 
 >**Permission**
 - - - - -
 download_file
 
-+ Response 304
++ Response 301
 
 ## Move a file metatdata object to a new parent [/files/{id}/move]
 + Parameters
