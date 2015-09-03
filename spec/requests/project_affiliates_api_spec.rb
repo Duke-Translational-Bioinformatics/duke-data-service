@@ -17,11 +17,10 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      let(:project) { resource.project }
 
-      #it_behaves_like 'a listable resource'
+      it_behaves_like 'a listable resource'
 
-      #it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authenticated resource'
     end
   end
 

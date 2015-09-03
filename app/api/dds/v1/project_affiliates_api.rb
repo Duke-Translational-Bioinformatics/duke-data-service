@@ -27,6 +27,17 @@ module DDS
           validation_error!(affiliation)
         end
       end
+
+      desc 'List project affiliations' do
+        detail 'List project affiliations'
+        named 'list project affiliation'
+        failure [401]
+      end
+      get '/projects/:project_id/affiliates', root: false do
+        authenticate!
+        project = Project.find(params[:project_id])
+        project.affiliations
+      end
     end
   end
 end
