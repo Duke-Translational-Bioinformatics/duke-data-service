@@ -16,10 +16,11 @@ module DDS
         declared_params = declared(params, include_missing: false)
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        affiliation = project.affiliations.build({
-          user: user,
-          project_role_id: declared_params[:project_role][:id]
-        })
+        affiliation = project.affiliations.where(user: user).first ||
+          project.affiliations.build({
+            user: user,
+          })
+        affiliation.project_role_id = declared_params[:project_role][:id]
         if affiliation.save
           affiliation
         else

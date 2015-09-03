@@ -41,17 +41,20 @@ describe DDS::V1::ProjectAffiliatesAPI do
       let!(:payload) {{
         project_role: {id: project_role.id}
       }}
+
       it_behaves_like 'a creatable resource' do
         let(:user) { FactoryGirl.create(:user) }
         let(:expected_response_status) {200}
         let(:new_object) { resource_class.last }
       end
-      #it_behaves_like 'an updatable resource'
-      #it_behaves_like 'a validated resource' do
-      #  let(:payload) {{
-      #    project_role: {id: nil}
-      #  }}
-      #end
+
+      it_behaves_like 'an updatable resource'
+      
+      it_behaves_like 'a validated resource' do
+        let(:payload) {{
+          project_role: {id: nil}
+        }}
+      end
 
       it_behaves_like 'an authenticated resource'
     end
