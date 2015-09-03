@@ -58,9 +58,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
-      #it_behaves_like 'a removable resource'
 
-      #it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a removable resource'
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

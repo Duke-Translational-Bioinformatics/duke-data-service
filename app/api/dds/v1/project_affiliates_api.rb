@@ -50,6 +50,19 @@ module DDS
         user = User.find(params[:user_id])
         Affiliation.where(project: project, user: user).first
       end
+
+      desc 'Delete project affiliation' do
+        detail 'Remove project level affiliation for a user'
+        named 'delete project affiliation'
+        failure [401]
+      end
+      delete '/projects/:project_id/affiliates/:user_id', root: false do
+        authenticate!
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
+        Affiliation.where(project: project, user: user).destroy_all
+        body false
+      end
     end
   end
 end
