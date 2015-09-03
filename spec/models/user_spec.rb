@@ -11,6 +11,10 @@ RSpec.describe User, type: :model do
     it 'should have_many user_authentication_services' do
       should have_many :user_authentication_services
     end
+
+    it 'should have many affiliations' do
+      should have_many(:affiliations)
+    end
   end
 
   describe 'validations' do

@@ -29,6 +29,10 @@ RSpec.describe Project, type: :model do
     it 'should have many uploads' do
       should have_many(:uploads)
     end
+
+    it 'should have many affiliations' do
+      should have_many(:affiliations)
+    end
   end
 
   describe 'validations' do
