@@ -33,8 +33,4 @@ class Upload < ActiveRecord::Base
   def complete
     response = storage_provider.put_object_manifest(project_id, id, manifest)
   end
-
-  def create_manifest
-    storage_provider.create_slo_manifest(self)
-  end
 end

@@ -41,10 +41,6 @@ RSpec.describe Upload, type: :model do
       expect(subject.temporary_url).to be_a String
     end
 
-    it 'should have a create_manifest method' do
-      is_expected.to respond_to 'create_manifest'
-    end
-
     it 'should have a completed_at attribute' do
       is_expected.to respond_to 'completed_at'
       is_expected.to respond_to 'completed_at='
