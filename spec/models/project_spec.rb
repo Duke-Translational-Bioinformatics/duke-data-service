@@ -18,6 +18,10 @@ RSpec.describe Project, type: :model do
       should have_many(:storage_folders)
     end
 
+    it 'should have many data_files' do
+      should have_many(:data_files)
+    end
+    
     it 'should have a creator' do
       should belong_to(:creator)
     end

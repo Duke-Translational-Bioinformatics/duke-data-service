@@ -5,7 +5,8 @@ module DDS
         detail 'Creates a project folder for the given payload.'
         named 'create project folder'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
+          [200, "This will never happen"],
+          [201, "Valid API Token in 'Authorization' Header"],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'Project Does not Exist, Parent Folder does not exist in Project']
         ]
@@ -65,7 +66,8 @@ module DDS
         detail 'Remove the folder for a given uuid.'
         named 'delete folder'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
+          [200, 'This will never happen'],
+          [204, "Successfully Deleted"],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'Folder does not exist']
         ]
