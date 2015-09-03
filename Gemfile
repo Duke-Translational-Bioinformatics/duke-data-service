@@ -37,6 +37,7 @@ group :development, :test do
   gem 'spring-commands-rspec', group: :development
   gem 'vcr'
   gem 'webmock'
+  gem 'pry-byebug'
 end
 
 #heroku requires this
