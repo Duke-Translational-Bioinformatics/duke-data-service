@@ -57,6 +57,17 @@ ActiveRecord::Schema.define(version: 20150903180944) do
     t.datetime "updated_at",            null: false
   end
 
+  create_table "data_files", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.uuid     "upload_id"
+    t.uuid     "parent_id"
+    t.uuid     "project_id"
+    t.uuid     "creator_id"
+    t.boolean  "is_deleted"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "folders", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.uuid     "parent_id"

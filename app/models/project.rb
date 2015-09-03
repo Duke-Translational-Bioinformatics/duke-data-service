@@ -10,7 +10,8 @@ class Project < ActiveRecord::Base
   has_many :project_permissions
   has_many :uploads
   has_many :affiliations
-  
+  has_many :data_files
+    
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :creator_id, presence: true
