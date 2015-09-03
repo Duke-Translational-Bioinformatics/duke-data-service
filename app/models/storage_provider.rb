@@ -54,30 +54,6 @@ class StorageProvider < ActiveRecord::Base
     URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
   end
 
-  def create_slo_manifest(upload)
-    manifest_document = upload.chunks.map {|chunk|
-      {
-        "path" => [upload.project.id, upload.id, chunk.number].join('/'),
-        "etag" => chunk.fingerprint_value,
-        "size_bytes" => chunk.size
-      }
-    }
-    authenticate
-    path = [
-      @storage_url,
-      upload.project.id,
-      upload.id
-    ].join('/')
-    resp = HTTParty.put(
-      "#{path}?multipart-manifest=put",
-      body: manifest_document.to_json,
-      headers:{"X-Auth-Token" => @auth_token}
-    )
-    unless resp.response.code.to_i == 201
-      raise StorageProviderException, resp.body
-    end
-  end
-
   def get_account_info
     resp = HTTParty.get(
       "#{storage_url}",
@@ -147,22 +123,6 @@ class StorageProvider < ActiveRecord::Base
       raise StorageProviderException, "Auth Failure: #{ @auth_uri_resp.body }"
     end
     @auth_uri_resp
-  end
-
-  def authenticate
-    return if @auth_token
-    auth_resp = HTTParty.get(
-        "#{url_root}#{auth_uri}",
-        headers: {
-          'X-Auth-User' => service_user,
-          'X-Auth-Key' => service_pass
-        }
-    )
-    unless auth_resp.response.code.to_i == 200
-      raise StorageProviderException, "Auth Failure: #{ auth_resp.body }"
-    end
-    @storage_url = auth_resp['x-storage-url']
-    @auth_token = auth_resp['x-auth-token']
   end
 end
 
