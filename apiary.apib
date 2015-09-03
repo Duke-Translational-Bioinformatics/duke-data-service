@@ -157,16 +157,18 @@ authenticated
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "id": "system_admin",
-                "name": "System Admin",
-                "description": "Can manage system level permissions and perform all operations across all projects",
-                "permissions": [ { "id": "system_admin" } ],
-                "contexts": [ "system" ],
-                "is_deprecated": false
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "system_admin",
+                    "name": "System Admin",
+                    "description": "Can manage system level permissions and perform all operations across all projects",
+                    "permissions": [ { "id": "system_admin" } ],
+                    "contexts": [ "system" ],
+                    "is_deprecated": false
+                }
+            ]
+        }
 
 ## Authorization Role instance [/{context}/auth_roles/{id}]
 + Parameters
@@ -185,7 +187,7 @@ authenticated
             "id": "file_editor",
             "name": "File Editor",
             "description": "Can view, download, create, update and delete files",
-            "permissions": [ { "id": "view_project" }, { "id": "download_file" }, ],
+            "permissions": [ { "id": "view_project" }, { "id": "download_file" } ],
             "contexts": [ "project" ],
             "is_deprecated": false
         }
@@ -263,23 +265,25 @@ authenticated
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "username": "mrgardner01",
-                "first_name": "Matthew",
-                "last_name": "Gardner",
-                "full_name": "Matthew Gardner",
-                "email": "mrgardner01@duke.edu",
-                "auth_provider": {
-                    "source": "duke_shibboleth",
-                    "uid": "gardner100",
-                },
-                "auth_role": { "id": "system_admin", "name": "System Admin" },
-                "last_login_on": "2015-01-01T12:00:00Z",
-                "audit": { }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "first_name": "Matthew",
+                    "last_name": "Gardner",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu",
+                    "auth_provider": {
+                        "source": "duke_shibboleth",
+                        "uid": "gardner100"
+                    },
+                    "auth_role": { "id": "system_admin", "name": "System Admin" },
+                    "last_login_on": "2015-01-01T12:00:00Z",
+                    "audit": { }
+                }
+            ]
+        }
 
 ## User instance [/users/{id}]
 + Parameters
@@ -326,16 +330,18 @@ system_admin
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "user": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "username": "mrgardner01",
-                    "full_name": "Matthew Gardner"
-                },
-                "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
+                }
+            ]
+        }
 
 ## System Permission instance [/system/permissions/{user_id}]
 + Parameters
@@ -438,15 +444,17 @@ authenticated
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)",
-                "description": "Goal of generating a targeted knockout mutation...",
-                "is_deleted": false,
-                "audit": { }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)",
+                    "description": "Goal of generating a targeted knockout mutation...",
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
 
 ## Project instance [/projects/{id}]
 + Parameters
@@ -515,17 +523,19 @@ view_project
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "user": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "username": "mrgardner01",
-                    "full_name": "Matthew Gardner"
-                },
-                "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
+                }
+            ]
+        }
 
 ## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
 + Parameters
@@ -607,20 +617,22 @@ authenticated
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "id": "principal_investigator",
-                "name": "Principal Investigator",
-                "description": "Lead investigator for the research project",
-                "is_deprecated": false
-            },
-            {
-                "id": "research_coordinator",
-                "name": "Research Coordinator",
-                "description": "Coordinator for the research project",
-                "is_deprecated": false
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "principal_investigator",
+                    "name": "Principal Investigator",
+                    "description": "Lead investigator for the research project",
+                    "is_deprecated": false
+                },
+                {
+                    "id": "research_coordinator",
+                    "name": "Research Coordinator",
+                    "description": "Coordinator for the research project",
+                    "is_deprecated": false
+                }
+            ]
+        }
 
 ## Project Role instance [/project_roles/{id}]
 + Parameters
@@ -656,18 +668,20 @@ view_project
 
 + Response 200 (application/json)
 
-        "results": [
-            {
-                "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "user": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "full_name": "Matthew Gardner",
-                    "email": "mrgardner01@duke.edu"
-                },
-                "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "ba33f7df-33ca-46dd-a015-92c46fdb6ba3",
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "full_name": "Matthew Gardner",
+                        "email": "mrgardner01@duke.edu"
+                    },
+                    "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
+                }
+            ]
+        }
 
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
 + Parameters
@@ -736,26 +750,28 @@ authenticated
 
 + Response 200 (application/json)
 
-        results: [
-            {
-                "id": "duke_isilon",
-                "name": "Duke Isilon Storage",
-                "description": "A description of the storage service level would go here.",
-                "is_deprecated": false
-            },
-            {
-                "id": "amazon_s3_glacier",
-                "name": "Amazon S# Glacier",
-                "description": "A description of the storage service level would go here.",
-                "is_deprecated": false
-            },
-            {
-                "id": "google_cloud_nearline",
-                "name": "Google Cloud Nearline",
-                "description": "A description of the storage service level would go here.",
-                "is_deprecated": false
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "duke_isilon",
+                    "name": "Duke Isilon Storage",
+                    "description": "A description of the storage service level would go here.",
+                    "is_deprecated": false
+                },
+                {
+                    "id": "amazon_s3_glacier",
+                    "name": "Amazon S# Glacier",
+                    "description": "A description of the storage service level would go here.",
+                    "is_deprecated": false
+                },
+                {
+                    "id": "google_cloud_nearline",
+                    "name": "Google Cloud Nearline",
+                    "description": "A description of the storage service level would go here.",
+                    "is_deprecated": false
+                }
+            ]
+        }
 
 ## Storage Provider instance [/storage_providers/{id}]
 + Parameters
@@ -826,17 +842,19 @@ view_project
 
 + Response 200 (application/json)
 
-        results: [
-            {
-                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
-                "name": "Raw Data",
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "virtual_path": "/Sequencing Core/Raw Data",
-                "is_deleted": false,
-                "audit": { }
-            },
-        ]
+        {
+            "results": [
+                {
+                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+                    "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+                    "name": "Raw Data",
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "virtual_path": "/Sequencing Core/Raw Data",
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
 
 ## Folder instance [/folders/{id}]
 + Parameters
@@ -975,34 +993,36 @@ view_project
 
 + Response 200 (application/json)
 
-        results: [
-            {
-                "kind": "folder",
-                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                "name": "Aligned",
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "virtual_path": "/Sequencing Core/Raw Data/Aligned",
-                "is_deleted": false,
-                "audit": { }
-            },
-            {
-                "kind": "file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "is_deleted": false,
-                "upload": {
-                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": "amazon_s3_standard" }
+        {
+            "results": [
+                {
+                    "kind": "folder",
+                    "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+                    "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "Aligned",
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                    "is_deleted": false,
+                    "audit": { }
                 },
-                "audit": { }
-            },
-        ]
+                {
+                    "kind": "file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                        "storage_provider": { "id": "amazon_s3_standard" }
+                    },
+                    "audit": { }
+                }
+            ]
+        }
 
 ## Projects Children collection [/projects/children{?name_contains}]
 + Parameters
@@ -1022,34 +1042,36 @@ view_project
 
 + Response 200 (application/json)
 
-        results: [
-            {
-                "kind": "folder",
-                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                "name": "Aligned",
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                "virtual_path": "/Sequencing Core/Raw Data/Aligned",
-                "is_deleted": false,
-                "audit": { }
-            },
-            {
-                "kind": "file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "is_deleted": false,
-                "upload": {
-                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": "amazon_s3_standard" }
+        {
+            "results": [
+                {
+                    "kind": "folder",
+                    "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+                    "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "Aligned",
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                    "is_deleted": false,
+                    "audit": { }
                 },
-                "audit": { }
-            },
-        ]
+                {
+                    "kind": "file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                        "storage_provider": { "id": "amazon_s3_standard" }
+                    },
+                    "audit": { }
+                }
+            ]
+        }
 
 ## Group Files
 A research data file that is maintained in the context of a project (and optionally a project folder).  A file resource represents
@@ -1313,31 +1335,33 @@ create_file
 
 + Response 200 (application/json)
 
-        results: [
-                {
-                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "content_type": "application/octet-stream",
-                    "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
-                    "chunks": [ ],
-                    "storage_provider": { "id": "amazon_s3_standard" },
-                    "storage_location": {
-                        "Bucket": "duke_data_service_prod",
-                        "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                        "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-                    },
-                    "status": {
-                        "initiated_on": "2015-07-10T13:00:00Z",
-                        "percent_complete": 0,
-                        "completed_on": null,
-                        "error_on": null,
-                        "error_message": null
-                    },
-                    "audit": { }
-                },
-        ]
+        {
+            "results": [
+                    {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                        "content_type": "application/octet-stream",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+                        "chunks": [ ],
+                        "storage_provider": { "id": "amazon_s3_standard" },
+                        "storage_location": {
+                            "Bucket": "duke_data_service_prod",
+                            "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
+                        },
+                        "status": {
+                            "initiated_on": "2015-07-10T13:00:00Z",
+                            "percent_complete": 0,
+                            "completed_on": null,
+                            "error_on": null,
+                            "error_message": null
+                        },
+                        "audit": { }
+                    }
+            ]
+        }
 
 ## Upload instance [/uploads/{id}]
 + Parameters
@@ -1407,7 +1431,7 @@ storage provider.
 
         { 
             "number": 1,
-            "size: "size": 5024000,
+            "size": 5024000,
             "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
         }
 
@@ -1418,7 +1442,7 @@ storage provider.
             "host": "duke_data_service_prod.s3.amazonaws.com",
             "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
             "http_headers": [
-                    { "Content-Length": "5024000" },
+                    { "Content-Length": "5024000" }
             ]
         }
 
@@ -1462,7 +1486,7 @@ is raised.
                     "number": 2,
                     "size": 5024000,
                     "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
-                },
+                }
             ],
             "storage_provider": { "id": "amazon_s3_standard" },
             "storage_location": {
