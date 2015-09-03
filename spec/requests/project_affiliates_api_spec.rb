@@ -19,7 +19,6 @@ describe DDS::V1::ProjectAffiliatesAPI do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a listable resource'
-
       it_behaves_like 'an authenticated resource'
     end
   end
@@ -30,9 +29,8 @@ describe DDS::V1::ProjectAffiliatesAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      #it_behaves_like 'a viewable resource'
-
-      #it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
     end
 
     describe 'PUT' do

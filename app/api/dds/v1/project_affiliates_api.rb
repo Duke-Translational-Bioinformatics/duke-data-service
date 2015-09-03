@@ -38,6 +38,18 @@ module DDS
         project = Project.find(params[:project_id])
         project.affiliations
       end
+
+      desc 'View project level affiliation for a user' do
+        detail 'View project level affiliation for a user'
+        named 'get project affiliation'
+        failure [401]
+      end
+      get '/projects/:project_id/affiliates/:user_id', root: false do
+        authenticate!
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
+        Affiliation.where(project: project, user: user).first
+      end
     end
   end
 end
