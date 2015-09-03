@@ -9,6 +9,7 @@ class Project < ActiveRecord::Base
   has_many :storage_folders
   has_many :project_permissions
   has_many :uploads
+  has_many :affiliations
   
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
