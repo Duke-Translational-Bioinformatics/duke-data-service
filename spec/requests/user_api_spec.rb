@@ -27,11 +27,13 @@ describe DDS::V1::UserAPI do
       }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
+        pre_time = DateTime.now.to_i
         expect{
           expect {
             get '/api/v1/user/api_token', {access_token: access_token}, json_headers
           }.to change{UserAuthenticationService.count}.by(1)
         }.to change{User.count}.by(1)
+        post_time = DateTime.now.to_i
         expect(response.status).to eq(200)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
@@ -48,9 +50,12 @@ describe DDS::V1::UserAPI do
         created_user = User.find(decoded_token['id'])
         expect(created_user).to be
         expect(created_user.display_name).to eq(new_user_token['display_name'])
+        expect(created_user.username).to eq(new_user_token['uid'])
         expect(created_user.first_name).to eq(new_user_token['first_name'])
         expect(created_user.last_name).to eq(new_user_token['last_name'])
         expect(created_user.email).to eq(new_user_token['email'])
+        expect(created_user.last_login_at.to_i).to be >= pre_time
+        expect(created_user.last_login_at.to_i).to be <= post_time
         created_user_authentication_service = created_user.user_authentication_services.where(uid: new_user_token['uid']).first
         expect(created_user_authentication_service).to be
         expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
@@ -72,7 +77,7 @@ describe DDS::V1::UserAPI do
           'display_name' => user.display_name,
           'first_name' => user.first_name,
           'last_name' => user.last_name,
-          'email' => user.email,
+          'email' => user.email
         }
       }
       let (:access_token) {
@@ -92,8 +97,11 @@ describe DDS::V1::UserAPI do
         JWT.encode(user_token, 'WrongSecret')
       }
 
-      it 'should return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
+      it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
+        original_last_login_at = user.last_login_at.to_i
+        pre_time = DateTime.now.to_i
         get '/api/v1/user/api_token', {access_token: access_token}, json_headers
+        post_time = DateTime.now.to_i
         expect(response.status).to eq(200)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
@@ -111,6 +119,9 @@ describe DDS::V1::UserAPI do
         existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
         expect(existing_user.id).to eq(user.id)
+        expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
+        expect(existing_user.last_login_at.to_i).to be >= pre_time
+        expect(existing_user.last_login_at.to_i).to be <= post_time
       end
 
       it 'should respond with an error when not provided an access_token' do
@@ -127,6 +138,7 @@ describe DDS::V1::UserAPI do
       end
 
       it 'should respond with an error when the service_id in the access_token is not registered' do
+        original_last_login_at = user.last_login_at.to_i
         get '/api/v1/user/api_token', {access_token: unknown_service_access_token}, json_headers
         expect(response.status).to eq(401)
         expect(response.body).to be
@@ -137,9 +149,12 @@ describe DDS::V1::UserAPI do
         expect(error_response['error']).to eq(401)
         expect(error_response['reason']).to eq('invalid access_token')
         expect(error_response['suggestion']).to eq('authenticaton service not recognized')
+        user.reload
+        expect(user.last_login_at.to_i).to eq(original_last_login_at)
       end
 
       it 'should respond with an error when the token has not been signed by the secret_key_base' do
+        original_last_login_at = user.last_login_at.to_i
         get '/api/v1/user/api_token', {access_token: wrong_secret_access_token}, json_headers
         expect(response.status).to eq(401)
         expect(response.body).to be
@@ -150,6 +165,8 @@ describe DDS::V1::UserAPI do
         expect(error_response['error']).to eq(401)
         expect(error_response['reason']).to eq('invalid access_token')
         expect(error_response['suggestion']).to eq('token not properly signed')
+        user.reload
+        expect(user.last_login_at.to_i).to eq(original_last_login_at)
       end
     end
   end

@@ -17,15 +17,7 @@ module DDS
           "error" => 400,
           "reason" => "no access_token",
           "suggestion" => "you might need to login through an authenticaton service"#,
-          #"errors" => []
         }
-        # e.errors.each_pair do |params, errors|
-        #   i = 0
-        #   params.each do |param|
-        #     error_json['errors'] << {'field' => param, 'message' => errors[i].to_s}
-        #     i += 1
-        #   end
-        # end
         error!(error_json, 400)
       end
       rescue_from JWT::VerificationError do
@@ -42,13 +34,18 @@ module DDS
           auth_service = AuthenticationService.where(uuid: access_token['service_id']).first
           if auth_service
             authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
-            if authorized_user.nil?
+            if authorized_user
+              new_login_at = DateTime.now
+              authorized_user.user.update_attribute(:last_login_at, DateTime.now)
+            else
               new_user = User.create(
                 id: SecureRandom.uuid,
+                username: access_token['uid'],
                 etag: SecureRandom.hex,
                 email: access_token['email'],
                 display_name: access_token['display_name'],
                 first_name: access_token['first_name'],
+                last_login_at: DateTime.now,
                 last_name: access_token['last_name']
               )
               authorized_user = auth_service.user_authentication_services.create(

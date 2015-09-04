@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
   has_many :projects, foreign_key: "creator_id"
   has_many :affiliations
 
+  validates :username, presence: true, uniqueness: true
   validates_each :auth_role_ids do |record, attr, value|
     record.errors.add(attr, 'does not exist') if value &&
       !value.empty? &&
