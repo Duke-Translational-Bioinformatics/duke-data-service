@@ -1,0 +1,66 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx2c6e5c3c41a047b291af9-0055e0dd08
+      Date:
+      - Fri, 28 Aug 2015 22:13:28 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+- request:
+    method: delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=delete
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - tx647e329d5c2543a99574c-0055e0dd08
+      Date:
+      - Fri, 28 Aug 2015 22:13:28 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: "Number Deleted: 2\nNumber Not Found: 0\nResponse Body: \nResponse Status:
+        200 OK\nErrors:\n"
+    http_version: 
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+recorded_with: VCR 2.9.3

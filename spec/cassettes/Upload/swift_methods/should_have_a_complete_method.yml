@@ -1,0 +1,69 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk7cb10375d9e0409bbac98c83b47a19fc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk7cb10375d9e0409bbac98c83b47a19fc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txcf83ba2d78ee495caa427-0055e5c722
+      Date:
+      - Tue, 01 Sep 2015 15:41:22 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 01 Sep 2015 15:41:22 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/2fb76bb7-8ea6-4007-83f9-b04edb8c0660/4e6f1cec-b373-46ac-ac4f-88105af11e7f?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"2fb76bb7-8ea6-4007-83f9-b04edb8c0660/4e6f1cec-b373-46ac-ac4f-88105af11e7f/2","etag":"06a8c27290f2bf29bc98a19454b14b7e5ee892babe07092285323eb8c85d428d","size_bytes":1}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tk7cb10375d9e0409bbac98c83b47a19fc
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Tue, 01 Sep 2015 15:41:23 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"06a8c27290f2bf29bc98a19454b14b7e5ee892babe07092285323eb8c85d428d"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx265ee308dfc0490cb83bd-0055e5c722
+      Date:
+      - Tue, 01 Sep 2015 15:41:22 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 01 Sep 2015 15:41:22 GMT
+recorded_with: VCR 2.9.3

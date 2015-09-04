@@ -11,6 +11,10 @@ RSpec.describe User, type: :model do
     it 'should have_many user_authentication_services' do
       should have_many :user_authentication_services
     end
+
+    it 'should have many affiliations' do
+      should have_many(:affiliations)
+    end
   end
 
   describe 'validations' do
@@ -40,6 +44,15 @@ RSpec.describe User, type: :model do
       new_role_ids = [ role_1.text_id, role_2.text_id ]
       subject.auth_roles = new_role_ids
       expect(subject.auth_role_ids).to eq(new_role_ids)
+    end
+
+    describe 'without roles' do
+      subject {FactoryGirl.create(:user)}
+      
+      it 'should have an auth_roles method that returns AuthRole objects' do
+        expect(subject).to respond_to(:auth_roles)
+        expect(subject.auth_roles).to be_a Array
+      end
     end
   end
 

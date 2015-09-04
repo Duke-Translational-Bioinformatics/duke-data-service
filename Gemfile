@@ -7,18 +7,17 @@ gem 'pg'
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4'
+gem 'rack-cors', :require => 'rack/cors'
+gem 'grape-swagger'
 
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem "grape-active_model_serializers"
-gem 'react-rails', '~> 1.0'
-gem 'react-router-rails', github: 'mariopeixoto/react-router-rails', branch: 'v0.13.3p1'
-gem 'tilt'
-gem 'jquery-rails'
 gem 'turbolinks'
 gem 'uglifier'
 gem 'pundit'
+gem 'httparty'
 
 # use figaro to set heroku environment variables for secrets
 gem 'figaro'
@@ -37,6 +36,8 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'shoulda-matchers', require: false
   gem 'spring-commands-rspec', group: :development
+  gem 'vcr'
+  gem 'webmock'
 end
 
 #heroku requires this

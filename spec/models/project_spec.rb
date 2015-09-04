@@ -10,16 +10,24 @@ RSpec.describe Project, type: :model do
       should have_many(:project_permissions)
     end
 
-    it 'should have many memberships' do
-      should have_many(:memberships)
-    end
-
     it 'should have many storage folders' do
       should have_many(:storage_folders)
     end
 
+    it 'should have many data_files' do
+      should have_many(:data_files)
+    end
+    
     it 'should have a creator' do
       should belong_to(:creator)
+    end
+
+    it 'should have many uploads' do
+      should have_many(:uploads)
+    end
+
+    it 'should have many affiliations' do
+      should have_many(:affiliations)
     end
   end
 

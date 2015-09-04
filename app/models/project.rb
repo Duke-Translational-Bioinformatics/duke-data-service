@@ -1,16 +1,16 @@
 class Project < ActiveRecord::Base
-  include StringIdCreator
-  self.primary_key = 'id'
 
-  before_create :create_string_id
   after_save :add_project_admin_role_to_user
   after_initialize :init
 
   belongs_to :creator, class_name: "User"
-  has_many :memberships
+  has_many :folders
   has_many :storage_folders
   has_many :project_permissions
-
+  has_many :uploads
+  has_many :affiliations
+  has_many :data_files
+    
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :creator_id, presence: true

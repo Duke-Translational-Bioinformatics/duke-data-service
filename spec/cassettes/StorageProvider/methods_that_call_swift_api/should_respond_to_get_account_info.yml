@@ -1,0 +1,79 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txed65cc6b30114ef9a5ed3-0055e0dd08
+      Date:
+      - Fri, 28 Aug 2015 22:13:28 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      X-Account-Object-Count:
+      - '0'
+      X-Account-Meta-Temp-Url-Key-2:
+      - 441a024782804b40bdd3e15655292245
+      X-Timestamp:
+      - '1440799760.48848'
+      X-Account-Meta-Temp-Url-Key:
+      - f32c4144d37aa0f0656611f335716083
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Accept-Ranges:
+      - bytes
+      X-Trans-Id:
+      - txd0768dd04cdf40cfa680b-0055e0dd08
+      Date:
+      - Fri, 28 Aug 2015 22:13:28 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+recorded_with: VCR 2.9.3

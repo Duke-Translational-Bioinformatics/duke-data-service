@@ -1,3 +1,5 @@
+require 'grape-swagger'
+
 module DDS
   module V1
     class Base < Grape::API
@@ -44,11 +46,11 @@ module DDS
             end
           else
             @auth_error = {
-              error: 400,
+              error: 401,
               reason: 'no api_token',
               suggestion: 'you might need to login through an authenticaton service'
             }
-            error!(@auth_error, 400)
+            error!(@auth_error, 401)
           end
           @current_user
         end
@@ -76,6 +78,20 @@ module DDS
         end
       end
 
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        missing_object = ''
+        m = e.message.match(/find\s(\w+)\swith.*/)
+        if m
+          missing_object = m[1]
+        end
+        error_json = {
+          "error" => "404",
+          "reason" => "#{missing_object} Not Found",
+          "suggestion" => "you may have mistyped the #{missing_object} id"
+        }
+        error!(error_json, 404)
+      end
+
       mount DDS::V1::UserAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
@@ -84,6 +100,13 @@ module DDS
       mount DDS::V1::ProjectAffiliatesAPI
       mount DDS::V1::AuthRolesAPI
       mount DDS::V1::ProjectPermissionsAPI
+      mount DDS::V1::FolderAPI
+      mount DDS::V1::UploadsAPI
+      mount DDS::V1::FileAPI
+      add_swagger_documentation(
+        api_version: 'v1',
+        hide_format: true
+      )
     end
   end
 end

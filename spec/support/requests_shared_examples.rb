@@ -17,6 +17,7 @@ end
 
 shared_examples 'a listable resource' do
   it 'should return a list that includes a serialized resource' do
+    expect(resource).to be_persisted
     is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
@@ -26,24 +27,28 @@ shared_examples 'a listable resource' do
 end
 
 shared_examples 'a creatable resource' do
+  let(:expected_response_status) {201}
+  let(:new_object) {
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('id')
+    resource_class.find(response_json['id'])
+  }
   it 'should return success' do
-    is_expected.to eq(201)
-    expect(response.status).to eq(201)
+    is_expected.to eq(expected_response_status)
+    expect(response.status).to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
   end
 
   it 'should be persisted' do
     expect {
-      is_expected.to eq(201)
+      is_expected.to eq(expected_response_status)
     }.to change{resource_class.count}.by(1)
   end
 
   it 'should return a serialized object' do
-    is_expected.to eq(201)
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key('id')
-    new_object = resource_class.find(response_json['id'])
+    is_expected.to eq(expected_response_status)
+    expect(new_object).to be
     expect(response.body).to include(resource_serializer.new(new_object).to_json)
   end
 end
@@ -59,6 +64,9 @@ shared_examples 'a viewable resource' do
 end
 
 shared_examples 'an updatable resource' do
+  before do
+    expect(resource).to be_persisted
+  end
   it 'should return success' do
     is_expected.to eq(200)
     expect(response.status).to eq(200)
@@ -101,9 +109,9 @@ end
 shared_examples 'an authenticated resource' do
   include_context 'without authentication'
 
-  it 'should return a 400 error response' do
-    is_expected.to eq(400)
-    expect(response.status).to eq(400)
+  it 'should return a 401 error response' do
+    is_expected.to eq(401)
+    expect(response.status).to eq(401)
   end
 end
 
@@ -132,5 +140,20 @@ shared_examples 'a validated resource' do
       expect(error).to have_key('field')
       expect(error).to have_key('message')
     end
+  end
+end
+
+shared_examples 'an identified resource' do
+  it 'should return 404 with error when resource not found with id' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("#{resource_class} Not Found")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("you may have mistyped the #{resource_class} id")
   end
 end

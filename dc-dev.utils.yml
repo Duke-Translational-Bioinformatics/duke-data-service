@@ -10,6 +10,21 @@ db:
   extends:
     file: dc-base.yml
     service: db
+swiftvol:
+  extends:
+    file: dc-base.yml
+    service: swiftvol
+swift:
+  extends:
+    file: dc-base.yml
+    service: swift
+  volumes_from:
+    - swiftvol
+swiftcli:
+  image: dukedataservice_server
+  volumes_from:
+    - server
+  entrypoint: ['swift']
 rails:
   image: dukedataservice_server
   volumes_from:
@@ -17,6 +32,8 @@ rails:
   entrypoint: ['rails']
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
 rake:
   image: dukedataservice_server
   volumes_from:
@@ -24,6 +41,8 @@ rake:
   entrypoint: ['rake']
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
 authservice:
   image: dukedataservice_server
   environment:
@@ -44,6 +63,8 @@ rspec:
     - server
   links:
     - db:postgres.db.host
+  env_file:
+    - swift.env
   entrypoint: ['rspec']
   command: spec
 heroku:

@@ -1,80 +1,79 @@
 module DDS
   module V1
     class ProjectAffiliatesAPI < Grape::API
-      desc 'Create a project affiliate' do
-        detail 'Creates a project affiliate for the given payload.'
-        named 'create project affiliate'
-        failure [401]
+      desc 'Associate affiliate to a project' do
+        detail 'Deletes any existing project role for the user and assigns new role.'
+        named 'create project affiliation'
+        failure [
+          [400, 'Project Name Already Exists'],
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
       params do
-        requires :user
-        requires :project_roles
+        requires :project_role, type: Hash do
+          requires :id, type: String
+        end
       end
-      post '/project/:project_id/affiliates', root: false do
+      put '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
-        membership_params = declared(params, include_missing: false)
+        declared_params = declared(params, include_missing: false)
         project = Project.find(params[:project_id])
-        user = User.where(id: membership_params[:user][:id]).first
-        membership = project.memberships.build({
-          user: user
-        })
-        if membership.save
-          membership
+        user = User.find(params[:user_id])
+        affiliation = project.affiliations.where(user: user).first ||
+          project.affiliations.build({
+            user: user,
+          })
+        affiliation.project_role_id = declared_params[:project_role][:id]
+        if affiliation.save
+          affiliation
         else
-          validation_error!(membership)
+          validation_error!(affiliation)
         end
       end
 
-      desc 'List project affiliates' do
-        detail 'Lists affiliates for a given project.'
-        named 'list project affiliates'
-        failure [401]
+      desc 'List project affiliations' do
+        detail 'List project affiliations'
+        named 'list project affiliation'
+        failure [
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
-      get '/project/:project_id/affiliates', root: false do
+      get '/projects/:project_id/affiliates', root: false do
         authenticate!
         project = Project.find(params[:project_id])
-        project.memberships
+        project.affiliations
       end
 
-      desc 'View project affiliate details' do
-        detail 'Returns the project affiliate details for a given uuid.'
-        named 'view project affiliate'
-        failure [401]
+      desc 'View project level affiliation for a user' do
+        detail 'View project level affiliation for a user'
+        named 'get project affiliation'
+        failure [
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
-      get '/project_affiliates/:id', root: false do
+      get '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
-        Membership.find(params[:id])
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
+        Affiliation.where(project: project, user: user).first
       end
 
-      desc 'Update a project affiliate' do
-        detail 'Update the project affiliate details for a given uuid.'
-        named 'update project affiliate'
-        failure [401]
-      end
-      params do
-        requires :user
-        requires :project_roles
-      end
-      put '/project_affiliates/:id', root: false do
-        authenticate!
-        membership_params = declared(params, include_missing: false)
-        user = User.where(id: membership_params[:user][:id]).first
-        membership = Membership.find(params[:id])
-        if membership.update(user: user)
-          membership
-        else
-          validation_error!(membership)
-        end
-      end
-
-      desc 'Delete a project affiliate' do
-        detail 'Remove the project affiliation for a given uuid.'
+      desc 'Delete project affiliation' do
+        detail 'Remove project level affiliation for a user'
         named 'delete project affiliation'
-        failure [401]
+        failure [
+          [401, 'Unauthorized'],
+          [404, 'Project Does not Exist']
+        ]
       end
-      delete '/project_affiliates/:id', root: false do
+      delete '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
-        membership = Membership.find(params[:id]).destroy
+        project = Project.find(params[:project_id])
+        user = User.find(params[:user_id])
+        Affiliation.where(project: project, user: user).destroy_all
         body false
       end
     end
