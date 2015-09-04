@@ -15,6 +15,10 @@ RSpec.describe User, type: :model do
     it 'should have many affiliations' do
       should have_many(:affiliations)
     end
+
+    it 'should have many data_files' do
+      should have_many(:data_files)
+    end
   end
 
   describe 'validations' do

@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :user_authentication_services
 
   has_many :projects, foreign_key: "creator_id"
+  has_many :data_files, foreign_key: "creator_id"
   has_many :affiliations
 
   validates :username, presence: true, uniqueness: true
