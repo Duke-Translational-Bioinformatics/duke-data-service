@@ -128,7 +128,7 @@ module DDS
             authenticate!
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
-            file.update_attributes(name: file_params[:name])
+            file.update_attribute(:name, file_params[:name])
             file
           end
         end
