@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
 
   has_many :projects, foreign_key: "creator_id"
   has_many :data_files, foreign_key: "creator_id"
+  has_many :uploads, through: :data_files
   has_many :affiliations
 
   validates :username, presence: true, uniqueness: true
@@ -24,5 +25,17 @@ class User < ActiveRecord::Base
 
   def auth_roles=(new_auth_role_ids)
     self.auth_role_ids = new_auth_role_ids
+  end
+
+  def project_count
+    self.projects.count
+  end
+
+  def file_count
+    self.data_files.count
+  end
+
+  def storage_bytes
+    self.uploads.sum(:size)
   end
 end

@@ -19,6 +19,10 @@ RSpec.describe User, type: :model do
     it 'should have many data_files' do
       should have_many(:data_files)
     end
+
+    it 'should have many uploads through data_files' do
+      should have_many(:uploads).through(:data_files)
+    end
   end
 
   describe 'validations' do
@@ -65,11 +69,70 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe 'serialization' do
+  describe 'usage' do
+    subject { FactoryGirl.create(:user) }
+    let(:projects) { FactoryGirl.create_list(:project, 5, creator_id: subject.id) }
+    let(:files) {
+      files = []
+      projects.each do |project|
+        upload = FactoryGirl.create(:upload, project_id: project.id)
+        files << FactoryGirl.create(:data_file, creator_id: subject.id, project_id: project.id, upload_id: upload.id)
+      end
+      files
+    }
+
+    describe 'project_count' do
+      let(:expected_count) { subject.projects.count }
+
+      it 'should provide the count of user projects' do
+        expect(subject).to respond_to('project_count')
+        expect(subject.project_count).to eq(expected_count)
+      end
+    end
+
+    describe 'file_count' do
+      let(:expected_count) { subject.data_files.count }
+      it 'should provide the count of user files' do
+        expect(subject).to respond_to('file_count')
+        expect(subject.file_count).to eq(expected_count)
+      end
+    end
+
+    describe 'storage_bytes' do
+      let(:expected_size) {
+        expected_size = 0
+        subject.uploads.each do |f|
+          expected_size = f.size + expected_size
+        end
+        expected_size
+      }
+      it 'should provide the sum total of the size of all user uploads' do
+        expect(subject).to respond_to('storage_bytes')
+        expect(subject.storage_bytes).to eq(expected_size)
+      end
+    end
+
+    describe 'UserUsageSerializer' do
+      it 'should serialize user.usage to json' do
+        serializer = UserUsageSerializer.new subject
+        payload = serializer.to_json
+        expect(payload).to be
+        parsed_json = JSON.parse(payload)
+        expect(parsed_json).to have_key('project_count')
+        expect(parsed_json).to have_key('file_count')
+        expect(parsed_json).to have_key('storage_bytes')
+        expect(parsed_json['project_count']).to eq(subject.project_count)
+        expect(parsed_json['file_count']).to eq(subject.file_count)
+        expect(parsed_json['storage_bytes']).to eq(subject.storage_bytes)
+      end
+    end
+  end
+
+  describe 'UserSerializer' do
     let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
     subject { user_authentication_service.user }
 
-    it 'should serialize to json' do
+    it 'should serialize user attributes to json' do
       serializer = UserSerializer.new subject
       payload = serializer.to_json
       expect(payload).to be
