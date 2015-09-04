@@ -10,10 +10,6 @@ RSpec.describe Project, type: :model do
       should have_many(:project_permissions)
     end
 
-    it 'should have many memberships' do
-      should have_many(:memberships)
-    end
-
     it 'should have many storage folders' do
       should have_many(:storage_folders)
     end
