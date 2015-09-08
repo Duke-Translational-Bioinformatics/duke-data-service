@@ -226,7 +226,7 @@ valid values are “system” or “project”.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="authorization-roles-authorization-role-instance" class="resource"><h3 class="resource-heading">Authorization Role instance<a href="#authorization-roles-authorization-role-instance" class="permalink">&para;</a></h3><div id="authorization-roles-authorization-role-instance-get" class="action get"><h4 class="action-heading"><div class="name">View authorization role details</div><a href="#authorization-roles-authorization-role-instance-get" class="method get">GET</a><code class="uri">/{context}/auth_roles/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>context</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>project</span></span><p>The <code>context</code> or scope in which permission can be granted;
@@ -298,7 +298,7 @@ valid values are “system” or “project”.</p>
   "<span class="hljs-attribute">storage_bytes</span>": <span class="hljs-value"><span class="hljs-number">304006007009</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="users" class="resource-group"><h2 class="group-heading">Users<a href="#users" class="permalink">&para;</a></h2><p>A user represents a registered user.</p>
 <div id="users-users-collection" class="resource"><h3 class="resource-heading">Users collection<a href="#users-users-collection" class="permalink">&para;</a></h3><div id="users-users-collection-get" class="action get"><h4 class="action-heading"><div class="name">List registered users</div><a href="#users-users-collection-get" class="method get">GET</a><code class="uri">/users{?name_contains}</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>name_contains</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>gardner</span></span><p>Returns users where their <code>full_name</code> contains the specified string.</p>
@@ -324,7 +324,7 @@ valid values are “system” or “project”.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="users-user-instance" class="resource"><h3 class="resource-heading">User instance<a href="#users-user-instance" class="permalink">&para;</a></h3><div id="users-user-instance-get" class="action get"><h4 class="action-heading"><div class="name">View registered user details</div><a href="#users-user-instance-get" class="method get">GET</a><code class="uri">/users/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique <code>id</code> for a user.</p>
@@ -347,7 +347,7 @@ valid values are “system” or “project”.</p>
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="system-permissions" class="resource-group"><h2 class="group-heading">System Permissions<a href="#system-permissions" class="permalink">&para;</a></h2><p>A system permission represents system level authorization roles that have been granted to a user.</p>
 <div id="system-permissions-system-permissions-collection" class="resource"><h3 class="resource-heading">System Permissions collection<a href="#system-permissions-system-permissions-collection" class="permalink">&para;</a></h3><div id="system-permissions-system-permissions-collection-get" class="action get"><h4 class="action-heading"><div class="name">List system level permissions</div><a href="#system-permissions-system-permissions-collection-get" class="method get">GET</a><code class="uri">/system/permissions</code></h4><blockquote>
-<p><strong>permission:</strong> system_admin</p>
+<p><strong>Permission:</strong> system_admin</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
@@ -366,7 +366,7 @@ valid values are “system” or “project”.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="system-permissions-system-permission-instance" class="resource"><h3 class="resource-heading">System Permission instance<a href="#system-permissions-system-permission-instance" class="permalink">&para;</a></h3><div id="system-permissions-system-permission-instance-put" class="action put"><h4 class="action-heading"><div class="name">Grant system level permissions to user</div><a href="#system-permissions-system-permission-instance-put" class="method put">PUT</a><code class="uri">/system/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> system_admin</p>
+<p><strong>Permission:</strong> system_admin</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -395,7 +395,7 @@ valid values are “system” or “project”.</p>
     "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Can manage system level permissions and perform all operations across all projects"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="system-permissions-system-permission-instance-get" class="action get"><h4 class="action-heading"><div class="name">View system level permissions for user</div><a href="#system-permissions-system-permission-instance-get" class="method get">GET</a><code class="uri">/system/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> system_admin OR system permissions are for the current user</p>
+<p><strong>Permission:</strong> system_admin OR system permissions are for the current user</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>user_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>user_id</code> of the user.</p>
@@ -411,7 +411,7 @@ valid values are “system” or “project”.</p>
     "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Can manage system level permissions and perform all operations across all projects"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="system-permissions-system-permission-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Revoke system level permissions for user</div><a href="#system-permissions-system-permission-instance-delete" class="method delete">DELETE</a><code class="uri">/system/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> system_admin</p>
+<p><strong>Permission:</strong> system_admin</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -424,7 +424,7 @@ valid values are “system” or “project”.</p>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>user_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>user_id</code> of the user.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="projects" class="resource-group"><h2 class="group-heading">Projects<a href="#projects" class="permalink">&para;</a></h2><p>A project is a container for storing, organizing, retrieving and sharing research data files.</p>
 <div id="projects-projects-collection" class="resource"><h3 class="resource-heading">Projects collection<a href="#projects-projects-collection" class="permalink">&para;</a></h3><div id="projects-projects-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create a project</div><a href="#projects-projects-collection-post" class="method post">POST</a><code class="uri">/projects</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -444,7 +444,7 @@ valid values are “system” or “project”.</p>
   "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-projects-collection-get" class="action get"><h4 class="action-heading"><div class="name">List projects</div><a href="#projects-projects-collection-get" class="method get">GET</a><code class="uri">/projects</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -465,7 +465,7 @@ valid values are “system” or “project”.</p>
       "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="projects-project-instance" class="resource"><h3 class="resource-heading">Project instance<a href="#projects-project-instance" class="permalink">&para;</a></h3><div id="projects-project-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project details</div><a href="#projects-project-instance-get" class="method get">GET</a><code class="uri">/projects/{id}</code></h4><p><strong>permission:</strong> view_project</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="projects-project-instance" class="resource"><h3 class="resource-heading">Project instance<a href="#projects-project-instance" class="permalink">&para;</a></h3><div id="projects-project-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project details</div><a href="#projects-project-instance-get" class="method get">GET</a><code class="uri">/projects/{id}</code></h4><p><strong>Permission:</strong> view_project</p>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>id</code> of the project.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
@@ -486,7 +486,7 @@ valid values are “system” or “project”.</p>
   "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Goal of generating a targeted knockout mutation..."</span></span>,
   "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-project-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a project</div><a href="#projects-project-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{id}</code></h4><p><strong>permission:</strong> delete_project</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-project-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a project</div><a href="#projects-project-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{id}</code></h4><p><strong>Permission:</strong> delete_project</p>
 <hr>
 <p><strong>Rules</strong></p>
 <hr>
@@ -501,7 +501,7 @@ valid values are “system” or “project”.</p>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>id</code> of the project.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="project-permissions" class="resource-group"><h2 class="group-heading">Project Permissions<a href="#project-permissions" class="permalink">&para;</a></h2><p>A project permission represents project level authorization roles that have been granted to a user.</p>
 <div id="project-permissions-project-permissions-collection" class="resource"><h3 class="resource-heading">Project Permissions collection<a href="#project-permissions-project-permissions-collection" class="permalink">&para;</a></h3><div id="project-permissions-project-permissions-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project level permissions</div><a href="#project-permissions-project-permissions-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/permissions</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>id</code> of the project.</p>
@@ -524,7 +524,7 @@ valid values are “system” or “project”.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-permissions-project-permission-instance" class="resource"><h3 class="resource-heading">Project Permission instance<a href="#project-permissions-project-permission-instance" class="permalink">&para;</a></h3><div id="project-permissions-project-permission-instance-put" class="action put"><h4 class="action-heading"><div class="name">Grant project level permissions to user</div><a href="#project-permissions-project-permission-instance-put" class="method put">PUT</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> manage_project_permissions</p>
+<p><strong>Permission:</strong> manage_project_permissions</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -557,7 +557,7 @@ valid values are “system” or “project”.</p>
     "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Can view, download, create, update and delete files"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-permissions-project-permission-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project level permissions for user</div><a href="#project-permissions-project-permission-instance-get" class="method get">GET</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>project_id</code> of the project.</p>
@@ -577,7 +577,7 @@ valid values are “system” or “project”.</p>
     "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Can view, download, create, update and delete files"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-permissions-project-permission-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Revoke project level permissions for user</div><a href="#project-permissions-project-permission-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> manage_project_permissions</p>
+<p><strong>Permission:</strong> manage_project_permissions</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -613,9 +613,8 @@ context of a project.  These roles have no relationship to authorization roles.<
 </tr>
 </tbody>
 </table>
-<div id="project-roles-project-roles-collection" class="resource"><h3 class="resource-heading">Project Roles collection<a href="#project-roles-project-roles-collection" class="permalink">&para;</a></h3><div id="project-roles-project-roles-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project roles</div><a href="#project-roles-project-roles-collection-get" class="method get">GET</a><code class="uri">/project_roles</code></h4><p><strong>Permissions required</strong></p>
+<div id="project-roles-project-roles-collection" class="resource"><h3 class="resource-heading">Project Roles collection<a href="#project-roles-project-roles-collection" class="permalink">&para;</a></h3><div id="project-roles-project-roles-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project roles</div><a href="#project-roles-project-roles-collection-get" class="method get">GET</a><code class="uri">/project_roles</code></h4><p><strong>Permission:</strong> authenticated</p>
 <hr>
-<p>authenticated</p>
 <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
     {
@@ -632,7 +631,7 @@ context of a project.  These roles have no relationship to authorization roles.<
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-roles-project-role-instance" class="resource"><h3 class="resource-heading">Project Role instance<a href="#project-roles-project-role-instance" class="permalink">&para;</a></h3><div id="project-roles-project-role-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project role details</div><a href="#project-roles-project-role-instance-get" class="method get">GET</a><code class="uri">/project_roles/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>principal_investigator</span></span><p>The unique <code>id</code> for a project role.</p>
@@ -645,7 +644,7 @@ context of a project.  These roles have no relationship to authorization roles.<
 perspective.  The affilate may be internal (i.e. a DDS user) or external (i.e. non-DDS user).  For the MVP, we will assume all affiliates
 must be a DDS user.</p>
 <div id="affiliates-affiliates-collection" class="resource"><h3 class="resource-heading">Affiliates collection<a href="#affiliates-affiliates-collection" class="permalink">&para;</a></h3><div id="affiliates-affiliates-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project affiliations</div><a href="#affiliates-affiliates-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/affiliates</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>id</code> of the project.</p>
@@ -667,7 +666,7 @@ must be a DDS user.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="affiliates-affiliate-instance" class="resource"><h3 class="resource-heading">Affiliate instance<a href="#affiliates-affiliate-instance" class="permalink">&para;</a></h3><div id="affiliates-affiliate-instance-put" class="action put"><h4 class="action-heading"><div class="name">Associate affiliate to a project</div><a href="#affiliates-affiliate-instance-put" class="method put">PUT</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> update_project</p>
+<p><strong>Permission:</strong> update_project</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -697,7 +696,7 @@ must be a DDS user.</p>
     "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Principal Investigator"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="affiliates-affiliate-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project level affiliation for a user</div><a href="#affiliates-affiliate-instance-get" class="method get">GET</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>project_id</code> of the project.</p>
@@ -716,14 +715,14 @@ must be a DDS user.</p>
     "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Principal Investigator"</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="affiliates-affiliate-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete project affiliate</div><a href="#affiliates-affiliate-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
-<p><strong>permission:</strong> update_project</p>
+<p><strong>Permission:</strong> update_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>Globally unique <code>project_id</code> of the project.</p>
 </dd><dt>user_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>Globally unique <code>user_id</code> of the user.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="storage-provider" class="resource-group"><h2 class="group-heading">Storage Provider<a href="#storage-provider" class="permalink">&para;</a></h2><p>A storage provider represents an external service that provides physical storage space for files.</p>
 <div id="storage-provider-storage-providers-collection" class="resource"><h3 class="resource-heading">Storage Providers collection<a href="#storage-provider-storage-providers-collection" class="permalink">&para;</a></h3><div id="storage-provider-storage-providers-collection-get" class="action get"><h4 class="action-heading"><div class="name">List storage providers</div><a href="#storage-provider-storage-providers-collection-get" class="method get">GET</a><code class="uri">/storage_providers</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
@@ -748,7 +747,7 @@ must be a DDS user.</p>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="storage-provider-storage-provider-instance" class="resource"><h3 class="resource-heading">Storage Provider instance<a href="#storage-provider-storage-provider-instance" class="permalink">&para;</a></h3><div id="storage-provider-storage-provider-instance-get" class="action get"><h4 class="action-heading"><div class="name">View storage provider details</div><a href="#storage-provider-storage-provider-instance-get" class="method get">GET</a><code class="uri">/storage_providers/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> authenticated</p>
+<p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>duke_isilon</span></span><p>Globally unique <code>id</code> of the storage provider.</p>
@@ -760,7 +759,7 @@ must be a DDS user.</p>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="folder" class="resource-group"><h2 class="group-heading">Folder<a href="#folder" class="permalink">&para;</a></h2><p>A folder represents a container for organizing files.  A folder is contained within the context of the
 project root or a project folder.</p>
 <div id="folder-folders-collection" class="resource"><h3 class="resource-heading">Folders collection<a href="#folder-folders-collection" class="permalink">&para;</a></h3><div id="folder-folders-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create a project folder</div><a href="#folder-folders-collection-post" class="method post">POST</a><code class="uri">/projects/{id}/folders</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -792,7 +791,7 @@ and only one parent folder.</li>
   "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="folder-folders-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project folders</div><a href="#folder-folders-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/folders</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -820,7 +819,7 @@ and only one parent folder.</li>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="folder-folder-instance" class="resource"><h3 class="resource-heading">Folder instance<a href="#folder-folder-instance" class="permalink">&para;</a></h3><div id="folder-folder-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project folder details</div><a href="#folder-folder-instance-get" class="method get">GET</a><code class="uri">/folders/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the folder.</p>
@@ -836,7 +835,7 @@ and only one parent folder.</li>
   "<span class="hljs-attribute">virtual_path</span>": <span class="hljs-value"><span class="hljs-string">"/Sequencing Core/Raw Data"</span></span>,
   "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="folder-folder-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a project folder</div><a href="#folder-folder-instance-delete" class="method delete">DELETE</a><code class="uri">/folders/{id}</code></h4><p><strong>permission:</strong> delete_file</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="folder-folder-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a project folder</div><a href="#folder-folder-instance-delete" class="method delete">DELETE</a><code class="uri">/folders/{id}</code></h4><p><strong>Permission:</strong> delete_file</p>
 <hr>
 <p><strong>Rules</strong></p>
 <hr>
@@ -850,7 +849,7 @@ and only one parent folder.</li>
 </ul>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the folder.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div><div id="folder-move-a-project-folder-to-new-parent" class="resource"><h3 class="resource-heading">Move a project folder to new parent<a href="#folder-move-a-project-folder-to-new-parent" class="permalink">&para;</a></h3><div id="folder-move-a-project-folder-to-new-parent-put" class="action put"><h4 class="action-heading"><div class="name">Move a project folder to new parent</div><a href="#folder-move-a-project-folder-to-new-parent-put" class="method put">PUT</a><code class="uri">/folders/{id}/move</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -879,7 +878,7 @@ folders <code>project</code> context.</li>
   "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="folder-rename-a-project-folder" class="resource"><h3 class="resource-heading">Rename a project folder<a href="#folder-rename-a-project-folder" class="permalink">&para;</a></h3><div id="folder-rename-a-project-folder-put" class="action put"><h4 class="action-heading"><div class="name">Rename a project folder</div><a href="#folder-rename-a-project-folder-put" class="method put">PUT</a><code class="uri">/folders/{id}/rename</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the folder.</p>
@@ -899,7 +898,7 @@ folders <code>project</code> context.</li>
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="parent-children" class="resource-group"><h2 class="group-heading">Parent/Children<a href="#parent-children" class="permalink">&para;</a></h2><p>Convenience endpoints for retrieval of a parent folder and project/folder children (folders and files).</p>
 <div id="parent-children-parent-folder-instance" class="resource"><h3 class="resource-heading">Parent Folder instance<a href="#parent-children-parent-folder-instance" class="permalink">&para;</a></h3><div id="parent-children-parent-folder-instance-get" class="action get"><h4 class="action-heading"><div class="name">View parent folder details</div><a href="#parent-children-parent-folder-instance-get" class="method get">GET</a><code class="uri">/folders/{id}/parent</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the folder.</p>
@@ -915,7 +914,7 @@ folders <code>project</code> context.</li>
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="parent-children-project-or-folder-children-collection" class="resource"><h3 class="resource-heading">Project or Folder Children collection<a href="#parent-children-project-or-folder-children-collection" class="permalink">&para;</a></h3><div id="parent-children-project-or-folder-children-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project or folder children</div><a href="#parent-children-project-or-folder-children-collection-get" class="method get">GET</a><code class="uri">/{context}/{id}/children{?name_contains}</code></h4><p>List children (folders and files) of the project root or a specific project folder.</p>
 <blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -975,7 +974,7 @@ If <code>context</code> is “folders”, globally unique <code>id</code> of “
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="parent-children-projects-children-collection" class="resource"><h3 class="resource-heading">Projects Children collection<a href="#parent-children-projects-children-collection" class="permalink">&para;</a></h3><div id="parent-children-projects-children-collection-get" class="action get"><h4 class="action-heading"><div class="name">List projects children</div><a href="#parent-children-projects-children-collection-get" class="method get">GET</a><code class="uri">/projects/children{?name_contains}</code></h4><p>List children (folders and files) for all projects where current user has view_project permission.</p>
 <blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1035,7 +1034,7 @@ the descriptive meta-data about file including the virtual path.</p>
 <div id="files-files-collection" class="resource"><h3 class="resource-heading">Files collection<a href="#files-files-collection" class="permalink">&para;</a></h3><div id="files-files-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create a file</div><a href="#files-files-collection-post" class="method post">POST</a><code class="uri">/projects/{id}/files</code></h4><p>Creates a file metadata object; The client is responsible for the creation of this object after confirming the associated physical
 file has been successfully uploaded to a storage provider. (see <code>Uploads</code> endpoints)</p>
 <blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1090,7 +1089,7 @@ file has been successfully uploaded to a storage provider. (see <code>Uploads</c
   </span>}</span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="files-file-instance" class="resource"><h3 class="resource-heading">File instance<a href="#files-file-instance" class="permalink">&para;</a></h3><div id="files-file-instance-get" class="action get"><h4 class="action-heading"><div class="name">View file metadata object details</div><a href="#files-file-instance-get" class="method get">GET</a><code class="uri">/files/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> view_project</p>
+<p><strong>Permission:</strong> view_project</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>Globally unique <code>id</code> of the file metadata object.</p>
@@ -1118,7 +1117,7 @@ file has been successfully uploaded to a storage provider. (see <code>Uploads</c
   </span>}</span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="files-file-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete a file metadata object</div><a href="#files-file-instance-delete" class="method delete">DELETE</a><code class="uri">/files/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> delete_file</p>
+<p><strong>Permission:</strong> delete_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1132,12 +1131,12 @@ file has been successfully uploaded to a storage provider. (see <code>Uploads</c
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>Globally unique <code>id</code> of the file metadata object.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div><div id="files-download-a-file" class="resource"><h3 class="resource-heading">Download a file<a href="#files-download-a-file" class="permalink">&para;</a></h3><div id="files-download-a-file-get" class="action get"><h4 class="action-heading"><div class="name">Download a file</div><a href="#files-download-a-file-get" class="method get">GET</a><code class="uri">/files/{id}/download</code></h4><p>Generate a storage provider specific pre-signed download URL for the file. Use a 301 temporary redirect to forward request to storage provider endpoint.</p>
 <blockquote>
-<p><strong>permission:</strong> download_file</p>
+<p><strong>Permission:</strong> download_file</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>Globally unique <code>id</code> of the file metadata object.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>301</code></strong></div></div></div><div id="files-move-a-file-metatdata-object-to-a-new-parent" class="resource"><h3 class="resource-heading">Move a file metatdata object to a new parent<a href="#files-move-a-file-metatdata-object-to-a-new-parent" class="permalink">&para;</a></h3><div id="files-move-a-file-metatdata-object-to-a-new-parent-put" class="action put"><h4 class="action-heading"><div class="name">Move a file metadata object to a new parent</div><a href="#files-move-a-file-metatdata-object-to-a-new-parent-put" class="method put">PUT</a><code class="uri">/files/{id}/move</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1177,7 +1176,7 @@ folders <code>project</code> context.</li>
   </span>}</span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="files-rename-a-file-metadata-object" class="resource"><h3 class="resource-heading">Rename a file metadata object<a href="#files-rename-a-file-metadata-object" class="permalink">&para;</a></h3><div id="files-rename-a-file-metadata-object-put" class="action put"><h4 class="action-heading"><div class="name">Rename a file metadata object</div><a href="#files-rename-a-file-metadata-object-put" class="method put">PUT</a><code class="uri">/files/{id}/rename</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>Globally unique <code>id</code> of the file metadata object.</p>
@@ -1211,7 +1210,7 @@ divide larger files into chunks and send each chunk separately, the result is a 
 be resent.  The following endpoints are used by the client to manage the chunked upload process.</p>
 <div id="uploads-uploads-collection" class="resource"><h3 class="resource-heading">Uploads collection<a href="#uploads-uploads-collection" class="permalink">&para;</a></h3><div id="uploads-uploads-collection-post" class="action post"><h4 class="action-heading"><div class="name">Intitiate a chunked file upload for a project</div><a href="#uploads-uploads-collection-post" class="method post">POST</a><code class="uri">/projects/{id}/uploads</code></h4><p>This is the first step in uploading a large file. An upload objects is created along with a composite status object used to track the progress of the chunked upload.</p>
 <blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1282,7 +1281,7 @@ storage provider.</li>
   </span>}</span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="uploads-uploads-collection-get" class="action get"><h4 class="action-heading"><div class="name">List file uploads for a project</div><a href="#uploads-uploads-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/uploads</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the project.</p>
@@ -1322,7 +1321,7 @@ storage provider.</li>
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="uploads-upload-instance" class="resource"><h3 class="resource-heading">Upload instance<a href="#uploads-upload-instance" class="permalink">&para;</a></h3><div id="uploads-upload-instance-get" class="action get"><h4 class="action-heading"><div class="name">View upload details/status</div><a href="#uploads-upload-instance-get" class="method get">GET</a><code class="uri">/uploads/{id}</code></h4><blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>xytu02a4-b9e6-473d-87c4-66f4c8815555</span></span><p>Globally unique <code>id</code> of the upload object.</p>
@@ -1361,7 +1360,7 @@ storage provider.</li>
 repeated for each chunk.  If the chunk uploads fails, the client must call this endpoint again to get a new pre-signed URL
 for the chunk number, then retry the upload.</p>
 <blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
@@ -1404,7 +1403,7 @@ storage provider.</li>
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="uploads-complete-the-chunked-file-upload" class="resource"><h3 class="resource-heading">Complete the chunked file upload<a href="#uploads-complete-the-chunked-file-upload" class="permalink">&para;</a></h3><div id="uploads-complete-the-chunked-file-upload-put" class="action put"><h4 class="action-heading"><div class="name">Complete the chunked file upload</div><a href="#uploads-complete-the-chunked-file-upload-put" class="method put">PUT</a><code class="uri">/uploads/{id}/complete</code></h4><p>This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.</p>
 <blockquote>
-<p><strong>permission:</strong> create_file</p>
+<p><strong>Permission:</strong> create_file</p>
 </blockquote>
 <hr>
 <blockquote>
