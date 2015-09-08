@@ -20,7 +20,7 @@ class Project < ActiveRecord::Base
 
   private
   def set_project_admin
-    project_admin_role = AuthRole.where(text_id: 'project_admin').first
+    project_admin_role = AuthRole.where(id: 'project_admin').first
     if project_admin_role
       self.project_permissions.build(
         user: self.creator,

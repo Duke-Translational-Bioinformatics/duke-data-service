@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :auth_role do
-    text_id { Faker::Internet.domain_word }
+    id { Faker::Internet.domain_word }
     name { Faker::App.name }
     description { Faker::Hacker.say_something_smart }
     permissions { (0..Faker::Number.digit.to_i).collect { Faker::Internet.domain_word } }

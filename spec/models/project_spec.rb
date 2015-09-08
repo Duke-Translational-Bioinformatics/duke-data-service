@@ -16,7 +16,7 @@ RSpec.describe Project, type: :model do
     it 'should have many data_files' do
       should have_many(:data_files)
     end
-    
+
     it 'should have a creator' do
       should belong_to(:creator)
     end
@@ -46,9 +46,9 @@ RSpec.describe Project, type: :model do
   end
 
   describe 'assign project admin' do
-    let(:auth_role) {FactoryGirl.create(:auth_role, {text_id: 'project_admin'})}
+    let!(:auth_role) { FactoryGirl.create(:auth_role, id: 'project_admin') }
     it 'should give the project creator a project_admin permission' do
-      expect(auth_role).to be_persisted
+      expect(AuthRole.where(id: 'project_admin').count).to eq(1)
       expect {
         expect(subject).to be_persisted
       }.to change{ProjectPermission.count}.by(1)
@@ -60,7 +60,8 @@ RSpec.describe Project, type: :model do
     end
 
     it 'should fail gracefullly if project_admin AuthRole does not exist' do
-      expect(AuthRole.where(text_id: 'project_admin').count).to eq(0)
+      auth_role.destroy
+      expect(AuthRole.where(id: 'project_admin').count).to eq(0)
       expect {
         expect(subject).to be_persisted
       }.to change{ProjectPermission.count}.by(0)
