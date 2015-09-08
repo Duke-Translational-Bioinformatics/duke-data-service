@@ -15,7 +15,7 @@ class ProjectPermissionSerializer < ActiveModel::Serializer
 
   def auth_role
     {
-      id: object.auth_role.text_id,
+      id: object.auth_role.id,
       name: object.auth_role.name,
       description: object.auth_role.description
     }

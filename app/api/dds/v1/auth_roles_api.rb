@@ -58,7 +58,7 @@ module DDS
       end
       get '/:context/auth_roles/:id', root: false do
         authenticate!
-        AuthRole.where(text_id: params[:id]).first
+        AuthRole.find(params[:id])
       end
     end
   end

@@ -34,7 +34,7 @@ RSpec.describe User, type: :model do
     end
 
     it 'should only allow auth_role_ids that exist' do
-      should allow_value([role_1.text_id]).for(:auth_role_ids)
+      should allow_value([role_1.id]).for(:auth_role_ids)
       should allow_value([]).for(:auth_role_ids)
       should_not allow_value(['foo']).for(:auth_role_ids)
     end
@@ -47,14 +47,14 @@ RSpec.describe User, type: :model do
       expect(subject).to respond_to(:auth_roles)
       expect(subject.auth_roles).to be_a Array
       subject.auth_role_ids.each do |role_id|
-        role = AuthRole.where(text_id: role_id).first
+        role = AuthRole.where(id: role_id).first
         expect(subject.auth_roles).to include(role)
       end
     end
 
     it 'should have an auth_roles= method' do
       expect(subject).to respond_to(:auth_roles=)
-      new_role_ids = [ role_1.text_id, role_2.text_id ]
+      new_role_ids = [ role_1.id, role_2.id ]
       subject.auth_roles = new_role_ids
       expect(subject.auth_role_ids).to eq(new_role_ids)
     end

@@ -36,7 +36,7 @@ module DDS
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
         permission = ProjectPermission.where(project: project, user: user).first || ProjectPermission.new(project: project, user: user)
-        permission.auth_role = AuthRole.where(text_id: permission_params[:auth_role][:id]).first
+        permission.auth_role = AuthRole.where(id: permission_params[:auth_role][:id]).first
         unless permission.auth_role
           raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
         end

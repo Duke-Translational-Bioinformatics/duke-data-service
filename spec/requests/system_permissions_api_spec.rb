@@ -8,8 +8,8 @@ describe DDS::V1::SystemPermissionsAPI do
   let(:auth_user) { FactoryGirl.create(:user, :with_auth_role) }
   let(:user_role_hash) {{
     'user' => JSON.parse(UserSerializer.new(auth_user).to_json),
-    'auth_roles' => auth_user.auth_roles.collect { |role| 
-      JSON.parse(AuthRoleSerializer.new(role).to_json) 
+    'auth_roles' => auth_user.auth_roles.collect { |role|
+      JSON.parse(AuthRoleSerializer.new(role).to_json)
     }
   }}
   let(:auth_role) { FactoryGirl.create(:auth_role) }
@@ -31,7 +31,7 @@ describe DDS::V1::SystemPermissionsAPI do
   describe 'Grant system permissions to user' do
     it 'should set auth_roles for a given user' do
       payload = {
-        auth_roles: [auth_role.text_id]
+        auth_roles: [auth_role.id]
       }
       expected_result = {
         user: JSON.parse(UserSerializer.new(user).to_json),

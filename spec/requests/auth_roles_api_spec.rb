@@ -82,7 +82,7 @@ describe DDS::V1::AuthRolesAPI do
   end
 
   describe 'List details of a single authorization role' do
-    let(:auth_role_id) { auth_role.text_id }
+    let(:auth_role_id) { auth_role.id }
     let(:url) { "/api/v1/project/auth_roles/#{auth_role_id}" }
     it 'should return a json with a specific authorization role' do
       expect(auth_role).to be_persisted
