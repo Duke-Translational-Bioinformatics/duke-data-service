@@ -13,18 +13,18 @@ RSpec.describe AuthRole, type: :model do
     it 'should require a name' do
       should validate_presence_of(:name)
     end
-    
+
     it 'should require a description' do
       should validate_presence_of(:description)
     end
-    
+
     it 'should require at least one permission' do
       should validate_presence_of(:permissions)
       should allow_value(['foo']).for(:permissions)
       should allow_value(['foo', 'bar']).for(:permissions)
       should_not allow_value([]).for(:permissions)
     end
-    
+
     it 'should require at least one context' do
       should validate_presence_of(:contexts)
       should allow_value(['foo']).for(:contexts)
@@ -33,11 +33,26 @@ RSpec.describe AuthRole, type: :model do
     end
   end
 
+  describe 'queries' do
+    let(:query_context) {'findme'}
+    let!(:with_context) { FactoryGirl.create_list(:auth_role, 5, contexts: [query_context]) }
+    let!(:others) { FactoryGirl.create_list(:auth_role, 5) }
+
+    it 'should support with_context' do
+      expect(AuthRole).to respond_to 'with_context'
+      found_with_context = AuthRole.with_context(query_context)
+      expect(found_with_context.count).to eq(with_context.length)
+      found_with_context.each do |ar|
+        expect(ar.contexts).to include(query_context)
+      end
+    end
+  end
+
   #{
   #  "id": "system_admin",
   #  "name": "System Admin",
   #  "description": "Can perform all system operations across all projects",
-  #  "permissions": [ "system_admin" ], 
+  #  "permissions": [ "system_admin" ],
   #  "contexts": [ "system" ], // Contexts in which role is relevant (i.e. "system" or "project"),
   #  "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
   #},
