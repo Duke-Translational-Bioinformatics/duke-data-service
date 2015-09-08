@@ -10,8 +10,6 @@ class Project < ActiveRecord::Base
   has_many :affiliations
   has_many :data_files
 
-  accepts_nested_attributes_for :project_permissions
-    
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :creator_id, presence: true
@@ -24,10 +22,10 @@ class Project < ActiveRecord::Base
   def set_project_admin
     project_admin_role = AuthRole.where(text_id: 'project_admin').first
     if project_admin_role
-      self.project_permissions_attributes = [{
-        user_id: self.creator.id,
-        auth_role_id: project_admin_role.id
-      }]
+      self.project_permissions.build(
+        user: self.creator,
+        auth_role: project_admin_role
+      )
     end
   end
 end

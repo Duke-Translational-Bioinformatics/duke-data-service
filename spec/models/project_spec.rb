@@ -54,6 +54,7 @@ RSpec.describe Project, type: :model do
       }.to change{ProjectPermission.count}.by(1)
       expect(subject.project_permissions.count).to eq(1)
       permission = subject.project_permissions.first
+      expect(permission).to be_persisted
       expect(permission.auth_role).to eq(auth_role)
       expect(permission.user).to eq(subject.creator)
     end
