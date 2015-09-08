@@ -128,6 +128,8 @@ GEM
       pry (~> 0.10)
     puma (2.11.3)
       rack (>= 1.1, < 2.0)
+    pundit (1.0.1)
+      activesupport (>= 3.0.0)
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -234,6 +236,7 @@ DEPENDENCIES
   pg
   pry-byebug
   puma
+  pundit
   rack (= 1.6.4)
   rack-cors
   rails (= 4.2.1)

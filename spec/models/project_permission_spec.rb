@@ -23,6 +23,10 @@ RSpec.describe ProjectPermission, type: :model do
       should validate_presence_of(:user_id)
     end
 
+    it 'should have a user_id unique to the project' do
+      should validate_uniqueness_of(:user_id).scoped_to(:project_id)
+    end
+
     it 'should have a project_id' do
       should validate_presence_of(:project_id)
     end

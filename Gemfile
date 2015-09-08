@@ -16,6 +16,7 @@ gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem "grape-active_model_serializers"
 gem 'turbolinks'
 gem 'uglifier'
+gem 'pundit'
 gem 'httparty'
 
 # use figaro to set heroku environment variables for secrets
