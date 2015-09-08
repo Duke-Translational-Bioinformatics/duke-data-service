@@ -1,7 +1,6 @@
 class Project < ActiveRecord::Base
-
-  after_save :add_project_admin_role_to_user
   after_initialize :init
+  before_create :set_project_admin
 
   belongs_to :creator, class_name: "User"
   has_many :folders
@@ -10,6 +9,8 @@ class Project < ActiveRecord::Base
   has_many :uploads
   has_many :affiliations
   has_many :data_files
+
+  accepts_nested_attributes_for :project_permissions
     
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
@@ -20,9 +21,13 @@ class Project < ActiveRecord::Base
   end
 
   private
-  def add_project_admin_role_to_user
-    user = self.creator
-    user.update(auth_role_ids: user.auth_roles=(['project_admin'])) if user
+  def set_project_admin
+    project_admin_role = AuthRole.where(text_id: 'project_admin').first
+    if project_admin_role
+      self.project_permissions_attributes = [{
+        user_id: self.creator.id,
+        auth_role_id: project_admin_role.id
+      }]
+    end
   end
-
 end

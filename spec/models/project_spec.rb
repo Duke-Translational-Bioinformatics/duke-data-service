@@ -2,7 +2,6 @@ require 'rails_helper'
 require 'shoulda-matchers'
 
 RSpec.describe Project, type: :model do
-  let(:user) { FactoryGirl.create(:user) }
   subject { FactoryGirl.create(:project) }
 
   describe 'associations' do
@@ -47,14 +46,24 @@ RSpec.describe Project, type: :model do
   end
 
   describe 'assign project admin' do
-    let!(:auth_role) {FactoryGirl.create(:auth_role, {text_id: 'project_admin'})}
+    let(:auth_role) {FactoryGirl.create(:auth_role, {text_id: 'project_admin'})}
     it 'should give the project creator a project_admin permission' do
-      expect(subject).to be_persisted
-      updated_user = User.find(subject.creator_id)
-      expect(updated_user.auth_role_ids).to be
-      expect(updated_user.auth_role_ids).not_to eq('null')
-      expect(updated_user.auth_role_ids).to eq(['project_admin'])
-      expect(updated_user.auth_roles).to include(auth_role)
+      expect(auth_role).to be_persisted
+      expect {
+        expect(subject).to be_persisted
+      }.to change{ProjectPermission.count}.by(1)
+      expect(subject.project_permissions.count).to eq(1)
+      permission = subject.project_permissions.first
+      expect(permission.auth_role).to eq(auth_role)
+      expect(permission.user).to eq(subject.creator)
+    end
+
+    it 'should fail gracefullly if project_admin AuthRole does not exist' do
+      expect(AuthRole.where(text_id: 'project_admin').count).to eq(0)
+      expect {
+        expect(subject).to be_persisted
+      }.to change{ProjectPermission.count}.by(0)
+      expect(subject.project_permissions.count).to eq(0)
     end
   end
 
