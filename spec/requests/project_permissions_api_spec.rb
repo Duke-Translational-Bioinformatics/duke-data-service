@@ -39,7 +39,7 @@ describe DDS::V1::ProjectPermissionsAPI do
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let!(:payload) {{
-        auth_role: {id: auth_role.text_id}
+        auth_role: {id: auth_role.id}
       }}
 
       context 'non-existent project permission' do

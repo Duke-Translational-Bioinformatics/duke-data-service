@@ -5,9 +5,9 @@ RSpec.describe AuthRole, type: :model do
   describe 'validations' do
     subject {FactoryGirl.create(:auth_role)}
 
-    it 'should require a unique text_id' do
-      should validate_presence_of(:text_id)
-      should validate_uniqueness_of(:text_id)
+    it 'should require a unique id' do
+      should validate_presence_of(:id)
+      should validate_uniqueness_of(:id)
     end
 
     it 'should require a name' do
@@ -70,7 +70,7 @@ RSpec.describe AuthRole, type: :model do
       expect(parsed_json).to have_key('permissions')
       expect(parsed_json).to have_key('contexts')
       expect(parsed_json).to have_key('is_deprecated')
-      expect(parsed_json['id']).to eq(subject.text_id)
+      expect(parsed_json['id']).to eq(subject.id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['description']).to eq(subject.description)
       expect(parsed_json['permissions']).to eq(subject.permissions)
