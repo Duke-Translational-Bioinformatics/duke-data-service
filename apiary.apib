@@ -176,7 +176,7 @@ An authorization role represents a set of discrete permissions that may be grant
     + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
 
 ### View authorization role details [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -255,7 +255,7 @@ A user represents a registered user.
 
 ## Users collection [/users{?name_contains}]
 ### List registered users [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Parameters
@@ -308,7 +308,7 @@ A user represents a registered user.
             }
 
 ### View registered user details [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200
@@ -321,7 +321,7 @@ A system permission represents system level authorization roles that have been g
 ## System Permissions collection [/system/permissions]
 
 ### List system level permissions [GET]
->**permission:** system_admin
+>**Permission:** system_admin
 - - - - -
 
 + Response 200 (application/json)
@@ -357,7 +357,7 @@ A system permission represents system level authorization roles that have been g
             }
 
 ### Grant system level permissions to user [PUT]
->**permission:** system_admin
+>**Permission:** system_admin
 - - - - -
 
 >**Rules**
@@ -377,7 +377,7 @@ A system permission represents system level authorization roles that have been g
     [System Permission instance][]
 
 ### View system level permissions for user [GET]
->**permission:** system_admin OR system permissions are for the current user
+>**Permission:** system_admin OR system permissions are for the current user
 - - - - -
 
 + Response 200
@@ -385,7 +385,7 @@ A system permission represents system level authorization roles that have been g
     [System Permission instance][]
 
 ### Revoke system level permissions for user [DELETE]
->**permission:** system_admin
+>**Permission:** system_admin
 - - - - -
 
 >**Rules**
@@ -400,7 +400,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 ## Projects collection [/projects]
 
 ### Create a project [POST]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 >**Rules**
@@ -425,7 +425,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
         }
 
 ### List projects [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 >**Rules**
@@ -464,7 +464,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
             }
 
 ### View project details [GET]
-**permission:** view_project
+**Permission:** view_project
 - - - - -
 
 + Response 200
@@ -487,7 +487,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
     [Project instance][]
 
 ### Delete a project [DELETE]
-**permission:** delete_project
+**Permission:** delete_project
 - - - - -
 
 **Rules**
@@ -505,7 +505,7 @@ A project permission represents project level authorization roles that have been
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
 ### List project level permissions [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -544,7 +544,7 @@ A project permission represents project level authorization roles that have been
             }
 
 ### Grant project level permissions to user [PUT]
->**permission:** manage_project_permissions
+>**Permission:** manage_project_permissions
 - - - - -
 
 >**Rules**
@@ -564,7 +564,7 @@ A project permission represents project level authorization roles that have been
     [Project Permission instance][]
 
 ### View project level permissions for user [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200
@@ -572,7 +572,7 @@ A project permission represents project level authorization roles that have been
     [Project Permission instance][]
 
 ### Revoke project level permissions for user [DELETE]
->**permission:** manage_project_permissions
+>**Permission:** manage_project_permissions
 - - - - -
 
 >**Rules**
@@ -595,7 +595,7 @@ context of a project.  These roles have no relationship to authorization roles.
 ## Project Roles collection [/project_roles]
 
 ### List project roles [GET]
-**permission:** authenticated
+**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -622,7 +622,7 @@ context of a project.  These roles have no relationship to authorization roles.
     + id (required, string, `principal_investigator`) ... The unique `id` for a project role.
 
 ### View project role details [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -644,7 +644,7 @@ must be a DDS user.
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
 ### List project affiliations [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -683,7 +683,7 @@ must be a DDS user.
             }
 
 ### Associate affiliate to a project [PUT]
->**permission:** update_project
+>**Permission:** update_project
 - - - - -
 
 >**Rules**
@@ -701,7 +701,7 @@ must be a DDS user.
     [Affiliate instance][]
 
 ### View project level affiliation for a user [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200
@@ -709,7 +709,7 @@ must be a DDS user.
     [Affiliate instance][]
 
 ### Delete project affiliate [DELETE]
->**permission:** update_project
+>**Permission:** update_project
 - - - - -
 
 + Response 204
@@ -720,7 +720,7 @@ A storage provider represents an external service that provides physical storage
 ## Storage Providers collection [/storage_providers]
 
 ### List storage providers [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -754,7 +754,7 @@ A storage provider represents an external service that provides physical storage
 
 
 ### View storage provider details [GET]
->**permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -775,7 +775,7 @@ project root or a project folder.
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
 
 ### Create a project folder [POST]
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Rules**
@@ -805,7 +805,7 @@ and only one parent folder.
         }
 
 ### List project folders [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 >**Rules**
@@ -833,7 +833,7 @@ and only one parent folder.
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
 ### View project folder details [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -849,7 +849,7 @@ and only one parent folder.
         }
 
 ### Delete a project folder [DELETE]
-**permission:** delete_file
+**Permission:** delete_file
 - - - - -
 
 **Rules**
@@ -864,7 +864,7 @@ and only one parent folder.
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
 ### Move a project folder to new parent [PUT]
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Rules**
@@ -895,7 +895,7 @@ folders `project` context.
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
 ### Rename a project folder [PUT]
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 + Request (application/json)
@@ -924,7 +924,7 @@ Convenience endpoints for retrieval of a parent folder and project/folder childr
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
 ## View parent folder details [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -948,7 +948,7 @@ Convenience endpoints for retrieval of a parent folder and project/folder childr
 
 ### List project or folder children [GET]
 List children (folders and files) of the project root or a specific project folder.
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 >**Rules**
@@ -996,7 +996,7 @@ List children (folders and files) of the project root or a specific project fold
 
 ### List projects children [GET]
 List children (folders and files) for all projects where current user has view_project permission.
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 >**Rules**
@@ -1050,7 +1050,7 @@ the descriptive meta\-data about file including the virtual path.
 Creates a file metadata object; The client is responsible for the creation of this object after confirming the associated physical 
 file has been successfully uploaded to a storage provider. (see `Uploads` endpoints)
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Rules**
@@ -1117,7 +1117,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
             }
 
 ### View file metadata object details [GET]
->**permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200
@@ -1125,7 +1125,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
     [File instance][]
 
 ### Delete a file metadata object [DELETE]
->**permission:** delete_file
+>**Permission:** delete_file
 - - - - -
 
 >**Rules**
@@ -1142,7 +1142,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
 ### Download a file [GET]
 Generate a storage provider specific pre-signed download URL for the file. Use a 301 temporary redirect to forward request to storage provider endpoint.
 
->**permission:** download_file
+>**Permission:** download_file
 - - - - -
 
 + Response 301
@@ -1152,7 +1152,7 @@ Generate a storage provider specific pre-signed download URL for the file. Use a
     + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
 
 ### Move a file metadata object to a new parent [PUT]
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Rules**
@@ -1189,7 +1189,7 @@ folders `project` context.
     + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file metadata object.
 
 ### Rename a file metadata object [PUT]
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 + Request (application/json)
@@ -1228,7 +1228,7 @@ be resent.  The following endpoints are used by the client to manage the chunked
 ### Intitiate a chunked file upload for a project [POST]
 This is the first step in uploading a large file. An upload objects is created along with a composite status object used to track the progress of the chunked upload.
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Request/Response Payload Properties**
@@ -1287,7 +1287,7 @@ storage provider.
 
 ### List file uploads for a project [GET]
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 + Response 200 (application/json)
@@ -1326,7 +1326,7 @@ storage provider.
 
 ## View upload details/status [GET]
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 + Response 200 (application/json)
@@ -1364,7 +1364,7 @@ Generate a pre-signed URL that will be used by client to upload a file chunk to 
 repeated for each chunk.  If the chunk uploads fails, the client must call this endpoint again to get a new pre-signed URL
 for the chunk number, then retry the upload.
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Request/Response Payload Properties**
@@ -1408,7 +1408,7 @@ storage provider.
 ### Complete the chunked file upload [PUT]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 
->**permission:** create_file
+>**Permission:** create_file
 - - - - -
 
 >**Rules**
