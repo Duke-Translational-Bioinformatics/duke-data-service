@@ -4,16 +4,17 @@ require 'securerandom'
 
 describe DDS::V1::CurrentUserAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
+  let (:auth_service) { FactoryGirl.create(:authentication_service) }
+  let (:user) { FactoryGirl.create(:user) }
+  let (:user_authentication_service) {
+    FactoryGirl.create(:user_authentication_service,
+      user: user,
+      authentication_service: auth_service,
+    )
+  }
+  let (:api_token) { user_authentication_service.api_token }
+
   describe 'get /current_user' do
-    let (:auth_service) { FactoryGirl.create(:authentication_service) }
-    let (:user) { FactoryGirl.create(:user) }
-    let (:user_authentication_service) {
-      FactoryGirl.create(:user_authentication_service,
-        user: user,
-        authentication_service: auth_service,
-      )
-    }
-    let (:api_token) { user_authentication_service.api_token }
     let(:wrong_secret_api_token) {
       JWT.encode({
         'id' => user.id,
@@ -76,5 +77,18 @@ describe DDS::V1::CurrentUserAPI do
       expect(error_response['reason']).to eq('expired api_token')
       expect(error_response['suggestion']).to eq('you need to login with your authenticaton service')
     end
+  end
+
+  describe 'get /current_user/usage' do
+    include_context 'with authentication'
+
+    let(:url) { '/api/v1/current_user/usage' }
+    subject { get(url, nil, headers) }
+    let(:resource) { user }
+    let(:resource_class) { User }
+    let(:resource_serializer) { UserUsageSerializer }
+
+    it_behaves_like 'a viewable resource'
+    it_behaves_like 'an authenticated resource'
   end
 end
