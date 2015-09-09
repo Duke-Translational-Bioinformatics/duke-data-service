@@ -24,7 +24,7 @@ describe ProjectPolicy do
       is_expected.not_to permit(user, other_project)
     end
 
-    it 'allows access' do
+    it 'grants access with project permission' do
       is_expected.to permit(user, project)
     end
   end
@@ -34,7 +34,7 @@ describe ProjectPolicy do
       is_expected.to permit(user, other_project)
     end
 
-    it 'grants access' do
+    it 'grants access with project permission' do
       is_expected.to permit(user, project)
     end
   end
@@ -44,7 +44,7 @@ describe ProjectPolicy do
       is_expected.not_to permit(user, other_project)
     end
 
-    it 'grants access' do
+    it 'grants access with project permission' do
       is_expected.to permit(user, project)
     end
   end
@@ -54,7 +54,7 @@ describe ProjectPolicy do
       is_expected.not_to permit(user, other_project)
     end
 
-    it 'grants access' do
+    it 'grants access with project permission' do
       is_expected.to permit(user, project)
     end
   end
