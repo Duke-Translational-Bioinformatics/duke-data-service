@@ -145,10 +145,9 @@ An authorization role represents a set of discrete permissions that may be grant
 | **update\_file** | Can upload new version of existing file |
 | **delete\_file** | Can delete a file |
 
-## Authorization Roles collection [/{context}/auth_roles]
+## Authorization Roles collection [/auth_roles{?context}]
 + Parameters
-    + context (required, string, `system`) ... The `context` or scope in which permission can be granted;
-    valid values are "system" or "project".
+    + context (optional, string, `system`) ... The `context` or scope in which permission can be granted; valid context values are "system" or "project".
 
 ### List authorization roles for a context [GET]
 >**Permission:** authenticated
@@ -169,10 +168,8 @@ An authorization role represents a set of discrete permissions that may be grant
             ]
         }
 
-## Authorization Role instance [/{context}/auth_roles/{id}]
+## Authorization Role instance [/auth_roles/{id}]
 + Parameters
-    + context (required, string, `project`) ... The `context` or scope in which permission can be granted;
-    valid values are "system" or "project".
     + id (required, string, `file_editor`) ... The unique `id` for an authorization role.
 
 ### View authorization role details [GET]
