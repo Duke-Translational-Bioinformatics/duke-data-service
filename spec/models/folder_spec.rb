@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe Folder, type: :model do
   subject { FactoryGirl.create(:folder) }

@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }

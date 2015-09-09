@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe AuthenticationService, type: :model do
   subject { FactoryGirl.create(:authentication_service) }

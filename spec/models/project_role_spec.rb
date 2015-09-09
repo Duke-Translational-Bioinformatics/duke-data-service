@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe ProjectRole, type: :model do
   it 'should have id as primary key' do

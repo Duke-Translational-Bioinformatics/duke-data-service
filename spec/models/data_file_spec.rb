@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe DataFile, type: :model do
   subject { FactoryGirl.create(:data_file) }

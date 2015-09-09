@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe ProjectPermission, type: :model do
   let(:roles) {FactoryGirl.create_list(:auth_role, 2)}
