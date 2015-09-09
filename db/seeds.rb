@@ -43,13 +43,13 @@ end
     id: 'principal_investigator',
     name: 'Principal Investigator',
     description: "Lead investigator for the research project",
-    is_depricated: false
+    is_deprecated: false
   },
   {
     id: "research_coordinator",
     name: "Research Coordinator",
     description: "Coordinator for the research project",
-    is_depricated: false
+    is_deprecated: false
   }
 ].each do |role|
   ProjectRole.create(role)
