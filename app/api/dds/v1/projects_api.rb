@@ -54,7 +54,9 @@ module DDS
       end
       get '/projects/:id', root: false do
         authenticate!
-        Project.find(params[:id])
+        project = Project.find(params[:id])
+        authorize project, :show?
+        project
       end
 
       desc 'Update a project' do

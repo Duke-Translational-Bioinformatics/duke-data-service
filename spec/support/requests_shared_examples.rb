@@ -115,6 +115,16 @@ shared_examples 'an authenticated resource' do
   end
 end
 
+shared_examples 'an authorized resource' do
+  it 'should return a 403 error response' do
+    expect(resource_permission).to be_persisted
+    expect(resource_permission.destroy!).to be_truthy
+    expect(resource_permission).not_to be_persisted
+    is_expected.to eq(403)
+    expect(response.status).to eq(403)
+  end
+end
+
 shared_examples 'a validated resource' do
   it 'returns a failed response' do
     is_expected.to eq(400)
