@@ -32,7 +32,7 @@ module DDS
         end
 
         desc 'View authorization role details' do
-          detail 'Returns the details of an auth role for a given text id.'
+          detail 'View authorization role details.'
           named 'view authorization role'
           failure [
             [200, 'Success'],
