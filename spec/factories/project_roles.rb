@@ -3,10 +3,10 @@ FactoryGirl.define do
     id { Faker::Lorem.word }
     name { Faker::Lorem.word.titleize }
     description { Faker::Lorem.sentence }
-    is_depricated false
+    is_deprecated false
 
-    trait :depricated do
-      is_depricated true
+    trait :deprecated do
+      is_deprecated true
     end
   end
 end
