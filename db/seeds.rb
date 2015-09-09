@@ -35,5 +35,22 @@
       permissions: %w(view_project download_file create_file update_file delete_file)
     }
 ].each do |role|
-  AuthRole.create(role) unless AuthRole.where(id: role[:text_id]).exists?
+  AuthRole.create(role)
+end
+
+[
+  {
+    id: 'principal_investigator',
+    name: 'Principal Investigator',
+    description: "Lead investigator for the research project",
+    is_depricated: false
+  },
+  {
+    id: "research_coordinator",
+    name: "Research Coordinator",
+    description: "Coordinator for the research project",
+    is_depricated: false
+  }
+].each do |role|
+  ProjectRole.create(role)
 end
