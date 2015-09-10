@@ -6,7 +6,7 @@ module DDS
         named 'api_token'
         failure [
           [200,'Success'],
-          [401, 'Missing, invalid, or Access Token']
+          [401, 'Missing, or invalid Access Token']
         ]
       end
       params do
@@ -65,16 +65,19 @@ module DDS
       end
 
       desc 'users' do
-        detail 'This allows a client to get a list of users using a filter'
+        detail 'This allows a client to get a list of users, with an optional filter'
         named 'users'
-        failure [400, 401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
       end
       params do
-        optional :last_name_begins_with
-        optional :first_name_begins_with
-        optional :display_name_contains
+        optional :last_name_begins_with, type: String, desc: 'list users whose last name begins with this string'
+        optional :first_name_begins_with, type: String, desc: 'list users whose first name begins with this string'
+        optional :display_name_contains, type: String, desc: 'list users whose full name contains this string'
       end
-      get '/users', root: false do
+      get '/users', root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
         users = []
@@ -93,7 +96,7 @@ module DDS
         else
           users = User.order(last_name: :asc).all
         end
-        {results: ActiveModel::ArraySerializer.new(users, each_serializer: UserSerializer) }
+        users
       end
     end
   end
