@@ -40,7 +40,7 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
-      get '/projects', root: false do
+      get '/projects', root: 'results' do
         authenticate!
         Project.where(is_deleted: false)
       end

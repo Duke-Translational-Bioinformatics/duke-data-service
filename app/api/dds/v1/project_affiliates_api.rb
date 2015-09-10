@@ -40,7 +40,7 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
-      get '/projects/:project_id/affiliates', root: false do
+      get '/projects/:project_id/affiliates', root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
         project.affiliations
