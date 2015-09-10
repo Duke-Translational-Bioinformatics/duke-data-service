@@ -178,7 +178,7 @@ describe DDS::V1::UserAPI do
 
     let(:last_name_begins_with) { 'Abc' }
     let(:first_name_begins_with) { 'Xyz' }
-    let(:display_name_contains) { 'aso' }
+    let(:full_name_contains) { 'aso' }
     let!(:users_with_last_name) {
       users = []
       5.times do
@@ -209,22 +209,22 @@ describe DDS::V1::UserAPI do
       users = []
       auser = FactoryGirl.create(:user_authentication_service, :populated)
       auser.user.update(
-        :display_name => "#{Faker::Name.first_name}#{display_name_contains} #{Faker::Name.last_name}"
+        :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
       )
       users << auser
       buser = FactoryGirl.create(:user_authentication_service, :populated)
       buser.user.update(
-        :display_name => "#{Faker::Name.first_name} #{display_name_contains}#{Faker::Name.last_name}"
+        :display_name => "#{Faker::Name.first_name} #{full_name_contains}#{Faker::Name.last_name}"
       )
       users << buser
       cuser = FactoryGirl.create(:user_authentication_service, :populated)
       cuser.user.update(
-        :display_name => "#{display_name_contains}#{Faker::Name.first_name} #{Faker::Name.last_name}"
+        :display_name => "#{full_name_contains}#{Faker::Name.first_name} #{Faker::Name.last_name}"
       )
       users << cuser
       duser = FactoryGirl.create(:user_authentication_service, :populated)
       duser.user.update(
-        :display_name => "#{Faker::Name.first_name} #{Faker::Name.last_name}#{display_name_contains}"
+        :display_name => "#{Faker::Name.first_name} #{Faker::Name.last_name}#{full_name_contains}"
       )
       users << duser
       users
@@ -283,20 +283,20 @@ describe DDS::V1::UserAPI do
       it_behaves_like 'an authenticated resource'
     end
 
-    describe 'with display_name_contains' do
-      subject {   get(url, {display_name_contains: display_name_contains}, headers) }
+    describe 'with full_name_contains' do
+      subject {   get(url, {full_name_contains: full_name_contains}, headers) }
 
       it_behaves_like 'a listable resource' do
         let(:resource) { users_with_display_name[0].user }
         let(:expected_list_length) { users_with_display_name.length }
 
-        it 'should return an list of users whose display_name_contains' do
+        it 'should return an list of users whose full_name_contains' do
           is_expected.to eq(200)
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('results')
           returned_users = response_json['results']
           returned_users.each do |ruser|
-            expect(ruser['full_name']).to match(display_name_contains)
+            expect(ruser['full_name']).to match(full_name_contains)
           end
         end
       end

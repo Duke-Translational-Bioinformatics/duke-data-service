@@ -75,7 +75,7 @@ module DDS
       params do
         optional :last_name_begins_with, type: String, desc: 'list users whose last name begins with this string'
         optional :first_name_begins_with, type: String, desc: 'list users whose first name begins with this string'
-        optional :display_name_contains, type: String, desc: 'list users whose full name contains this string'
+        optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
       end
       get '/users', root: 'results' do
         authenticate!
@@ -85,10 +85,10 @@ module DDS
           users = User.where(
             "last_name like ?",
             "#{query_params[:last_name_begins_with]}%").order(last_name: :asc).all
-        elsif query_params[:display_name_contains]
+        elsif query_params[:full_name_contains]
           users = User.where(
             "display_name like ?",
-            "%#{query_params[:display_name_contains]}%").order(last_name: :asc).all
+            "%#{query_params[:full_name_contains]}%").order(last_name: :asc).all
         elsif query_params[:first_name_begins_with]
           users = User.where(
             "first_name like ?",
