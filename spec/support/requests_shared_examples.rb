@@ -16,13 +16,25 @@ shared_context 'with authentication' do
 end
 
 shared_examples 'a listable resource' do
-  it 'should return a list that includes a serialized resource' do
+  let(:expected_list_length) { resource_class.all.count }
+  before do
     expect(resource).to be_persisted
+  end
+  it 'should return a list that includes a serialized resource' do
     is_expected.to eq(200)
     expect(response.status).to eq(200)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
     expect(response.body).to include(resource_serializer.new(resource).to_json)
+  end
+
+  it 'should include the expected number of results' do
+    is_expected.to eq(200)
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('results')
+    returned_results = response_json['results']
+    expect(returned_results).to be_a(Array)
+    expect(returned_results.length).to eq(expected_list_length)
   end
 end
 

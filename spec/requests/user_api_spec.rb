@@ -3,20 +3,22 @@ require 'jwt'
 require 'securerandom'
 
 describe DDS::V1::UserAPI do
-  let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
-  let (:auth_service) { FactoryGirl.create(:authentication_service) }
+  include_context 'with authentication'
+  let (:auth_service) { user_auth.authentication_service }
 
   describe 'get /api/v1/user/api_token' do
+    let(:url) { '/api/v1/user/api_token' }
+
     describe 'for first time users' do
-      let(:user) { FactoryGirl.build(:user) }
+      let(:new_user) { FactoryGirl.attributes_for(:user) }
       let(:new_user_token) {
         {
           'service_id' => auth_service.uuid,
           'uid' => FactoryGirl.attributes_for(:user_authentication_service)[:uid],
-          'display_name' => user.display_name,
-          'first_name' => user.first_name,
-          'last_name' => user.last_name,
-          'email' => user.email,
+          'display_name' => new_user[:display_name],
+          'first_name' => new_user[:first_name],
+          'last_name' => new_user[:last_name],
+          'email' => new_user[:email],
         }
       }
       let (:access_token) {
@@ -25,12 +27,16 @@ describe DDS::V1::UserAPI do
           Rails.application.secrets.secret_key_base
         )
       }
+      subject { get(url, {access_token: access_token}, common_headers) }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
+        expect(current_user).to be_persisted
+        expect(user_auth).to be_persisted
+        expect(auth_service).to be_persisted
         pre_time = DateTime.now.to_i
         expect{
           expect {
-            get '/api/v1/user/api_token', {access_token: access_token}, json_headers
+            is_expected.to eq(200)
           }.to change{UserAuthenticationService.count}.by(1)
         }.to change{User.count}.by(1)
         post_time = DateTime.now.to_i
@@ -63,21 +69,14 @@ describe DDS::V1::UserAPI do
     end
 
     describe 'for all users' do
-      let (:user) { FactoryGirl.create(:user) }
-      let (:user_authentication_service) {
-        FactoryGirl.create(:user_authentication_service,
-          user: user,
-          authentication_service: auth_service,
-        )
-      }
       let (:user_token) {
         {
           'service_id' => auth_service.uuid,
-          'uid' => user_authentication_service.uid,
-          'display_name' => user.display_name,
-          'first_name' => user.first_name,
-          'last_name' => user.last_name,
-          'email' => user.email
+          'uid' => user_auth.uid,
+          'display_name' => current_user.display_name,
+          'first_name' => current_user.first_name,
+          'last_name' => current_user.last_name,
+          'email' => current_user.email
         }
       }
       let (:access_token) {
@@ -86,21 +85,22 @@ describe DDS::V1::UserAPI do
       let (:unknown_service_access_token) {
         JWT.encode({
           'service_id' => SecureRandom.uuid,
-          'uid' => user_authentication_service.uid,
-          'display_name' => user.display_name,
-          'first_name' => user.first_name,
-          'last_name' => user.last_name,
-          'email' => user.email,
+          'uid' => user_auth.uid,
+          'display_name' => current_user.display_name,
+          'first_name' => current_user.first_name,
+          'last_name' => current_user.last_name,
+          'email' => current_user.email,
         }, Rails.application.secrets.secret_key_base)
       }
       let (:wrong_secret_access_token) {
         JWT.encode(user_token, 'WrongSecret')
       }
+      subject { get(url, {access_token: access_token}, common_headers) }
 
       it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-        original_last_login_at = user.last_login_at.to_i
+        original_last_login_at = current_user.last_login_at.to_i
         pre_time = DateTime.now.to_i
-        get '/api/v1/user/api_token', {access_token: access_token}, json_headers
+        is_expected.to eq(200)
         post_time = DateTime.now.to_i
         expect(response.status).to eq(200)
         expect(response.body).to be
@@ -114,18 +114,18 @@ describe DDS::V1::UserAPI do
         %w(id authentication_service_id exp).each do |expected_key|
           expect(decoded_token).to have_key(expected_key)
         end
-        expect(decoded_token['id']).to eq(user.id)
+        expect(decoded_token['id']).to eq(current_user.id)
         expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
         existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
-        expect(existing_user.id).to eq(user.id)
+        expect(existing_user.id).to eq(current_user.id)
         expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
         expect(existing_user.last_login_at.to_i).to be >= pre_time
         expect(existing_user.last_login_at.to_i).to be <= post_time
       end
 
       it 'should respond with an error when not provided an access_token' do
-        get '/api/v1/user/api_token', nil, json_headers
+        get url, nil, common_headers
         expect(response.status).to eq(400)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
@@ -138,8 +138,8 @@ describe DDS::V1::UserAPI do
       end
 
       it 'should respond with an error when the service_id in the access_token is not registered' do
-        original_last_login_at = user.last_login_at.to_i
-        get '/api/v1/user/api_token', {access_token: unknown_service_access_token}, json_headers
+        original_last_login_at = current_user.last_login_at.to_i
+        get url, {access_token: unknown_service_access_token}, common_headers
         expect(response.status).to eq(401)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
@@ -149,13 +149,13 @@ describe DDS::V1::UserAPI do
         expect(error_response['error']).to eq(401)
         expect(error_response['reason']).to eq('invalid access_token')
         expect(error_response['suggestion']).to eq('authenticaton service not recognized')
-        user.reload
-        expect(user.last_login_at.to_i).to eq(original_last_login_at)
+        current_user.reload
+        expect(current_user.last_login_at.to_i).to eq(original_last_login_at)
       end
 
       it 'should respond with an error when the token has not been signed by the secret_key_base' do
-        original_last_login_at = user.last_login_at.to_i
-        get '/api/v1/user/api_token', {access_token: wrong_secret_access_token}, json_headers
+        original_last_login_at = current_user.last_login_at.to_i
+        get url, {access_token: wrong_secret_access_token}, common_headers
         expect(response.status).to eq(401)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
@@ -165,22 +165,21 @@ describe DDS::V1::UserAPI do
         expect(error_response['error']).to eq(401)
         expect(error_response['reason']).to eq('invalid access_token')
         expect(error_response['suggestion']).to eq('token not properly signed')
-        user.reload
-        expect(user.last_login_at.to_i).to eq(original_last_login_at)
+        current_user.reload
+        expect(current_user.last_login_at.to_i).to eq(original_last_login_at)
       end
     end
   end
 
   describe 'get /api/v1/users' do
     let(:url) { "/api/v1/users" }
-    let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
-    let(:user) { user_auth.user }
-    let (:api_token) { user_auth.api_token }
-    let(:json_headers_with_auth) {{'Authorization' => api_token}.merge(json_headers)}
+    let(:resource_class) { User }
+    let(:resource_serializer) {UserSerializer}
+
     let(:last_name_begins_with) { 'Abc' }
     let(:first_name_begins_with) { 'Xyz' }
     let(:display_name_contains) { 'aso' }
-    let(:users_with_last_name) {
+    let!(:users_with_last_name) {
       users = []
       5.times do
         nuser = FactoryGirl.create(
@@ -193,7 +192,7 @@ describe DDS::V1::UserAPI do
       users
     }
 
-    let(:users_with_first_name) {
+    let!(:users_with_first_name) {
       users = []
       5.times do
         nuser = FactoryGirl.create(
@@ -206,7 +205,7 @@ describe DDS::V1::UserAPI do
       users
     }
 
-    let(:users_with_display_name) {
+    let!(:users_with_display_name) {
       users = []
       auser = FactoryGirl.create(:user_authentication_service, :populated)
       auser.user.update(
@@ -231,70 +230,78 @@ describe DDS::V1::UserAPI do
       users
     }
 
-    it 'should return all users when not provided a filter' do
-      expect(users_with_first_name.length + users_with_first_name.length).to be <= 10
-      get url, nil, json_headers_with_auth
-      expect(response.status).to eq(200);
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('results')
-      returned_users = response_json['results']
-      expect(returned_users.length).to eq(User.all.count)
-    end
+    describe 'without filters' do
+      subject { get(url, nil, headers) }
 
-    it 'should return an list of users whose last_name_begins_with' do
-      expect(users_with_last_name.length).to be >= 5
-      get url, {last_name_begins_with: last_name_begins_with}, json_headers_with_auth
-      expect(response.status).to eq(200);
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).not_to be_empty
-      expect(response_json).to have_key('results')
-      returned_users = response_json['results']
-      expect(returned_users).not_to be_empty
-      expect(returned_users.length).to be >= users_with_last_name.length
-      returned_users.each do |ruser|
-        expect(ruser['last_name']).to start_with(last_name_begins_with)
+      it_behaves_like 'a listable resource' do
+        let(:resource) { users_with_first_name[0].user }
       end
+
+      it_behaves_like 'an authenticated resource'
     end
 
-    it 'should return an list of users whose first_name_begins_with' do
-      expect(users_with_first_name.length).to be >= 5
-      get url, {first_name_begins_with: first_name_begins_with}, json_headers_with_auth
-      expect(response.status).to eq(200);
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('results')
-      returned_users = response_json['results']
-      expect(returned_users).not_to be_empty
-      expect(returned_users.length).to be >= users_with_first_name.length
-      returned_users.each do |ruser|
-        expect(ruser['first_name']).to start_with(first_name_begins_with)
+    describe 'with last_name_begins_with filter' do
+      subject { get(url, {last_name_begins_with: last_name_begins_with}, headers) }
+
+      it_behaves_like 'a listable resource' do
+        let(:resource) { users_with_last_name[0].user }
+        let(:expected_list_length) { users_with_last_name.length }
+
+        it 'should return a list of users whose last_name_begins_with' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).not_to be_empty
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['last_name']).to start_with(last_name_begins_with)
+          end
+        end
       end
+
+      it_behaves_like 'an authenticated resource'
     end
 
-    it 'should return an list of users whose display_name_contains' do
-      expect(users_with_display_name.length).to be >= 4
-      get url, {display_name_contains: display_name_contains}, json_headers_with_auth
-      expect(response.status).to eq(200);
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('results')
-      returned_users = response_json['results']
-      expect(returned_users).not_to be_empty
-      expect(returned_users.length).to be >= users_with_display_name.length
-      returned_users.each do |ruser|
-        expect(ruser['full_name']).to match(display_name_contains)
+    describe 'with first_name_begins_with' do
+      subject { get(url, {first_name_begins_with: first_name_begins_with}, headers) }
+
+      it_behaves_like 'a listable resource' do
+        let(:resource) { users_with_first_name[0].user }
+        let(:expected_list_length) { users_with_first_name.length }
+
+        it 'should return an list of users whose first_name_begins_with' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['first_name']).to start_with(first_name_begins_with)
+          end
+        end
       end
+
+      it_behaves_like 'an authenticated resource'
     end
 
-    it 'should require an auth token' do
-      get url, nil, json_headers
-      expect(response.status).to eq(401)
+    describe 'with display_name_contains' do
+      subject {   get(url, {display_name_contains: display_name_contains}, headers) }
+
+      it_behaves_like 'a listable resource' do
+        let(:resource) { users_with_display_name[0].user }
+        let(:expected_list_length) { users_with_display_name.length }
+
+        it 'should return an list of users whose display_name_contains' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['full_name']).to match(display_name_contains)
+          end
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

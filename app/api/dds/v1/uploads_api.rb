@@ -48,7 +48,7 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
-      get '/projects/:project_id/uploads', root: false do
+      get '/projects/:project_id/uploads', root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
         project.uploads.all

@@ -42,7 +42,7 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
-      get '/projects/:id/folders', root: false do
+      get '/projects/:id/folders', root: 'results' do
         authenticate!
         project = Project.find(params[:id])
         project.folders.all
@@ -154,15 +154,10 @@ module DDS
           [404, 'Folder does not exist']
         ]
       end
-      get '/folders/:id/children', root: false do
+      get '/folders/:id/children', root: 'results' do
         authenticate!
-        #results = []
-        #Folder.where(parent_id: params[:id]).find_each do |folder|
-        #  results.push(folder)
-        #end
-        #results
         folder = Folder.find(params[:id])
-        folder.children
+        folder.children.where(is_deleted: false)
       end
     end
   end
