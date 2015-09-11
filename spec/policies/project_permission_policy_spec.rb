@@ -10,7 +10,7 @@ describe ProjectPermissionPolicy do
   subject { described_class }
 
   permissions ".scope" do
-    it 'returns project_permissions with for projects with project permissions' do
+    it 'returns project_permissions for projects with project permissions' do
       expect(project_permission).to be_persisted
       expect(other_project_permission).to be_persisted
       expect(scope.all).to include(project_permission)
