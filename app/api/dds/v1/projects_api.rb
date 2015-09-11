@@ -51,6 +51,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
+          [403, 'Forbidden'],
           [404, 'Project Does not Exist']
         ]
       end
@@ -67,6 +68,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
+          [403, 'Forbidden'],
           [400, 'Project Name Already Exists'],
           [404, 'Project Does not Exist']
         ]
@@ -79,6 +81,7 @@ module DDS
         authenticate!
         project_params = declared(params, include_missing: false)
         project = Project.find(params[:id])
+        authorize project, :update?
         if project.update(project_params)
           project
         else
@@ -92,12 +95,14 @@ module DDS
         failure [
           [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
+          [403, 'Forbidden'],
           [404, 'Project Does not Exist']
         ]
       end
       delete '/projects/:id', root: false do
         authenticate!
         project = Project.find(params[:id])
+        authorize project, :destroy?
         project.update_attribute(:is_deleted, true)
         body false
       end

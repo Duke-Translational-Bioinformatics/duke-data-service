@@ -90,6 +90,7 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
 
     describe 'DELETE' do
@@ -106,6 +107,7 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 end
