@@ -12,7 +12,7 @@ class ApplicationPolicy
   end
 
   def show?
-    scope.where(:id => record.id).exists?
+    permission.exists?
   end
 
   def create?
@@ -50,5 +50,11 @@ class ApplicationPolicy
     def resolve
       scope
     end
+  end
+
+  private
+
+  def permission
+    scope.where(:id => record.id)
   end
 end
