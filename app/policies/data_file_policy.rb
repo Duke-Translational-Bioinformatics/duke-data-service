@@ -1,4 +1,8 @@
 class DataFilePolicy < ApplicationPolicy
+  def download?
+    permission.exists?
+  end
+
   def create?
     permission.exists?
   end
