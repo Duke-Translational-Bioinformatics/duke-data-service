@@ -3,7 +3,7 @@ require 'rails_helper'
 describe UploadPolicy do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:user) { project_permission.user }
-  let(:upload) { FactoryGirl.create(:upload, project: project_permission.project) }
+  let(:upload) { FactoryGirl.build(:upload, project: project_permission.project) }
   let(:other_upload) { FactoryGirl.create(:upload) }
 
   let(:scope) { subject.new(user, upload).scope }
@@ -12,7 +12,7 @@ describe UploadPolicy do
 
   permissions ".scope" do
     it 'returns uploads with project permissions' do
-      expect(upload).to be_persisted
+      expect(upload.save).to be_truthy
       expect(other_upload).to be_persisted
       expect(scope.all).to include(upload)
       expect(scope.all).not_to include(other_upload)

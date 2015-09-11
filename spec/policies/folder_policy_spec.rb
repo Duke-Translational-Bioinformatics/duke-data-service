@@ -3,7 +3,7 @@ require 'rails_helper'
 describe FolderPolicy do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:user) { project_permission.user }
-  let(:folder) { FactoryGirl.create(:folder, project: project_permission.project) }
+  let(:folder) { FactoryGirl.build(:folder, project: project_permission.project) }
   let(:other_folder) { FactoryGirl.create(:folder) }
 
   let(:scope) { subject.new(user, folder).scope }
@@ -12,7 +12,7 @@ describe FolderPolicy do
 
   permissions ".scope" do
     it 'returns folders with project permissions' do
-      expect(folder).to be_persisted
+      expect(folder.save).to be_truthy
       expect(other_folder).to be_persisted
       expect(scope.all).to include(folder)
       expect(scope.all).not_to include(other_folder)

@@ -4,7 +4,7 @@ describe ChunkPolicy do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:user) { project_permission.user }
   let(:upload) { FactoryGirl.create(:upload, project: project_permission.project) }
-  let(:chunk) { FactoryGirl.create(:chunk, upload: upload) }
+  let(:chunk) { FactoryGirl.build(:chunk, upload: upload) }
   let(:other_chunk) { FactoryGirl.create(:chunk) }
 
   let(:scope) { subject.new(user, chunk).scope }
@@ -13,7 +13,7 @@ describe ChunkPolicy do
 
   permissions ".scope" do
     it 'returns chunks with project permissions' do
-      expect(chunk).to be_persisted
+      expect(chunk.save).to be_truthy
       expect(other_chunk).to be_persisted
       expect(scope.all).to include(chunk)
       expect(scope.all).not_to include(other_chunk)

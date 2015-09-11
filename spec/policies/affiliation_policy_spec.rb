@@ -3,7 +3,7 @@ require 'rails_helper'
 describe AffiliationPolicy do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:user) { project_permission.user }
-  let(:affiliation) { FactoryGirl.create(:affiliation, project: project_permission.project) }
+  let(:affiliation) { FactoryGirl.build(:affiliation, project: project_permission.project) }
   let(:other_affiliation) { FactoryGirl.create(:affiliation) }
 
   let(:scope) { subject.new(user, affiliation).scope }
@@ -12,7 +12,7 @@ describe AffiliationPolicy do
 
   permissions ".scope" do
     it 'returns affiliations with project permissions' do
-      expect(affiliation).to be_persisted
+      expect(affiliation.save).to be_truthy
       expect(other_affiliation).to be_persisted
       expect(scope.all).to include(affiliation)
       expect(scope.all).not_to include(other_affiliation)

@@ -55,6 +55,6 @@ class ApplicationPolicy
   private
 
   def permission
-    scope.where(:id => record.id)
+    record.project_permissions.where(user: user)
   end
 end

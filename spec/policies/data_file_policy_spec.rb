@@ -3,7 +3,7 @@ require 'rails_helper'
 describe DataFilePolicy do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:user) { project_permission.user }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
+  let(:data_file) { FactoryGirl.build(:data_file, project: project_permission.project) }
   let(:other_data_file) { FactoryGirl.create(:data_file) }
 
   let(:scope) { subject.new(user, data_file).scope }
@@ -12,7 +12,7 @@ describe DataFilePolicy do
 
   permissions ".scope" do
     it 'returns data_files with project permissions' do
-      expect(data_file).to be_persisted
+      expect(data_file.save).to be_truthy
       expect(other_data_file).to be_persisted
       expect(scope.all).to include(data_file)
       expect(scope.all).not_to include(other_data_file)
