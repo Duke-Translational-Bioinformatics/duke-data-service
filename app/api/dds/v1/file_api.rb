@@ -32,6 +32,7 @@ module DDS
           upload_id: upload.id,
           name: upload.name
         })
+        authorize file, :create?
         if file.save
           file
         else
@@ -53,7 +54,9 @@ module DDS
           end
           get '/', root: false do
             authenticate!
-            DataFile.find(params[:id])
+            file = DataFile.find(params[:id])
+            authorize file, :show?
+            file
           end
 
           desc 'Delete a file metadata object' do
@@ -69,6 +72,7 @@ module DDS
           delete '/', root: false do
             authenticate!
             file = DataFile.find(params[:id])
+            authorize file, :destroy?
             file.update_attribute(:is_deleted, true)
             body false
           end
@@ -86,6 +90,7 @@ module DDS
           get '/download', root: false do
             authenticate!
             file = DataFile.find(params[:id])
+            authorize file, :download?
             redirect file.upload.temporary_url, permanent: true
           end
 
@@ -108,6 +113,7 @@ module DDS
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
             new_parent = file.project.folders.find(file_params[:parent][:id])
+            authorize file, :create?
             file.update_attribute(:parent_id, new_parent.id)
             file
           end
@@ -128,6 +134,7 @@ module DDS
             authenticate!
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
+            authorize file, :create?
             file.update_attribute(:name, file_params[:name])
             file
           end
