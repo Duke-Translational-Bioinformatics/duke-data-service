@@ -7,8 +7,6 @@ describe DDS::V1::FileAPI do
   let(:upload) { FactoryGirl.create(:upload, project_id: project.id) }
   let(:folder) { FactoryGirl.create(:folder, project_id: project.id) }
   let(:file) { FactoryGirl.create(:data_file, project_id: project.id, upload_id: upload.id) }
-  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project_id: project.id, upload_id: upload.id) }
-  let(:serialized_file) { DataFileSerializer.new(file).to_json }
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { file }

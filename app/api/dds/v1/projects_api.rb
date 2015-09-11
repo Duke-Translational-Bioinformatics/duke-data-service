@@ -36,10 +36,11 @@ module DDS
         detail 'Lists projects for which the current user has the "view_project" permission.'
         named 'list projects'
         failure [
+          [200, 'Success'],
           [401, 'Unauthorized']
         ]
       end
-      get '/projects', root: false do
+      get '/projects', root: 'results' do
         authenticate!
         Project.where(is_deleted: false)
       end
@@ -48,6 +49,7 @@ module DDS
         detail 'Returns the project details for a given project uuid.'
         named 'view project'
         failure [
+          [200, 'Success'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
         ]
@@ -63,6 +65,7 @@ module DDS
         detail 'Update the project details for a given project uuid.'
         named 'update project'
         failure [
+          [200, 'Success'],
           [401, 'Unauthorized'],
           [400, 'Project Name Already Exists'],
           [404, 'Project Does not Exist']
