@@ -12,6 +12,10 @@ RSpec.describe ProjectPermission, type: :model do
       should belong_to :project
     end
 
+    it 'should have many a project permissions' do
+      should have_many(:project_permissions).through(:project)
+    end
+
     it 'should belong to an auth_role' do
       should belong_to :auth_role
     end
