@@ -14,17 +14,19 @@ describe DDS::V1::UploadsAPI do
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: upload.project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      #let(:project) { resource.project }
 
       it_behaves_like 'a listable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
         let(:resource_class) { 'Project' }
@@ -64,6 +66,8 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
         let(:resource_class) { 'Project' }
@@ -80,6 +84,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/uploads/notexists_resourceid" }
       end
@@ -125,6 +131,8 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/uploads/notexists_resourceid/chunks" }
         let(:resource_class) {"Upload"}
@@ -137,8 +145,11 @@ describe DDS::V1::UploadsAPI do
 
     describe 'PUT' do
       subject { put(url, nil, headers) }
+
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
       end
