@@ -15,6 +15,8 @@ describe DDS::V1::FolderAPI do
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
   let(:resource_id) { folder.id }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+
   let(:project_id) { project.id}
   let(:child_folder_id) {child_folder.id}
   let(:child_and_parent_id) {child_and_parent.id}
@@ -34,6 +36,7 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:project_id) {'notfoundid'}
@@ -51,6 +54,7 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'a creatable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
@@ -82,6 +86,7 @@ describe DDS::V1::FolderAPI do
 
   describe 'Folder instance' do
     let(:url) { "/api/v1/folders/#{resource_id}" }
+    let(:project) { resource.project }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -89,6 +94,7 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -113,12 +119,14 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 
   describe 'Move a Project Folder to a New Parent' do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
     let(:new_parent) { FactoryGirl.create(:folder) }
+    let(:project) { resource.project }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -128,6 +136,7 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an updatable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -137,6 +146,7 @@ describe DDS::V1::FolderAPI do
 
   describe 'Rename a Project Folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/rename" }
+    let(:project) { resource.project }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -151,6 +161,7 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -165,10 +176,12 @@ describe DDS::V1::FolderAPI do
       subject { get(url, nil, headers) }
       let(:parent) { child_folder.parent }
       let(:resource) { parent }
+      let(:project) { child_folder.project }
 
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:child_folder_id) {'notfoundid'}
@@ -185,6 +198,7 @@ describe DDS::V1::FolderAPI do
       let(:resource) { FactoryGirl.create(:folder, parent_id: child_and_parent.id) }
       #Add deleted folder to ensure it isn't included in listable result
       let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, parent_id: child_and_parent.id) }
+      let(:project) { child_and_parent.project }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { child_and_parent.children.count }
@@ -196,6 +210,7 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:child_and_parent_id) {'notfoundid'}
