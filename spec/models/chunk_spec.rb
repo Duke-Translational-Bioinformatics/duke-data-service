@@ -16,6 +16,12 @@ RSpec.describe Chunk, type: :model do
     it 'should have_one storage_provider via upload' do
       should have_one(:storage_provider).through(:upload)
     end
+    it 'should have one project via upload' do
+      should have_one(:project).through(:upload)
+    end
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
+    end
   end
 
   describe 'validations' do

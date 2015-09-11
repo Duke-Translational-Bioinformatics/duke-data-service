@@ -3,6 +3,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :project
 	belongs_to :parent, class_name: "Folder"
   belongs_to :upload
+  has_many :project_permissions, through: :project
 
   validates :name, presence: true
   validates :project_id, presence: true

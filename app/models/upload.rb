@@ -2,6 +2,7 @@ class Upload < ActiveRecord::Base
   belongs_to :project
   belongs_to :storage_provider
   has_many :chunks
+  has_many :project_permissions, through: :project
 
   validates :project_id, presence: true
   validates :name, presence: true

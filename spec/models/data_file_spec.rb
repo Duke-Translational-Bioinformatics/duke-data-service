@@ -4,7 +4,6 @@ RSpec.describe DataFile, type: :model do
   subject { FactoryGirl.create(:data_file) }
 
   describe 'associations' do
-
     it 'should be part of a project' do
       should belong_to(:project)
     end
@@ -15,6 +14,10 @@ RSpec.describe DataFile, type: :model do
 
     it 'should be based on an upload' do
       should belong_to(:upload)
+    end
+
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
     end
   end
 

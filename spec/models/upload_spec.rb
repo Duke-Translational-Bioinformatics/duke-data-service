@@ -16,6 +16,10 @@ RSpec.describe Upload, type: :model do
     it 'should have_many chunks' do
       should have_many :chunks
     end
+
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
+    end
   end
 
   describe 'validations' do

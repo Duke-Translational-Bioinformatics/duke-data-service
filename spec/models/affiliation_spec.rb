@@ -13,6 +13,10 @@ RSpec.describe Affiliation, type: :model do
     it 'should belong_to a project_role' do
       should belong_to(:project_role)
     end
+
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
+    end
   end
 
   describe 'validations' do

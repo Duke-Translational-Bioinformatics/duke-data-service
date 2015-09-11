@@ -12,6 +12,10 @@ RSpec.describe Folder, type: :model do
     it 'should have a parent' do
       should belong_to(:parent)
     end
+
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
+    end
   end
 
   describe 'validations' do
