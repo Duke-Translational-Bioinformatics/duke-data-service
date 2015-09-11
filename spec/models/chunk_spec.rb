@@ -20,7 +20,7 @@ RSpec.describe Chunk, type: :model do
       should have_one(:project).through(:upload)
     end
     it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:project)
+      should have_many(:project_permissions).through(:upload)
     end
   end
 

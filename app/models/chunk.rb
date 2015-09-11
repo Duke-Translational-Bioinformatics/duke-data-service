@@ -2,7 +2,7 @@ class Chunk < ActiveRecord::Base
   belongs_to :upload
   has_one :storage_provider, through: :upload
   has_one :project, through: :upload
-  has_many :project_permissions, through: :project
+  has_many :project_permissions, through: :upload
 
   validates :upload_id, presence: true
   validates :number, presence: true
