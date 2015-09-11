@@ -7,10 +7,12 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let(:project) { affiliation.project }
   let(:user) { affiliation.user }
   let(:project_role) { FactoryGirl.create(:project_role) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
   let(:resource_class) { Affiliation }
   let(:resource_serializer) { AffiliationSerializer }
   let!(:resource) { affiliation }
+  let!(:resource_permission) { project_permission }
 
   describe 'Project Affiliate collection' do
     let(:url) { "/api/v1/projects/#{project.id}/affiliates" }
@@ -20,6 +22,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a listable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 
@@ -31,6 +34,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
 
     describe 'PUT' do
@@ -54,6 +58,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
 
     describe 'DELETE' do
@@ -61,6 +66,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 end

@@ -22,9 +22,10 @@ module DDS
         user = User.find(params[:user_id])
         affiliation = project.affiliations.where(user: user).first ||
           project.affiliations.build({
-            user: user,
+            user: user
           })
         affiliation.project_role_id = declared_params[:project_role][:id]
+        authorize affiliation, :create?
         if affiliation.save
           affiliation
         else
@@ -43,6 +44,7 @@ module DDS
       get '/projects/:project_id/affiliates', root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
+        authorize project, :show?
         project.affiliations
       end
 
@@ -58,7 +60,9 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        Affiliation.where(project: project, user: user).first
+        affiliation = Affiliation.where(project: project, user: user).first
+        authorize affiliation, :show?
+        affiliation
       end
 
       desc 'Delete project affiliation' do
@@ -73,7 +77,9 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        Affiliation.where(project: project, user: user).destroy_all
+        affiliations = Affiliation.where(project: project, user: user).all
+        authorize affiliations.first, :destroy?
+        affiliations.destroy_all
         body false
       end
     end
