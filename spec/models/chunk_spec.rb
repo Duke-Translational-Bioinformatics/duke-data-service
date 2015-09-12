@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe Chunk, type: :model do
   subject { FactoryGirl.create(:chunk) }
@@ -16,6 +15,12 @@ RSpec.describe Chunk, type: :model do
     end
     it 'should have_one storage_provider via upload' do
       should have_one(:storage_provider).through(:upload)
+    end
+    it 'should have one project via upload' do
+      should have_one(:project).through(:upload)
+    end
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:upload)
     end
   end
 

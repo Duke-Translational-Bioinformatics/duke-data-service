@@ -6,10 +6,12 @@ describe DDS::V1::ProjectsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
   let(:project_stub) { FactoryGirl.build(:project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
   let(:resource_class) { Project }
   let(:resource_serializer) { ProjectSerializer }
   let!(:resource) { project }
+  let!(:resource_permission) { project_permission }
 
   describe 'Project collection' do
     let(:url) { "/api/v1/projects" }
@@ -70,6 +72,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
 
     describe 'PUT' do
@@ -87,6 +90,7 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
 
     describe 'DELETE' do
@@ -103,6 +107,7 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 end

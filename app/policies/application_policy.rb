@@ -2,6 +2,7 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(user, record)
+    raise Pundit::NotAuthorizedError, "must be logged in" unless user
     @user = user
     @record = record
   end
@@ -11,7 +12,7 @@ class ApplicationPolicy
   end
 
   def show?
-    scope.where(:id => record.id).exists?
+    permission.exists?
   end
 
   def create?
@@ -49,5 +50,11 @@ class ApplicationPolicy
     def resolve
       scope
     end
+  end
+
+  private
+
+  def permission
+    record.project_permissions.where(user: user)
   end
 end

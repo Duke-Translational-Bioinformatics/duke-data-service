@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
@@ -16,6 +15,10 @@ RSpec.describe Upload, type: :model do
 
     it 'should have_many chunks' do
       should have_many :chunks
+    end
+
+    it 'should have many project permissions' do
+      should have_many(:project_permissions).through(:project)
     end
   end
 

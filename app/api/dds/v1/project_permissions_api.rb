@@ -13,6 +13,7 @@ module DDS
       get '/projects/:project_id/permissions', root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
+        authorize project, :show?
         project.project_permissions
       end
 
@@ -40,6 +41,7 @@ module DDS
         unless permission.auth_role
           raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
         end
+        authorize permission, :create?
         if permission.save
           permission
         else
@@ -64,6 +66,7 @@ module DDS
         unless permission
           raise ActiveRecord::RecordNotFound.new(message: "Couldn't find ProjectPermission with project_id #{params[:project_id]} user #{params[:user_id]}")
         end
+        authorize permission, :show?
         permission
       end
 
@@ -81,7 +84,9 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        ProjectPermission.where(project: project, user: user).first.destroy
+        permission = ProjectPermission.where(project: project, user: user).first
+        authorize permission, :show?
+        permission.destroy
         body false
       end
     end

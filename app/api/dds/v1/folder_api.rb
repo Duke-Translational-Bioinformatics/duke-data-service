@@ -26,6 +26,7 @@ module DDS
           parent_id: folder_params[:parent][:id],
           name: folder_params[:name]
         })
+        authorize folder, :create?
         if folder.save
           folder
         else
@@ -45,6 +46,7 @@ module DDS
       get '/projects/:id/folders', root: 'results' do
         authenticate!
         project = Project.find(params[:id])
+        authorize project, :show?
         project.folders.all
       end
 
@@ -59,7 +61,9 @@ module DDS
       end
       get '/folders/:id', root: false do
         authenticate!
-        Folder.find(params[:id])
+        folder = Folder.find(params[:id])
+        authorize folder, :show?
+        folder
       end
 
       desc 'Delete a folder' do
@@ -75,6 +79,7 @@ module DDS
       delete '/folders/:id', root: false do
         authenticate!
         folder = Folder.find(params[:id])
+        authorize folder, :destroy?
         folder.update_attribute(:is_deleted, true)
         body false
       end
@@ -96,6 +101,7 @@ module DDS
         folder_params = declared(params, include_missing: false)
         new_parent = folder_params[:parent][:id]
         folder = Folder.find(params[:id])
+        authorize folder, :create?
         #TODO: validate that parent exists
         if folder.update(parent_id: new_parent)
           folder
@@ -121,6 +127,7 @@ module DDS
         folder_params = declared(params, include_missing: false)
         new_name = folder_params[:name]
         folder = Folder.find(params[:id])
+        authorize folder, :create?
         if folder.update(name: new_name)
           folder
         else
@@ -142,6 +149,7 @@ module DDS
         #parent_id = Folder.find(params[:id]).parent_id
         #Folder.find(parent_id)
         folder = Folder.find(params[:id])
+        authorize folder, :show?
         folder.parent
       end
 
@@ -157,6 +165,7 @@ module DDS
       get '/folders/:id/children', root: 'results' do
         authenticate!
         folder = Folder.find(params[:id])
+        authorize folder, :show?
         folder.children.where(is_deleted: false)
       end
     end

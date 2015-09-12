@@ -10,6 +10,7 @@ module DDS
       formatter :json, Grape::Formatter::ActiveModelSerializers
       prefix :api
 
+      helpers Pundit
       helpers do
         def logger
           Rails.logger
@@ -90,6 +91,15 @@ module DDS
           "suggestion" => "you may have mistyped the #{missing_object} id"
         }
         error!(error_json, 404)
+      end
+
+      rescue_from Pundit::NotAuthorizedError do |e|
+        error_json = {
+          "error" => "403",
+          "reason" => "Unauthorized",
+          "suggestion" => "request permission to access this resource"
+        }
+        error!(error_json, 403)
       end
 
       mount DDS::V1::UserAPI

@@ -7,9 +7,12 @@ describe DDS::V1::FileAPI do
   let(:upload) { FactoryGirl.create(:upload, project_id: project.id) }
   let(:folder) { FactoryGirl.create(:folder, project_id: project.id) }
   let(:file) { FactoryGirl.create(:data_file, project_id: project.id, upload_id: upload.id) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { file }
+  let!(:resource_permission) { project_permission }
 
   describe 'Files collection' do
     let(:url) { "/api/v1/projects/#{project.id}/files" }
@@ -24,6 +27,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'a creatable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/notexists_project_id/files" }
@@ -57,6 +61,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id" }
@@ -81,6 +86,7 @@ describe DDS::V1::FileAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 
@@ -88,13 +94,14 @@ describe DDS::V1::FileAPI do
     let(:url) { "/api/v1/files/#{resource.id}/download" }
 
     describe 'GET' do
-      subject! { get(url, nil, headers) }
+      subject { get(url, nil, headers) }
 
       it 'permenantly redirects to a temporary get url for the upload' do
-        expect(response.status).to eq(301)
+        is_expected.to eq(301)
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/download" }
@@ -114,6 +121,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'an updatable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/move" }
@@ -132,6 +140,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'an updatable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/rename" }

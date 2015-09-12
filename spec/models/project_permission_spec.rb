@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda-matchers'
 
 RSpec.describe ProjectPermission, type: :model do
   let(:roles) {FactoryGirl.create_list(:auth_role, 2)}
@@ -11,6 +10,10 @@ RSpec.describe ProjectPermission, type: :model do
 
     it 'should belong to a project' do
       should belong_to :project
+    end
+
+    it 'should have many a project permissions' do
+      should have_many(:project_permissions).through(:project)
     end
 
     it 'should belong to an auth_role' do

@@ -32,6 +32,7 @@ module DDS
           fingerprint_algorithm: upload_params[:hash][:algorithm],
           storage_provider_id: storage_provider.id
         })
+        authorize upload, :create?
         if upload.save
           upload
         else
@@ -51,6 +52,7 @@ module DDS
       get '/projects/:project_id/uploads', root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
+        authorize project, :show?
         project.uploads.all
       end
 
@@ -65,7 +67,9 @@ module DDS
       end
       get '/uploads/:id/', root: false do
         authenticate!
-        Upload.find(params[:id])
+        upload = Upload.find(params[:id])
+        authorize upload, :show?
+        upload
       end
 
       desc 'Get pre-signed URL to upload the next chunk' do
@@ -96,6 +100,7 @@ module DDS
           fingerprint_value: chunk_params[:hash][:value],
           fingerprint_algorithm: chunk_params[:hash][:algorithm]
         })
+        authorize chunk, :create?
         if chunk.save
           chunk
         else
@@ -115,6 +120,7 @@ module DDS
       put '/uploads/:id/complete', root: false do
         authenticate!
         upload = Upload.find(params[:id])
+        authorize upload, :update?
         upload.touch
         upload
       end
