@@ -3,7 +3,6 @@ require 'rails_helper'
 describe DDS::V1::FolderAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
   let(:folder) { FactoryGirl.create(:folder) }
   let(:child_folder) { FactoryGirl.create(:child_folder) }
   let(:child_and_parent) { FactoryGirl.create(:child_and_parent) }
@@ -17,6 +16,7 @@ describe DDS::V1::FolderAPI do
   let(:resource_id) { folder.id }
   let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
+  let(:project) { resource.project }
   let(:project_id) { project.id}
   let(:child_folder_id) {child_folder.id}
   let(:child_and_parent_id) {child_and_parent.id}
@@ -26,7 +26,6 @@ describe DDS::V1::FolderAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      let(:project) { resource.project }
 
       it_behaves_like 'a listable resource' do
         it 'should not include deleted folders' do
@@ -46,6 +45,7 @@ describe DDS::V1::FolderAPI do
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
+      let(:project) { FactoryGirl.create(:project) }
       let!(:payload) {{
         parent: { id: folder_stub.parent_id },
         name: folder_stub.name
@@ -86,7 +86,6 @@ describe DDS::V1::FolderAPI do
 
   describe 'Folder instance' do
     let(:url) { "/api/v1/folders/#{resource_id}" }
-    let(:project) { resource.project }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -126,7 +125,6 @@ describe DDS::V1::FolderAPI do
   describe 'Move a Project Folder to a New Parent' do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
     let(:new_parent) { FactoryGirl.create(:folder) }
-    let(:project) { resource.project }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -146,7 +144,6 @@ describe DDS::V1::FolderAPI do
 
   describe 'Rename a Project Folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/rename" }
-    let(:project) { resource.project }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -176,7 +173,6 @@ describe DDS::V1::FolderAPI do
       subject { get(url, nil, headers) }
       let(:parent) { child_folder.parent }
       let(:resource) { parent }
-      let(:project) { child_folder.project }
 
       it_behaves_like 'a viewable resource'
 
