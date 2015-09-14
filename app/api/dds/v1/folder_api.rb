@@ -149,8 +149,9 @@ module DDS
         #parent_id = Folder.find(params[:id]).parent_id
         #Folder.find(parent_id)
         folder = Folder.find(params[:id])
-        authorize folder, :show?
-        folder.parent
+        parent = folder.parent
+        authorize parent, :show?
+        parent
       end
 
       desc 'View children folder details' do
