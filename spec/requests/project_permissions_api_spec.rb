@@ -18,7 +18,12 @@ describe DDS::V1::ProjectPermissionsAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it_behaves_like 'a listable resource'
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_permission,
+          FactoryGirl.create(:project_permission, user: current_user)
+        ] }
+      end
 
       it 'should only include permissions for this project' do
         expect(other_permission).to be_persisted

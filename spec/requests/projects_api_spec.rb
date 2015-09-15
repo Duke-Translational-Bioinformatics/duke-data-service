@@ -23,7 +23,7 @@ describe DDS::V1::ProjectsAPI do
         let(:unexpected_resources) { [
           deleted_project,
           other_project
-        ]}
+        ] }
       end
 
       it_behaves_like 'an authenticated resource'
