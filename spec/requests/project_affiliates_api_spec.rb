@@ -8,6 +8,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let(:user) { affiliation.user }
   let(:project_role) { FactoryGirl.create(:project_role) }
   let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let(:other_affiliation) { FactoryGirl.create(:affiliation) }
 
   let(:resource_class) { Affiliation }
   let(:resource_serializer) { AffiliationSerializer }
@@ -20,7 +21,12 @@ describe DDS::V1::ProjectAffiliatesAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it_behaves_like 'a listable resource'
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_affiliation
+        ] }
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
     end

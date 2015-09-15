@@ -42,7 +42,7 @@ module DDS
       end
       get '/projects', root: 'results' do
         authenticate!
-        Project.where(is_deleted: false)
+        policy_scope(Project).where(is_deleted: false)
       end
 
       desc 'View project details' do
