@@ -47,7 +47,7 @@ module DDS
         authenticate!
         project = Project.find(params[:id])
         authorize project, :show?
-        project.folders.all
+        policy_scope(Folder).where(project: project, is_deleted: false)
       end
 
       desc 'View folder details' do
