@@ -6,6 +6,7 @@ describe DDS::V1::UploadsAPI do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:project) { FactoryGirl.create(:project) }
   let(:upload) { FactoryGirl.create(:upload, project_id: project.id) }
+  let(:other_upload) { FactoryGirl.create(:upload) }
   let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload) }
@@ -22,7 +23,11 @@ describe DDS::V1::UploadsAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it_behaves_like 'a listable resource'
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_upload
+        ] }
+      end
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
