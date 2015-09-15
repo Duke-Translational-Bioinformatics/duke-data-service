@@ -87,17 +87,17 @@ module DDS
         if query_params[:last_name_begins_with]
           users = User.where(
             "last_name like ?",
-            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc).all
+            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc)
         elsif query_params[:full_name_contains]
           users = User.where(
             "display_name like ?",
-            "%#{query_params[:full_name_contains]}%").order(last_name: :asc).all
+            "%#{query_params[:full_name_contains]}%").order(last_name: :asc)
         elsif query_params[:first_name_begins_with]
           users = User.where(
             "first_name like ?",
-            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc).all
+            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc)
         else
-          users = User.order(last_name: :asc).all
+          users = User.order(last_name: :asc)
         end
         paginate(users)
       end
