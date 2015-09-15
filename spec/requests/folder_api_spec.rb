@@ -6,9 +6,11 @@ describe DDS::V1::FolderAPI do
   let(:folder) { FactoryGirl.create(:folder) }
   let(:child_folder) { FactoryGirl.create(:child_folder) }
   let(:child_and_parent) { FactoryGirl.create(:child_and_parent) }
-  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted) }
+  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder) }
   let(:serialized_folder) { FolderSerializer.new(folder).to_json }
+  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
 
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
@@ -28,10 +30,10 @@ describe DDS::V1::FolderAPI do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a listable resource' do
-        it 'should not include deleted folders' do
-          is_expected.to eq(200)
-          expect(response.body).not_to include(resource_serializer.new(deleted_folder).to_json)
-        end
+        let(:unexpected_resources) { [
+          deleted_folder,
+          other_folder
+        ] }
       end
 
       it_behaves_like 'an authenticated resource'
