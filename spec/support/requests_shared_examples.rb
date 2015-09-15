@@ -38,6 +38,57 @@ shared_examples 'a listable resource' do
   end
 end
 
+shared_examples 'a paginated resource' do
+  let(:expected_total_length) { resource_class.all.count }
+  let(:page) { 2 }
+  let(:per_page) { 1 }
+  let(:extras) { FactoryGirl.create_list(resource.class.name.downcase.to_sym, 5) }
+
+  let(:pagination_parameters) {
+    {
+      per_page: per_page,
+      page: page
+    }
+  }
+
+  #paginated_payload must include pagination_parameters
+  #if you override it to pass other parameters
+  let(:paginated_payload) {
+    pagination_parameters
+  }
+
+  subject { get(url, paginated_payload, headers) }
+
+  it 'should return pagination response headers' do
+     expect(extras.count).to be > per_page
+     is_expected.to eq(200)
+     response_headers = response.headers
+     expect(response_headers).to have_key('X-Total')
+     expect(response_headers['X-Total'].to_i).to eq(expected_total_length)
+     expect(response_headers).to have_key('X-Total-Pages')
+     expect(response_headers['X-Total-Pages'].to_i).to eq(expected_total_length/per_page)
+     expect(response_headers).to have_key('X-Page')
+     expect(response_headers['X-Page'].to_i).to eq(page)
+     expect(response_headers).to have_key('X-Per-Page')
+     expect(response_headers['X-Per-Page'].to_i).to eq(per_page)
+     expect(response_headers).to have_key('X-Next-Page')
+     expect(response_headers['X-Next-Page'].to_i).to eq(page+1)
+     expect(response_headers).to have_key('X-Prev-Page')
+     expect(response_headers['X-Prev-Page'].to_i).to eq(page-1)
+  end
+
+  it 'should return only per_page results' do
+    expect(extras.count).to be > per_page
+    paginated_payload.merge({per_page: per_page})
+    is_expected.to eq(200)
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('results')
+    returned_results = response_json['results']
+    expect(returned_results).to be_a(Array)
+    expect(returned_results.length).to eq(per_page)
+  end
+end
+
 shared_examples 'a creatable resource' do
   let(:expected_response_status) {201}
   let(:new_object) {
