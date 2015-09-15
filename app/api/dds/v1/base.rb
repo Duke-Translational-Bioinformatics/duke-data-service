@@ -3,12 +3,14 @@ require 'grape-swagger'
 module DDS
   module V1
     class Base < Grape::API
+      include Grape::Kaminari
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
       default_format :json
       formatter :json, Grape::Formatter::ActiveModelSerializers
       prefix :api
+      paginate offset: false
 
       helpers Pundit
       helpers do

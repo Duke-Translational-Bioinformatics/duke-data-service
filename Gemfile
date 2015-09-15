@@ -9,6 +9,8 @@ gem 'puma'
 gem 'rack', '1.6.4'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-swagger'
+gem 'kaminari'
+gem 'grape-kaminari'
 
 gem 'jwt'
 gem 'grape'
