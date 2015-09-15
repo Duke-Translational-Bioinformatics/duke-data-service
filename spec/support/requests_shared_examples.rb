@@ -17,6 +17,7 @@ end
 
 shared_examples 'a listable resource' do
   let(:expected_list_length) { resource_class.all.count }
+  let(:unexpected_resources) { [] }
   before do
     expect(resource).to be_persisted
   end
@@ -35,6 +36,14 @@ shared_examples 'a listable resource' do
     returned_results = response_json['results']
     expect(returned_results).to be_a(Array)
     expect(returned_results.length).to eq(expected_list_length)
+  end
+
+  it 'should not include unexpected resources' do
+    expect(unexpected_resources).to be_a(Array)
+    is_expected.to eq(200)
+    unexpected_resources.each do |unexpected_resource|
+      expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
+    end
   end
 end
 
