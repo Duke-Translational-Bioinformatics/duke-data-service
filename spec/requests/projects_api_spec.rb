@@ -5,6 +5,7 @@ describe DDS::V1::ProjectsAPI do
 
   let(:project) { FactoryGirl.create(:project) }
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
+  let(:other_project) { FactoryGirl.create(:project) }
   let(:project_stub) { FactoryGirl.build(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
@@ -19,11 +20,10 @@ describe DDS::V1::ProjectsAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
       it_behaves_like 'a listable resource' do
-        it 'should not include deleted projects' do
-          expect(deleted_project).to be_persisted
-          is_expected.to eq(200)
-          expect(response.body).not_to include(resource_serializer.new(deleted_project).to_json)
-        end
+        let(:unexpected_resources) { [
+          deleted_project,
+          other_project
+        ]}
       end
 
       it_behaves_like 'an authenticated resource'
