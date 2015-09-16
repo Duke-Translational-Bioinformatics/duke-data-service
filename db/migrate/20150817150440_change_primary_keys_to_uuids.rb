@@ -37,8 +37,6 @@ class ChangePrimaryKeysToUuids < ActiveRecord::Migration
     add_column :project_permissions, :user_id, :uuid
     remove_column :project_permissions, :project_id, :string
     add_column :project_permissions, :project_id, :uuid
-    remove_column :storage_folders, :project_id, :string
-    add_column :storage_folders, :project_id, :uuid
     remove_column :user_authentication_services, :user_id, :string
     add_column :user_authentication_services, :user_id, :uuid
   end
