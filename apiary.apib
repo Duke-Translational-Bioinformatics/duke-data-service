@@ -250,13 +250,13 @@ View summary usage for current user across all projects.
 ## Group Users
 A user represents a registered user.
 
-## Users collection [/users{?display_name_contains,first_name_begins_with,last_name_begins_with}]
+## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with}]
 ### List registered users [GET]
 >**Permission:** authenticated
 - - - - -
 
 + Parameters
-    + name_contains (optional, string, `gardner`) ... Returns users where their `full_name` contains the specified string.
+    + full_name_contains (optional, string, `gardner`) ... Returns users where their `full_name` contains the specified string.
     + first_name_begins_with (optional, string, `mat`) ... Returns users where their `first_name` begins with the specified string.
     + last_name_begins_with (optional, string, `gar`) ... Returns users where their `last_name` begins with the specified string.
 
