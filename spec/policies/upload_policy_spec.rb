@@ -49,6 +49,16 @@ describe UploadPolicy do
     end
   end
 
+  permissions :complete? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_upload)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, upload)
+    end
+  end
+
   permissions :destroy? do
     it 'denies access without project permission' do
       is_expected.not_to permit(user, other_upload)

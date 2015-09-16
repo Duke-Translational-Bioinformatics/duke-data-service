@@ -120,7 +120,7 @@ module DDS
       put '/uploads/:id/complete', root: false do
         authenticate!
         upload = Upload.find(params[:id])
-        authorize upload, :update?
+        authorize upload, :complete?
         upload.touch
         upload
       end
