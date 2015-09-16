@@ -105,15 +105,6 @@ ActiveRecord::Schema.define(version: 20150909190156) do
     t.datetime "deleted_at"
   end
 
-  create_table "storage_folders", force: :cascade do |t|
-    t.string   "name"
-    t.text     "description"
-    t.string   "storage_service_uuid"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-    t.uuid     "project_id"
-  end
-
   create_table "storage_providers", force: :cascade do |t|
     t.string   "name"
     t.string   "url_root"

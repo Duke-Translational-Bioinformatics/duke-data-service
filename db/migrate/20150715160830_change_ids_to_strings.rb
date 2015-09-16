@@ -6,7 +6,6 @@ class ChangeIdsToStrings < ActiveRecord::Migration
     change_column :projects, :id, :string
     change_column :projects, :creator_id, :string
     remove_column :projects, :uuid, :string
-    change_column :storage_folders, :project_id, :string
     change_column :memberships, :id, :string
     change_column :memberships, :project_id, :string
     change_column :memberships, :user_id, :string

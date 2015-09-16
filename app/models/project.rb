@@ -4,7 +4,6 @@ class Project < ActiveRecord::Base
 
   belongs_to :creator, class_name: "User"
   has_many :folders
-  has_many :storage_folders
   has_many :project_permissions
   has_many :uploads
   has_many :affiliations
