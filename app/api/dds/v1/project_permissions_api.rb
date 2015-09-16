@@ -85,7 +85,7 @@ module DDS
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
         permission = ProjectPermission.where(project: project, user: user).first
-        authorize permission, :show?
+        authorize permission, :destroy?
         permission.destroy
         body false
       end
