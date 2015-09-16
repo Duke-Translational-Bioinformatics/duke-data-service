@@ -8,10 +8,6 @@ RSpec.describe Project, type: :model do
       should have_many(:project_permissions)
     end
 
-    it 'should have many storage folders' do
-      should have_many(:storage_folders)
-    end
-
     it 'should have many data_files' do
       should have_many(:data_files)
     end
