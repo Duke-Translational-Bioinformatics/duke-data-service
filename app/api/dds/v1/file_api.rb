@@ -113,7 +113,7 @@ module DDS
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
             new_parent = file.project.folders.find(file_params[:parent][:id])
-            authorize file, :create?
+            authorize file, :move?
             file.update_attribute(:parent_id, new_parent.id)
             file
           end
@@ -134,7 +134,7 @@ module DDS
             authenticate!
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
-            authorize file, :create?
+            authorize file, :rename?
             file.update_attribute(:name, file_params[:name])
             file
           end

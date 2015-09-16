@@ -3,6 +3,14 @@ class DataFilePolicy < ApplicationPolicy
     permission.exists?
   end
 
+  def move?
+    permission.exists?
+  end
+
+  def rename?
+    permission.exists?
+  end
+
   def create?
     permission.exists?
   end
