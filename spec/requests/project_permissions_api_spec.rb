@@ -6,14 +6,17 @@ describe DDS::V1::ProjectPermissionsAPI do
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:other_permission) { FactoryGirl.create(:project_permission) }
   let!(:auth_role) { FactoryGirl.create(:auth_role) }
+  let(:other_user) { FactoryGirl.create(:user) }
 
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
   let!(:resource) { project_permission }
   let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: resource.project) }
+  let(:resource_project) { resource.project }
+  let(:resource_user) { resource.user }
 
   describe 'Project Permissions collection' do
-    let(:url) { "/api/v1/projects/#{resource.project.id}/permissions" }
+    let(:url) { "/api/v1/projects/#{resource_project.id}/permissions" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -41,7 +44,7 @@ describe DDS::V1::ProjectPermissionsAPI do
   end
 
   describe 'Project Permission instance' do
-    let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/#{resource.user.id}" }
+    let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/#{resource_user.id}" }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -49,43 +52,23 @@ describe DDS::V1::ProjectPermissionsAPI do
         auth_role: {id: auth_role.id}
       }}
 
-      context 'non-existent project permission' do
-        it 'should create a project permission' do
-          expected_resource = resource.clone
-          expected_resource.auth_role = auth_role
-          resource.destroy
-          expect(resource).not_to be_persisted
-          expect {
-            put url, payload.to_json, headers
-            expect(response.status).to eq(200)
-            expect(response.body).to be
-            expect(response.body).not_to eq('null')
-          }.to change{resource_class.count}.by(1)
-          expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
-        end
+      it_behaves_like 'a creatable resource' do
+        let(:expected_response_status) {200}
+        let(:resource_user) { other_user }
+        let(:new_object) {
+          resource_class.find_by(project: resource_project, user: resource_user)
+        }
       end
 
       it_behaves_like 'an updatable resource'
-      it 'should update the auth_role' do
-        expect {
-          put url, payload.to_json, headers
-          expect(response.status).to eq(200)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-        }.not_to change{resource_class.count}
-        resource.reload
-        expect(resource.auth_role).to eq(auth_role)
-        expect(response.body).to include(resource_serializer.new(resource).to_json)
-      end
-
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/permissions/#{resource.user.id}" }
+        let(:url) { "/api/v1/projects/notexists_projectid/permissions/#{resource_user.id}" }
         let(:resource_class) {'Project'}
       end
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
@@ -100,15 +83,14 @@ describe DDS::V1::ProjectPermissionsAPI do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a viewable resource'
-
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{other_permission.project.id}/permissions/#{resource.user.id}" }
+        let(:url) { "/api/v1/projects/#{other_permission.project.id}/permissions/#{resource_user.id}" }
         let(:resource_class) {'ProjectPermission'}
       end
     end
@@ -120,7 +102,7 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource.project.id}/permissions/notexists_userid" }
+        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
     end
