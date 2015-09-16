@@ -38,20 +38,30 @@ will be created in the platforms local user data store.
 
 Collection Pagination
 --------------
-For endpoints that return a collection of resources/objects, the number of objects returned can be
-controlled by including the `limit` query parameter.  For example: `/projects?limit=25`; Collection
-payloads may have the following structure to facilitate client pagination:
+For endpoints that return a collection of resources/objects, the number of objects returned will be
+paginated. The number of objects returned per page, and the desired page can
+be controlled using the query parameters 'page', and 'per_page'.
+For example: `/projects?per_page=25`; would return the first 25 projects, and
+`/projects?page=3&per_page=25` would return the third batch of 25 projects.
+Collection payloads will always be returned in an envelope with the 'results'
+key tied to an array of objects.
 
     {
-        "count": 100,
-        "limit": 25,
-        "next": "https://data-services.duke.edu/projects?page=3",
-        "previous": "https://data-services.duke.edu/projects?page=1",
         "results": [
             { },
             { },
         ]
     }
+
+To make it easy for clients to manage pagination, the following headers will
+always be included in the response:
+
+  * X-Total: The total number of objects that would be returned by the query unpaginated
+  * X-Total-Pages: The total number of pages given X-Total and X-Per-Page
+  * X-Page: Current Page (passed in as query parameter)
+  * X-Per-Page: per_page (passed in as query parameter)
+  * X-Next-Page: Next page to be collected
+  * X-Prev-Page: Previous page (will be empty on first page)
 
 **Example payloads herein for resource specific collections will only include** `"results": [ ]` **structure.**
 
@@ -250,13 +260,13 @@ View summary usage for current user across all projects.
 ## Group Users
 A user represents a registered user.
 
-## Users collection [/users{?display_name_contains,first_name_begins_with,last_name_begins_with}]
+## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with}]
 ### List registered users [GET]
 >**Permission:** authenticated
 - - - - -
 
 + Parameters
-    + name_contains (optional, string, `gardner`) ... Returns users where their `full_name` contains the specified string.
+    + full_name_contains (optional, string, `gardner`) ... Returns users where their `full_name` contains the specified string.
     + first_name_begins_with (optional, string, `mat`) ... Returns users where their `first_name` begins with the specified string.
     + last_name_begins_with (optional, string, `gar`) ... Returns users where their `last_name` begins with the specified string.
 

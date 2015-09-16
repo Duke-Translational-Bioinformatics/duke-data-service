@@ -1,6 +1,8 @@
 module DDS
   module V1
     class UserAPI < Grape::API
+      helpers PaginationParams
+
       desc 'api_token' do
         detail 'This allows a client to present an access token from a registred authentication service and get an api token'
         named 'api_token'
@@ -76,6 +78,7 @@ module DDS
         optional :last_name_begins_with, type: String, desc: 'list users whose last name begins with this string'
         optional :first_name_begins_with, type: String, desc: 'list users whose first name begins with this string'
         optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
+        use :pagination
       end
       get '/users', root: 'results' do
         authenticate!
@@ -84,19 +87,19 @@ module DDS
         if query_params[:last_name_begins_with]
           users = User.where(
             "last_name like ?",
-            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc).all
+            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc)
         elsif query_params[:full_name_contains]
           users = User.where(
             "display_name like ?",
-            "%#{query_params[:full_name_contains]}%").order(last_name: :asc).all
+            "%#{query_params[:full_name_contains]}%").order(last_name: :asc)
         elsif query_params[:first_name_begins_with]
           users = User.where(
             "first_name like ?",
-            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc).all
+            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc)
         else
-          users = User.order(last_name: :asc).all
+          users = User.order(last_name: :asc)
         end
-        users
+        paginate(users)
       end
     end
   end

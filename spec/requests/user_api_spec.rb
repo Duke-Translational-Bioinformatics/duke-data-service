@@ -207,45 +207,51 @@ describe DDS::V1::UserAPI do
 
     let!(:users_with_display_name) {
       users = []
-      auser = FactoryGirl.create(:user_authentication_service, :populated)
-      auser.user.update(
-        :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
-      )
-      users << auser
-      buser = FactoryGirl.create(:user_authentication_service, :populated)
-      buser.user.update(
-        :display_name => "#{Faker::Name.first_name} #{full_name_contains}#{Faker::Name.last_name}"
-      )
-      users << buser
-      cuser = FactoryGirl.create(:user_authentication_service, :populated)
-      cuser.user.update(
-        :display_name => "#{full_name_contains}#{Faker::Name.first_name} #{Faker::Name.last_name}"
-      )
-      users << cuser
-      duser = FactoryGirl.create(:user_authentication_service, :populated)
-      duser.user.update(
-        :display_name => "#{Faker::Name.first_name} #{Faker::Name.last_name}#{full_name_contains}"
-      )
-      users << duser
+      5.times do
+        auser = FactoryGirl.create(:user_authentication_service, :populated)
+        auser.user.update(
+          :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
+        )
+        users << auser
+      end
       users
     }
 
     describe 'without filters' do
       subject { get(url, nil, headers) }
+      let(:resource) { users_with_first_name[0].user }
 
-      it_behaves_like 'a listable resource' do
-        let(:resource) { users_with_first_name[0].user }
-      end
-
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'a paginated resource'
       it_behaves_like 'an authenticated resource'
     end
 
     describe 'with last_name_begins_with filter' do
-      subject { get(url, {last_name_begins_with: last_name_begins_with}, headers) }
+      let(:payload) { {last_name_begins_with: last_name_begins_with} }
+      subject { get(url, payload, headers) }
+      let(:resource) { users_with_last_name[0].user }
 
       it_behaves_like 'a listable resource' do
-        let(:resource) { users_with_last_name[0].user }
         let(:expected_list_length) { users_with_last_name.length }
+
+        it 'should return a list of users whose last_name_begins_with' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).not_to be_empty
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['last_name']).to start_with(last_name_begins_with)
+          end
+        end
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:extras) { users_with_last_name }
+        let(:expected_total_length) { users_with_last_name.length }
+        let!(:paginated_payload) {
+          payload.merge(pagination_parameters)
+        }
 
         it 'should return a list of users whose last_name_begins_with' do
           is_expected.to eq(200)
@@ -263,10 +269,11 @@ describe DDS::V1::UserAPI do
     end
 
     describe 'with first_name_begins_with' do
-      subject { get(url, {first_name_begins_with: first_name_begins_with}, headers) }
+      let(:payload) { {first_name_begins_with: first_name_begins_with} }
+      subject { get(url, payload, headers) }
+      let(:resource) { users_with_first_name[0].user }
 
       it_behaves_like 'a listable resource' do
-        let(:resource) { users_with_first_name[0].user }
         let(:expected_list_length) { users_with_first_name.length }
 
         it 'should return an list of users whose first_name_begins_with' do
@@ -280,19 +287,58 @@ describe DDS::V1::UserAPI do
         end
       end
 
+      it_behaves_like 'a paginated resource' do
+        let(:extras) { users_with_first_name }
+        let(:expected_total_length) { users_with_first_name.length }
+        let!(:paginated_payload) {
+          payload.merge(pagination_parameters)
+        }
+
+        it 'should return a list of users whose last_name_begins_with' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).not_to be_empty
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['first_name']).to start_with(first_name_begins_with)
+          end
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
     end
 
     describe 'with full_name_contains' do
-      subject {   get(url, {full_name_contains: full_name_contains}, headers) }
+      let(:payload) { {full_name_contains: full_name_contains} }
+      subject { get(url, payload, headers) }
+      let(:resource) { users_with_display_name[0].user }
 
       it_behaves_like 'a listable resource' do
-        let(:resource) { users_with_display_name[0].user }
         let(:expected_list_length) { users_with_display_name.length }
 
         it 'should return an list of users whose full_name_contains' do
           is_expected.to eq(200)
           response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('results')
+          returned_users = response_json['results']
+          returned_users.each do |ruser|
+            expect(ruser['full_name']).to match(full_name_contains)
+          end
+        end
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:extras) { users_with_display_name }
+        let(:expected_total_length) { users_with_display_name.length }
+        let!(:paginated_payload) {
+          payload.merge(pagination_parameters)
+        }
+
+        it 'should return a list of users whose last_name_begins_with' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json).not_to be_empty
           expect(response_json).to have_key('results')
           returned_users = response_json['results']
           returned_users.each do |ruser|
