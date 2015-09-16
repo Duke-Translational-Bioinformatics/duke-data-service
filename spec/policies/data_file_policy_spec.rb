@@ -39,6 +39,26 @@ describe DataFilePolicy do
     end
   end
 
+  permissions :move? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_data_file)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, data_file)
+    end
+  end
+
+  permissions :rename? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_data_file)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, data_file)
+    end
+  end
+
   permissions :create? do
     it 'denies access without project permission' do
       is_expected.not_to permit(user, other_data_file)
