@@ -7,6 +7,10 @@ class UploadPolicy < ApplicationPolicy
     permission.exists?
   end
 
+  def complete?
+    permission.exists?
+  end
+
   def destroy?
     permission.exists?
   end
