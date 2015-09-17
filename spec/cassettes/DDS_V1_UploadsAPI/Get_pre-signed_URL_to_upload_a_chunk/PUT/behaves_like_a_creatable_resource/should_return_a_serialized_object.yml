@@ -1,0 +1,127 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txf3ace2e4e5fa4303b04a2-0055fae08b
+      Date:
+      - Thu, 17 Sep 2015 15:47:23 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:47:23 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/24cdbba2-9d59-40ed-9e48-21cedf9515eb
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx683f0b1681f14e088d1a1-0055fae08b
+      Date:
+      - Thu, 17 Sep 2015 15:47:23 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:47:23 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx27a3e10380134091b675b-0055fae08b
+      Date:
+      - Thu, 17 Sep 2015 15:47:23 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:47:23 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/24cdbba2-9d59-40ed-9e48-21cedf9515eb
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      Content-Length:
+      - '76'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txdb08092f43e34b1fbd259-0055fae08b
+      Date:
+      - Thu, 17 Sep 2015 15:47:23 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:47:23 GMT
+recorded_with: VCR 2.9.3

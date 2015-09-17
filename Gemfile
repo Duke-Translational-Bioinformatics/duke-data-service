@@ -30,16 +30,19 @@ gem 'rspec_junit_formatter', '0.2.2'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-group :development, :test do
+group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+end
+
+group :test do
   gem "factory_girl_rails"
   gem "faker"
   gem 'rspec-rails'
   gem 'shoulda-matchers', require: false
-  gem 'spring-commands-rspec', group: :development
-  gem 'vcr'
-  gem 'webmock'
+  gem 'spring-commands-rspec'
+  gem 'vcr', group: :test
+  gem 'webmock', group: :test
   gem 'pry-byebug'
 end
 
