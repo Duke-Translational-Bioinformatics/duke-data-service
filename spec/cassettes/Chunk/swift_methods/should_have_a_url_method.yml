@@ -1,0 +1,65 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx6da32a396be84ed980219-0055fadeb2
+      Date:
+      - Thu, 17 Sep 2015 15:39:30 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:39:30 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/1207f0ca-19f6-417f-812d-68649d0a8a45
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdc4098b404cf4bdbbf27a4afb7d8d3dc
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx8b97a377d915421aa5db4-0055fadeb2
+      Date:
+      - Thu, 17 Sep 2015 15:39:30 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 17 Sep 2015 15:39:30 GMT
+recorded_with: VCR 2.9.3
