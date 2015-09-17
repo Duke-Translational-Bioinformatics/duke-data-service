@@ -14,7 +14,7 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         authorize project, :show?
-        project.project_permissions
+        policy_scope(ProjectPermission).where(project: project)
       end
 
       desc 'Grant project level permissions to a user' do
