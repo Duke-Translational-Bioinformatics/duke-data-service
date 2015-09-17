@@ -178,7 +178,7 @@ describe DDS::V1::UserAPI do
 
     let(:last_name_begins_with) { 'Abc' }
     let(:first_name_begins_with) { 'Xyz' }
-    let(:full_name_contains) { 'aso' }
+    let(:full_name_contains) { 'xxxx' }
     let!(:users_with_last_name) {
       users = []
       5.times do
