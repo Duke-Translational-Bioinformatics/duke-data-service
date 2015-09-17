@@ -142,6 +142,8 @@ describe DDS::V1::UploadsAPI do
         let(:url) { "/api/v1/uploads/notexists_resourceid/chunks" }
         let(:resource_class) {"Upload"}
       end
+
+      it_behaves_like 'a storage_provider backed resource'
     end
   end
 

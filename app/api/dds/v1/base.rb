@@ -104,6 +104,15 @@ module DDS
         error!(error_json, 403)
       end
 
+      rescue_from StorageProviderException do |e|
+        error_json = {
+          "error" => "500",
+          "reason" => 'The storage provider is unavailable',
+          "suggestion" => 'try again in a few minutes, or contact the systems administrators'
+        }
+        error!(error_json, 500)
+      end
+
       mount DDS::V1::UserAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
