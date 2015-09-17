@@ -1,0 +1,2 @@
+class StorageProviderException < StandardError
+end

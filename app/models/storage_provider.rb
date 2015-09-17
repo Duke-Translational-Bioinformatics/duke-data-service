@@ -59,7 +59,7 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}",
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([200,204].include?(resp.response.code.to_i)) || 
+    ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
@@ -68,7 +68,7 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}/#{container}",
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([201,202,204].include?(resp.response.code.to_i)) || 
+    ([201,202,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
@@ -77,7 +77,7 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}/#{container}",
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([204].include?(resp.response.code.to_i)) || 
+    ([204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
@@ -87,7 +87,7 @@ class StorageProvider < ActiveRecord::Base
       body: body,
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([201].include?(resp.response.code.to_i)) || 
+    ([201].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
@@ -97,7 +97,7 @@ class StorageProvider < ActiveRecord::Base
       body: manifest.to_json,
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([201,202].include?(resp.response.code.to_i)) || 
+    ([201,202].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
@@ -106,25 +106,26 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
       headers:{"X-Auth-Token" => auth_token}
     )
-    ([200,204].include?(resp.response.code.to_i)) || 
+    ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
   private
   def call_auth_uri
-    @auth_uri_resp ||= HTTParty.get(
-        "#{url_root}#{auth_uri}",
-        headers: {
-          'X-Auth-User' => service_user,
-          'X-Auth-Key' => service_pass
-        }
-    )
+    begin
+      @auth_uri_resp ||= HTTParty.get(
+          "#{url_root}#{auth_uri}",
+          headers: {
+            'X-Auth-User' => service_user,
+            'X-Auth-Key' => service_pass
+          }
+      )
+    rescue
+      raise StorageProviderException, "Unexpected StorageProvider Error"
+    end
     unless @auth_uri_resp.response.code.to_i == 200
       raise StorageProviderException, "Auth Failure: #{ @auth_uri_resp.body }"
     end
     @auth_uri_resp
   end
-end
-
-class StorageProviderException < StandardError
 end
