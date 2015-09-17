@@ -13,7 +13,7 @@ class ProjectPermissionPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      scope.joins(:project_permissions).where(project_permissions: {user: user})
+      scope.joins(project_permissions: :user).where(users: {id: user.id})
     end
   end
 end
