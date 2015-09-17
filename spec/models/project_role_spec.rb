@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ProjectRole, type: :model do
+  subject {FactoryGirl.create(:project_role)}
+
   it 'should have id as primary key' do
     expect(ProjectRole.primary_key).to eq('id')
   end
@@ -27,8 +29,6 @@ RSpec.describe ProjectRole, type: :model do
   end
 
   describe 'serialization' do
-    subject {FactoryGirl.create(:project_role)}
-
     it 'should serialize to json' do
       serializer = ProjectRoleSerializer.new subject
       payload = serializer.to_json
