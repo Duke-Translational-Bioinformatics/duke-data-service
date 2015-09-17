@@ -33,6 +33,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def url
+    storage_provider.put_container(upload.project_id)
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 end

@@ -54,39 +54,31 @@ RSpec.describe Chunk, type: :model do
       should respond_to :http_headers
       expect(subject.http_headers).to eq []
     end
+  end
+
+  describe 'swift methods', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+    subject { FactoryGirl.create(:chunk, :swift) }
 
     it 'should have a url method' do
       should respond_to :url
       expect(subject.url).to eq expected_url
     end
-  end
 
-  describe 'methods used to build a signed url' do
-    it 'should have a sub_path method' do
-      should respond_to :sub_path
-      expect(subject.sub_path).to eq expected_sub_path
-    end
-
-    it 'should have an expiry method' do
-      should respond_to :expiry
-      expect(subject.expiry).to eq expected_expiry
-    end
-  end
-  
-  describe 'serialization' do
-    it 'should serialize to json' do
-      serializer = ChunkSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to have_key('http_verb')
-      expect(parsed_json).to have_key('host')
-      expect(parsed_json).to have_key('url')
-      expect(parsed_json).to have_key('http_headers')
-      expect(parsed_json['http_verb']).to eq(subject.http_verb)
-      expect(parsed_json['host']).to eq(subject.host)
-      expect(parsed_json['http_headers']).to eq(subject.http_headers)
-      expect(parsed_json['url']).to eq(subject.url)
+    describe 'serialization' do
+      it 'should serialize to json' do
+        serializer = ChunkSerializer.new subject
+        payload = serializer.to_json
+        expect(payload).to be
+        parsed_json = JSON.parse(payload)
+        expect(parsed_json).to have_key('http_verb')
+        expect(parsed_json).to have_key('host')
+        expect(parsed_json).to have_key('url')
+        expect(parsed_json).to have_key('http_headers')
+        expect(parsed_json['http_verb']).to eq(subject.http_verb)
+        expect(parsed_json['host']).to eq(subject.host)
+        expect(parsed_json['http_headers']).to eq(subject.http_headers)
+        expect(parsed_json['url']).to eq(subject.url)
+      end
     end
   end
 end

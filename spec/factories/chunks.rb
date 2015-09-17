@@ -5,5 +5,9 @@ FactoryGirl.define do
     size { Faker::Number.digit }
     fingerprint_value { SecureRandom.hex(32) }
     fingerprint_algorithm "md5"
+
+    trait :swift do
+      upload { create(:upload, :swift) }
+    end
   end
 end

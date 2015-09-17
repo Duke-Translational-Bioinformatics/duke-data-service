@@ -3,11 +3,11 @@ require 'rails_helper'
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
 
-  let(:chunk) { FactoryGirl.create(:chunk) }
-  let(:project) { FactoryGirl.create(:project) }
-  let(:upload) { FactoryGirl.create(:upload, project_id: project.id) }
+  let(:chunk) { FactoryGirl.create(:chunk, :swift) }
+  let(:upload) { chunk.upload }
+  let(:project) { upload.project }
+  let!(:storage_provider) { upload.storage_provider }
   let(:other_upload) { FactoryGirl.create(:upload) }
-  let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload) }
   let(:chunk_stub) { FactoryGirl.build(:chunk) }
@@ -97,7 +97,7 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Get pre-signed URL to upload a chunk' do
+  describe 'Get pre-signed URL to upload a chunk', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
