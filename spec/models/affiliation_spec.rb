@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Affiliation, type: :model do
+  let(:affiliation) { FactoryGirl.create(:affiliation) }
   describe 'associations' do
     it 'should belong_to a project' do
       should belong_to(:project)
@@ -25,6 +26,7 @@ RSpec.describe Affiliation, type: :model do
     end
 
     it 'should have a user_id unique to the project' do
+      expect(affiliation).to be_persisted
       should validate_uniqueness_of(:user_id).scoped_to(:project_id)
     end
 
@@ -38,7 +40,7 @@ RSpec.describe Affiliation, type: :model do
   end
 
   describe 'serialization' do
-    subject { FactoryGirl.create(:affiliation) }
+    subject { affiliation }
     let(:user) {subject.user}
     let(:role) {subject.project_role}
 
