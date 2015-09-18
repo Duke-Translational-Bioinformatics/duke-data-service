@@ -1310,19 +1310,17 @@ storage provider.
                         "content_type": "application/octet-stream",
                         "size": 30024000,
                         "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
-                        "chunks": [ ],
-                        "storage_provider": { "id": "amazon_s3_standard" },
-                        "storage_location": {
-                            "Bucket": "duke_data_service_prod",
-                            "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                            "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-                        },
+                        "chunks": [
+                          {
+                            "number": 1,
+                            "size": 10000,
+                            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                          }
+                        ],
+                        "storage_provider": { "id": "64b82547-8f84-4dcc-8d84-92d45a3e78bc", "name": "Swift" },
                         "status": {
                             "initiated_on": "2015-07-10T13:00:00Z",
-                            "percent_complete": 0,
                             "completed_on": null,
-                            "error_on": null,
-                            "error_message": null
                         },
                         "audit": { }
                     }

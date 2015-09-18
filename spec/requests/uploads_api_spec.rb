@@ -20,7 +20,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
 
-    describe 'GET' do
+    describe 'List file uploads for a project' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a listable resource' do
@@ -35,6 +35,11 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
         let(:resource_class) { 'Project' }
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { project.uploads.count }
+        let(:extras) { FactoryGirl.create_list(:upload, 5, project_id: project.id) }
       end
     end
 

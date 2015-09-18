@@ -1,6 +1,7 @@
 module DDS
   module V1
     class UploadsAPI < Grape::API
+      helpers PaginationParams
 
       namespace :projects do
         route_param :project_id do
@@ -32,6 +33,7 @@ module DDS
             upload = project.uploads.build({
               name: upload_params[:name],
               size: upload_params[:size],
+              content_type: upload_params[:content_type],
               fingerprint_value: upload_params[:hash][:value],
               fingerprint_algorithm: upload_params[:hash][:algorithm],
               storage_provider_id: storage_provider.id
@@ -53,11 +55,15 @@ module DDS
               [404, 'Project Does not Exist']
             ]
           end
+          params do
+            requires :project_id, type: String, desc: "The ID of the Project"
+            use :pagination
+          end
           get '/uploads', root: 'results' do
             authenticate!
             project = Project.find(params[:project_id])
             authorize project, :show?
-            project.uploads.all
+            paginate(project.uploads.all)
           end
         end
       end
