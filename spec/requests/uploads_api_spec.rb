@@ -88,7 +88,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Upload instance' do
     let(:url) { "/api/v1/uploads/#{resource.id}" }
 
-    describe 'GET' do
+    describe 'View upload details/status' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a viewable resource'
