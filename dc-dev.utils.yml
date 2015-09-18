@@ -43,6 +43,12 @@ rake:
     - db:postgres.db.host
   env_file:
     - swift.env
+bundle:
+  image: dukedataservice_server
+  volumes_from:
+    - server
+  entrypoint: ['bundle']
+  command: install
 authservice:
   image: dukedataservice_server
   environment:
