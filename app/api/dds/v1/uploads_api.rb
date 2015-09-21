@@ -79,6 +79,9 @@ module DDS
               [404, 'Upload Does not Exist']
             ]
           end
+          params do
+            requires :id, type: String, desc: "Globally unique id of the upload object."
+          end
           get '/', root: false do
             authenticate!
             upload = Upload.find(params[:id])
