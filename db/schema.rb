@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150909190156) do
+ActiveRecord::Schema.define(version: 20150918202603) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -116,6 +116,13 @@ ActiveRecord::Schema.define(version: 20150909190156) do
     t.string   "secondary_key"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+  end
+
+  create_table "system_permissions", force: :cascade do |t|
+    t.uuid     "user_id"
+    t.string   "auth_role_id"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
