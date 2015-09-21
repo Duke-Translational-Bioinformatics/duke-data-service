@@ -426,6 +426,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 + Response 201 (application/json)
 
         {
+            "kind": "dds#project",
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
             "description": "Goal of generating a targeted knockout mutation...",
@@ -447,6 +448,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
         {
             "results": [
                 {
+                    "kind": "dds#project",
                     "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                     "name": "Knockout Mouse Project (KOMP)",
                     "description": "Goal of generating a targeted knockout mutation...",
@@ -465,6 +467,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
     + Body
 
             {
+                "kind": "dds#project",
                 "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                 "name": "Knockout Mouse Project (KOMP)",
                 "description": "Goal of generating a targeted knockout mutation...",
@@ -804,6 +807,7 @@ and only one parent folder.
 + Response 201 (application/json)
 
         {
+            "kind": "dds#folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
             "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data",
@@ -811,30 +815,6 @@ and only one parent folder.
             "virtual_path": "/Sequencing Core/Raw Data",
             "is_deleted": false,
             "audit": { }
-        }
-
-### List project folders [GET]
->**Permission:** view_project
-- - - - -
-
->**Rules**
-- - - - -
-* Project folders that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
-
-+ Response 200 (application/json)
-
-        {
-            "results": [
-                {
-                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                    "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
-                    "name": "Raw Data",
-                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                    "virtual_path": "/Sequencing Core/Raw Data",
-                    "is_deleted": false,
-                    "audit": { }
-                }
-            ]
         }
 
 ## Folder instance [/folders/{id}]
@@ -848,6 +828,7 @@ and only one parent folder.
 + Response 200 (application/json)
 
         {
+            "kind": "dds#folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
             "parent": { "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
             "name": "Raw Data",
@@ -890,6 +871,7 @@ folders `project` context.
 + Response 200 (application/json)
 
         {
+            "kind": "dds#folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
             "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "Raw Data",
@@ -916,6 +898,7 @@ folders `project` context.
 + Response 200 (application/json)
 
         {
+            "kind": "dds#folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
             "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "Model Data",
@@ -926,19 +909,20 @@ folders `project` context.
         }
 
 ## Group Parent/Children
-Convenience endpoints for retrieval of a parent folder and project/folder children (folders and files).
+Convenience endpoints for retrieval of a parent folder instance and the children (i.e. folders and files) of a project or folder.
 
-## Parent Folder instance [/folders/{id}/parent]
+## Parent of a Folder instance [/folders/{id}/parent]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the folder.
 
-## View parent folder details [GET]
+## View parent of a folder details [GET]
 >**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
 
         {
+            "kind": "dds#folder",
             "id": "f8416bbe-357a-4687-919d-3d13d4108dc1",
             "parent": "root",
             "name": "Flow Core",
@@ -948,30 +932,52 @@ Convenience endpoints for retrieval of a parent folder and project/folder childr
             "audit": { }
         }
 
-## Project or Folder Children collection [/{context}/{id}/children{?name_contains}]
+## Parent of a File instance [/files/{id}/parent]
 + Parameters
-    + context (required, string, `folders`) ... The parent `context` for children; valid values are "projects" root or "folders".
-    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... If `context` is "projects", globally unique `id` of the "project";
-    If `context` is "folders", globally unique `id` of "folder".
+    + id (required, string, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... Globally unique `id` of the file.
+
+## View parent of a file details [GET]
+>**Permission:** view_project
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds#folder",
+            "id": "f8416bbe-357a-4687-919d-3d13d4108dc1",
+            "parent": "root",
+            "name": "Flow Core",
+            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "virtual_path": "/Flow Core",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+
+## Project Children collection [/project/{id}/children{?kind,name_contains}]
++ Parameters
+    + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
+    + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
     + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
 
-### List project or folder children [GET]
-List children (folders and files) of the project root or a specific project folder.
+### List project children [GET]
+List children (folders and files) of the project root.
 >**Permission:** view_project
 - - - - -
 
 >**Rules**
 - - - - -
+* Returns the immedate children of the project unless the `name_contains` parameter is specified.
+* When specified, the `name_contains` parameter invokes a recursive search of the project hierarchy.
 * Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 * The `kind` property can be used to determine if child object is a folder or a file.
-* The `name_contains` parameter should recursively search the folder hierarchy.
 
 + Response 200 (application/json)
 
         {
             "results": [
                 {
-                    "kind": "folder",
+                    "kind": "dds#folder",
                     "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
                     "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                     "name": "Aligned",
@@ -981,7 +987,58 @@ List children (folders and files) of the project root or a specific project fold
                     "audit": { }
                 },
                 {
-                    "kind": "file",
+                    "kind": "dds#file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "virtual_path": "/Sequencing Core/Raw Data/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                        "storage_provider": { "id": "amazon_s3_standard" }
+                    },
+                    "audit": { }
+                }
+            ]
+        }
+
+## Folder Children collection [/folder/{id}/children{?kind,name_contains}]
++ Parameters
+    + id (required, string, `ad9115b8-1e4a-4399-b606-56622eb462e1`) ... Globally unique `id` of the folder.
+    + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
+    + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
+
+### List folder children [GET]
+List children (folders and files) of the folder.
+>**Permission:** view_project
+- - - - -
+
+>**Rules**
+- - - - -
+* Returns the immedate children of the folder unless the `name_contains` parameter is specified.
+* When specified, the `name_contains` parameter invokes a recursive search of the folder hierarchy.
+* Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
+* The `kind` property can be used to determine if child object is a folder or a file.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds#folder",
+                    "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
+                    "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "Aligned",
+                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                    "is_deleted": false,
+                    "audit": { }
+                },
+                {
+                    "kind": "dds#file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
                     "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1001,25 +1058,26 @@ List children (folders and files) of the project root or a specific project fold
 
 ## Projects Children collection [/projects/children{?name_contains}]
 + Parameters
-    + name_contains (optional, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
+    + name_contains (required, string, `Sequencing`) ... Returns children where their `name` contains the specified string.
 
 ### List projects children [GET]
-List children (folders and files) for all projects where current user has view_project permission.
+Search/list children (folders and files) for all projects where current user has view_project permission.
 >**Permission:** view_project
 - - - - -
 
 >**Rules**
 - - - - -
+* The `name_contains` parameter is required and invokes a recursive search of project hierarchy.
 * Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in this listing.
 * The `kind` property can be used to determine if child object is a folder or a file.
-* The `name_contains` parameter should recursively search the folder hierarchy.
+
 
 + Response 200 (application/json)
 
         {
             "results": [
                 {
-                    "kind": "folder",
+                    "kind": "dds#folder",
                     "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
                     "parent": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                     "name": "Aligned",
@@ -1029,7 +1087,7 @@ List children (folders and files) for all projects where current user has view_p
                     "audit": { }
                 },
                 {
-                    "kind": "file",
+                    "kind": "dds#file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
                     "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1086,6 +1144,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
 + Response 201 (application/json)
 
         {
+            "kind": "dds#file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
             "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1110,6 +1169,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
     + Body
 
             {
+                "kind": "dds#file",
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
                 "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
                 "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1178,6 +1238,7 @@ folders `project` context.
 + Response 200 (application/json)
 
         {
+            "kind": "dds#file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
             "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
@@ -1210,6 +1271,7 @@ folders `project` context.
 + Response 200 (application/json)
 
         {
+            "kind": "dds#file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
             "parent": { "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
@@ -1310,19 +1372,17 @@ storage provider.
                         "content_type": "application/octet-stream",
                         "size": 30024000,
                         "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
-                        "chunks": [ ],
-                        "storage_provider": { "id": "amazon_s3_standard" },
-                        "storage_location": {
-                            "Bucket": "duke_data_service_prod",
-                            "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                            "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-                        },
+                        "chunks": [
+                          {
+                            "number": 1,
+                            "size": 10000,
+                            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                          }
+                        ],
+                        "storage_provider": { "id": "64b82547-8f84-4dcc-8d84-92d45a3e78bc", "name": "Swift" },
                         "status": {
                             "initiated_on": "2015-07-10T13:00:00Z",
-                            "percent_complete": 0,
                             "completed_on": null,
-                            "error_on": null,
-                            "error_message": null
                         },
                         "audit": { }
                     }

@@ -56,7 +56,7 @@ RSpec.describe Upload, type: :model do
       expect(subject.manifest.count).to eq(subject.chunks.count)
       subject.chunks.each do |chunk|
         chunk_manifest = {
-          path: chunk.sub_path, 
+          path: chunk.sub_path,
           etag: chunk.fingerprint_value,
           size_bytes: chunk.size
         }
@@ -65,11 +65,11 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  describe 'swift methods' do
+  describe 'swift methods', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
     let(:complete) { subject.complete }
-    it 'should have a complete method', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+    it 'should have a complete method' do
       is_expected.to respond_to 'complete'
       expect { complete }.not_to raise_error
       expect(complete).to be_truthy
@@ -77,5 +77,61 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'serialization' do
+    let(:expected_keys) {
+      %w(
+        id
+        project
+        name
+        content_type
+        size
+        hash
+        chunks
+        storage_provider
+        status
+      )
+    }
+    it 'should serialize to json' do
+      serializer = UploadSerializer.new subject
+      payload = serializer.to_json
+      expect(payload).to be
+      parsed_json = JSON.parse(payload)
+      expected_keys.each do |ekey|
+        expect(parsed_json).to have_key ekey
+      end
+      expect(parsed_json["id"]).to eq(subject.id)
+      expect(parsed_json["project"]).to eq({"id" => subject.project.id})
+      expect(parsed_json["name"]).to eq(subject.name)
+      expect(parsed_json["content_type"]).to eq(subject.content_type)
+      expect(parsed_json["size"]).to eq(subject.size)
+      expect(parsed_json["hash"]).to eq({
+        "value" => subject.fingerprint_value,
+        "algorithm" => subject.fingerprint_algorithm,
+        "client_reported" => true,
+        "confirmed" => false
+      })
+      expect(parsed_json["chunks"]).to eq(
+        subject.chunks.collect{ |chunk|
+          {
+            "number" => chunk.number,
+            "size" => chunk.size,
+            "hash" => { "value" => chunk.fingerprint_value, "algorithm" => chunk.fingerprint_algorithm }
+          }
+        }
+      )
+      expect(parsed_json["storage_provider"]).to eq({
+        "id" => subject.storage_provider.id,
+        "name" => subject.storage_provider.name,
+      })
+      expect(parsed_json["status"]).to be_a Hash
+      %w(initiated_on completed_on).each do |ekey|
+        expect(parsed_json["status"]).to have_key ekey
+      end
+      expect(DateTime.parse(parsed_json["status"]["initiated_on"]).to_i).to eq(subject.created_at.to_i)
+      if subject.completed_at
+        expect(DateTime.parse(parsed_json["status"]["completed_on"]).to_i).to eq(subject.completed_at.to_i)
+      else
+        expect(parsed_json["status"]["completed_on"]).to eq(subject.completed_at)
+      end
+    end
   end
 end

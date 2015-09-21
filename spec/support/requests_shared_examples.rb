@@ -48,7 +48,7 @@ shared_examples 'a listable resource' do
 end
 
 shared_examples 'a paginated resource' do
-  let(:expected_total_length) { resource_class.all.count }
+  let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }
   let(:per_page) { 1 }
   let(:extras) { FactoryGirl.create_list(resource.class.name.downcase.to_sym, 5) }
