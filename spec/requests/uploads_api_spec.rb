@@ -43,7 +43,7 @@ describe DDS::V1::UploadsAPI do
       end
     end
 
-    describe 'POST' do
+    describe 'Initiate a chunked file upload for a project' do
       subject { post(url, payload.to_json, headers) }
       let!(:payload) {{
         name: upload_stub.name,
@@ -88,7 +88,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Upload instance' do
     let(:url) { "/api/v1/uploads/#{resource.id}" }
 
-    describe 'GET' do
+    describe 'View upload details/status' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a viewable resource'
