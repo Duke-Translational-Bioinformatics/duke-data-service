@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :system_permission do
     user
-    auth_role
+    association :auth_role, factory: [:auth_role, :system]
   end
 end
