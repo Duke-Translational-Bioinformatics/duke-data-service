@@ -20,7 +20,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
 
-    describe 'GET' do
+    describe 'List file uploads for a project' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a listable resource' do
@@ -36,9 +36,14 @@ describe DDS::V1::UploadsAPI do
         let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
         let(:resource_class) { 'Project' }
       end
+
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { project.uploads.count }
+        let(:extras) { FactoryGirl.create_list(:upload, 5, project_id: project.id) }
+      end
     end
 
-    describe 'POST' do
+    describe 'Initiate a chunked file upload for a project' do
       subject { post(url, payload.to_json, headers) }
       let!(:payload) {{
         name: upload_stub.name,
@@ -83,7 +88,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Upload instance' do
     let(:url) { "/api/v1/uploads/#{resource.id}" }
 
-    describe 'GET' do
+    describe 'View upload details/status' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a viewable resource'

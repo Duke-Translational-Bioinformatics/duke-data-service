@@ -35,10 +35,13 @@ group :development do
   gem 'spring'
 end
 
-group :test do
+group :development, :test do
   gem "factory_girl_rails"
   gem "faker"
   gem 'rspec-rails'
+end
+
+group :test do
   gem 'shoulda-matchers', require: false
   gem 'spring-commands-rspec'
   gem 'vcr', group: :test

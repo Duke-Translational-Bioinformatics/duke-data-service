@@ -15,6 +15,7 @@ class Project < ActiveRecord::Base
 
   def init
     self.is_deleted = false if self.is_deleted.nil?
+    self.save
   end
 
   private
