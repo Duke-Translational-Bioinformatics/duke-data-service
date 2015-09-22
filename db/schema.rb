@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150918202603) do
+ActiveRecord::Schema.define(version: 20150922181221) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,17 +63,17 @@ ActiveRecord::Schema.define(version: 20150918202603) do
     t.uuid     "parent_id"
     t.uuid     "project_id"
     t.uuid     "creator_id"
-    t.boolean  "is_deleted"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.boolean  "is_deleted", default: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   create_table "folders", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.uuid     "parent_id"
-    t.boolean  "is_deleted"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.boolean  "is_deleted", default: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.uuid     "project_id"
   end
 
@@ -99,10 +99,9 @@ ActiveRecord::Schema.define(version: 20150918202603) do
     t.string   "description"
     t.uuid     "creator_id"
     t.string   "etag"
-    t.boolean  "is_deleted"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-    t.datetime "deleted_at"
+    t.boolean  "is_deleted",  default: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
   create_table "storage_providers", force: :cascade do |t|

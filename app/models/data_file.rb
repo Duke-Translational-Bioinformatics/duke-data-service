@@ -1,7 +1,6 @@
 class DataFile < ActiveRecord::Base
-  has_many :children, class_name: "Folder", foreign_key: "parent_id"
   belongs_to :project
-	belongs_to :parent, class_name: "Folder"
+  belongs_to :parent, class_name: "Folder"
   belongs_to :upload
   has_many :project_permissions, through: :project
 

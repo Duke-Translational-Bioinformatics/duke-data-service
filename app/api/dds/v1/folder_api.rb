@@ -48,6 +48,10 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :show?
         policy_scope(Folder).where(project: project, is_deleted: false)
+        #test script
+        # project = Folder.last.project_id
+        # Folder.where(project: project, is_deleted: nil)
+        #TODO
       end
 
       desc 'View folder details' do
@@ -146,8 +150,6 @@ module DDS
       end
       get '/folders/:id/parent', root: false do
         authenticate!
-        #parent_id = Folder.find(params[:id]).parent_id
-        #Folder.find(parent_id)
         folder = Folder.find(params[:id])
         parent = folder.parent
         authorize parent, :show?

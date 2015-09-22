@@ -1,5 +1,4 @@
 class Project < ActiveRecord::Base
-  after_initialize :init
   before_create :set_project_admin
 
   belongs_to :creator, class_name: "User"
@@ -12,10 +11,6 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :creator_id, presence: true
-
-  def init
-    self.is_deleted = false if self.is_deleted.nil?
-  end
 
   private
   def set_project_admin
