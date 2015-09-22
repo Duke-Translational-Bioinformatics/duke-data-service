@@ -6,8 +6,14 @@ class FolderSerializer < ActiveModel::Serializer
     { id: object.project_id }
   end
 
+#TODO folder_id
   def parent
-    { id: object.parent_id }
+    { id: object.folder_id }
+    # if object.folder_id
+    #   { id: object.folder_id }
+    # else
+    #   "root"
+    # end
   end
 
   def is_deleted
