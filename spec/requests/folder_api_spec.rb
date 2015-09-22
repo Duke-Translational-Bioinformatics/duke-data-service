@@ -49,7 +49,7 @@ describe DDS::V1::FolderAPI do
       subject { post(url, payload.to_json, headers) }
       let(:project) { FactoryGirl.create(:project) }
       let!(:payload) {{
-        parent: { id: folder_stub.parent_id },
+        parent: { id: folder_stub.folder_id },
         name: folder_stub.name
       }}
 
@@ -60,7 +60,7 @@ describe DDS::V1::FolderAPI do
 
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
-          parent: { id: resource.parent_id },
+          parent: { id: resource.folder_id },
           name: nil
         }}
         it 'should not persist changes' do
@@ -173,7 +173,7 @@ describe DDS::V1::FolderAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      let(:parent) { child_folder.parent }
+      let(:parent) { child_folder.folder }
       let(:resource) { parent }
 
       it_behaves_like 'a viewable resource'
@@ -193,9 +193,9 @@ describe DDS::V1::FolderAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
       #Adding resource to the list of factory-generated children allows testing for its inclusion
-      let(:resource) { FactoryGirl.create(:folder, parent_id: child_and_parent.id) }
+      let(:resource) { FactoryGirl.create(:folder, folder_id: child_and_parent.id) }
       #Add deleted folder to ensure it isn't included in listable result
-      let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, parent_id: child_and_parent.id) }
+      let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, folder_id: child_and_parent.id) }
       let(:project) { child_and_parent.project }
 
       it_behaves_like 'a listable resource' do

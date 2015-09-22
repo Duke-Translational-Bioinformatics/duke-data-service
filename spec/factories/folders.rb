@@ -1,12 +1,12 @@
 FactoryGirl.define do
   factory :folder do
     name { Faker::Team.name }
-    parent_id { SecureRandom.uuid }
+    folder_id { SecureRandom.uuid }
     project
     is_deleted false
 
     factory :child_folder do
-      association :parent, factory: :folder
+      association :folder, factory: :folder
     end
 
     #Three children is an arbitrary number to test but keep # of children small
@@ -15,7 +15,7 @@ FactoryGirl.define do
     end
 
     trait :root do
-      parent_id nil
+      folder_id nil
     end
 
     trait :deleted do
