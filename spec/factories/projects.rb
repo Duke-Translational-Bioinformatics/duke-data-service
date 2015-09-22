@@ -7,7 +7,6 @@ FactoryGirl.define do
 
     trait :deleted do
       is_deleted true
-      deleted_at { Time.now }
     end
   end
 

@@ -1,6 +1,4 @@
 class Folder < ActiveRecord::Base
-  after_initialize :init
-
   has_many :children, class_name: "Folder", foreign_key: "folder_id"
   belongs_to :project
 	belongs_to :folder
@@ -8,11 +6,6 @@ class Folder < ActiveRecord::Base
 
   validates :name, presence: true
   validates :project_id, presence: true
-
-  def init
-    self.is_deleted = false if self.is_deleted.nil?
-    self.save
-  end
 
   def virtual_path
     if folder
