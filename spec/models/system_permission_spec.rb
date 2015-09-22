@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe SystemPermission, type: :model do
   subject { FactoryGirl.create(:system_permission) }
+  let(:auth_role) { FactoryGirl.create(:auth_role) }
+  let(:system_auth_role) { FactoryGirl.create(:auth_role, :system) }
 
   describe 'associations' do
     it 'should have a user' do
@@ -14,7 +16,6 @@ RSpec.describe SystemPermission, type: :model do
   end
 
   describe 'validations' do
-
     it 'should have a unique user_id' do
       should validate_presence_of(:user_id)
       should validate_uniqueness_of(:user_id)
@@ -22,6 +23,11 @@ RSpec.describe SystemPermission, type: :model do
 
     it 'should have an auth_role_id' do
       should validate_presence_of(:auth_role_id)
+    end
+
+    it 'should only allow auth_role with system context' do
+      should allow_value(system_auth_role).for(:auth_role)
+      should_not allow_value(auth_role).for(:auth_role)
     end
   end
 

@@ -5,7 +5,7 @@ describe DDS::V1::SystemPermissionsAPI do
   
   let(:system_permission) { FactoryGirl.create(:system_permission) }
   let(:other_permission) { FactoryGirl.create(:system_permission) }
-  let!(:auth_role) { FactoryGirl.create(:auth_role) }
+  let!(:auth_role) { FactoryGirl.create(:auth_role, :system) }
   let(:other_user) { FactoryGirl.create(:user) }
 
   let(:resource_class) { SystemPermission }
