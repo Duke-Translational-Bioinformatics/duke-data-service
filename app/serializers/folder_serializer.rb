@@ -6,11 +6,11 @@ class FolderSerializer < ActiveModel::Serializer
     { id: object.project_id }
   end
 
-#TODO folder_id
+#TODO parent_id
   def parent
-    { id: object.folder_id }
-    # if object.folder_id
-    #   { id: object.folder_id }
+    { id: object.parent_id }
+    # if object.parent_id
+    #   { id: object.parent_id }
     # else
     #   "root"
     # end

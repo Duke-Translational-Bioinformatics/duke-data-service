@@ -8,8 +8,8 @@ RSpec.describe DataFile, type: :model do
       should belong_to(:project)
     end
 
-    it 'should have a folder' do
-      should belong_to(:folder)
+    it 'should have a parent' do
+      should belong_to(:parent)
     end
 
     it 'should be based on an upload' do
@@ -50,7 +50,7 @@ RSpec.describe DataFile, type: :model do
       expect(parsed_json).to have_key('is_deleted')
       expect(parsed_json).to have_key('upload')
       expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['parent']['id']).to eq(subject.folder_id)
+      expect(parsed_json['parent']['id']).to eq(subject.parent_id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['project']['id']).to eq(subject.project_id)
       expect(parsed_json['virtual_path']).to eq(subject.virtual_path)
@@ -62,9 +62,9 @@ RSpec.describe DataFile, type: :model do
   describe 'instance methods' do
     it 'should support virtual_path' do
       expect(subject).to respond_to(:virtual_path)
-      if subject.folder
+      if subject.parent
         expect(subject.virtual_path).to eq([
-          subject.folder.virtual_path,
+          subject.parent.virtual_path,
           subject.name
         ].join('/'))
       else

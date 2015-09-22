@@ -1,6 +1,6 @@
 class DataFile < ActiveRecord::Base
   belongs_to :project
-	belongs_to :folder
+  belongs_to :parent, class_name: "Folder"
   belongs_to :upload
   has_many :project_permissions, through: :project
 
@@ -9,8 +9,8 @@ class DataFile < ActiveRecord::Base
   validates :upload_id, presence: true
 
   def virtual_path
-    if folder
-      [folder.virtual_path, self.name].join('/')
+    if parent
+      [parent.virtual_path, self.name].join('/')
     else
       "/#{self.name}"
     end

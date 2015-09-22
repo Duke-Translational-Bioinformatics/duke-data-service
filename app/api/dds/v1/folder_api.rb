@@ -23,7 +23,7 @@ module DDS
         project = Project.find(params[:id])
         folder = project.folders.build({
           project: project,
-          folder_id: folder_params[:parent][:id],
+          parent_id: folder_params[:parent][:id],
           name: folder_params[:name]
         })
         authorize folder, :create?
@@ -107,7 +107,7 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :create?
         #TODO: validate that parent exists
-        if folder.update(folder_id: new_parent)
+        if folder.update(parent_id: new_parent)
           folder
         else
           validation_error!(folder)
@@ -151,7 +151,7 @@ module DDS
       get '/folders/:id/parent', root: false do
         authenticate!
         folder = Folder.find(params[:id])
-        parent = folder.folder
+        parent = folder.parent
         authorize parent, :show?
         parent
       end

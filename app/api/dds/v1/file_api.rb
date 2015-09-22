@@ -28,7 +28,7 @@ module DDS
           project.folders.find(params[:parent][:id])
         end
         file = project.data_files.build({
-          folder_id: file_params[:parent][:id],
+          parent_id: file_params[:parent][:id],
           upload_id: upload.id,
           name: upload.name
         })
@@ -114,7 +114,7 @@ module DDS
             file_params = declared(params, include_missing: false)
             new_parent = file.project.folders.find(file_params[:parent][:id])
             authorize file, :move?
-            file.update_attribute(:folder_id, new_parent.id)
+            file.update_attribute(:parent_id, new_parent.id)
             file
           end
 
