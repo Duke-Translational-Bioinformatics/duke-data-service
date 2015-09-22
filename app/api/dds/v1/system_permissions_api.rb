@@ -42,7 +42,7 @@ module DDS
         if permission.save
           permission
         else
-          #validation_error! permission
+          validation_error! permission
         end
       end
 

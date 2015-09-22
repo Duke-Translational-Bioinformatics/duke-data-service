@@ -7,6 +7,7 @@ describe DDS::V1::SystemPermissionsAPI do
   let(:other_permission) { FactoryGirl.create(:system_permission) }
   let!(:auth_role) { FactoryGirl.create(:auth_role, :system) }
   let(:other_user) { FactoryGirl.create(:user) }
+  let!(:invalid_auth_role) { FactoryGirl.create(:auth_role) }
 
   let(:resource_class) { SystemPermission }
   let(:resource_serializer) { SystemPermissionSerializer }
@@ -44,6 +45,13 @@ describe DDS::V1::SystemPermissionsAPI do
       end
 
       it_behaves_like 'an updatable resource'
+      
+      it_behaves_like 'a validated resource' do
+        let!(:payload) {{
+          auth_role: {id: invalid_auth_role.id}
+        }}
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
