@@ -33,6 +33,8 @@ class UploadSerializer < ActiveModel::Serializer
     {
       initiated_on: object.created_at,
       completed_on: object.completed_at,
+      error_on: object.error_at,
+      error_message: object.error_message
     }
   end
 end
