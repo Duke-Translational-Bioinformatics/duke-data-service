@@ -125,6 +125,14 @@ Similar to above, it should always return a table with the following headers, an
 0 or more entries:
 REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 
+Launching the Application
+-------------------------
+This project includes a shell script, launch_application.sh, which will
+bring up a running instance of the Application, and run all rake tasks required
+to prepare the application to work.  Use this script to launch the application,
+and read on for how this scrpt works, and how you can utilize docker and
+docker-compose to develop and test the system.
+
 Dockerfile
 -----------
 Docker uses a [Dockerfile](https://docs.docker.com/reference/builder/) to

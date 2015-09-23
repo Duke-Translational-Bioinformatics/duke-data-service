@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx2c6e5c3c41a047b291af9-0055e0dd08
+      - tx3be7a15be86147b9ac5b3-00560059a2
       Date:
-      - Fri, 28 Aug 2015 22:13:28 GMT
+      - Mon, 21 Sep 2015 19:25:22 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
 - request:
     method: delete
     uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=delete
@@ -43,7 +43,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
   response:
     status:
       code: 200
@@ -52,9 +52,9 @@ http_interactions:
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx647e329d5c2543a99574c-0055e0dd08
+      - txbf3170879dff4488b9adc-00560059a2
       Date:
-      - Fri, 28 Aug 2015 22:13:28 GMT
+      - Mon, 21 Sep 2015 19:25:22 GMT
       Transfer-Encoding:
       - chunked
     body:
@@ -62,5 +62,5 @@ http_interactions:
       string: "Number Deleted: 2\nNumber Not Found: 0\nResponse Body: \nResponse Status:
         200 OK\nErrors:\n"
     http_version: 
-  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
 recorded_with: VCR 2.9.3

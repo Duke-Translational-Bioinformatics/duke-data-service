@@ -954,7 +954,7 @@ Convenience endpoints for retrieval of a parent folder instance and the children
         }
 
 
-## Project Children collection [/project/{id}/children{?kind,name_contains}]
+## Project Children collection [/projects/{id}/children{?kind,name_contains}]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
     + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
@@ -1005,7 +1005,7 @@ List children (folders and files) of the project root.
             ]
         }
 
-## Folder Children collection [/folder/{id}/children{?kind,name_contains}]
+## Folder Children collection [/folders/{id}/children{?kind,name_contains}]
 + Parameters
     + id (required, string, `ad9115b8-1e4a-4399-b606-56622eb462e1`) ... Globally unique `id` of the folder.
     + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
@@ -1342,6 +1342,8 @@ storage provider.
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
+                "error_on": null,
+                "error_message": null
             },
             "audit": { }
         }
@@ -1373,7 +1375,9 @@ storage provider.
                         "status": {
                             "initiated_on": "2015-07-10T13:00:00Z",
                             "completed_on": null,
-                        },
+                            "error_on": null,
+                            "error_message": null
+                    },
                         "audit": { }
                     }
             ]
@@ -1408,6 +1412,8 @@ storage provider.
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
+                "error_on": null,
+                "error_message": null
             },
             "audit": { }
         }
@@ -1472,8 +1478,8 @@ This operation is called by the client after all file chunks have been successfu
 - - - - -
 * If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call
 the storage provider API to assemble the parts into a single file object.
-* If a client computed file hash was provided, it must equal the storage provider computed file hash, or an integrity
-exception is raised.
+* The client reported file hash for each chunk must equal the storage provider computed file hash for the same chunk, or an
+integrity exception is raised.
 * If the client reported file size (bytes) does not match the storage provider reported file size, an integrity exception
 is raised.
 * If there are no errors or integrity exceptions, the `upload_status.complete_on` is set to the current timestamp.
@@ -1500,14 +1506,8 @@ is raised.
                 }
             ],
             "storage_provider": { "id": 1, "name": "amazon_s3_standard" },
-            "storage_location": {
-                "Bucket": "duke_data_service_prod",
-                "Key": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "UploadId": "EXAMPLEJZ6e0YupT2h66iePQCc9IEbYbDUy4RTpMeo..."
-            },
-            "upload_status": {
+            "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
-                "percent_complete": 100,
                 "completed_on": "2015-07-10T13:00:00Z",
                 "error_on": null,
                 "error_message": null

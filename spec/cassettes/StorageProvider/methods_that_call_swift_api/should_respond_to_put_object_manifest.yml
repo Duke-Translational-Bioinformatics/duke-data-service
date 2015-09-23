@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx58b897cfcbc14dd2803aa-0055e0dd08
+      - tx1cd6b1265afd4fa7bf35a-00560059a2
       Date:
-      - Fri, 28 Aug 2015 22:13:28 GMT
+      - Mon, 21 Sep 2015 19:25:22 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
 - request:
     method: put
     uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=put
@@ -43,14 +43,14 @@ http_interactions:
       string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tkfdba669c0f7c465e8855aa78a284d90c
+      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Fri, 28 Aug 2015 22:13:29 GMT
+      - Mon, 21 Sep 2015 19:25:23 GMT
       Content-Length:
       - '0'
       Etag:
@@ -58,12 +58,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx0810ad641c664af2b3410-0055e0dd08
+      - tx662b24e0c3ea4f3887bfa-00560059a2
       Date:
-      - Fri, 28 Aug 2015 22:13:28 GMT
+      - Mon, 21 Sep 2015 19:25:22 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 28 Aug 2015 22:13:28 GMT
+  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
 recorded_with: VCR 2.9.3

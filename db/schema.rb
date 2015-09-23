@@ -135,6 +135,8 @@ ActiveRecord::Schema.define(version: 20150922181221) do
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.datetime "completed_at"
+    t.datetime "error_at"
+    t.string   "error_message"
   end
 
   create_table "user_authentication_services", force: :cascade do |t|
