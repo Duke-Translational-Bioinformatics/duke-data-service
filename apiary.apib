@@ -954,7 +954,7 @@ Convenience endpoints for retrieval of a parent folder instance and the children
         }
 
 
-## Project Children collection [/project/{id}/children{?kind,name_contains}]
+## Project Children collection [/projects/{id}/children{?kind,name_contains}]
 + Parameters
     + id (required, string, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... Globally unique `id` of the project.
     + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
@@ -1005,7 +1005,7 @@ List children (folders and files) of the project root.
             ]
         }
 
-## Folder Children collection [/folder/{id}/children{?kind,name_contains}]
+## Folder Children collection [/folders/{id}/children{?kind,name_contains}]
 + Parameters
     + id (required, string, `ad9115b8-1e4a-4399-b606-56622eb462e1`) ... Globally unique `id` of the folder.
     + kind (optional, string, `dds#folder`) ... Returns children of the specified kind; supported kinds are `dds#folder` and `dds#file`.
