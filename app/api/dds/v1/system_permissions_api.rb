@@ -6,15 +6,10 @@ module DDS
         named 'list permissions'
         failure [401]
       end
-      get '/system/permissions', root: false do
-        {
-          results: User.all.collect {|u|
-            {
-              user: UserSerializer.new(u),
-              auth_roles: u.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
-            }
-          }
-        }
+      get '/system/permissions', root: :results do
+        authenticate!
+        authorize SystemPermission.new, :show?
+        SystemPermission.all
       end
 
       desc 'Grant system level permission to user' do
