@@ -13,7 +13,7 @@ RSpec.describe StorageProvider, type: :model do
     let(:segment_path) { [container_name, segment_name].join('/') }
     let(:object_body) { 'This is the object body!' }
     let(:manifest_hash) { [ {
-      path: segment_path, 
+      path: segment_path,
       etag: Digest::MD5.hexdigest(object_body),
       size_bytes: object_body.length
     } ] }
@@ -58,6 +58,17 @@ RSpec.describe StorageProvider, type: :model do
       expect(put_object).to be_truthy
     end
 
+    let(:get_object_metadata) { subject.get_object_metadata(container_name, segment_name) }
+    it 'should respond to get_object_metadata' do
+      put_container
+      put_object
+      is_expected.to respond_to :get_object_metadata
+      expect {
+        resp = get_object_metadata
+        expect(resp).to be
+      }.not_to raise_error
+    end
+
     let(:put_object_manifest) { subject.put_object_manifest(container_name, object_name, manifest_hash) }
     it 'should respond to put_object_manifest' do
       is_expected.to respond_to :put_object_manifest
@@ -83,7 +94,7 @@ RSpec.describe StorageProvider, type: :model do
   describe 'methods for building signed urls' do
     subject { storage_provider }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
-    
+
     it 'should respond to signed_url_duration' do
       is_expected.to respond_to :signed_url_duration
       expect(subject.signed_url_duration).to eq(300)

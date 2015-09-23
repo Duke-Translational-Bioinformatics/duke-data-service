@@ -68,15 +68,84 @@ RSpec.describe Upload, type: :model do
   describe 'swift methods', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
-    let(:complete) { subject.complete }
-    it 'should have a complete method' do
-      is_expected.to respond_to 'complete'
-      expect { complete }.not_to raise_error
-      expect(complete).to be_truthy
-    end
-  end
+    describe 'complete' do
+      it 'should be implemented' do
+        is_expected.to respond_to 'complete'
+      end
+
+      describe 'calls' do
+        before do
+          actual_size = 0
+          subject.storage_provider.put_container(subject.project_id)
+          subject.chunks.each do |chunk|
+            object = [subject.id, chunk.number].join('/')
+            body = 'this is a chunk'
+            subject.storage_provider.put_object(
+              subject.project_id,
+              object,
+              body
+            )
+            chunk.update_attributes({
+              fingerprint_value: Digest::MD5.hexdigest(body),
+              size: body.length
+            })
+            actual_size = body.length + actual_size
+          end
+          subject.update_attribute(:size, actual_size)
+        end
+
+        after do
+          subject.chunks.each do |chunk|
+            object = [subject.id, chunk.number].join('/')
+            subject.storage_provider.delete_object(subject.project_id, object)
+          end
+        end
+
+        describe 'with valid reported size and chunk hashes' do
+          it 'should update completed_at, leave error_at and error_message null and return true' do
+            expect {
+              is_complete = subject.complete
+              expect(is_complete).to be_truthy
+            }.not_to raise_error
+            subject.reload
+            expect(subject.completed_at).to be
+            expect(subject.error_at).to be_nil
+            expect(subject.error_message).to be_nil
+          end
+        end #with valid
+
+        describe 'with reported size not equal to swift computed size' do
+          it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+            subject.update_attribute(:size, subject.size - 1)
+            expect { subject.complete }.to raise_error(IntegrityException)
+            subject.reload
+            expect(subject.completed_at).to be
+            expect(subject.error_at).to be
+            expect(subject.error_message).to be
+          end
+        end #with reported size
+
+        describe 'with reported chunk hash not equal to swift computed chunk etag' do
+          it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+            bad_chunk = subject.chunks.first
+            bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
+            expect {
+              subject.complete
+            }.to raise_error(IntegrityException)
+            subject.reload
+            expect(subject.completed_at).to be
+            expect(subject.error_at).to be
+            expect(subject.error_message).to be
+          end
+        end #with reported chunk
+
+      end #calls
+    end #complete
+  end #swift methods
 
   describe 'serialization' do
+    subject { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
+
     let(:expected_keys) {
       %w(
         id
@@ -123,15 +192,13 @@ RSpec.describe Upload, type: :model do
         "name" => subject.storage_provider.name,
       })
       expect(parsed_json["status"]).to be_a Hash
-      %w(initiated_on completed_on).each do |ekey|
+      %w(initiated_on completed_on error_on error_message).each do |ekey|
         expect(parsed_json["status"]).to have_key ekey
       end
       expect(DateTime.parse(parsed_json["status"]["initiated_on"]).to_i).to eq(subject.created_at.to_i)
-      if subject.completed_at
-        expect(DateTime.parse(parsed_json["status"]["completed_on"]).to_i).to eq(subject.completed_at.to_i)
-      else
-        expect(parsed_json["status"]["completed_on"]).to eq(subject.completed_at)
-      end
+      expect(DateTime.parse(parsed_json["status"]["completed_on"]).to_i).to eq(subject.completed_at.to_i)
+      expect(DateTime.parse(parsed_json["status"]["error_on"]).to_i).to eq(subject.error_at.to_i)
+      expect(parsed_json["status"]["error_message"]).to eq(subject.error_message)
     end
   end
 end

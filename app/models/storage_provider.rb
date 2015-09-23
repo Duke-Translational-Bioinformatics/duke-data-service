@@ -110,6 +110,16 @@ class StorageProvider < ActiveRecord::Base
       raise(StorageProviderException, resp.body)
   end
 
+  def get_object_metadata(container, object)
+    resp = HTTParty.head(
+      "#{storage_url}/#{container}/#{object}",
+      headers:{"X-Auth-Token" => auth_token}
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+     resp.headers
+  end
+
   private
   def call_auth_uri
     begin
@@ -120,8 +130,8 @@ class StorageProvider < ActiveRecord::Base
             'X-Auth-Key' => service_pass
           }
       )
-    rescue
-      raise StorageProviderException, "Unexpected StorageProvider Error"
+    rescue Exception => e
+      raise StorageProviderException, "Unexpected StorageProvider Error #{e.message}"
     end
     unless @auth_uri_resp.response.code.to_i == 200
       raise StorageProviderException, "Auth Failure: #{ @auth_uri_resp.body }"

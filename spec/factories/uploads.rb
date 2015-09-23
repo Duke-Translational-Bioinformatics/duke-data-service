@@ -9,11 +9,20 @@ FactoryGirl.define do
     storage_provider
 
     trait :with_chunks do
-      chunks { build_list(:chunk, 1) }
+      chunks { [ build(:chunk, number: 1) ] }
     end
 
     trait :swift do
       storage_provider { create(:storage_provider, :swift) }
+    end
+
+    trait :completed do
+      completed_at { DateTime.now }
+    end
+
+    trait :with_error do
+      error_at { DateTime.now }
+      error_message { Faker::Lorem.sentence }
     end
   end
 end
