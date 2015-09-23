@@ -136,11 +136,19 @@ module DDS
               [404, 'Upload Does not Exist']
             ]
           end
+          rescue_from IntegrityException do |e|
+            error_json = {
+              "error" => "500",
+              "reason" => "IntegrityException",
+              "suggestion" => e.message
+            }
+            error!(error_json, 500)
+          end
           put '/complete', root: false do
             authenticate!
             upload = Upload.find(params[:id])
             authorize upload, :complete?
-            upload.touch
+            upload.complete
             upload
           end
         end
