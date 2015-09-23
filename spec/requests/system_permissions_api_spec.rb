@@ -15,20 +15,20 @@ describe DDS::V1::SystemPermissionsAPI do
   let!(:resource_permission) { FactoryGirl.create(:system_permission, user: current_user) }
   let(:resource_user) { resource.user }
 
-#  describe 'System Permissions collection' do
-#    let(:url) { "/api/v1/systems/permissions" }
-#
-#    describe 'GET' do
-#      subject { get(url, nil, headers) }
-#
-#      it_behaves_like 'a listable resource'
-#      it_behaves_like 'an authenticated resource'
-#      it_behaves_like 'an authorized resource'
-#    end
-#  end
+  describe 'System Permissions collection' do
+    let(:url) { "/api/v1/system/permissions" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+    end
+  end
 
   describe 'System Permission instance' do
-    let(:url) { "/api/v1/system//permissions/#{resource_user.id}" }
+    let(:url) { "/api/v1/system/permissions/#{resource_user.id}" }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
