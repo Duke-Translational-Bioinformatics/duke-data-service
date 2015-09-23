@@ -133,16 +133,18 @@ module DDS
             failure [
               [200, 'Success'],
               [401, 'Unauthorized'],
-              [404, 'Upload Does not Exist']
+              [404, 'Upload Does not Exist'],
+              [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
+              [500, 'Unexpected StorageProviderException experienced']
             ]
           end
           rescue_from IntegrityException do |e|
             error_json = {
-              "error" => "500",
+              "error" => "400",
               "reason" => "IntegrityException",
               "suggestion" => e.message
             }
-            error!(error_json, 500)
+            error!(error_json, 400)
           end
           put '/complete', root: false do
             authenticate!

@@ -194,12 +194,12 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'a storage_provider backed resource' do
       it 'should return an error if the reported size does not match storage_provider computed size' do
         resource.update_attribute(:size, resource.size - 1)
-        is_expected.to eq(500)
+        is_expected.to eq(400)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
         response_json = JSON.parse(response.body)
         expect(response_json).to have_key('error')
-        expect(response_json['error']).to eq('500')
+        expect(response_json['error']).to eq('400')
         expect(response_json).to have_key('reason')
         expect(response_json['reason']).to eq('IntegrityException')
         expect(response_json).to have_key('suggestion')
@@ -208,12 +208,12 @@ describe DDS::V1::UploadsAPI do
 
       it 'should return an error if the reported chunk hash does not match storage_provider computed size' do
         chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-        is_expected.to eq(500)
+        is_expected.to eq(400)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
         response_json = JSON.parse(response.body)
         expect(response_json).to have_key('error')
-        expect(response_json['error']).to eq('500')
+        expect(response_json['error']).to eq('400')
         expect(response_json).to have_key('reason')
         expect(response_json['reason']).to eq('IntegrityException')
         expect(response_json).to have_key('suggestion')
