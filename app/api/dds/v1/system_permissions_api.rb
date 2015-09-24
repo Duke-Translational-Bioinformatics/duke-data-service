@@ -4,7 +4,10 @@ module DDS
       desc 'List system permissions' do
         detail 'Returns a list of users with their associated auth_roles'
         named 'list permissions'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
       end
       get '/system/permissions', root: :results do
         authenticate!
@@ -41,17 +44,21 @@ module DDS
         end
       end
 
-      desc 'View system permissions to user' do
-        detail 'Gets the auth_roles for a given user'
+      desc 'View system level permissions for user' do
+        detail 'Returns the system permissions for a given user'
         named 'show permissions'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'User Does not Exist']
+        ]
       end
       get '/system/permissions/:user_id', root: false do
+        authenticate!
         user = User.find(params[:user_id])
-        {
-          user: UserSerializer.new(user),
-          auth_roles: user.auth_roles.collect {|r| AuthRoleSerializer.new(r)}
-        }
+        permission = user.system_permission
+        authorize permission, :show?
+        permission
       end
 
       desc 'Revoke system permissions to user' do
