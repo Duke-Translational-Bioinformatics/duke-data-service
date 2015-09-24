@@ -62,13 +62,20 @@ module DDS
       end
 
       desc 'Revoke system permissions to user' do
-        detail 'Deletes all auth_roles for a given user'
+        detail 'Deletes system permissions for a given user'
         named 'delete permissions'
-        failure [401]
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'User Does not Exist']
+        ]
       end
       delete '/system/permissions/:user_id', root: false do
+        authenticate!
         user = User.find(params[:user_id])
-        user.update_attribute(:auth_roles, nil)
+        permission = user.system_permission
+        authorize permission, :destroy?
+        permission.destroy
         body false
       end
     end
