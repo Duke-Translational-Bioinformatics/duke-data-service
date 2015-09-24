@@ -22,6 +22,10 @@ RSpec.describe User, type: :model do
     it 'should have many uploads through data_files' do
       should have_many(:uploads).through(:data_files)
     end
+
+    it 'should have one system_permission' do
+      should have_one(:system_permission)
+    end
   end
 
   describe 'validations' do

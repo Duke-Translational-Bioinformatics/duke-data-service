@@ -1,85 +1,69 @@
 require 'rails_helper'
-require 'jwt'
-require 'securerandom'
 
 describe DDS::V1::SystemPermissionsAPI do
-  let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
-  let(:user) { FactoryGirl.create(:user) }
-  let(:auth_user) { FactoryGirl.create(:user, :with_auth_role) }
-  let(:user_role_hash) {{
-    'user' => JSON.parse(UserSerializer.new(auth_user).to_json),
-    'auth_roles' => auth_user.auth_roles.collect { |role|
-      JSON.parse(AuthRoleSerializer.new(role).to_json)
-    }
-  }}
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
+  include_context 'with authentication'
+  
+  let(:system_permission) { FactoryGirl.create(:system_permission) }
+  let(:other_permission) { FactoryGirl.create(:system_permission) }
+  let!(:auth_role) { FactoryGirl.create(:auth_role, :system) }
+  let(:other_user) { FactoryGirl.create(:user) }
+  let!(:invalid_auth_role) { FactoryGirl.create(:auth_role) }
 
-  describe 'List system permissions' do
-    it 'should return a list of users and auth_role objects' do
-      expected_result = user_role_hash
-      get '/api/v1/system/permissions', json_headers
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('results')
-      expect(response_json['results']).to be_a Array
-      expect(response_json['results']).to include(expected_result)
+  let(:resource_class) { SystemPermission }
+  let(:resource_serializer) { SystemPermissionSerializer }
+  let!(:resource) { system_permission }
+  let!(:resource_permission) { FactoryGirl.create(:system_permission, user: current_user) }
+  let(:resource_user) { resource.user }
+
+  describe 'System Permissions collection' do
+    let(:url) { "/api/v1/system/permissions" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
     end
   end
 
-  describe 'Grant system permissions to user' do
-    it 'should set auth_roles for a given user' do
-      payload = {
-        auth_roles: [auth_role.id]
-      }
-      expected_result = {
-        user: JSON.parse(UserSerializer.new(user).to_json),
-        auth_roles: [JSON.parse(AuthRoleSerializer.new(auth_role).to_json)]
-      }.stringify_keys
-      put "/api/v1/system/permissions/#{user.id}", payload.to_json, json_headers
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to eq(expected_result)
-    end
+  describe 'System Permission instance' do
+    let(:url) { "/api/v1/system/permissions/#{resource_user.id}" }
 
-    it 'should return validation errors for non-existent roles' do
-      payload = {
-        auth_roles: ['platform_user']
-      }
-      put "/api/v1/system/permissions/#{user.id}", payload.to_json, json_headers
-      expect(response.status).to eq(400)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to have_key('error')
-      expect(response_json['error']).to eq(400)
-      expect(response_json).to have_key('reason')
-      expect(response_json['reason']).to eq('validation failed')
-    end
-  end
+    describe 'PUT' do
+      subject { put(url, payload.to_json, headers) }
+      let!(:payload) {{
+        auth_role: {id: auth_role.id}
+      }}
 
-  describe 'View system permissions for user' do
-    it 'should get auth_roles for a given user' do
-      get "/api/v1/system/permissions/#{auth_user.id}", json_headers
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      response_json = JSON.parse(response.body)
-      expect(response_json).to eq(user_role_hash)
-    end
-  end
+      it_behaves_like 'a creatable resource' do
+        let(:expected_response_status) {200}
+        let(:resource_user) { other_user }
+        let(:new_object) {
+          resource_class.find_by(user: resource_user)
+        }
+      end
 
-  describe 'Revoke system permissions for user' do
-    it 'should delete all auth_roles for a given user' do
-      delete "/api/v1/system/permissions/#{auth_user.id}", json_headers
-      expect(response.status).to eq(204)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      auth_user.reload
-      expect(auth_user.auth_role_ids).to be_nil
+      it_behaves_like 'an updatable resource'
+      
+      it_behaves_like 'a validated resource' do
+        let!(:payload) {{
+          auth_role: {id: invalid_auth_role.id}
+        }}
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/system/permissions/notexists_userid" }
+        let(:resource_class) {'User'}
+      end
+      it_behaves_like 'an identified resource' do
+        let!(:payload) {{
+          auth_role: {id: 'invalid_role'}
+        }}
+        let(:resource_class) {'AuthRole'}
+      end
     end
   end
 end

@@ -21,6 +21,5 @@ FactoryGirl.define do
     trait :deleted do
       is_deleted true
     end
-
   end
 end

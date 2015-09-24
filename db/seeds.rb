@@ -54,3 +54,15 @@ end
 ].each do |role|
   ProjectRole.create(role)
 end
+
+#
+# Project.create({
+#   creator_id: User.first.id,
+#   name: "Project#{Project.count}",
+#   description: "Project#{Project.count} User#{User.first.first_name}"
+#   })
+#
+# Folder.create({
+#   project_id: Project.first.id,
+#   name: Project.first.name + "_folder#{Folder.count}"
+#   })

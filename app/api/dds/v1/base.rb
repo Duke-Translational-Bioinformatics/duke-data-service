@@ -125,6 +125,7 @@ module DDS
       mount DDS::V1::UploadsAPI
       mount DDS::V1::FileAPI
       mount DDS::V1::ProjectRolesAPI
+      # mount DDS::V1::ParentChildrenAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

@@ -8,6 +8,11 @@ class DataFileSerializer < ActiveModel::Serializer
 
   def parent
     { id: object.parent_id }
+    # if object.parent_id
+    #   { id: object.parent_id }
+    # else
+    #   "root"
+    # end
   end
 
   def upload

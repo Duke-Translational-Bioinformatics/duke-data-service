@@ -9,6 +9,7 @@ class User < ActiveRecord::Base
   has_many :data_files, foreign_key: "creator_id"
   has_many :uploads, through: :data_files
   has_many :affiliations
+  has_one :system_permission
 
   validates :username, presence: true, uniqueness: true
   validates_each :auth_role_ids do |record, attr, value|
