@@ -77,5 +77,17 @@ describe DDS::V1::SystemPermissionsAPI do
         let(:resource_class) {'User'}
       end
     end
+
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+
+      it_behaves_like 'a removable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an identified resource' do
+        let(:url) { "/api/v1/system/permissions/notexists_userid" }
+        let(:resource_class) {'User'}
+      end
+    end
   end
 end
