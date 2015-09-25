@@ -1115,29 +1115,29 @@ the descriptive meta\-data about file including the virtual path.
 
 ### Create a file [POST]
 Creates a file metadata object; The client is responsible for the creation of this object after confirming the associated physical
-file has been successfully uploaded to a storage provider. (see `Uploads` endpoints)
+file has been successfully uploaded to a storage provider. (see `Uploads` endpoints). The name of the file will be `upload.name`.
+This can be modified after it is created. (See `/files/{id}/rename`).
 
 >**Permission:** create_file
 - - - - -
 
 >**Rules**
 - - - - -
-* The `upload.id` must be for an upload that completed successfully (`upload.status.completed_on != null`)
+* The `upload.id` must be for an upload that completed successfully (`upload.status.error_on is null`)
 * The target `project.id` specified must match the `upload.project.id`.
 * The target `folder.id` specified must be in the context of the `project.id`.
 * The current user must be the user who uploaded the file.
 
 >**Request/Response Payload Properties**
 - - - - -
-+ parent.id (string) - The globally unique id of the virtual destination folder - specifiy alias "root" for project root.
-+ name (string) - The name of the file (optionally provided) - defaults to the `upload.name` if not provided.
++ parent.id (string) - The globally unique id of the virtual destination folder - leave nil for project root.
 + upload.id (string) - The globally unique id of the upload object.
 
 + Request (application/json)
 
         {
             "parent": { "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
-            "name": null,
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "upload": { "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23" }
         }
 
@@ -1151,12 +1151,7 @@ file has been successfully uploaded to a storage provider. (see `Uploads` endpoi
             "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "virtual_path": "/Sequencing Core/Raw Data/Aligned/RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": 1, "name": "amazon_s3_standard" }
-            },
+            "upload": { "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23" },
             "audit": { }
         }
 

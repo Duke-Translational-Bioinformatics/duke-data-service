@@ -29,7 +29,7 @@ namespace :api_test_user do
           'exp' => Time.now.to_i + 5.years.to_i
         }, Rails.application.secrets.secret_key_base)
 
-    $stdout.puts token
+    $stdout.print token
   end
 
   desc "destroys the 'DDS_api_test_user'"

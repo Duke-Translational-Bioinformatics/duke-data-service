@@ -22,7 +22,8 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'validations' do
-
+    let(:upload_without_error) { FactoryGirl.create(:upload) }
+    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error) }
     it 'should have a name' do
       should validate_presence_of(:name)
     end
@@ -33,6 +34,15 @@ RSpec.describe DataFile, type: :model do
 
     it 'should have a upload_id' do
       should validate_presence_of(:upload_id)
+    end
+
+    it 'should require that upload has no error' do
+      should allow_value(upload_without_error).for(:upload)
+      should_not allow_value(upload_with_error).for(:upload)
+      file = FactoryGirl.build(:data_file, upload_id: upload_with_error.id)
+      expect(file.valid?).to be_falsey
+      expect(file.errors.keys).to include(:upload)
+      expect(file.errors[:upload]).to include('upload cannot have an error')
     end
   end
 

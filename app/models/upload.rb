@@ -17,7 +17,7 @@ class Upload < ActiveRecord::Base
 
   def temporary_url
     http_verb = 'GET'
-    expiry = updated_at.to_i + storage_provider.signed_url_duration
+    expiry = Time.now.to_i + storage_provider.signed_url_duration
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 

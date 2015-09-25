@@ -34,7 +34,7 @@ RSpec.describe StorageProvider, type: :model do
     it 'should respond to get_account_info' do
       is_expected.to respond_to :get_account_info
       expect { get_account_info }.not_to raise_error
-      expect(get_account_info).to be_truthy
+      expect(get_account_info).to be
     end
 
     let(:register_keys) { subject.register_keys }
