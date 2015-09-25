@@ -1,5 +1,3 @@
-# To make this file default docker-compose file run the following (or add ~/.bash_profile):
-# export COMPOSE_FILE=dc-dev.utils.yml
 server:
   extends:
     file: dc-base.yml
@@ -10,3 +8,13 @@ db:
   extends:
     file: dc-base.yml
     service: db
+swiftvol:
+  extends:
+    file: dc-base.yml
+    service: swiftvol
+swift:
+  extends:
+    file: dc-base.yml
+    service: swift
+  volumes_from:
+    - swiftvol

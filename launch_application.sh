@@ -2,13 +2,13 @@
 
 if [ -z $COMPOSE_FILE ]
 then
-  docker-compose up -d
+  docker-compose up -d server
   docker-compose -f dc-dev.utils.yml run rake db:migrate
   docker-compose -f dc-dev.utils.yml run rake db:seed
   docker-compose -f dc-dev.utils.yml run authservice
   if [ -s swift.env ]
   then
-    docker-compose -f dc-dev.utils.yml up -d swift
+    docker-compose up -d swift
   fi
   docker-compose -f dc-dev.utils.yml run rake storage_provider:create
 else
