@@ -61,6 +61,7 @@ class StorageProvider < ActiveRecord::Base
     )
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
+    resp
   end
 
   def put_container(container)
