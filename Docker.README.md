@@ -128,10 +128,11 @@ REPOSITORY          TAG                 IMAGE ID            CREATED             
 Launching the Application
 -------------------------
 This project includes a shell script, launch_application.sh, which will
-bring up a running instance of the Application, and run all rake tasks required
-to prepare the application to work.  Use this script to launch the application,
-and read on for how this scrpt works, and how you can utilize docker and
-docker-compose to develop and test the system.
+bring up a running instance of the Application and its associated
+db postgres instance, and run all rake tasks required to prepare the application
+to work.  Use this script to launch the application, and read on for how this
+script works, and how you can utilize docker and docker-compose to develop and
+test the system.
 
 Dockerfile
 -----------
@@ -399,6 +400,102 @@ cd PATHTO/duke-authentication-service
 ./launch_application.sh
 cd PATHTO/duke-data-service
 ./launch_application.sh
+```
+
+Creating an API_TEST_USER and token
+-----------------------------------
+A rake task, api_test_user:create, has been written to create a
+test user account to use in any test applications.  This creates
+a single User (if it does not already exist). Each time it is run,
+it will print a new api_token to STDOUT (even if the User already exists).
+This api_token has an expiry of 5 years from the time the rake task is run.
+Here is how you can create one and capture the token into a bash variable:
+```
+api_token=`docker-compose -f dc-dev.utils run rake api-test_user:create`
+```
+You can use this in any code that needs to access the API (see the workflow.sh
+script for an example).
+If you want to use this in the swagger apiexplorer, launch the /apiexplorer,
+open the javascript console, type
+```
+window.localStorage.api_token='yourtoken'
+```
+and reload the page.
+
+Connecting to an Openstack Swift Object Store
+---------------------------------------------
+Currently, DDS is designed to support a single Openstack Swift object storage.
+A StorageProvider object must be created for the target Swift service.
+
+A rake task, storage_provider:create, has been created to facilitate the
+creation of a StorageProvider. It uses the following Environment variables
+SWIFT_ACCT: This must be the root path after the SWIFT_URL_ROOT for the account
+SWIFT_URL_ROOT: This must be the Root URI to the swift service, with protocol (http/https)
+SWIFT_VERSION: v1: This is appended to the SWIFT_ACCT
+SWIFT_AUTH_URI: This is appended to SWIFT_ACCT and SWIFT_VERSION
+SWIFT_USER: The username to pass to swift to get an Auth token
+SWIFT_PASS: The password to pass to swift to get an Auth token
+SWIFT_PRIMARY_KEY: This is a long secret string that is registered on the SWIFT_ACCT
+to allow temporary_urls (get upload and put chunk) to be generated (see
+storage_provider.register_keys)
+SWIFT_SECONDARY_KEY: This is a second key that can be registered to the SWIFT_ACCT
+for temporary_url generation.  Either key can be used to generate a temporary_url.
+
+You can also destroy the storage_provider with the rake task storage_provider:destroy
+
+This repo includes an empty_swift.env file which is symlinked to swift.env,
+and a local_swift.env which specifies these parameters for the local swift servic
+(see next). The launch_application.sh script, and the storage_provider:create
+rake task will do extra things when these Environment variables are set.
+
+launch_application: if these are set, launches the local dockerized swift services,
+attached to a volume container for the files (When you remove the stopped swift-vol
+container, all files stored to this swift service are deleted). Also runs the
+rake storage_provider:create task.
+
+storage_provider:create: This will register the keys to swift service specified
+in the Environement variables if these are set.
+
+Running a local swift service using Docker
+------------------------------------------
+We have specified the ability to extend an existing Docker Hub hosted Swift
+service to create a locally running swift service that allows very small
+static_large_object 'chunks' (see docker/builds/swift for the Docker build context).
+To use this, change the swift.env to point to local_swift.env, and then launch
+the application:
+```
+rm swift.env
+ln -s local_swift.env swift.env
+./launch_application.sh
+```
+
+Running the Workflow
+--------------------
+A bash script, workflow.sh, has been created to test the locally running API using a set of
+files. To run this:
+
+- make sure you set the swift.env to point to the local_swift.env file
+- create a freshly launched application (e.g. the postgres database and swift service
+are completely clean). You can run the following to ensure this:
+```
+docker-compose stop
+docker rm $(docker ps -aq)
+```
+- create an api_test_user
+```
+api_token=`rake api_test_user:create`
+```
+- run the workflow with the api_token
+```
+./workflow.sh ${api_token}
+```
+
+You will need to clean up after each run to get rid of all of the DDS objects, and Swift
+containers/objects that are created, or the workflow will fail when it tries to create the
+project with an existing name.
+```
+docker-compose stop
+docker rm $(docker ps -aq)
 ```
 
 Troubleshooting Docker
