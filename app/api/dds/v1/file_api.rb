@@ -7,6 +7,7 @@ module DDS
         failure [
           [200, "this will never happen"],
           [201, "Successfully Created"],
+          [400, 'Upload has an IntegrityException'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'Project Does not Exist, Parent Folder or Upload does not exist in Project']
         ]
@@ -24,14 +25,14 @@ module DDS
         file_params = declared(params, include_missing: false)
         project = Project.find(params[:id])
         upload = project.uploads.find(file_params[:upload][:id])
-        if params[:parent][:id]
-          project.folders.find(params[:parent][:id])
-        end
         file = project.data_files.build({
-          parent_id: file_params[:parent][:id],
           upload_id: upload.id,
           name: upload.name
         })
+        if file_params[:parent] && file_params[:parent][:id]
+          project.folders.find(file_params[:parent][:id])
+          file.parent_id = file_params[:parent][:id]
+        end
         authorize file, :create?
         if file.save
           file
@@ -91,7 +92,8 @@ module DDS
             authenticate!
             file = DataFile.find(params[:id])
             authorize file, :download?
-            redirect file.upload.temporary_url, permanent: true
+            new_url = "#{file.upload.storage_provider.url_root}#{file.upload.temporary_url}"
+            redirect new_url, permanent: true
           end
 
           desc 'Move a file metadata object to a new parent folder' do
