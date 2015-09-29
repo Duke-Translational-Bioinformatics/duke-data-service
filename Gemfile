@@ -12,6 +12,9 @@ gem 'grape-swagger'
 gem 'kaminari'
 gem 'grape-kaminari'
 
+# Auditing
+gem "audited-activerecord"
+
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
