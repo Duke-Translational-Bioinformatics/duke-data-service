@@ -4,6 +4,26 @@ require 'jwt'
 RSpec.describe User, type: :model do
   let(:role_1) {FactoryGirl.create(:auth_role)}
   let(:role_2) {FactoryGirl.create(:auth_role)}
+  let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
+  subject { user_authentication_service.user }
+  let(:resource_class) { User }
+  let(:resource_serializer) { UserSerializer }
+  let!(:resource) { subject }
+
+  it_behaves_like 'an audited model'
+
+  it 'should have an audited_user_info method to return the information required by audit _by methods' do
+    should respond_to('audited_user_info')
+    audited_user_info = subject.audited_user_info
+    expect(audited_user_info).to be
+    expect(audited_user_info).to have_key(:id)
+    expect(audited_user_info).to have_key(:username)
+    expect(audited_user_info).to have_key(:full_name)
+    expect(audited_user_info[:id]).to eq(subject.id)
+    expect(audited_user_info[:username]).to eq(subject.username)
+    expect(audited_user_info[:full_name]).to eq(subject.display_name)
+  end
+
   describe 'associations' do
     subject {FactoryGirl.create(:user)}
 
