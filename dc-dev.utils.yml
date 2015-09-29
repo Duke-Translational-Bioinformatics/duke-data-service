@@ -34,6 +34,11 @@ rails:
     - db:postgres.db.host
   env_file:
     - swift.env
+bundle:
+  image: dukedataservice_server
+  volumes_from:
+    - server
+  entrypoint: ['bundle']
 rake:
   image: dukedataservice_server
   volumes_from:
