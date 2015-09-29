@@ -91,3 +91,16 @@ shared_examples 'an audited model' do
     expect(parsed_json['audit'].to_json).to eq(subject.audit.to_json)
   end
 end
+
+shared_examples 'an audited endpoint' do
+  let(:expected_status) { 200 }
+  it 'should create an audit with the url as audit_comment' do
+    expect {
+      is_expected.to eq(expected_status)
+    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(1)
+    last_audit = Audited.audit_class.last
+    expect(last_audit.user).to be
+    expect(last_audit.user.id).to eq(current_user.id)
+    expect(last_audit.audit_comment).to eq(url)
+  end
+end
