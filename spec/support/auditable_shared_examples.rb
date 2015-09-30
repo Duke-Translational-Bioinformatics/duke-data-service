@@ -26,12 +26,14 @@ shared_context 'with destroy' do
 end
 
 shared_examples 'an audited model' do
-  include_context 'with update'
-  include_context 'with destroy'
-
   it 'should have an audit record' do
     expect(subject.audits).to be
   end
+end
+
+shared_examples 'with a serialized audit' do
+  include_context 'with update'
+  include_context 'with destroy'
 
   it 'should have an audit method that returns the audit expected by the serializer' do
     expect(update).to be_truthy
