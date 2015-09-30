@@ -5,6 +5,7 @@ require 'securerandom'
 describe DDS::V1::UserAPI do
   include_context 'with authentication'
   let (:auth_service) { user_auth.authentication_service }
+  let(:resource_class) { User }
 
   describe 'get /api/v1/user/api_token' do
     let(:url) { '/api/v1/user/api_token' }
@@ -65,6 +66,10 @@ describe DDS::V1::UserAPI do
         created_user_authentication_service = created_user.user_authentication_services.where(uid: new_user_token['uid']).first
         expect(created_user_authentication_service).to be
         expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
+      end
+
+      it_behaves_like 'an audited endpoint' do
+        let!(:with_current_user) { false }
       end
     end
 
@@ -173,7 +178,6 @@ describe DDS::V1::UserAPI do
 
   describe 'get /api/v1/users' do
     let(:url) { "/api/v1/users" }
-    let(:resource_class) { User }
     let(:resource_serializer) {UserSerializer}
 
     let(:last_name_begins_with) { 'Abc' }

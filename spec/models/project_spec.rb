@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
+  let(:resource_class) { Project }
+  let(:resource_serializer) { ProjectSerializer }
+  let(:resource) { subject }
+
+  it_behaves_like 'an audited model'
 
   describe 'associations' do
     it 'should have many project permissions' do

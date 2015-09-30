@@ -23,12 +23,16 @@ module DDS
           id: SecureRandom.uuid,
           name: project_params[:name],
           description: project_params[:description],
-          creator_id: current_user.id
+          creator_id: current_user.id,
+          audit_comment: '/api/v1/projects'
         })
-        if project.save
-          project
-        else
-          validation_error!(project)
+        auditor = current_user
+        Audited.audit_class.as_user(auditor) do
+          if project.save
+            project
+          else
+            validation_error!(project)
+          end
         end
       end
 
@@ -82,10 +86,13 @@ module DDS
         project_params = declared(params, include_missing: false)
         project = Project.find(params[:id])
         authorize project, :update?
-        if project.update(project_params)
-          project
-        else
-          validation_error!(project)
+        auditor = current_user
+        Audited.audit_class.as_user(auditor) do
+          if project.update(project_params.merge(audit_comment: "/api/v1/projects/#{params[:id]}"))
+            project
+          else
+            validation_error!(project)
+          end
         end
       end
 
@@ -103,7 +110,10 @@ module DDS
         authenticate!
         project = Project.find(params[:id])
         authorize project, :destroy?
-        project.update_attribute(:is_deleted, true)
+        auditor = current_user
+        Audited.audit_class.as_user(auditor) do
+          project.update(is_deleted: true, audit_comment: "/api/v1/projects/#{params[:id]}")
+        end
         body false
       end
     end
