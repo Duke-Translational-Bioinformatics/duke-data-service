@@ -68,7 +68,9 @@ describe DDS::V1::UserAPI do
         expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
       end
 
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an audited endpoint' do
+        let!(:with_current_user) { false }
+      end
     end
 
     describe 'for all users' do
