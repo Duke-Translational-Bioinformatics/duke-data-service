@@ -60,6 +60,11 @@ describe DDS::V1::ProjectsAPI do
           }.not_to change{resource_class.count}
         end
       end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:resource) { project_stub }
+        let(:expected_status) { 201 }
+      end
     end
   end
 
@@ -91,6 +96,7 @@ describe DDS::V1::ProjectsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint'
     end
 
     describe 'DELETE' do
@@ -108,6 +114,9 @@ describe DDS::V1::ProjectsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+      end
     end
   end
 end
