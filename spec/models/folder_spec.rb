@@ -2,6 +2,13 @@ require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
   subject { FactoryGirl.create(:folder) }
+  let(:resource_class) { Folder }
+  let(:resource_serializer) { FolderSerializer }
+  let!(:resource) { subject }
+
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
 
   describe 'associations' do
 
