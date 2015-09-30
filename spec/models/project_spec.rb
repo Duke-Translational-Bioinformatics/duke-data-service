@@ -6,7 +6,9 @@ RSpec.describe Project, type: :model do
   let(:resource_serializer) { ProjectSerializer }
   let(:resource) { subject }
 
-  it_behaves_like 'an audited model'
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
 
   describe 'associations' do
     it 'should have many project permissions' do

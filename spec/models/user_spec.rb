@@ -10,7 +10,9 @@ RSpec.describe User, type: :model do
   let(:resource_serializer) { UserSerializer }
   let!(:resource) { subject }
 
-  it_behaves_like 'an audited model'
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
 
   it 'should have an audited_user_info method to return the information required by audit _by methods' do
     should respond_to('audited_user_info')
