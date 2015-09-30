@@ -94,13 +94,17 @@ end
 
 shared_examples 'an audited endpoint' do
   let(:expected_status) { 200 }
-  it 'should create an audit with the url as audit_comment' do
+  let(:with_current_user) { true }
+  it 'should create an audit with the current_user as user, and url as audit_comment' do
+    expect(current_user).to be_persisted
     expect {
       is_expected.to eq(expected_status)
-    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(1)
-    last_audit = Audited.audit_class.last
-    expect(last_audit.user).to be
-    expect(last_audit.user.id).to eq(current_user.id)
-    expect(last_audit.audit_comment).to eq(url)
+    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s, comment: url).count }.by(1)
+    last_audit = Audited.audit_class.where(auditable_type: resource_class.to_s, comment: url).order(:created_at).last
+    if with_current_user
+      expect(last_audit.user).to be
+      expect(last_audit.user.id).to eq(current_user.id)
+    end
+    expect(last_audit.comment).to eq(url)
   end
 end
