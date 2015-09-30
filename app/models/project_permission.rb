@@ -1,4 +1,5 @@
 class ProjectPermission < ActiveRecord::Base
+  audited
   belongs_to :user
   belongs_to :project
   belongs_to :auth_role
