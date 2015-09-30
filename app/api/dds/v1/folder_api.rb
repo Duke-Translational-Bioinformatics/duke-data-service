@@ -24,13 +24,16 @@ module DDS
         folder = project.folders.build({
           project: project,
           parent_id: folder_params[:parent][:id],
-          name: folder_params[:name]
+          name: folder_params[:name],
+          audit_comment: "/api/v1/projects/#{ project.id }/folders"
         })
         authorize folder, :create?
-        if folder.save
-          folder
-        else
-          validation_error!(folder)
+        Audited.audit_class.as_user(current_user) do
+          if folder.save
+            folder
+          else
+            validation_error!(folder)
+          end
         end
       end
 
@@ -84,7 +87,9 @@ module DDS
         authenticate!
         folder = Folder.find(params[:id])
         authorize folder, :destroy?
-        folder.update_attribute(:is_deleted, true)
+        Audited.audit_class.as_user(current_user) do
+          folder.update(is_deleted: true, audit_comment: "/api/v1/folders/#{folder.id}")
+        end
         body false
       end
 
@@ -107,10 +112,12 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :create?
         #TODO: validate that parent exists
-        if folder.update(parent_id: new_parent)
-          folder
-        else
-          validation_error!(folder)
+        Audited.audit_class.as_user(current_user) do
+          if folder.update(parent_id: new_parent, audit_comment: "/api/v1/folders/#{folder.id}/move")
+            folder
+          else
+            validation_error!(folder)
+          end
         end
       end
 
@@ -132,10 +139,12 @@ module DDS
         new_name = folder_params[:name]
         folder = Folder.find(params[:id])
         authorize folder, :create?
-        if folder.update(name: new_name)
-          folder
-        else
-          validation_error!(folder)
+        Audited.audit_class.as_user(current_user) do
+          if folder.update(name: new_name, audit_comment: "/api/v1/folders/#{folder.id}/rename")
+            folder
+          else
+            validation_error!(folder)
+          end
         end
       end
 
