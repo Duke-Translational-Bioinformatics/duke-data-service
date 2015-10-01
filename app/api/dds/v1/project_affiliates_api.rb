@@ -20,16 +20,19 @@ module DDS
         declared_params = declared(params, include_missing: false)
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        affiliation = project.affiliations.where(user: user).first ||
-          project.affiliations.build({
-            user: user
-          })
-        affiliation.project_role_id = declared_params[:project_role][:id]
-        authorize affiliation, :create?
-        if affiliation.save
-          affiliation
-        else
-          validation_error!(affiliation)
+        Audited.audit_class.as_user(current_user) do
+          affiliation = project.affiliations.where(user: user).first ||
+            project.affiliations.build({
+              user: user
+            })
+          affiliation.project_role_id = declared_params[:project_role][:id]
+          affiliation.audit_comment = "/api/v1/projects/#{project.id}/affiliates/#{user.id}"
+          authorize affiliation, :create?
+          if affiliation.save
+            affiliation
+          else
+            validation_error!(affiliation)
+          end
         end
       end
 
@@ -79,7 +82,13 @@ module DDS
         user = User.find(params[:user_id])
         affiliations = Affiliation.where(project: project, user: user).all
         authorize affiliations.first, :destroy?
-        affiliations.destroy_all
+        Audited.audit_class.as_user(current_user) do
+          affiliations.each do |affiliation|
+            affiliation.audit_comment = "/api/v1/projects/#{project.id}/affiliates/#{user.id}"
+            "/projects/#{project.id}/affiliates/#{user.id}"
+            affiliation.destroy
+          end
+        end
         body false
       end
     end
