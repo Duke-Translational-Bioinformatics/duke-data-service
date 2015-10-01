@@ -170,6 +170,9 @@ shared_examples 'an updatable resource' do
     }.not_to change{resource_class.count}
     resource.reload
     expect(resource.attributes).not_to eq(original_attributes)
+    if original_attributes.has_key? "etag"
+      expect(resource.etag).not_to eq(original_attributes["etag"])
+    end
   end
   it 'should return a serialized resource' do
     is_expected.to eq(200)
