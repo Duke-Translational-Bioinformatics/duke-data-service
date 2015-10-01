@@ -3,6 +3,7 @@ require 'rails_helper'
 describe DDS::V1::ProjectsAPI do
   include_context 'with authentication'
 
+  let(:project_admin_role) { FactoryGirl.create(:auth_role, :project_admin) }
   let(:project) { FactoryGirl.create(:project) }
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
   let(:other_project) { FactoryGirl.create(:project) }
@@ -37,12 +38,18 @@ describe DDS::V1::ProjectsAPI do
       }}
       it_behaves_like 'a creatable resource' do
         let(:resource) { project_stub }
-        it 'should set creator to current_user' do
-          is_expected.to eq(201)
+        it 'should set creator to current_user and make them a project_admin' do
+          expect(project_admin_role).to be_persisted
+          expect {
+            is_expected.to eq(201)
+          }.to change{ ProjectPermission.count }.by(1)
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('id')
           new_object = resource_class.find(response_json['id'])
           expect(new_object.creator_id).to eq(current_user.id)
+          project_admin_role = AuthRole.where(id: 'project_admin').first
+          project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
+          expect(project_admin_permission).to be
         end
       end
 
@@ -64,6 +71,15 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:resource) { project_stub }
         let(:expected_status) { 201 }
+      end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:resource) { project_stub }
+        let(:resource_class) { ProjectPermission }
+        let(:expected_status) { 201 }
+        before do
+          expect(project_admin_role).to be_persisted
+        end
       end
     end
   end
@@ -87,6 +103,7 @@ describe DDS::V1::ProjectsAPI do
         description: project_stub.description
       }}
       it_behaves_like 'an updatable resource'
+
       it_behaves_like 'a validated resource' do
         let(:payload) {{
             name: nil,
