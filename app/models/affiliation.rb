@@ -1,4 +1,5 @@
 class Affiliation < ActiveRecord::Base
+  audited
   belongs_to :user
   belongs_to :project
   belongs_to :project_role
