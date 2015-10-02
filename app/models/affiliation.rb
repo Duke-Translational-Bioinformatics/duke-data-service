@@ -15,6 +15,7 @@ class Affiliation < ActiveRecord::Base
   private
 
   def update_project_etag
-    self.project.update(etag: SecureRandom.hex, audit_comment: self.audits.last.comment)
+    last_audit = self.audits.last
+    self.project.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
   end
 end

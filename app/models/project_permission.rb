@@ -1,5 +1,8 @@
 class ProjectPermission < ActiveRecord::Base
   audited
+  after_save :update_project_etag
+  after_destroy :update_project_etag
+
   belongs_to :user
   belongs_to :project
   belongs_to :auth_role
@@ -8,4 +11,11 @@ class ProjectPermission < ActiveRecord::Base
   validates :user_id, presence: true, uniqueness: {scope: :project_id}
   validates :project_id, presence: true
   validates :auth_role_id, presence: true
+
+  private
+
+  def update_project_etag
+    last_audit = self.audits.last
+    self.project.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
+  end
 end

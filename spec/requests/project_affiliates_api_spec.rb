@@ -65,9 +65,8 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint'
       it_behaves_like 'an audited endpoint' do
-        let(:resource_class) { Project }
+        let(:with_audited_parent) { Project }
       end
     end
 
@@ -79,10 +78,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
-      end
-      it_behaves_like 'an audited endpoint' do
-        let(:resource_class) { Project }
-        let(:expected_status) { 204 }
+        let(:with_audited_parent) { Project}
       end
     end
   end
