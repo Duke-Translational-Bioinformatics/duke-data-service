@@ -83,6 +83,10 @@ describe DDS::V1::FolderAPI do
       #     name: folder_stub.name
       #   }}
       # end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 201 }
+      end
     end
   end
 
@@ -121,6 +125,9 @@ describe DDS::V1::FolderAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+      end
     end
   end
 
@@ -141,6 +148,8 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
+
+      it_behaves_like 'an audited endpoint'
     end
   end
 
@@ -165,6 +174,8 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
+
+      it_behaves_like 'an audited endpoint'
     end
   end
 

@@ -19,16 +19,16 @@ module DDS
       post '/projects', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
-        project = Project.new({
-          id: SecureRandom.uuid,
-          name: project_params[:name],
-          description: project_params[:description],
-          creator_id: current_user.id,
-          audit_comment: '/api/v1/projects'
-        })
         auditor = current_user
         Audited.audit_class.as_user(auditor) do
-          if project.save
+          project = Project.create({
+            etag: SecureRandom.hex,
+            name: project_params[:name],
+            description: project_params[:description],
+            creator_id: current_user.id,
+            audit_comment: '/api/v1/projects'
+          })
+          if project.valid?
             project
           else
             validation_error!(project)
@@ -88,7 +88,7 @@ module DDS
         authorize project, :update?
         auditor = current_user
         Audited.audit_class.as_user(auditor) do
-          if project.update(project_params.merge(audit_comment: "/api/v1/projects/#{params[:id]}"))
+          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: "/api/v1/projects/#{params[:id]}"))
             project
           else
             validation_error!(project)

@@ -36,16 +36,19 @@ module DDS
         permission_params = declared(params)
         project = Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        permission = ProjectPermission.find_by(project: project, user: user) || ProjectPermission.new(project: project, user: user)
-        permission.auth_role = AuthRole.find(permission_params[:auth_role][:id])
-        unless permission.auth_role
-          raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
-        end
-        authorize permission, :create?
-        if permission.save
-          permission
-        else
-          validation_error! permission
+        Audited.audit_class.as_user(current_user) do
+          permission = ProjectPermission.find_by(project: project, user: user) || ProjectPermission.new(project: project, user: user)
+          permission.auth_role = AuthRole.find(permission_params[:auth_role][:id])
+          unless permission.auth_role
+            raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
+          end
+          permission.audit_comment = "/api/v1/projects/#{project.id}/permissions/#{user.id}"
+          authorize permission, :create?
+          if permission.save
+            permission
+          else
+            validation_error! permission
+          end
         end
       end
 
@@ -86,7 +89,10 @@ module DDS
         user = User.find(params[:user_id])
         permission = ProjectPermission.find_by(project: project, user: user)
         authorize permission, :destroy?
-        permission.destroy
+        Audited.audit_class.as_user(current_user) do
+          permission.audit_comment = "/api/v1/projects/#{project.id}/permissions/#{user.id}"
+          permission.destroy
+        end
         body false
       end
     end

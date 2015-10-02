@@ -77,6 +77,10 @@ describe DDS::V1::ProjectPermissionsAPI do
         }}
         let(:resource_class) {'AuthRole'}
       end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:with_audited_parent) { Project }
+      end
     end
 
     describe 'GET' do
@@ -104,6 +108,10 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
         let(:resource_class) {'User'}
+      end
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+        let(:with_audited_parent) { Project}
       end
     end
   end

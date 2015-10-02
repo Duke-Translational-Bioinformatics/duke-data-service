@@ -1,6 +1,6 @@
 class Project < ActiveRecord::Base
   audited
-  before_create :set_project_admin
+  after_create :set_project_admin
 
   belongs_to :creator, class_name: "User"
   has_many :folders
@@ -40,9 +40,10 @@ class Project < ActiveRecord::Base
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
     if project_admin_role
-      self.project_permissions.build(
+      pp = self.project_permissions.create(
         user: self.creator,
-        auth_role: project_admin_role
+        auth_role: project_admin_role,
+        audit_comment: self.audits.last.comment
       )
     end
   end

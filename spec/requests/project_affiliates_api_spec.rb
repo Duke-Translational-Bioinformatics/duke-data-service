@@ -56,7 +56,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       end
 
       it_behaves_like 'an updatable resource'
-      
+
       it_behaves_like 'a validated resource' do
         let(:payload) {{
           project_role: {id: nil}
@@ -65,6 +65,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:with_audited_parent) { Project }
+      end
     end
 
     describe 'DELETE' do
@@ -73,6 +76,10 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+        let(:with_audited_parent) { Project}
+      end
     end
   end
 end
