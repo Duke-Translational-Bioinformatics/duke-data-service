@@ -16,8 +16,8 @@ class ProjectPermission < ActiveRecord::Base
 
   def update_project_etag
     last_audit = self.audits.last
-    self.project.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
     last_parent_audit = self.project.audits.last
+    self.project.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
     last_parent_audit.update(request_uuid: last_audit.request_uuid)
   end
 end
