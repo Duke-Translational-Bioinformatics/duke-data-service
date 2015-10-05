@@ -25,11 +25,12 @@ module DDS
           project: project,
           parent_id: folder_params[:parent][:id],
           name: folder_params[:name],
-          audit_comment: "/api/v1/projects/#{ project.id }/folders"
+          audit_comment: request.env["REQUEST_URI"]
         })
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
           if folder.save
+            folder.audits.last.update(remote_address: request.ip)
             folder
           else
             validation_error!(folder)
@@ -88,7 +89,8 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :destroy?
         Audited.audit_class.as_user(current_user) do
-          folder.update(is_deleted: true, audit_comment: "/api/v1/folders/#{folder.id}")
+          folder.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+          folder.audits.last.update(remote_address: request.ip)
         end
         body false
       end
@@ -113,7 +115,8 @@ module DDS
         authorize folder, :create?
         #TODO: validate that parent exists
         Audited.audit_class.as_user(current_user) do
-          if folder.update(parent_id: new_parent, audit_comment: "/api/v1/folders/#{folder.id}/move")
+          if folder.update(parent_id: new_parent, audit_comment: request.env["REQUEST_URI"])
+            folder.audits.last.update(remote_address: request.ip)
             folder
           else
             validation_error!(folder)
@@ -140,7 +143,8 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
-          if folder.update(name: new_name, audit_comment: "/api/v1/folders/#{folder.id}/rename")
+          if folder.update(name: new_name, audit_comment: request.env["REQUEST_URI"])
+            folder.audits.last.update(remote_address: request.ip)
             folder
           else
             validation_error!(folder)
