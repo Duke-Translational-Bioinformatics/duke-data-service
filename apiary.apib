@@ -505,7 +505,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
 **Rules**
 - - - - -
 * Logically deletes project from the metadata (i.e. sets `"is_deleted": true`).
-* For the MVP, the files associated to the project are not deleted from their physical storage location.
+* Projects that have children (folders or files) cannot be deleted.
 
 + Response 204
 
@@ -845,7 +845,7 @@ and only one parent folder.
 **Rules**
 - - - - -
 * Logically deletes project folder from the metadata (i.e. sets `"is_deleted": true`).
-* For the MVP, the files associated to the project folder are not deleted from their physical storage location.
+* Folders that have children (folders or files) cannot be deleted.
 
 + Response 204
 
