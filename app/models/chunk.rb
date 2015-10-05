@@ -1,4 +1,5 @@
 class Chunk < ActiveRecord::Base
+  audited
   belongs_to :upload
   has_one :storage_provider, through: :upload
   has_one :project, through: :upload
