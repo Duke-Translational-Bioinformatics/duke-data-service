@@ -14,6 +14,6 @@
 config/keystore
 # Ignore application configuration
 /config/application.yml
-oit_swift.env
+swift.oit.env
 app/api/dds/v1/parent_children_api.rb
 spec/requests/parent_children_api_spec.rb

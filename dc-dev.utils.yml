@@ -33,6 +33,7 @@ rails:
   links:
     - db:postgres.db.host
   env_file:
+    - webapp.env
     - swift.env
 bundle:
   image: dukedataservice_server
@@ -47,6 +48,7 @@ rake:
   links:
     - db:postgres.db.host
   env_file:
+    - webapp.env
     - swift.env
 bundle:
   image: dukedataservice_server
@@ -75,6 +77,7 @@ rspec:
   links:
     - db:postgres.db.host
   env_file:
+    - webapp.env
     - swift.env
   entrypoint: ['rspec']
   command: spec
