@@ -49,10 +49,11 @@ module DDS
                 first_name: access_token['first_name'],
                 last_login_at: DateTime.now,
                 last_name: access_token['last_name'],
-                audit_comment: '/api/v1/user/api_token'
+                audit_comment: request.env["REQUEST_URI"]
               )
               last_audit = new_user.audits.last
               last_audit.user = new_user
+              last_audit.remote_address = request.ip
               last_audit.save
               authorized_user = auth_service.user_authentication_services.create(
                 uid: access_token['uid'],
