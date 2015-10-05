@@ -1,6 +1,6 @@
 class DataFileSerializer < ActiveModel::Serializer
   self.root = false
-  attributes :id, :parent, :name, :project, :upload, :virtual_path, :is_deleted
+  attributes :id, :parent, :name, :project, :audit, :upload, :virtual_path, :is_deleted
 
   def project
     { id: object.project_id }

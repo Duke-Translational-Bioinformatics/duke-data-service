@@ -2,6 +2,13 @@ require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
   subject { FactoryGirl.create(:data_file) }
+  let(:resource_class) { DataFile }
+  let(:resource_serializer) { FolderSerializer }
+  let!(:resource) { subject }
+
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
 
   describe 'associations' do
     it 'should be part of a project' do
