@@ -103,13 +103,14 @@ shared_examples 'an audited endpoint' do
     expect(current_user).to be_persisted
     expect {
       is_expected.to eq(expected_status)
-    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(1)
+    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }
     last_audit = Audited.audit_class.where(auditable_type: resource_class.to_s, comment: url).order(:created_at).last
     if with_current_user
       expect(last_audit.user).to be
       expect(last_audit.user.id).to eq(current_user.id)
     end
     expect(last_audit.remote_address).to be_truthy
+    expect(last_audit.request_uuid).to be_truthy
     expect(last_audit.comment).to eq(url)
   end
 
