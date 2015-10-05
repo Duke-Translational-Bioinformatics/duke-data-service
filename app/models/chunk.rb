@@ -1,4 +1,8 @@
 class Chunk < ActiveRecord::Base
+  audited
+  after_save :update_upload_etag
+  after_destroy :update_upload_etag
+
   belongs_to :upload
   has_one :storage_provider, through: :upload
   has_one :project, through: :upload
@@ -36,4 +40,12 @@ class Chunk < ActiveRecord::Base
     storage_provider.put_container(upload.project_id)
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
+
+  private
+
+  def update_upload_etag
+    last_audit = self.audits.last
+    self.upload.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
+  end
+
 end

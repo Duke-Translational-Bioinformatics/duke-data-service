@@ -3,6 +3,13 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
+  let(:resource_class) { Upload }
+  let(:resource_serializer) { UploadSerializer }
+  let!(:resource) { subject }
+
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
 
   describe 'associations' do
     it 'should belong_to a project' do
@@ -153,6 +160,7 @@ RSpec.describe Upload, type: :model do
         name
         content_type
         size
+        etag
         hash
         chunks
         storage_provider
