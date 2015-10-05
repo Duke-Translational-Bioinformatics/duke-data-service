@@ -46,6 +46,7 @@ class Chunk < ActiveRecord::Base
   def update_upload_etag
     last_audit = self.audits.last
     self.upload.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
+    last_parent_audit = self.upload.audits.last
+    last_parent_audit.update(request_uuid: last_audit.request_uuid)
   end
-
 end

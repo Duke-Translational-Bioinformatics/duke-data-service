@@ -124,6 +124,9 @@ shared_examples 'an audited endpoint' do
         expect(last_audit_parent_audit.user).to be
         expect(last_audit_parent_audit.user.id).to eq(current_user.id)
       end
+      expect(last_audit.request_uuid).to be_truthy
+      expect(last_audit_parent_audit.request_uuid).to be_truthy
+      expect(last_audit_parent_audit.request_uuid).to eq(last_audit.request_uuid)
       expect(last_audit_parent_audit.comment).to eq("#{url} raised by: #{ last_audit.id }")
     end
   end
