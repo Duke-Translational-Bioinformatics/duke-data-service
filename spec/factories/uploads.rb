@@ -6,6 +6,7 @@ FactoryGirl.define do
     size { Faker::Number.number(2) }
     fingerprint_value { SecureRandom.hex(32) }
     fingerprint_algorithm "md5"
+    etag { SecureRandom.hex }
     storage_provider
 
     trait :with_chunks do

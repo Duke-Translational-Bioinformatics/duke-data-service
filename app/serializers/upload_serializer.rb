@@ -5,6 +5,7 @@ class UploadSerializer < ActiveModel::Serializer
              :name,
              :content_type,
              :size,
+             :etag,
              :hash,
              :chunks,
              :storage_provider,

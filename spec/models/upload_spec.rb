@@ -160,6 +160,7 @@ RSpec.describe Upload, type: :model do
         name
         content_type
         size
+        etag
         hash
         chunks
         storage_provider
