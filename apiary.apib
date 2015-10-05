@@ -476,7 +476,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
             }
 
 ### View project details [GET]
-**Permission:** view_project
+>**Permission:** view_project
 - - - - -
 
 + Response 200
@@ -484,7 +484,7 @@ A project is a container for storing, organizing, retrieving and sharing researc
     [Project instance][]
 
 ### Update a project [PUT]
-**Permission:** update_project
+>**Permission:** update_project
 - - - - -
 
 + Request (application/json)
@@ -499,10 +499,10 @@ A project is a container for storing, organizing, retrieving and sharing researc
     [Project instance][]
 
 ### Delete a project [DELETE]
-**Permission:** delete_project
+>**Permission:** delete_project
 - - - - -
 
-**Rules**
+>**Rules**
 - - - - -
 * Logically deletes project from the metadata (i.e. sets `"is_deleted": true`).
 * Projects that have children (folders or files) cannot be deleted.
@@ -607,7 +607,7 @@ context of a project.  These roles have no relationship to authorization roles.
 ## Project Roles collection [/project_roles]
 
 ### List project roles [GET]
-**Permission:** authenticated
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -839,10 +839,10 @@ and only one parent folder.
         }
 
 ### Delete a project folder [DELETE]
-**Permission:** delete_file
+>**Permission:** delete_file
 - - - - -
 
-**Rules**
+>**Rules**
 - - - - -
 * Logically deletes project folder from the metadata (i.e. sets `"is_deleted": true`).
 * Folders that have children (folders or files) cannot be deleted.
