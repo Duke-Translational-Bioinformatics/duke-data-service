@@ -30,19 +30,23 @@ module DDS
             upload_params = declared(params, include_missing: false)
             project = Project.find(params[:project_id])
             storage_provider = StorageProvider.first
-            upload = project.uploads.build({
-              name: upload_params[:name],
-              size: upload_params[:size],
-              content_type: upload_params[:content_type],
-              fingerprint_value: upload_params[:hash][:value],
-              fingerprint_algorithm: upload_params[:hash][:algorithm],
-              storage_provider_id: storage_provider.id
-            })
-            authorize upload, :create?
-            if upload.save
-              upload
-            else
-              validation_error!(upload)
+            Audited.audit_class.as_user(current_user) do
+              upload = project.uploads.build({
+                name: upload_params[:name],
+                size: upload_params[:size],
+                etag: SecureRandom.hex,
+                content_type: upload_params[:content_type],
+                fingerprint_value: upload_params[:hash][:value],
+                fingerprint_algorithm: upload_params[:hash][:algorithm],
+                storage_provider_id: storage_provider.id,
+                audit_comment: request.env["REQUEST_URI"]
+              })
+              authorize upload, :create?
+              if upload.save
+                upload
+              else
+                validation_error!(upload)
+              end
             end
           end
 
@@ -112,18 +116,21 @@ module DDS
             authenticate!
             chunk_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
-            chunk = Chunk.new({
-              upload_id: upload.id,
-              number: chunk_params[:number],
-              size: chunk_params[:size],
-              fingerprint_value: chunk_params[:hash][:value],
-              fingerprint_algorithm: chunk_params[:hash][:algorithm]
-            })
-            authorize chunk, :create?
-            if chunk.save
-              chunk
-            else
-              validation_error!(chunk)
+            Audited.audit_class.as_user(current_user) do
+              chunk = Chunk.new({
+                upload_id: upload.id,
+                number: chunk_params[:number],
+                size: chunk_params[:size],
+                fingerprint_value: chunk_params[:hash][:value],
+                fingerprint_algorithm: chunk_params[:hash][:algorithm],
+                audit_comment: request.env["REQUEST_URI"]
+              })
+              authorize chunk, :create?
+              if chunk.save
+                chunk
+              else
+                validation_error!(chunk)
+              end
             end
           end
 
@@ -150,7 +157,11 @@ module DDS
             authenticate!
             upload = Upload.find(params[:id])
             authorize upload, :complete?
-            upload.complete
+            Audited.audit_class.as_user(current_user) do
+              upload.audit_comment = request.env["REQUEST_URI"]
+              upload.etag = SecureRandom.hex
+              upload.complete
+            end
             upload
           end
         end

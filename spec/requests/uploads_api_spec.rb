@@ -20,7 +20,8 @@ describe DDS::V1::UploadsAPI do
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
 
-    describe 'List file uploads for a project' do
+    #List file uploads for a project
+    describe 'GET' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a listable resource' do
@@ -43,7 +44,8 @@ describe DDS::V1::UploadsAPI do
       end
     end
 
-    describe 'Initiate a chunked file upload for a project' do
+    #Initiate a chunked file upload for a project
+    describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let!(:payload) {{
         name: upload_stub.name,
@@ -82,13 +84,18 @@ describe DDS::V1::UploadsAPI do
         let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
         let(:resource_class) { 'Project' }
       end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 201 }
+      end
     end
   end
 
   describe 'Upload instance' do
     let(:url) { "/api/v1/uploads/#{resource.id}" }
 
-    describe 'View upload details/status' do
+    #View upload details/status
+    describe 'GET' do
       subject { get(url, nil, headers) }
 
       it_behaves_like 'a viewable resource'
@@ -149,6 +156,10 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'a storage_provider backed resource'
+
+      it_behaves_like 'an audited endpoint' do
+        let(:with_audited_parent) { Upload }
+      end
     end
   end
 
@@ -190,6 +201,8 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'an identified resource' do
       let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
     end
+
+    it_behaves_like 'an audited endpoint'
 
     it_behaves_like 'a storage_provider backed resource' do
       it 'should return an error if the reported size does not match storage_provider computed size' do
