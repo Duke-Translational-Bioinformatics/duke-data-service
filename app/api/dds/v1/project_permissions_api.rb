@@ -42,9 +42,11 @@ module DDS
           unless permission.auth_role
             raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
           end
-          permission.audit_comment = "/api/v1/projects/#{project.id}/permissions/#{user.id}"
+          permission.audit_comment = request.env["REQUEST_URI"]
           authorize permission, :create?
           if permission.save
+            permission.audits.last.update(remote_address: request.ip)
+            project.audits.last.update(remote_address: request.ip)
             permission
           else
             validation_error! permission
@@ -90,8 +92,10 @@ module DDS
         permission = ProjectPermission.find_by(project: project, user: user)
         authorize permission, :destroy?
         Audited.audit_class.as_user(current_user) do
-          permission.audit_comment = "/api/v1/projects/#{project.id}/permissions/#{user.id}"
+          permission.audit_comment = request.env["REQUEST_URI"]
           permission.destroy
+          permission.audits.last.update(remote_address: request.ip)
+          project.audits.last.update(remote_address: request.ip)
         end
         body false
       end

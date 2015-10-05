@@ -49,6 +49,10 @@ describe DDS::V1::FileAPI do
         }}
         let(:resource_class) { 'Upload' }
       end
+
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 201 }
+      end
     end
   end
 
@@ -87,6 +91,9 @@ describe DDS::V1::FileAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+      end
     end
   end
 
@@ -126,6 +133,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/move" }
       end
+      it_behaves_like 'an audited endpoint'
     end
   end
 
@@ -145,6 +153,7 @@ describe DDS::V1::FileAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/rename" }
       end
+      it_behaves_like 'an audited endpoint'
     end
   end
 end

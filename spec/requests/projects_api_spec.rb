@@ -15,6 +15,10 @@ describe DDS::V1::ProjectsAPI do
   let!(:resource) { project }
   let!(:resource_permission) { project_permission }
 
+  before do
+    expect(project_admin_role).to be_persisted
+  end
+
   describe 'Project collection' do
     let(:url) { "/api/v1/projects" }
 
@@ -39,7 +43,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'a creatable resource' do
         let(:resource) { project_stub }
         it 'should set creator to current_user and make them a project_admin' do
-          expect(project_admin_role).to be_persisted
+
           expect {
             is_expected.to eq(201)
           }.to change{ ProjectPermission.count }.by(1)
@@ -77,9 +81,6 @@ describe DDS::V1::ProjectsAPI do
         let(:resource) { project_stub }
         let(:resource_class) { ProjectPermission }
         let(:expected_status) { 201 }
-        before do
-          expect(project_admin_role).to be_persisted
-        end
       end
     end
   end

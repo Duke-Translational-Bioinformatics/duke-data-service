@@ -1,4 +1,6 @@
 class DataFile < ActiveRecord::Base
+  include SerializedAudit
+  audited
   belongs_to :project
   belongs_to :parent, class_name: "Folder"
   belongs_to :upload

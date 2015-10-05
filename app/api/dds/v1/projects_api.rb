@@ -19,16 +19,20 @@ module DDS
       post '/projects', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
-        auditor = current_user
-        Audited.audit_class.as_user(auditor) do
+        Audited.audit_class.as_user(current_user) do
           project = Project.create({
             etag: SecureRandom.hex,
             name: project_params[:name],
             description: project_params[:description],
             creator_id: current_user.id,
-            audit_comment: '/api/v1/projects'
+            audit_comment: request.env["REQUEST_URI"]
           })
           if project.valid?
+            project.reload
+            project.audits.last.update(remote_address: request.ip)
+            last_permission = project.set_project_admin
+            last_permission_audit = last_permission.audits.last
+            last_permission_audit.update(remote_address: request.ip)
             project
           else
             validation_error!(project)
@@ -86,9 +90,9 @@ module DDS
         project_params = declared(params, include_missing: false)
         project = Project.find(params[:id])
         authorize project, :update?
-        auditor = current_user
-        Audited.audit_class.as_user(auditor) do
-          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: "/api/v1/projects/#{params[:id]}"))
+        Audited.audit_class.as_user(current_user) do
+          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: request.env["REQUEST_URI"]))
+            project.audits.last.update(remote_address: request.ip)
             project
           else
             validation_error!(project)
@@ -110,9 +114,9 @@ module DDS
         authenticate!
         project = Project.find(params[:id])
         authorize project, :destroy?
-        auditor = current_user
-        Audited.audit_class.as_user(auditor) do
-          project.update(is_deleted: true, audit_comment: "/api/v1/projects/#{params[:id]}")
+        Audited.audit_class.as_user(current_user) do
+          project.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+          project.audits.last.update(remote_address: request.ip)
         end
         body false
       end

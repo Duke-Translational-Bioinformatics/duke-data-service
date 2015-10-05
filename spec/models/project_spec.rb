@@ -47,12 +47,14 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  describe 'assign project admin' do
-    let!(:auth_role) { FactoryGirl.create(:auth_role, id: 'project_admin') }
+  describe 'set_project_admin' do
+    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
     it 'should give the project creator a project_admin permission' do
       expect(AuthRole.where(id: 'project_admin').count).to eq(1)
+      expect(subject).to be_persisted
+      expect(subject).to respond_to 'set_project_admin'
       expect {
-        expect(subject).to be_persisted
+        subject.set_project_admin
       }.to change{ProjectPermission.count}.by(1)
       expect(subject.project_permissions.count).to eq(1)
       permission = subject.project_permissions.first

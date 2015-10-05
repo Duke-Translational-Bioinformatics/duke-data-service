@@ -26,9 +26,11 @@ module DDS
               user: user
             })
           affiliation.project_role_id = declared_params[:project_role][:id]
-          affiliation.audit_comment = "/api/v1/projects/#{project.id}/affiliates/#{user.id}"
+          affiliation.audit_comment = request.env["REQUEST_URI"]
           authorize affiliation, :create?
           if affiliation.save
+            affiliation.audits.last.update(remote_address: request.ip)
+            project.audits.last.update(remote_address: request.ip)
             affiliation
           else
             validation_error!(affiliation)
@@ -84,9 +86,10 @@ module DDS
         authorize affiliations.first, :destroy?
         Audited.audit_class.as_user(current_user) do
           affiliations.each do |affiliation|
-            affiliation.audit_comment = "/api/v1/projects/#{project.id}/affiliates/#{user.id}"
-            "/projects/#{project.id}/affiliates/#{user.id}"
+            affiliation.audit_comment = request.env["REQUEST_URI"]
             affiliation.destroy
+            affiliation.audits.last.update(remote_address: request.ip)
+            project.audits.last.update(remote_address: request.ip)
           end
         end
         body false
