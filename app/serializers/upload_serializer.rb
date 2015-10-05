@@ -1,6 +1,15 @@
 class UploadSerializer < ActiveModel::Serializer
   self.root = false
-  attributes :id, :project, :name, :content_type, :size, :hash, :chunks, :storage_provider, :status
+  attributes :id,
+             :project,
+             :name,
+             :content_type,
+             :size,
+             :hash,
+             :chunks,
+             :storage_provider,
+             :status,
+             :audit
 
   def project
     {id: object.project_id}

@@ -1,4 +1,6 @@
 class Upload < ActiveRecord::Base
+  include SerializedAudit
+  audited
   belongs_to :project
   belongs_to :storage_provider
   has_many :chunks
