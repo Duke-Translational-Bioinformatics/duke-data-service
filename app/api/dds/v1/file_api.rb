@@ -27,17 +27,21 @@ module DDS
         upload = project.uploads.find(file_params[:upload][:id])
         file = project.data_files.build({
           upload_id: upload.id,
-          name: upload.name
+          name: upload.name,
+          audit_comment: request.env["REQUEST_URI"]
         })
         if file_params[:parent] && file_params[:parent][:id]
           project.folders.find(file_params[:parent][:id])
           file.parent_id = file_params[:parent][:id]
         end
         authorize file, :create?
-        if file.save
-          file
-        else
-          validation_error!(file)
+        Audited.audit_class.as_user(current_user) do
+          if file.save
+            file.audits.last.update(remote_address: request.ip)
+            file
+          else
+            validation_error!(file)
+          end
         end
       end
 
@@ -74,7 +78,10 @@ module DDS
             authenticate!
             file = DataFile.find(params[:id])
             authorize file, :destroy?
-            file.update_attribute(:is_deleted, true)
+            Audited.audit_class.as_user(current_user) do
+              file.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+              file.audits.last.update(remote_address: request.ip)
+            end
             body false
           end
 
@@ -116,7 +123,10 @@ module DDS
             file_params = declared(params, include_missing: false)
             new_parent = file.project.folders.find(file_params[:parent][:id])
             authorize file, :move?
-            file.update_attribute(:parent_id, new_parent.id)
+            Audited.audit_class.as_user(current_user) do
+              file.update(parent_id: new_parent.id, audit_comment: request.env["REQUEST_URI"])
+              file.audits.last.update(remote_address: request.ip)
+            end
             file
           end
 
@@ -137,7 +147,10 @@ module DDS
             file = DataFile.find(params[:id])
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
-            file.update_attribute(:name, file_params[:name])
+            Audited.audit_class.as_user(current_user) do
+              file.update(name: file_params[:name], audit_comment: request.env["REQUEST_URI"])
+              file.audits.last.update(remote_address: request.ip)
+            end
             file
           end
         end
