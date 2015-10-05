@@ -43,6 +43,8 @@ module DDS
               })
               authorize upload, :create?
               if upload.save
+                last_audit = upload.audits.last
+                last_audit.update(remote_address: request.ip)
                 upload
               else
                 validation_error!(upload)
@@ -127,6 +129,10 @@ module DDS
               })
               authorize chunk, :create?
               if chunk.save
+                last_audit = chunk.audits.last
+                last_audit.update(remote_address: request.ip)
+                last_parent_audit = upload.audits.last
+                last_parent_audit.update(remote_address: request.ip)
                 chunk
               else
                 validation_error!(chunk)
@@ -161,6 +167,8 @@ module DDS
               upload.audit_comment = request.env["REQUEST_URI"]
               upload.etag = SecureRandom.hex
               upload.complete
+              last_audit = upload.audits.last
+              last_audit.update(remote_address: request.ip)
             end
             upload
           end
