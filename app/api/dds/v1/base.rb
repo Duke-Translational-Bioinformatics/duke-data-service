@@ -79,6 +79,24 @@ module DDS
           end
           error!(error_payload, 400)
         end
+
+        def annotate_audits(audits = [], additional_annotation)
+          comment_annotation = {
+            endpoint: request.env["REQUEST_URI"],
+            action: request.env["REQUEST_METHOD"]
+          }
+          audit_annotation = additional_annotation ?
+            additional_annotation.merge({remote_address: request.ip}) :
+            {remote_address: request.ip}
+
+          audits.each do |audit|
+            audit_update = audit_annotation
+            audit_update[:comment] = audit.comment ?
+              audit.comment.merge(comment_annotation) :
+              comment_annotation
+            audit.update(audit_update)
+          end
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
