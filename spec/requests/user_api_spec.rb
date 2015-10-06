@@ -29,6 +29,7 @@ describe DDS::V1::UserAPI do
         )
       }
       subject { get(url, {access_token: access_token}, common_headers) }
+      let(:called_action) { "GET" }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
         expect(current_user).to be_persisted
