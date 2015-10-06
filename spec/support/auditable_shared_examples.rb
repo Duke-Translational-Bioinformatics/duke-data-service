@@ -133,19 +133,13 @@ shared_examples 'an audited endpoint' do
       }.to change{
         Audited.audit_class.where(
           auditable_type: resource_class.to_s
-        ).where(
-          'comment @> ?', {"action": called_action, "endpoint": url}.to_json
         ).count
       }.by(1)
       last_audit = Audited.audit_class.where(
         auditable_type: resource_class.to_s
-      ).where(
-        'comment @> ?',{"action": called_action, "endpoint": url}.to_json
       ).order(:created_at).last
       last_audit_parent_audit = Audited.audit_class.where(
         auditable_type: with_audited_parent.to_s
-      ).where(
-        'comment @> ?', {"action": called_action, "endpoint": url}.to_json
       ).order(:created_at).last
       if with_current_user
         expect(last_audit_parent_audit.user).to be
