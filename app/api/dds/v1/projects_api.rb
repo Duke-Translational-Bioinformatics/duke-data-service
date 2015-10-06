@@ -25,7 +25,7 @@ module DDS
             name: project_params[:name],
             description: project_params[:description],
             creator_id: current_user.id,
-            audit_comment: request.env["REQUEST_URI"]
+            audit_comment: {action: request.env["REQUEST_URI"]}
           })
           if project.valid?
             project.reload
@@ -91,7 +91,7 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :update?
         Audited.audit_class.as_user(current_user) do
-          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: request.env["REQUEST_URI"]))
+          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: {action: request.env["REQUEST_URI"]}))
             project.audits.last.update(remote_address: request.ip)
             project
           else
@@ -115,7 +115,7 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :destroy?
         Audited.audit_class.as_user(current_user) do
-          project.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+          project.update(is_deleted: true, audit_comment: {action: request.env["REQUEST_URI"]})
           project.audits.last.update(remote_address: request.ip)
         end
         body false

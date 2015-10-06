@@ -75,6 +75,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:resource) { project_stub }
         let(:expected_status) { 201 }
+        let(:expected_audits) { 2 }
       end
 
       it_behaves_like 'an audited endpoint' do
