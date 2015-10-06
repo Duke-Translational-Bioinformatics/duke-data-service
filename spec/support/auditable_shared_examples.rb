@@ -104,16 +104,25 @@ shared_examples 'an audited endpoint' do
     expect(current_user).to be_persisted
     expect {
       is_expected.to eq(expected_status)
-    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(expected_audits)
-    last_audit = Audited.audit_class.where(auditable_type: resource_class.to_s).where('comment @> ?',{"action": url}.to_json).order(:created_at).last
+    }.to change{
+      Audited.audit_class.where(
+        auditable_type: resource_class.to_s
+      ).count }.by(expected_audits)
+    last_audit = Audited.audit_class.where(
+      auditable_type: resource_class.to_s
+    ).order(:created_at).last
     if with_current_user
       expect(last_audit.user).to be
       expect(last_audit.user.id).to eq(current_user.id)
     end
     expect(last_audit.remote_address).to be_truthy
     expect(last_audit.request_uuid).to be_truthy
+    expect(last_audit.comment).to have_key("endpoint")
+    expect(last_audit.comment["endpoint"]).to be_truthy
+    expect(last_audit.comment["endpoint"]).to eq(url)
     expect(last_audit.comment).to have_key("action")
-    expect(last_audit.comment["action"]).to eq(url)
+    expect(last_audit.comment["action"]).to be_truthy
+    expect(last_audit.comment["action"]).to eq(called_action)
   end
 
   it 'should create an audit for an audited_parent with the current_user as user, and url as audit_comment if with_audited_parent' do
@@ -121,9 +130,23 @@ shared_examples 'an audited endpoint' do
       expect(current_user).to be_persisted
       expect {
         is_expected.to eq(expected_status)
-      }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).where('comment @> ?', {"action": url}.to_json).count }.by(1)
-      last_audit = Audited.audit_class.where(auditable_type: resource_class.to_s).where('comment @> ?',{"action": url}.to_json).order(:created_at).last
-      last_audit_parent_audit = with_audited_parent ? Audited.audit_class.where(auditable_type: with_audited_parent.to_s).where('comment @> ?', {"action": url}.to_json).order(:created_at).last : nil
+      }.to change{
+        Audited.audit_class.where(
+          auditable_type: resource_class.to_s
+        ).where(
+          'comment @> ?', {"action": called_action, "endpoint": url}.to_json
+        ).count
+      }.by(1)
+      last_audit = Audited.audit_class.where(
+        auditable_type: resource_class.to_s
+      ).where(
+        'comment @> ?',{"action": called_action, "endpoint": url}.to_json
+      ).order(:created_at).last
+      last_audit_parent_audit = Audited.audit_class.where(
+        auditable_type: with_audited_parent.to_s
+      ).where(
+        'comment @> ?', {"action": called_action, "endpoint": url}.to_json
+      ).order(:created_at).last
       if with_current_user
         expect(last_audit_parent_audit.user).to be
         expect(last_audit_parent_audit.user.id).to eq(current_user.id)
@@ -135,9 +158,14 @@ shared_examples 'an audited endpoint' do
       expect(last_audit_parent_audit.remote_address).to eq(last_audit.remote_address)
       expect(last_audit_parent_audit.request_uuid).to eq(last_audit.request_uuid)
       audit_comment = last_audit_parent_audit.comment
+      expect(audit_comment).to have_key("endpoint")
       expect(audit_comment).to have_key("action")
       expect(audit_comment).to have_key("raised_by_audit")
-      expect(audit_comment["action"]).to eq(url)
+      expect(audit_coment["endpoint"]).to be_truthy
+      expect(audit_comment["endpoint"]).to eq(url)
+      expect(audit_comment["action"]).to be_truthy
+      expect(audit_comment["action"]).to eq(called_action)
+      expect(audit_comment["raised_by_audit"]).to be_truthy
       expect(audit_comment["raised_by_audit"]).to eq(last_audit.id)
     end
   end
