@@ -47,6 +47,7 @@ describe DDS::V1::UploadsAPI do
     #Initiate a chunked file upload for a project
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
+      let(:called_action) { "POST" }
       let!(:payload) {{
         name: upload_stub.name,
         content_type: upload_stub.content_type,
@@ -117,6 +118,7 @@ describe DDS::V1::UploadsAPI do
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
+      let(:called_action) { "PUT" }
       let!(:payload) {{
         number: chunk_stub.number,
         size: chunk_stub.size,
@@ -165,6 +167,7 @@ describe DDS::V1::UploadsAPI do
 
   describe 'Complete the chunked file upload', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
     let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
+    let(:called_action) { "PUT" }
     subject { put(url, nil, headers) }
 
     before do
