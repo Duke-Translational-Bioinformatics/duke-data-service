@@ -28,9 +28,9 @@ module DDS
             audit_comment: {action: request.env["REQUEST_URI"]}
           })
           if project.valid?
-            project.reload
             project.audits.last.update(remote_address: request.ip)
             last_permission = project.set_project_admin
+            project.audits.last.update(remote_address: request.ip)
             last_permission_audit = last_permission.audits.last
             last_permission_audit.update(remote_address: request.ip)
             project
