@@ -49,7 +49,7 @@ module DDS
                 first_name: access_token['first_name'],
                 last_login_at: DateTime.now,
                 last_name: access_token['last_name'],
-                audit_comment: request.env["REQUEST_URI"]
+                audit_comment: {action: request.env["REQUEST_URI"]}
               )
               last_audit = new_user.audits.last
               last_audit.user = new_user
