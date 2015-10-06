@@ -39,7 +39,7 @@ module DDS
                 fingerprint_value: upload_params[:hash][:value],
                 fingerprint_algorithm: upload_params[:hash][:algorithm],
                 storage_provider_id: storage_provider.id,
-                audit_comment: request.env["REQUEST_URI"]
+                audit_comment: {action: request.env["REQUEST_URI"]}
               })
               authorize upload, :create?
               if upload.save
@@ -125,7 +125,7 @@ module DDS
                 size: chunk_params[:size],
                 fingerprint_value: chunk_params[:hash][:value],
                 fingerprint_algorithm: chunk_params[:hash][:algorithm],
-                audit_comment: request.env["REQUEST_URI"]
+                audit_comment: {action: request.env["REQUEST_URI"]}
               })
               authorize chunk, :create?
               if chunk.save
@@ -164,7 +164,7 @@ module DDS
             upload = Upload.find(params[:id])
             authorize upload, :complete?
             Audited.audit_class.as_user(current_user) do
-              upload.audit_comment = request.env["REQUEST_URI"]
+              upload.audit_comment = {action: request.env["REQUEST_URI"]}
               upload.etag = SecureRandom.hex
               upload.complete
               last_audit = upload.audits.last
