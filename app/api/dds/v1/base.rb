@@ -80,7 +80,7 @@ module DDS
           error!(error_payload, 400)
         end
 
-        def annotate_audits(audits = [], additional_annotation)
+        def annotate_audits(audits = [], additional_annotation = nil)
           comment_annotation = {
             endpoint: request.env["REQUEST_URI"],
             action: request.env["REQUEST_METHOD"]
