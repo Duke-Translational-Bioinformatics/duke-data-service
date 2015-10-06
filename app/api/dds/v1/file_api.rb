@@ -28,7 +28,7 @@ module DDS
         file = project.data_files.build({
           upload_id: upload.id,
           name: upload.name,
-          audit_comment: request.env["REQUEST_URI"]
+          audit_comment: {action: request.env["REQUEST_URI"]}
         })
         if file_params[:parent] && file_params[:parent][:id]
           project.folders.find(file_params[:parent][:id])
@@ -79,7 +79,7 @@ module DDS
             file = DataFile.find(params[:id])
             authorize file, :destroy?
             Audited.audit_class.as_user(current_user) do
-              file.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+              file.update(is_deleted: true, audit_comment: {action: request.env["REQUEST_URI"]})
               file.audits.last.update(remote_address: request.ip)
             end
             body false
@@ -124,7 +124,7 @@ module DDS
             new_parent = file.project.folders.find(file_params[:parent][:id])
             authorize file, :move?
             Audited.audit_class.as_user(current_user) do
-              file.update(parent_id: new_parent.id, audit_comment: request.env["REQUEST_URI"])
+              file.update(parent_id: new_parent.id, audit_comment: {action: request.env["REQUEST_URI"]})
               file.audits.last.update(remote_address: request.ip)
             end
             file
@@ -148,7 +148,7 @@ module DDS
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
             Audited.audit_class.as_user(current_user) do
-              file.update(name: file_params[:name], audit_comment: request.env["REQUEST_URI"])
+              file.update(name: file_params[:name], audit_comment: {action: request.env["REQUEST_URI"]})
               file.audits.last.update(remote_address: request.ip)
             end
             file

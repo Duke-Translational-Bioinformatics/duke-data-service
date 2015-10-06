@@ -25,7 +25,7 @@ module DDS
           project: project,
           parent_id: folder_params[:parent][:id],
           name: folder_params[:name],
-          audit_comment: request.env["REQUEST_URI"]
+          audit_comment: {action: request.env["REQUEST_URI"]}
         })
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
@@ -89,7 +89,7 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :destroy?
         Audited.audit_class.as_user(current_user) do
-          folder.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
+          folder.update(is_deleted: true, audit_comment: {action: request.env["REQUEST_URI"]})
           folder.audits.last.update(remote_address: request.ip)
         end
         body false
@@ -115,7 +115,7 @@ module DDS
         authorize folder, :create?
         #TODO: validate that parent exists
         Audited.audit_class.as_user(current_user) do
-          if folder.update(parent_id: new_parent, audit_comment: request.env["REQUEST_URI"])
+          if folder.update(parent_id: new_parent, audit_comment: {action: request.env["REQUEST_URI"]})
             folder.audits.last.update(remote_address: request.ip)
             folder
           else
@@ -143,7 +143,7 @@ module DDS
         folder = Folder.find(params[:id])
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
-          if folder.update(name: new_name, audit_comment: request.env["REQUEST_URI"])
+          if folder.update(name: new_name, audit_comment: {action: request.env["REQUEST_URI"]})
             folder.audits.last.update(remote_address: request.ip)
             folder
           else
