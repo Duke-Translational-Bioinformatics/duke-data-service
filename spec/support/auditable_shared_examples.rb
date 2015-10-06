@@ -98,12 +98,13 @@ shared_examples 'an audited endpoint' do
   let(:expected_status) { 200 }
   let(:with_current_user) { true }
   let(:with_audited_parent) { false }
+  let(:expected_audits) { 1 }
 
   it 'should create an audit with the current_user as user, and url as audit_comment' do
     expect(current_user).to be_persisted
     expect {
       is_expected.to eq(expected_status)
-    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(1)
+    }.to change{ Audited.audit_class.where(auditable_type: resource_class.to_s).count }.by(expected_audits)
     last_audit = Audited.audit_class.where(auditable_type: resource_class.to_s).where('comment @> ?',{"action": url}.to_json).order(:created_at).last
     if with_current_user
       expect(last_audit.user).to be
