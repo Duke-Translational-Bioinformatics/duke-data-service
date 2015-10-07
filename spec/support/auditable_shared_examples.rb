@@ -20,7 +20,12 @@ shared_context 'with destroy' do
   let(:delete) {
     Audited.audit_class.as_user(auditor) do
       subject.audit_comment = {"action": destroy_action}
-      subject.destroy
+      if is_logically_deleted
+        subject.update(is_deleted: true)
+        subject.audits.last.update(comment: {action: 'DELETE'})
+      else
+        subject.destroy
+      end
     end
   }
 end
@@ -71,7 +76,9 @@ shared_examples 'with a serialized audit' do
 
     expect(audit).to have_key(:deleted_on)
     expect(audit).to have_key(:deleted_by)
-    delete_audit = subject.audits.where(action: "destroy").first
+    delete_audit = is_logically_deleted ?
+      subject.audits.where(action: "update").where('comment @> ?', {action: 'DELETE'}.to_json).first :
+      subject.audits.where(action: "destroy").first
     expect(delete_audit).to be
     expect(audit[:deleted_on].to_i).to eq(delete_audit.created_at.to_i)
     deleter = User.find(delete_audit.user_id)
