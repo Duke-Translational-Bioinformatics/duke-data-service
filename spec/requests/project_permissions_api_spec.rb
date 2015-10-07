@@ -48,6 +48,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
       let!(:payload) {{
         auth_role: {id: auth_role.id}
       }}
@@ -101,6 +102,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
 
       it_behaves_like 'an authenticated resource'

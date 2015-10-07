@@ -25,14 +25,13 @@ module DDS
             name: project_params[:name],
             description: project_params[:description],
             creator_id: current_user.id,
-            audit_comment: request.env["REQUEST_URI"]
           })
           if project.valid?
-            project.reload
-            project.audits.last.update(remote_address: request.ip)
+            pre_permission_audit = project.audits.last
             last_permission = project.set_project_admin
+            post_permission_audit = project.audits.last
             last_permission_audit = last_permission.audits.last
-            last_permission_audit.update(remote_address: request.ip)
+            annotate_audits [pre_permission_audit, post_permission_audit, last_permission_audit]
             project
           else
             validation_error!(project)
@@ -63,6 +62,9 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
+      params do
+        requires :id, type: String, desc: 'Project UUID'
+      end
       get '/projects/:id', root: false do
         authenticate!
         project = Project.find(params[:id])
@@ -82,6 +84,7 @@ module DDS
         ]
       end
       params do
+        requires :id, type: String, desc: 'Project UUID'
         optional :name, type: String, desc: 'The Name of the Project'
         optional :description, type: String, desc: 'The Description of the Project'
       end
@@ -91,8 +94,8 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :update?
         Audited.audit_class.as_user(current_user) do
-          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: request.env["REQUEST_URI"]))
-            project.audits.last.update(remote_address: request.ip)
+          if project.update(project_params.merge(etag: SecureRandom.hex))
+            annotate_audits [project.audits.last]
             project
           else
             validation_error!(project)
@@ -110,13 +113,16 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
+      params do
+        requires :id, type: String, desc: 'Project UUID'
+      end
       delete '/projects/:id', root: false do
         authenticate!
         project = Project.find(params[:id])
         authorize project, :destroy?
         Audited.audit_class.as_user(current_user) do
-          project.update(is_deleted: true, audit_comment: request.env["REQUEST_URI"])
-          project.audits.last.update(remote_address: request.ip)
+          project.update(is_deleted: true)
+          annotate_audits [project.audits.last]
         end
         body false
       end

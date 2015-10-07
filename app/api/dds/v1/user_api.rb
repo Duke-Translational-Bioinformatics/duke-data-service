@@ -48,13 +48,10 @@ module DDS
                 display_name: access_token['display_name'],
                 first_name: access_token['first_name'],
                 last_login_at: DateTime.now,
-                last_name: access_token['last_name'],
-                audit_comment: request.env["REQUEST_URI"]
+                last_name: access_token['last_name']
               )
               last_audit = new_user.audits.last
-              last_audit.user = new_user
-              last_audit.remote_address = request.ip
-              last_audit.save
+              annotate_audits([last_audit], {user: new_user})
               authorized_user = auth_service.user_authentication_services.create(
                 uid: access_token['uid'],
                 user: new_user

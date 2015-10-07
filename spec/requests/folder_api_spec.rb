@@ -47,6 +47,7 @@ describe DDS::V1::FolderAPI do
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
+      let(:called_action) { 'POST' }
       let(:project) { FactoryGirl.create(:project) }
       let!(:payload) {{
         parent: { id: folder_stub.parent_id },
@@ -108,6 +109,7 @@ describe DDS::V1::FolderAPI do
 
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 
@@ -137,6 +139,7 @@ describe DDS::V1::FolderAPI do
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
       let!(:payload) {{
         parent: { id: new_parent.id }
       }}
@@ -158,6 +161,7 @@ describe DDS::V1::FolderAPI do
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: new_name
       }}

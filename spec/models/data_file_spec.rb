@@ -5,7 +5,8 @@ RSpec.describe DataFile, type: :model do
   let(:resource_class) { DataFile }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
-
+  let(:is_logically_deleted) { true }
+  
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
   end

@@ -36,6 +36,7 @@ describe DDS::V1::ProjectsAPI do
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
+      let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name,
         description: resource.description
@@ -75,6 +76,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:resource) { project_stub }
         let(:expected_status) { 201 }
+        let(:expected_audits) { 2 }
       end
 
       it_behaves_like 'an audited endpoint' do
@@ -99,6 +101,7 @@ describe DDS::V1::ProjectsAPI do
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
       let(:payload) {{
         name: project_stub.name,
         description: project_stub.description
@@ -119,6 +122,7 @@ describe DDS::V1::ProjectsAPI do
 
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 

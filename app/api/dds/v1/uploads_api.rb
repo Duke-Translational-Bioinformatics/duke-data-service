@@ -39,12 +39,10 @@ module DDS
                 fingerprint_value: upload_params[:hash][:value],
                 fingerprint_algorithm: upload_params[:hash][:algorithm],
                 storage_provider_id: storage_provider.id,
-                audit_comment: request.env["REQUEST_URI"]
               })
               authorize upload, :create?
               if upload.save
-                last_audit = upload.audits.last
-                last_audit.update(remote_address: request.ip)
+                annotate_audits [upload.audits.last]
                 upload
               else
                 validation_error!(upload)
@@ -125,14 +123,10 @@ module DDS
                 size: chunk_params[:size],
                 fingerprint_value: chunk_params[:hash][:value],
                 fingerprint_algorithm: chunk_params[:hash][:algorithm],
-                audit_comment: request.env["REQUEST_URI"]
               })
               authorize chunk, :create?
               if chunk.save
-                last_audit = chunk.audits.last
-                last_audit.update(remote_address: request.ip)
-                last_parent_audit = upload.audits.last
-                last_parent_audit.update(remote_address: request.ip)
+                annotate_audits [chunk.audits.last, upload.audits.last]
                 chunk
               else
                 validation_error!(chunk)
@@ -164,11 +158,9 @@ module DDS
             upload = Upload.find(params[:id])
             authorize upload, :complete?
             Audited.audit_class.as_user(current_user) do
-              upload.audit_comment = request.env["REQUEST_URI"]
               upload.etag = SecureRandom.hex
               upload.complete
-              last_audit = upload.audits.last
-              last_audit.update(remote_address: request.ip)
+              annotate_audits [upload.audits.last]
             end
             upload
           end

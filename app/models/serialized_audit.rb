@@ -2,7 +2,14 @@ module SerializedAudit
   def audit
     creation_audit = audits.where(action: "create").last
     last_update_audit = audits.where(action: "update").last
-    delete_audit = audits.where(action: "destroy").last
+    delete_audit = nil
+    if respond_to?('is_deleted') && is_deleted
+      delete_audit = audits.where(action: "update").where(
+        'comment @> ?', {action: 'DELETE'}.to_json
+      ).last
+    else
+      delete_audit = audits.where(action: "destroy").last
+    end
     creator = creation_audit ?
         User.where(id: creation_audit.user_id).first :
         nil

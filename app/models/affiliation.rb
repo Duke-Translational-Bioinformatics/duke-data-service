@@ -16,8 +16,9 @@ class Affiliation < ActiveRecord::Base
 
   def update_project_etag
     last_audit = self.audits.last
-    self.project.update(etag: SecureRandom.hex, audit_comment: "#{last_audit.comment} raised by: #{last_audit.id}")
+    new_comment = last_audit.comment ? last_audit.comment.merge({raised_by_audit: last_audit.id}) : {raised_by_audit: last_audit.id}
+    self.project.update(etag: SecureRandom.hex)
     last_parent_audit = self.project.audits.last
-    last_parent_audit.update(request_uuid: last_audit.request_uuid)
+    last_parent_audit.update(request_uuid: last_audit.request_uuid, comment: new_comment)
   end
 end
