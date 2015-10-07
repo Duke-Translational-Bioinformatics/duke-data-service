@@ -81,13 +81,17 @@ module DDS
         end
 
         def annotate_audits(audits = [], additional_annotation = nil)
+          request_annotation = {
+            request_uuid: SecureRandom.hex,
+            remote_address: request.ip
+          }
           comment_annotation = {
             endpoint: request.env["REQUEST_URI"],
             action: request.env["REQUEST_METHOD"]
           }
           audit_annotation = additional_annotation ?
-            additional_annotation.merge({remote_address: request.ip}) :
-            {remote_address: request.ip}
+            additional_annotation.merge(request_annotation) :
+            request_annotation
 
           audits.each do |audit|
             audit_update = audit_annotation
