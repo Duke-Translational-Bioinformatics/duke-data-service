@@ -4,9 +4,10 @@ RSpec.describe Affiliation, type: :model do
   subject { FactoryGirl.create(:affiliation) }
   let(:resource) { subject }
   let(:resource_class) { Affilation }
+  let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model'
-  
+
   describe 'associations' do
     it 'should belong_to a project' do
       should belong_to(:project)

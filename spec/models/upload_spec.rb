@@ -6,6 +6,7 @@ RSpec.describe Upload, type: :model do
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { subject }
+  let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'

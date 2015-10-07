@@ -9,6 +9,7 @@ RSpec.describe User, type: :model do
   let(:resource_class) { User }
   let(:resource_serializer) { UserSerializer }
   let!(:resource) { subject }
+  let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
