@@ -20,7 +20,7 @@ module DDS
       post '/projects/:id/folders', root: false do
         authenticate!
         folder_params = declared(params, include_missing: false)
-        project = Project.find(params[:id])
+        project = hide_logically_deleted Project.find(params[:id])
         folder = project.folders.build({
           project: project,
           parent_id: folder_params[:parent][:id],
@@ -48,7 +48,7 @@ module DDS
       end
       get '/projects/:id/folders', root: 'results' do
         authenticate!
-        project = Project.find(params[:id])
+        project = hide_logically_deleted Project.find(params[:id])
         authorize project, :show?
         policy_scope(Folder).where(project: project, is_deleted: false)
         #test script
@@ -68,7 +68,7 @@ module DDS
       end
       get '/folders/:id', root: false do
         authenticate!
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :show?
         folder
       end
@@ -85,7 +85,7 @@ module DDS
       end
       delete '/folders/:id', root: false do
         authenticate!
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :destroy?
         Audited.audit_class.as_user(current_user) do
           folder.update(is_deleted: true)
@@ -110,7 +110,8 @@ module DDS
         authenticate!
         folder_params = declared(params, include_missing: false)
         new_parent = folder_params[:parent][:id]
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
+        parent_folder = hide_logically_deleted Folder.find(new_parent)
         authorize folder, :create?
         #TODO: validate that parent exists
         Audited.audit_class.as_user(current_user) do
@@ -139,7 +140,7 @@ module DDS
         authenticate!
         folder_params = declared(params, include_missing: false)
         new_name = folder_params[:name]
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
           if folder.update(name: new_name)
@@ -162,7 +163,7 @@ module DDS
       end
       get '/folders/:id/parent', root: false do
         authenticate!
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
         parent = folder.parent
         authorize parent, :show?
         parent
@@ -179,7 +180,7 @@ module DDS
       end
       get '/folders/:id/children', root: 'results' do
         authenticate!
-        folder = Folder.find(params[:id])
+        folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :show?
         folder.children.where(is_deleted: false)
       end
