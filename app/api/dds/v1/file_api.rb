@@ -27,8 +27,7 @@ module DDS
         upload = project.uploads.find(file_params[:upload][:id])
         file = project.data_files.build({
           upload_id: upload.id,
-          name: upload.name,
-          audit_comment: {action: request.env["REQUEST_URI"]}
+          name: upload.name
         })
         if file_params[:parent] && file_params[:parent][:id]
           project.folders.find(file_params[:parent][:id])
@@ -37,7 +36,7 @@ module DDS
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
           if file.save
-            file.audits.last.update(remote_address: request.ip)
+            annotate_audits [file.audits.last]
             file
           else
             validation_error!(file)
@@ -79,8 +78,8 @@ module DDS
             file = DataFile.find(params[:id])
             authorize file, :destroy?
             Audited.audit_class.as_user(current_user) do
-              file.update(is_deleted: true, audit_comment: {action: request.env["REQUEST_URI"]})
-              file.audits.last.update(remote_address: request.ip)
+              file.update(is_deleted: true)
+              annotate_audits [file.audits.last]
             end
             body false
           end
@@ -124,8 +123,8 @@ module DDS
             new_parent = file.project.folders.find(file_params[:parent][:id])
             authorize file, :move?
             Audited.audit_class.as_user(current_user) do
-              file.update(parent_id: new_parent.id, audit_comment: {action: request.env["REQUEST_URI"]})
-              file.audits.last.update(remote_address: request.ip)
+              file.update(parent_id: new_parent.id)
+              annotate_audits [file.audits.last]
             end
             file
           end
@@ -148,8 +147,8 @@ module DDS
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
             Audited.audit_class.as_user(current_user) do
-              file.update(name: file_params[:name], audit_comment: {action: request.env["REQUEST_URI"]})
-              file.audits.last.update(remote_address: request.ip)
+              file.update(name: file_params[:name])
+              annotate_audits [file.audits.last]
             end
             file
           end
