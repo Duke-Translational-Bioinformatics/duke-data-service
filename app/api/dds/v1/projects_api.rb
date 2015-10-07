@@ -62,6 +62,9 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
+      params do
+        requires :id, type: String, desc: 'Project UUID'
+      end
       get '/projects/:id', root: false do
         authenticate!
         project = Project.find(params[:id])
@@ -81,6 +84,7 @@ module DDS
         ]
       end
       params do
+        requires :id, type: String, desc: 'Project UUID'
         optional :name, type: String, desc: 'The Name of the Project'
         optional :description, type: String, desc: 'The Description of the Project'
       end
@@ -108,6 +112,9 @@ module DDS
           [403, 'Forbidden'],
           [404, 'Project Does not Exist']
         ]
+      end
+      params do
+        requires :id, type: String, desc: 'Project UUID'
       end
       delete '/projects/:id', root: false do
         authenticate!
