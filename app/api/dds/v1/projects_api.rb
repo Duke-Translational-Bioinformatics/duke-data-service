@@ -25,14 +25,13 @@ module DDS
             name: project_params[:name],
             description: project_params[:description],
             creator_id: current_user.id,
-            audit_comment: {action: request.env["REQUEST_URI"]}
           })
           if project.valid?
-            project.audits.last.update(remote_address: request.ip)
+            pre_permission_audit = project.audits.last
             last_permission = project.set_project_admin
-            project.audits.last.update(remote_address: request.ip)
+            post_permission_audit = project.audits.last
             last_permission_audit = last_permission.audits.last
-            last_permission_audit.update(remote_address: request.ip)
+            annotate_audits [pre_permission_audit, post_permission_audit, last_permission_audit]
             project
           else
             validation_error!(project)
@@ -91,8 +90,8 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :update?
         Audited.audit_class.as_user(current_user) do
-          if project.update(project_params.merge(etag: SecureRandom.hex, audit_comment: {action: request.env["REQUEST_URI"]}))
-            project.audits.last.update(remote_address: request.ip)
+          if project.update(project_params.merge(etag: SecureRandom.hex))
+            annotate_audits [project.audits.last]
             project
           else
             validation_error!(project)
@@ -115,8 +114,8 @@ module DDS
         project = Project.find(params[:id])
         authorize project, :destroy?
         Audited.audit_class.as_user(current_user) do
-          project.update(is_deleted: true, audit_comment: {action: request.env["REQUEST_URI"]})
-          project.audits.last.update(remote_address: request.ip)
+          project.update(is_deleted: true)
+          annotate_audits [project.audits.last]
         end
         body false
       end
