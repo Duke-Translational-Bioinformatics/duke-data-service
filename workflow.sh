@@ -11,8 +11,15 @@ then
   echo "usage: workflow.sh [auth_token]"
   exit 1
 fi
+
+dds_url=$DDSURL
+if [ -z $dds_url ]
+then
+  dds_url=192.168.99.100
+fi
+
 echo "creating project"
-resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"DarinProject","description":"ProjectDarin"}' "http://192.168.99.100:3001/api/v1/projects"`
+resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"DarinProject","description":"ProjectDarin"}' "http://${dds_url}:3001/api/v1/projects"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
@@ -23,7 +30,7 @@ project_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
 upload_size=`wc -c test_file.txt | awk '{print $1}'`
 upload_md5=`md5 test_file.txt | awk '{print $NF}'`
 echo "creating upload"
-resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"test_file.txt","content_type":"text%2Fplain","size":"'${upload_size}'","hash":{"value":"'${upload_md5}'","algorithm":"md5"}}' "http://192.168.99.100:3001/api/v1/projects/${project_id}/uploads"`
+resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"test_file.txt","content_type":"text%2Fplain","size":"'${upload_size}'","hash":{"value":"'${upload_md5}'","algorithm":"md5"}}' "http://${dds_url}:3001/api/v1/projects/${project_id}/uploads"`
 if [ $? -gt 0 ]
 then
   echo "Problem! ${resp}"
@@ -37,7 +44,7 @@ do
    size=`wc -c ${chunk} | awk '{print $1}'`
    number=`echo ${chunk} | perl -pe 's/chunk(\d)\.txt/$1/'`
    echo "creating chunk ${number}"
-   resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "http://192.168.99.100:3001/api/v1/uploads/${upload_id}/chunks"`
+   resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "http://${dds_url}:3001/api/v1/uploads/${upload_id}/chunks"`
    if [ $? -gt 0 ]
    then
      echo "Problem! ${resp}"
@@ -55,7 +62,7 @@ do
    fi
 done
 echo "completing upload"
-resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://192.168.99.100:3001/api/v1/uploads/${upload_id}/complete"`
+resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://${dds_url}:3001/api/v1/uploads/${upload_id}/complete"`
 if [ $? -gt 0 ]
 then
   echo "Problem! ${resp}"
@@ -63,7 +70,7 @@ then
 fi
 echo ${resp} | jq
 echo "creating file"
-resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"upload":{"id":"'${upload_id}'"}}' "http://192.168.99.100:3001/api/v1/projects/${project_id}/files"`
+resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"upload":{"id":"'${upload_id}'"}}' "http://${dds_url}:3001/api/v1/projects/${project_id}/files"`
 if [ $? -gt 0 ]
 then
   echo "Problem! ${resp}"
@@ -71,13 +78,13 @@ then
 fi
 echo ${resp} | jq
 file_id=`echo $resp | jq '.id' | sed 's/\"//g'`
-curl -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://192.168.99.100:3001/api/v1/files/${file_id}" | jq
+curl -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://${dds_url}:3001/api/v1/files/${file_id}" | jq
 if [ $? -gt 0 ]
 then
   echo "Problem!"
   exit 1
 fi
-curl -# -L --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://192.168.99.100:3001/api/v1/files/${file_id}/download"
+curl -# -L --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "http://${dds_url}:3001/api/v1/files/${file_id}/download"
 if [ $? -gt 0 ]
 then
   echo "Problem!"
