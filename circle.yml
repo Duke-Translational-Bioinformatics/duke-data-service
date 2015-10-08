@@ -1,16 +1,33 @@
 machine:
+  services:
+    - docker
 
   # Version of ruby to use
   ruby:
     version:
       2.2.2
 
-# deployment:
-#   development:
-#     branch: develop
-#     commands:
-#       - heroku run rake assets:clobber --app 'duke-data-service-dev'
-#       - git push git@heroku.com:duke-data-service-dev.git $CIRCLE_SHA1:refs/heads/master:
-#           timeout: 54000
-#       - heroku run rake db:migrate --app 'duke-data-service-dev'
-#       - heroku run rake db:seed --app 'duke-data-service-dev'
+dependencies:
+  pre:
+    - sudo pip install --upgrade docker-compose==1.3.0
+    - docker-compose build
+    - rm swift.env
+    - rm webapp.env
+    - ln -s swift.circle.env swift.env
+    - ln -s webapp.circle.env webapp.env
+  post:
+    - ./launch_application.sh
+
+test:
+  post:
+    - './workflow.sh `docker-compose -f dc-dev.utils.yml run rake api_test_user:create | tail -1`'
+
+deployment:
+  development:
+    branch: develop
+    commands:
+      - heroku run rake assets:clobber --app 'duke-data-service-dev'
+      - git push git@heroku.com:duke-data-service-dev.git $CIRCLE_SHA1:refs/heads/master:
+          timeout: 54000
+      - heroku run rake db:migrate --app 'duke-data-service-dev'
+      - heroku run rake db:seed --app 'duke-data-service-dev'
