@@ -11,6 +11,8 @@ RSpec.describe Project, type: :model do
     it_behaves_like 'with a serialized audit'
   end
 
+  it_behaves_like 'a kind'
+
   describe 'associations' do
     it 'should have many project permissions' do
       should have_many(:project_permissions)

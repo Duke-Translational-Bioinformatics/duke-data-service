@@ -1,5 +1,6 @@
 class Project < ActiveRecord::Base
   include SerializedAudit
+  include Kinded
   audited
 
   belongs_to :creator, class_name: "User"

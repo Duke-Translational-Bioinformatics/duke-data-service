@@ -1,5 +1,7 @@
 class Folder < ActiveRecord::Base
   include SerializedAudit
+  include Kinded
+  
   audited
   has_many :children, class_name: "Folder", foreign_key: "parent_id"
   belongs_to :project
