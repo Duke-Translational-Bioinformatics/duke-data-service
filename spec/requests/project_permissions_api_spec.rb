@@ -40,6 +40,9 @@ describe DDS::V1::ProjectPermissionsAPI do
         let(:url) { "/api/v1/projects/notexists_projectid/permissions" }
         let(:resource_class) {'Project'}
       end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { resource_project }
+      end
     end
   end
 
@@ -82,6 +85,10 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:with_audited_parent) { Project }
       end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { resource_project }
+      end
     end
 
     describe 'GET' do
@@ -97,6 +104,9 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/projects/#{other_permission.project.id}/permissions/#{resource_user.id}" }
         let(:resource_class) {'ProjectPermission'}
+      end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { resource_project }
       end
     end
 
@@ -114,6 +124,9 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
         let(:with_audited_parent) { Project}
+      end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { resource_project }
       end
     end
   end

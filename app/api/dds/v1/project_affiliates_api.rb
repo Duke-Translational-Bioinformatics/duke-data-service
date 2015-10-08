@@ -18,7 +18,7 @@ module DDS
       put '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
         declared_params = declared(params, include_missing: false)
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         Audited.audit_class.as_user(current_user) do
           affiliation = project.affiliations.where(user: user).first ||
@@ -46,7 +46,7 @@ module DDS
       end
       get '/projects/:project_id/affiliates', root: 'results' do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         authorize project, :show?
         project.affiliations
       end
@@ -61,7 +61,7 @@ module DDS
       end
       get '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         affiliation = Affiliation.where(project: project, user: user).first
         authorize affiliation, :show?
@@ -78,7 +78,7 @@ module DDS
       end
       delete '/projects/:project_id/affiliates/:user_id', root: false do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         affiliations = Affiliation.where(project: project, user: user).all
         authorize affiliations.first, :destroy?

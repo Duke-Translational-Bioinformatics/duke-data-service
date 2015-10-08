@@ -91,7 +91,7 @@ module DDS
       put '/projects/:id', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
-        project = Project.find(params[:id])
+        project = hide_logically_deleted Project.find(params[:id])
         authorize project, :update?
         Audited.audit_class.as_user(current_user) do
           if project.update(project_params.merge(etag: SecureRandom.hex))
@@ -118,7 +118,7 @@ module DDS
       end
       delete '/projects/:id', root: false do
         authenticate!
-        project = Project.find(params[:id])
+        project = hide_logically_deleted Project.find(params[:id])
         authorize project, :destroy?
         Audited.audit_class.as_user(current_user) do
           project.update(is_deleted: true)
