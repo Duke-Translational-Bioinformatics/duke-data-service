@@ -29,6 +29,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
   end
 
@@ -41,6 +44,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
 
     describe 'PUT' do
@@ -69,6 +75,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'an audited endpoint' do
         let(:with_audited_parent) { Project }
       end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
 
     describe 'DELETE' do
@@ -80,6 +89,9 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
         let(:with_audited_parent) { Project}
+      end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
       end
     end
   end

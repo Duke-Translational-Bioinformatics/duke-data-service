@@ -101,6 +101,13 @@ module DDS
             audit.update(audit_update)
           end
         end
+
+        def hide_logically_deleted(object)
+          if object.is_deleted
+            raise ActiveRecord::RecordNotFound.new("find #{object.class.name} with #{object.id} not found")
+          end
+          object
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|

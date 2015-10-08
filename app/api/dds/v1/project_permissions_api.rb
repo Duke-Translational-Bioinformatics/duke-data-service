@@ -12,7 +12,7 @@ module DDS
       end
       get '/projects/:project_id/permissions', root: 'results' do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         authorize project, :show?
         policy_scope(ProjectPermission).where(project: project)
       end
@@ -34,7 +34,7 @@ module DDS
       put '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
         permission_params = declared(params)
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         Audited.audit_class.as_user(current_user) do
           permission = ProjectPermission.find_by(project: project, user: user) ||
@@ -65,7 +65,7 @@ module DDS
       end
       get '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         permission = ProjectPermission.find_by(project: project, user: user)
         unless permission
@@ -87,7 +87,7 @@ module DDS
       end
       delete '/projects/:project_id/permissions/:user_id', root: false do
         authenticate!
-        project = Project.find(params[:project_id])
+        project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
         permission = ProjectPermission.find_by(project: project, user: user)
         authorize permission, :destroy?

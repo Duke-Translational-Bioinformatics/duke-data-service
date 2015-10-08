@@ -118,6 +118,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint'
+      it_behaves_like 'a logically deleted resource'
     end
 
     describe 'DELETE' do
@@ -139,6 +140,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
       end
+      it_behaves_like 'a logically deleted resource'
     end
   end
 end

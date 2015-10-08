@@ -23,7 +23,7 @@ module DDS
       post '/projects/:id/files', root: false do
         authenticate!
         file_params = declared(params, include_missing: false)
-        project = Project.find(params[:id])
+        project = hide_logically_deleted(Project.find(params[:id]))
         upload = project.uploads.find(file_params[:upload][:id])
         file = project.data_files.build({
           upload_id: upload.id,
@@ -75,7 +75,7 @@ module DDS
           end
           delete '/', root: false do
             authenticate!
-            file = DataFile.find(params[:id])
+            file = hide_logically_deleted(DataFile.find(params[:id]))
             authorize file, :destroy?
             Audited.audit_class.as_user(current_user) do
               file.update(is_deleted: true)
@@ -96,7 +96,7 @@ module DDS
           end
           get '/download', root: false do
             authenticate!
-            file = DataFile.find(params[:id])
+            file = hide_logically_deleted(DataFile.find(params[:id]))
             authorize file, :download?
             new_url = "#{file.upload.storage_provider.url_root}#{file.upload.temporary_url}"
             redirect new_url, permanent: true
@@ -118,9 +118,9 @@ module DDS
           end
           put '/move', root: false do
             authenticate!
-            file = DataFile.find(params[:id])
+            file = hide_logically_deleted(DataFile.find(params[:id]))
             file_params = declared(params, include_missing: false)
-            new_parent = file.project.folders.find(file_params[:parent][:id])
+            new_parent = hide_logically_deleted(file.project.folders.find(file_params[:parent][:id]))
             authorize file, :move?
             Audited.audit_class.as_user(current_user) do
               file.update(parent_id: new_parent.id)
@@ -143,7 +143,7 @@ module DDS
           end
           put '/rename', root: false do
             authenticate!
-            file = DataFile.find(params[:id])
+            file = hide_logically_deleted(DataFile.find(params[:id]))
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
             Audited.audit_class.as_user(current_user) do

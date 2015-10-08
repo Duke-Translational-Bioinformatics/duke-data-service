@@ -42,6 +42,10 @@ describe DDS::V1::UploadsAPI do
         let(:expected_total_length) { project.uploads.count }
         let(:extras) { FactoryGirl.create_list(:upload, 5, project_id: project.id) }
       end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
 
     #Initiate a chunked file upload for a project
@@ -88,6 +92,10 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 201 }
+      end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
       end
     end
   end

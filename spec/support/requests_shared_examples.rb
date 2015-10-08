@@ -259,3 +259,22 @@ shared_examples 'an identified resource' do
     expect(response_json['suggestion']).to eq("you may have mistyped the #{resource_class} id")
   end
 end
+
+shared_examples 'a logically deleted resource' do
+  let(:deleted_resource) { resource }
+  it 'should return 404 with error when resource found is logically deleted' do
+    expect(deleted_resource).to be_persisted
+    expect(deleted_resource).to respond_to 'is_deleted'
+    deleted_resource.update(is_deleted: true)
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("#{deleted_resource.class.name} Not Found")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("you may have mistyped the #{deleted_resource.class.name} id")
+  end
+end

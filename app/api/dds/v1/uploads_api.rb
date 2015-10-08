@@ -28,7 +28,7 @@ module DDS
           post '/uploads', root: false do
             authenticate!
             upload_params = declared(params, include_missing: false)
-            project = Project.find(params[:project_id])
+            project = hide_logically_deleted Project.find(params[:project_id])
             storage_provider = StorageProvider.first
             Audited.audit_class.as_user(current_user) do
               upload = project.uploads.build({
@@ -65,7 +65,7 @@ module DDS
           end
           get '/uploads', root: 'results' do
             authenticate!
-            project = Project.find(params[:project_id])
+            project = hide_logically_deleted Project.find(params[:project_id])
             authorize project, :show?
             paginate(project.uploads.all)
           end

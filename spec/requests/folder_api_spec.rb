@@ -43,6 +43,9 @@ describe DDS::V1::FolderAPI do
         let(:project_id) {'notfoundid'}
         let(:resource_class) {'Project'}
       end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
 
     describe 'POST' do
@@ -88,6 +91,10 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 201 }
       end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
     end
   end
 
@@ -105,6 +112,7 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
+      it_behaves_like 'a logically deleted resource'
     end
 
     describe 'DELETE' do
@@ -130,6 +138,7 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
       end
+      it_behaves_like 'a logically deleted resource'
     end
   end
 
@@ -153,6 +162,10 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an audited endpoint'
+      it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { new_parent }
+      end
     end
   end
 
@@ -180,6 +193,7 @@ describe DDS::V1::FolderAPI do
       end
 
       it_behaves_like 'an audited endpoint'
+      it_behaves_like 'a logically deleted resource'
     end
   end
 
@@ -198,6 +212,9 @@ describe DDS::V1::FolderAPI do
 
       it_behaves_like 'an identified resource' do
         let(:child_folder_id) {'notfoundid'}
+      end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { child_folder }
       end
     end
   end
@@ -227,6 +244,9 @@ describe DDS::V1::FolderAPI do
 
       it_behaves_like 'an identified resource' do
         let(:child_and_parent_id) {'notfoundid'}
+      end
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { child_and_parent }
       end
     end
   end
