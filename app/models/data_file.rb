@@ -1,5 +1,7 @@
 class DataFile < ActiveRecord::Base
   include SerializedAudit
+  include Kinded
+
   audited
   belongs_to :project
   belongs_to :parent, class_name: "Folder"
@@ -21,5 +23,9 @@ class DataFile < ActiveRecord::Base
     else
       "/#{self.name}"
     end
+  end
+
+  def kind
+    super('file')
   end
 end

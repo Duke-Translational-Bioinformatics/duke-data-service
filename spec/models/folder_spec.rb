@@ -11,6 +11,8 @@ RSpec.describe Folder, type: :model do
     it_behaves_like 'with a serialized audit'
   end
 
+  it_behaves_like 'a kind'
+
   describe 'associations' do
 
     it 'should be part of a project' do
