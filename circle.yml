@@ -24,7 +24,7 @@ dependencies:
 
 test:
   post:
-    - './workflow.sh `docker-compose run rake api_test_user:create | tail -1`'
+    - './workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
 
 deployment:
   development:
