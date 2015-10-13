@@ -2,6 +2,8 @@ server:
   extends:
     file: dc-base.yml
     service: webapp
+  volumes:
+    - .:/var/www/app
   links:
     - db:postgres.db.host
 db:
