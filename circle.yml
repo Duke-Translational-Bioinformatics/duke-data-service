@@ -1,6 +1,6 @@
 machine:
   environment:
-    DDSURL: 0.0.0.0
+    DDSURL: http://0.0.0.0
     COMPOSE_FILE: docker-compose.circle.yml
   services:
     - docker
