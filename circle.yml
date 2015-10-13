@@ -1,6 +1,7 @@
 machine:
   environment:
     DDSURL: 0.0.0.0
+    COMPOSE_FILE: docker-compose.circle.yml
   services:
     - docker
 
@@ -19,11 +20,11 @@ dependencies:
     - ln -s swift.circle.env swift.env
     - ln -s webapp.circle.env webapp.env
   post:
-    - ./launch_application.sh
+    - ./launch_application.circle.sh
 
 test:
   post:
-    - './workflow.sh `docker-compose -f dc-dev.utils.yml run rake api_test_user:create | tail -1`'
+    - './workflow.sh `docker-compose run rake api_test_user:create | tail -1`'
 
 deployment:
   development:
