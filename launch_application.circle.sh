@@ -1,8 +1,9 @@
 #!/bin/bash
 
 docker-compose up -d swift
-curl http:0.0.0.0:12345/info
 sleep 5
+docker-compose ps
+curl http:0.0.0.0:12345/info
 docker-compose up -d server
 sleep 5
 docker-compose run rake db:migrate
