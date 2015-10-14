@@ -49,7 +49,7 @@ do
    echo ${resp} | jq
    host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
-   echo "posting data"
+   echo "posting data to ${host}${put_url}"
    curl -v -T ${chunk} "${host}${put_url}"
    if [ $? -gt 0 ]
    then
