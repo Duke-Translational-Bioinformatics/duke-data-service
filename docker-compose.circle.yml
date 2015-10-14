@@ -19,6 +19,8 @@ swift:
     service: swift
   volumes_from:
     - swiftvol
+  ports:
+    - 8080:8080
 rake:
   image: dukedataservice_server
   entrypoint: ['rake']
