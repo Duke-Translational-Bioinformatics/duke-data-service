@@ -16,13 +16,13 @@ dependencies:
   pre:
     - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.3.0
-    - sudo docker-compose build
+    - docker-compose build
     - rm swift.env
     - rm webapp.env
     - ln -s swift.circle.env swift.env
     - ln -s webapp.circle.env webapp.env
   post:
-    - sudo ./launch_application.circle.sh
+    - ./launch_application.circle.sh
 
 test:
   post:

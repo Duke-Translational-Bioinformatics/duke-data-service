@@ -5,9 +5,6 @@ server:
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
-  env_file:
-    - webapp.env
-    - swift.env
 db:
   extends:
     file: dc-base.yml
