@@ -4,6 +4,7 @@ server:
     service: webapp
   links:
     - db:postgres.db.host
+  net: "host"
   env_file:
     - webapp.env
     - swift.env
