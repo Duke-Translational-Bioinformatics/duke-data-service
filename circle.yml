@@ -1,7 +1,10 @@
 machine:
   environment:
-    DDSURL: http://0.0.0.0
+    DDSURL: http://dds.circle.host
     COMPOSE_FILE: docker-compose.circle.yml
+  hosts:
+    dds.circle.host: 0.0.0.0
+    swift.circle.host: 0.0.0.0
   services:
     - docker
 
