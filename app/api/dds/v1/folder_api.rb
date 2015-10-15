@@ -21,9 +21,11 @@ module DDS
         authenticate!
         folder_params = declared(params, include_missing: false)
         project = hide_logically_deleted Project.find(params[:id])
+        if folder_params[:parent]
+          parent = project.folders.find(folder_params[:parent][:id])
+        end
         folder = project.folders.build({
-          project: project,
-          parent_id: folder_params[:parent][:id],
+          parent: parent,
           name: folder_params[:name]
         })
         authorize folder, :create?
@@ -130,39 +132,6 @@ module DDS
             validation_error!(folder)
           end
         end
-      end
-
-      desc 'View parent folder' do
-        detail 'Returns the folder details for the parent of a given folder.'
-        named 'view parent folder'
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist']
-        ]
-      end
-      get '/folders/:id/parent', root: false do
-        authenticate!
-        folder = hide_logically_deleted Folder.find(params[:id])
-        parent = folder.parent
-        authorize parent, :show?
-        parent
-      end
-
-      desc 'View children folder details' do
-        detail 'Returns the folder details of children folders.'
-        named 'view children '
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist']
-        ]
-      end
-      get '/folders/:id/children', root: 'results' do
-        authenticate!
-        folder = hide_logically_deleted Folder.find(params[:id])
-        authorize folder, :show?
-        folder.children.where(is_deleted: false)
       end
     end
   end
