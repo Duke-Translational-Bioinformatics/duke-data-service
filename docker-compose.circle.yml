@@ -26,6 +26,7 @@ rake:
   entrypoint: ['rake']
   links:
     - db:postgres.db.host
+    - swift:swift.circle.host
   env_file:
     - webapp.env
     - swift.env
@@ -41,12 +42,14 @@ authservice:
     - db:postgres.db.host
   env_file:
     - webapp.env
+    - swift.env
 rspec:
   image: dukedataservice_server
   environment:
     - RAILS_ENV=test
   links:
     - db:postgres.db.host
+    - swift:swift.circle.host
   env_file:
     - swift.env
   entrypoint: ['rspec']
