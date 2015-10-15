@@ -37,26 +37,6 @@ module DDS
         end
       end
 
-      desc 'List folders' do
-        detail 'Lists folders for a given project.'
-        named 'list folders'
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project Does not Exist']
-        ]
-      end
-      get '/projects/:id/folders', root: 'results' do
-        authenticate!
-        project = hide_logically_deleted Project.find(params[:id])
-        authorize project, :show?
-        policy_scope(Folder).where(project: project, is_deleted: false)
-        #test script
-        # project = Folder.last.project_id
-        # Folder.where(project: project, is_deleted: nil)
-        #TODO
-      end
-
       desc 'View folder details' do
         detail 'Returns the folder details for a given uuid of a folder.'
         named 'view folder'

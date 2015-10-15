@@ -29,22 +29,8 @@ describe DDS::V1::FolderAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it_behaves_like 'a listable resource' do
-        let(:unexpected_resources) { [
-          deleted_folder,
-          other_folder
-        ] }
-      end
-
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
-
-      it_behaves_like 'an identified resource' do
-        let(:project_id) {'notfoundid'}
-        let(:resource_class) {'Project'}
-      end
-      it_behaves_like 'a logically deleted resource' do
-        let(:deleted_resource) { project }
+      it 'returns a method not allowed error' do
+        is_expected.to eq 405
       end
     end
 
