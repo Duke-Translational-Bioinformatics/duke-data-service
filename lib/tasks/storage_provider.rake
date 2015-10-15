@@ -17,9 +17,8 @@ namespace :storage_provider do
         secondary_key: ENV['SWIFT_SECONDARY_KEY']
       )
       begin
-        $stderr.puts "Registering Keys"
+        $stderr.puts "Registering Keys ACCT INFO #{ sp.get_account_info.to_json }"
         sp.register_keys
-        $stderr.puts "ACCT INFO #{ sp.get_account_info.to_json }"
       rescue StorageProviderException => e
         $stderr.puts "Could not register storage_provider keys #{e.message}"
       end
