@@ -50,10 +50,10 @@ do
    host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
    echo "posting data to ${host}${put_url}"
-   curl -v -T ${chunk} "${host}${put_url}"
-   if [ $? -gt 0 ]
+   resp=`curl -v -T ${chunk} "${host}${put_url}"`
+   if [ ! -z "${resp}" ]
    then
-     echo "Problem!"
+     echo "PROBLEM ${resp}"
      exit 1
    fi
 done
