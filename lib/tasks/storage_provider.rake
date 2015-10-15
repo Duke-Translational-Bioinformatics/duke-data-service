@@ -18,7 +18,7 @@ namespace :storage_provider do
       )
       begin
         $stderr.puts "Registering Keys #{s.to_json}"
-        $stderr.puts "ACCT INFO #{ sp.get_account_info.to_json }"
+        $stderr.puts "ACCT INFO #{ s.get_account_info.to_json }"
         sp.register_keys
       rescue StorageProviderException => e
         $stderr.puts "Could not register storage_provider keys #{e.message}"
