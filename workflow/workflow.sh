@@ -41,7 +41,17 @@ upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
 for chunk in workflow/chunk*.txt
 do
    md5=`md5 ${chunk} | awk '{print $NF}'`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem! ${resp}"
+     exit 1
+   fi
    size=`wc -c ${chunk} | awk '{print $1}'`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem! ${resp}"
+     exit 1
+   fi
    number=`echo ${chunk} | perl -pe 's/.*chunk(\d)\.txt/$1/'`
    echo "creating chunk ${number}"
    resp=`curl --insecure -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "${dds_url}:3001/api/v1/uploads/${upload_id}/chunks"`
@@ -50,11 +60,18 @@ do
      echo "Problem! ${resp}"
      exit 1
    fi
+   echo "error? "`echo ${resp} | jq '.error'`
+   host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    echo ${resp} | jq
    host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
    echo "posting data"
    resp=`curl --insecure -v -T ${chunk} "${host}${put_url}"`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem! ${resp}"
+     exit 1
+   fi
    if [ ! -z "${resp}" ]
    then
      echo "PROBLEM ${resp}"

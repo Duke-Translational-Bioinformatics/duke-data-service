@@ -37,7 +37,19 @@ upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
 for chunk in chunk*.txt
 do
    md5=`md5sum ${chunk} | awk '{print $1}'`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem!"
+     exit 1
+   fi
+
    size=`wc -c ${chunk} | awk '{print $1}'`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem!"
+     exit 1
+   fi
+
    number=`echo ${chunk} | perl -pe 's/.*chunk(\d)\.txt/$1/'`
    echo "creating chunk ${number}"
    resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "${dds_url}:3001/api/v1/uploads/${upload_id}/chunks"`
@@ -47,10 +59,16 @@ do
      exit 1
    fi
    echo ${resp} | jq
+   echo "error? "`echo ${resp} | jq '.error'`
    host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
    echo "posting data to ${host}${put_url}"
    resp=`curl -v -T ${chunk} "${host}${put_url}"`
+   if [ $? -gt 0 ]
+   then
+     echo "Problem!"
+     exit 1
+   fi
    if [ ! -z "${resp}" ]
    then
      echo "PROBLEM ${resp}"
