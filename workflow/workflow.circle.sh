@@ -34,7 +34,7 @@ then
 fi
 echo ${resp} | jq
 upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
-for chunk in chunk*.txt
+for chunk in workflow/chunk*.txt
 do
    md5=`md5sum ${chunk} | awk '{print $1}'`
    if [ $? -gt 0 ]
