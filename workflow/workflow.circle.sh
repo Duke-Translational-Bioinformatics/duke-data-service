@@ -38,7 +38,7 @@ for chunk in chunk*.txt
 do
    md5=`md5sum ${chunk} | awk '{print $1}'`
    size=`wc -c ${chunk} | awk '{print $1}'`
-   number=`echo ${chunk} | perl -pe 's/chunk(\d)\.txt/$1/'`
+   number=`echo ${chunk} | perl -pe 's/.*chunk(\d)\.txt/$1/'`
    echo "creating chunk ${number}"
    resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "${dds_url}:3001/api/v1/uploads/${upload_id}/chunks"`
    if [ $? -gt 0 ]

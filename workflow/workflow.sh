@@ -38,11 +38,11 @@ then
 fi
 echo ${resp} | jq
 upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
-for chunk in chunk*.txt
+for chunk in workflow/chunk*.txt
 do
    md5=`md5 ${chunk} | awk '{print $NF}'`
    size=`wc -c ${chunk} | awk '{print $1}'`
-   number=`echo ${chunk} | perl -pe 's/chunk(\d)\.txt/$1/'`
+   number=`echo ${chunk} | perl -pe 's/.*chunk(\d)\.txt/$1/'`
    echo "creating chunk ${number}"
    resp=`curl --insecure -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"number":"'${number}'","size":"'${size}'","hash":{"value":"'${md5}'","algorithm":"md5"}}' "${dds_url}:3001/api/v1/uploads/${upload_id}/chunks"`
    if [ $? -gt 0 ]
