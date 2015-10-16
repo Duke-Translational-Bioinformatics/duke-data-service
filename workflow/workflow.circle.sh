@@ -12,6 +12,7 @@ then
   exit 1
 fi
 if [ -z $DDSURL ]
+then
   echo "DDSURL Environmet Variable Empty!"
   exit 1
 fi
