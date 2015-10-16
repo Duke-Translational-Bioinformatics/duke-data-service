@@ -11,6 +11,10 @@ then
   echo "usage: workflow.sh [auth_token]"
   exit 1
 fi
+if [ -z $DDSURL ]
+  echo "DDSURL Environmet Variable Empty!"
+  exit 1
+fi
 
 dds_url=$DDSURL
 
@@ -18,10 +22,15 @@ echo "creating project ${dds_url}"
 resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"DarinProject","description":"ProjectDarin"}' "${dds_url}:3001/api/v1/projects"`
 if [ $? -gt 0 ]
 then
-  echo "Problem!"
+  echo "Problem with curl!"
   exit 1
 fi
 echo ${resp} | jq
+if [ ! -z `echo ${resp} | jq '.error'` ]
+then
+  echo "Problem!"
+  exit 1
+fi
 project_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
 upload_size=`wc -c test_file.txt | awk '{print $1}'`
 upload_md5=`md5sum test_file.txt | awk '{print $1}'`
@@ -33,6 +42,11 @@ then
   exit 1
 fi
 echo ${resp} | jq
+if [ ! -z `echo ${resp} | jq '.error'` ]
+then
+  echo "Problem!"
+  exit 1
+fi
 upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
 for chunk in workflow/chunk*.txt
 do
@@ -59,7 +73,11 @@ do
      exit 1
    fi
    echo ${resp} | jq
-   echo "error? "`echo ${resp} | jq '.error'`
+   if [ ! -z `echo ${resp} | jq '.error'` ]
+   then
+     echo "Problem!"
+     exit 1
+   fi
    host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
    put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
    echo "posting data to ${host}${put_url}"
@@ -83,6 +101,11 @@ then
   exit 1
 fi
 echo ${resp} | jq
+if [ ! -z `echo ${resp} | jq '.error'` ]
+then
+  echo "Problem!"
+  exit 1
+fi
 echo "creating file"
 resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"upload":{"id":"'${upload_id}'"}}' "${dds_url}:3001/api/v1/projects/${project_id}/files"`
 if [ $? -gt 0 ]
@@ -91,9 +114,20 @@ then
   exit 1
 fi
 echo ${resp} | jq
+if [ ! -z `echo ${resp} | jq '.error'` ]
+then
+  echo "Problem!"
+  exit 1
+fi
 file_id=`echo $resp | jq '.id' | sed 's/\"//g'`
-curl -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}" | jq
+resp=`curl -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}"`
 if [ $? -gt 0 ]
+then
+  echo "Problem!"
+  exit 1
+fi
+echo ${resp} | jq
+if [ ! -z `echo ${resp} | jq '.error'` ]
 then
   echo "Problem!"
   exit 1
