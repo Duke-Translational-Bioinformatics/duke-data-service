@@ -20,40 +20,23 @@ describe DDS::V1::FolderAPI do
   let(:project_id) { project.id}
 
   describe 'Folder collection' do
-    let(:url) { "/api/v1/projects/#{project_id}/folders" }
-
-    describe 'GET' do
-      subject { get(url, nil, headers) }
-
-      it 'returns a method not allowed error' do
-        is_expected.to eq 405
-      end
-    end
+    let(:url) { "/api/v1/folders" }
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
-        parent: { id: parent.id },
+        parent: { kind: parent.kind, id: parent.id },
         name: folder_stub.name
       }}
 
       it_behaves_like 'a creatable resource'
-
-      context 'without parent in payload' do
-        it_behaves_like 'a creatable resource' do
-          let(:payload) {{
-            name: folder_stub.name
-          }}
-        end
-      end
-
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
-          parent: { id: parent.id },
+          parent: { kind: parent.kind, id: parent.id },
           name: nil
         }}
         it 'should not persist changes' do
@@ -64,21 +47,38 @@ describe DDS::V1::FolderAPI do
         end
       end
 
-      it_behaves_like 'an identified resource' do
-        let(:project_id) {'notfoundid'}
-        let(:resource_class) {'Project'}
-      end
-
-      it_behaves_like 'an identified resource' do
-        let!(:payload) {{
-          parent: { id: 'notfoundid' },
+      context 'without parent in payload' do
+        let(:payload) {{
           name: folder_stub.name
         }}
+        it 'returns a failed response' do
+          is_expected.to eq(400)
+          expect(response.status).to eq(400)
+        end
+      end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
+
+      context 'with project as parent' do
+        let(:parent) { project }
+        it_behaves_like 'an identified resource' do
+          let!(:payload) {{
+            parent: { kind: parent.kind, id: 'notfoundid' },
+            name: folder_stub.name
+          }}
+          let(:resource_class) {'Project'}
+        end
+
+        it_behaves_like 'a logically deleted resource' do
+          let(:deleted_resource) { project }
+        end
       end
 
       it_behaves_like 'an identified resource' do
         let!(:payload) {{
-          parent: { id: other_folder.id },
+          parent: { kind: parent.kind, id: 'notfoundid' },
           name: folder_stub.name
         }}
       end
@@ -86,9 +86,13 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 201 }
       end
+    end
 
-      it_behaves_like 'a logically deleted resource' do
-        let(:deleted_resource) { project }
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it 'returns a method not allowed error' do
+        is_expected.to eq 405
       end
     end
   end
