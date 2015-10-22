@@ -12,17 +12,20 @@ module DDS
         ]
       end
       params do
-        optional :parent, desc: "Parent Folder ID", type: Hash do
-          requires :id, type: String
+        requires :parent, type: Hash do
+          requires :kind, desc: "Parent kind", type: String
+          requires :id, desc: "Parent ID", type: String
         end
         requires :name, type: String, desc: "Folder Name"
       end
-      post '/projects/:id/folders', root: false do
+      post '/folders', root: false do
         authenticate!
         folder_params = declared(params, include_missing: false)
-        project = hide_logically_deleted Project.find(params[:id])
-        if folder_params[:parent]
-          parent = project.folders.find(folder_params[:parent][:id])
+        if folder_params[:parent][:kind] == Project.new.kind
+          project = hide_logically_deleted Project.find(params[:parent][:id])
+        else
+          parent = Folder.find(folder_params[:parent][:id])
+          project = hide_logically_deleted parent.project
         end
         folder = project.folders.build({
           parent: parent,
