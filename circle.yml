@@ -9,8 +9,7 @@ deployment:
   development:
     branch: develop
     commands:
-      - heroku run rake assets:clobber --app 'duke-data-service-dev'
-      - git push git@heroku.com:duke-data-service-dev.git $CIRCLE_SHA1:refs/heads/master:
+      - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
           timeout: 54000
-      - heroku run rake db:migrate --app 'duke-data-service-dev'
-      - heroku run rake db:seed --app 'duke-data-service-dev'
+      - heroku run rake db:migrate --app 'dukeds-dev'
+      - heroku run rake db:seed --app 'dukeds-dev'
