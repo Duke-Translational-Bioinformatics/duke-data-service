@@ -55,8 +55,8 @@ Resource payloads may include a composite audit object. An example structure of 
             "username": "mrgardner01",
             "full_name": "Matthew Gardner"
         },
-        "updated_on": "2015-01-01T13:00:00Z",
-        "updated_by": {
+        "last_updated_on": "2015-01-01T13:00:00Z",
+        "last_updated_by": {
             "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
             "username": "jturner01",
             "full_name": "Jon Turner"
@@ -674,7 +674,7 @@ Represents an individual that plays some project level role of interest from a c
 
 + Response 204
 
-## Group Storage Provider
+## Group Storage Providers
 Represents an external service that provides physical storage space for DDS files.
 
 ## Storage Providers collection [/storage_providers]
@@ -726,7 +726,7 @@ Represents an external service that provides physical storage space for DDS file
             "is_deprecated": false
         }
 
-## Group Folder
+## Group Folders
 A folder is a container for files and sub-folders; folders are located in the top-level project root or a a parent folder.
 
 ## Folders collection [/folders]
@@ -1148,7 +1148,7 @@ Generate a pre-signed URL that will be used by client to upload a file chunk to 
             ]
         }
 
-## Complete the chunked file upload [PUT /uploads/{id}/complete]
+## Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 
 >**Permission:** create_file
