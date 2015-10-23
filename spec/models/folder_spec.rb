@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
-  subject { FactoryGirl.create(:folder) }
+  subject { FactoryGirl.create(:folder, :with_parent) }
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
@@ -40,21 +40,43 @@ RSpec.describe Folder, type: :model do
   end
 
   describe 'serialization' do
+    let(:serializer) { FolderSerializer.new subject }
+    let(:payload) { serializer.to_json }
+    let(:parsed_json) { JSON.parse(payload) }
     it 'should serialize to json' do
-      serializer = FolderSerializer.new subject
-      payload = serializer.to_json
       expect(payload).to be
-      parsed_json = JSON.parse(payload)
+      expect{parsed_json}.to_not raise_error
+    end
+
+    it 'should have expected keys and values' do
       expect(parsed_json).to have_key('id')
       expect(parsed_json).to have_key('parent')
+      expect(parsed_json['parent']).to have_key('kind')
+      expect(parsed_json['parent']).to have_key('id')
       expect(parsed_json).to have_key('name')
       expect(parsed_json).to have_key('project')
+      expect(parsed_json['project']).to have_key('id')
       expect(parsed_json).to have_key('is_deleted')
+
       expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['parent']['id']).to eq(subject.parent_id)
+      expect(parsed_json['parent']['kind']).to eq(subject.parent.kind)
+      expect(parsed_json['parent']['id']).to eq(subject.parent.id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['project']['id']).to eq(subject.project_id)
       expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
+    end
+
+    context 'without a parent' do
+      subject { FactoryGirl.create(:folder, :root) }
+
+      it 'should have expected keys and values' do
+        expect(parsed_json).to have_key('parent')
+        expect(parsed_json['parent']).to have_key('kind')
+        expect(parsed_json['parent']).to have_key('id')
+
+        expect(parsed_json['parent']['kind']).to eq(subject.project.kind)
+        expect(parsed_json['parent']['id']).to eq(subject.project.id)
+    end
     end
   end
 
