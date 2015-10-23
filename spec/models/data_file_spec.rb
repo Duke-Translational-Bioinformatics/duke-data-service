@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe DataFile, type: :model do
   subject { FactoryGirl.create(:data_file) }
   let(:resource_class) { DataFile }
-  let(:resource_serializer) { FolderSerializer }
+  let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { subject }
   let(:is_logically_deleted) { true }
 
