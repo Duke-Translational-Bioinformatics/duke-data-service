@@ -9,11 +9,6 @@ class FolderSerializer < ActiveModel::Serializer
   def parent
     parent = object.parent || object.project
     { kind: parent.kind, id: parent.id }
-    # if object.parent_id
-    #   { id: object.parent_id }
-    # else
-    #   "root"
-    # end
   end
 
   def is_deleted
