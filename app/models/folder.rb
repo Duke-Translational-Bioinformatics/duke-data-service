@@ -10,6 +10,11 @@ class Folder < ActiveRecord::Base
 
   validates :name, presence: true
   validates :project_id, presence: true
+  validates :is_deleted, absence: true, if: :children_present?
+  
+  def children_present?
+    !children.empty?
+  end
 
   def virtual_path
     if parent
