@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
-  subject { FactoryGirl.create(:folder, :with_parent) }
+  subject { child_folder }
+  let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
@@ -14,7 +15,6 @@ RSpec.describe Folder, type: :model do
   it_behaves_like 'a kind'
 
   describe 'associations' do
-
     it 'should be part of a project' do
       should belong_to(:project)
     end
@@ -29,13 +29,26 @@ RSpec.describe Folder, type: :model do
   end
 
   describe 'validations' do
-
     it 'should have a name' do
       should validate_presence_of(:name)
     end
 
     it 'should have a project_id' do
       should validate_presence_of(:project_id)
+    end
+
+    it 'should allow is_deleted to be set' do
+      should allow_value(true).for(:is_deleted)
+      should allow_value(false).for(:is_deleted)
+    end
+
+    context 'with children' do
+      subject { child_folder.parent }
+
+      it 'should not allow is_deleted to be set to true' do
+        should_not allow_value(true).for(:is_deleted)
+        should allow_value(false).for(:is_deleted)
+      end
     end
   end
 
