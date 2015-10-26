@@ -117,6 +117,7 @@ describe DDS::V1::FolderAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
+
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 
@@ -127,8 +128,14 @@ describe DDS::V1::FolderAPI do
           expect(resource.is_deleted?).to be_truthy
         end
 
-        it_behaves_like 'an identified resource' do
-          let(:resource_id) {'notfoundid'}
+        it_behaves_like 'a validated resource' do
+          let(:resource_id) { parent.id }
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
+          end
         end
       end
 
@@ -136,6 +143,9 @@ describe DDS::V1::FolderAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
       end
       it_behaves_like 'a logically deleted resource'
     end
