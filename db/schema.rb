@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151005221907) do
+ActiveRecord::Schema.define(version: 20151027144832) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -128,7 +128,9 @@ ActiveRecord::Schema.define(version: 20151005221907) do
     t.datetime "updated_at",                  null: false
   end
 
-  create_table "storage_providers", force: :cascade do |t|
+  create_table "storage_providers", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "display_name"
+    t.string   "description"
     t.string   "name"
     t.string   "url_root"
     t.string   "provider_version"
@@ -137,6 +139,7 @@ ActiveRecord::Schema.define(version: 20151005221907) do
     t.string   "service_pass"
     t.string   "primary_key"
     t.string   "secondary_key"
+    t.boolean  "is_deprecated"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
   end
@@ -155,13 +158,13 @@ ActiveRecord::Schema.define(version: 20151005221907) do
     t.integer  "size"
     t.string   "fingerprint_value"
     t.string   "fingerprint_algorithm"
-    t.integer  "storage_provider_id"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.datetime "completed_at"
     t.datetime "error_at"
     t.string   "error_message"
     t.string   "etag"
+    t.uuid     "storage_provider_id"
   end
 
   create_table "user_authentication_services", force: :cascade do |t|

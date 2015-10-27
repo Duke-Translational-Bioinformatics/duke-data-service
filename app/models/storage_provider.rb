@@ -1,4 +1,6 @@
 class StorageProvider < ActiveRecord::Base
+  validates :display_name, presence: true, uniqueness: true
+  validates :description, presence: true
   validates :name, presence: true
   validates :url_root, presence: true
   validates :provider_version, presence: true

@@ -198,7 +198,7 @@ RSpec.describe Upload, type: :model do
       )
       expect(parsed_json["storage_provider"]).to eq({
         "id" => subject.storage_provider.id,
-        "name" => subject.storage_provider.name,
+        "name" => subject.storage_provider.display_name,
       })
       expect(parsed_json["status"]).to be_a Hash
       %w(initiated_on completed_on error_on error_message).each do |ekey|
