@@ -82,7 +82,7 @@ module DDS
         end
       end
 
-      desc 'Move a folder' do
+      desc 'Move folder' do
         detail 'Move a folder with a given uuid to a new parent.'
         named 'move folder'
         failure [
@@ -92,27 +92,30 @@ module DDS
         ]
       end
       params do
-        requires :parent
+        requires :parent, type: Hash do
+          requires :kind, desc: "Parent kind", type: String
+          requires :id, desc: "Parent ID", type: String
+        end
       end
       put '/folders/:id/move', root: false do
         authenticate!
         folder_params = declared(params, include_missing: false)
-        new_parent = folder_params[:parent][:id]
         folder = hide_logically_deleted Folder.find(params[:id])
-        parent_folder = hide_logically_deleted Folder.find(new_parent)
+        update_params = {parent: nil}
+        if folder_params[:parent][:kind] == Project.new.kind
+          update_params[:project] = hide_logically_deleted Project.find(folder_params[:parent][:id])
+        else
+          update_params[:parent] = hide_logically_deleted Folder.find(folder_params[:parent][:id])
+        end
         authorize folder, :create?
-        #TODO: validate that parent exists
         Audited.audit_class.as_user(current_user) do
-          if folder.update(parent_id: new_parent)
-            annotate_audits [folder.audits.last]
-            folder
-          else
-            validation_error!(folder)
-          end
+          folder.update(update_params)
+          annotate_audits [folder.audits.last]
+          folder
         end
       end
 
-      desc 'Rename a folder' do
+      desc 'Rename folder' do
         detail 'Give a folder with a given uuid a new name.'
         named 'rename folder'
         failure [
