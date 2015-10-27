@@ -6,6 +6,7 @@ describe DDS::V1::FolderAPI do
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
+  let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
@@ -151,26 +152,48 @@ describe DDS::V1::FolderAPI do
     end
   end
 
-  describe 'Move a Project Folder to a New Parent' do
+  describe 'Move folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
-    let(:new_parent) { FactoryGirl.create(:folder) }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
-      let!(:payload) {{
-        parent: { id: new_parent.id }
+      let!(:new_parent) { folder_at_root }
+      let(:payload) {{
+        parent: { kind: new_parent.kind, id: new_parent.id }
       }}
+      
       it_behaves_like 'an updatable resource'
-
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-
+      it_behaves_like 'an audited endpoint'
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
+      it_behaves_like 'an identified resource' do
+        let(:payload) {{
+          parent: { kind: new_parent.kind, id: 'notfoundid' }
+        }}
+      end
 
-      it_behaves_like 'an audited endpoint'
+      context 'with project as parent' do
+        let(:new_parent) { project }
+
+        it_behaves_like 'an updatable resource'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
+        it_behaves_like 'an audited endpoint'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+        it_behaves_like 'an identified resource' do
+          let(:payload) {{
+            parent: { kind: new_parent.kind, id: 'notfoundid' }
+          }}
+          let(:resource_class) {'Project'}
+        end
+      end
+
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { new_parent }
