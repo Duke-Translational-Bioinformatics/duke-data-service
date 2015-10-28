@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DDS::V1::FileAPI do
+describe DDS::V1::FilesAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }

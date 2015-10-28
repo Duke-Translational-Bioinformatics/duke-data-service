@@ -1,6 +1,6 @@
 module DDS
   module V1
-    class FileAPI < Grape::API
+    class FilesAPI < Grape::API
       desc 'Create a file' do
         detail 'Creates a project file for the given payload.'
         named 'create project file'
