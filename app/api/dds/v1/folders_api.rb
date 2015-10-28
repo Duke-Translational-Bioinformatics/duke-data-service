@@ -1,6 +1,6 @@
 module DDS
   module V1
-    class FolderAPI < Grape::API
+    class FoldersAPI < Grape::API
       desc 'Create a project folder' do
         detail 'Creates a project folder for the given payload.'
         named 'create project folder'

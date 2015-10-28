@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DDS::V1::FolderAPI do
+describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
 
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
