@@ -7,6 +7,8 @@ namespace :storage_provider do
     end
     unless StorageProvider.where(name: ENV['SWIFT_ACCT']).exists?
       sp = StorageProvider.create(
+        display_name: ENV['SWIFT_DISPLAY_NAME'],
+        description: ENV['SWIFT_DESCRIPTION'],
         name: ENV['SWIFT_ACCT'],
         url_root: ENV['SWIFT_URL_ROOT'],
         provider_version: ENV['SWIFT_VERSION'],
@@ -16,11 +18,15 @@ namespace :storage_provider do
         primary_key: ENV['SWIFT_PRIMARY_KEY'],
         secondary_key: ENV['SWIFT_SECONDARY_KEY']
       )
-      begin
-        $stderr.puts "Registering Keys"
-        sp.register_keys
-      rescue StorageProviderException => e
-        $stderr.puts "Could not register storage_provider keys #{e.message}"
+      if sp.valid?
+        begin
+          $stderr.puts "Registering Keys"
+          sp.register_keys
+        rescue StorageProviderException => e
+          $stderr.puts "Could not register storage_provider keys #{e.message}"
+        end
+      else
+        $stderr.puts "Error: #{ sp.errors.to_json }"
       end
     end
   end
