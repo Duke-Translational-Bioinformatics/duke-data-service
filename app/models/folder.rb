@@ -1,7 +1,7 @@
 class Folder < ActiveRecord::Base
   include SerializedAudit
   include Kinded
-  
+
   audited
   has_many :children, class_name: "Folder", foreign_key: "parent_id"
   belongs_to :project
@@ -9,9 +9,9 @@ class Folder < ActiveRecord::Base
   has_many :project_permissions, through: :project
 
   validates :name, presence: true
-  validates :project_id, presence: true
+  validates :project_id, presence: true, immutable: true
   validates :is_deleted, absence: true, if: :children_present?
-  
+
   def children_present?
     !children.empty?
   end
