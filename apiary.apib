@@ -800,7 +800,8 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Rules**
 - - - - -
-+ Current user must have `create_file` permission for source project and target project.
++ Current user must have `create_file` permission for source project and destination project.
++ The destination folder cannot be a child of the folder being moved.
 
 + Parameters
     + id (string, required, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... The unique `id` of the folder.
@@ -964,7 +965,7 @@ Generates a storage provider specific pre-signed URL to use for file download, t
 
 >**Rules**
 - - - - -
-+ Current user must have `create_file` permission for source project and target project.
++ Current user must have `create_file` permission for source project and destination project.
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -1238,12 +1239,34 @@ Search for the children (i.e. folders and files) of a project or folder.
             "results": [
                 {
                     "kind": "dds-folder",
-                    "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                    "parent": { "kind": "dds-folder", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                    "name": "Aligned",
+                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+                    "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+                    "name": "Raw Data",
                     "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                    "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                    "virtual_path": [
+                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" }, 
+                        { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                    ],
                     "is_deleted": false,
+                    "audit": { }
+                },
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "virtual_path": [
+                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" }, 
+                        { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                    ],
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                        "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                    },
                     "audit": { }
                 }
             ]
@@ -1268,14 +1291,36 @@ Search for the children (i.e. folders and files) of a project or folder.
 
         {
             "results": [
-                {
+                 {
                     "kind": "dds-folder",
-                    "id": "ad9115b8-1e4a-4399-b606-56622eb462e1",
-                    "parent": { "kind": "dds-folder", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-                    "name": "Aligned",
+                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+                    "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+                    "name": "Raw Data",
                     "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
-                    "virtual_path": "/Sequencing Core/Raw Data/Aligned",
+                    "virtual_path": [
+                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" }, 
+                        { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                    ],
                     "is_deleted": false,
+                    "audit": { }
+                },
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "virtual_path": [
+                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" }, 
+                        { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                    ],
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
+                        "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                    },
                     "audit": { }
                 }
             ]
