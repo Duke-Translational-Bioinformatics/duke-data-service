@@ -7,7 +7,7 @@ class CreateContainers < ActiveRecord::Migration
       t.uuid :project_id
       t.uuid :creator_id
       t.uuid :upload_id
-      t.boolean :is_deleted
+      t.boolean :is_deleted, default: false
 
       t.timestamps null: false
     end
