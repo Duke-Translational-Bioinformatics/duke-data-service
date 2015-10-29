@@ -1,4 +1,4 @@
-class Folder < ActiveRecord::Base
+class Folder < Container
   include SerializedAudit
   include Kinded
 
