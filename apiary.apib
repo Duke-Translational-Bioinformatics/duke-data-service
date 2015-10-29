@@ -688,21 +688,15 @@ Represents an external service that provides physical storage space for DDS file
         {
             "results": [
                 {
-                    "id": "duke_isilon",
-                    "name": "Duke Isilon Storage",
-                    "description": "A description of the storage service level would go here.",
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage",
                     "is_deprecated": false
                 },
                 {
-                    "id": "amazon_s3_glacier",
-                    "name": "Amazon S3 Glacier",
-                    "description": "A description of the storage service level would go here.",
-                    "is_deprecated": false
-                },
-                {
-                    "id": "google_cloud_nearline",
-                    "name": "Google Cloud Nearline",
-                    "description": "A description of the storage service level would go here.",
+                    "id": "t4479f73-0774-4f96-afc7-9d251e65by88",
+                    "name": "amazon_s3_glacier",
+                    "description": "Amazon Glacier Cloud Storage",
                     "is_deprecated": false
                 }
             ]
@@ -710,7 +704,7 @@ Represents an external service that provides physical storage space for DDS file
 
 ## Storage Provider instance [/storage_providers/{id}]
 + Parameters
-    + id (string, required, `duke_isilon`) ... The unique `id` of the storage provider.
+    + id (string, required, `g5579f73-0558-4f96-afc7-9d251e65bv33`) ... The unique `id` of the storage provider.
 
 
 ### View storage provider [GET]
@@ -720,9 +714,9 @@ Represents an external service that provides physical storage space for DDS file
 + Response 200 (application/json)
 
         {
-            "id": "duke_isilon",
-            "name": "Duke Isilon Storage",
-            "description": "A description of the storage service level would go here.",
+            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+            "name": "duke_oit_swift",
+            "description": "Duke Office of Information Technology Storage",
             "is_deprecated": false
         }
 
@@ -892,7 +886,7 @@ Creates a file metadata object; The client is responsible for the creation of th
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                     "size": 30024000,
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": 1, "name": "amazon_s3_standard" }
+                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
                 },
             "audit": { }
         }
@@ -919,7 +913,7 @@ Creates a file metadata object; The client is responsible for the creation of th
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                     "size": 30024000,
                     "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": 1, "name": "amazon_s3_standard" }
+                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
                 },
             "audit": { }
         }
@@ -976,7 +970,7 @@ Generates a storage provider specific pre-signed URL to use for file download, t
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": 1, "name": "amazon_s3_standard" }
+                "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
             },
             "audit": { }
         }
@@ -1009,7 +1003,7 @@ Generates a storage provider specific pre-signed URL to use for file download, t
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": 1, "name": "amazon_s3_standard" }
+                "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
             },
             "audit": { }
         }
@@ -1061,7 +1055,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "size": 30024000,
             "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
             "chunks": [ ],
-            "storage_provider": { "id": 1, "name": "amazon_s3_standard" },
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -1096,7 +1090,7 @@ This is the first step in uploading a large file. An upload objects is created a
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
               }
             ],
-            "storage_provider": { "id": 1, "name": "amazon_s3_standard" },
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -1185,7 +1179,7 @@ This operation is called by the client after all file chunks have been successfu
                     "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
                 }
             ],
-            "storage_provider": { "id": 1, "name": "amazon_s3_standard" },
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": "2015-07-10T13:00:00Z",
