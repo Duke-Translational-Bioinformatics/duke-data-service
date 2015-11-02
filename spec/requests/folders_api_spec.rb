@@ -85,6 +85,7 @@ describe DDS::V1::FoldersAPI do
       end
 
       it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
         let(:expected_status) { 201 }
       end
     end
@@ -143,6 +144,7 @@ describe DDS::V1::FoldersAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
         let(:expected_status) { 204 }
       end
       it_behaves_like 'an identified resource' do
@@ -162,11 +164,13 @@ describe DDS::V1::FoldersAPI do
       let(:payload) {{
         parent: { kind: new_parent.kind, id: new_parent.id }
       }}
-      
+
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
+      end
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
@@ -182,7 +186,9 @@ describe DDS::V1::FoldersAPI do
         it_behaves_like 'an updatable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'an authorized resource'
-        it_behaves_like 'an audited endpoint'
+        it_behaves_like 'an audited endpoint' do
+          let(:resource_class) { Container }
+        end
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
         end
@@ -221,7 +227,9 @@ describe DDS::V1::FoldersAPI do
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
+      end
       it_behaves_like 'a logically deleted resource'
     end
   end
