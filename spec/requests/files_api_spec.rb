@@ -52,6 +52,7 @@ describe DDS::V1::FilesAPI do
       end
 
       it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
         let(:expected_status) { 201 }
       end
 
@@ -98,6 +99,7 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
         let(:expected_status) { 204 }
       end
       it_behaves_like 'a logically deleted resource'
@@ -143,7 +145,9 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/move" }
       end
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
+      end
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { new_parent }
@@ -168,7 +172,9 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/files/notexists_file_id/rename" }
       end
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { Container }
+      end
       it_behaves_like 'a logically deleted resource'
     end
   end
