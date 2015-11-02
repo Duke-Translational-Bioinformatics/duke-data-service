@@ -92,15 +92,15 @@ RSpec.describe DataFile, type: :model do
           expect(subject.project).to be
           expect(subject.parent).to be
           expect(parsed_json['virtual_path']).to eq [
-            { 
+            {
               'kind' => subject.project.kind,
               'id' => subject.project.id,
-              'name' => subject.project.name 
+              'name' => subject.project.name
             },
-            { 
+            {
               'kind' => subject.parent.kind,
               'id' => subject.parent.id,
-              'name' => subject.parent.name 
+              'name' => subject.parent.name
             }
           ]
         end
@@ -111,7 +111,7 @@ RSpec.describe DataFile, type: :model do
         it 'should return the project' do
           expect(subject.project).to be
           expect(parsed_json['virtual_path']).to eq [
-            { 
+            {
               'kind' => subject.project.kind,
               'id' => subject.project.id,
               'name' => subject.project.name }
