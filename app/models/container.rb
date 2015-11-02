@@ -9,11 +9,21 @@ class Container < ActiveRecord::Base
 
   validates :name, presence: true
 
-  def virtual_path
+  def ancestors
     if parent
-      [parent.virtual_path, self.name].join('/')
+      [parent.ancestors, parent].flatten
     else
-      "/#{self.name}"
+      [project]
+    end
+  end
+
+  def virtual_path
+    ancestors.collect do |a|
+      {
+        kind: a.kind,
+        id: a.id,
+        name: a.name
+      }
     end
   end
 end
