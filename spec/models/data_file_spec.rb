@@ -6,6 +6,8 @@ RSpec.describe DataFile, type: :model do
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { subject }
   let(:is_logically_deleted) { true }
+  let(:root_file) { FactoryGirl.create(:data_file, :root) }
+  let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -59,11 +61,15 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'serialization' do
+    let(:serializer) { DataFileSerializer.new subject }
+    let(:payload) { serializer.to_json }
+    let(:parsed_json) { JSON.parse(payload) }
     it 'should serialize to json' do
-      serializer = DataFileSerializer.new subject
-      payload = serializer.to_json
       expect(payload).to be
-      parsed_json = JSON.parse(payload)
+      expect{parsed_json}.to_not raise_error
+    end
+
+    it 'should expected keys and values' do
       expect(parsed_json).to have_key('id')
       expect(parsed_json).to have_key('parent')
       expect(parsed_json).to have_key('name')
@@ -75,22 +81,68 @@ RSpec.describe DataFile, type: :model do
       expect(parsed_json['parent']['id']).to eq(subject.parent_id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['project']['id']).to eq(subject.project_id)
-      expect(parsed_json['virtual_path']).to eq(subject.virtual_path)
       expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
       expect(parsed_json['upload']['id']).to eq(subject.upload_id)
+    end
+
+    describe 'virtual_path' do
+      context 'with a parent folder' do
+        subject { child_file }
+        it 'should return the project and parent' do
+          expect(subject.project).to be
+          expect(subject.parent).to be
+          expect(parsed_json['virtual_path']).to eq [
+            { 
+              'kind' => subject.project.kind,
+              'id' => subject.project.id,
+              'name' => subject.project.name 
+            },
+            { 
+              'kind' => subject.parent.kind,
+              'id' => subject.parent.id,
+              'name' => subject.parent.name 
+            }
+          ]
+        end
+      end
+
+      context 'without a parent' do
+        subject { root_file }
+        it 'should return the project' do
+          expect(subject.project).to be
+          expect(parsed_json['virtual_path']).to eq [
+            { 
+              'kind' => subject.project.kind,
+              'id' => subject.project.id,
+              'name' => subject.project.name }
+          ]
+        end
+      end
     end
   end
 
   describe 'instance methods' do
-    it 'should support virtual_path' do
-      expect(subject).to respond_to(:virtual_path)
-      if subject.parent
-        expect(subject.virtual_path).to eq([
-          subject.parent.virtual_path,
-          subject.name
-        ].join('/'))
-      else
-        expect(subject.virtual_path).to eq("/#{subject.name}")
+    describe 'ancestors' do
+      it 'should respond with an Array' do
+        is_expected.to respond_to(:ancestors)
+        expect(subject.ancestors).to be_a Array
+      end
+
+      context 'with a parent folder' do
+        subject { child_file }
+        it 'should return the project and parent' do
+          expect(subject.project).to be
+          expect(subject.parent).to be
+          expect(subject.ancestors).to eq [subject.project, subject.parent]
+        end
+      end
+
+      context 'without a parent' do
+        subject { root_file }
+        it 'should return the project' do
+          expect(subject.project).to be
+          expect(subject.ancestors).to eq [subject.project]
+        end
       end
     end
   end
