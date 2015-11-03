@@ -46,8 +46,8 @@ RSpec.describe Folder, type: :model do
     context 'with children' do
       subject { child_folder.parent }
 
-      it 'should not allow is_deleted to be set to true' do
-        should_not allow_value(true).for(:is_deleted)
+      it 'should allow is_deleted to be set to true' do
+        should allow_value(true).for(:is_deleted)
         should allow_value(false).for(:is_deleted)
       end
     end

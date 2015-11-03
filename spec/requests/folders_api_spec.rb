@@ -15,7 +15,7 @@ describe DDS::V1::FoldersAPI do
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
-  let(:resource_id) { folder.id }
+  let(:resource_id) { resource.id }
   let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
   let(:project_id) { project.id}
@@ -128,14 +128,19 @@ describe DDS::V1::FoldersAPI do
           resource.reload
           expect(resource.is_deleted?).to be_truthy
         end
+      end
 
-        it_behaves_like 'a validated resource' do
-          let(:resource_id) { parent.id }
-          it 'should not persist changes' do
+      context 'with children' do
+        let(:resource) { parent }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
             expect(resource).to be_persisted
-            expect {
-              is_expected.to eq(400)
-            }.not_to change{resource_class.count}
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
           end
         end
       end
