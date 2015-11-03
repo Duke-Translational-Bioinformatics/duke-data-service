@@ -6,6 +6,8 @@ describe DDS::V1::FoldersAPI do
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
+  
+  let(:child_file) { FactoryGirl.create(:data_file, parent: folder) }
   let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
@@ -132,15 +134,25 @@ describe DDS::V1::FoldersAPI do
 
       context 'with children' do
         let(:resource) { parent }
+        let!(:child) { folder }
+        let!(:grand_child) { child_file }
 
         it_behaves_like 'a removable resource' do
-          let(:resource_counter) { resource_class.where(is_deleted: false) }
+          let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
+          let(:expected_count_change) { -3 }
 
           it 'should be marked as deleted' do
-            expect(resource).to be_persisted
             is_expected.to eq(204)
-            resource.reload
+            expect(resource.reload).to be_truthy
             expect(resource.is_deleted?).to be_truthy
+          end
+
+          it 'should be mark children as deleted' do
+            is_expected.to eq(204)
+            expect(folder.reload).to be_truthy
+            expect(folder.is_deleted?).to be_truthy
+            expect(child_file.reload).to be_truthy
+            expect(child_file.is_deleted?).to be_truthy
           end
         end
       end
