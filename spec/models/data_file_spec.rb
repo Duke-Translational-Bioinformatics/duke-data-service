@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
-  subject { FactoryGirl.create(:data_file) }
+  subject { child_file }
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { subject }
