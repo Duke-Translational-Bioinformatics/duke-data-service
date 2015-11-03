@@ -106,9 +106,12 @@ module DDS
         end
         authorize folder, :create?
         Audited.audit_class.as_user(current_user) do
-          folder.update(update_params)
-          annotate_audits [folder.audits.last]
-          folder
+          if folder.update(update_params)
+            annotate_audits [folder.audits.last]
+            folder
+          else
+            validation_error!(folder)
+          end
         end
       end
 
