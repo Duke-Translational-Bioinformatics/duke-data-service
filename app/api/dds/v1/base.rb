@@ -155,7 +155,7 @@ module DDS
       mount DDS::V1::FilesAPI
       mount DDS::V1::ProjectRolesAPI
       mount DDS::V1::StorageProvidersAPI
-      # mount DDS::V1::ParentChildrenAPI
+      mount DDS::V1::ChildrenAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

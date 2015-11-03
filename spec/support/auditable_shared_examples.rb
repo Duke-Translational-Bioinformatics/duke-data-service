@@ -106,6 +106,7 @@ shared_examples 'an audited endpoint' do
   let(:with_current_user) { true }
   let(:with_audited_parent) { false }
   let(:expected_audits) { 1 }
+  let(:expected_auditable_type) { resource_class.base_class.to_s }
 
   it 'should create an audit with the current_user as user, and url as audit_comment' do
     expect(current_user).to be_persisted
@@ -113,12 +114,12 @@ shared_examples 'an audited endpoint' do
       is_expected.to eq(expected_status)
     }.to change{
       Audited.audit_class.where(
-        auditable_type: resource_class.to_s
+        auditable_type: expected_auditable_type
       ).where(
         'comment @> ?', {action: called_action, endpoint: url}.to_json
       ).count }.by(expected_audits)
     last_audit = Audited.audit_class.where(
-      auditable_type: resource_class.to_s
+      auditable_type: expected_auditable_type
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last
@@ -143,13 +144,13 @@ shared_examples 'an audited endpoint' do
         is_expected.to eq(expected_status)
       }.to change{
         Audited.audit_class.where(
-          auditable_type: resource_class.to_s
+          auditable_type: expected_auditable_type
           ).where(
             'comment @> ?', {action: called_action, endpoint: url}.to_json
           ).count
       }.by(1)
       last_audit = Audited.audit_class.where(
-        auditable_type: resource_class.to_s
+        auditable_type: expected_auditable_type
       ).where(
         'comment @> ?', {action: called_action, endpoint: url}.to_json
       ).order(:created_at).last
