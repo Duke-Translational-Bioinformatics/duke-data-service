@@ -73,12 +73,9 @@ module DDS
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :destroy?
         Audited.audit_class.as_user(current_user) do
-          if folder.update(is_deleted: true)
-            annotate_audits [folder.audits.last]
-            body false
-          else
-            validation_error!(folder)
-          end
+          folder.update(is_deleted: true)
+          annotate_audits [folder.audits.last]
+          body false
         end
       end
 
