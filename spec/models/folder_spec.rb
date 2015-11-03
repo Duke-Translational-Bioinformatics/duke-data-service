@@ -45,6 +45,12 @@ RSpec.describe Folder, type: :model do
       should allow_value(false).for(:is_deleted)
     end
 
+    it 'should not be its own parent' do
+      should_not allow_value(subject).for(:parent)
+      expect(child_folder.reload).to be_truthy
+      should_not allow_value(subject.id).for(:parent_id)
+    end
+
     context 'with children' do
       subject { child_folder.parent }
 
@@ -54,24 +60,34 @@ RSpec.describe Folder, type: :model do
         should allow_value(false).for(:is_deleted)
       end
 
-      it 'should set is_deleted on children' do
-        expect(child_folder.is_deleted?).to be_falsey
-        should allow_value(true).for(:is_deleted)
-        expect(subject.save).to be_truthy
+      it 'should not allow child as parent' do
+        should_not allow_value(child_folder).for(:parent)
         expect(child_folder.reload).to be_truthy
-        expect(child_folder.is_deleted?).to be_truthy
+        should_not allow_value(child_folder.id).for(:parent_id)
       end
+    end
+  end
 
-      it 'should set is_deleted on grand-children' do
-        expect(grand_child_folder.is_deleted?).to be_falsey
-        expect(grand_child_file.is_deleted?).to be_falsey
-        should allow_value(true).for(:is_deleted)
-        expect(subject.save).to be_truthy
-        expect(grand_child_folder.reload).to be_truthy
-        expect(grand_child_file.reload).to be_truthy
-        expect(grand_child_folder.is_deleted?).to be_truthy
-        expect(grand_child_file.is_deleted?).to be_truthy
-      end
+  describe '.is_deleted= on parent' do
+    subject { child_folder.parent }
+
+    it 'should set is_deleted on children' do
+      expect(child_folder.is_deleted?).to be_falsey
+      should allow_value(true).for(:is_deleted)
+      expect(subject.save).to be_truthy
+      expect(child_folder.reload).to be_truthy
+      expect(child_folder.is_deleted?).to be_truthy
+    end
+
+    it 'should set is_deleted on grand-children' do
+      expect(grand_child_folder.is_deleted?).to be_falsey
+      expect(grand_child_file.is_deleted?).to be_falsey
+      should allow_value(true).for(:is_deleted)
+      expect(subject.save).to be_truthy
+      expect(grand_child_folder.reload).to be_truthy
+      expect(grand_child_file.reload).to be_truthy
+      expect(grand_child_folder.is_deleted?).to be_truthy
+      expect(grand_child_file.is_deleted?).to be_truthy
     end
   end
 

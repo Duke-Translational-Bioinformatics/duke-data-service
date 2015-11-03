@@ -193,6 +193,11 @@ describe DDS::V1::FoldersAPI do
         }}
       end
 
+      it_behaves_like 'a validated resource' do
+        let(:resource) { parent }
+        let(:new_parent) { folder }
+      end
+
       context 'with project as parent' do
         let(:new_parent) { project }
 
