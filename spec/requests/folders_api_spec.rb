@@ -162,7 +162,7 @@ describe DDS::V1::FoldersAPI do
       let(:payload) {{
         parent: { kind: new_parent.kind, id: new_parent.id }
       }}
-      
+
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'

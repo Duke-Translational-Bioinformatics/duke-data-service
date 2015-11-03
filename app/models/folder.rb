@@ -1,26 +1,12 @@
-class Folder < ActiveRecord::Base
-  include SerializedAudit
-  include Kinded
-  
-  audited
-  has_many :children, class_name: "Folder", foreign_key: "parent_id"
-  belongs_to :project
-	belongs_to :parent, class_name: "Folder"
-  has_many :project_permissions, through: :project
+# Folder and DataFile are siblings in the Container class through single table inheritance.
 
-  validates :name, presence: true
-  validates :project_id, presence: true
+class Folder < Container
+  has_many :children, class_name: "Container", foreign_key: "parent_id"
+
+  validates :project_id, presence: true, immutable: true
   validates :is_deleted, absence: true, if: :children_present?
-  
+
   def children_present?
     !children.empty?
-  end
-
-  def virtual_path
-    if parent
-      [parent.virtual_path, self.name].join('/')
-    else
-      "/#{self.name}"
-    end
   end
 end
