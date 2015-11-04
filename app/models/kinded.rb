@@ -5,6 +5,6 @@ module Kinded
   # make sure to call super(your_new_kind_name)
   def kind(kind_name=nil)
     kind_name ||= self.class.name
-    ['dds',kind_name.downcase].join('#')
+    ['dds',kind_name.downcase].join('-')
   end
 end

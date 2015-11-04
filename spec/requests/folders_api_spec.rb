@@ -6,6 +6,8 @@ describe DDS::V1::FoldersAPI do
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
+  
+  let(:child_file) { FactoryGirl.create(:data_file, parent: folder) }
   let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
@@ -15,7 +17,7 @@ describe DDS::V1::FoldersAPI do
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
-  let(:resource_id) { folder.id }
+  let(:resource_id) { resource.id }
   let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
 
   let(:project_id) { project.id}
@@ -128,14 +130,29 @@ describe DDS::V1::FoldersAPI do
           resource.reload
           expect(resource.is_deleted?).to be_truthy
         end
+      end
 
-        it_behaves_like 'a validated resource' do
-          let(:resource_id) { parent.id }
-          it 'should not persist changes' do
-            expect(resource).to be_persisted
-            expect {
-              is_expected.to eq(400)
-            }.not_to change{resource_class.count}
+      context 'with children' do
+        let(:resource) { parent }
+        let!(:child) { folder }
+        let!(:grand_child) { child_file }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
+          let(:expected_count_change) { -3 }
+
+          it 'should be marked as deleted' do
+            is_expected.to eq(204)
+            expect(resource.reload).to be_truthy
+            expect(resource.is_deleted?).to be_truthy
+          end
+
+          it 'should be mark children as deleted' do
+            is_expected.to eq(204)
+            expect(folder.reload).to be_truthy
+            expect(folder.is_deleted?).to be_truthy
+            expect(child_file.reload).to be_truthy
+            expect(child_file.is_deleted?).to be_truthy
           end
         end
       end
@@ -174,6 +191,11 @@ describe DDS::V1::FoldersAPI do
         let(:payload) {{
           parent: { kind: new_parent.kind, id: 'notfoundid' }
         }}
+      end
+
+      it_behaves_like 'a validated resource' do
+        let(:resource) { parent }
+        let(:new_parent) { folder }
       end
 
       context 'with project as parent' do

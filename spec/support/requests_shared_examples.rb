@@ -183,6 +183,7 @@ end
 
 shared_examples 'a removable resource' do
   let(:resource_counter) { resource_class }
+  let(:expected_count_change) { -1 }
 
   it 'should return an empty 204 response' do
     is_expected.to eq(204)
@@ -194,7 +195,7 @@ shared_examples 'a removable resource' do
     expect(resource).to be_persisted
     expect {
       is_expected.to eq(204)
-    }.to change{resource_counter.count}.by(-1)
+    }.to change{resource_counter.count}.by(expected_count_change)
   end
 end
 

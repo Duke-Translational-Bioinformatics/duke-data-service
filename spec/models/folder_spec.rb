@@ -3,6 +3,9 @@ require 'rails_helper'
 RSpec.describe Folder, type: :model do
   subject { child_folder }
   let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
+  let(:root_folder) { FactoryGirl.create(:folder, :root) }
+  let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
+  let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
@@ -42,13 +45,49 @@ RSpec.describe Folder, type: :model do
       should allow_value(false).for(:is_deleted)
     end
 
+    it 'should not be its own parent' do
+      should_not allow_value(subject).for(:parent)
+      expect(child_folder.reload).to be_truthy
+      should_not allow_value(subject.id).for(:parent_id)
+    end
+
     context 'with children' do
       subject { child_folder.parent }
 
-      it 'should not allow is_deleted to be set to true' do
-        should_not allow_value(true).for(:is_deleted)
+      it 'should allow is_deleted to be set to true' do
+        should allow_value(true).for(:is_deleted)
+        expect(subject.is_deleted?).to be_truthy
         should allow_value(false).for(:is_deleted)
       end
+
+      it 'should not allow child as parent' do
+        should_not allow_value(child_folder).for(:parent)
+        expect(child_folder.reload).to be_truthy
+        should_not allow_value(child_folder.id).for(:parent_id)
+      end
+    end
+  end
+
+  describe '.is_deleted= on parent' do
+    subject { child_folder.parent }
+
+    it 'should set is_deleted on children' do
+      expect(child_folder.is_deleted?).to be_falsey
+      should allow_value(true).for(:is_deleted)
+      expect(subject.save).to be_truthy
+      expect(child_folder.reload).to be_truthy
+      expect(child_folder.is_deleted?).to be_truthy
+    end
+
+    it 'should set is_deleted on grand-children' do
+      expect(grand_child_folder.is_deleted?).to be_falsey
+      expect(grand_child_file.is_deleted?).to be_falsey
+      should allow_value(true).for(:is_deleted)
+      expect(subject.save).to be_truthy
+      expect(grand_child_folder.reload).to be_truthy
+      expect(grand_child_file.reload).to be_truthy
+      expect(grand_child_folder.is_deleted?).to be_truthy
+      expect(grand_child_file.is_deleted?).to be_truthy
     end
   end
 
@@ -69,6 +108,7 @@ RSpec.describe Folder, type: :model do
       expect(parsed_json).to have_key('name')
       expect(parsed_json).to have_key('project')
       expect(parsed_json['project']).to have_key('id')
+      expect(parsed_json).to have_key('virtual_path')
       expect(parsed_json).to have_key('is_deleted')
 
       expect(parsed_json['id']).to eq(subject.id)
@@ -79,8 +119,27 @@ RSpec.describe Folder, type: :model do
       expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
     end
 
+    describe 'virtual_path' do
+      it 'should return the project and parent' do
+        expect(subject.project).to be
+        expect(subject.parent).to be
+        expect(parsed_json['virtual_path']).to eq [
+          { 
+            'kind' => subject.project.kind,
+            'id' => subject.project.id,
+            'name' => subject.project.name 
+          },
+          { 
+            'kind' => subject.parent.kind,
+            'id' => subject.parent.id,
+            'name' => subject.parent.name 
+          }
+        ]
+      end
+    end
+
     context 'without a parent' do
-      subject { FactoryGirl.create(:folder, :root) }
+      subject { root_folder }
 
       it 'should have expected keys and values' do
         expect(parsed_json).to have_key('parent')
@@ -89,20 +148,18 @@ RSpec.describe Folder, type: :model do
 
         expect(parsed_json['parent']['kind']).to eq(subject.project.kind)
         expect(parsed_json['parent']['id']).to eq(subject.project.id)
-    end
-    end
-  end
+      end
 
-  describe 'instance methods' do
-    it 'should support virtual_path' do
-      expect(subject).to respond_to(:virtual_path)
-      if subject.parent
-        expect(subject.virtual_path).to eq([
-          subject.parent.virtual_path,
-          subject.name
-        ].join('/'))
-      else
-        expect(subject.virtual_path).to eq("/#{subject.name}")
+      describe 'virtual_path' do
+        it 'should return the project' do
+          expect(subject.project).to be
+          expect(parsed_json['virtual_path']).to eq [
+            { 
+              'kind' => subject.project.kind,
+              'id' => subject.project.id,
+              'name' => subject.project.name }
+          ]
+        end
       end
     end
   end

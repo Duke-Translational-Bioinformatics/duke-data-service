@@ -10,11 +10,11 @@ module DDS
           [404, 'Folder does not exist']
         ]
       end
-      get '/folders/:id/children', root: false do
+      get '/folders/:id/children', root: 'results' do
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :show?
-        #folder
+        folder.children.where(is_deleted: false)
       end
 
       desc 'List project children' do
@@ -26,11 +26,11 @@ module DDS
           [404, 'Project does not exist']
         ]
       end
-      get '/projects/:id/children', root: false do
+      get '/projects/:id/children', root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :show?
-        #folder
+        project.children.where(is_deleted: false)
       end
     end
   end
