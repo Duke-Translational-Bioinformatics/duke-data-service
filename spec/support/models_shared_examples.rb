@@ -3,7 +3,7 @@ shared_examples 'a kind' do
   let(:serialized_kind) { true }
   it 'should have a kind' do
     expect(subject).to respond_to('kind')
-    expected_kind = ['dds', kind_name.downcase].join('#')
+    expected_kind = ['dds', kind_name.downcase].join('-')
     expect(subject.kind).to eq(expected_kind)
   end
 
