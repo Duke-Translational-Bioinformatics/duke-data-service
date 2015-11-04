@@ -33,6 +33,14 @@ RSpec.describe Project, type: :model do
     it 'should have many affiliations' do
       should have_many(:affiliations)
     end
+
+    it 'should have many children' do
+      should have_many(:children).class_name('Container').conditions(parent_id: nil)
+    end
+
+    it 'should have many containers' do
+      should have_many(:containers)
+    end
   end
 
   describe 'validations' do

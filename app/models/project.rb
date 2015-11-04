@@ -9,7 +9,8 @@ class Project < ActiveRecord::Base
   has_many :uploads
   has_many :affiliations
   has_many :data_files
-  has_many :children, -> { where parent_id: nil }, class_name: "Container", foreign_key: "project_id"
+  has_many :children, -> { where parent_id: nil }, class_name: "Container"
+  has_many :containers
 
   validates :name, presence: true, uniqueness: true
   validates :description, presence: true

@@ -11,6 +11,7 @@ describe DDS::V1::ChildrenAPI do
   let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
   let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
   let(:root_deleted_folder) { FactoryGirl.create(:folder, :deleted, :root, project: project) }
+  let(:named_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX folder', project: project) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
@@ -26,7 +27,8 @@ describe DDS::V1::ChildrenAPI do
   let(:parent_id) { parent.id }
 
   describe 'Folder children collection' do
-    let(:url) { "/api/v1/folders/#{parent_id}/children" }
+    let(:query_params) { '' }
+    let(:url) { "/api/v1/folders/#{parent_id}/children#{query_params}" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -64,7 +66,8 @@ describe DDS::V1::ChildrenAPI do
     let(:resource) { root_folder }
     let(:parent_id) { project.id }
     let(:parent) { project }
-    let(:url) { "/api/v1/projects/#{parent_id}/children" }
+    let(:query_params) { '' }
+    let(:url) { "/api/v1/projects/#{parent_id}/children#{query_params}" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -84,6 +87,45 @@ describe DDS::V1::ChildrenAPI do
         let(:parent) { folder.project }
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { 2 }
+        end
+      end
+
+      context 'with name_contains query parameter' do
+        let(:resource) { named_folder }
+        let(:query_params) { "?name_contains=#{name_contains}" }
+
+        describe 'empty string' do
+          let(:name_contains) { '' }
+          it_behaves_like 'a listable resource' do
+            let(:expected_list_length) { 2 }
+            let(:unexpected_resources) { [
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
+
+        describe 'string without matches' do
+          let(:name_contains) { 'name_without_matches' }
+          it_behaves_like 'a listable resource' do
+            let(:expected_list_length) { 0 }
+            let(:unexpected_resources) { [
+              resource,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
+
+        describe 'string with a match' do
+          let(:name_contains) { 'XXXX' }
+          it_behaves_like 'a listable resource' do
+            let(:expected_list_length) { 1 }
+            let(:unexpected_resources) { [
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
         end
       end
 
