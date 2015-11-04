@@ -50,7 +50,7 @@ shared_examples 'with a serialized audit' do
     expect(audit).to have_key(:created_by)
     creation_audit = subject.audits.where(action: "create").first
     expect(creation_audit).to be
-    expect(audit[:created_on].to_i).to eq(creation_audit.created_at.to_i)
+    expect(audit[:created_on].to_i).to be_within(1).of(creation_audit.created_at.to_i)
     if creation_audit.user_id
       creator = User.find(creation_audit.user_id)
       expect(audit[:created_by]).to eq({
@@ -66,7 +66,7 @@ shared_examples 'with a serialized audit' do
     expect(audit).to have_key(:last_updated_by)
     last_update_audit = subject.audits.where(action: "update").last
     expect(last_update_audit).to be
-    expect(audit[:last_updated_on].to_i).to eq(last_update_audit.created_at.to_i)
+    expect(audit[:last_updated_on].to_i).to be_within(1).of(last_update_audit.created_at.to_i)
     updator = User.find(last_update_audit.user_id)
     expect(audit[:last_updated_by]).to eq({
       id: updator.id,
@@ -80,7 +80,7 @@ shared_examples 'with a serialized audit' do
       subject.audits.where(action: "update").where('comment @> ?', {action: 'DELETE'}.to_json).first :
       subject.audits.where(action: "destroy").first
     expect(delete_audit).to be
-    expect(audit[:deleted_on].to_i).to eq(delete_audit.created_at.to_i)
+    expect(audit[:deleted_on].to_i).to be_within(1).of(delete_audit.created_at.to_i)
     deleter = User.find(delete_audit.user_id)
     expect(audit[:deleted_by]).to eq({
       id: deleter.id,
