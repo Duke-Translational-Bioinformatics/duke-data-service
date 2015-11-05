@@ -1037,7 +1037,10 @@ Generates a storage provider specific pre-signed URL to use for file download, t
 ## Group Uploads
 All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following endpoints must be used by the client to manage the chunked upload process.
 
-## Uploads collection [/uploads]
+## Uploads collection [/projects/{id}/uploads]
++ Parameters
+    + id (required, string, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... Globally unique `id` of the project.
+
 
 ### Initiate chunked upload [POST]
 This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client to track the progress of the chunked upload.
@@ -1047,8 +1050,6 @@ This is the first step in uploading a large file. An upload objects is created a
 
 >**Request Properties**
 - - - - -
-+ parent.kind (string, required) - The kind of parent container for the upload; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
-+ parent.id (string, required) - The unique id of the parent.
 + name (string, required) - The name of the client file to upload.
 + content_type (string, optional) - Valid type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + size (number, required) - The size in bytes (computed by client).
@@ -1064,7 +1065,6 @@ This is the first step in uploading a large file. An upload objects is created a
 + Request (application/json)
 
         {
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
@@ -1075,7 +1075,7 @@ This is the first step in uploading a large file. An upload objects is created a
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
@@ -1104,7 +1104,7 @@ This is the first step in uploading a large file. An upload objects is created a
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
