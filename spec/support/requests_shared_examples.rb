@@ -47,6 +47,29 @@ shared_examples 'a listable resource' do
   end
 end
 
+shared_examples 'a searchable resource' do
+  let(:expected_resources) { [] }
+  let(:unexpected_resources) { [] }
+  before do
+    expect(expected_resources).to be_a(Array)
+    expect(unexpected_resources).to be_a(Array)
+  end
+
+  it 'should include expected resources' do
+    is_expected.to eq(200)
+    expected_resources.each do |expected_resource|
+      expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+    end
+  end
+
+  it 'should not include unexpected resources' do
+    is_expected.to eq(200)
+    unexpected_resources.each do |unexpected_resource|
+      expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
+    end
+  end
+end
+
 shared_examples 'a paginated resource' do
   let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }

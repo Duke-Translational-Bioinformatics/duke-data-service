@@ -11,7 +11,8 @@ describe DDS::V1::ChildrenAPI do
   let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
   let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
   let(:root_deleted_folder) { FactoryGirl.create(:folder, :deleted, :root, project: project) }
-  let(:named_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX folder', project: project) }
+  let(:named_root_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX root folder', project: project) }
+  let(:named_child_folder) { FactoryGirl.create(:folder, name: 'The XXXX child folder', parent: root_folder, project: project) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
@@ -91,13 +92,17 @@ describe DDS::V1::ChildrenAPI do
       end
 
       context 'with name_contains query parameter' do
-        let(:resource) { named_folder }
         let(:query_params) { "?name_contains=#{name_contains}" }
 
         describe 'empty string' do
           let(:name_contains) { '' }
-          it_behaves_like 'a listable resource' do
-            let(:expected_list_length) { 3 }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              folder,
+              root_folder,
+              named_child_folder,
+              named_root_folder
+            ] }
             let(:unexpected_resources) { [
               root_deleted_folder,
               other_folder
@@ -107,10 +112,13 @@ describe DDS::V1::ChildrenAPI do
 
         describe 'string without matches' do
           let(:name_contains) { 'name_without_matches' }
-          it_behaves_like 'a listable resource' do
-            let(:expected_list_length) { 0 }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
             let(:unexpected_resources) { [
-              resource,
+              root_folder,
+              named_root_folder,
+              named_child_folder,
               root_deleted_folder,
               other_folder
             ] }
@@ -119,9 +127,13 @@ describe DDS::V1::ChildrenAPI do
 
         describe 'string with a match' do
           let(:name_contains) { 'XXXX' }
-          it_behaves_like 'a listable resource' do
-            let(:expected_list_length) { 1 }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_root_folder,
+              named_child_folder
+            ] }
             let(:unexpected_resources) { [
+              root_folder,
               root_deleted_folder,
               other_folder
             ] }
