@@ -6,16 +6,16 @@ describe DDS::V1::ChildrenAPI do
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
-  let(:file) { FactoryGirl.create(:data_file, parent: parent) }
+  let(:file) { FactoryGirl.create(:data_file, parent: parent, project: project) }
 
   let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
   let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
   let(:root_deleted_folder) { FactoryGirl.create(:folder, :deleted, :root, project: project) }
 
   let(:named_root_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX root folder', project: project) }
-  let(:named_child_folder) { FactoryGirl.create(:folder, name: 'The XXXX child folder', parent: root_folder, project: project) }
+  let(:named_child_folder) { FactoryGirl.create(:folder, name: 'The XXXX child folder', parent: folder, project: project) }
   let(:named_root_file) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root file', project: project) }
-  let(:named_child_file) { FactoryGirl.create(:data_file, name: 'The XXXX child file', parent: root_folder, project: project) }
+  let(:named_child_file) { FactoryGirl.create(:data_file, name: 'The XXXX child file', parent: folder, project: project) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
@@ -42,10 +42,62 @@ describe DDS::V1::ChildrenAPI do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { 1 }
         let!(:unexpected_resources) { [
+          named_child_folder,
           deleted_folder,
           other_folder
         ] }
       end
+
+      context 'with name_contains query parameter' do
+        let(:query_params) { "?name_contains=#{name_contains}" }
+
+        describe 'empty string' do
+          let(:name_contains) { '' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              folder,
+              named_child_folder
+            ] }
+            let(:unexpected_resources) { [
+              root_folder,
+              named_root_folder,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
+
+        describe 'string without matches' do
+          let(:name_contains) { 'name_without_matches' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              root_folder,
+              named_root_folder,
+              named_child_folder,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
+
+        describe 'string with a match' do
+          let(:name_contains) { 'XXXX' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_child_folder
+            ] }
+            let(:unexpected_resources) { [
+              named_root_folder,
+              root_folder,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
+      end
+
 
       context 'with file child' do
         let(:resource_class) { file_class }
@@ -54,6 +106,58 @@ describe DDS::V1::ChildrenAPI do
 
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { 2 }
+        end
+
+        context 'with name_contains query parameter' do
+          let(:query_params) { "?name_contains=#{name_contains}" }
+
+          describe 'empty string' do
+            let(:name_contains) { '' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                file,
+                named_child_file
+              ] }
+              let(:unexpected_resources) { [
+                named_root_file,
+                root_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'string without matches' do
+            let(:name_contains) { 'name_without_matches' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+              ] }
+              let(:unexpected_resources) { [
+                file,
+                root_file,
+                named_root_file,
+                named_child_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'string with a match' do
+            let(:name_contains) { 'XXXX' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                named_child_file,
+              ] }
+              let(:unexpected_resources) { [
+                file,
+                named_root_file,
+                root_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
         end
       end
 
@@ -71,7 +175,6 @@ describe DDS::V1::ChildrenAPI do
   describe 'Project children collection' do
     let(:resource) { root_folder }
     let(:parent_id) { project.id }
-    let(:parent) { project }
     let(:query_params) { '' }
     let(:url) { "/api/v1/projects/#{parent_id}/children#{query_params}" }
 
@@ -151,6 +254,7 @@ describe DDS::V1::ChildrenAPI do
             let(:name_contains) { '' }
             it_behaves_like 'a searchable resource' do
               let(:expected_resources) { [
+                file,
                 root_file,
                 named_root_file,
                 named_child_file,
@@ -168,6 +272,7 @@ describe DDS::V1::ChildrenAPI do
               let(:expected_resources) { [
               ] }
               let(:unexpected_resources) { [
+                file,
                 root_file,
                 named_root_file,
                 named_child_file,
@@ -185,6 +290,7 @@ describe DDS::V1::ChildrenAPI do
                 named_child_file,
               ] }
               let(:unexpected_resources) { [
+                file,
                 root_file,
                 deleted_file,
                 other_file
