@@ -11,12 +11,17 @@ describe DDS::V1::ChildrenAPI do
   let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
   let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
   let(:root_deleted_folder) { FactoryGirl.create(:folder, :deleted, :root, project: project) }
+
   let(:named_root_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX root folder', project: project) }
   let(:named_child_folder) { FactoryGirl.create(:folder, name: 'The XXXX child folder', parent: root_folder, project: project) }
+  let(:named_root_file) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root file', project: project) }
+  let(:named_child_file) { FactoryGirl.create(:data_file, name: 'The XXXX child file', parent: root_folder, project: project) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
-  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project, parent: parent) }
+  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project, parent: folder) }
+  let(:other_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
+  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: project, parent: folder) }
 
   let(:file_class) { DataFile }
   let(:file_serializer) { DataFileSerializer }
@@ -81,16 +86,6 @@ describe DDS::V1::ChildrenAPI do
         ] }
       end
 
-      context 'with file child' do
-        let(:resource_class) { file_class }
-        let(:resource_serializer) { file_serializer }
-        let!(:resource) { root_file }
-        let(:parent) { folder.project }
-        it_behaves_like 'a listable resource' do
-          let(:expected_list_length) { 2 }
-        end
-      end
-
       context 'with name_contains query parameter' do
         let(:query_params) { "?name_contains=#{name_contains}" }
 
@@ -137,6 +132,64 @@ describe DDS::V1::ChildrenAPI do
               root_deleted_folder,
               other_folder
             ] }
+          end
+        end
+      end
+
+      context 'with file child' do
+        let(:resource_class) { file_class }
+        let(:resource_serializer) { file_serializer }
+        let!(:resource) { root_file }
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { 2 }
+        end
+
+        context 'with name_contains query parameter' do
+          let(:query_params) { "?name_contains=#{name_contains}" }
+
+          describe 'empty string' do
+            let(:name_contains) { '' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                root_file,
+                named_root_file,
+                named_child_file,
+              ] }
+              let(:unexpected_resources) { [
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'string without matches' do
+            let(:name_contains) { 'name_without_matches' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+              ] }
+              let(:unexpected_resources) { [
+                root_file,
+                named_root_file,
+                named_child_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'string with a match' do
+            let(:name_contains) { 'XXXX' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                named_root_file,
+                named_child_file,
+              ] }
+              let(:unexpected_resources) { [
+                root_file,
+                deleted_file,
+                other_file
+              ] }
+            end
           end
         end
       end
