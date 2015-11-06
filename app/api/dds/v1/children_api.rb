@@ -10,11 +10,20 @@ module DDS
           [404, 'Folder does not exist']
         ]
       end
+      params do
+        optional :name_contains, type: String, desc: 'list children whose name contains this string'
+      end
       get '/folders/:id/children', root: 'results' do
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :show?
-        folder.children.where(is_deleted: false)
+        name_contains = params[:name_contains]
+        if name_contains.nil? # return only the direct children
+          descendants = folder.children
+        else # return all descendants that have the name_contains in there name field
+          descendants = folder.descendants.where("name like ?", "%#{name_contains}%")
+        end
+        descendants.where(is_deleted: false)
       end
 
       desc 'List project children' do
@@ -34,12 +43,12 @@ module DDS
         name_contains = params[:name_contains]
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :show?
-        if name_contains.nil? # return only the direct children
-          decendants = project.children
-        else # return all decendants that have the name_contains in there name field
-          decendants = project.containers.where("name like ?", "%#{name_contains}%")
+        if name_contains.nil?
+          descendants = project.children
+        else
+          descendants = project.containers.where("name like ?", "%#{name_contains}%")
         end
-        decendants.where(is_deleted: false)
+        descendants.where(is_deleted: false)
       end
     end
   end
