@@ -54,6 +54,7 @@ RSpec.describe ProjectPermission, type: :model do
       expect(parsed_json).to have_key('auth_role')
       expect(parsed_json['user']).to eq({
         'id' => subject.user.id,
+        'username' => subject.user.username,
         'full_name' => subject.user.display_name
       })
       expect(subject.auth_role).to be
