@@ -74,7 +74,7 @@ RSpec.describe DataFile, type: :model do
       expect(parsed_json).to have_key('parent')
       expect(parsed_json).to have_key('name')
       expect(parsed_json).to have_key('project')
-      expect(parsed_json).to have_key('virtual_path')
+      expect(parsed_json).to have_key('ancestors')
       expect(parsed_json).to have_key('is_deleted')
       expect(parsed_json).to have_key('upload')
       expect(parsed_json['id']).to eq(subject.id)
@@ -85,13 +85,13 @@ RSpec.describe DataFile, type: :model do
       expect(parsed_json['upload']['id']).to eq(subject.upload_id)
     end
 
-    describe 'virtual_path' do
+    describe 'ancestors' do
       context 'with a parent folder' do
         subject { child_file }
         it 'should return the project and parent' do
           expect(subject.project).to be
           expect(subject.parent).to be
-          expect(parsed_json['virtual_path']).to eq [
+          expect(parsed_json['ancestors']).to eq [
             {
               'kind' => subject.project.kind,
               'id' => subject.project.id,
@@ -110,7 +110,7 @@ RSpec.describe DataFile, type: :model do
         subject { root_file }
         it 'should return the project' do
           expect(subject.project).to be
-          expect(parsed_json['virtual_path']).to eq [
+          expect(parsed_json['ancestors']).to eq [
             {
               'kind' => subject.project.kind,
               'id' => subject.project.id,
