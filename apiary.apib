@@ -829,7 +829,6 @@ A folder is a container for files and sub-folders; folders are located in the to
         }
 
 ## Rename folder [PUT /folders/{id}/rename]
-
 >**Permission:** create_file
 - - - - -
 
@@ -912,6 +911,34 @@ This is the first step in uploading a large file. An upload objects is created a
                 "error_message": null
             },
             "audit": { }
+        }
+
+### List chunked uploads [GET]
+>**Permission:** create_file
+- - - - -
+
++ Response 201 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "content_type": "application/octet-stream",
+                    "size": 30024000,
+                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+                    "chunks": [ ],
+                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+                    "status": {
+                        "initiated_on": "2015-07-10T13:00:00Z",
+                        "completed_on": null,
+                        "error_on": null,
+                        "error_message": null
+                    },
+                    "audit": { }
+                }
+            ]
         }
 
 ## Upload instance [/uploads/{id}]
