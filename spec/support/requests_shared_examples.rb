@@ -11,7 +11,7 @@ shared_context 'with authentication' do
   include_context 'common headers'
   let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:current_user) { user_auth.user }
-  let (:api_token) { user_auth.api_token }
+  let(:api_token) { user_auth.api_token }
   let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
 end
 

@@ -97,7 +97,7 @@ describe DDS::V1::ChildrenAPI do
         describe 'empty string' do
           let(:name_contains) { '' }
           it_behaves_like 'a listable resource' do
-            let(:expected_list_length) { 2 }
+            let(:expected_list_length) { 3 }
             let(:unexpected_resources) { [
               root_deleted_folder,
               other_folder
