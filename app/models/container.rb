@@ -16,14 +16,4 @@ class Container < ActiveRecord::Base
       [project]
     end
   end
-
-  def virtual_path
-    ancestors.collect do |a|
-      {
-        kind: a.kind,
-        id: a.id,
-        name: a.name
-      }
-    end
-  end
 end

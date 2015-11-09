@@ -8,7 +8,11 @@ class UserSerializer < ActiveModel::Serializer
              :email,
              :audit,
              :auth_provider,
-             :last_login_at
+             :last_login_on
+
+  def last_login_on
+    object.last_login_at
+  end
 
   def full_name
     object.display_name

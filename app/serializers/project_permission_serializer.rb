@@ -5,6 +5,7 @@ class ProjectPermissionSerializer < ActiveModel::Serializer
   def user
     {
       id: object.user.id,
+      username: object.user.username,
       full_name: object.user.display_name
     }
   end
