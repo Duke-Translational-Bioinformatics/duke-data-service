@@ -63,6 +63,7 @@ RSpec.describe AuthRole, type: :model do
       payload = serializer.to_json
       expect(payload).to be
       parsed_json = JSON.parse(payload)
+      permissions_parsed = parsed_json['permissions'].collect { |c| c['id'] }
       expect(parsed_json).to have_key('id')
       expect(parsed_json).to have_key('name')
       expect(parsed_json).to have_key('description')
@@ -72,9 +73,9 @@ RSpec.describe AuthRole, type: :model do
       expect(parsed_json['id']).to eq(subject.id)
       expect(parsed_json['name']).to eq(subject.name)
       expect(parsed_json['description']).to eq(subject.description)
-      expect(parsed_json['permissions']).to eq(subject.permissions)
       expect(parsed_json['contexts']).to eq(subject.contexts)
       expect(parsed_json['is_deprecated']).to eq(subject.is_deprecated)
+      expect(permissions_parsed).to eq(subject.permissions)
     end
   end
 end

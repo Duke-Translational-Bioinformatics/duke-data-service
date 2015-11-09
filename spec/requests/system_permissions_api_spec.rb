@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::SystemPermissionsAPI do
   include_context 'with authentication'
-  
+
   let(:system_permission) { FactoryGirl.create(:system_permission) }
   let(:other_permission) { FactoryGirl.create(:system_permission) }
   let!(:auth_role) { FactoryGirl.create(:auth_role, :system) }
@@ -45,7 +45,7 @@ describe DDS::V1::SystemPermissionsAPI do
       end
 
       it_behaves_like 'an updatable resource'
-      
+
       it_behaves_like 'a validated resource' do
         let!(:payload) {{
           auth_role: {id: invalid_auth_role.id}

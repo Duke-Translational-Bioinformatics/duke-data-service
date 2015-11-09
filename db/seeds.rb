@@ -7,6 +7,13 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 [
     {
+      id: "system_admin",
+      name: "System Admin",
+      description: "Can administrate the system",
+      contexts: %w(system),
+      permissions: %w(system_admin)
+    },
+    {
       id: "project_admin",
       name: "Project Admin",
       description: "Can update project details, delete project, manage project level permissions and perform all file operations",
