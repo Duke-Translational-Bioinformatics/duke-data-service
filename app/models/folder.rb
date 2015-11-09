@@ -11,11 +11,10 @@ class Folder < Container
       record.parent.reload.ancestors.include?(record)
   end
 
-  #returns all decendents of a folder through a recursive call
   def descendants
-    if children
-      children << children.collect { |c| c.descendants }
-    end
+    descendants = project.containers.select { |c| c.ancestors.include?(self) }
+    descendants_id = descendants.collect { |d| d.id }
+    project.containers.where( 'id in (?)', descendants_id )
   end
 
   def is_deleted=(val)

@@ -18,9 +18,9 @@ module DDS
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :show?
         name_contains = params[:name_contains]
-        if name_contains.nil? # return only the direct children
+        if name_contains.nil?
           descendants = folder.children
-        else # return all descendants that have the name_contains in there name field
+        else
           descendants = folder.descendants.where("name like ?", "%#{name_contains}%")
         end
         descendants.where(is_deleted: false)
