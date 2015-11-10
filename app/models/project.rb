@@ -9,7 +9,7 @@ class Project < ActiveRecord::Base
   has_many :uploads
   has_many :affiliations
   has_many :data_files
-  has_many :children, -> { where parent_id: nil }, class_name: "Container"
+  has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
 
   validates :name, presence: true, uniqueness: true
@@ -27,5 +27,14 @@ class Project < ActiveRecord::Base
       )
       pp
     end
+  end
+
+  def is_deleted=(val)
+    if val
+      children.each do |child|
+        child.is_deleted = true
+      end
+    end
+    super(val)
   end
 end

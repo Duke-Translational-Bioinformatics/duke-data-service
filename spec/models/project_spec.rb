@@ -84,6 +84,37 @@ RSpec.describe Project, type: :model do
     end
   end
 
+  context 'with descendants' do
+    let(:folder) { FactoryGirl.create(:folder, :root, project: subject) }
+    let(:child_folder) { FactoryGirl.create(:folder, parent: folder, project: subject) }
+    let(:grandchild_folder) { FactoryGirl.create(:folder, parent: child_folder, project: subject) }
+    let(:grandchild_file) { FactoryGirl.create(:data_file, parent: child_folder, project: subject) }
+    let(:child_file) { FactoryGirl.create(:data_file, parent: folder, project: subject) }
+    let(:file) { FactoryGirl.create(:data_file, :root, project: subject) }
+    let(:descendants) { [
+      file, folder,
+      child_file, child_folder,
+      grandchild_file, grandchild_folder
+    ] }
+
+    describe '.is_deleted=' do
+      it 'should set is_deleted on containers' do
+        expect(subject.is_deleted?).to be_falsey
+        expect(descendants).to be_a Array
+        descendants.each do |child|
+          expect(child.is_deleted?).to be_falsey
+        end
+        should allow_value(true).for(:is_deleted)
+        expect(subject.save).to be_truthy
+        expect(subject.is_deleted?).to be_truthy
+        descendants.each do |child|
+          expect(child.reload).to be_truthy
+          expect(child.is_deleted?).to be_truthy
+        end
+      end
+    end
+  end
+
   describe 'serialization' do
     it 'should serialize to json' do
       serializer = ProjectSerializer.new subject
