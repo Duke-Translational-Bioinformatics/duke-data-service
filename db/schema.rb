@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151029161136) do
+ActiveRecord::Schema.define(version: 20151110145610) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,14 +50,14 @@ ActiveRecord::Schema.define(version: 20151029161136) do
   add_index "audits", ["user_id", "user_type"], name: "user_index", using: :btree
 
   create_table "auth_roles", id: false, force: :cascade do |t|
-    t.string   "id",            null: false
+    t.string   "id",                            null: false
     t.string   "name"
     t.string   "description"
     t.jsonb    "permissions"
     t.jsonb    "contexts"
-    t.boolean  "is_deprecated"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.boolean  "is_deprecated", default: false, null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   add_index "auth_roles", ["contexts"], name: "index_auth_roles_on_contexts", using: :gin
@@ -122,12 +122,12 @@ ActiveRecord::Schema.define(version: 20151029161136) do
   end
 
   create_table "project_roles", id: false, force: :cascade do |t|
-    t.string   "id",            null: false
+    t.string   "id",                            null: false
     t.string   "name"
     t.string   "description"
-    t.boolean  "is_deprecated"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.boolean  "is_deprecated", default: false, null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "projects", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
@@ -151,9 +151,9 @@ ActiveRecord::Schema.define(version: 20151029161136) do
     t.string   "service_pass"
     t.string   "primary_key"
     t.string   "secondary_key"
-    t.boolean  "is_deprecated"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.boolean  "is_deprecated",    default: false, null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "system_permissions", force: :cascade do |t|

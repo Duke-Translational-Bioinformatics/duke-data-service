@@ -10,7 +10,6 @@ FactoryGirl.define do
     service_pass { Faker::Internet.password }
     primary_key { SecureRandom.hex }
     secondary_key { SecureRandom.hex }
-    is_deprecated false
 
     trait :swift do
       name { ENV['SWIFT_ACCT'] || Faker::Name.name }

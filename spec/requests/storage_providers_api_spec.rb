@@ -15,7 +15,16 @@ describe DDS::V1::StorageProvidersAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it_behaves_like 'a listable resource'
+      it_behaves_like 'a listable resource' do
+        it 'should only return false or true for is_deprecated' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json['results'].first['is_deprecated']).to_not be(nil)
+          expect(response_json['results'].first['is_deprecated']).to be(false)
+          expect(response.body).not_to eq('null')
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
     end
   end

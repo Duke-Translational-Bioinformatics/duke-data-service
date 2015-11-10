@@ -26,6 +26,14 @@ describe DDS::V1::AuthRolesAPI do
           expect(response.body).to include(resource_serializer.new(resource).to_json)
           expect(response.body).not_to include(resource_serializer.new(other_context_auth_role).to_json)
         end
+
+        it 'should only return false or true for is_deprecated' do
+          is_expected.to eq(200)
+          response_json = JSON.parse(response.body)
+          expect(response_json['results'].first['is_deprecated']).to_not be(nil)
+          expect(response_json['results'].first['is_deprecated']).to be(false)
+          expect(response.body).not_to eq('null')
+        end
       end
 
       it_behaves_like 'an authenticated resource'

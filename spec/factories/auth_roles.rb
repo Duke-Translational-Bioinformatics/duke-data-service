@@ -5,7 +5,6 @@ FactoryGirl.define do
     description { Faker::Hacker.say_something_smart }
     permissions { (0..Faker::Number.digit.to_i).collect { Faker::Internet.domain_word } }
     contexts  { (0..Faker::Number.digit.to_i).collect { Faker::Internet.slug } }
-    is_deprecated false
 
     trait :system do
       contexts %w(system)
