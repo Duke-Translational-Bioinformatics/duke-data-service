@@ -194,7 +194,6 @@ Represents the currently authenticated user.
                 "source": "duke_shibboleth",
                 "uid": "gardner100"
             },
-            "auth_role": { "id": "system_admin", "name": "System Admin" },
             "last_login_on": "2015-01-01T12:00:00Z",
             "audit": { }
         }
@@ -253,7 +252,6 @@ Represents registered users.
                         "source": "duke_shibboleth",
                         "uid": "gardner100"
                     },
-                    "auth_role": { "id": "system_admin", "name": "System Admin" },
                     "last_login_on": "2015-01-01T12:00:00Z",
                     "audit": { }
                 }
@@ -829,7 +827,6 @@ A folder is a container for files and sub-folders; folders are located in the to
         }
 
 ## Rename folder [PUT /folders/{id}/rename]
-
 >**Permission:** create_file
 - - - - -
 
@@ -855,6 +852,214 @@ A folder is a container for files and sub-folders; folders are located in the to
                 { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc", "name": "Flow Core" }
             ],
             "is_deleted": false,
+            "audit": { }
+        }
+
+## Group Uploads
+All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following endpoints must be used by the client to manage the chunked upload process.
+
+## Uploads collection [/projects/{id}/uploads]
++ Parameters
+    + id (required, string, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... Globally unique `id` of the project.
+
+### Initiate chunked upload [POST]
+This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client to track the progress of the chunked upload.
+
+>**Permission:** create_file
+- - - - -
+
+>**Request Properties**
+- - - - -
++ name (string, required) - The name of the client file to upload.
++ content_type (string, optional) - Valid type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
++ size (number, required) - The size in bytes (computed by client).
++ hash.value (number, required) - The files hash (computed by client).
++ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by the target storage provider.
+
+>**Response Properties**
+- - - - -
++ chunks (object) - The chunks the client has requested to upload.
++ storage_location (object) - Object that contains physical file storage details.
++ status (object) - Object used to track status of overall file upload.
+
++ Request (application/json)
+
+        {
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "chunks": [ ],
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": null,
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
+### List chunked uploads [GET]
+>**Permission:** create_file
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "content_type": "application/octet-stream",
+                    "size": 30024000,
+                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+                    "chunks": [ ],
+                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+                    "status": {
+                        "initiated_on": "2015-07-10T13:00:00Z",
+                        "completed_on": null,
+                        "error_on": null,
+                        "error_message": null
+                    },
+                    "audit": { }
+                }
+            ]
+        }
+
+## Upload instance [/uploads/{id}]
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
+## View upload [GET]
+
+>**Permission:** create_file
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "chunks": [
+              {
+                "number": 1,
+                "size": 10000,
+                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
+              }
+            ],
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": null,
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
+## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
+Generate a pre-signed URL that will be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this endpoint again to get a new pre-signed URL for the chunk number, then retry the upload.
+
+>**Permission:** create_file
+- - - - -
+
+>**Request Properties**
+- - - - -
++ number (number, required) - The chunk number.
++ size (number, required) - The size of the chunk in bytes (computed by client)
++ hash.value (string, required) - The chunk hash (computed by client).
++ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by storage provider.
+
+>**Response Properties**
+- - - - -
++ http_verb (string) - The http verb to use for uploading the next chunk.
++ host (string) - The storage provider host.
++ url (string) - The signed URL endpoint for uploading the next chunk to the storage provider.
++ http_headers (array) - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Request (application/json)
+
+        {
+            "number": 1,
+            "size": 5024000,
+            "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "http_verb": "PUT",
+            "host": "duke_data_service_prod.s3.amazonaws.com",
+            "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
+            "http_headers": [
+                    { "Content-Length": "5024000" }
+            ]
+        }
+
+## Complete chunked file upload [PUT /uploads/{id}/complete]
+This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
+
+>**Permission:** create_file
+- - - - -
+
+>**Rules**
+- - - - -
++ If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider endpoint to assemble the parts into a single file object.
++ The client reported file hash for each chunk must equal the storage provider computed file hash for the same chunk, or an upload error is reported.
++ The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
++ If there are no errors, the `upload_status.complete_on` is set to the current timestamp.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": true },
+            "chunks": [
+                {
+                    "number": 1,
+                    "size": 5024000,
+                    "hash": { "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", "algorithm": "md5" }
+                },
+                {
+                    "number": 2,
+                    "size": 5024000,
+                    "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
+                }
+            ],
+            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": "2015-07-10T13:00:00Z",
+                "error_on": null,
+                "error_message": null
+            },
             "audit": { }
         }
 
@@ -1030,187 +1235,6 @@ Generates a storage provider specific pre-signed URL to use for file download, t
                 "size": 30024000,
                 "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
                 "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
-            },
-            "audit": { }
-        }
-
-## Group Uploads
-All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following endpoints must be used by the client to manage the chunked upload process.
-
-## Uploads collection [/uploads]
-
-### Initiate chunked upload [POST]
-This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client to track the progress of the chunked upload.
-
->**Permission:** create_file
-- - - - -
-
->**Request Properties**
-- - - - -
-+ parent.kind (string, required) - The kind of parent container for the upload; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
-+ parent.id (string, required) - The unique id of the parent.
-+ name (string, required) - The name of the client file to upload.
-+ content_type (string, optional) - Valid type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
-+ size (number, required) - The size in bytes (computed by client).
-+ hash.value (number, required) - The files hash (computed by client).
-+ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by the target storage provider.
-
->**Response Properties**
-- - - - -
-+ chunks (object) - The chunks the client has requested to upload.
-+ storage_location (object) - Object that contains physical file storage details.
-+ status (object) - Object used to track status of overall file upload.
-
-+ Request (application/json)
-
-        {
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
-            "chunks": [ ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
-            "status": {
-                "initiated_on": "2015-07-10T13:00:00Z",
-                "completed_on": null,
-                "error_on": null,
-                "error_message": null
-            },
-            "audit": { }
-        }
-
-## Upload instance [/uploads/{id}]
-+ Parameters
-    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
-
-## View upload [GET]
-
->**Permission:** create_file
-- - - - -
-
-+ Response 200 (application/json)
-
-        {
-            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "parent": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
-            "chunks": [
-              {
-                "number": 1,
-                "size": 10000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
-              }
-            ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
-            "status": {
-                "initiated_on": "2015-07-10T13:00:00Z",
-                "completed_on": null,
-                "error_on": null,
-                "error_message": null
-            },
-            "audit": { }
-        }
-
-## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
-Generate a pre-signed URL that will be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this endpoint again to get a new pre-signed URL for the chunk number, then retry the upload.
-
->**Permission:** create_file
-- - - - -
-
->**Request Properties**
-- - - - -
-+ number (number, required) - The chunk number.
-+ size (number, required) - The size of the chunk in bytes (computed by client)
-+ hash.value (string, required) - The chunk hash (computed by client).
-+ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by storage provider.
-
->**Response Properties**
-- - - - -
-+ http_verb (string) - The http verb to use for uploading the next chunk.
-+ host (string) - The storage provider host.
-+ url (string) - The signed URL endpoint for uploading the next chunk to the storage provider.
-+ http_headers (array) - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
-
-+ Parameters
-    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
-
-+ Request (application/json)
-
-        {
-            "number": 1,
-            "size": 5024000,
-            "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "http_verb": "PUT",
-            "host": "duke_data_service_prod.s3.amazonaws.com",
-            "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
-            "http_headers": [
-                    { "Content-Length": "5024000" }
-            ]
-        }
-
-## Complete chunked file upload [PUT /uploads/{id}/complete]
-This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
-
->**Permission:** create_file
-- - - - -
-
->**Rules**
-- - - - -
-+ If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider endpoint to assemble the parts into a single file object.
-+ The client reported file hash for each chunk must equal the storage provider computed file hash for the same chunk, or an upload error is reported.
-+ The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
-+ If there are no errors, the `upload_status.complete_on` is set to the current timestamp.
-
-+ Parameters
-    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
-
-+ Response 200 (application/json)
-
-        {
-            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": true },
-            "chunks": [
-                {
-                    "number": 1,
-                    "size": 5024000,
-                    "hash": { "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", "algorithm": "md5" }
-                },
-                {
-                    "number": 2,
-                    "size": 5024000,
-                    "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
-                }
-            ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
-            "status": {
-                "initiated_on": "2015-07-10T13:00:00Z",
-                "completed_on": "2015-07-10T13:00:00Z",
-                "error_on": null,
-                "error_message": null
             },
             "audit": { }
         }
