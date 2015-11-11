@@ -13,32 +13,36 @@ module DDS
         ]
       end
       params do
-        optional :parent, desc: "Parent Folder ID", type: Hash do
-          requires :id, type: String, desc: "Parent Folder UUID"
+        requires :parent, desc: "Parent Folder ID", type: Hash do
+          requires :kind, type: String, desc: "Parent kind"
+          requires :id, type: String, desc: "Parent UUID"
         end
         requires :upload, desc: "Upload", type: Hash do
           requires :id, type: String, desc: "Upload UUID"
         end
       end
-      post '/projects/:id/files', root: false do
+      post '/files', root: false do
         authenticate!
         file_params = declared(params, include_missing: false)
-        project = hide_logically_deleted(Project.find(params[:id]))
-        upload = project.uploads.find(file_params[:upload][:id])
+        if file_params[:parent][:kind] == Project.new.kind
+          project = hide_logically_deleted(Project.find(file_params[:parent][:id]))
+        else
+          parent = hide_logically_deleted(Folder.find(file_params[:parent][:id]))
+          project = hide_logically_deleted(parent.project)
+        end
+        upload = Upload.find(file_params[:upload][:id])
         file = project.data_files.build({
-          upload_id: upload.id,
+          parent: parent,
+          upload: upload,
           name: upload.name
         })
-        if file_params[:parent] && file_params[:parent][:id]
-          project.folders.find(file_params[:parent][:id])
-          file.parent_id = file_params[:parent][:id]
-        end
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
           if file.save
             annotate_audits [file.audits.last]
             file
           else
+            file
             validation_error!(file)
           end
         end

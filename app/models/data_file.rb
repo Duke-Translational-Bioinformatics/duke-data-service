@@ -6,8 +6,14 @@ class DataFile < Container
   validates :project_id, presence: true
   validates :upload_id, presence: true
 
-  validates_each :upload do |record, attr, value|
-    record.errors.add(attr, 'upload cannot have an error') if value && value.error_at
+  validates_each :upload, :upload_id do |record, attr, value|
+    if record.upload
+      if record.upload.error_at
+        record.errors.add(attr, 'cannot have an error')
+      elsif !record.upload.completed_at
+        record.errors.add(attr, 'must be completed successfully')
+      end
+    end
   end
 
   def kind
