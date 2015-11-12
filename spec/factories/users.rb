@@ -11,5 +11,11 @@ FactoryGirl.define do
     trait :with_auth_role do
       auth_role_ids { [FactoryGirl.create(:auth_role).id] }
     end
+
+    trait :delong do
+      display_name 'Mark Randall DeLong'
+      first_name 'Mark'
+      last_name 'DeLong'
+    end
   end
 end
