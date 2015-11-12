@@ -8,6 +8,8 @@ RSpec.describe DataFile, type: :model do
   let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
+  let(:project) { subject.project }
+  let(:other_project) { FactoryGirl.create(:project) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -45,6 +47,17 @@ RSpec.describe DataFile, type: :model do
 
     it 'should have a project_id' do
       should validate_presence_of(:project_id)
+    end
+
+    it 'should not allow project_id to be changed' do
+      should allow_value(project).for(:project)
+      expect(subject).to be_valid
+      should allow_value(project.id).for(:project_id)
+      should_not allow_value(other_project.id).for(:project_id)
+      should allow_value(project.id).for(:project_id)
+      expect(subject).to be_valid
+      should allow_value(other_project).for(:project)
+      expect(subject).not_to be_valid
     end
 
     it 'should have a upload_id' do

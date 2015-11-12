@@ -10,6 +10,8 @@ RSpec.describe Folder, type: :model do
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
   let(:is_logically_deleted) { true }
+  let(:project) { subject.project }
+  let(:other_project) { FactoryGirl.create(:project) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -38,6 +40,17 @@ RSpec.describe Folder, type: :model do
 
     it 'should have a project_id' do
       should validate_presence_of(:project_id)
+    end
+
+    it 'should not allow project_id to be changed' do
+      should allow_value(project).for(:project)
+      expect(subject).to be_valid
+      should allow_value(project.id).for(:project_id)
+      should_not allow_value(other_project.id).for(:project_id)
+      should allow_value(project.id).for(:project_id)
+      expect(subject).to be_valid
+      should allow_value(other_project).for(:project)
+      expect(subject).not_to be_valid
     end
 
     it 'should allow is_deleted to be set' do

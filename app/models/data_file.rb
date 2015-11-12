@@ -3,7 +3,7 @@
 class DataFile < Container
   belongs_to :upload
 
-  validates :project_id, presence: true
+  validates :project_id, presence: true, immutable: true
   validates :upload_id, presence: true
 
   validates_each :upload, :upload_id do |record, attr, value|
