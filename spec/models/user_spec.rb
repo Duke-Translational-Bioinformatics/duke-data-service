@@ -2,8 +2,6 @@ require 'rails_helper'
 require 'jwt'
 
 RSpec.describe User, type: :model do
-  let(:role_1) {FactoryGirl.create(:auth_role)}
-  let(:role_2) {FactoryGirl.create(:auth_role)}
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   subject { user_authentication_service.user }
   let(:resource_class) { User }
@@ -57,41 +55,6 @@ RSpec.describe User, type: :model do
     it 'should validate presence of username' do
       should validate_presence_of(:username)
       should validate_uniqueness_of(:username)
-    end
-
-    it 'should only allow auth_role_ids that exist' do
-      should allow_value([role_1.id]).for(:auth_role_ids)
-      should allow_value([]).for(:auth_role_ids)
-      should_not allow_value(['foo']).for(:auth_role_ids)
-    end
-  end
-
-  describe 'authorization roles' do
-    subject {FactoryGirl.create(:user, :with_auth_role)}
-
-    it 'should have an auth_roles method that returns AuthRole objects' do
-      expect(subject).to respond_to(:auth_roles)
-      expect(subject.auth_roles).to be_a Array
-      subject.auth_role_ids.each do |role_id|
-        role = AuthRole.where(id: role_id).first
-        expect(subject.auth_roles).to include(role)
-      end
-    end
-
-    it 'should have an auth_roles= method' do
-      expect(subject).to respond_to(:auth_roles=)
-      new_role_ids = [ role_1.id, role_2.id ]
-      subject.auth_roles = new_role_ids
-      expect(subject.auth_role_ids).to eq(new_role_ids)
-    end
-
-    describe 'without roles' do
-      subject {FactoryGirl.create(:user)}
-
-      it 'should have an auth_roles method that returns AuthRole objects' do
-        expect(subject).to respond_to(:auth_roles)
-        expect(subject.auth_roles).to be_a Array
-      end
     end
   end
 

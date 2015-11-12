@@ -85,22 +85,7 @@ module DDS
       get '/users', root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
-        users = []
-        if query_params[:last_name_begins_with]
-          users = User.where(
-            "last_name like ?",
-            "#{query_params[:last_name_begins_with]}%").order(last_name: :asc)
-        elsif query_params[:full_name_contains]
-          users = User.where(
-            "display_name like ?",
-            "%#{query_params[:full_name_contains]}%").order(last_name: :asc)
-        elsif query_params[:first_name_begins_with]
-          users = User.where(
-            "first_name like ?",
-            "#{query_params[:first_name_begins_with]}%").order(last_name: :asc)
-        else
-          users = User.order(last_name: :asc)
-        end
+        users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)
         paginate(users)
       end
     end
