@@ -3,6 +3,8 @@
 class DataFile < Container
   belongs_to :upload
 
+  after_set_parent_attribute :set_project_to_parent_project
+
   validates :project_id, presence: true, immutable: true
   validates :upload_id, presence: true
 
