@@ -8,6 +8,9 @@ RSpec.describe DataFile, type: :model do
   let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
+  let(:project) { subject.project }
+  let(:other_project) { FactoryGirl.create(:project) }
+  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -36,8 +39,9 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'validations' do
-    let(:upload_without_error) { FactoryGirl.create(:upload) }
-    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error) }
+    let(:completed_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
+    let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
+    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
     it 'should have a name' do
       should validate_presence_of(:name)
     end
@@ -46,19 +50,67 @@ RSpec.describe DataFile, type: :model do
       should validate_presence_of(:project_id)
     end
 
+    it 'should not allow project_id to be changed' do
+      should allow_value(project).for(:project)
+      expect(subject).to be_valid
+      should allow_value(project.id).for(:project_id)
+      should_not allow_value(other_project.id).for(:project_id)
+      should allow_value(project.id).for(:project_id)
+      expect(subject).to be_valid
+      should allow_value(other_project).for(:project)
+      expect(subject).not_to be_valid
+    end
+
     it 'should have a upload_id' do
       should validate_presence_of(:upload_id)
     end
 
-    it 'should require that upload has no error' do
-      should allow_value(upload_without_error).for(:upload)
+    it 'should require upload has no error' do
+      should allow_value(completed_upload.id).for(:upload_id)
+      should_not allow_value(upload_with_error.id).for(:upload_id)
+      should allow_value(completed_upload).for(:upload)
       should_not allow_value(upload_with_error).for(:upload)
-      file = FactoryGirl.build(:data_file, upload_id: upload_with_error.id)
-      expect(file.valid?).to be_falsey
-      expect(file.errors.keys).to include(:upload)
-      expect(file.errors[:upload]).to include('upload cannot have an error')
+      should_not allow_value(upload_with_error).for(:upload)
+      expect(subject.valid?).to be_falsey
+      expect(subject.errors.keys).to include(:upload)
+      expect(subject.errors[:upload]).to include('cannot have an error')
+    end
+
+    it 'should require a completed upload' do
+      should allow_value(completed_upload.id).for(:upload_id)
+      should_not allow_value(incomplete_upload.id).for(:upload_id)
+      should allow_value(completed_upload).for(:upload)
+      should_not allow_value(incomplete_upload).for(:upload)
+      expect(subject.valid?).to be_falsey
+      expect(subject.errors.keys).to include(:upload)
+      expect(subject.errors[:upload]).to include('must be completed successfully')
     end
   end
+
+  describe '.parent=' do
+    it 'should set project to parent.project' do
+      expect(subject.parent).not_to eq other_folder
+      expect(subject.project).not_to eq other_folder.project
+      expect(subject.project_id).not_to eq other_folder.project_id
+      should allow_value(other_folder).for(:parent)
+      expect(subject.parent).to eq other_folder
+      expect(subject.project).to eq other_folder.project
+      expect(subject.project_id).to eq other_folder.project_id
+    end
+  end
+
+  describe '.parent_id=' do
+    it 'should set project to parent.project' do
+      expect(subject.parent).not_to eq other_folder
+      expect(subject.project).not_to eq other_folder.project
+      expect(subject.project_id).not_to eq other_folder.project_id
+      should allow_value(other_folder.id).for(:parent_id)
+      expect(subject.parent).to eq other_folder
+      expect(subject.project).to eq other_folder.project
+      expect(subject.project_id).to eq other_folder.project_id
+    end
+  end
+
 
   describe 'serialization' do
     let(:serializer) { DataFileSerializer.new subject }

@@ -10,6 +10,9 @@ RSpec.describe Folder, type: :model do
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { subject }
   let(:is_logically_deleted) { true }
+  let(:project) { subject.project }
+  let(:other_project) { FactoryGirl.create(:project) }
+  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -40,6 +43,17 @@ RSpec.describe Folder, type: :model do
       should validate_presence_of(:project_id)
     end
 
+    it 'should not allow project_id to be changed' do
+      should allow_value(project).for(:project)
+      expect(subject).to be_valid
+      should allow_value(project.id).for(:project_id)
+      should_not allow_value(other_project.id).for(:project_id)
+      should allow_value(project.id).for(:project_id)
+      expect(subject).to be_valid
+      should allow_value(other_project).for(:project)
+      expect(subject).not_to be_valid
+    end
+
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
       should allow_value(false).for(:is_deleted)
@@ -65,6 +79,30 @@ RSpec.describe Folder, type: :model do
         expect(child_folder.reload).to be_truthy
         should_not allow_value(child_folder.id).for(:parent_id)
       end
+    end
+  end
+
+  describe '.parent=' do
+    it 'should set project to parent.project' do
+      expect(subject.parent).not_to eq other_folder
+      expect(subject.project).not_to eq other_folder.project
+      expect(subject.project_id).not_to eq other_folder.project_id
+      should allow_value(other_folder).for(:parent)
+      expect(subject.parent).to eq other_folder
+      expect(subject.project).to eq other_folder.project
+      expect(subject.project_id).to eq other_folder.project_id
+    end
+  end
+
+  describe '.parent_id=' do
+    it 'should set project to parent.project' do
+      expect(subject.parent).not_to eq other_folder
+      expect(subject.project).not_to eq other_folder.project
+      expect(subject.project_id).not_to eq other_folder.project_id
+      should allow_value(other_folder.id).for(:parent_id)
+      expect(subject.parent).to eq other_folder
+      expect(subject.project).to eq other_folder.project
+      expect(subject.project_id).to eq other_folder.project_id
     end
   end
 
