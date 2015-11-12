@@ -133,9 +133,12 @@ module DDS
             end
             authorize file, :move?
             Audited.audit_class.as_user(current_user) do
-              file.update(update_params)
-              annotate_audits [file.audits.last]
-              file
+              if file.update(update_params)
+                annotate_audits [file.audits.last]
+                file
+              else
+                validation_error! file
+              end
             end
           end
 
