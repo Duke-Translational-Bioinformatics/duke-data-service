@@ -7,7 +7,11 @@ class CreateUploads < ActiveRecord::Migration
       t.integer :size
       t.string :fingerprint_value
       t.string :fingerprint_algorithm
-      t.integer :storage_provider_id
+      t.uuid :storage_provider_id
+      t.datetime :error_at
+      t.string :error_message
+      t.datetime :completed_at
+      t.string :etag
 
       t.timestamps null: false
     end

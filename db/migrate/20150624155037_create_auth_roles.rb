@@ -1,12 +1,12 @@
 class CreateAuthRoles < ActiveRecord::Migration
   def change
-    create_table :auth_roles do |t|
-      t.string :text_id
+    create_table :auth_roles, id: false do |t|
+      t.string :id, null: false
       t.string :name
       t.string :description
       t.jsonb :permissions
       t.jsonb :contexts
-      t.boolean :is_deprecated
+      t.boolean :is_deprecated, null: false, default: false
 
       t.timestamps null: false
     end

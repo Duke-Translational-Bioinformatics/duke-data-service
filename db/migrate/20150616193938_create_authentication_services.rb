@@ -1,7 +1,6 @@
 class CreateAuthenticationServices < ActiveRecord::Migration
   def change
-    create_table :authentication_services do |t|
-      t.string :uuid
+    create_table :authentication_services, id: :uuid do |t|
       t.string :base_uri
       t.string :name
 
