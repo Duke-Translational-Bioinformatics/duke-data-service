@@ -232,7 +232,7 @@ describe DDS::V1::FilesAPI do
     end
   end
 
-  describe 'Rename a File metadata Object' do
+  describe 'Rename file' do
     let(:url) { "/api/v1/files/#{resource_id}/rename" }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
@@ -241,16 +241,28 @@ describe DDS::V1::FilesAPI do
       let!(:payload) {{
         name: new_name
       }}
-      it_behaves_like 'an updatable resource'
 
+      it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'a logically deleted resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
-      it_behaves_like 'an audited endpoint'
-      it_behaves_like 'a logically deleted resource'
+
+      it_behaves_like 'a validated resource' do
+        let(:new_name) { '' }
+      end
+
+      context 'without name in payload' do
+        let(:payload) {{}}
+        it 'returns a failed response' do
+          is_expected.to eq(400)
+          expect(response.status).to eq(400)
+        end
+      end
     end
   end
 end

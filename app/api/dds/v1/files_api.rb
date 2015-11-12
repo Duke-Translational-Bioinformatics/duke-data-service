@@ -142,7 +142,7 @@ module DDS
             end
           end
 
-          desc 'Rename a file metadata object' do
+          desc 'Rename file' do
             detail 'Rename a file metadata object'
             named 'rename file'
             failure [
@@ -152,7 +152,7 @@ module DDS
             ]
           end
           params do
-            requires :name, type: String, desc: 'New Name for File'
+            requires :name, type: String, desc: 'New name for File'
           end
           put '/rename', root: false do
             authenticate!
@@ -160,10 +160,13 @@ module DDS
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
             Audited.audit_class.as_user(current_user) do
-              file.update(name: file_params[:name])
-              annotate_audits [file.audits.last]
+              if file.update(name: file_params[:name])
+                annotate_audits [file.audits.last]
+                file
+              else
+                validation_error! file
+              end
             end
-            file
           end
         end
       end
