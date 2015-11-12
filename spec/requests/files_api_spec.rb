@@ -16,6 +16,7 @@ describe DDS::V1::FilesAPI do
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { file }
+  let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
 
   describe 'Files collection' do
@@ -98,7 +99,7 @@ describe DDS::V1::FilesAPI do
   end
 
   describe 'File instance' do
-    let(:url) { "/api/v1/files/#{resource.id}" }
+    let(:url) { "/api/v1/files/#{resource_id}" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -109,7 +110,7 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/files/notexists_file_id" }
+        let(:resource_id) {'notfoundid'}
       end
     end
 
@@ -127,7 +128,7 @@ describe DDS::V1::FilesAPI do
         end
 
         it_behaves_like 'an identified resource' do
-          let(:url) { "/api/v1/files/notexists_file_id" }
+          let(:resource_id) {'notfoundid'}
         end
       end
 
@@ -141,7 +142,7 @@ describe DDS::V1::FilesAPI do
   end
 
   describe 'Download a file' do
-    let(:url) { "/api/v1/files/#{resource.id}/download" }
+    let(:url) { "/api/v1/files/#{resource_id}/download" }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -154,41 +155,72 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/files/notexists_file_id/download" }
+        let(:resource_id) {'notfoundid'}
       end
 
       it_behaves_like 'a logically deleted resource'
     end
   end
 
-  describe 'Move a File metadata Object to a New Parent' do
-    let(:url) { "/api/v1/files/#{resource.id}/move" }
-    let(:new_parent) { FactoryGirl.create(:folder, project_id: project.id) }
+  describe 'Move file' do
+    let(:url) { "/api/v1/files/#{resource_id}/move" }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
-      let!(:payload) {{
-        parent: { id: new_parent.id }
+      let!(:new_parent) { FactoryGirl.create(:folder, project: project) }
+      let(:payload) {{
+        parent: { kind: new_parent.kind, id: new_parent.id }
       }}
-      it_behaves_like 'an updatable resource'
 
+      it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-
-      it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/files/notexists_file_id/move" }
-      end
       it_behaves_like 'an audited endpoint'
       it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { new_parent }
+      end
+
+      it_behaves_like 'an identified resource' do
+        let(:payload) {{
+          parent: { kind: new_parent.kind, id: 'notfoundid' }
+        }}
+        let(:resource_class) {new_parent.class}
+      end
+
+      context 'with project as parent' do
+        let(:new_parent) { project }
+
+        it_behaves_like 'an updatable resource'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
+        it_behaves_like 'an audited endpoint'
+        it_behaves_like 'a logically deleted resource'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+
+        it_behaves_like 'a logically deleted resource' do
+          let(:deleted_resource) { new_parent }
+        end
+
+        it_behaves_like 'an identified resource' do
+          let(:payload) {{
+            parent: { kind: new_parent.kind, id: 'notfoundid' }
+          }}
+          let(:resource_class) {new_parent.class}
+        end
       end
     end
   end
 
   describe 'Rename a File metadata Object' do
-    let(:url) { "/api/v1/files/#{resource.id}/rename" }
+    let(:url) { "/api/v1/files/#{resource_id}/rename" }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -202,7 +234,7 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/files/notexists_file_id/rename" }
+        let(:resource_id) {'notfoundid'}
       end
       it_behaves_like 'an audited endpoint'
       it_behaves_like 'a logically deleted resource'
