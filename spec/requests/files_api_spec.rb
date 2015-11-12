@@ -11,6 +11,7 @@ describe DDS::V1::FilesAPI do
   let(:parent) { folder }
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_project) { other_permission.project }
+  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
   let(:incomplete_upload) { FactoryGirl.create(:upload, project: project) }
   let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project) }
@@ -197,6 +198,11 @@ describe DDS::V1::FilesAPI do
 
       context 'with different project as new parent' do
         let(:new_parent) { other_project }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with folder in different project as new parent' do
+        let(:new_parent) { other_folder }
         it_behaves_like 'a validated resource'
       end
 
