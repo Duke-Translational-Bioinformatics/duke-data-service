@@ -12,7 +12,8 @@ describe DDS::V1::FoldersAPI do
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
+  let(:other_project) { other_permission.project }
+  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
@@ -193,9 +194,20 @@ describe DDS::V1::FoldersAPI do
         }}
       end
 
-      it_behaves_like 'a validated resource' do
+      context 'with child as new parent' do
         let(:resource) { parent }
         let(:new_parent) { folder }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with different project as new parent' do
+        let(:new_parent) { other_project }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with folder in different project as new parent' do
+        let(:new_parent) { other_folder }
+        it_behaves_like 'a validated resource'
       end
 
       context 'with project as parent' do
