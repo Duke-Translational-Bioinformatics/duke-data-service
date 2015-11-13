@@ -88,6 +88,25 @@ module DDS
         users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)
         paginate(users)
       end
+
+      desc 'View user details' do
+        detail 'Returns the user details for a given uuid of a user.'
+        named 'view user'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'User does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'User UUID'
+      end
+      get '/users/:id', root: false do
+        authenticate!
+        user = User.find(params[:id])
+        user
+      end
+
     end
   end
 end

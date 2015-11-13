@@ -1,11 +1,11 @@
 require 'rails_helper'
-require 'jwt'
-require 'securerandom'
 
 describe DDS::V1::UserAPI do
   include_context 'with authentication'
   let (:auth_service) { user_auth.authentication_service }
   let(:resource_class) { User }
+  let(:resource) { FactoryGirl.create(:user) }
+  let(:resource_serializer) { UserSerializer }
 
   describe 'get /api/v1/user/api_token' do
     let(:url) { '/api/v1/user/api_token' }
@@ -352,6 +352,17 @@ describe DDS::V1::UserAPI do
         end
       end
 
+      it_behaves_like 'an authenticated resource'
+    end
+  end
+
+  describe 'User instance' do
+    let(:url) { "/api/v1/users/#{resource.id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
     end
   end

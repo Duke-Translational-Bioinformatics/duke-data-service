@@ -9,7 +9,7 @@ FactoryGirl.define do
     last_login_at { Faker::Time.backward(14, :evening) }
 
     trait :with_auth_role do
-      auth_role_ids { [FactoryGirl.create(:auth_role).id] }
+      auth_role { FactoryGirl.create(:auth_role, :system) }
     end
 
     trait :delong do

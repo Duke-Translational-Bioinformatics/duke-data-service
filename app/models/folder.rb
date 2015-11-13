@@ -3,6 +3,8 @@
 class Folder < Container
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
 
+  after_set_parent_attribute :set_project_to_parent_project
+
   validates :project_id, presence: true, immutable: true
   validates_each :parent, :parent_id do |record, attr, value|
     record.errors.add(attr, 'cannot be itself') if record.parent == record
