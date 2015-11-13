@@ -29,42 +29,41 @@ module DDS
           suggestion: 'token not properly signed'
         },401)
       end
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        error!({
+          error: 401,
+          reason: 'invalid access_token',
+          suggestion: 'authenticaton service not recognized'
+        }, 401)
+      end
       get '/user/api_token', root: false do
         token_info_params = declared(params)
         encoded_access_token = token_info_params[:access_token]
         if access_token = JWT.decode(encoded_access_token, Rails.application.secrets.secret_key_base)[0]
-          auth_service = AuthenticationService.where(uuid: access_token['service_id']).first
-          if auth_service
-            authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
-            if authorized_user
-              new_login_at = DateTime.now
-              authorized_user.user.update_attribute(:last_login_at, DateTime.now)
-            else
-              new_user = User.create(
-                id: SecureRandom.uuid,
-                username: access_token['uid'],
-                etag: SecureRandom.hex,
-                email: access_token['email'],
-                display_name: access_token['display_name'],
-                first_name: access_token['first_name'],
-                last_login_at: DateTime.now,
-                last_name: access_token['last_name']
-              )
-              last_audit = new_user.audits.last
-              annotate_audits([last_audit], {user: new_user})
-              authorized_user = auth_service.user_authentication_services.create(
-                uid: access_token['uid'],
-                user: new_user
-              )
-            end
-            {'api_token' => authorized_user.api_token}
+          auth_service = AuthenticationService.find(access_token['service_id'])
+          authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
+          if authorized_user
+            new_login_at = DateTime.now
+            authorized_user.user.update_attribute(:last_login_at, DateTime.now)
           else
-            error!({
-              error: 401,
-              reason: 'invalid access_token',
-              suggestion: 'authenticaton service not recognized'
-            }, 401)
+            new_user = User.create(
+              id: SecureRandom.uuid,
+              username: access_token['uid'],
+              etag: SecureRandom.hex,
+              email: access_token['email'],
+              display_name: access_token['display_name'],
+              first_name: access_token['first_name'],
+              last_login_at: DateTime.now,
+              last_name: access_token['last_name']
+            )
+            last_audit = new_user.audits.last
+            annotate_audits([last_audit], {user: new_user})
+            authorized_user = auth_service.user_authentication_services.create(
+              uid: access_token['uid'],
+              user: new_user
+            )
           end
+          {'api_token' => authorized_user.api_token}
         end
       end
 

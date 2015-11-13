@@ -14,7 +14,7 @@ describe DDS::V1::UserAPI do
       let(:new_user) { FactoryGirl.attributes_for(:user) }
       let(:new_user_token) {
         {
-          'service_id' => auth_service.uuid,
+          'service_id' => auth_service.id,
           'uid' => FactoryGirl.attributes_for(:user_authentication_service)[:uid],
           'display_name' => new_user[:display_name],
           'first_name' => new_user[:first_name],
@@ -77,7 +77,7 @@ describe DDS::V1::UserAPI do
     describe 'for all users' do
       let (:user_token) {
         {
-          'service_id' => auth_service.uuid,
+          'service_id' => auth_service.id,
           'uid' => user_auth.uid,
           'display_name' => current_user.display_name,
           'first_name' => current_user.first_name,

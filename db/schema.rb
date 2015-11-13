@@ -112,7 +112,7 @@ ActiveRecord::Schema.define(version: 20151029161136) do
   create_table "projects", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
-    t.integer  "creator_id"
+    t.uuid     "creator_id"
     t.string   "etag"
     t.boolean  "is_deleted",  default: false
     t.datetime "created_at",                  null: false
