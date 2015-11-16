@@ -3,7 +3,7 @@ class CreateProjects < ActiveRecord::Migration
     create_table :projects, id: :uuid do |t|
       t.string :name
       t.string :description
-      t.integer :creator_id
+      t.uuid :creator_id
       t.string :etag
       t.boolean :is_deleted, :default => false
 
