@@ -12,6 +12,10 @@ RSpec.describe AuthenticationService, type: :model do
     should validate_presence_of :name
   end
 
+  it 'should require a service_id' do
+    should validate_presence_of :service_id
+  end
+
   it 'should require a base_uri' do
     should validate_presence_of :base_uri
   end

@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 20151029161136) do
   add_index "auth_roles", ["permissions"], name: "index_auth_roles_on_permissions", using: :gin
 
   create_table "authentication_services", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "service_id"
     t.string   "base_uri"
     t.string   "name"
     t.datetime "created_at", null: false
