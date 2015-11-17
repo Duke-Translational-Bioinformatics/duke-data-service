@@ -93,15 +93,7 @@ heroku:
   privileged: true
   tty: true
   net: host
-figaro:
-  image: dukedataservice_server
-  volumes_from:
-    - server
+genportal:
+  build: ./docker/builds/genportal
   volumes:
-    - ~/.heroku:/home/deployer/heroku
-  entrypoint: ['figaro']
-  command: heroku:set -e production
-  user: deployer
-  privileged: true
-  tty: true
-  net: host
+    - .:/var/www/app
