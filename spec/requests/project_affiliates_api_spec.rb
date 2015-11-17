@@ -59,7 +59,13 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a creatable resource' do
         let(:user) { FactoryGirl.create(:user) }
         let(:expected_response_status) {200}
-        let(:new_object) { resource_class.last }
+        let(:new_object) {
+          resource_class.where(
+            project_id: project.id,
+            user_id: user.id,
+            project_role_id: payload[:project_role][:id]
+          ).last
+        }
       end
 
       it_behaves_like 'an updatable resource'

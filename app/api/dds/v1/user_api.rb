@@ -33,7 +33,7 @@ module DDS
         token_info_params = declared(params)
         encoded_access_token = token_info_params[:access_token]
         if access_token = JWT.decode(encoded_access_token, Rails.application.secrets.secret_key_base)[0]
-          auth_service = AuthenticationService.where(uuid: access_token['service_id']).first
+          auth_service = AuthenticationService.where(service_id: access_token['service_id']).take
           if auth_service
             authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
             if authorized_user
