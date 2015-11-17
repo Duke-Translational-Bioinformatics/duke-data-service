@@ -1,4 +1,5 @@
 class Affiliation < ActiveRecord::Base
+  default_scope { order('created_at DESC') }
   audited
   after_save :update_project_etag
   after_destroy :update_project_etag

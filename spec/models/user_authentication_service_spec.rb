@@ -50,8 +50,8 @@ RSpec.describe UserAuthenticationService, type: :model do
       expect(decoded_token).to be
       expect(decoded_token).to have_key('id')
       expect(decoded_token['id']).to eq(subject.user_id)
-      expect(decoded_token).to have_key('authentication_service_id')
-      expect(decoded_token['authentication_service_id']).to eq(subject.authentication_service_id)
+      expect(decoded_token).to have_key('service_id')
+      expect(decoded_token['service_id']).to eq(subject.authentication_service.service_id)
       expect(decoded_token).to have_key('exp')
       expect(decoded_token['exp']).to eq(Time.now.to_i + 2.hours.to_i)
     end
