@@ -1,15 +1,13 @@
 # This file is used by Rack-based servers to start the application.
 
-map '/portal' do
-  use Rack::Static,
-    :urls => [
-              "/css",
-              "/images",
-              "/js",
-              "/lib"
-            ],
-    :root => "portal"
+require ::File.expand_path('../config/environment', __FILE__)
 
+map '/' do
+  run Rails.application
+end
+
+map '/portal' do
+  use Rack::Static
   run lambda { |env|
     [
       200,
@@ -21,6 +19,3 @@ map '/portal' do
     ]
   }
 end
-
-require ::File.expand_path('../config/environment', __FILE__)
-run Rails.application
