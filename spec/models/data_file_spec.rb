@@ -2,9 +2,6 @@ require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
   subject { child_file }
-  let(:resource_class) { DataFile }
-  let(:resource_serializer) { DataFileSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }

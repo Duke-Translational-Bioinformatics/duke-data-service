@@ -6,9 +6,6 @@ RSpec.describe Folder, type: :model do
   let(:root_folder) { FactoryGirl.create(:folder, :root) }
   let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
   let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
-  let(:resource_class) { Folder }
-  let(:resource_serializer) { FolderSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { true }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }

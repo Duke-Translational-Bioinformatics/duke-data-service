@@ -4,10 +4,7 @@ RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-  let(:resource_class) { StorageProvider }
-  let(:resource_serializer) { StorageProviderSerializer }
   subject { storage_provider }
-  let!(:resource) { subject }
 
   describe 'methods that call swift api', :vcr do
     subject { swift_storage_provider }
@@ -184,7 +181,7 @@ RSpec.describe StorageProvider, type: :model do
 
   describe 'serialization' do
     it 'should serialize to json' do
-      serializer = resource_serializer.new subject
+      serializer = StorageProviderSerializer.new subject
       payload = serializer.to_json
       expect(payload).to be
       parsed_json = JSON.parse(payload)

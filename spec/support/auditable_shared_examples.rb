@@ -39,6 +39,7 @@ end
 shared_examples 'with a serialized audit' do
   include_context 'with update'
   include_context 'with destroy'
+  let(:resource_serializer) { ActiveModel::Serializer.serializer_for(subject) }
 
   it 'should have an audit method that returns the audit expected by the serializer' do
     expect(update).to be_truthy

@@ -7,8 +7,6 @@ RSpec.describe Chunk, type: :model do
   let(:expected_sub_path) { [subject.project_id, subject.upload_id, subject.number].join('/')}
   let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
   let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
-  let(:resource_class) { Chunk }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model'
