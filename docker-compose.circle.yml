@@ -53,3 +53,7 @@ rspec:
     - circle/swift.circle.env
   entrypoint: ['rspec']
   command: spec
+dredd:
+  build: ./docker/builds/dredd
+  links:
+   - server

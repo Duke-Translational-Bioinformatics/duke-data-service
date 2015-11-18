@@ -22,6 +22,8 @@ dependencies:
 test:
   post:
     - './workflow/workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
+    - 'cp apiary.apib ./docker/builds/dredd/dredd_scripts/apiary.apib'
+    - 'docker run -it --env HOST_NAME=${dds_url}:3001/api/v1  --env MY_GENERATED_JWT=`docker-compose -f dc-dev.utils.yml run rake api_test_user:create | tail -1` dukedataservice_dredd /bin/bash -c "cd /home/dredd_scripts; node dds-dredd.js"'
 
 #deployment:
 #  development:
