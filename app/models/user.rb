@@ -1,6 +1,7 @@
 require 'jwt'
 
 class User < ActiveRecord::Base
+  default_scope { order('created_at DESC') }
   include SerializedAudit
   audited except: :last_login_at
 

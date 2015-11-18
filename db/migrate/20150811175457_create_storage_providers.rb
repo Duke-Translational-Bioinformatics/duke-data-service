@@ -1,6 +1,8 @@
 class CreateStorageProviders < ActiveRecord::Migration
   def change
-    create_table :storage_providers do |t|
+    create_table :storage_providers, id: :uuid do |t|
+      t.string :display_name
+      t.string :description
       t.string :name
       t.string :url_root
       t.string :provider_version
@@ -9,6 +11,7 @@ class CreateStorageProviders < ActiveRecord::Migration
       t.string :service_pass
       t.string :primary_key
       t.string :secondary_key
+      t.boolean :is_deprecated, null: false, default: false
 
       t.timestamps null: false
     end

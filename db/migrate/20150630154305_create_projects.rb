@@ -1,13 +1,11 @@
 class CreateProjects < ActiveRecord::Migration
   def change
-    create_table :projects do |t|
+    create_table :projects, id: :uuid do |t|
       t.string :name
       t.string :description
-      t.string :uuid
-      t.integer :creator_id
+      t.uuid :creator_id
       t.string :etag
-      t.boolean :is_deleted
-      t.datetime :deleted_at
+      t.boolean :is_deleted, :default => false
 
       t.timestamps null: false
     end

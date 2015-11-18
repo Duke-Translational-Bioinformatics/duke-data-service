@@ -1,6 +1,6 @@
 class CreateChunks < ActiveRecord::Migration
   def change
-    create_table :chunks do |t|
+    create_table :chunks, id: :uuid do |t|
       t.uuid :upload_id
       t.integer :number
       t.integer :size

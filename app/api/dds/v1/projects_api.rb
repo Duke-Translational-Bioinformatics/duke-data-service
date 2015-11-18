@@ -19,14 +19,14 @@ module DDS
       post '/projects', root: false do
         authenticate!
         project_params = declared(params, include_missing: false)
+        project = Project.new({
+          etag: SecureRandom.hex,
+          name: project_params[:name],
+          description: project_params[:description],
+          creator_id: current_user.id,
+        })
         Audited.audit_class.as_user(current_user) do
-          project = Project.create({
-            etag: SecureRandom.hex,
-            name: project_params[:name],
-            description: project_params[:description],
-            creator_id: current_user.id,
-          })
-          if project.valid?
+          if project.save
             pre_permission_audit = project.audits.last
             last_permission = project.set_project_admin
             post_permission_audit = project.audits.last

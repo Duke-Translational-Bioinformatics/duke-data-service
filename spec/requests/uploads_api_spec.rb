@@ -137,7 +137,15 @@ describe DDS::V1::UploadsAPI do
       }}
       it_behaves_like 'a creatable resource' do
         let(:expected_response_status) {200}
-        let(:new_object) { resource_class.last }
+        let(:new_object) {
+          resource_class.where(
+            upload_id: upload.id,
+            number: payload[:number],
+            size: payload[:size],
+            fingerprint_value: payload[:hash][:value],
+            fingerprint_algorithm: payload[:hash][:algorithm]
+          ).last
+        }
       end
 
       it_behaves_like 'a validated resource' do
