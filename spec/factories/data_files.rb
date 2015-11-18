@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :data_file do
     name { Faker::Team.name }
-    upload_id { SecureRandom.uuid }
+    association :upload, :completed
     parent_id { SecureRandom.uuid }
     project
     creator_id { SecureRandom.uuid }
