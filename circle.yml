@@ -23,8 +23,8 @@ test:
   post:
     - './workflow/workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
 
-deployment:
-  development:
+#deployment:
+#  development:
 #    branch: develop
 #    commands:
 #      - heroku run rake assets:clobber --app 'duke-data-service-dev'
