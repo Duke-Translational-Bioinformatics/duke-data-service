@@ -56,4 +56,4 @@ rspec:
 dredd:
   build: ./docker/builds/dredd
   links:
-   - server
+   - server:dds.host
