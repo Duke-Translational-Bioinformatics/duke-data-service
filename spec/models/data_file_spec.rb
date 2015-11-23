@@ -113,12 +113,14 @@ RSpec.describe DataFile, type: :model do
     let(:serializer) { DataFileSerializer.new subject }
     let(:payload) { serializer.to_json }
     let(:parsed_json) { JSON.parse(payload) }
+    let(:upload) { subject.upload }
+
     it 'should serialize to json' do
       expect(payload).to be
       expect{parsed_json}.to_not raise_error
     end
 
-    it 'should expected keys and values' do
+    it 'should have expected keys and values' do
       expect(parsed_json).to have_key('id')
       expect(parsed_json).to have_key('parent')
       expect(parsed_json).to have_key('name')
@@ -132,6 +134,24 @@ RSpec.describe DataFile, type: :model do
       expect(parsed_json['project']['id']).to eq(subject.project_id)
       expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
       expect(parsed_json['upload']['id']).to eq(subject.upload_id)
+    end
+
+    it 'should have upload in paylod' do
+      expect(parsed_json).to have_key('upload')
+      expect(upload).not_to be_nil
+      expect(parsed_json['upload']).to eq({
+        'id' => upload.id,
+        'size' => upload.size,
+        'hash' => {
+          'value' => upload.fingerprint_value,
+          'algorithm' => upload.fingerprint_algorithm
+        },
+        'storage_provider' => {
+          'id' => upload.storage_provider.id,
+          'name' => upload.storage_provider.display_name,
+          'description' => upload.storage_provider.description
+        }
+      })
     end
 
     describe 'ancestors' do
