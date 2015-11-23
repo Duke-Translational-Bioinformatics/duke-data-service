@@ -3,9 +3,6 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
-  let(:resource_class) { Upload }
-  let(:resource_serializer) { UploadSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model' do
