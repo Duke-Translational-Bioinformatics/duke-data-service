@@ -1,8 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectPermission, type: :model do
-  let(:roles) {FactoryGirl.create_list(:auth_role, 2)}
-  subject {FactoryGirl.create(:project_permission)}
+  subject {FactoryGirl.build(:project_permission)}
 
   it_behaves_like 'an audited model'
 
