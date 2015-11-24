@@ -33,7 +33,7 @@ rake:
 authservice:
   image: dukedataservice_server
   environment:
-    - UUID=342c075a-7aca-4c35-b3f5-29f043884b5b
+    - AUTH_SERVICE_ID=342c075a-7aca-4c35-b3f5-29f043884b5b
     - BASE_URI=https://192.168.99.100:3000
     - NAME=Duke Authentication Service
   entrypoint: ['rake']
