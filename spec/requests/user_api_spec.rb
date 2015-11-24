@@ -1,11 +1,11 @@
 require 'rails_helper'
-require 'jwt'
-require 'securerandom'
 
 describe DDS::V1::UserAPI do
   include_context 'with authentication'
   let (:auth_service) { user_auth.authentication_service }
   let(:resource_class) { User }
+  let(:resource) { FactoryGirl.create(:user) }
+  let(:resource_serializer) { UserSerializer }
 
   describe 'get /api/v1/user/api_token' do
     let(:url) { '/api/v1/user/api_token' }
@@ -14,7 +14,7 @@ describe DDS::V1::UserAPI do
       let(:new_user) { FactoryGirl.attributes_for(:user) }
       let(:new_user_token) {
         {
-          'service_id' => auth_service.uuid,
+          'service_id' => auth_service.service_id,
           'uid' => FactoryGirl.attributes_for(:user_authentication_service)[:uid],
           'display_name' => new_user[:display_name],
           'first_name' => new_user[:first_name],
@@ -51,10 +51,10 @@ describe DDS::V1::UserAPI do
           Rails.application.secrets.secret_key_base
         )[0]
         expect(decoded_token).to be
-        %w(id authentication_service_id exp).each do |expected_key|
+        %w(id service_id exp).each do |expected_key|
           expect(decoded_token).to have_key(expected_key)
         end
-        expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
+        expect(decoded_token['service_id']).to eq(auth_service.service_id)
         created_user = User.find(decoded_token['id'])
         expect(created_user).to be
         expect(created_user.display_name).to eq(new_user_token['display_name'])
@@ -77,7 +77,7 @@ describe DDS::V1::UserAPI do
     describe 'for all users' do
       let (:user_token) {
         {
-          'service_id' => auth_service.uuid,
+          'service_id' => auth_service.service_id,
           'uid' => user_auth.uid,
           'display_name' => current_user.display_name,
           'first_name' => current_user.first_name,
@@ -117,11 +117,11 @@ describe DDS::V1::UserAPI do
           Rails.application.secrets.secret_key_base
         )[0]
         expect(decoded_token).to be
-        %w(id authentication_service_id exp).each do |expected_key|
+        %w(id service_id exp).each do |expected_key|
           expect(decoded_token).to have_key(expected_key)
         end
         expect(decoded_token['id']).to eq(current_user.id)
-        expect(decoded_token['authentication_service_id']).to eq(auth_service.id)
+        expect(decoded_token['service_id']).to eq(auth_service.service_id)
         existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
         expect(existing_user.id).to eq(current_user.id)
@@ -352,6 +352,17 @@ describe DDS::V1::UserAPI do
         end
       end
 
+      it_behaves_like 'an authenticated resource'
+    end
+  end
+
+  describe 'User instance' do
+    let(:url) { "/api/v1/users/#{resource.id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
     end
   end

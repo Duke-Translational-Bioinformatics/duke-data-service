@@ -1,6 +1,6 @@
 module DDS
   module V1
-    class FileAPI < Grape::API
+    class FilesAPI < Grape::API
       desc 'Create a file' do
         detail 'Creates a project file for the given payload.'
         named 'create project file'
@@ -13,32 +13,36 @@ module DDS
         ]
       end
       params do
-        optional :parent, desc: "Parent Folder ID", type: Hash do
-          requires :id, type: String, desc: "Parent Folder UUID"
+        requires :parent, desc: "Parent Folder ID", type: Hash do
+          requires :kind, type: String, desc: "Parent kind"
+          requires :id, type: String, desc: "Parent UUID"
         end
         requires :upload, desc: "Upload", type: Hash do
           requires :id, type: String, desc: "Upload UUID"
         end
       end
-      post '/projects/:id/files', root: false do
+      post '/files', root: false do
         authenticate!
         file_params = declared(params, include_missing: false)
-        project = hide_logically_deleted(Project.find(params[:id]))
-        upload = project.uploads.find(file_params[:upload][:id])
+        if file_params[:parent][:kind] == Project.new.kind
+          project = hide_logically_deleted(Project.find(file_params[:parent][:id]))
+        else
+          parent = hide_logically_deleted(Folder.find(file_params[:parent][:id]))
+          project = hide_logically_deleted(parent.project)
+        end
+        upload = Upload.find(file_params[:upload][:id])
         file = project.data_files.build({
-          upload_id: upload.id,
+          parent: parent,
+          upload: upload,
           name: upload.name
         })
-        if file_params[:parent] && file_params[:parent][:id]
-          project.folders.find(file_params[:parent][:id])
-          file.parent_id = file_params[:parent][:id]
-        end
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
           if file.save
             annotate_audits [file.audits.last]
             file
           else
+            file
             validation_error!(file)
           end
         end
@@ -102,8 +106,8 @@ module DDS
             redirect new_url, permanent: true
           end
 
-          desc 'Move a file metadata object to a new parent folder' do
-            detail 'Move a file metadata object to a new parent folder'
+          desc 'Move file' do
+            detail 'Move a file metadata object to a new parent'
             named 'move file'
             failure [
               [200, 'Success'],
@@ -112,24 +116,33 @@ module DDS
             ]
           end
           params do
-            requires :parent, desc: "Parent Folder ID", type: Hash do
-              requires :id, type: String, desc: 'Folder UUID'
+            requires :parent, type: Hash do
+              requires :kind, desc: 'Parent kind', type: String
+              requires :id, desc: 'Parent ID', type: String
             end
           end
           put '/move', root: false do
             authenticate!
             file = hide_logically_deleted(DataFile.find(params[:id]))
             file_params = declared(params, include_missing: false)
-            new_parent = hide_logically_deleted(file.project.folders.find(file_params[:parent][:id]))
+            update_params = {parent: nil}
+            if file_params[:parent][:kind] == Project.new.kind
+              update_params[:project] = hide_logically_deleted Project.find(file_params[:parent][:id])
+            else
+              update_params[:parent] = hide_logically_deleted Folder.find(file_params[:parent][:id])
+            end
             authorize file, :move?
             Audited.audit_class.as_user(current_user) do
-              file.update(parent_id: new_parent.id)
-              annotate_audits [file.audits.last]
+              if file.update(update_params)
+                annotate_audits [file.audits.last]
+                file
+              else
+                validation_error! file
+              end
             end
-            file
           end
 
-          desc 'Rename a file metadata object' do
+          desc 'Rename file' do
             detail 'Rename a file metadata object'
             named 'rename file'
             failure [
@@ -139,7 +152,7 @@ module DDS
             ]
           end
           params do
-            requires :name, type: String, desc: 'New Name for File'
+            requires :name, type: String, desc: 'New name for File'
           end
           put '/rename', root: false do
             authenticate!
@@ -147,10 +160,13 @@ module DDS
             file_params = declared(params, include_missing: false)
             authorize file, :rename?
             Audited.audit_class.as_user(current_user) do
-              file.update(name: file_params[:name])
-              annotate_audits [file.audits.last]
+              if file.update(name: file_params[:name])
+                annotate_audits [file.audits.last]
+                file
+              else
+                validation_error! file
+              end
             end
-            file
           end
         end
       end

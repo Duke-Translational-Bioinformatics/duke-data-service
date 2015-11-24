@@ -150,11 +150,12 @@ module DDS
       mount DDS::V1::ProjectAffiliatesAPI
       mount DDS::V1::AuthRolesAPI
       mount DDS::V1::ProjectPermissionsAPI
-      mount DDS::V1::FolderAPI
+      mount DDS::V1::FoldersAPI
       mount DDS::V1::UploadsAPI
-      mount DDS::V1::FileAPI
+      mount DDS::V1::FilesAPI
       mount DDS::V1::ProjectRolesAPI
-      # mount DDS::V1::ParentChildrenAPI
+      mount DDS::V1::StorageProvidersAPI
+      mount DDS::V1::ChildrenAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

@@ -4,7 +4,7 @@ class CreateProjectRoles < ActiveRecord::Migration
       t.string :id, null: false
       t.string :name
       t.string :description
-      t.boolean :is_depricated
+      t.boolean :is_deprecated, null: false, default: false
 
       t.timestamps null: false
     end

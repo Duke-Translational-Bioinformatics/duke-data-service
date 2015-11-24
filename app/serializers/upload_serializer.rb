@@ -36,7 +36,11 @@ class UploadSerializer < ActiveModel::Serializer
   end
 
   def storage_provider
-    {id: object.storage_provider_id, name: object.storage_provider.name}
+    {
+      id: object.storage_provider_id,
+      description: object.storage_provider.description,
+      name: object.storage_provider.display_name
+    }
   end
 
   def status

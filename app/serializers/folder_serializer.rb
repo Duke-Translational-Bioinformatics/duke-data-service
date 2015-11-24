@@ -1,22 +1,27 @@
 class FolderSerializer < ActiveModel::Serializer
   self.root = false
-  attributes :kind, :id, :parent, :name, :project, :is_deleted, :audit
+  attributes :kind, :id, :parent, :name, :project, :is_deleted, :audit, :ancestors
 
   def project
     { id: object.project_id }
   end
 
-#TODO parent_id
   def parent
-    { id: object.parent_id }
-    # if object.parent_id
-    #   { id: object.parent_id }
-    # else
-    #   "root"
-    # end
+    parent = object.parent || object.project
+    { kind: parent.kind, id: parent.id }
   end
 
   def is_deleted
     object.is_deleted?
+  end
+
+  def ancestors
+    object.ancestors.collect do |a|
+      {
+        kind: a.kind,
+        id: a.id,
+        name: a.name
+      }
+    end
   end
 end

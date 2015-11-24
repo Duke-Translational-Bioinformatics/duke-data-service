@@ -8,12 +8,12 @@ RSpec.describe AuthenticationService, type: :model do
     end
   end
 
-  it 'should require a unique uuid' do
-    should validate_uniqueness_of :uuid
-  end
-
   it 'should require a name' do
     should validate_presence_of :name
+  end
+
+  it 'should require a service_id' do
+    should validate_presence_of :service_id
   end
 
   it 'should require a base_uri' do

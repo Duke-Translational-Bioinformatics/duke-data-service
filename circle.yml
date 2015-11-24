@@ -25,12 +25,12 @@ test:
     - 'cp apiary.apib ./docker/builds/dredd/dredd_scripts/apiary.apib'
     - 'docker run -it --env HOST_NAME=http://dds.host:3000/api/v1  --link dukedataservice_server_1:dds.host --env MY_GENERATED_JWT=`docker-compose -f dc-dev.utils.yml run rake api_test_user:create | tail -1` dukedataservice_dredd /bin/bash -c "cd /home/dredd_scripts; node dds-dredd.js"'
 
-#deployment:
-#  development:
-#    branch: develop
-#    commands:
-#      - heroku run rake assets:clobber --app 'duke-data-service-dev'
-#      - git push git@heroku.com:duke-data-service-dev.git $CIRCLE_SHA1:refs/heads/master:
-#          timeout: 54000
-#      - heroku run rake db:migrate --app 'duke-data-service-dev'
-#      - heroku run rake db:seed --app 'duke-data-service-dev'
+deployment:
+  development:
+    branch: develop
+    commands:
+      - heroku run rake assets:clobber --app 'dukeds-dev'
+      - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
+          timeout: 54000
+      - heroku run rake db:migrate --app 'dukeds-dev'
+      - heroku run rake db:seed --app 'dukeds-dev'

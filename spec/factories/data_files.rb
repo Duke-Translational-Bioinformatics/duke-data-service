@@ -1,19 +1,15 @@
 FactoryGirl.define do
   factory :data_file do
     name { Faker::Team.name }
-    upload_id { SecureRandom.uuid }
+    association :upload, :completed
     parent_id { SecureRandom.uuid }
-    project_id { SecureRandom.uuid }
+    project
     creator_id { SecureRandom.uuid }
     is_deleted false
 
-    factory :child_data_file do
+    trait :with_parent do
       association :parent, factory: :folder
-    end
-
-    # Three children is an arbitrary number to test but keep # of children small
-    factory :child_data_file_and_parent, parent: :folder do |folder|
-      children { build_list :child_folder, 3 }
+      project { parent.project }
     end
 
     trait :root do

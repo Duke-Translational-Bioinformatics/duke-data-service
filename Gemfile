@@ -8,6 +8,7 @@ gem 'pg'
 gem 'puma'
 gem 'rack', '1.6.4'
 gem 'rack-cors', :require => 'rack/cors'
+
 gem 'grape-swagger'
 gem 'kaminari'
 gem 'grape-kaminari'
@@ -24,8 +25,9 @@ gem 'uglifier'
 gem 'pundit'
 gem 'httparty'
 
-# use figaro to set heroku environment variables for secrets
-gem 'figaro'
+# use heroku platform-api to set heroku environment variables for secrets
+gem 'platform-api'
+gem 'netrc'
 
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'

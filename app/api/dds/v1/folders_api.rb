@@ -1,6 +1,6 @@
 module DDS
   module V1
-    class FolderAPI < Grape::API
+    class FoldersAPI < Grape::API
       desc 'Create a project folder' do
         detail 'Creates a project folder for the given payload.'
         named 'create project folder'
@@ -12,18 +12,23 @@ module DDS
         ]
       end
       params do
-        optional :parent, desc: "Parent Folder ID", type: Hash do
-          requires :id, type: String
+        requires :parent, type: Hash do
+          requires :kind, desc: "Parent kind", type: String
+          requires :id, desc: "Parent ID", type: String
         end
         requires :name, type: String, desc: "Folder Name"
       end
-      post '/projects/:id/folders', root: false do
+      post '/folders', root: false do
         authenticate!
         folder_params = declared(params, include_missing: false)
-        project = hide_logically_deleted Project.find(params[:id])
+        if folder_params[:parent][:kind] == Project.new.kind
+          project = hide_logically_deleted Project.find(params[:parent][:id])
+        else
+          parent = Folder.find(folder_params[:parent][:id])
+          project = hide_logically_deleted parent.project
+        end
         folder = project.folders.build({
-          project: project,
-          parent_id: folder_params[:parent][:id],
+          parent: parent,
           name: folder_params[:name]
         })
         authorize folder, :create?
@@ -35,26 +40,6 @@ module DDS
             validation_error!(folder)
           end
         end
-      end
-
-      desc 'List folders' do
-        detail 'Lists folders for a given project.'
-        named 'list folders'
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project Does not Exist']
-        ]
-      end
-      get '/projects/:id/folders', root: 'results' do
-        authenticate!
-        project = hide_logically_deleted Project.find(params[:id])
-        authorize project, :show?
-        policy_scope(Folder).where(project: project, is_deleted: false)
-        #test script
-        # project = Folder.last.project_id
-        # Folder.where(project: project, is_deleted: nil)
-        #TODO
       end
 
       desc 'View folder details' do
@@ -90,11 +75,11 @@ module DDS
         Audited.audit_class.as_user(current_user) do
           folder.update(is_deleted: true)
           annotate_audits [folder.audits.last]
+          body false
         end
-        body false
       end
 
-      desc 'Move a folder' do
+      desc 'Move folder' do
         detail 'Move a folder with a given uuid to a new parent.'
         named 'move folder'
         failure [
@@ -104,18 +89,24 @@ module DDS
         ]
       end
       params do
-        requires :parent
+        requires :parent, type: Hash do
+          requires :kind, desc: "Parent kind", type: String
+          requires :id, desc: "Parent ID", type: String
+        end
       end
       put '/folders/:id/move', root: false do
         authenticate!
         folder_params = declared(params, include_missing: false)
-        new_parent = folder_params[:parent][:id]
         folder = hide_logically_deleted Folder.find(params[:id])
-        parent_folder = hide_logically_deleted Folder.find(new_parent)
+        update_params = {parent: nil}
+        if folder_params[:parent][:kind] == Project.new.kind
+          update_params[:project] = hide_logically_deleted Project.find(folder_params[:parent][:id])
+        else
+          update_params[:parent] = hide_logically_deleted Folder.find(folder_params[:parent][:id])
+        end
         authorize folder, :create?
-        #TODO: validate that parent exists
         Audited.audit_class.as_user(current_user) do
-          if folder.update(parent_id: new_parent)
+          if folder.update(update_params)
             annotate_audits [folder.audits.last]
             folder
           else
@@ -124,7 +115,7 @@ module DDS
         end
       end
 
-      desc 'Rename a folder' do
+      desc 'Rename folder' do
         detail 'Give a folder with a given uuid a new name.'
         named 'rename folder'
         failure [
@@ -150,39 +141,6 @@ module DDS
             validation_error!(folder)
           end
         end
-      end
-
-      desc 'View parent folder' do
-        detail 'Returns the folder details for the parent of a given folder.'
-        named 'view parent folder'
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist']
-        ]
-      end
-      get '/folders/:id/parent', root: false do
-        authenticate!
-        folder = hide_logically_deleted Folder.find(params[:id])
-        parent = folder.parent
-        authorize parent, :show?
-        parent
-      end
-
-      desc 'View children folder details' do
-        detail 'Returns the folder details of children folders.'
-        named 'view children '
-        failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist']
-        ]
-      end
-      get '/folders/:id/children', root: 'results' do
-        authenticate!
-        folder = hide_logically_deleted Folder.find(params[:id])
-        authorize folder, :show?
-        folder.children.where(is_deleted: false)
       end
     end
   end

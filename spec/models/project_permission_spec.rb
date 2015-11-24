@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe ProjectPermission, type: :model do
   let(:roles) {FactoryGirl.create_list(:auth_role, 2)}
   subject {FactoryGirl.create(:project_permission)}
-  let(:resource_class) { Project }
 
   it_behaves_like 'an audited model'
 
@@ -54,6 +53,7 @@ RSpec.describe ProjectPermission, type: :model do
       expect(parsed_json).to have_key('auth_role')
       expect(parsed_json['user']).to eq({
         'id' => subject.user.id,
+        'username' => subject.user.username,
         'full_name' => subject.user.display_name
       })
       expect(subject.auth_role).to be

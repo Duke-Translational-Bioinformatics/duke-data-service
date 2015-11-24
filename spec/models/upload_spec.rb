@@ -3,9 +3,6 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
-  let(:resource_class) { Upload }
-  let(:resource_serializer) { UploadSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model' do
@@ -198,7 +195,8 @@ RSpec.describe Upload, type: :model do
       )
       expect(parsed_json["storage_provider"]).to eq({
         "id" => subject.storage_provider.id,
-        "name" => subject.storage_provider.name,
+        "description" => subject.storage_provider.description,
+        "name" => subject.storage_provider.display_name,
       })
       expect(parsed_json["status"]).to be_a Hash
       %w(initiated_on completed_on error_on error_message).each do |ekey|

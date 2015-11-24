@@ -11,7 +11,7 @@ shared_context 'with authentication' do
   include_context 'common headers'
   let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:current_user) { user_auth.user }
-  let (:api_token) { user_auth.api_token }
+  let(:api_token) { user_auth.api_token }
   let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
 end
 
@@ -40,6 +40,29 @@ shared_examples 'a listable resource' do
 
   it 'should not include unexpected resources' do
     expect(unexpected_resources).to be_a(Array)
+    is_expected.to eq(200)
+    unexpected_resources.each do |unexpected_resource|
+      expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
+    end
+  end
+end
+
+shared_examples 'a searchable resource' do
+  let(:expected_resources) { [] }
+  let(:unexpected_resources) { [] }
+  before do
+    expect(expected_resources).to be_a(Array)
+    expect(unexpected_resources).to be_a(Array)
+  end
+
+  it 'should include expected resources' do
+    is_expected.to eq(200)
+    expected_resources.each do |expected_resource|
+      expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+    end
+  end
+
+  it 'should not include unexpected resources' do
     is_expected.to eq(200)
     unexpected_resources.each do |unexpected_resource|
       expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
@@ -183,6 +206,7 @@ end
 
 shared_examples 'a removable resource' do
   let(:resource_counter) { resource_class }
+  let(:expected_count_change) { -1 }
 
   it 'should return an empty 204 response' do
     is_expected.to eq(204)
@@ -194,7 +218,7 @@ shared_examples 'a removable resource' do
     expect(resource).to be_persisted
     expect {
       is_expected.to eq(204)
-    }.to change{resource_counter.count}.by(-1)
+    }.to change{resource_counter.count}.by(expected_count_change)
   end
 end
 
@@ -265,7 +289,7 @@ shared_examples 'a logically deleted resource' do
   it 'should return 404 with error when resource found is logically deleted' do
     expect(deleted_resource).to be_persisted
     expect(deleted_resource).to respond_to 'is_deleted'
-    deleted_resource.update(is_deleted: true)
+    expect(deleted_resource.update_attribute(:is_deleted, true)).to be_truthy
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
