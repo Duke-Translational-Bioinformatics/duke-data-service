@@ -116,7 +116,7 @@ then
 fi
 
 echo "creating file"
-resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"parent":{"kind":"'${project_kind}'","id":"'${project_id}'"},"upload":{"id":"'${upload_id}'"}}' "4{dds_url}:3001/api/v1/files"`
+resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"parent":{"kind":"'${project_kind}'","id":"'${project_id}'"},"upload":{"id":"'${upload_id}'"}}' "${dds_url}:3001/api/v1/files"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
@@ -133,13 +133,6 @@ file_id=`echo $resp | jq -r '.id'`
 echo "FILE ${file_id} Created:"
 curl -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}" | jq
 if [ $? -gt 0 ]
-then
-  echo "Problem!"
-  exit 1
-fi
-echo ${resp} | jq
-error=`echo ${resp} | jq '.error'`
-if [ ${error} != null ]
 then
   echo "Problem!"
   exit 1

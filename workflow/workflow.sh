@@ -29,11 +29,11 @@ echo ${resp} | jq
 error=`echo ${resp} | jq '.error'`
 if [ ${error} != null ]
 then
-  echo "PROBLEM!"
+  echo "Problem!"
   exit 1
 fi
-
-project_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
+project_id=`echo ${resp} | jq -r '.id'`
+project_kind=`echo ${resp} | jq -r '.kind'`
 upload_size=`wc -c test_file.txt | awk '{print $1}'`
 upload_md5=`md5 test_file.txt | awk '{print $NF}'`
 echo "creating upload"
@@ -51,7 +51,7 @@ then
   exit 1
 fi
 
-upload_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
+upload_id=`echo ${resp} | jq -r '.id'`
 for chunk in workflow/chunk*.txt
 do
    md5=`md5 ${chunk} | awk '{print $NF}'`
@@ -84,8 +84,8 @@ do
      exit 1
    fi
 
-   host=`echo ${resp} | jq '.host' | sed 's/\"//g'`
-   put_url=`echo ${resp} | jq '.url'| sed 's/\"//g'`
+   host=`echo ${resp} | jq -r '.host'`
+   put_url=`echo ${resp} | jq -r '.url'`
    echo "posting data to ${host}${put_url}"
    resp=`curl --insecure -v -T ${chunk} "${host}${put_url}"`
    if [ $? -gt 0 ]
@@ -115,12 +115,13 @@ then
 fi
 
 echo "creating file"
-resp=`curl --insecure -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"upload":{"id":"'${upload_id}'"}}' "${dds_url}:3001/api/v1/projects/${project_id}/files"`
+resp=`curl --insecure -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"parent":{"kind":"'${project_kind}'","id":"'${project_id}'"},"upload":{"id":"'${upload_id}'"}}' "${dds_url}:3001/api/v1/files"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
   exit 1
 fi
+echo ${resp}
 echo ${resp} | jq
 error=`echo ${resp} | jq '.error'`
 if [ ${error} != null ]
@@ -128,19 +129,13 @@ then
   echo "Problem!"
   exit 1
 fi
-
-file_id=`echo ${resp} | jq '.id' | sed 's/\"//g'`
-resp=`curl --insecure -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}"`
+file_id=`echo ${resp} | jq -r '.id'`
+echo "FILE ${file_id} Created:"
+curl --insecure -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}" | jq
 if [ $? -gt 0 ]
 then
   echo "Problem!"
   exit 1
 fi
-echo ${resp} | jq
-error=`echo ${resp} | jq '.error'`
-if [ ${error} != null ]
-then
-  echo "Problem!"
-  exit 1
-fi
+echo "FILE ${file_id} download:"
 curl --insecure -# -L --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}:3001/api/v1/files/${file_id}/download"
