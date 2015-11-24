@@ -81,27 +81,17 @@ rspec:
     - swift.env
   entrypoint: ['rspec']
   command: spec
-heroku:
+deploysecrets:
   image: dukedataservice_server
+  environment:
+    - RAILS_ENV=${RAILS_ENV}
+    - VAULT_ADDR=http://vldfrds02.dhemgt:8200
   volumes_from:
     - server
   volumes:
-    - ~/.heroku:/home/deployer/heroku
-  entrypoint: ['heroku']
-  command: login
-  user: deployer
-  privileged: true
-  tty: true
-  net: host
-figaro:
-  image: dukedataservice_server
-  volumes_from:
-    - server
-  volumes:
-    - ~/.heroku:/home/deployer/heroku
-  entrypoint: ['figaro']
-  command: heroku:set -e production
-  user: deployer
+    - ~/.netrc:/root/.netrc
+  entrypoint: ['rake']
+  command: heroku_secrets:deploy
   privileged: true
   tty: true
   net: host

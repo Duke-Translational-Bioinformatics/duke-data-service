@@ -70,6 +70,7 @@ GEM
     diff-lcs (1.2.5)
     equalizer (0.0.11)
     erubis (2.7.0)
+    excon (0.45.4)
     execjs (2.5.2)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -78,8 +79,6 @@ GEM
       railties (>= 3.0.0)
     faker (1.4.3)
       i18n (~> 0.5)
-    figaro (1.1.1)
-      thor (~> 0.14)
     globalid (0.3.5)
       activesupport (>= 4.1.0)
     grape (0.12.0)
@@ -107,6 +106,12 @@ GEM
     hashie (3.4.2)
     hashie-forbidden_attributes (0.1.1)
       hashie (>= 3.0)
+    heroics (0.0.14)
+      erubis (~> 2.7.0)
+      excon
+      moneta
+      multi_json (>= 1.9.2)
+      netrc
     httparty (0.13.5)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -125,11 +130,15 @@ GEM
     mime-types (2.6.1)
     mini_portile (0.6.2)
     minitest (5.7.0)
+    moneta (0.8.0)
     multi_json (1.11.1)
     multi_xml (0.5.5)
+    netrc (0.11.0)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     pg (0.18.2)
+    platform-api (0.3.0)
+      heroics (~> 0.0.10)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -240,7 +249,6 @@ DEPENDENCIES
   audited-activerecord
   factory_girl_rails
   faker
-  figaro
   grape
   grape-active_model_serializers
   grape-kaminari
@@ -249,7 +257,9 @@ DEPENDENCIES
   httparty
   jwt
   kaminari
+  netrc
   pg
+  platform-api
   pry-byebug
   puma
   pundit
