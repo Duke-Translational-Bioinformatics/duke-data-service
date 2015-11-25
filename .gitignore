@@ -14,4 +14,4 @@
 config/keystore
 # Ignore application configuration
 /config/application.yml
-oit_swift.env
+swift.oit.env
