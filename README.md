@@ -1,4 +1,6 @@
 # duke-data-service
+See the `develop` branch for active commits.
+
 This is an open source project for building a "data service" for researchers that allows them to:
 
 1. Have a unified interface for storing and managing research data across multiple internal (enterprise data stores) and external (cloud data stores)
