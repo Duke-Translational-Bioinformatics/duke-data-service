@@ -26,4 +26,5 @@ RUN npm install dredd
 COPY ./dredd_scripts /home/dredd_scripts/
 
 #Execute the node app
-CMD ["node","/home/dredd_scripts/dds-dredd.js"]
+WORKDIR /home/dredd_scripts
+CMD ["node","dds-dredd.js"]

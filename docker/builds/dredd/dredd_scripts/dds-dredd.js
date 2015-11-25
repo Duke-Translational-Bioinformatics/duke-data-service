@@ -11,7 +11,7 @@ configuration = {
   server: process.env.HOST_NAME, // your URL to API endpoint the tests will run against server: 'http://192.168.99.100:3001/api/v1'
   options: {
 
-    'path': ['apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
+    'path': ['/home/dredd_scripts/apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
 
     'dry-run': false, // Boolean, do not run any real HTTP transaction
     'names': false,   // Boolean, Print Transaction names and finish, similar to dry-run
