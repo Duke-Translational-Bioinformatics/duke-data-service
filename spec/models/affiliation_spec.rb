@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Affiliation, type: :model do
-  subject { FactoryGirl.create(:affiliation) }
+  subject { FactoryGirl.build(:affiliation) }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model'
@@ -30,7 +30,6 @@ RSpec.describe Affiliation, type: :model do
     end
 
     it 'should have a user_id unique to the project' do
-      expect(subject).to be_persisted
       should validate_uniqueness_of(:user_id).scoped_to(:project_id)
     end
 
