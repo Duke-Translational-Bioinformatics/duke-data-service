@@ -46,36 +46,4 @@ RSpec.describe AuthRole, type: :model do
       end
     end
   end
-
-  #{
-  #  "id": "system_admin",
-  #  "name": "System Admin",
-  #  "description": "Can perform all system operations across all projects",
-  #  "permissions": [ "system_admin" ],
-  #  "contexts": [ "system" ], // Contexts in which role is relevant (i.e. "system" or "project"),
-  #  "is_deprecated": false // If deprecated, cannot be granted, but show for existing users who have this role
-  #},
-  describe 'serialization' do
-    subject {FactoryGirl.create(:auth_role)}
-
-    it 'should serialize to json' do
-      serializer = AuthRoleSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      permissions_parsed = parsed_json['permissions'].collect { |c| c['id'] }
-      expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('name')
-      expect(parsed_json).to have_key('description')
-      expect(parsed_json).to have_key('permissions')
-      expect(parsed_json).to have_key('contexts')
-      expect(parsed_json).to have_key('is_deprecated')
-      expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['name']).to eq(subject.name)
-      expect(parsed_json['description']).to eq(subject.description)
-      expect(parsed_json['contexts']).to eq(subject.contexts)
-      expect(parsed_json['is_deprecated']).to eq(subject.is_deprecated)
-      expect(permissions_parsed).to eq(subject.permissions)
-    end
-  end
 end

@@ -97,51 +97,5 @@ RSpec.describe User, type: :model do
         expect(subject.storage_bytes).to eq(expected_size)
       end
     end
-
-    describe 'UserUsageSerializer' do
-      it 'should serialize user.usage to json' do
-        serializer = UserUsageSerializer.new subject
-        payload = serializer.to_json
-        expect(payload).to be
-        parsed_json = JSON.parse(payload)
-        expect(parsed_json).to have_key('project_count')
-        expect(parsed_json).to have_key('file_count')
-        expect(parsed_json).to have_key('storage_bytes')
-        expect(parsed_json['project_count']).to eq(subject.project_count)
-        expect(parsed_json['file_count']).to eq(subject.file_count)
-        expect(parsed_json['storage_bytes']).to eq(subject.storage_bytes)
-      end
-    end
-  end
-
-  describe 'UserSerializer' do
-    let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
-    subject { user_authentication_service.user }
-
-    it 'should serialize user attributes to json' do
-      serializer = UserSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('username')
-      expect(parsed_json).to have_key('full_name')
-      expect(parsed_json).to have_key('first_name')
-      expect(parsed_json).to have_key('last_name')
-      expect(parsed_json).to have_key('email')
-      expect(parsed_json).to have_key('auth_provider')
-      expect(parsed_json).to have_key('last_login_on')
-      expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['username']).to eq(subject.username)
-      expect(parsed_json['full_name']).to eq(subject.display_name)
-      expect(parsed_json['first_name']).to eq(subject.first_name)
-      expect(parsed_json['last_name']).to eq(subject.last_name)
-      expect(parsed_json['email']).to eq(subject.email)
-      expect(parsed_json['auth_provider']).to have_key('uid')
-      expect(parsed_json['auth_provider']).to have_key('source')
-      expect(parsed_json['auth_provider']['uid']).to eq(user_authentication_service.uid)
-      expect(parsed_json['auth_provider']['source']).to eq(user_authentication_service.authentication_service.name)
-      expect(parsed_json['last_login_on'].to_json).to eq(subject.last_login_at.to_json)
-    end
   end
 end

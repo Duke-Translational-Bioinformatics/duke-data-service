@@ -41,30 +41,4 @@ RSpec.describe Affiliation, type: :model do
       should validate_presence_of(:project_role_id)
     end
   end
-
-  describe 'serialization' do
-    let(:user) {subject.user}
-    let(:role) {subject.project_role}
-
-    it 'should serialize to json' do
-      serializer = AffiliationSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to eq({
-        'project' => {
-          'id' => subject.project_id
-        },
-        'user' => {
-          'id' => user.id,
-          'full_name' => user.display_name,
-          'email' => user.email
-        },
-        'project_role' => {
-          'id' => role.id,
-          'name' => role.name
-        }
-      })
-    end
-  end
 end
