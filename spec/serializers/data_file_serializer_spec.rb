@@ -1,25 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe DataFileSerializer, type: :serializer do
+  let(:resource) { child_file }
+  let(:root_file) { FactoryGirl.create(:data_file, :root) }
+  let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
+
   it 'should have one upload preview' do
     expect(described_class._associations).to have_key(:upload)
     expect(described_class._associations[:upload]).to be_a(ActiveModel::Serializer::Association::HasOne)
     expect(described_class._associations[:upload].serializer_from_options).to eq(UploadPreviewSerializer)
   end
 
-  describe 'serializer#to_json' do
-    let(:resource) { child_file }
-    let(:serializer) { DataFileSerializer.new(resource) }
-    subject { JSON.parse(serializer.to_json) }
-
-    let(:root_file) { FactoryGirl.create(:data_file, :root) }
-    let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
-
-
-    it 'should serialize to json' do
-      expect{subject}.to_not raise_error
-    end
-
+  it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('id')
       is_expected.to have_key('parent')
