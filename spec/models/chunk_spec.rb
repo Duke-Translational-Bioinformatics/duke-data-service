@@ -65,22 +65,5 @@ RSpec.describe Chunk, type: :model do
       should respond_to :url
       expect(subject.url).to eq expected_url
     end
-
-    describe 'serialization' do
-      it 'should serialize to json' do
-        serializer = ChunkSerializer.new subject
-        payload = serializer.to_json
-        expect(payload).to be
-        parsed_json = JSON.parse(payload)
-        expect(parsed_json).to have_key('http_verb')
-        expect(parsed_json).to have_key('host')
-        expect(parsed_json).to have_key('url')
-        expect(parsed_json).to have_key('http_headers')
-        expect(parsed_json['http_verb']).to eq(subject.http_verb)
-        expect(parsed_json['host']).to eq(subject.host)
-        expect(parsed_json['http_headers']).to eq(subject.http_headers)
-        expect(parsed_json['url']).to eq(subject.url)
-      end
-    end
   end
 end
