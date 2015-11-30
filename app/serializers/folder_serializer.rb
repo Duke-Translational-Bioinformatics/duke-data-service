@@ -1,9 +1,7 @@
 class FolderSerializer < ActiveModel::Serializer
   attributes :kind, :id, :parent, :name, :project, :is_deleted, :audit, :ancestors
 
-  def project
-    { id: object.project_id }
-  end
+  has_one :project, serializer: ProjectPreviewSerializer
 
   def parent
     parent = object.parent || object.project
