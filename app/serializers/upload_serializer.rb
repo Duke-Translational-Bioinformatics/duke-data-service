@@ -1,5 +1,4 @@
 class UploadSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :id,
              :project,
              :name,
@@ -12,9 +11,8 @@ class UploadSerializer < ActiveModel::Serializer
              :status,
              :audit
 
-  def project
-    {id: object.project_id}
-  end
+  has_one :project, serializer: ProjectPreviewSerializer
+  has_one :storage_provider, serializer: StorageProviderPreviewSerializer
 
   def hash
     {
@@ -32,14 +30,6 @@ class UploadSerializer < ActiveModel::Serializer
         size: chunk.size,
         hash: { value: chunk.fingerprint_value, algorithm: chunk.fingerprint_algorithm }
       }
-    }
-  end
-
-  def storage_provider
-    {
-      id: object.storage_provider_id,
-      description: object.storage_provider.description,
-      name: object.storage_provider.display_name
     }
   end
 

@@ -1,12 +1,8 @@
 class DataFileSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :kind, :id, :parent, :name, :project, :audit, :upload, :ancestors, :is_deleted
 
   has_one :upload, serializer: UploadPreviewSerializer
-
-  def project
-    { id: object.project_id }
-  end
+  has_one :project, serializer: ProjectPreviewSerializer
 
   def parent
     parent = object.parent || object.project

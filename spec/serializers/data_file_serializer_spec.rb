@@ -6,19 +6,18 @@ RSpec.describe DataFileSerializer, type: :serializer do
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
 
   it_behaves_like 'a has_one association with', :upload, UploadPreviewSerializer
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('id')
       is_expected.to have_key('parent')
       is_expected.to have_key('name')
-      is_expected.to have_key('project')
       is_expected.to have_key('ancestors')
       is_expected.to have_key('is_deleted')
       expect(subject['id']).to eq(resource.id)
       expect(subject['parent']['id']).to eq(resource.parent_id)
       expect(subject['name']).to eq(resource.name)
-      expect(subject['project']['id']).to eq(resource.project_id)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
 
