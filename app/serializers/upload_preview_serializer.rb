@@ -1,5 +1,4 @@
 class UploadPreviewSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :id,
              :size,
              :hash

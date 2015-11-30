@@ -1,5 +1,4 @@
 class SystemPermissionSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :user, :auth_role
 
   def user

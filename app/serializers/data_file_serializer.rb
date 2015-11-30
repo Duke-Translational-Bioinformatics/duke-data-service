@@ -1,5 +1,4 @@
 class DataFileSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :kind, :id, :parent, :name, :project, :audit, :upload, :ancestors, :is_deleted
 
   has_one :upload, serializer: UploadPreviewSerializer

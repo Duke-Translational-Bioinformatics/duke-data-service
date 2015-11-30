@@ -1,5 +1,4 @@
 class ProjectPermissionSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :project, :user, :auth_role
 
   def user

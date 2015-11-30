@@ -1,5 +1,4 @@
 class FolderSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :kind, :id, :parent, :name, :project, :is_deleted, :audit, :ancestors
 
   def project

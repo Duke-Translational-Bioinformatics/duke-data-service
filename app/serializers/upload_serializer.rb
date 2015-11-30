@@ -1,5 +1,4 @@
 class UploadSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :id,
              :project,
              :name,

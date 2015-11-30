@@ -1,5 +1,4 @@
 class AffiliationSerializer < ActiveModel::Serializer
-  self.root = false
   attributes :project, :user, :project_role
 
   def project
