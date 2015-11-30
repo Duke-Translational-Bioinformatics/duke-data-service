@@ -5,17 +5,18 @@ RSpec.describe UploadSerializer, type: :serializer do
   let(:expected_keys) {
     %w(
       id
-      project
       name
       content_type
       size
       etag
       hash
       chunks
-      storage_provider
       status
     )
   }
+
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
+  it_behaves_like 'a has_one association with', :storage_provider, StorageProviderPreviewSerializer
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
@@ -23,7 +24,6 @@ RSpec.describe UploadSerializer, type: :serializer do
         is_expected.to have_key ekey
       end
       expect(subject["id"]).to eq(resource.id)
-      expect(subject["project"]).to eq({"id" => resource.project.id})
       expect(subject["name"]).to eq(resource.name)
       expect(subject["content_type"]).to eq(resource.content_type)
       expect(subject["size"]).to eq(resource.size)
@@ -42,11 +42,6 @@ RSpec.describe UploadSerializer, type: :serializer do
           }
         }
       )
-      expect(subject["storage_provider"]).to eq({
-        "id" => resource.storage_provider.id,
-        "description" => resource.storage_provider.description,
-        "name" => resource.storage_provider.display_name,
-      })
       expect(subject["status"]).to be_a Hash
       %w(initiated_on completed_on error_on error_message).each do |ekey|
         expect(subject["status"]).to have_key ekey

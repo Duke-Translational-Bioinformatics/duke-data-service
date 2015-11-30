@@ -5,6 +5,8 @@ RSpec.describe FolderSerializer, type: :serializer do
   let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:root_folder) { FactoryGirl.create(:folder, :root) }
 
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
+
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('id')
@@ -12,8 +14,6 @@ RSpec.describe FolderSerializer, type: :serializer do
       expect(subject['parent']).to have_key('kind')
       expect(subject['parent']).to have_key('id')
       is_expected.to have_key('name')
-      is_expected.to have_key('project')
-      expect(subject['project']).to have_key('id')
       is_expected.to have_key('ancestors')
       is_expected.to have_key('is_deleted')
 
@@ -21,7 +21,6 @@ RSpec.describe FolderSerializer, type: :serializer do
       expect(subject['parent']['kind']).to eq(resource.parent.kind)
       expect(subject['parent']['id']).to eq(resource.parent.id)
       expect(subject['name']).to eq(resource.name)
-      expect(subject['project']['id']).to eq(resource.project_id)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
 
