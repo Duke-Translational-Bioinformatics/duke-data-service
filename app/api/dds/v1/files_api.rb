@@ -103,7 +103,8 @@ module DDS
             file = hide_logically_deleted(DataFile.find(params[:id]))
             authorize file, :download?
             new_url = "#{file.upload.storage_provider.url_root}#{file.upload.temporary_url}"
-            redirect new_url, permanent: true
+            logger.error "Redirecting!"
+            redirect new_url
           end
 
           desc 'Move file' do

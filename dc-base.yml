@@ -3,8 +3,6 @@ webapp:
   env_file:
     - swift.env
     - webapp.env
-  volumes:
-    - .:/var/www/app
   ports:
     - 3001:3000
 db:

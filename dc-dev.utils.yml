@@ -4,6 +4,8 @@ server:
   extends:
     file: dc-base.yml
     service: webapp
+  volumes:
+    - .:/var/www/app
   links:
     - db:postgres.db.host
 db:
@@ -95,3 +97,11 @@ deploysecrets:
   privileged: true
   tty: true
   net: host
+dredd:
+  build: ./docker/builds/dredd
+  links:
+   - server:dds.host
+  env_file:
+    - dredd.env
+  volumes:
+    - ./apiary.apib:/home/dredd_scripts/apiary.apib
