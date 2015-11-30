@@ -1,9 +1,29 @@
 machine:
+  environment:
+    DDSURL: http://0.0.0.0
+    COMPOSE_FILE: docker-compose.circle.yml
+  hosts:
+    swift.circle.host: 0.0.0.0
+  services:
+    - docker
 
   # Version of ruby to use
   ruby:
     version:
       2.2.2
+
+dependencies:
+  pre:
+    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
+    - sudo pip install --upgrade docker-compose==1.3.0
+#    - docker-compose build
+#    - ./circle/launch_application.circle.sh
+#    - echo "MY_GENERATED_JWT="`docker-compose run rake api_test_user:create | tail -1` >> dredd.env
+
+#test:
+#  post:
+#    - './workflow/workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
+#    - 'docker-compose run dredd'
 
 deployment:
   development:
