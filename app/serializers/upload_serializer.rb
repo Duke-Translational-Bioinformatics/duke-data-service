@@ -3,6 +3,7 @@ class UploadSerializer < ActiveModel::Serializer
 
   has_one :project, serializer: ProjectPreviewSerializer
   has_one :storage_provider, serializer: StorageProviderPreviewSerializer
+  has_many :chunks, serializer: ChunkPreviewSerializer
 
   def hash
     {
@@ -10,16 +11,6 @@ class UploadSerializer < ActiveModel::Serializer
       algorithm: object.fingerprint_algorithm,
       client_reported: true,
       confirmed: false
-    }
-  end
-
-  def chunks
-    object.chunks.collect{ |chunk|
-      {
-        number: chunk.number,
-        size: chunk.size,
-        hash: { value: chunk.fingerprint_value, algorithm: chunk.fingerprint_algorithm }
-      }
     }
   end
 
