@@ -92,8 +92,7 @@ deploysecrets:
     - server
   volumes:
     - ~/.netrc:/root/.netrc
-  entrypoint: ['rake']
-  command: heroku_secrets:deploy
+  command: ['rake', 'heroku_secrets:deploy']
   privileged: true
   tty: true
   net: host
