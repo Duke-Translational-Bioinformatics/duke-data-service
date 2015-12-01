@@ -1,15 +1,5 @@
 class UploadSerializer < ActiveModel::Serializer
-  attributes :id,
-             :project,
-             :name,
-             :content_type,
-             :size,
-             :etag,
-             :hash,
-             :chunks,
-             :storage_provider,
-             :status,
-             :audit
+  attributes :id, :name, :content_type, :size, :etag, :hash, :chunks, :status, :audit
 
   has_one :project, serializer: ProjectPreviewSerializer
   has_one :storage_provider, serializer: StorageProviderPreviewSerializer

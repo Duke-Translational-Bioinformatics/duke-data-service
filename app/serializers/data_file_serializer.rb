@@ -1,5 +1,5 @@
 class DataFileSerializer < ActiveModel::Serializer
-  attributes :kind, :id, :parent, :name, :project, :audit, :upload, :ancestors, :is_deleted
+  attributes :kind, :id, :parent, :name, :audit, :is_deleted
 
   has_one :upload, serializer: UploadPreviewSerializer
   has_one :project, serializer: ProjectPreviewSerializer
