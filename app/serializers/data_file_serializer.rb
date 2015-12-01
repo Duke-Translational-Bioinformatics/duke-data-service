@@ -3,6 +3,7 @@ class DataFileSerializer < ActiveModel::Serializer
 
   has_one :upload, serializer: UploadPreviewSerializer
   has_one :project, serializer: ProjectPreviewSerializer
+  has_many :ancestors, serializer: AncestorSerializer
 
   def parent
     parent = object.parent || object.project
@@ -11,16 +12,5 @@ class DataFileSerializer < ActiveModel::Serializer
 
   def is_deleted
     object.is_deleted?
-  end
-
-
-  def ancestors
-    object.ancestors.collect do |a|
-      {
-        kind: a.kind,
-        id: a.id,
-        name: a.name
-      }
-    end
   end
 end
