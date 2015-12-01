@@ -10,13 +10,13 @@ RSpec.describe UploadSerializer, type: :serializer do
       size
       etag
       hash
-      chunks
       status
     )
   }
 
   it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
   it_behaves_like 'a has_one association with', :storage_provider, StorageProviderPreviewSerializer
+  it_behaves_like 'a has_many association with', :chunks, ChunkPreviewSerializer
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
@@ -33,15 +33,6 @@ RSpec.describe UploadSerializer, type: :serializer do
         "client_reported" => true,
         "confirmed" => false
       })
-      expect(subject["chunks"]).to eq(
-        resource.chunks.collect{ |chunk|
-          {
-            "number" => chunk.number,
-            "size" => chunk.size,
-            "hash" => { "value" => chunk.fingerprint_value, "algorithm" => chunk.fingerprint_algorithm }
-          }
-        }
-      )
       expect(subject["status"]).to be_a Hash
       %w(initiated_on completed_on error_on error_message).each do |ekey|
         expect(subject["status"]).to have_key ekey
