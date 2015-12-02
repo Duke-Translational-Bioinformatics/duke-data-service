@@ -52,18 +52,10 @@ rake:
   env_file:
     - webapp.env
     - swift.env
-bundle:
-  image: dukedataservice_server
-  volumes_from:
-    - server
-  entrypoint: ['bundle']
-  command: install
 authservice:
   image: dukedataservice_server
-  environment:
-    - AUTH_SERVICE_ID=342c075a-7aca-4c35-b3f5-29f043884b5b
-    - BASE_URI=https://192.168.99.100:3000
-    - NAME=Duke Authentication Service
+  env_file:
+    - auth_service.env
   volumes_from:
     - server
   entrypoint: ['rake']
