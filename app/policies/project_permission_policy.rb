@@ -4,11 +4,11 @@ class ProjectPermissionPolicy < ApplicationPolicy
   end
 
   def update?
-    permission.exists?
+    permission.exists? && record.user != user
   end
 
   def destroy?
-    permission.exists?
+    permission.exists? && record.user != user
   end
 
   class Scope < Scope
