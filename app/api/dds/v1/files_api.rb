@@ -34,7 +34,8 @@ module DDS
         file = project.data_files.build({
           parent: parent,
           upload: upload,
-          name: upload.name
+          name: upload.name,
+          creator_id: current_user.id
         })
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
