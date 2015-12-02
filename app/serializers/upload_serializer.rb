@@ -1,20 +1,9 @@
 class UploadSerializer < ActiveModel::Serializer
-  self.root = false
-  attributes :id,
-             :project,
-             :name,
-             :content_type,
-             :size,
-             :etag,
-             :hash,
-             :chunks,
-             :storage_provider,
-             :status,
-             :audit
+  attributes :id, :name, :content_type, :size, :etag, :hash, :chunks, :status, :audit
 
-  def project
-    {id: object.project_id}
-  end
+  has_one :project, serializer: ProjectPreviewSerializer
+  has_one :storage_provider, serializer: StorageProviderPreviewSerializer
+  has_many :chunks, serializer: ChunkPreviewSerializer
 
   def hash
     {
@@ -22,24 +11,6 @@ class UploadSerializer < ActiveModel::Serializer
       algorithm: object.fingerprint_algorithm,
       client_reported: true,
       confirmed: false
-    }
-  end
-
-  def chunks
-    object.chunks.collect{ |chunk|
-      {
-        number: chunk.number,
-        size: chunk.size,
-        hash: { value: chunk.fingerprint_value, algorithm: chunk.fingerprint_algorithm }
-      }
-    }
-  end
-
-  def storage_provider
-    {
-      id: object.storage_provider_id,
-      description: object.storage_provider.description,
-      name: object.storage_provider.display_name
     }
   end
 

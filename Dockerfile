@@ -35,9 +35,6 @@ ADD docker/includes/cert_config /root/installs/cert_config
 RUN ["chmod", "u+x", "/root/installs/install_ssl_cert.sh"]
 RUN ["/root/installs/install_ssl_cert.sh"]
 
-# Heroku integration
-RUN wget -qO- https://toolbelt.heroku.com/install.sh | sed 's/sudo //g' | sh
-RUN ln -s /usr/local/heroku/bin/heroku /usr/local/bin/heroku
 # user or deployments
 RUN ["/usr/sbin/userdel", "ftp"]
 RUN ["/usr/sbin/groupadd", "-g", "50", "staff"]
@@ -51,6 +48,7 @@ RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "epel-release"]
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "git", "libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
 RUN ["mkdir","-p","/var/www/app"]
 WORKDIR /var/www/app
+RUN curl -L https://api.github.com/repos/Duke-Translational-Bioinformatics/duke-data-service/tarball/develop | tar -zxvf - --strip 1
 ADD Gemfile /var/www/app/Gemfile
 ADD Gemfile.lock /var/www/app/Gemfile.lock
 RUN ["bundle", "config", "build.nokogiri", "--use-system-libraries"]

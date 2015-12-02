@@ -7,8 +7,6 @@ RSpec.describe Chunk, type: :model do
   let(:expected_sub_path) { [subject.project_id, subject.upload_id, subject.number].join('/')}
   let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
   let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
-  let(:resource_class) { Chunk }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model'
@@ -66,23 +64,6 @@ RSpec.describe Chunk, type: :model do
     it 'should have a url method' do
       should respond_to :url
       expect(subject.url).to eq expected_url
-    end
-
-    describe 'serialization' do
-      it 'should serialize to json' do
-        serializer = ChunkSerializer.new subject
-        payload = serializer.to_json
-        expect(payload).to be
-        parsed_json = JSON.parse(payload)
-        expect(parsed_json).to have_key('http_verb')
-        expect(parsed_json).to have_key('host')
-        expect(parsed_json).to have_key('url')
-        expect(parsed_json).to have_key('http_headers')
-        expect(parsed_json['http_verb']).to eq(subject.http_verb)
-        expect(parsed_json['host']).to eq(subject.host)
-        expect(parsed_json['http_headers']).to eq(subject.http_headers)
-        expect(parsed_json['url']).to eq(subject.url)
-      end
     end
   end
 end

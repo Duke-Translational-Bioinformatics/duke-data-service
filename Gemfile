@@ -28,8 +28,9 @@ gem 'uglifier'
 gem 'pundit'
 gem 'httparty'
 
-# use figaro to set heroku environment variables for secrets
-gem 'figaro'
+# use heroku platform-api to set heroku environment variables for secrets
+gem 'platform-api'
+gem 'netrc'
 
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'

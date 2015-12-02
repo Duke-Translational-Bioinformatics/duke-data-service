@@ -80,6 +80,11 @@ test:
 #   production:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
+
+ua_test:
+  <<: *default
+  database: duke-data-service_ua_test
+
 production:
   <<: *default
   database: <%= ENV['DUKE_DATA_SERVICE_DATABASE_DB'] %>

@@ -2,9 +2,6 @@ require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
   subject { child_file }
-  let(:resource_class) { DataFile }
-  let(:resource_serializer) { DataFileSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
@@ -108,68 +105,6 @@ RSpec.describe DataFile, type: :model do
       expect(subject.parent).to eq other_folder
       expect(subject.project).to eq other_folder.project
       expect(subject.project_id).to eq other_folder.project_id
-    end
-  end
-
-
-  describe 'serialization' do
-    let(:serializer) { DataFileSerializer.new subject }
-    let(:payload) { serializer.to_json }
-    let(:parsed_json) { JSON.parse(payload) }
-    it 'should serialize to json' do
-      expect(payload).to be
-      expect{parsed_json}.to_not raise_error
-    end
-
-    it 'should expected keys and values' do
-      expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('parent')
-      expect(parsed_json).to have_key('name')
-      expect(parsed_json).to have_key('project')
-      expect(parsed_json).to have_key('ancestors')
-      expect(parsed_json).to have_key('is_deleted')
-      expect(parsed_json).to have_key('upload')
-      expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['parent']['id']).to eq(subject.parent_id)
-      expect(parsed_json['name']).to eq(subject.name)
-      expect(parsed_json['project']['id']).to eq(subject.project_id)
-      expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
-      expect(parsed_json['upload']['id']).to eq(subject.upload_id)
-    end
-
-    describe 'ancestors' do
-      context 'with a parent folder' do
-        subject { child_file }
-        it 'should return the project and parent' do
-          expect(subject.project).to be
-          expect(subject.parent).to be
-          expect(parsed_json['ancestors']).to eq [
-            {
-              'kind' => subject.project.kind,
-              'id' => subject.project.id,
-              'name' => subject.project.name
-            },
-            {
-              'kind' => subject.parent.kind,
-              'id' => subject.parent.id,
-              'name' => subject.parent.name
-            }
-          ]
-        end
-      end
-
-      context 'without a parent' do
-        subject { root_file }
-        it 'should return the project' do
-          expect(subject.project).to be
-          expect(parsed_json['ancestors']).to eq [
-            {
-              'kind' => subject.project.kind,
-              'id' => subject.project.id,
-              'name' => subject.project.name }
-          ]
-        end
-      end
     end
   end
 

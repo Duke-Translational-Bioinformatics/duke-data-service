@@ -3,9 +3,6 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
-  let(:resource_class) { Upload }
-  let(:resource_serializer) { UploadSerializer }
-  let!(:resource) { subject }
   let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model' do
@@ -150,65 +147,4 @@ RSpec.describe Upload, type: :model do
       end #calls
     end #complete
   end #swift methods
-
-  describe 'serialization' do
-    subject { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
-
-    let(:expected_keys) {
-      %w(
-        id
-        project
-        name
-        content_type
-        size
-        etag
-        hash
-        chunks
-        storage_provider
-        status
-      )
-    }
-    it 'should serialize to json' do
-      serializer = UploadSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expected_keys.each do |ekey|
-        expect(parsed_json).to have_key ekey
-      end
-      expect(parsed_json["id"]).to eq(subject.id)
-      expect(parsed_json["project"]).to eq({"id" => subject.project.id})
-      expect(parsed_json["name"]).to eq(subject.name)
-      expect(parsed_json["content_type"]).to eq(subject.content_type)
-      expect(parsed_json["size"]).to eq(subject.size)
-      expect(parsed_json["hash"]).to eq({
-        "value" => subject.fingerprint_value,
-        "algorithm" => subject.fingerprint_algorithm,
-        "client_reported" => true,
-        "confirmed" => false
-      })
-      expect(parsed_json["chunks"]).to eq(
-        subject.chunks.collect{ |chunk|
-          {
-            "number" => chunk.number,
-            "size" => chunk.size,
-            "hash" => { "value" => chunk.fingerprint_value, "algorithm" => chunk.fingerprint_algorithm }
-          }
-        }
-      )
-      expect(parsed_json["storage_provider"]).to eq({
-        "id" => subject.storage_provider.id,
-        "description" => subject.storage_provider.description,
-        "name" => subject.storage_provider.display_name,
-      })
-      expect(parsed_json["status"]).to be_a Hash
-      %w(initiated_on completed_on error_on error_message).each do |ekey|
-        expect(parsed_json["status"]).to have_key ekey
-      end
-      expect(DateTime.parse(parsed_json["status"]["initiated_on"]).to_i).to eq(subject.created_at.to_i)
-      expect(DateTime.parse(parsed_json["status"]["completed_on"]).to_i).to eq(subject.completed_at.to_i)
-      expect(DateTime.parse(parsed_json["status"]["error_on"]).to_i).to eq(subject.error_at.to_i)
-      expect(parsed_json["status"]["error_message"]).to eq(subject.error_message)
-    end
-  end
 end

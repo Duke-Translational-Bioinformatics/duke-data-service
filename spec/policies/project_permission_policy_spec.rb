@@ -46,6 +46,10 @@ describe ProjectPermissionPolicy do
       is_expected.not_to permit(user, other_project_permission)
     end
 
+    it 'denies access to project permission for current_user' do
+      is_expected.not_to permit(user, permission)
+    end
+
     it 'grants access with project permission' do
       is_expected.to permit(user, project_permission)
     end
@@ -54,6 +58,10 @@ describe ProjectPermissionPolicy do
   permissions :destroy? do
     it 'denies access without project permission' do
       is_expected.not_to permit(user, other_project_permission)
+    end
+
+    it 'denies access to project permission for current_user' do
+      is_expected.not_to permit(user, permission)
     end
 
     it 'grants access with project permission' do

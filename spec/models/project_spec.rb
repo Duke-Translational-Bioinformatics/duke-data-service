@@ -2,9 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
-  let(:resource_class) { Project }
-  let(:resource_serializer) { ProjectSerializer }
-  let(:resource) { subject }
   let(:is_logically_deleted) { true }
 
   it_behaves_like 'an audited model' do
@@ -112,23 +109,6 @@ RSpec.describe Project, type: :model do
           expect(child.is_deleted?).to be_truthy
         end
       end
-    end
-  end
-
-  describe 'serialization' do
-    it 'should serialize to json' do
-      serializer = ProjectSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('name')
-      expect(parsed_json).to have_key('description')
-      expect(parsed_json).to have_key('is_deleted')
-      expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['name']).to eq(subject.name)
-      expect(parsed_json['description']).to eq(subject.description)
-      expect(parsed_json['is_deleted']).to eq(subject.is_deleted)
     end
   end
 end

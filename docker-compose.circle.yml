@@ -1,0 +1,61 @@
+server:
+  build: .
+  env_file:
+    - circle/swift.circle.env
+    - circle/webapp.circle.env
+  links:
+    - db:postgres.db.host
+    - swift:swift.circle.host
+  ports:
+    - 3001:3000
+db:
+  build: ./docker/builds/db
+  env_file:
+    - db.env
+swiftvol:
+  image: busybox
+  volumes:
+    - /srv
+swift:
+  build: ./docker/builds/swift
+  ports:
+    - 8080:8080
+rake:
+  image: dukedataservice_server
+  entrypoint: ['rake']
+  links:
+    - db:postgres.db.host
+    - swift:swift.circle.host
+  env_file:
+    - circle/webapp.circle.env
+    - circle/swift.circle.env
+authservice:
+  image: dukedataservice_server
+  env_file:
+    - auth_service.env
+  entrypoint: ['rake']
+  command: authentication_service:create
+  links:
+    - db:postgres.db.host
+  env_file:
+    - circle/webapp.circle.env
+    - circle/swift.circle.env
+rspec:
+  image: dukedataservice_server
+  environment:
+    - RAILS_ENV=test
+  links:
+    - db:postgres.db.host
+    - swift:swift.circle.host
+  env_file:
+    - circle/swift.circle.env
+  entrypoint: ['rspec']
+  command: spec
+dredd:
+  build: ./docker/builds/dredd
+  links:
+   - server:dds.host
+  env_file:
+    - dredd.env
+  volumes:
+    - ./apiary.apib:/home/dredd_scripts/apiary.apib

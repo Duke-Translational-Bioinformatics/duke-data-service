@@ -151,7 +151,7 @@ describe DDS::V1::FilesAPI do
       subject { get(url, nil, headers) }
 
       it 'permenantly redirects to a temporary get url for the upload' do
-        is_expected.to eq(301)
+        is_expected.to eq(302)
       end
 
       it_behaves_like 'an authenticated resource'

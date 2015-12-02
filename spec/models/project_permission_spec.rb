@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectPermission, type: :model do
-  let(:roles) {FactoryGirl.create_list(:auth_role, 2)}
-  subject {FactoryGirl.create(:project_permission)}
-  let(:resource_class) { Project }
+  subject {FactoryGirl.build(:project_permission)}
 
   it_behaves_like 'an audited model'
 
@@ -40,30 +38,6 @@ RSpec.describe ProjectPermission, type: :model do
 
     it 'should have an auth_role_id' do
       should validate_presence_of(:auth_role_id)
-    end
-  end
-
-  describe 'serialization' do
-    it 'should serialize to json' do
-      serializer = ProjectPermissionSerializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to have_key('user')
-      expect(parsed_json).to have_key('project')
-      expect(parsed_json).to have_key('auth_role')
-      expect(parsed_json['user']).to eq({
-        'id' => subject.user.id,
-        'username' => subject.user.username,
-        'full_name' => subject.user.display_name
-      })
-      expect(subject.auth_role).to be
-      expect(parsed_json['auth_role']).to eq({
-        'id' => subject.auth_role.id,
-        'name' => subject.auth_role.name,
-        'description' => subject.auth_role.description
-      })
-      expect(parsed_json['project']).to eq({'id' => subject.project.id})
     end
   end
 end

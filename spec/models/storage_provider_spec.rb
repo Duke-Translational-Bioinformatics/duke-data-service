@@ -4,10 +4,7 @@ RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-  let(:resource_class) { StorageProvider }
-  let(:resource_serializer) { StorageProviderSerializer }
   subject { storage_provider }
-  let!(:resource) { subject }
 
   describe 'methods that call swift api', :vcr do
     subject { swift_storage_provider }
@@ -179,23 +176,6 @@ RSpec.describe StorageProvider, type: :model do
       should validate_presence_of :service_pass
       should validate_presence_of :primary_key
       should validate_presence_of :secondary_key
-    end
-  end
-
-  describe 'serialization' do
-    it 'should serialize to json' do
-      serializer = resource_serializer.new subject
-      payload = serializer.to_json
-      expect(payload).to be
-      parsed_json = JSON.parse(payload)
-      expect(parsed_json).to have_key('id')
-      expect(parsed_json).to have_key('name')
-      expect(parsed_json).to have_key('description')
-      expect(parsed_json).to have_key('is_deprecated')
-      expect(parsed_json['id']).to eq(subject.id)
-      expect(parsed_json['name']).to eq(subject.display_name)
-      expect(parsed_json['description']).to eq(subject.description)
-      expect(parsed_json['is_deprecated']).to eq(subject.is_deprecated)
     end
   end
 end

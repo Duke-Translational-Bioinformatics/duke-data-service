@@ -4,6 +4,8 @@ server:
   extends:
     file: dc-base.yml
     service: webapp
+  volumes:
+    - .:/var/www/app
   links:
     - db:postgres.db.host
 db:
@@ -50,18 +52,10 @@ rake:
   env_file:
     - webapp.env
     - swift.env
-bundle:
-  image: dukedataservice_server
-  volumes_from:
-    - server
-  entrypoint: ['bundle']
-  command: install
 authservice:
   image: dukedataservice_server
-  environment:
-    - AUTH_SERVICE_ID=342c075a-7aca-4c35-b3f5-29f043884b5b
-    - BASE_URI=https://192.168.99.100:3000
-    - NAME=Duke Authentication Service
+  env_file:
+    - auth_service.env
   volumes_from:
     - server
   entrypoint: ['rake']
@@ -81,15 +75,16 @@ rspec:
     - swift.env
   entrypoint: ['rspec']
   command: spec
-heroku:
+deploysecrets:
   image: dukedataservice_server
+  environment:
+    - RAILS_ENV=${RAILS_ENV}
+    - VAULT_ADDR=http://vldfrds02.dhemgt:8200
   volumes_from:
     - server
   volumes:
-    - ~/.heroku:/home/deployer/heroku
-  entrypoint: ['heroku']
-  command: login
-  user: deployer
+    - ~/.netrc:/root/.netrc
+  command: ['rake', 'heroku_secrets:deploy']
   privileged: true
   tty: true
   net: host
@@ -97,3 +92,11 @@ genportal:
   build: ./docker/builds/genportal
   volumes:
     - .:/var/www/app
+dredd:
+  build: ./docker/builds/dredd
+  links:
+   - server:dds.host
+  env_file:
+    - dredd.env
+  volumes:
+    - ./apiary.apib:/home/dredd_scripts/apiary.apib
