@@ -3,6 +3,7 @@ webapp:
   env_file:
     - swift.env
     - webapp.env
+    - portal.env
   ports:
     - 3001:3000
 db:
