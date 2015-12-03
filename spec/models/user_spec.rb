@@ -33,12 +33,20 @@ RSpec.describe User, type: :model do
       should have_many(:affiliations)
     end
 
-    it 'should have many data_files' do
-      should have_many(:data_files)
+    it 'should have many project permissions' do
+      should have_many(:project_permissions)
     end
 
-    it 'should have many uploads through data_files' do
-      should have_many(:uploads).through(:data_files)
+    it 'should have many permitted_projects through project permissions' do
+      should have_many(:permitted_projects).class_name('Project').through(:project_permissions).source(:project).conditions(is_deleted: false)
+    end
+
+    it 'should have many created_files' do
+      should have_many(:created_files).class_name('DataFile').through(:permitted_projects).source(:data_files).with_foreign_key(:creator_id).conditions(is_deleted: false)
+    end
+
+    it 'should have many uploads through created_files' do
+      should have_many(:uploads).through(:created_files)
     end
 
     it 'should have one system_permission' do
@@ -57,29 +65,43 @@ RSpec.describe User, type: :model do
 
   describe 'usage' do
     subject { FactoryGirl.create(:user) }
-    let(:projects) { FactoryGirl.create_list(:project, 5, creator_id: subject.id) }
-    let(:files) {
-      files = []
+    let(:project_permissions) { FactoryGirl.create_list(:project_permission, 5, user_id: subject.id) }
+    let(:projects) { project_permissions.collect {|p| p.project} }
+    let(:uploads) {
+      uploads = []
       projects.each do |project|
-        upload = FactoryGirl.create(:upload, project_id: project.id)
-        files << FactoryGirl.create(:data_file, creator_id: subject.id, project_id: project.id, upload_id: upload.id)
+        uploads << FactoryGirl.create(:upload, :completed, project_id: project.id)
+      end
+      uploads
+    }
+    let!(:files) {
+      files = []
+      uploads.each do |upload|
+        files << FactoryGirl.create(:data_file, creator_id: subject.id, project_id: upload.project.id, upload_id: upload.id)
       end
       files
     }
+    let!(:other_project) { FactoryGirl.create(:project, creator_id: subject.id) }
+    let!(:other_file) { FactoryGirl.create(:data_file, creator_id: subject.id) }
+    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted, user_id: subject.id).project }
+    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, project_id: projects.first.id)}
+    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator_id: subject.id, project_id: deleted_upload.project.id, upload_id: deleted_upload.id) }
 
     describe 'project_count' do
-      let(:expected_count) { subject.projects.count }
+      let(:expected_count) { projects.count }
 
       it 'should provide the count of user projects' do
         expect(subject).to respond_to('project_count')
+        expect(expected_count).to be > 0
         expect(subject.project_count).to eq(expected_count)
       end
     end
 
     describe 'file_count' do
-      let(:expected_count) { subject.data_files.count }
+      let(:expected_count) { files.count }
       it 'should provide the count of user files' do
         expect(subject).to respond_to('file_count')
+        expect(expected_count).to be > 0
         expect(subject.file_count).to eq(expected_count)
       end
     end
@@ -87,13 +109,14 @@ RSpec.describe User, type: :model do
     describe 'storage_bytes' do
       let(:expected_size) {
         expected_size = 0
-        subject.uploads.each do |f|
+        uploads.each do |f|
           expected_size = f.size + expected_size
         end
         expected_size
       }
       it 'should provide the sum total of the size of all user uploads' do
         expect(subject).to respond_to('storage_bytes')
+        expect(expected_size).to be > 0
         expect(subject.storage_bytes).to eq(expected_size)
       end
     end
