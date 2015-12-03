@@ -48,7 +48,7 @@ RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "epel-release"]
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "git", "libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
 RUN ["mkdir","-p","/var/www/app"]
 WORKDIR /var/www/app
-RUN curl -L https://api.github.com/repos/Duke-Translational-Bioinformatics/duke-data-service/tarball/try_docker_workflow | tar -zxvf - --strip 1
+RUN curl -L https://api.github.com/repos/Duke-Translational-Bioinformatics/duke-data-service/tarball/develop | tar -zxvf - --strip 1
 ADD Gemfile /var/www/app/Gemfile
 ADD Gemfile.lock /var/www/app/Gemfile.lock
 RUN ["bundle", "config", "build.nokogiri", "--use-system-libraries"]
