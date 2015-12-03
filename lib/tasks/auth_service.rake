@@ -4,8 +4,8 @@ namespace :authentication_service do
     unless AuthenticationService.where(service_id: ENV['AUTH_SERVICE_ID']).exists?
       AuthenticationService.create(
         service_id: ENV['AUTH_SERVICE_ID'],
-        base_uri: ENV['BASE_URI'],
-        name: ENV['NAME']
+        base_uri: ENV['AUTH_SERVICE_BASE_URI'],
+        name: ENV['AUTH_SERVICE_NAME']
       )
     end
   end
