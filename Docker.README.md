@@ -83,7 +83,7 @@ docker-machine ls
 If you ever need to destroy your entire machine, including any docker images
 downloaded or built:
 ```
-docker machine rm default
+docker-machine rm default
 ```
 
 The docker command is designed to be wired to a docker machine daemon on any
