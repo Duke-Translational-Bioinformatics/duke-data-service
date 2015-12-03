@@ -33,8 +33,16 @@ RSpec.describe User, type: :model do
       should have_many(:affiliations)
     end
 
+    it 'should have many project permissions' do
+      should have_many(:project_permissions)
+    end
+
+    it 'should have many permitted_projects through project permissions' do
+      should have_many(:permitted_projects).class_name('Project').through(:project_permissions).source(:project).conditions(is_deleted: false)
+    end
+
     it 'should have many created_files' do
-      should have_many(:created_files).class_name('DataFile').with_foreign_key(:creator_id).conditions(is_deleted: false)
+      should have_many(:created_files).class_name('DataFile').through(:permitted_projects).source(:data_files).with_foreign_key(:creator_id).conditions(is_deleted: false)
     end
 
     it 'should have many uploads through created_files' do
@@ -57,7 +65,8 @@ RSpec.describe User, type: :model do
 
   describe 'usage' do
     subject { FactoryGirl.create(:user) }
-    let(:projects) { FactoryGirl.create_list(:project, 5, creator_id: subject.id) }
+    let(:project_permissions) { FactoryGirl.create_list(:project_permission, 5, user_id: subject.id) }
+    let(:projects) { project_permissions.collect {|p| p.project} }
     let(:uploads) {
       uploads = []
       projects.each do |project|
@@ -72,7 +81,9 @@ RSpec.describe User, type: :model do
       end
       files
     }
-    let!(:deleted_project) { FactoryGirl.create(:project, :deleted, creator_id: subject.id) }
+    let!(:other_project) { FactoryGirl.create(:project, creator_id: subject.id) }
+    let!(:other_file) { FactoryGirl.create(:data_file, creator_id: subject.id) }
+    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted, user_id: subject.id).project }
     let(:deleted_upload) { FactoryGirl.create(:upload, :completed, project_id: projects.first.id)}
     let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator_id: subject.id, project_id: deleted_upload.project.id, upload_id: deleted_upload.id) }
 
