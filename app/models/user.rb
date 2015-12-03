@@ -9,8 +9,11 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :user_authentication_services
 
   has_many :projects, foreign_key: "creator_id"
-  has_many :data_files, foreign_key: "creator_id"
-  has_many :uploads, through: :data_files
+  has_many :created_files, 
+    -> { where(is_deleted: false) }, 
+    class_name: 'DataFile', 
+    foreign_key: "creator_id"
+  has_many :uploads, through: :created_files
   has_many :affiliations
   has_one :system_permission
   has_one :auth_role, through: :system_permission
@@ -18,11 +21,11 @@ class User < ActiveRecord::Base
   validates :username, presence: true, uniqueness: true
 
   def project_count
-    self.projects.count
+    self.projects.where(is_deleted: false).count
   end
 
   def file_count
-    self.data_files.count
+    self.created_files.where(is_deleted: false).count
   end
 
   def storage_bytes
