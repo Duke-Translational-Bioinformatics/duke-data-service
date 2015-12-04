@@ -344,7 +344,7 @@ docker-compose run storageprovider
 
 Start a locally running swift storage service ([see below](#running-a-local-swift-service-using-docker)):
 ```
-docker-compose run swift
+docker-compose up -d swift
 ```
 
 Create an api test user ([see below](#creating-an-api_test_user-and-token))
