@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe DDS::V1::UserAPI do
+describe DDS::V1::UsersAPI do
   include_context 'with authentication'
   let (:auth_service) { user_auth.authentication_service }
   let(:resource_class) { User }

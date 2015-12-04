@@ -142,7 +142,7 @@ module DDS
         error!(error_json, 500)
       end
 
-      mount DDS::V1::UserAPI
+      mount DDS::V1::UsersAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
       mount DDS::V1::CurrentUserAPI

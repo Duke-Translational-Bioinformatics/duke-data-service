@@ -96,6 +96,21 @@ describe DDS::V1::ChildrenAPI do
             ] }
           end
         end
+
+        describe 'lowercase string with a match' do
+          let(:name_contains) { 'xxxx' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_child_folder
+            ] }
+            let(:unexpected_resources) { [
+              named_root_folder,
+              root_folder,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
       end
 
 
@@ -145,6 +160,22 @@ describe DDS::V1::ChildrenAPI do
 
           describe 'string with a match' do
             let(:name_contains) { 'XXXX' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                named_child_file,
+              ] }
+              let(:unexpected_resources) { [
+                file,
+                named_root_file,
+                root_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'lowercase string with a match' do
+            let(:name_contains) { 'xxxx' }
             it_behaves_like 'a searchable resource' do
               let(:expected_resources) { [
                 named_child_file,
@@ -237,6 +268,21 @@ describe DDS::V1::ChildrenAPI do
             ] }
           end
         end
+
+        describe 'lowercase string with a match' do
+          let(:name_contains) { 'xxxx' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_root_folder,
+              named_child_folder
+            ] }
+            let(:unexpected_resources) { [
+              root_folder,
+              root_deleted_folder,
+              other_folder
+            ] }
+          end
+        end
       end
 
       context 'with file child' do
@@ -284,6 +330,22 @@ describe DDS::V1::ChildrenAPI do
 
           describe 'string with a match' do
             let(:name_contains) { 'XXXX' }
+            it_behaves_like 'a searchable resource' do
+              let(:expected_resources) { [
+                named_root_file,
+                named_child_file,
+              ] }
+              let(:unexpected_resources) { [
+                file,
+                root_file,
+                deleted_file,
+                other_file
+              ] }
+            end
+          end
+
+          describe 'lowercase string with a match' do
+            let(:name_contains) { 'xxxx' }
             it_behaves_like 'a searchable resource' do
               let(:expected_resources) { [
                 named_root_file,

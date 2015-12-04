@@ -21,7 +21,7 @@ module DDS
         if name_contains.nil?
           descendants = folder.children
         else
-          descendants = folder.descendants.where("name like ?", "%#{name_contains}%")
+          descendants = folder.descendants.where("lower(name) like lower(?)", "%#{name_contains}%")
         end
         descendants.where(is_deleted: false)
       end
@@ -46,7 +46,7 @@ module DDS
         if name_contains.nil?
           descendants = project.children
         else
-          descendants = project.containers.where("name like ?", "%#{name_contains}%")
+          descendants = project.containers.where("lower(name) like lower(?)", "%#{name_contains}%")
         end
         descendants.where(is_deleted: false)
       end

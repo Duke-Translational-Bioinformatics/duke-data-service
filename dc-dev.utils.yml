@@ -88,6 +88,10 @@ deploysecrets:
   privileged: true
   tty: true
   net: host
+genportal:
+  build: ./docker/builds/genportal
+  volumes:
+    - .:/var/www/app
 dredd:
   build: ./docker/builds/dredd
   links:

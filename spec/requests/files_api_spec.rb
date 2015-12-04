@@ -35,7 +35,12 @@ describe DDS::V1::FilesAPI do
         upload: payload_upload
       }}
 
-      it_behaves_like 'a creatable resource'
+      it_behaves_like 'a creatable resource' do
+        it 'should set creator' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.creator_id).to eq(current_user.id)
+        end
+      end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
 

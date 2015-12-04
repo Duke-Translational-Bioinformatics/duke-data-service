@@ -1,6 +1,6 @@
 module DDS
   module V1
-    class UserAPI < Grape::API
+    class UsersAPI < Grape::API
       helpers PaginationParams
 
       desc 'api_token' do
