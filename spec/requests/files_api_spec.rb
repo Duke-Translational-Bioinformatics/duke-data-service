@@ -12,6 +12,7 @@ describe DDS::V1::FilesAPI do
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_upload) { FactoryGirl.create(:upload, project: other_project) }
 
   let(:incomplete_upload) { FactoryGirl.create(:upload, project: project) }
   let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project) }
@@ -61,6 +62,11 @@ describe DDS::V1::FilesAPI do
 
       it_behaves_like 'an identified resource' do
         let(:payload_upload) {{ id: 'notfoundid' }}
+        let(:resource_class) { 'Upload' }
+      end
+
+      it_behaves_like 'an identified resource' do
+        let(:payload_upload) {{ id: other_upload.id }}
         let(:resource_class) { 'Upload' }
       end
 
