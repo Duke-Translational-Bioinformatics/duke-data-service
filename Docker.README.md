@@ -179,7 +179,7 @@ container):
 docker-compose up -d server
 ```
 
-**Note** there is a preferred method to [launch the application](#launching-the-application).
+**Note** there is a preferred method to [launching the application](#launching-the-application).
 
 The docker-compose definition for this application service mounts the Application
 Root as /var/www/app in the server docker container.  Since the Dockerfile specifies
