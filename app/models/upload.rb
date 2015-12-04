@@ -6,6 +6,7 @@ class Upload < ActiveRecord::Base
   belongs_to :storage_provider
   has_many :chunks
   has_many :project_permissions, through: :project
+  belongs_to :creator, class_name: 'User'
 
   validates :project_id, presence: true
   validates :name, presence: true
@@ -13,6 +14,7 @@ class Upload < ActiveRecord::Base
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true
   validates :storage_provider_id, presence: true
+  validates :creator_id, presence: true
 
   def sub_path
     [project_id, id].join('/')

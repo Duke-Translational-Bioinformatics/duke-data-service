@@ -8,6 +8,7 @@ FactoryGirl.define do
     fingerprint_algorithm "md5"
     etag { SecureRandom.hex }
     storage_provider
+    association :creator, factory: :user
 
     trait :with_chunks do
       chunks { [ build(:chunk, number: 1) ] }
