@@ -4,7 +4,7 @@ FactoryGirl.define do
     association :upload, :completed
     parent_id { SecureRandom.uuid }
     project
-    association :creator, factory: :user
+    creator { upload.creator }
     is_deleted false
 
     trait :with_parent do
