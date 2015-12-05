@@ -39,6 +39,7 @@ module DDS
                 fingerprint_value: upload_params[:hash][:value],
                 fingerprint_algorithm: upload_params[:hash][:algorithm],
                 storage_provider_id: storage_provider.id,
+                creator: current_user
               })
               authorize upload, :create?
               if upload.save

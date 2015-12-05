@@ -65,27 +65,28 @@ RSpec.describe User, type: :model do
 
   describe 'usage' do
     subject { FactoryGirl.create(:user) }
-    let(:project_permissions) { FactoryGirl.create_list(:project_permission, 5, user_id: subject.id) }
+    let(:project_permissions) { FactoryGirl.create_list(:project_permission, 5, user: subject) }
     let(:projects) { project_permissions.collect {|p| p.project} }
     let(:uploads) {
       uploads = []
       projects.each do |project|
-        uploads << FactoryGirl.create(:upload, :completed, project_id: project.id)
+        uploads << FactoryGirl.create(:upload, :completed, creator: subject, project: project)
       end
       uploads
     }
     let!(:files) {
       files = []
       uploads.each do |upload|
-        files << FactoryGirl.create(:data_file, creator_id: subject.id, project_id: upload.project.id, upload_id: upload.id)
+        files << FactoryGirl.create(:data_file, creator: subject, project: upload.project, upload: upload)
       end
       files
     }
-    let!(:other_project) { FactoryGirl.create(:project, creator_id: subject.id) }
-    let!(:other_file) { FactoryGirl.create(:data_file, creator_id: subject.id) }
-    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted, user_id: subject.id).project }
-    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, project_id: projects.first.id)}
-    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator_id: subject.id, project_id: deleted_upload.project.id, upload_id: deleted_upload.id) }
+    let!(:other_project) { FactoryGirl.create(:project, creator: subject) }
+    let!(:other_upload) { FactoryGirl.create(:upload, :completed, creator: subject) }
+    let!(:other_file) { FactoryGirl.create(:data_file, upload: other_upload) }
+    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted, user: subject).project }
+    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, creator: subject, project: projects.first)}
+    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator: subject, project: deleted_upload.project, upload: deleted_upload) }
 
     describe 'project_count' do
       let(:expected_count) { projects.count }

@@ -30,7 +30,7 @@ module DDS
           parent = hide_logically_deleted(Folder.find(file_params[:parent][:id]))
           project = hide_logically_deleted(parent.project)
         end
-        upload = Upload.find(file_params[:upload][:id])
+        upload = project.uploads.find(file_params[:upload][:id])
         file = project.data_files.build({
           parent: parent,
           upload: upload,

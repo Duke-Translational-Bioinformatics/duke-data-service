@@ -25,6 +25,10 @@ RSpec.describe Upload, type: :model do
     it 'should have many project permissions' do
       should have_many(:project_permissions).through(:project)
     end
+
+    it 'should belong to creator' do
+      should belong_to(:creator).class_name('User')
+    end
   end
 
   describe 'validations' do
@@ -35,6 +39,7 @@ RSpec.describe Upload, type: :model do
       should validate_presence_of :fingerprint_value
       should validate_presence_of :fingerprint_algorithm
       should validate_presence_of :storage_provider_id
+      should validate_presence_of :creator_id
     end
   end
 
