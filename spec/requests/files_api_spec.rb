@@ -4,7 +4,7 @@ describe DDS::V1::FilesAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, project: project) }
+  let(:upload) { FactoryGirl.create(:upload, :completed, project: project, creator: current_user) }
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
@@ -12,10 +12,10 @@ describe DDS::V1::FilesAPI do
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
-  let(:other_upload) { FactoryGirl.create(:upload, project: other_project) }
+  let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
 
-  let(:incomplete_upload) { FactoryGirl.create(:upload, project: project) }
-  let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project) }
+  let(:incomplete_upload) { FactoryGirl.create(:upload, project: project, creator: current_user) }
+  let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project, creator: current_user) }
 
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }

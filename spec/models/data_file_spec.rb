@@ -43,6 +43,7 @@ RSpec.describe DataFile, type: :model do
     let(:completed_upload) { FactoryGirl.create(:upload, :completed, creator: subject.creator, project: subject.project) }
     let(:incomplete_upload) { FactoryGirl.create(:upload, creator: subject.creator, project: subject.project) }
     let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, creator: subject.creator, project: subject.project) }
+    let(:not_creator_of_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
     it 'should have a name' do
       should validate_presence_of(:name)
     end
@@ -85,6 +86,16 @@ RSpec.describe DataFile, type: :model do
       expect(subject.valid?).to be_falsey
       expect(subject.errors.keys).to include(:upload)
       expect(subject.errors[:upload]).to include('must be completed successfully')
+    end
+
+    it 'should require creator equal upload.creator' do
+      should allow_value(completed_upload.id).for(:upload_id)
+      should_not allow_value(not_creator_of_upload.id).for(:upload_id)
+      should allow_value(completed_upload).for(:upload)
+      should_not allow_value(not_creator_of_upload).for(:upload)
+      expect(subject.valid?).to be_falsey
+      expect(subject.errors.keys).to include(:upload)
+      expect(subject.errors[:upload]).to include('created by another user')
     end
 
     it 'should require a creator_id' do
