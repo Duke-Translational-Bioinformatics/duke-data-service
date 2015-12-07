@@ -170,6 +170,7 @@ following command from within the Application Root (where this file you are
 reading resides), to build the server image and any other ancillary support
 images that it needs (You must be connected to the internet so that docker can
 pull down any base docker images, or package/gem installs, for this to work).
+***This WILL take 20 minutes or more if you have never built the images***
 ```
 docker-compose build
 ```
@@ -180,7 +181,7 @@ container):
 docker-compose up -d server
 ```
 
-**Note** there is a preferred method to [launching the application](#launching-the-application).
+**Note** there is a preferred method to [launch the application](#launching-the-application).
 
 The docker-compose definition for this application service mounts the Application
 Root as /var/www/app in the server docker container.  Since the Dockerfile specifies
@@ -243,14 +244,15 @@ command, you can easily stop all running containers:
 docker stop $(docker ps -q)
 ```
 
-Similarly, to remove all stopped commands (this will skip running commands, but
+Similarly, to remove all stopped containers (this will skip running containers, but
 print a warning for each):
 ```
 docker rm -v $(docker ps -aq)
 ```
 (It is useful to alias this particular command in your bash_profile). We
 recommend running this command frequently to clean up containers that build up
-over time.
+over time. If there are no stopped containers, docker will print a warning that
+it requires 1 or more arguments, but this is ok.
 
 dc-base.yml
 ---
@@ -298,7 +300,7 @@ Run the rspec
 ```
 docker-compose run rspec
 docker-compose run rspec spec/requests
-docker-compose run rspec spec/models/survey_spec.rb
+docker-compose run rspec spec/models/user_spec.rb
 ```
 
 Run bundle (see
@@ -320,15 +322,10 @@ docker-compose run rails c
 docker-compose run rails c RAILS_ENV=test
 ```
 
-docker-compose.circle.yml
----
-This docker-compose yml file is specifically configured for CircleCI. It
-does not extend dc-base.yml. This is to ensure that it works with the version
-of docker-compose that is made available on the CircleCI host machine.
-
 Create an AuthenticationService object that links to the
 [Duke Authentication Service](https://github.com/Duke-Translational-Bioinformatics/duke-authentication-service) container that is run from its Application Root using docker-compose
-([see below](#connecting-a-duke-authentication-service-microservice)):
+([see below](#connecting-a-duke-authentication-service-microservice)) **Note this must be run against
+an existing, migrated database**:
 ```
 docker-compose run authservice
 ```
@@ -338,7 +335,8 @@ Remove the authservice
 docker-compose run authservice authservice:destroy
 ```
 
-Create a StorageProvider linked to a swift service (defined in [swift.env](#running-a-local-swift-service-using-docker)]):
+Create a StorageProvider linked to a swift service (defined in [swift.env](#running-a-local-swift-service-using-docker)]) **Note this must be run against
+an existing, migrated database**:
 ```
 docker-compose run storageprovider
 ```
@@ -348,7 +346,7 @@ Start a locally running swift storage service ([see below](#running-a-local-swif
 docker-compose up -d swift
 ```
 
-Create an api test user ([see below](#creating-an-api_test_user-and-token))
+Create an api test user ([see below](#creating-an-api_test_user-and-token)) **Note this must be run against an existing, migrated database**
 ```
 docker-compose run rake api_test_user:create
 ```
@@ -363,7 +361,16 @@ Clean up any objects created by the api_test_user, such as by [running the workf
 docker-compose run rake api_test_user:clean
 ```
 
-[Run dredd](#run-dredd)
+Run the [dredd](#run-dredd) API specification tests (see below for how to
+run this).
+
+docker-compose.circle.yml
+---
+This docker-compose yml file is specifically configured for CircleCI. It
+does not extend dc-base.yml. This is to ensure that it works with the version
+of docker-compose that is made available on the CircleCI host machine.
+**Developers should not use this file unless they are troubleshooting a
+failed CircleCI build on the CircleCI machine**
 
 Creating an API_TEST_USER and token
 ===
@@ -431,14 +438,14 @@ allow clients to upload chunks and download files.
 in the same way as the SWIFT_PRIMARY_KEY.
 
 A rake task, storage_provider:create, has been created to facilitate the
-creation of a StorageProvider. It uses the following Environment variables
-
+creation of a StorageProvider. It uses these Environment variables.
 You can destroy the storage_provider with the rake task storage_provider:destroy.
 
 This repo includes an empty_swift.env file which is symlinked to swift.env,
 and a swift.local.env which specifies these environment variables for the
 [local swift service](#running-a-local-swift-service-using-docker).
-The launch_application.sh script, and the storage_provider:create
+
+**Note** The launch_application.sh script, and the storage_provider:create
 rake task will do extra things when these Environment variables are set, such
 as by copying or symlinking swift.local.env to swift.env. When the swift.env file
 is not empty, launch_application.sh launches the local dockerized swift services,
@@ -577,6 +584,10 @@ In production, the portal requires the following Environment variables:
 Note, these are designed to be kept in sync with the same environment variables
 used in the DDS and /apiexplorer regarding communication with the Duke
 Authentication Service.
+
+Local Portal
+---
+To run locally, you must link the portal to a live [Duke Authentication Service microservice](#connecting-a-duke-authentication-service-microservice).
 
 Generating the Compiled distribution
 ---

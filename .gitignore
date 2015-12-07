@@ -17,3 +17,4 @@ config/keystore
 swift.oit.env
 app/api/dds/v1/parent_children_api.rb
 spec/requests/parent_children_api_spec.rb
+secrets.*.env
