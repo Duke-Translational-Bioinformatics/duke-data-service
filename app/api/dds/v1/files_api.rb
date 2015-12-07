@@ -90,7 +90,7 @@ module DDS
           end
 
           desc 'Download a file' do
-            detail 'Streams the contents of the file itself'
+            detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download file.'
             named 'download file'
             failure [
               [200, "This will never happen"],
@@ -99,13 +99,11 @@ module DDS
               [404, 'File does not exist']
             ]
           end
-          get '/download', root: false do
+          get '/url', root: false, serializer: DataFileUrlSerializer do
             authenticate!
             file = hide_logically_deleted(DataFile.find(params[:id]))
             authorize file, :download?
-            new_url = "#{file.upload.storage_provider.url_root}#{file.upload.temporary_url}"
-            logger.error "Redirecting!"
-            redirect new_url
+            file
           end
 
           desc 'Move file' do
