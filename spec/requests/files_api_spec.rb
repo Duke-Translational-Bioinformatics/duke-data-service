@@ -156,15 +156,13 @@ describe DDS::V1::FilesAPI do
   end
 
   describe 'Download a file' do
-    let(:url) { "/api/v1/files/#{resource_id}/download" }
+    let(:url) { "/api/v1/files/#{resource_id}/url" }
+    let(:resource_serializer) { DataFileUrlSerializer }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      it 'permenantly redirects to a temporary get url for the upload' do
-        is_expected.to eq(302)
-      end
-
+      it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
 

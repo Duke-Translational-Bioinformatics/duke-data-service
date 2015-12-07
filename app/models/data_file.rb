@@ -22,6 +22,16 @@ class DataFile < Container
     end
   end
 
+  delegate :http_verb, to: :upload
+
+  def host
+    upload.url_root
+  end
+
+  def url
+    upload.temporary_url
+  end
+
   def kind
     super('file')
   end

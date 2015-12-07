@@ -16,12 +16,17 @@ class Upload < ActiveRecord::Base
   validates :storage_provider_id, presence: true
   validates :creator_id, presence: true
 
+  delegate :url_root, to: :storage_provider
+
   def sub_path
     [project_id, id].join('/')
   end
 
+  def http_verb 
+    'GET'
+  end
+
   def temporary_url
-    http_verb = 'GET'
     expiry = Time.now.to_i + storage_provider.signed_url_duration
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
