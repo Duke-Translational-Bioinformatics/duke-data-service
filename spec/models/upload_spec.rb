@@ -44,6 +44,13 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'instance methods' do
+    it { should delegate_method(:url_root).to(:storage_provider) }
+
+    it 'should have a http_verb method' do
+      should respond_to :http_verb
+      expect(subject.http_verb).to eq 'GET'
+    end
+
     it 'should have a sub_path method' do
       should respond_to :sub_path
       expect(subject.sub_path).to eq expected_sub_path

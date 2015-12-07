@@ -128,6 +128,10 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'instance methods' do
+    it { should delegate_method(:http_verb).to(:upload) }
+    it { should delegate_method(:host).to(:upload).as(:url_root) }
+    it { should delegate_method(:url).to(:upload).as(:temporary_url) }
+
     describe 'ancestors' do
       it 'should respond with an Array' do
         is_expected.to respond_to(:ancestors)
