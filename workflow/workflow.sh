@@ -137,5 +137,24 @@ then
   echo "Problem!"
   exit 1
 fi
-echo "FILE ${file_id} download:"
-curl --insecure -# -L --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}/api/v1/files/${file_id}/download"
+echo "getting FILE ${file_id} download url:"
+resp=`curl --insecure -# --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}/api/v1/files/${file_id}/url"`
+if [ $? -gt 0 ]
+then
+  echo "Problem!"
+  exit 1
+fi
+echo ${resp} | jq
+error=`echo ${resp} | jq '.error'`
+if [ ${error} != null ]
+then
+  echo "Problem!"
+  exit 1
+fi
+host=`echo ${resp} | jq -r '.host'`
+put_url_template=`echo ${resp} | jq -r '.url'`
+put_url=`echo ${put_url_template} | awk -F '?' '{print $1}'`
+temp_url_sig=`echo ${put_url_template} | awk -F '?' '{print $NF}' | awk -F'&' '{print $1}'`
+temp_url_expires=`echo ${put_url_template} | awk -F '?' '{print $NF}' | awk -F'&' '{print $2}'`
+echo "downloading FILE data from ${host}${put_url} ${temp_url_sig} ${temp_url_expires}"
+curl -G --data-urlencode "${temp_url_sig}" --data-urlencode "${temp_url_expires}" "${host}${put_url}"

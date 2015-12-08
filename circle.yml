@@ -1,6 +1,6 @@
 machine:
   environment:
-    DDSURL: http://0.0.0.0
+    DDSURL: http://0.0.0.0:3001
     COMPOSE_FILE: docker-compose.circle.yml
   hosts:
     swift.circle.host: 0.0.0.0
