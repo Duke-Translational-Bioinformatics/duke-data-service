@@ -25,8 +25,8 @@ dependencies:
 
 test:
  post:
-  #  - './workflow/workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
-  #  - 'docker-compose run dredd'
+  - './workflow/workflow.circle.sh `docker-compose run rake api_test_user:create | tail -1`'
+  - 'docker-compose run dredd'
   - 'docker-compose stop'
 
 deployment:
