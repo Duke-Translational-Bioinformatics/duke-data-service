@@ -26,6 +26,7 @@ then
   echo "Problem!"
   exit 1
 fi
+echo ${resp}
 echo ${resp} | jq
 error=`echo ${resp} | jq '.error'`
 if [ ${error} != null ]
