@@ -19,7 +19,7 @@ fi
 
 dds_url=$DDSURL
 
-echo "creating project ${dds_url}"
+echo "creating project ${dds_url} ${auth_token}"
 resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"DarinProject","description":"ProjectDarin"}' "${dds_url}/api/v1/projects"`
 if [ $? -gt 0 ]
 then
