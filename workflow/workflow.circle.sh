@@ -5,10 +5,11 @@ then
   echo "install jq https://stedolan.github.io/jq/"
   exit 1
 fi
-auth_token=$1
+
+auth_token=`grep MY_GENERATED_JWT dredd.env | awk -F'=' '{print $NF}'`
 if [ -z ${auth_token} ]
 then
-  echo "usage: workflow.sh [auth_token]"
+  cat dredd.env
   exit 1
 fi
 if [ -z $DDSURL ]
