@@ -16,7 +16,7 @@ module DDS
             logger.error("database not seeded")
             raise 'database not seeded'
           end
-          {status: 'ok'}
+          {status: 'ok', environment: "#{Rails.env}"}
         rescue Exception => e
           error!({status: 'error', message: e.message},503)
         end

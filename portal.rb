@@ -15,6 +15,7 @@ class Portal < Sinatra::Base
     @authServiceUri = ENV['AUTH_SERVICE_BASE_URI']
     @authServiceName = ENV['AUTH_SERVICE_NAME']
     @securityState = SecureRandom.hex
+    @environment = ENV['RAILS_ENV']
     erb :index
   end
 end
