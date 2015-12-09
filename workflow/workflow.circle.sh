@@ -96,11 +96,6 @@ do
      echo "Problem!"
      exit 1
    fi
-   if [ ! -z "${resp}" ]
-   then
-     echo "PROBLEM ${resp}"
-     exit 1
-   fi
 done
 echo "completing upload"
 resp=`curl -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}/api/v1/uploads/${upload_id}/complete"`
