@@ -5,10 +5,11 @@ then
   echo "install jq https://stedolan.github.io/jq/"
   exit 1
 fi
-auth_token=$1
+
+auth_token=`grep MY_GENERATED_JWT dredd.env | awk -F'=' '{print $NF}'`
 if [ -z ${auth_token} ]
 then
-  echo "usage: workflow.sh [auth_token]"
+  cat dredd.env
   exit 1
 fi
 if [ -z $DDSURL ]
@@ -19,13 +20,14 @@ fi
 
 dds_url=$DDSURL
 
-echo "creating project ${dds_url}"
+echo "creating project ${dds_url} ${auth_token}"
 resp=`curl -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"DarinProject","description":"ProjectDarin"}' "${dds_url}/api/v1/projects"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
   exit 1
 fi
+echo ${resp}
 echo ${resp} | jq
 error=`echo ${resp} | jq '.error'`
 if [ ${error} != null ]
@@ -92,11 +94,6 @@ do
    if [ $? -gt 0 ]
    then
      echo "Problem!"
-     exit 1
-   fi
-   if [ ! -z "${resp}" ]
-   then
-     echo "PROBLEM ${resp}"
      exit 1
    fi
 done
