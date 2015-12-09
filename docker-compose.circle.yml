@@ -37,9 +37,6 @@ authservice:
   command: authentication_service:create
   links:
     - db:postgres.db.host
-  env_file:
-    - circle/webapp.circle.env
-    - circle/swift.circle.env
 rspec:
   image: dukedataservice_server
   environment:
