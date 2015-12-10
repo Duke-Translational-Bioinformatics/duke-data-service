@@ -35,6 +35,10 @@ gem 'netrc'
 # circle-ci metadata formatter
 gem 'rspec_junit_formatter', '0.2.2'
 
+# newrelic agent
+# https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
+gem 'newrelic_rpm'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

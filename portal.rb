@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'newrelic_rpm'
 
 class Portal < Sinatra::Base
   set :root, File.dirname(__FILE__)
