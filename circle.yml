@@ -26,7 +26,7 @@ test:
  post:
   #- './workflow/workflow.circle.sh'
   - 'docker-compose run dredd'
-  - 'docker-compose stop'
+  #- 'docker-compose stop'
 
 #deployment:
 #  development:
