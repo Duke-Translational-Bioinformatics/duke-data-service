@@ -8,10 +8,13 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 configuration = {
-  server: process.env.HOST_NAME, // your URL to API endpoint the tests will run against server: 'http://192.168.99.100:3001/api/v1'
+  server: process.env.HOST_NAME, // your URL to API endpoint the tests will run against
+  //For debug: export HOST_NAME=https://dukeds-dev.herokuapp.com/api/v1
+  //Get JWT: https://dukeds-dev.herokuapp.com/apiexplorer
+  //export MY_GENERATED_JWT=
   options: {
 
-    'path': ['/home/dredd_scripts/apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
+    'path': ['./apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
 
     'dry-run': false, // Boolean, do not run any real HTTP transaction
     'names': false,   // Boolean, Print Transaction names and finish, similar to dry-run
@@ -26,7 +29,7 @@ configuration = {
 
     'hookfiles': ['./hooks.js'], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters 'apiary'
+    'reporter': [], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 

@@ -29,7 +29,7 @@ function createResource(request_method, request_path, request_payload) {
 }
 
 // function to generate sample chunk details - returns chunk object
-function getSampleChunk(chunk_number) { 
+function getSampleChunk(chunk_number) {
   var chunk = {};
   chunk['content'] = 'This is sample chunk content for chunk number: '.concat(chunk_number);
   // console.log('Sample chunk content to upload: '.concat(chunk['content']));
@@ -47,7 +47,7 @@ function uploadSwiftChunk(request_method, request_path, chunk_content) {
   var request = new Promise();
   var client = new Client();
   var args = {
-    // "headers": { "Content-Type": "application/json", "Authorization": process.env.DUKEDS_API_KEY },
+    // "headers": { "Content-Type": "application/json", "Authorization": process.env. },
     "data": chunk_content
   };
   console.log('Upload Swift chunk request path: '.concat(request_path));
@@ -106,7 +106,7 @@ function createUploadResource() {
   init_chunked_upload().then(upload_chunk).then(function(data) {
     complete_upload(uploadId).then(function(data) {
       upload.resolve(data);
-    }); 
+    });
   });
   return upload;
 }
@@ -120,7 +120,7 @@ hooks.before(LIST_AUTH_ROLES, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     transaction.fullPath = url.substr(0, url.indexOf('?'));
-  } 
+  }
 });
 
 hooks.after(LIST_AUTH_ROLES, function (transaction) {
@@ -156,7 +156,7 @@ hooks.before(LIST_USERS, function (transaction) {;
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     transaction.fullPath = url.substr(0, url.indexOf('?'));
-  } 
+  }
 });
 
 hooks.after(LIST_USERS, function (transaction) {
@@ -222,7 +222,7 @@ hooks.before(LIST_PROJECTS, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     transaction.fullPath = url.substr(0, url.indexOf('?'));
-  } 
+  }
 });
 
 hooks.before(VIEW_PROJECT, function (transaction) {
@@ -251,9 +251,9 @@ hooks.before(UPDATE_PROJECT, function (transaction) {
 
 
 hooks.before(DELETE_PROJECT, function (transaction, done) {
-  var payload = { 
-    "name": "Delete project for dredd - ".concat(shortid.generate()), 
-    "description": "A project to delete for dredd" 
+  var payload = {
+    "name": "Delete project for dredd - ".concat(shortid.generate()),
+    "description": "A project to delete for dredd"
   };
   var request = createResource('POST', '/projects', JSON.stringify(payload));
   // delete sample project resource we created
@@ -274,7 +274,7 @@ hooks.before(LIST_PROJECT_PERMISSIONS, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     url = url.substr(0, url.indexOf('?'));
-  } 
+  }
   transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_projectId);
 });
 
@@ -308,7 +308,7 @@ hooks.before(LIST_PROJECT_ROLES, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     transaction.fullPath = url.substr(0, url.indexOf('?'));
-  } 
+  }
 });
 
 hooks.after(LIST_PROJECT_ROLES, function (transaction) {
@@ -331,7 +331,7 @@ var DELETE_AFFILIATE = "Affiliates > Affiliate instance > Delete affiliate";
 
 hooks.before(LIST_AFFILIATES, function (transaction, done) {
   // create sample affiliate resource in case none exist for listing
-  var payload = { 
+  var payload = {
     "project_role": { "id": "principal_investigator" }
   };
   var request = createResource('PUT', '/projects/'.concat(g_projectId).concat('/affiliates/').concat(g_userId), JSON.stringify(payload));
@@ -339,7 +339,7 @@ hooks.before(LIST_AFFILIATES, function (transaction, done) {
     var url = transaction.fullPath;
     if (url.indexOf('?') > -1) {
       url = url.substr(0, url.indexOf('?'));
-    } 
+    }
     transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_projectId);
     done();
   });
@@ -375,7 +375,7 @@ hooks.before(LIST_STORAGE_PROVIDERS, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     transaction.fullPath = url.substr(0, url.indexOf('?'));
-  } 
+  }
 });
 
 hooks.after(LIST_STORAGE_PROVIDERS, function (transaction) {
@@ -426,7 +426,7 @@ hooks.before(VIEW_FOLDER, function (transaction) {
 });
 
 hooks.before(DELETE_FOLDER, function (transaction, done) {
-  var payload = { 
+  var payload = {
     "parent": { "kind": "dds-folder", "id": g_folderId },
     "name": "Delete folder for dredd - ".concat(shortid.generate())
   };
@@ -440,7 +440,7 @@ hooks.before(DELETE_FOLDER, function (transaction, done) {
 });
 
 hooks.before(MOVE_FOLDER, function (transaction, done) {
-  var payload = { 
+  var payload = {
     "parent": { "kind": "dds-project", "id": g_projectId },
     "name": "Move folder for dredd - ".concat(shortid.generate())
   };
@@ -553,7 +553,7 @@ hooks.before(COMPLETE_CHUNKED_UPLOAD, function (transaction) {
 var CREATE_FILE = "Files > Files collection > Create file";
 var VIEW_FILE = "Files > File instance > View file";
 var DELETE_FILE = "Files > File instance > Delete file";
-var DOWNLOAD_FILE = "Files > File instance > Download file";
+var GET_FILE_URL = "Files > File instance > Get pre-signed download URL";
 var MOVE_FILE = "Files > File instance > Move file";
 var RENAME_FILE = "Files > File instance > Rename file";
 var responseStash = {};
@@ -602,7 +602,7 @@ hooks.before(DELETE_FILE, function (transaction, done) {
   });
 });
 
-hooks.before(DOWNLOAD_FILE, function (transaction) {
+hooks.before(GET_FILE_URL, function (transaction) {
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('777be35a-98e0-4c2e-9a17-7bc009f9b111', g_fileId);
 });
@@ -662,7 +662,7 @@ hooks.before(SEARCH_PROJECT_CHILDREN, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     url = url.substr(0, url.indexOf('?'));
-  } 
+  }
   transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_projectId);
 });
 
@@ -671,7 +671,12 @@ hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction) {
   var url = transaction.fullPath;
   if (url.indexOf('?') > -1) {
     url = url.substr(0, url.indexOf('?'));
-  } 
+  }
   transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_folderId);
 });
 
+var CREATE_TAG = "Tags > Tags collection > Create tag";
+
+hooks.before(CREATE_TAG, function (transaction) {
+  transaction.skip = true;
+});
