@@ -19,7 +19,7 @@ then
   gulp build --type production
   rm -rf /var/www/app/portal/*
   mv dist/index.html /var/www/app/portal/index.erb
-  rsync -avz dist/ /var/www/app/portal/ /var/www/app/portal.version
+  rsync -avz dist/ /var/www/app/portal/
   git ls-remote https://github.com/Duke-Translational-Bioinformatics/duke-data-service-portal.git "refs/heads/${dds_branch}" > /var/www/app/portal.version
   echo "Generated ${next_commit}"
 else
