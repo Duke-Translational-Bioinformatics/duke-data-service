@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
   let(:is_logically_deleted) { true }
+  let(:other_project) { FactoryGirl.create(:project) }
+  let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -42,8 +44,12 @@ RSpec.describe Project, type: :model do
 
   describe 'validations' do
     it 'should have a unique project name' do
+      expect(other_project).to be_persisted
+      expect(deleted_project).to be_persisted
       should validate_presence_of(:name)
-      should validate_uniqueness_of(:name)
+      should validate_uniqueness_of(:name).case_insensitive
+      should_not allow_value(other_project.name).for(:name)
+      should allow_value(deleted_project.name).for(:name)
     end
 
     it 'should have a description' do
