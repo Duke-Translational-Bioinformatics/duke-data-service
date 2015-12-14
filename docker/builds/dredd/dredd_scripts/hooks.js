@@ -162,7 +162,9 @@ hooks.before(LIST_USERS, function (transaction) {;
 hooks.after(LIST_USERS, function (transaction) {
   // saving HTTP response to the stash
   responseStash[LIST_USERS] = transaction.real.body;
+  console.log(JSON.parse(responseStash[LIST_USERS])['results']);
 });
+
 
 hooks.before(VIEW_USER, function (transaction) {
   // reusing data from previous response here
