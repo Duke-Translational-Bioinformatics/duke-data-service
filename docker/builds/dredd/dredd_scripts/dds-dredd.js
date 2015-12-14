@@ -22,12 +22,15 @@ configuration = {
     'level': 'info', // String, log-level (info, silly, debug, verbose, ...)
     'silent': false, // Boolean, Silences all logging output
 
-    'only': [], // Array of Strings, run only transaction that match these names
+    'only': [
+
+            ], // Array of Strings, run only transaction that match these names
 
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
     'user': null,    // String, Basic Auth credentials in the form username:password
 
-    'hookfiles': ['./hooks.js'], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
+    'hookfiles': [ 'hooks.js'
+                ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
     'reporter': [], // Array of possible reporters, see folder src/reporters
 
