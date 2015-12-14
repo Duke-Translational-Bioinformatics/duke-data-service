@@ -26,6 +26,8 @@ test:
  post:
   #- './workflow/workflow.circle.sh'
   - 'docker-compose run dredd'
+  #- 'docker run -it -v /home/ubuntu/duke-data-service/docker/builds/dredd/dredd_scripts:/dds --env HOST_NAME=https://dukeds-dev.herokuapp.com/api/v1 --env MY_GENERATED_JWT=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjRhYmZiNWYyLWRmMTItNDQ3ZC1hMGQ5LWU0NzgzMDg2N2FjZSIsInNlcnZpY2VfaWQiOiIzNDJjMDc1YS03YWNhLTRjMzUtYjNmNS0yOWYwNDM4ODRiNWIiLCJleHAiOjE0NTAxMjEyMzh9.ZDl1vDScUKn-HPLo8uKohbHiT-NOp7ojbHNey3EoruY dukedataservice_dredd  /bin/bash'
+  #- 'docker run -it -v /home/ubuntu/duke-data-service/docker/builds/dredd/dredd_scripts:/dds --env HOST_NAME=http://dds.host:3000/api/v1 --env MY_GENERATED_JWT=`docker-compose run rake api_test_user:create | tail -1` --link dukedataservice_server_1:dds.host --link dukedataservice_swift_1:swift.circle.host  dukedataservice_dredd /bin/bash'
   #- 'docker-compose stop'
 
 #deployment:
