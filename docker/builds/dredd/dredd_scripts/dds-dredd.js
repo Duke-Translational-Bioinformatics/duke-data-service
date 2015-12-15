@@ -55,6 +55,17 @@ configuration = {
 var dredd = new Dredd(configuration);
 
 dredd.run(function (err, stats) {
-  // err is present if anything went wrong
+  console.log(err);
+  console.log(stats);
+  console.log(stats['failures']);
+  if (stats['failures']>0)
+  {
+    console.log("There was one or more failures, check log above.");
+    return process.exit(1)
+  }
+else
+  {
+     return process.exit(0)
+  }
   // otherwise stats is an object with useful statistics
 });
