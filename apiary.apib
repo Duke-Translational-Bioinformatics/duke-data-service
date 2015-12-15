@@ -368,7 +368,8 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
 >**Rules**
 - - - - -
-+ User who creates project is granted the "project_admin" authorization role.
++ User who creates project is granted the `project_admin` authorization role.
++ The `project.name` must be unique.
 
 + Request (application/json)
 
@@ -516,6 +517,8 @@ Represents project level authorization roles that have been granted to a user.
 - - - - -
 + Revokes (deletes) any existing project level authorization role for the user and grants new role.
 + The role specified must be a project level authorization role (i.e. "project" in `auth_role.contexts`).
++ The project must have at least one user with the `project_admin` role.
++ The current user cannot grant or revoke their own project level role.
 
 + Request (application/json)
 
@@ -538,6 +541,11 @@ Represents project level authorization roles that have been granted to a user.
 ### Revoke project permission [DELETE]
 >**Permission:** manage_project_permissions
 - - - - -
+
+>**Rules**
+- - - - -
++ The project must have at least one user with the `project_admin` role.
++ The current user cannot revoke their own project level role.
 
 + Response 204
 
@@ -1077,11 +1085,13 @@ Creates a file metadata object; The client is responsible for the creation of th
 - - - - -
 + parent.kind (string, required) - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
 + parent.id (string, required) - The unique id of the parent.
-+ upload.id (string, required) - The `upload.id` for an upload that completed successfully. (i.e. `upload.status.error_on is null`). 
++ upload.id (string, required) - The unique id for an upload that completed successfully.
 
 >**Rules**
 - - - - -
-+ The current user must be the user who uploaded the physical file. 
++ The current user must be the user who uploaded the file. 
++ The parent object (`dds-project` or `dds-folder`) must be associated with the same project that the upload object is associated with.
++ The upload must be in a completed state (i.e. `upload.complete_on != null`).
 
 + Request (application/json)
 
