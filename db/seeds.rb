@@ -62,19 +62,6 @@ end
   ProjectRole.create(role)
 end
 
-if ENV['CREATE_TEST_USER_POOL']
-  User.create(
-  id: SecureRandom.uuid,
-  username: 'dreddtestuser1',
-  etag: SecureRandom.hex,
-  email: 'dreddtestuser1@duke.edu',
-  display_name: 'dreddtest user1',
-  first_name: 'dreddtest',
-  last_login_at: DateTime.now,
-  last_name: 'user1'
-  )
-end
-
 #
 # Project.create({
 #   creator_id: User.first.id,
