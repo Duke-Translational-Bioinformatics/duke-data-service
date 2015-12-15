@@ -32,7 +32,7 @@ configuration = {
     'hookfiles': [ 'hooks.js'
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
@@ -55,9 +55,6 @@ configuration = {
 var dredd = new Dredd(configuration);
 
 dredd.run(function (err, stats) {
-  console.log(err);
-  console.log(stats);
-  console.log(stats['failures']);
   if (stats['failures']>0)
   {
     console.log("There was one or more failures, check log above.");
