@@ -25,16 +25,15 @@ dependencies:
 
 test:
  post:
-  - './workflow/workflow.circle.sh'
-  # - 'docker-compose run dredd'
-  - 'docker-compose stop'
+  #- './workflow/workflow.circle.sh'
+  - 'docker-compose run dredd'
 
 deployment:
-  development:
-    branch: develop
-    commands:
-      - heroku run rake assets:clobber --app 'dukeds-dev'
-      - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
-          timeout: 54000
-      - heroku run rake db:migrate --app 'dukeds-dev'
-      - heroku run rake db:seed --app 'dukeds-dev'
+ development:
+   branch: develop
+   commands:
+     - heroku run rake assets:clobber --app 'dukeds-dev'
+     - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
+         timeout: 54000
+     - heroku run rake db:migrate --app 'dukeds-dev'
+     - heroku run rake db:seed --app 'dukeds-dev'
