@@ -92,6 +92,13 @@ genportal:
   build: ./docker/builds/genportal
   volumes:
     - .:/var/www/app
+genlocalportal:
+  build: ./docker/builds/genportal
+  environment:
+    - USE_LOCAL_PORTAL=1
+  volumes:
+    - .:/var/www/app
+    - ../duke-data-service-portal:/var/www/duke-data-service-portal
 dredd:
   build: ./docker/builds/dredd
   links:
