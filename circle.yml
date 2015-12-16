@@ -32,7 +32,7 @@ deployment:
  development:
    branch: develop
    commands:
-     - heroku run --exit-code rake assets:clobber --app 'dukeds-dev'
+    #  - heroku run --exit-code rake assets:clobber --app 'dukeds-dev'
      - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
          timeout: 54000
      - heroku run --exit-code rake db:migrate --app 'dukeds-dev'
