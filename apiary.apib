@@ -1091,7 +1091,7 @@ Creates a file metadata object; The client is responsible for the creation of th
 - - - - -
 + The current user must be the user who uploaded the file. 
 + The parent object (`dds-project` or `dds-folder`) must be associated with the same project that the upload object is associated with.
-+ The upload must be in a completed state (i.e. `upload.complete_on != null`).
++ The upload must be in a completed state (i.e. `upload.completed_on != null`).
 
 + Request (application/json)
 
