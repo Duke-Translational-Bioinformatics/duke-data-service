@@ -162,6 +162,7 @@ hooks.before(LIST_USERS, function (transaction) {;
 hooks.after(LIST_USERS, function (transaction) {
   // saving HTTP response to the stash
   responseStash[LIST_USERS] = transaction.real.body;
+  console.log(responseStash[LIST_USERS]);
 });
 
 
@@ -707,6 +708,17 @@ hooks.before(SEARCH_PROJECT_CHILDREN, function (transaction, done) {
   });
 });
 
+// hooks.beforeValidation(SEARCH_PROJECT_CHILDREN, function (transaction) {
+//   // get the real body content
+//   var realBody = JSON.parse(transaction.real.body);
+//   // place a folder and file on top of the array stack to aligh with apiary
+//   var folder_idx = _.findIndex(realBody.results, { kind: 'dds-folder' });
+//   realBody.results = _.move(realBody.results, folder_idx, 0);
+//   var file_idx = _.findIndex(realBody.results, { kind: 'dds-file' });
+//   realBody.results = _.move(realBody.results, file_idx, 1);
+//   transaction.real.body = JSON.stringify(realBody);
+// });
+
 hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction, done) {
   //first create a project
   var payload = {
@@ -750,3 +762,14 @@ hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction, done) {
     });
   });
 });
+
+// hooks.beforeValidation(SEARCH_FOLDER_CHILDREN, function (transaction) {
+//   // get the real body content
+//   var realBody = JSON.parse(transaction.real.body);
+//   // place a folder and file on top of the array stack to aligh with apiary
+//   var folder_idx = _.findIndex(realBody.results, { kind: 'dds-folder' });
+//   realBody.results = _.move(realBody.results, folder_idx, 0);
+//   var file_idx = _.findIndex(realBody.results, { kind: 'dds-file' });
+//   realBody.results = _.move(realBody.results, file_idx, 1);
+//   transaction.real.body = JSON.stringify(realBody);
+// });
