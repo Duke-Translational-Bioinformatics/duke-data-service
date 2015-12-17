@@ -23,7 +23,8 @@ RUN npm install md5
 RUN npm install dredd
 
 #COPY Files
-COPY ./dredd_scripts /home/dredd_scripts/
+#These files are now mounted via docker-compose.circle.yml
+#COPY ./dredd_scripts /home/dredd_scripts/
 
 #Execute the node app
 WORKDIR /home/dredd_scripts

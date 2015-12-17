@@ -658,26 +658,95 @@ hooks.before(RENAME_FILE, function (transaction, done) {
 var SEARCH_PROJECT_CHILDREN = "Search Project/Folder Children > Search Project Children > Search Project Children";
 var SEARCH_FOLDER_CHILDREN = "Search Project/Folder Children > Search Folder Children > Search Folder Children";
 
-hooks.before(SEARCH_PROJECT_CHILDREN, function (transaction) {
-  // replacing id in URL with stashed id from previous response
-  var url = transaction.fullPath;
-  if (url.indexOf('?') > -1) {
-    url = url.substr(0, url.indexOf('?'));
-  }
-  transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_projectId);
+hooks.before(SEARCH_PROJECT_CHILDREN, function (transaction, done) {
+  //first create a project
+  var payload = {
+    "name": "Delete project for dredd - ".concat(shortid.generate()),
+    "description": "A project to delete for dredd"
+  };
+  var request = createResource('POST', '/projects', JSON.stringify(payload));
+  request.then(function(data) {
+    //Once project created, create folder
+    var project_id = data['id'];
+    var payload = {
+      "parent": { "kind": "dds-project", "id": project_id },
+      "name": "Delete folder for dredd - ".concat(shortid.generate())
+    };
+    var request2 = createResource('POST', '/folders', JSON.stringify(payload));
+    request2.then(function(data) {
+      var folder_id = data['id'];
+      //Once folder created, upload file, post it to folder
+      // upload a file
+      var request3 = createUploadResource(project_id);
+      request3.then(function(data3) {
+        var upload_id = data3['id'];
+        var payload = {
+          "parent": { "kind": "dds-folder", "id": folder_id },
+          "upload": { "id": upload_id }
+        };
+        //post that file to the new folder
+        var request4 = createResource('POST', '/files', JSON.stringify(payload));
+        request4.then(function(data4) {
+          // once the file is posted to the folder, modify the hook's transaction.fullpath
+          var file_id = data4['id'];
+          var url = transaction.fullPath;
+          //we don't want any parameters in our path, so we'll remove them
+          if (url.indexOf('?') > -1) {
+            url = url.substr(0, url.indexOf('?'));
+          }
+          transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', project_id);
+          console.log("Project id: " + project_id);
+          console.log("Folder id: " + folder_id);
+          console.log("Upload id: " + upload_id);
+          console.log("File id: " + file_id);
+          console.log("Called Endpoint: " + transaction.fullPath);
+          done();
+        });
+      });
+    });
+  });
 });
 
-hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction) {
-  // replacing id in URL with stashed id from previous response
-  var url = transaction.fullPath;
-  if (url.indexOf('?') > -1) {
-    url = url.substr(0, url.indexOf('?'));
-  }
-  transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', g_folderId);
-});
-
-var CREATE_TAG = "Tags > Tags collection > Create tag";
-
-hooks.before(CREATE_TAG, function (transaction) {
-  transaction.skip = true;
+hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction, done) {
+  //first create a project
+  var payload = {
+    "name": "Delete project for dredd - ".concat(shortid.generate()),
+    "description": "A project to delete for dredd"
+  };
+  var request = createResource('POST', '/projects', JSON.stringify(payload));
+  request.then(function(data) {
+    //Once project created, create folder
+    var project_id = data['id'];
+    var payload = {
+      "parent": { "kind": "dds-project", "id": project_id },
+      "name": "Delete folder for dredd - ".concat(shortid.generate())
+    };
+    var request2 = createResource('POST', '/folders', JSON.stringify(payload));
+    request2.then(function(data) {
+      var folder_id = data['id'];
+      //Once folder created, upload file, post it to folder
+      // upload a file
+      var request3 = createUploadResource(project_id);
+      request3.then(function(data3) {
+        var upload_id = data3['id'];
+        var payload = {
+          "parent": { "kind": "dds-folder", "id": folder_id },
+          "upload": { "id": upload_id }
+        };
+        //post that file to the new folder
+        var request4 = createResource('POST', '/files', JSON.stringify(payload));
+        request4.then(function(data4) {
+          // once the file is posted to the folder, modify the hook's transaction.fullpath
+          var file_id = data4['id'];
+          var url = transaction.fullPath;
+          //we don't want any parameters in our path, so we'll remove them
+          if (url.indexOf('?') > -1) {
+            url = url.substr(0, url.indexOf('?'));
+          }
+          transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', folder_id);
+          done();
+        });
+      });
+    });
+  });
 });

@@ -50,11 +50,12 @@ configuration = {
              //"Storage Providers > Storage Providers collection > List storage providers",
              //"Storage Providers > Storage Provider instance > View storage provider",
              //Folders
-             "Folders > Folders collection > Create folder",
+             //"Folders > Folders collection > Create folder",
              //"Folders > Folder instance > View folder",
-             "Folders > Folder instance > Delete folder",
+             //"Folders > Folder instance > Delete folder",
              //"Folders > Folder instance > Move folder",
-             //"Folders > Folder instance > Rename folder"
+             //"Folders > Folder instance > Rename folder",
+             "Search Project/Folder Children > Search Project Children > Search Project Children"
 
             ], // Array of Strings, run only transaction that match these names
 
