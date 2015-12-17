@@ -64,7 +64,7 @@ class StorageProvider < ActiveRecord::Base
     )
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
-    resp
+    resp.headers
   end
 
   def put_container(container)
@@ -143,6 +143,6 @@ class StorageProvider < ActiveRecord::Base
     unless @auth_uri_resp.response.code.to_i == 200
       raise StorageProviderException, "Auth Failure: #{ @auth_uri_resp.body }"
     end
-    @auth_uri_resp
+    @auth_uri_resp.headers
   end
 end
