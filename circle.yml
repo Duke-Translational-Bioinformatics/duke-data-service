@@ -37,3 +37,11 @@ deployment:
          timeout: 54000
      - heroku run --exit-code rake db:migrate --app 'dukeds-dev'
      - heroku run --exit-code rake db:seed --app 'dukeds-dev'
+ ua_test:
+   branch: ua_test
+   commands:
+    #  - heroku run --exit-code rake assets:clobber --app 'dukeds-uatest'
+     - git push git@heroku.com:dukeds-uatest.git $CIRCLE_SHA1:refs/heads/master:
+         timeout: 54000
+     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
+     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
