@@ -27,7 +27,7 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx4ab6f1974a1c421f83bd1-005671bc2c
+      - tx3d70ce8a856f451c90c7c-005671bc2c
       Date:
       - Wed, 16 Dec 2015 19:31:56 GMT
     body:
@@ -37,28 +37,63 @@ http_interactions:
   recorded_at: Wed, 16 Dec 2015 19:31:56 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object/1
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
     body:
       encoding: UTF-8
-      string: This is the object body!
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      Content-Length:
+      - '76'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx59d65f5726bf4cb5a4842-005671bc2c
+      Date:
+      - Wed, 16 Dec 2015 19:31:56 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:31:56 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
+    body:
+      encoding: US-ASCII
+      string: ''
     headers:
       X-Auth-Token:
       - AUTH_tk873232b138f0496680a71aa498ea3103
   response:
     status:
-      code: 201
-      message: Created
+      code: 204
+      message: No Content
     headers:
-      Last-Modified:
-      - Wed, 16 Dec 2015 19:31:57 GMT
       Content-Length:
       - '0'
-      Etag:
-      - 9e42a695a672299a8fd4e9b5195e7d70
+      X-Container-Object-Count:
+      - '0'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1450294316.26977'
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+      X-Container-Bytes-Used:
+      - '0'
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx0b07de2044504fda97932-005671bc2c
+      - txf8ee8fb0ff1c4e3a99349-005671bc2c
       Date:
       - Wed, 16 Dec 2015 19:31:56 GMT
     body:

@@ -19,31 +19,33 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx1f1869641e9b4458949a8-005602ed90
+      - tx1544d54df7b64672856d7-005671bc92
       Date:
-      - Wed, 23 Sep 2015 18:21:04 GMT
+      - Wed, 16 Dec 2015 19:33:38 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:04 GMT
+  recorded_at: Wed, 16 Dec 2015 19:33:38 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/cc2c704e-7f3b-4b03-b3ff-f65f3c04128a
+    uri: http://192.168.99.100:12345/v1/AUTH_test/42550c96-1124-484f-8806-7f6a586106e4
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
   response:
     status:
       code: 201
@@ -54,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txc0435971b2db43ebacc6a-005602ed90
+      - tx69a19dc961384b87ae8a5-005671bc92
       Date:
-      - Wed, 23 Sep 2015 18:21:04 GMT
+      - Wed, 16 Dec 2015 19:33:38 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:04 GMT
+  recorded_at: Wed, 16 Dec 2015 19:33:38 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/cc2c704e-7f3b-4b03-b3ff-f65f3c04128a/cdf09de5-d510-42a0-8b43-f52bc199b06e/1
+    uri: http://192.168.99.100:12345/v1/AUTH_test/42550c96-1124-484f-8806-7f6a586106e4/d6510afb-092a-4540-ad78-3aa6ff20b5d4/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Wed, 23 Sep 2015 18:21:05 GMT
+      - Wed, 16 Dec 2015 19:33:39 GMT
       Content-Length:
       - '0'
       Etag:
@@ -85,23 +87,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx59277a1f6cfb4c86b27eb-005602ed90
+      - tx22abf30294654a8e9b3ff-005671bc92
       Date:
-      - Wed, 23 Sep 2015 18:21:04 GMT
+      - Wed, 16 Dec 2015 19:33:38 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:04 GMT
+  recorded_at: Wed, 16 Dec 2015 19:33:38 GMT
 - request:
     method: delete
-    uri: http://192.168.99.100:12345/v1/AUTH_test/cc2c704e-7f3b-4b03-b3ff-f65f3c04128a/cdf09de5-d510-42a0-8b43-f52bc199b06e/1?multipart-manifest=delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/42550c96-1124-484f-8806-7f6a586106e4/d6510afb-092a-4540-ad78-3aa6ff20b5d4/1?multipart-manifest=delete
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
   response:
     status:
       code: 200
@@ -110,16 +112,16 @@ http_interactions:
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx23d0e19e61cc4cdd82689-005602ed90
+      - tx40124ee58b3940a584c4e-005671bc92
       Date:
-      - Wed, 23 Sep 2015 18:21:04 GMT
+      - Wed, 16 Dec 2015 19:33:38 GMT
       Transfer-Encoding:
       - chunked
     body:
       encoding: UTF-8
       string: "Number Deleted: 0\nNumber Not Found: 0\nResponse Body: \nResponse Status:
-        400 Bad Request\nErrors:\n/cc2c704e-7f3b-4b03-b3ff-f65f3c04128a/cdf09de5-d510-42a0-8b43-f52bc199b06e/1,
+        400 Bad Request\nErrors:\n/42550c96-1124-484f-8806-7f6a586106e4/d6510afb-092a-4540-ad78-3aa6ff20b5d4/1,
         Not an SLO manifest"
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:04 GMT
-recorded_with: VCR 2.9.3
+  recorded_at: Wed, 16 Dec 2015 19:33:38 GMT
+recorded_with: VCR 3.0.0

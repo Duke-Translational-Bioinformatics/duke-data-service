@@ -19,31 +19,33 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx29fda1a95b6a4fe9b3b55-005602ed8f
+      - txea9ab81fc2c5419ea4e5f-005671bc8f
       Date:
-      - Wed, 23 Sep 2015 18:21:03 GMT
+      - Wed, 16 Dec 2015 19:33:35 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:03 GMT
+  recorded_at: Wed, 16 Dec 2015 19:33:35 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/23c29264-522e-465d-8cce-da068b7c4e66
+    uri: http://192.168.99.100:12345/v1/AUTH_test/a8e1c871-76a2-4548-ae53-841138d4185c
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk37ab66e32886406ebefaaa04434a79ea
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
   response:
     status:
       code: 201
@@ -54,12 +56,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx8a67ad31e94f473e9e1bd-005602ed8f
+      - tx12e6d2c0628e4342a75f4-005671bc8f
       Date:
-      - Wed, 23 Sep 2015 18:21:03 GMT
+      - Wed, 16 Dec 2015 19:33:35 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 23 Sep 2015 18:21:03 GMT
-recorded_with: VCR 2.9.3
+  recorded_at: Wed, 16 Dec 2015 19:33:35 GMT
+recorded_with: VCR 3.0.0

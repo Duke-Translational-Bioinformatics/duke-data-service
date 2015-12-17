@@ -52,6 +52,16 @@ RSpec.describe StorageProvider, type: :model do
       expect(put_container).to be_truthy
     end
 
+    let(:put_container_meta){
+      resp = subject.put_container(container_name)
+      HTTParty.get("#{subject.storage_url}/#{container_name}", headers:{"X-Auth-Token" => subject.auth_token})
+    }
+    it 'should set X-Container-Meta-Access-Control-Allow-Origin' do
+      expect { put_container_meta }.not_to raise_error
+      expect(put_container_meta.headers).to have_key 'x-container-meta-access-control-allow-origin'
+      expect(put_container_meta.headers['x-container-meta-access-control-allow-origin']).to eq '*'
+    end
+
     let(:put_object) { subject.put_object(container_name, segment_name, object_body) }
     it 'should respond to put_object' do
       is_expected.to respond_to :put_object

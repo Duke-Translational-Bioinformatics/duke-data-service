@@ -1,3 +1,6 @@
+require 'factory_girl_rails'
+require 'faker'
+
 def user_name
   'DDS_api_test_user'
 end
@@ -102,6 +105,28 @@ namespace :api_test_user do
       clean_artifacts(api_test_user.user)
     else
       $stderr.puts 'DDS_api_test_user not found'
+    end
+  end
+end
+
+namespace :api_test_user_pool do
+  desc "creates a pool of users for api tests to use in tests where other users are needed"
+  task create: :environment do
+    auth_service = get_auth_service
+    users = FactoryGirl.build_list(:user_authentication_service, 2, :populated, authentication_service_id: auth_service.id)
+    users.each do |auser|
+      auser.uid = "api_test_pool_#{auser.uid}"
+      auser.save
+    end
+  end
+
+  desc "destroys the dredd_test_user_pool users and all of their artifacts"
+  task destroy: :environment do
+    auth_service = get_auth_service
+    auth_service.user_authentication_services.where('uid like ?', 'api_test_pool%').each do |puser|
+      clean_artifacts(puser.user)
+      puser.user.destroy
+      puser.destroy
     end
   end
 end
