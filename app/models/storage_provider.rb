@@ -70,7 +70,10 @@ class StorageProvider < ActiveRecord::Base
   def put_container(container)
     resp = HTTParty.put(
       "#{storage_url}/#{container}",
-      headers:{"X-Auth-Token" => auth_token}
+      headers:{
+        "X-Auth-Token" => auth_token,
+        "X-Container-Meta-Access-Control-Allow-Origin" => "*"
+      }
     )
     ([201,202,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)

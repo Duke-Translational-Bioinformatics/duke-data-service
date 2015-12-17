@@ -15,8 +15,6 @@ config/keystore
 # Ignore application configuration
 /config/application.yml
 swift.oit.env
-app/api/dds/v1/parent_children_api.rb
-spec/requests/parent_children_api_spec.rb
 secrets.*.env
 docker/circle/ruby_2.2.2.docker.tgz
 docker/circle/dredd.docker.tgz

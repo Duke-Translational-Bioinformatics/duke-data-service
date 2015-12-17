@@ -604,6 +604,14 @@ To generate and publish a new version of the Portal into the DDS:
 docker-compose -f dc-dev.utils.yml run genportal
 ```
 
+If your duke-data-service-portal repository is cloned into the same directory
+as this repository, e.g. ls ../duke-data-service-portal will print the contents
+of that repo, you can run the genlocalportal service to generate the compiled portal
+binaries from your local repo.
+```
+docker-compose -f dc-dev.utils.yml run genlocalportal
+```
+
 You should then add/rm, commit, and push all the newly generated files in the
 portal directory.
 

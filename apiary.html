@@ -409,7 +409,8 @@ error encountered.</p>
 </blockquote>
 <hr>
 <ul>
-<li>User who creates project is granted the “project_admin” authorization role.</li>
+<li>User who creates project is granted the <code>project_admin</code> authorization role.</li>
+<li>The <code>project.name</code> must be unique.</li>
 </ul>
 <div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span></span>,
@@ -518,6 +519,8 @@ error encountered.</p>
 <ul>
 <li>Revokes (deletes) any existing project level authorization role for the user and grants new role.</li>
 <li>The role specified must be a project level authorization role (i.e. “project” in <code>auth_role.contexts</code>).</li>
+<li>The project must have at least one user with the <code>project_admin</code> role.</li>
+<li>The current user cannot grant or revoke their own project level role.</li>
 </ul>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>project_id</code> of the project.</p>
 </dd><dt>user_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique <code>user_id</code> of the user.</p>
@@ -563,6 +566,14 @@ error encountered.</p>
 <p><strong>Permission:</strong> manage_project_permissions</p>
 </blockquote>
 <hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The project must have at least one user with the <code>project_admin</code> role.</li>
+<li>The current user cannot revoke their own project level role.</li>
+</ul>
 <div class="title"><strong>Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>project_id</code> of the project.</p>
 </dd><dt>user_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique <code>user_id</code> of the user.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="project-roles" class="resource-group"><h2 class="group-heading">Project Roles<a href="#project-roles" class="permalink">&para;</a></h2><p>Represents an organizational role that an individual (i.e. user) may assume in the context of a project.  These organizational roles have no relationship to authorization roles.</p>
@@ -1143,14 +1154,16 @@ error encountered.</p>
 <ul>
 <li>parent.kind (string, required) - The kind of parent container for the file; this can be a project (i.e. <code>dds-project</code>) or a folder (i.e. <code>dds-folder</code>).</li>
 <li><a href="http://parent.id">parent.id</a> (string, required) - The unique id of the parent.</li>
-<li><a href="http://upload.id">upload.id</a> (string, required) - The <code>upload.id</code> for an upload that completed successfully. (i.e. <code>upload.status.error_on is null</code>).</li>
+<li><a href="http://upload.id">upload.id</a> (string, required) - The unique id for an upload that completed successfully.</li>
 </ul>
 <blockquote>
 <p><strong>Rules</strong></p>
 </blockquote>
 <hr>
 <ul>
-<li>The current user must be the user who uploaded the physical file.</li>
+<li>The current user must be the user who uploaded the file.</li>
+<li>The parent object (<code>dds-project</code> or <code>dds-folder</code>) must be associated with the same project that the upload object is associated with.</li>
+<li>The upload must be in a completed state (i.e. <code>upload.completed_on != null</code>).</li>
 </ul>
 <div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
@@ -1531,7 +1544,7 @@ error encountered.</p>
       "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 04 Dec 2015</p><script>/* eslint-env browser */
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 16 Dec 2015</p><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 

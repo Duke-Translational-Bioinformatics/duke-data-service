@@ -52,6 +52,8 @@ dredd:
   build: ./docker/builds/dredd
   links:
    - server:dds.host
+   - swift:swift.circle.host
+   - db:postgres.db.host
   env_file:
     - dredd.env
   volumes:

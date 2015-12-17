@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
+      - AUTH_tk873232b138f0496680a71aa498ea3103
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txbed466ac4bc349e0aa270-00560059a2
+      - txeab46c2dffd0416e9d8ab-005671bc2c
       Date:
-      - Mon, 21 Sep 2015 19:25:22 GMT
+      - Wed, 16 Dec 2015 19:31:56 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
+  recorded_at: Wed, 16 Dec 2015 19:31:56 GMT
 - request:
     method: get
     uri: http://192.168.99.100:12345/v1/AUTH_test
@@ -43,79 +43,33 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tke7b5dbc576974028a61b706ed1fdcb42
+      - AUTH_tk873232b138f0496680a71aa498ea3103
   response:
     status:
-      code: 200
-      message: OK
+      code: 204
+      message: No Content
     headers:
-      Content-Length:
-      - '1554'
+      Content-Type:
+      - text/plain; charset=utf-8
       X-Account-Object-Count:
       - '0'
-      X-Account-Meta-Temp-Url-Key-2:
-      - 767eb189d603825e06a9134a3ca66311
       X-Timestamp:
-      - '1442856537.89277'
-      X-Account-Meta-Temp-Url-Key:
-      - c8d2290e2bed596f98e9178b46c804d8
+      - '1450294316.19272'
       X-Account-Bytes-Used:
       - '0'
       X-Account-Container-Count:
-      - '42'
-      Content-Type:
-      - text/plain; charset=utf-8
-      Accept-Ranges:
-      - bytes
+      - '0'
+      X-Put-Timestamp:
+      - '1450294316.19272'
+      Content-Length:
+      - '0'
       X-Trans-Id:
-      - tx572a00d43c9b41f4ab373-00560059a2
+      - txbdd461e4fb44492095499-005671bc2c
       Date:
-      - Mon, 21 Sep 2015 19:25:22 GMT
+      - Wed, 16 Dec 2015 19:31:56 GMT
     body:
       encoding: UTF-8
-      string: |
-        024f24d6-7f97-453f-b973-8f4929efabd9
-        0642fa0d-dbd9-4265-a63f-8037e31c2bf9
-        13e5f28b-6392-4521-a786-847f617f90c2
-        15330fd2-b0b8-4c7e-a1b9-4b79d50f4dcf
-        1e6e76fb-260c-4e5e-9a4f-c3af9e85074e
-        217b359c-1010-4c2b-859d-5ae3d85ea986
-        300f1d51-dda3-45ec-af08-841c70a50095
-        30eec075-0393-46c3-9910-a314bcd56140
-        38d76629-7200-4dc0-8f45-cefd677c4c54
-        39fa20c8-7114-43a0-87fa-4a45c9d9c7b1
-        50ae8cf0-a7bf-44f2-9809-88156c99d195
-        5879ff0a-2300-4513-8c67-353850ffef31
-        5ad916ff-fcee-476a-8b0c-00b6a2e86085
-        60cf2bf5-4021-4660-bb19-0b3733e248e3
-        6638d8fc-dd34-4ef7-9cf9-5223971238cd
-        6cc4009c-4f90-41c0-9ddd-fe2dc89d3c5d
-        7133e1b3-bbbb-4979-b4a1-e35a44fab4fe
-        7637c51e-58ca-4b6b-a2e6-376dbddc18dd
-        7c2aa79d-fd33-40c5-ac18-120db1132d9a
-        81e29603-5fb1-49fc-a4c8-a169962419ad
-        87c767b2-c0b3-4842-89b7-e441a88d561e
-        9345b839-68b3-4557-8d74-1e2f27e8d302
-        9bf82420-12ed-4d35-a360-6d08d7c926e3
-        9c0cf311-faff-45b9-8983-3e53c5e6a549
-        9e727f26-9c77-4c4e-add7-e03f967ffefc
-        a0bd2291-529d-4870-a2d8-783cd82deef4
-        a28d369a-e24c-411a-b71d-43918ebecf09
-        a6b10409-a673-49cb-8623-e8e75a2c86c2
-        a9dd8048-23a6-47aa-a9ef-a722ee95526c
-        b4a53e23-a85b-4d1a-84c6-a0ee3e68a5c1
-        b9fb7eda-cc6f-4ad4-a42c-d19b8a6f5658
-        ba73a283-799c-4e7f-a1ef-2fe7b04b11de
-        bb83925b-cab7-40a3-a509-fd99c34f506a
-        bc5ea929-5bec-4c1c-986c-827c3057c888
-        bdda7e01-904f-4f01-b5d1-677acf12d732
-        c2d4e92d-a967-4549-9e08-e04e60dd28bb
-        c6546c86-f885-418f-924c-d5f290d953f9
-        cb5e271d-5175-466b-b826-8a295bf56681
-        db7f9fec-70b3-4043-ad54-f164be66a9ff
-        dbf22a61-eff2-41d2-8780-f5084b007c9a
-        e877cf14-2828-4a19-b52c-d87e969ab43b
-        ec453c64-700e-4bc3-84a3-e74d8b4fad74
+      string: ''
     http_version: 
-  recorded_at: Mon, 21 Sep 2015 19:25:22 GMT
-recorded_with: VCR 2.9.3
+  recorded_at: Wed, 16 Dec 2015 19:31:56 GMT
+recorded_with: VCR 3.0.0
