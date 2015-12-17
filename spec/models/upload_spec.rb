@@ -82,7 +82,7 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  describe 'swift methods', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+  describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
     describe 'complete' do

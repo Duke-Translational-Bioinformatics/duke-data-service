@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ChunkSerializer, type: :serializer, :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+RSpec.describe ChunkSerializer, type: :serializer, vcr: true do
   let(:resource) { FactoryGirl.create(:chunk, :swift) }
 
   it_behaves_like 'a json serializer' do
