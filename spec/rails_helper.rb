@@ -62,8 +62,16 @@ VCR.configure do |c|
   c.hook_into :webmock
   c.configure_rspec_metadata!
 
+  c.register_request_matcher :header_keys do |request_1, request_2|
+    request_1.headers.keys == request_2.headers.keys
+  end
+
   c.register_request_matcher :uri_ignoring_uuids do |request_1, request_2|
     uuid = /\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/
     request_1.uri.gsub(uuid, 'uuid') == request_2.uri.gsub(uuid, 'uuid')
   end
+
+  c.default_cassette_options = {
+    match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
+  }
 end
