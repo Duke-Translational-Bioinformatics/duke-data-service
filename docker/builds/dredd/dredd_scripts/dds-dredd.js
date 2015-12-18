@@ -22,8 +22,7 @@ configuration = {
     'level': 'info', // String, log-level (info, silly, debug, verbose, ...)
     'silent': false, // Boolean, Silences all logging output
 
-    'only': [
-
+    'only': [ 
             ], // Array of Strings, run only transaction that match these names
 
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction

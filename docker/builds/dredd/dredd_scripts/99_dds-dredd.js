@@ -55,7 +55,8 @@ configuration = {
              //"Folders > Folder instance > Delete folder",
              //"Folders > Folder instance > Move folder",
              //"Folders > Folder instance > Rename folder",
-             "Search Project/Folder Children > Search Project Children > Search Project Children"
+             "Search Project/Folder Children > Search Project Children > Search Project Children",
+             "Search Project/Folder Children > Search Folder Children > Search Folder Children"
 
             ], // Array of Strings, run only transaction that match these names
 

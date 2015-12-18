@@ -65,7 +65,7 @@ function uploadSwiftChunk(request_method, request_path, chunk_content) {
   return request;
 }
 
-function createUploadResource() {
+function createUploadResource(gprojectId) {
   var upload = new Promise();
   var chunk = getSampleChunk(1);
   var uploadId = null;
@@ -78,7 +78,7 @@ function createUploadResource() {
     payload['hash'] = {};
     payload['hash']['value'] = chunk['hash']['value'];
     payload['hash']['algorithm'] = chunk['hash']['algorithm'];
-    createResource('POST', '/projects/'.concat(g_projectId).concat('/uploads'), JSON.stringify(payload)).then(function(data) {
+    createResource('POST', '/projects/'.concat(gprojectId).concat('/uploads'), JSON.stringify(payload)).then(function(data) {
       uploadId = data['id'];
       request.resolve(data);
     });
@@ -588,7 +588,7 @@ hooks.before(VIEW_FILE, function (transaction) {
 });
 
 hooks.before(DELETE_FILE, function (transaction, done) {
-  var request = createUploadResource();
+  var request = createUploadResource(g_projectId);
   request.then(function(data) {
     var payload = {
       "parent": { "kind": "dds-project", "id": g_projectId },
@@ -617,7 +617,7 @@ hooks.before(MOVE_FILE, function (transaction, done) {
   requestBody['parent']['id'] = g_folderId;
   // stringify the new body to request
   transaction.request.body = JSON.stringify(requestBody);
-  var request = createUploadResource();
+  var request = createUploadResource(g_projectId);
   request.then(function(data) {
     var payload = {
       "parent": { "kind": "dds-project", "id": g_projectId },
@@ -640,7 +640,7 @@ hooks.before(RENAME_FILE, function (transaction, done) {
   requestBody['name'] = 'dredd_rename'.concat('.').concat(shortid.generate()).concat('.').concat(requestBody['name']);
   // stringify the new body to request
   transaction.request.body = JSON.stringify(requestBody);
-  var request = createUploadResource();
+  var request = createUploadResource(g_projectId);
   request.then(function(data) {
     var payload = {
       "parent": { "kind": "dds-project", "id": g_projectId },
@@ -756,6 +756,11 @@ hooks.before(SEARCH_FOLDER_CHILDREN, function (transaction, done) {
             url = url.substr(0, url.indexOf('?'));
           }
           transaction.fullPath = url.replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1', folder_id);
+          console.log("Project id: " + project_id);
+          console.log("Folder id: " + folder_id);
+          console.log("Upload id: " + upload_id);
+          console.log("File id: " + file_id);
+          console.log("Called Endpoint: " + transaction.fullPath);
           done();
         });
       });
