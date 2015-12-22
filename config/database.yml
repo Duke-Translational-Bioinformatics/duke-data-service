@@ -83,7 +83,7 @@ test:
 
 ua_test:
   <<: *default
-  database: duke-data-service_ua_test
+  database: <%= ENV['DUKE_DATA_SERVICE_DATABASE_DB'] %>
 
 production:
   <<: *default
