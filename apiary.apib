@@ -1844,7 +1844,7 @@ What events do we want to publish/expose via this endpoint?
 </li>
 </ul>
 
->**Events Properties**
+>**Event Properties**
 - - - - -
 + **published_on (string, required)** - The datetime of the event.
 + **kind (string, required)** - Defines the kind or type of event; these are expressed in the standard format: `<dds-object>-<verb>`. 
@@ -1854,7 +1854,7 @@ What events do we want to publish/expose via this endpoint?
 + **message (string, required)** - The message rendered based on a `message_template` specific to the `kind` of event.
 + **context (object, required)** - The context (or scope) of the event; currently this is always a project (i.e. `dds-project`).
 
->**Supported Activity Streams (Some proposed examples)** 
+>**Supported Events (Some proposed examples)** 
 
 | kind | actor | object | target | message_template |
 |:------------|:------------|:------------|:------------|:------------|
@@ -1864,7 +1864,7 @@ What events do we want to publish/expose via this endpoint?
 | **dds-upload-completed** | `dds-user` | `dds-upload` | `null` | "Upload completed for file { `primary.name` }" |
 | **dds-file-move** | `dds-user` | `dds-file` | `dds-file` | "File { `primary.name` } moved from { `primary.parent.name` } to { `target.parent.name` }"" |
 
-*For the objects: **actor**, **primary** and **target**, abbreviated JSON representations are used in the API examples herein, not the complete resource payload.*
+*For the objects:* **actor**, **primary** and **target** *abbreviated JSON representations are used in the API examples herein, not the complete resource payload.*
 
 ## List events [GET /events]
 List the events; most recent events are sorted to the top of the list.
