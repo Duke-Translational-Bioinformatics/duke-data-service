@@ -106,7 +106,7 @@ Represents set of discrete permissions that may be granted to a user.
 
 **Authorization Roles:**
 
-| Role | Name | Description | Permission(s) |
+| role | name | description | permission(s) |
 |:-----|:-----|:------------|:--------------|
 | **system_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system_admin |
 | **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
@@ -118,7 +118,7 @@ Represents set of discrete permissions that may be granted to a user.
 
 **Permissions:**
 
-| Permission | Description |
+| permission | description |
 |:------------|:------------|
 | **system_admin** | Can manage system level permissions and perform all operations across all projects |
 | **view_project** | Can view project and file metadata |
@@ -558,7 +558,7 @@ Represents an organizational role that an individual (i.e. user) may assume in t
 
 **Project Roles:**
 
-| Role | Name | Description |
+| role | name | description |
 |:-----|:-----|:------------|
 | **principal_investigator** | Principal Investigator | Lead investigator for the research project |
 | **research_coordinator** | Research Coordinator | Coordinator for the research project |
@@ -958,7 +958,6 @@ This is the first step in uploading a large file. An upload objects is created a
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
 ## View chunked upload [GET]
-
 >**Permission:** create_file
 - - - - -
 
@@ -1478,7 +1477,7 @@ Get list of all the **distinct** `tag.term` values for objects the current user 
 + Response 204 
 
 ## Group Properties
-A property is a key/value pair that can be associated to a DDS object.  Using properties allows the storage of additional structured metadata about objects.
+A property is a key/value pair that can be associated to a DDS object; this allows the storage of additional structured metadata about objects.
 
 <h3 style="color:blue;">Design Considerations</h3>
 <ul>
@@ -1658,7 +1657,261 @@ Get a property for an object by key.
 
 + Response 204 
 
-## Group Search 
+## Group Activities
+An activity is something that occurs over a period of time and acts upon or with DDS objects; it may include consuming, processing, transforming, modifying, relocating, using, or generating objects (i.e. folders, files, etc.).  These are activities recorded/tracked by researchers and their software agents (i.e. pipelines) with the intent of maintaining comprehensive data provenance.
+
+## Activities collection [/activities]
+
+### Create activity [POST]
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **name (string, required)** - A short name for this activity.
++ **description (string, optional)** - A verbose description of this activity.
++ **started_on (string, optional)** - The datetime this activity was started; defaults to the current datetime if not specified.
++ **ended_on (string, optional)** - The datetime this activity ended.
+
+>**Rules**
+- - - - -
++ The `ended_on` datetime must be greater than or equal to the `started_on` datetime. 
+
++ Request (application/json)
+
+        { 
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### List activities [GET]
+>**Permission:** 
+- - - - -
++ Current user owns (i.e. created) the activity OR 
++ Current user has view permission (i.e. view_project) for a project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
+
+>**Rules**
+- - - - -
++ Activities that have been deleted (i.e. `"is_deleted": true`) are not included.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-activity",
+                    "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                    "name": "RF PI3-Kinase",
+                    "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                    "started_on": "2015-01-01T12:00:00Z",
+                    "ended_on": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Activities instance [/activities/{id}]
+
+### View activity [GET]
+>**Permission:** 
+- - - - -
++ Current user owns (i.e. created) the activity OR 
++ Current user `view_project` for project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
+
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Update activity [PUT]
+>**Permission:** 
+- - - - -
++ Current user owns (i.e. created) the activity OR 
++ Current user has `create_file` for project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
+
+>**Rules**
+- - - - -
++ Only `name`, `description`, `started_on`, and `updated_on` properties may be updated; this endpoint supports PATCH semantics.
+
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
++ Request (application/json)
+
+        {
+            "ended_on": "2015-01-01T114:30:00"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": "2015-01-01T114:30:00Z",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Update activity started date [PUT /activities/{id}/started]
+A convenience action to set started date to current system date.
+
+>**Permission:** Same as "Update activity" action
+- - - - -
+
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": "2015-01-01T114:30:00Z",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Update activity ended date [PUT /activities/{id}/ended]
+A convenience action to set ended date to current system date.
+
+>**Permission:** Same as "Update activity" action
+- - - - -
+
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": "2015-01-01T114:30:00Z",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Delete activity [DELETE]
+>**Permission:** Same as "Update activity" action
+- - - - -
+
+>**Rules**
+- - - - -
++ Logically deletes activity (i.e. sets `"is_deleted": true`).
+
++ Response 204
+
+## Group Events
+This API provides insight to users about what key events have occurred.  This is a read-only API to view the events; events of interest are derived from the execution of other API actions. 
+
+<h3 style="color:blue;">Design Considerations</h3>
+<ul>
+<li>
+What events do we want to publish/expose via this endpoint?
+</li>
+</ul>
+
+>**Events Properties**
+- - - - -
++ **published_on (string, required)** - The datetime of the event.
++ **kind (string, required)** - Defines the kind or type of event; these are expressed in the standard format: `<dds-object>-<verb>`. 
++ **actor (object, required)** - The entity that triggered the event; currently this is always a user (i.e. `dds-user`).
++ **object (object, required)** - The primary object of the event; for example this may be a `folder` or a `file`, etc.
++ **target (object, optional)** - The indirect object, or target, of the event. The precise meaning of the target is largely dependent on the `kind` of event being described, but will often be the object of the English preposition "to". For instance, the event "Erich Huang moved `folder: Sequenceng_Raw` to `folder: Sequencing_Raw_Archive`", the target of the event is `folder: Sequencing_Raw_Archive`.
++ **message (string, required)** - The message rendered based on a `message_template` specific to the `kind` of event.
++ **context (object, required)** - The context (or scope) of the event; currently this is always a project (i.e. `dds-project`).
+
+>**Supported Activity Streams (Some proposed examples)** 
+
+| kind | actor | object | target | message_template |
+|:------------|:------------|:------------|:------------|:------------|
+| **dds-project-permission-granted** | `dds-user` | `dds-project-permission` | `null` | "Granted role { `primary.auth_role.name` } to { `primary.user.full_name` }" |
+| **dds-project-permission-revoked** | `dds-user` | `dds-project-permission` | `null` | "Revoked role { `primary.auth_role.name` } from { `primary.user.full_name` }" |
+| **dds-upload-started** | `dds-user` | `dds-upload` | `null` | "Upload initiated for file { `primary.name` }" |
+| **dds-upload-completed** | `dds-user` | `dds-upload` | `null` | "Upload completed for file { `primary.name` }" |
+| **dds-file-move** | `dds-user` | `dds-file` | `dds-file` | "File { `primary.name` } moved from { `primary.parent.name` } to { `target.parent.name` }"" |
+
+*For the objects: **actor**, **primary** and **target**, abbreviated JSON representations are used in the API examples herein, not the complete resource payload.*
+
+## List events [GET /events]
+List the events; most recent events are sorted to the top of the list.
+
+>**Permission:** view_project
+- - - - -
+
++ Response 200 (application/json)
+
+        {   
+            "results": [
+                {
+                    "published_on": "2016-01-01T12:45:00Z",
+                    "kind": "dds-upload-completed",
+                    "actor": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "object": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                    },
+                    "target": null,
+                    "message": "Upload completed for file RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "context": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" }
+                },
+                {
+                    "published_on": "2016-01-01T12:00:00Z",
+                    "kind": "dds-upload-started",
+                    "actor": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "object": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                    },
+                    "target": null,
+                    "message": "Upload initiated for file RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "context": { "kind": "dds-project", "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" }
+                }        
+            ]
+        }
+
+## Group Full-Text Search 
 The Search API is optimized to help you find the specific DDS objects you're looking for (e.g., a specific project, a specific folder, or a specific file, etc.). Think of it the way you think of performing a search on Google. It's designed to help you find the one result you're looking for (or maybe the few results you're looking for).
 
 ### Search project children [GET /search/projects/children]
@@ -1707,9 +1960,9 @@ We will support searching tags initially, and then extend to support searching p
 + If `sort` is not specified, sort is based on `best match` ranking (i.e. scoring) of the underlying search engine.  This is a computed value representing the relevance of an item relative to the other items in the result set.
 + Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in search.
 
->**Supported Boolean Query Predicates**  
+>**Supported Boolean Query Predicates (Some proposed examples)**  
 
-| Field | Operators | Description |
+| field | operators | description |
 |:------------|:------------|:------------|
 | **kind (string)** | eq | Limit query to only folders (i.e. `dds-folder`) or files (i.e. `dds-file`) |
 | **created_on (string)** | lt, lte, eq, neq, gt, gte | Date folder/file was created. |
@@ -1757,178 +2010,3 @@ We will support searching tags initially, and then extend to support searching p
                 }
             ]
         }
-
-## Group Activities
-An activity is something that occurs over a period of time and acts upon or with DDS objects; it may include consuming, processing, transforming, modifying, relocating, using, or generating objects (i.e. folders, files, etc.).
-
-## Activities collection [/activities]
-
-### Create activity [POST]
->**Permission:** authenticated
-- - - - -
-
->**Properties**
-- - - - -
-+ **name (string, required)** - A short name for this activity.
-+ **description (string, optional)** - A verbose description of this activity.
-+ **started_on (string, optional)** - The datetime this activity was started; defaults to the current datetime if not specified.
-+ **ended_on (string, optional)** - The datetime this activity ended.
-
->**Rules**
-- - - - -
-+ The `ended_on` datetime must be greater than or equal to the `started_on` datetime. 
-
-+ Request (application/json)
-
-        { 
-            "name": "RF PI3-Kinase",
-            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity"
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "kind": "dds-activity",
-            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-            "name": "RF PI3-Kinase",
-            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-            "started_on": "2015-01-01T12:00:00",
-            "ended_on": null,
-            "audit": { }
-        }
-
-### List activities [GET]
->**Permission:** 
-- - - - -
-+ Current user owns (i.e. created) the activity OR 
-+ Current user has view permission (i.e. view_project) for a project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
-
->**Rules**
-- - - - -
-+ Activities that have been deleted (i.e. `"is_deleted": true`) are not included.
-
-+ Response 200 (application/json)
-
-        {
-            "results": [
-                {
-                    "kind": "dds-activity",
-                    "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                    "name": "RF PI3-Kinase",
-                    "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-                    "started_on": "2015-01-01T12:00:00",
-                    "ended_on": null,
-                    "audit": { }
-                }
-            ]
-        }
-
-## Activities instance [/activities/{id}]
-
-### View activity [GET]
->**Permission:** 
-- - - - -
-+ Current user owns (i.e. created) the activity OR 
-+ Current user has view permission (i.e. view_project) for a project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
-
-+ Parameters
-    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
-
-+ Response 200 (application/json)
-
-        {
-            "kind": "dds-activity",
-            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-            "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-            "started_on": "2015-01-01T12:00:00",
-            "ended_on": null,
-            "audit": { }
-        }
-
-### Update activity [PUT]
->**Permission:** 
-- - - - -
-+ Current user owns (i.e. created) the activity OR 
-+ Current user has view permission (i.e. view_project) for a project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
-
->**Rules**
-- - - - -
-+ Only `name`, `description`, `started_on`, and `updated_on` properties may be updated; this endpoint supports PATCH semantics.
-
-+ Parameters
-    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
-
-+ Request (application/json)
-
-        {
-            "ended_on": "2015-01-01T114:30:00"
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "kind": "dds-activity",
-            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-            "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-            "started_on": "2015-01-01T12:00:00",
-            "ended_on": "2015-01-01T114:30:00",
-            "audit": { }
-        }
-
-### Update activity started date [PUT /activities/{id}/started]
-A convenience action to set started date to current system date.
-
->**Permission:** Same as "Update activity" action
-- - - - -
-
-+ Parameters
-    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
-
-+ Response 200 (application/json)
-
-        {
-            "kind": "dds-activity",
-            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-            "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-            "started_on": "2015-01-01T12:00:00",
-            "ended_on": "2015-01-01T114:30:00",
-            "audit": { }
-        }
-
-### Update activity ended date [PUT /activities/{id}/ended]
-A convenience action to set ended date to current system date.
-
->**Permission:** Same as "Update activity" action
-- - - - -
-
-+ Parameters
-    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
-
-+ Response 200 (application/json)
-
-        {
-            "kind": "dds-activity",
-            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-            "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-            "started_on": "2015-01-01T12:00:00",
-            "ended_on": "2015-01-01T114:30:00",
-            "audit": { }
-        }
-
-### Delete activity [DELETE]
->**Permission:** 
-- - - - -
-+ Current user owns (i.e. created) the activity OR 
-+ Current user has view permission (i.e. view_project) for a project folder/file the activity has a provenace relation with; this can be a "used" (i.e. `dds-relation-used`) or "generated" (i.e. `dds-relation-generated`) relation.
-
->**Rules**
-- - - - -
-+ Logically deletes activity (i.e. sets `"is_deleted": true`).
-
-+ Response 204
-
-
