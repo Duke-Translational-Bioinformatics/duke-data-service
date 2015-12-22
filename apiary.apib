@@ -1850,7 +1850,7 @@ What events do we want to publish/expose via this endpoint?
 + **kind (string, required)** - Defines the kind or type of event; these are expressed in the standard format: `<dds-object>-<verb>`. 
 + **actor (object, required)** - The entity that triggered the event; currently this is always a user (i.e. `dds-user`).
 + **object (object, required)** - The primary object of the event; for example this may be a `folder` or a `file`, etc.
-+ **target (object, optional)** - The indirect object, or target, of the event. The precise meaning of the target is largely dependent on the `kind` of event being described, but will often be the object of the English preposition "to". For instance, the event "Erich Huang moved `folder: Sequenceng_Raw` to `folder: Sequencing_Raw_Archive`", the target of the event is `folder: Sequencing_Raw_Archive`.
++ **target (object, optional)** - The indirect object, or target, of the event. The precise meaning of the target is largely dependent on the `kind` of event being described, but will often be the object of the English preposition "to". For instance, the event "Erich Huang moved folder: Sequenceng_Raw to folder: Sequencing_Raw_Archive" - the target of this event is `folder: Sequencing_Raw_Archive`.
 + **message (string, required)** - The message rendered based on a `message_template` specific to the `kind` of event.
 + **context (object, required)** - The context (or scope) of the event; currently this is always a project (i.e. `dds-project`).
 
