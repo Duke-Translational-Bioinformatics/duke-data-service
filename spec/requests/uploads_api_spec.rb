@@ -123,7 +123,7 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Get pre-signed URL to upload a chunk', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+  describe 'Get pre-signed URL to upload a chunk', :vcr do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
@@ -186,7 +186,7 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Complete the chunked file upload', :vcr => {:match_requests_on => [:method, :uri_ignoring_uuids]} do
+  describe 'Complete the chunked file upload', :vcr do
     let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
     let(:called_action) { "PUT" }
     subject { put(url, nil, headers) }
