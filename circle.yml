@@ -18,7 +18,7 @@ dependencies:
     - "docker/circle"
   pre:
 #    - ./docker/circle/cache_ruby.sh
-#    - ./docker/circle/cache_dredd.sh
+    - ./docker/circle/cache_dredd.sh
     - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.3.0
     - ./circle/launch_application.circle.sh
