@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duke Data Service API Doc</title>
+  <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
+  <%= stylesheet_link_tag 'bootstrap.min.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/typography.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/reset.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/screen.css', media: 'screen', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/reset.css', media: 'print', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag 'swaggerui/print.css', media: 'print', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag "layout_blue", :media => "all" %>
+  <%= javascript_include_tag "ie10-viewport-bug-workaround" %>
+  <%= javascript_include_tag 'swaggerui', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag "bootstrap.min.js" %>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <%= javascript_include_tag "html5" %>
+    <%= javascript_include_tag "respond" %>
+  <![endif]-->
+
+  <%= csrf_meta_tags %>
+  <script type="text/javascript">
+	$(function () {
+    $('#logoutButton').click(function(event) {
+      event.preventDefault();
+      handleLogout();
+      return false;
+    });
+
+    $('#current_user_info').hide();
+    loadSwaggerUi();
+
+    if (window.localStorage.api_token) {
+      $('#login').hide();
+      addApiKeyAuthorization();
+    }
+    else if (window.location.href.indexOf('#access_token') > 0){
+      $('#login').hide();
+      var parts = window.location.hash.split('&');
+      var access_token = parts[0].split('=')[1];
+      validateAccessToken(access_token).then(
+        function(data) {
+          signed_token = data['signed_info'];
+          getApiToken(signed_token).then(
+            function(data) {
+              api_token = data['api_token'];
+              window.localStorage.api_token = api_token;
+              $('#login').hide();
+              addApiKeyAuthorization();
+              window.location.replace("#");
+            },
+            handleInvalidSignedToken
+          );
+        },
+        handleInvalidAccessToken
+      );
+    }
+    else {
+      $('#login').show();
+    }
+
+    function handleLogout() {
+      window.localStorage.removeItem('api_token');
+      $('#current_user_info').hide();
+      $('#login').show();
+      removeApiKeyAuthorization();
+    }
+
+    function addApiKeyAuthorization(){
+      key = window.localStorage.api_token;
+      if(key && key.trim() != "") {
+        var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("Authorization", key, "header");
+        window.swaggerUi.api.clientAuthorizations.add("Authorization", apiKeyAuth);
+      }
+      getCurrentUser().then(
+        loadCurrentUser,
+        handleAjaxError
+      );
+    }
+
+    function removeApiKeyAuthorization(){
+      window.swaggerUi.api.clientAuthorizations.remove("Authorization");
+      $('#current_user').html('');
+      $('#current_user_token').html('');
+    }
+
+    function getCurrentUser() {
+      var api_token = window.localStorage.api_token;
+      return $.ajax({
+        type: 'GET',
+        url: '/api/v1/current_user',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Authorization", api_token);
+        },
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+    }
+
+    function loadCurrentUser(data) {
+      $('#current_user').html(data['full_name']);
+      $('#current_user_token').html(window.localStorage.api_token);
+      $('#current_user_info').show();
+    }
+
+    function validateAccessToken(access_token) {
+      return $.ajax({
+        type: 'GET',
+        url: "<%= @auth_service.base_uri -%>/api/v1/token_info?access_token="+access_token,
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+    }
+
+    function handleInvalidAccessToken(jqXHR, status, err) {
+      if ('console' in window) {
+        console.log(jqXHR.responseText);
+      }
+      var errorMessage = JSON.parse(jqXHR.responseText);
+      if ('console' in window) {
+        console.log("ERROR "+errorMessage);
+      }
+      handleLogout();
+    }
+
+    function handleInvalidSignedToken(jqXHR, status, err) {
+      if ('console' in window) {
+        console.log(jqXHR.responseText);
+      }
+      var errorMessage = JSON.parse(jqXHR.responseText);
+      if ('console' in window) {
+        console.log("ERROR "+errorMessage);
+      }
+    };
+
+    function getApiToken(signed_token) {
+      return $.ajax({
+        type: 'GET',
+        url: '/api/v1/user/api_token?access_token='+signed_token,
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+    }
+
+    function handleValidationErrors(errorInfo) {
+      handleLogout();
+      if ('console' in window){
+        console.log("Authentication Error "+JSON.stringify(errorInfo));
+      }
+    }
+
+    function loadSwaggerUi() {
+      window.swaggerUi = new SwaggerUi({
+        url: "<%= "#{dds_base_url}api/v1/swagger_doc" -%>",
+        dom_id: "swagger-ui-container",
+        validatorUrl: null,
+        supportHeaderParams: true,
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+        onComplete: function(swaggerApi, swaggerUi){
+          $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+          if (window.localStorage.api_token) {
+            addApiKeyAuthorization();
+          }
+        },
+        onFailure: function(data) {
+          if('console' in window) {
+            console.log("Unable to Load SwaggerUI");
+            console.log(data);
+          }
+        },
+        docExpansion: "none",
+        apisSorter: "alpha",
+        showRequestHeaders: false
+      });
+      window.swaggerUi.load();
+    }
+
+    function handleAjaxError(jqXHR, status, err) {
+      switch(jqXHR.status) {
+      case 401:
+        if('console' in window) {
+          console.log("Expired Token: "+JSON.parse(jqXHR.responseText));
+        }
+        handleLogout();
+        break;
+      default:
+        if('console' in window) {
+          console.log("Unexpected Error: "+jqXHR.responseText);
+        }
+        break;
+      }
+    }
+  });
+</script>
+</head>
+
+<body class="swagger-section container-fluid" id="basic_content">
+  <div id="authentication" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="swagger-ui-wrap">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid"><%= @auth_service.name -%></a>
+            </li>
+          </ul>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Skip Authentication</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="login">
+    <div class="swagger-ui-wrap">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#authentication">Authenticate</button>
+    </div>
+  </div>
+  <div id="current_user_info">
+    <div class="swagger-ui-wrap">
+      <div class="panel panel-info">
+        <div class="panel panel-heading">
+          <h3 id="current_user" class="panel-title" ></h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <p>Requests submitted with Request Header "Authorization":</p>
+            <code id="current_user_token" style="word-wrap: break-word;"></code>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-default" id="logoutButton">Logout</button>
+    </div>
+  </div>
+  <div id="message-bar" class="swagger-ui-wrap">
+    &nbsp;
+  </div>
+
+  <div id="swagger-ui-container" class="swagger-ui-wrap">
+  </div>
+</body>
+</html>

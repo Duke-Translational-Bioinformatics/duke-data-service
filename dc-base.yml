@@ -1,0 +1,20 @@
+webapp:
+  build: .
+  env_file:
+    - swift.env
+    - webapp.env
+    - portal.env
+  ports:
+    - 3001:3000
+db:
+  build: ./docker/builds/db
+  env_file:
+    - db.env
+swiftvol:
+  image: busybox
+  volumes:
+    - /srv
+swift:
+  build: ./docker/builds/swift
+  ports:
+    - 12345:8080

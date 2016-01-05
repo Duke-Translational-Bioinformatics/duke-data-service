@@ -1,0 +1,230 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx830b78b640e1479a94d44-005671bc43
+      Date:
+      - Wed, 16 Dec 2015 19:32:19 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:19 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/c6c7f85d-7a50-4a41-9cff-10e665dd6141
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx8b7c0b1823c94ba48a73b-005671bc43
+      Date:
+      - Wed, 16 Dec 2015 19:32:19 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:19 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512/1
+    body:
+      encoding: UTF-8
+      string: this is a chunk
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Wed, 16 Dec 2015 19:32:20 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - 2b1f638751fa49d7fba5a64fecf48bb2
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx7bc136bd2d6a439887e0a-005671bc43
+      Date:
+      - Wed, 16 Dec 2015 19:32:19 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:19 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Wed, 16 Dec 2015 19:32:21 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"b77622f6f760a1bed182840a7c02a53c"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx766abda882414fd88e595-005671bc44
+      Date:
+      - Wed, 16 Dec 2015 19:32:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:20 GMT
+- request:
+    method: head
+    uri: http://192.168.99.100:12345/v1/AUTH_test/c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '15'
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Wed, 16 Dec 2015 19:32:21 GMT
+      Etag:
+      - '"b77622f6f760a1bed182840a7c02a53c"'
+      X-Timestamp:
+      - '1450294340.02808'
+      X-Static-Large-Object:
+      - 'True'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      X-Trans-Id:
+      - tx18562f30e68f4408af970-005671bc44
+      Date:
+      - Wed, 16 Dec 2015 19:32:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:20 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txcd9e764aca674fe1a9206-005671bc44
+      Date:
+      - Wed, 16 Dec 2015 19:32:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:20 GMT
+- request:
+    method: delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512/1?multipart-manifest=delete
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk873232b138f0496680a71aa498ea3103
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - txd20ab998ef1f432890913-005671bc44
+      Date:
+      - Wed, 16 Dec 2015 19:32:20 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: "Number Deleted: 0\nNumber Not Found: 0\nResponse Body: \nResponse Status:
+        400 Bad Request\nErrors:\n/c6c7f85d-7a50-4a41-9cff-10e665dd6141/51e55a8b-897e-4e4e-914b-f8850a432512/1,
+        Not an SLO manifest"
+    http_version: 
+  recorded_at: Wed, 16 Dec 2015 19:32:20 GMT
+recorded_with: VCR 3.0.0

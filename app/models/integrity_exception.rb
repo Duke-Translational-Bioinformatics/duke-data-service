@@ -1,0 +1,2 @@
+class IntegrityException < StandardError
+end
