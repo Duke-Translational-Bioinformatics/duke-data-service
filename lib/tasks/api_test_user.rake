@@ -26,8 +26,12 @@ def clean_artifacts(user)
       u = Upload.find(ua.auditable_id)
       $stderr.puts "Cleaning #{u.project_id} #{u.id}"
       sp = u.storage_provider
-      sp.delete_object(u.project_id, u.id)
-      sp.delete_container(u.project_id)
+      begin
+        sp.delete_object(u.project_id, u.id)
+        sp.delete_container(u.project_id)
+      rescue StorageProviderException => e
+        $stderr.puts "error deleting storage_provider artifacts #{e.message}"
+      end
       u.chunks.destroy_all
       u.destroy
     end
