@@ -67,6 +67,25 @@ describe DDS::V1::UploadsAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
         end
+        
+        it 'should set fingerprint_value' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.fingerprint_value).to eq(payload[:hash][:value])
+        end
+        
+        it 'should set fingerprint_algorithm' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.fingerprint_algorithm).to eq(payload[:hash][:algorithm])
+        end
+      end
+
+      context 'without hash parameter in payload' do
+        let!(:payload) {{
+          name: upload_stub.name,
+          content_type: upload_stub.content_type,
+          size: upload_stub.size
+        }}
+        it_behaves_like 'a creatable resource'
       end
 
       it_behaves_like 'a validated resource' do
