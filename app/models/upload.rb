@@ -20,7 +20,7 @@ class Upload < ActiveRecord::Base
     [project_id, id].join('/')
   end
 
-  def http_verb 
+  def http_verb
     'GET'
   end
 
@@ -30,7 +30,7 @@ class Upload < ActiveRecord::Base
   end
 
   def manifest
-    chunks.collect do |chunk|
+    chunks.reorder(:number).collect do |chunk|
       {
         path: chunk.sub_path,
         etag: chunk.fingerprint_value,

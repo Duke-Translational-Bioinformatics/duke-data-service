@@ -72,13 +72,13 @@ RSpec.describe Upload, type: :model do
       expect(subject.manifest).to be_a Array
       expect(subject.chunks).not_to be_empty
       expect(subject.manifest.count).to eq(subject.chunks.count)
-      subject.chunks.each do |chunk|
+      subject.chunks.reorder(:number).each do |chunk|
         chunk_manifest = {
           path: chunk.sub_path,
           etag: chunk.fingerprint_value,
           size_bytes: chunk.size
         }
-        expect(subject.manifest).to include chunk_manifest
+        expect(subject.manifest[chunk.number - 1]).to eq chunk_manifest
       end
     end
   end
