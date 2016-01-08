@@ -142,6 +142,7 @@ RSpec.describe StorageProvider, type: :model do
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }
     let(:expiry) { Faker::Number.number(10) }
+    let(:filename) { 'File Name With Spaces.txt' }
 
     let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry) }
     let(:parsed_url) { URI.parse(signed_url) }
@@ -170,6 +171,23 @@ RSpec.describe StorageProvider, type: :model do
     it 'should have temp_url_expires in query' do
       expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
       expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry)
+    end
+
+    context 'with filename' do
+      let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry, filename) }
+
+      it 'should return a valid url with query params' do
+        expect(signed_url).to be_a String
+        expect { parsed_url }.not_to raise_error
+        expect(parsed_url.query).not_to be_empty
+        expect { decoded_query }.not_to raise_error
+        expect(decoded_query).to be_a Array
+      end
+
+      it 'should have filename in query' do
+        expect(decoded_query.assoc('filename')).not_to be_nil
+        expect(decoded_query.assoc('filename').last).to eq(filename)
+      end
     end
   end
 
