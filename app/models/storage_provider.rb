@@ -102,7 +102,7 @@ class StorageProvider < ActiveRecord::Base
 
   def put_object_manifest(container, object, manifest, content_type=nil, filename=nil)
     content_headers = {}
-    if content_type
+    if content_type && !content_type.empty?
       content_headers['content-type'] = content_type
     end
     if filename
