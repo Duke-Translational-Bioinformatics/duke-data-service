@@ -4,6 +4,8 @@ RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:content_type) {'text/plain'}
+  let(:filename) {'text_file.txt'}
   subject { storage_provider }
 
   describe 'methods that call swift api', :vcr do
@@ -23,6 +25,12 @@ RSpec.describe StorageProvider, type: :model do
       is_expected.to respond_to :auth_token
       expect { subject.auth_token }.not_to raise_error
       expect(subject.auth_token).to be_a String
+    end
+
+    it 'should respond to auth_header' do
+      is_expected.to respond_to :auth_header
+      expect { subject.auth_header }.not_to raise_error
+      expect(subject.auth_header).to be_a Hash
     end
 
     it 'should respond to storage_url' do
@@ -50,6 +58,7 @@ RSpec.describe StorageProvider, type: :model do
       is_expected.to respond_to :put_container
       expect { put_container }.not_to raise_error
       expect(put_container).to be_truthy
+      subject.delete_container(container_name)
     end
 
     let(:put_container_meta){
@@ -57,16 +66,20 @@ RSpec.describe StorageProvider, type: :model do
       HTTParty.get("#{subject.storage_url}/#{container_name}", headers:{"X-Auth-Token" => subject.auth_token})
     }
     it 'should set X-Container-Meta-Access-Control-Allow-Origin' do
+      subject.put_container(container_name)
       expect { put_container_meta }.not_to raise_error
       expect(put_container_meta.headers).to have_key 'x-container-meta-access-control-allow-origin'
       expect(put_container_meta.headers['x-container-meta-access-control-allow-origin']).to eq '*'
+      subject.delete_container(container_name)
     end
 
     let(:put_object) { subject.put_object(container_name, segment_name, object_body) }
     it 'should respond to put_object' do
+      subject.put_container(container_name)
       is_expected.to respond_to :put_object
       expect { put_object }.not_to raise_error
       expect(put_object).to be_truthy
+      subject.delete_container(container_name)
     end
 
     let(:get_object_metadata) { subject.get_object_metadata(container_name, segment_name) }
@@ -78,24 +91,79 @@ RSpec.describe StorageProvider, type: :model do
         resp = get_object_metadata
         expect(resp).to be
       }.not_to raise_error
+      subject.delete_container(container_name)
     end
 
-    let(:put_object_manifest) { subject.put_object_manifest(container_name, object_name, manifest_hash) }
-    it 'should respond to put_object_manifest' do
-      is_expected.to respond_to :put_object_manifest
-      expect { put_object_manifest }.not_to raise_error
-      expect(put_object_manifest).to be_truthy
+    describe 'put_object_manifest' do
+      describe 'without content_type and filename' do
+        let(:put_object_manifest) { subject.put_object_manifest(container_name, object_name, manifest_hash) }
+        it 'should respond to put_object_manifest' do
+          subject.put_container(container_name)
+          is_expected.to respond_to :put_object_manifest
+          expect { put_object_manifest }.not_to raise_error
+          expect(put_object_manifest).to be_truthy
+          subject.delete_container(container_name)
+        end
+      end
+
+      describe 'with content_type' do
+        let(:put_object_manifest) {
+          subject.put_object_manifest(container_name, object_name, manifest_hash, content_type)
+        }
+        it 'should store the content_type on the manifest object as the content-type' do
+          subject.put_container(container_name)
+          is_expected.to respond_to :put_object_manifest
+          expect { put_object_manifest }.not_to raise_error
+          expect(put_object_manifest).to be_truthy
+          resp = subject.get_object_metadata(container_name, object_name)
+          expect(resp['content-type']).to eq(content_type)
+          subject.delete_container(container_name)
+        end
+      end
+
+      describe 'with filename' do
+        let(:put_object_manifest) {
+          subject.put_object_manifest(container_name, object_name, manifest_hash, nil, filename)
+        }
+        it 'should store the filename on the manifest object in the content-disposition' do
+          subject.put_container(container_name)
+          expect { put_object_manifest }.not_to raise_error
+          expect(put_object_manifest).to be_truthy
+          resp = subject.get_object_metadata(container_name, object_name)
+          expect(resp['content-type']).to eq(content_type)
+          expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
+          subject.delete_container(container_name)
+        end
+      end
+
+      describe 'with content_type and filename' do
+        let(:put_object_manifest) {
+          subject.put_object_manifest(container_name, object_name, manifest_hash, content_type, filename)
+        }
+        it 'should store the filename on the manifest object in the content-disposition' do
+          subject.put_container(container_name)
+          expect { put_object_manifest }.not_to raise_error
+          expect(put_object_manifest).to be_truthy
+          resp = subject.get_object_metadata(container_name, object_name)
+          expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
+          subject.delete_container(container_name)
+        end
+      end
     end
 
     let(:delete_object) { subject.delete_object(container_name, object_name) }
     it 'should respond to delete_object' do
+      subject.put_container(container_name)
+      subject.put_object_manifest(container_name, object_name, manifest_hash, content_type, filename)
       is_expected.to respond_to :delete_object
       expect { delete_object }.not_to raise_error
       expect(delete_object).to be_truthy
+      subject.delete_container(container_name)
     end
 
     let(:delete_container) { subject.delete_container(container_name) }
     it 'should respond to delete_container' do
+      subject.put_container(container_name)
       is_expected.to respond_to :delete_container
       expect { delete_container }.not_to raise_error
       expect(delete_container).to be_truthy
