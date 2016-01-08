@@ -41,7 +41,7 @@ class Upload < ActiveRecord::Base
 
   def complete
     begin
-      response = storage_provider.put_object_manifest(project_id, id, manifest)
+      response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
       meta = storage_provider.get_object_metadata(project_id, id)
       unless meta["content-length"].to_i == size
         integrity_exception("reported size does not match size computed by StorageProvider")
