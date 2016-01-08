@@ -29,7 +29,7 @@ class DataFile < Container
   end
 
   def url
-    upload.temporary_url
+    upload.temporary_url(name)
   end
 
   def kind

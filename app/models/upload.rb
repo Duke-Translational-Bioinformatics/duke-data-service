@@ -24,9 +24,10 @@ class Upload < ActiveRecord::Base
     'GET'
   end
 
-  def temporary_url
+  def temporary_url(filename=nil)
     expiry = Time.now.to_i + storage_provider.signed_url_duration
-    storage_provider.build_signed_url(http_verb, sub_path, expiry)
+    filename ||= name
+    storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
   end
 
   def manifest

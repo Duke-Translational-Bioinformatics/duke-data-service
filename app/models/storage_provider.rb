@@ -50,11 +50,13 @@ class StorageProvider < ActiveRecord::Base
     OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
   end
 
-  def build_signed_url(http_verb, sub_path, expiry)
+  def build_signed_url(http_verb, sub_path, expiry, filename=nil)
     path = [root_path, sub_path].join('/')
     hmac_body = [http_verb, expiry, path].join("\n")
     signature = build_signature(hmac_body)
-    URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
+    signed_url = URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
+    signed_url = signed_url + "&filename=#{URI.encode(filename)}" if filename
+    signed_url
   end
 
   def get_account_info
