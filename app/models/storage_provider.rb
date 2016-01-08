@@ -19,14 +19,17 @@ class StorageProvider < ActiveRecord::Base
     call_auth_uri['x-storage-url']
   end
 
+  def auth_header
+    {'X-Auth-Token' => auth_token}
+  end
+
   def register_keys
     resp = HTTParty.post(
       storage_url,
-      headers:{
-        'X-Auth-Token' => auth_token,
+      headers: auth_header.merge({
         'X-Account-Meta-Temp-URL-Key' => primary_key,
         'X-Account-Meta-Temp-URL-Key-2' => secondary_key
-      }
+      })
     )
     (resp.response.code.to_i == 204) || raise(StorageProviderException, resp.body)
   end
@@ -62,7 +65,7 @@ class StorageProvider < ActiveRecord::Base
   def get_account_info
     resp = HTTParty.get(
       "#{storage_url}",
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header
     )
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
@@ -72,10 +75,9 @@ class StorageProvider < ActiveRecord::Base
   def put_container(container)
     resp = HTTParty.put(
       "#{storage_url}/#{container}",
-      headers:{
-        "X-Auth-Token" => auth_token,
+      headers: auth_header.merge({
         "X-Container-Meta-Access-Control-Allow-Origin" => "*"
-      }
+      })
     )
     ([201,202,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
@@ -84,7 +86,7 @@ class StorageProvider < ActiveRecord::Base
   def delete_container(container)
     resp = HTTParty.delete(
       "#{storage_url}/#{container}",
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header
     )
     ([204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
@@ -94,17 +96,24 @@ class StorageProvider < ActiveRecord::Base
     resp = HTTParty.put(
       "#{storage_url}/#{container}/#{object}",
       body: body,
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header
     )
     ([201].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
   end
 
-  def put_object_manifest(container, object, manifest)
+  def put_object_manifest(container, object, manifest, content_type=nil, filename=nil)
+    content_headers = {}
+    if content_type && !content_type.empty?
+      content_headers['content-type'] = content_type
+    end
+    if filename
+      content_headers['content-disposition'] = "attachment; filename=#{filename}"
+    end
     resp = HTTParty.put(
       "#{storage_url}/#{container}/#{object}?multipart-manifest=put",
       body: manifest.to_json,
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header.merge(content_headers)
     )
     ([201,202].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
@@ -113,7 +122,7 @@ class StorageProvider < ActiveRecord::Base
   def delete_object(container, object)
     resp = HTTParty.delete(
       "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header
     )
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
@@ -122,7 +131,7 @@ class StorageProvider < ActiveRecord::Base
   def get_object_metadata(container, object)
     resp = HTTParty.head(
       "#{storage_url}/#{container}/#{object}",
-      headers:{"X-Auth-Token" => auth_token}
+      headers: auth_header
     )
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
