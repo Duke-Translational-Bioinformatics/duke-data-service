@@ -19,20 +19,20 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk873232b138f0496680a71aa498ea3103
+      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk873232b138f0496680a71aa498ea3103
+      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx9289b8f1dcd742309d4a3-005671bc2c
+      - tx4a34f80bc82641a49c508-0056900b79
       Date:
-      - Wed, 16 Dec 2015 19:31:56 GMT
+      - Fri, 08 Jan 2016 19:18:17 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Dec 2015 19:31:56 GMT
+  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
 recorded_with: VCR 3.0.0
