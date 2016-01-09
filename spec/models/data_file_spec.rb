@@ -8,6 +8,7 @@ RSpec.describe DataFile, type: :model do
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:uri_encoded_name) { URI.encode(subject.name) }
 
   it_behaves_like 'an audited model' do
     it_behaves_like 'with a serialized audit'
@@ -131,6 +132,10 @@ RSpec.describe DataFile, type: :model do
     it { should delegate_method(:http_verb).to(:upload) }
     it { should delegate_method(:host).to(:upload).as(:url_root) }
     it { should delegate_method(:url).to(:upload).as(:temporary_url) }
+
+    describe '#url' do
+      it { expect(subject.url).to include uri_encoded_name }
+    end
 
     describe 'ancestors' do
       it 'should respond with an Array' do

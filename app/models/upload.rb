@@ -11,8 +11,6 @@ class Upload < ActiveRecord::Base
   validates :project_id, presence: true
   validates :name, presence: true
   validates :size, presence: true
-  validates :fingerprint_value, presence: true
-  validates :fingerprint_algorithm, presence: true
   validates :storage_provider_id, presence: true
   validates :creator_id, presence: true
 
@@ -26,9 +24,10 @@ class Upload < ActiveRecord::Base
     'GET'
   end
 
-  def temporary_url
+  def temporary_url(filename=nil)
     expiry = Time.now.to_i + storage_provider.signed_url_duration
-    storage_provider.build_signed_url(http_verb, sub_path, expiry)
+    filename ||= name
+    storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
   end
 
   def manifest
@@ -43,7 +42,7 @@ class Upload < ActiveRecord::Base
 
   def complete
     begin
-      response = storage_provider.put_object_manifest(project_id, id, manifest)
+      response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
       meta = storage_provider.get_object_metadata(project_id, id)
       unless meta["content-length"].to_i == size
         integrity_exception("reported size does not match size computed by StorageProvider")

@@ -4,6 +4,8 @@ RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
   let(:storage_provider) { FactoryGirl.create(:storage_provider) }
   let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:content_type) {'text/plain'}
+  let(:filename) {'text_file.txt'}
   subject { storage_provider }
 
   describe 'methods that call swift api', :vcr do
@@ -23,6 +25,12 @@ RSpec.describe StorageProvider, type: :model do
       is_expected.to respond_to :auth_token
       expect { subject.auth_token }.not_to raise_error
       expect(subject.auth_token).to be_a String
+    end
+
+    it 'should respond to auth_header' do
+      is_expected.to respond_to :auth_header
+      expect { subject.auth_header }.not_to raise_error
+      expect(subject.auth_header).to be_a Hash
     end
 
     it 'should respond to storage_url' do
@@ -87,6 +95,37 @@ RSpec.describe StorageProvider, type: :model do
       expect(put_object_manifest).to be_truthy
     end
 
+    let(:put_object_manifest_content_type) {
+      subject.put_object_manifest(container_name, object_name, manifest_hash, content_type)
+    }
+    it 'should store the content_type on the manifest object as the content-type' do
+      expect { put_object_manifest_content_type }.not_to raise_error
+      expect(put_object_manifest_content_type).to be_truthy
+      resp = subject.get_object_metadata(container_name, object_name)
+      expect(resp['content-type']).to eq(content_type)
+    end
+
+    let(:put_object_manifest_filename) {
+      subject.put_object_manifest(container_name, object_name, manifest_hash, nil, filename)
+    }
+    it 'should store the filename on the manifest object in the content-disposition' do
+      expect { put_object_manifest_filename }.not_to raise_error
+      expect(put_object_manifest_filename).to be_truthy
+      resp = subject.get_object_metadata(container_name, object_name)
+      expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
+    end
+
+    let(:put_object_manifest_content_type_filename) {
+      subject.put_object_manifest(container_name, object_name, manifest_hash, content_type, filename)
+    }
+    it 'should store both the content_type and filename on the manifest object' do
+      expect { put_object_manifest_content_type_filename }.not_to raise_error
+      expect(put_object_manifest_content_type_filename).to be_truthy
+      resp = subject.get_object_metadata(container_name, object_name)
+      expect(resp['content-type']).to eq(content_type)
+      expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
+    end
+
     let(:delete_object) { subject.delete_object(container_name, object_name) }
     it 'should respond to delete_object' do
       is_expected.to respond_to :delete_object
@@ -142,6 +181,7 @@ RSpec.describe StorageProvider, type: :model do
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }
     let(:expiry) { Faker::Number.number(10) }
+    let(:filename) { 'File Name With Spaces.txt' }
 
     let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry) }
     let(:parsed_url) { URI.parse(signed_url) }
@@ -170,6 +210,23 @@ RSpec.describe StorageProvider, type: :model do
     it 'should have temp_url_expires in query' do
       expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
       expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry)
+    end
+
+    context 'with filename' do
+      let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry, filename) }
+
+      it 'should return a valid url with query params' do
+        expect(signed_url).to be_a String
+        expect { parsed_url }.not_to raise_error
+        expect(parsed_url.query).not_to be_empty
+        expect { decoded_query }.not_to raise_error
+        expect(decoded_query).to be_a Array
+      end
+
+      it 'should have filename in query' do
+        expect(decoded_query.assoc('filename')).not_to be_nil
+        expect(decoded_query.assoc('filename').last).to eq(filename)
+      end
     end
   end
 

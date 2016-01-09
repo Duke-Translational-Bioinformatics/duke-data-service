@@ -36,11 +36,12 @@ RSpec.describe Upload, type: :model do
       should validate_presence_of :project_id
       should validate_presence_of :name
       should validate_presence_of :size
-      should validate_presence_of :fingerprint_value
-      should validate_presence_of :fingerprint_algorithm
       should validate_presence_of :storage_provider_id
       should validate_presence_of :creator_id
     end
+
+    it { is_expected.not_to validate_presence_of :fingerprint_value }
+    it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
   end
 
   describe 'instance methods' do
@@ -56,9 +57,15 @@ RSpec.describe Upload, type: :model do
       expect(subject.sub_path).to eq expected_sub_path
     end
 
-    it 'should have a temporary_url method' do
-      is_expected.to respond_to :temporary_url
-      expect(subject.temporary_url).to be_a String
+    describe '#temporary_url' do
+      it { is_expected.to respond_to :temporary_url }
+      it { expect(subject.temporary_url).to be_a String }
+      it { expect(subject.temporary_url).to include subject.name }
+
+      context 'when filename is provided' do
+        let(:filename) { 'different-file-name.txt' }
+        it { expect(subject.temporary_url(filename)).to include filename }
+      end
     end
 
     it 'should have a completed_at attribute' do
