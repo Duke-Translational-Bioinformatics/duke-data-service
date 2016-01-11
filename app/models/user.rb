@@ -9,14 +9,14 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :user_authentication_services
 
   has_many :project_permissions
-  has_many :permitted_projects, 
-    -> { where(is_deleted: false) }, 
-    class_name: 'Project', 
+  has_many :permitted_projects,
+    -> { where(is_deleted: false) },
+    class_name: 'Project',
     through: :project_permissions,
     source: :project
-  has_many :created_files, 
-    -> { where(is_deleted: false) }, 
-    class_name: 'DataFile', 
+  has_many :created_files,
+    -> { where(is_deleted: false) },
+    class_name: 'DataFile',
     through: :permitted_projects,
     source: :data_files,
     foreign_key: "creator_id"
@@ -36,7 +36,7 @@ class User < ActiveRecord::Base
   end
 
   def storage_bytes
-    self.uploads.sum(:size)
+    self.uploads.sum(:size).to_i
   end
 
   def audited_user_info
