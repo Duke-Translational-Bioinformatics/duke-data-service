@@ -7,9 +7,6 @@ var Promise = require("node-promise").Promise;
 var fs = require("fs");
 var md5 = require('md5');
 
-console.log(typeof tools.createResource);
-console.log(process.env.HOST_NAME);
-
 var CREATE_PROJECT = "Projects > Projects collection > Create project";
 var LIST_PROJECTS = "Projects > Projects collection > List projects";
 var VIEW_PROJECT = "Projects > Project instance > View project";
