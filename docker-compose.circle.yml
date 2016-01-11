@@ -57,4 +57,16 @@ dredd:
   env_file:
     - dredd.env
   volumes:
+    - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
     - ./apiary.apib:/home/dredd_scripts/apiary.apib
+#Sometimes need to run interactively to qc issues, so here is the docker invocation
+# docker run \
+# -it \
+# -v /home/ubuntu/duke-data-service/docker/builds/dredd/dredd_scripts:/home/dredd_scripts/ \
+# -v /home/ubuntu/duke-data-service/apiary.apib:/home/dredd_scripts/apiary.apib \
+# --link server:dds.host \
+# --link swift:swift.circle.host \
+# --link db:postgres.db.host \
+# --env HOST_NAME=http://dds.host:3000/api/v1 \
+# --env MY_GENERATED_JWT=`docker-compose run rake api_test_user:create | tail -1` \
+# dukedataservice_dredd bash
