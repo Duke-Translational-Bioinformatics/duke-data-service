@@ -16,22 +16,33 @@ var COMPLETE_CHUNKED_UPLOAD = "Uploads > Upload instance > Complete chunked file
 var responseStash = {};
 var g_uploadId = null;
 // get a sample chunk to upload
-var chunk = getSampleChunk(1);
+var chunk = tools.getSampleChunk(1);
 
-hooks.before(INIT_CHUNKED_UPLOAD, function (transaction) {
-  // parse request body from blueprint
-  var requestBody = JSON.parse(transaction.request.body);
-  // modify request body here
-  requestBody['name'] = 'upload-sample'.concat('-').concat(shortid.generate()).concat('.txt');
-  requestBody['content_type'] = chunk['content_type'];
-  requestBody['size'] = chunk['size'];
-  requestBody['hash']['value'] = chunk['hash']['value'];
-  requestBody['hash']['algorithm'] = chunk['hash']['algorithm'];
-  // stringify the new boy to request
-  transaction.request.body = JSON.stringify(requestBody);
-  // replacing id in URL with stashed id from previous response
-  var url = transaction.fullPath;
-  transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', g_projectId);
+hooks.before(INIT_CHUNKED_UPLOAD, function (transaction,done) {
+  //first we'll create a project
+  var payload = {
+    "name": "Delete project for dredd - ".concat(shortid.generate()),
+    "description": "A project to delete for dredd"
+  };
+  var payload_na = {};
+  var request = tools.createResource('POST', '/projects', JSON.stringify(payload),hooks.configuration.server);
+  request.then(function(data) {
+    responseStash['createdProject'] = data['id'];
+    // parse request body from blueprint
+    var requestBody = JSON.parse(transaction.request.body);
+    // modify request body here
+    requestBody['name'] = 'upload-sample'.concat('-').concat(shortid.generate()).concat('.txt');
+    requestBody['content_type'] = chunk['content_type'];
+    requestBody['size'] = chunk['size'];
+    requestBody['hash']['value'] = chunk['hash']['value'];
+    requestBody['hash']['algorithm'] = chunk['hash']['algorithm'];
+    // stringify the new boy to request
+    transaction.request.body = JSON.stringify(requestBody);
+    // replacing id in URL with stashed id from previous response
+    var url = transaction.fullPath;
+    transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', responseStash['createdProject']);
+    done();
+  });
 });
 
 hooks.after(INIT_CHUNKED_UPLOAD, function (transaction) {
@@ -42,7 +53,7 @@ hooks.after(INIT_CHUNKED_UPLOAD, function (transaction) {
 hooks.before(LIST_CHUNKED_UPLOADS, function (transaction) {
   // replacing id in URL with stashed id from previous response
   var url = transaction.fullPath;
-  transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', g_projectId);
+  transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', responseStash['createdProject']);
 });
 
 hooks.before(VIEW_CHUNKED_UPLOAD, function (transaction) {
@@ -74,7 +85,7 @@ hooks.after(GET_CHUNK_URL, function (transaction, done) {
   // saving HTTP response to the stash
   responseStash[GET_CHUNK_URL] = transaction.real.body;
   payload = JSON.parse(responseStash[GET_CHUNK_URL]);
-  request = uploadSwiftChunk('PUT', payload['host'].concat(payload['url']), chunk['content']);
+  request = tools.uploadSwiftChunk('PUT', payload['host'].concat(payload['url']), chunk['content']);
   request.then(function(data) {
     done();
   });
