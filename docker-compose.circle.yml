@@ -57,4 +57,5 @@ dredd:
   env_file:
     - dredd.env
   volumes:
+    - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
     - ./apiary.apib:/home/dredd_scripts/apiary.apib
