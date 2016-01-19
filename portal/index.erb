@@ -20,22 +20,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <script type="text/javascript">
-    var DDS_PORTAL_CONFIG = {
-        serviceId: '<%= @serviceID -%>',
-        baseUrl: '<%= @baseUrl -%>',
-        authServiceUri: '<%= @authServiceUri -%>',
-        authServiceName: '<%= @authServiceName -%>',
-        securityState:'<%= @securityState -%>',
-        environment:'<%= @environment -%>'
-    };
-    if (DDS_PORTAL_CONFIG.environment != 'production') {
-        (function (d, t) {
-            var bh = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            bh.type = 'text/javascript';
-            bh.src = '//www.bugherd.com/sidebarv2.js?apikey=zhcaqqrxbp37fy04xao8yg';
-            s.parentNode.insertBefore(bh, s);
-        })(document, 'script');
-    }
+        var DDS_PORTAL_CONFIG = {
+            serviceId: '<%= @serviceID -%>',
+            baseUrl: '<%= @baseUrl -%>',
+            authServiceUri: '<%= @authServiceUri -%>',
+            authServiceName: '<%= @authServiceName -%>',
+            securityState:'<%= @securityState -%>',
+            environment:'<%= @environment -%>'
+        };
     </script>
 </head>
 <body>
