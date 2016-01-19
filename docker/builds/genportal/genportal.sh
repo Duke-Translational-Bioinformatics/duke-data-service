@@ -37,6 +37,7 @@ then
   gulp build --type production
   rm -rf /var/www/app/portal/*
   cp dist/index.erb /var/www/app/portal/index.erb
+  mv dist/images/* /var/www/app/public/images
   rsync -avz dist/ /var/www/app/portal/
   git ls-remote https://github.com/Duke-Translational-Bioinformatics/duke-data-service-portal.git "refs/heads/${dds_branch}" > /var/www/app/portal.version
   echo "Generated ${next_commit}"
