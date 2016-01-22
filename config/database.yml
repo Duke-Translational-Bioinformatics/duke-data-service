@@ -24,6 +24,10 @@ default: &default
   password: abc123
   host: postgres.db.host
 
+docker:
+  <<: *default
+  database: duke-data-service_development
+
 development:
   <<: *default
   database: duke-data-service_development
