@@ -43,4 +43,18 @@ RSpec.describe UploadSerializer, type: :serializer do
       expect(subject["status"]["error_message"]).to eq(resource.error_message)
     end
   end
+
+  context 'upload without fingerprint' do
+    let(:resource) { FactoryGirl.create(:upload, :without_fingerprint, :with_chunks, :completed, :with_error) }
+
+    it_behaves_like 'a json serializer' do
+      before do
+        expected_keys.each do |ekey|
+          is_expected.to have_key ekey
+        end
+      end
+
+      it { expect(subject["hash"]).to eq(nil) }
+    end
+  end
 end
