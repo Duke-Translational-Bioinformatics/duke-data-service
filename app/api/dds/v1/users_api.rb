@@ -40,7 +40,7 @@ module DDS
               new_login_at = DateTime.now
               authorized_user.user.update_attribute(:last_login_at, DateTime.now)
             else
-              new_user = User.create(
+              new_user = User.new(
                 id: SecureRandom.uuid,
                 username: access_token['uid'],
                 etag: SecureRandom.hex,
@@ -50,12 +50,13 @@ module DDS
                 last_login_at: DateTime.now,
                 last_name: access_token['last_name']
               )
+              authorized_user = new_user.user_authentication_services.build(
+                uid: access_token['uid'],
+                authentication_service: auth_service
+              )
+              new_user.save!
               last_audit = new_user.audits.last
               annotate_audits([last_audit], {user: new_user})
-              authorized_user = auth_service.user_authentication_services.create(
-                uid: access_token['uid'],
-                user: new_user
-              )
             end
             {'api_token' => authorized_user.api_token}
           else
