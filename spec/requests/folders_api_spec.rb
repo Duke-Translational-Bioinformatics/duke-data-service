@@ -133,6 +133,27 @@ describe DDS::V1::FoldersAPI do
         end
       end
 
+      context 'with invalid child file' do
+        let!(:invalid_child_file) { FactoryGirl.create(:data_file, :invalid, parent: resource) }
+
+        it { expect(invalid_child_file).to be_invalid }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+          end
+        end
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { DataFile.where(is_deleted: false) }
+        end
+      end
+
       context 'with children' do
         let(:resource) { parent }
         let!(:child) { folder }
