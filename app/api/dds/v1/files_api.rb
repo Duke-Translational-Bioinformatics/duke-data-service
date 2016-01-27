@@ -83,7 +83,7 @@ module DDS
             file = hide_logically_deleted(DataFile.find(params[:id]))
             authorize file, :destroy?
             Audited.audit_class.as_user(current_user) do
-              file.update(is_deleted: true)
+              file.update_attribute(:is_deleted, true)
               annotate_audits [file.audits.last]
             end
             body false

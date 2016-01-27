@@ -7,6 +7,7 @@ describe DDS::V1::FilesAPI do
   let(:upload) { FactoryGirl.create(:upload, :completed, project: project, creator: current_user) }
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
+  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
   let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
   let(:parent) { folder }
   let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
@@ -143,6 +144,27 @@ describe DDS::V1::FilesAPI do
 
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
+        end
+      end
+
+      context 'with invalid resource' do
+        let(:resource) { invalid_file }
+
+        it { expect(resource).to be_invalid }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+          end
+
+          it_behaves_like 'an identified resource' do
+            let(:resource_id) {'notfoundid'}
+          end
         end
       end
 

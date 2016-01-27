@@ -6,11 +6,11 @@ class DataFile < Container
 
   after_set_parent_attribute :set_project_to_parent_project
 
-  validates :project_id, presence: true, immutable: true
-  validates :upload_id, presence: true
-  validates :creator_id, presence: true
+  validates :project_id, presence: true, immutable: true, unless: :is_deleted
+  validates :upload_id, presence: true, unless: :is_deleted
+  validates :creator_id, presence: true, unless: :is_deleted
 
-  validates_each :upload, :upload_id do |record, attr, value|
+  validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
     if record.upload
       if record.upload.creator_id != record.creator_id
         record.errors.add(attr, 'created by another user')
