@@ -9,7 +9,7 @@ class Container < ActiveRecord::Base
   has_many :project_permissions, through: :project
 
   define_model_callbacks :set_parent_attribute
-  validates :name, presence: true
+  validates :name, presence: true, unless: :is_deleted
 
   def ancestors
     if parent

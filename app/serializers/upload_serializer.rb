@@ -6,12 +6,16 @@ class UploadSerializer < ActiveModel::Serializer
   has_many :chunks, serializer: ChunkPreviewSerializer
 
   def hash
-    {
-      value: object.fingerprint_value,
-      algorithm: object.fingerprint_algorithm,
-      client_reported: true,
-      confirmed: false
-    }
+    if object.fingerprint_value
+      {
+        value: object.fingerprint_value,
+        algorithm: object.fingerprint_algorithm,
+        client_reported: true,
+        confirmed: false
+      }
+    else
+      nil
+    end
   end
 
   def status
