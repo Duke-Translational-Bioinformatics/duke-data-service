@@ -6,9 +6,13 @@ class UploadPreviewSerializer < ActiveModel::Serializer
   has_one :storage_provider, serializer: StorageProviderPreviewSerializer
 
   def hash
-    {
-      value: object.fingerprint_value,
-      algorithm: object.fingerprint_algorithm
-    }
+    if object.fingerprint_value
+      {
+        value: object.fingerprint_value,
+        algorithm: object.fingerprint_algorithm
+      }
+    else
+      nil
+    end
   end
 end

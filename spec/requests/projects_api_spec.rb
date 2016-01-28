@@ -135,6 +135,25 @@ describe DDS::V1::ProjectsAPI do
         end
       end
 
+      context 'with invalid resource' do
+        let(:resource) { FactoryGirl.create(:project, :invalid) }
+        let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: resource) }
+
+        it { expect(resource).to be_invalid }
+        it { expect(resource).not_to be_is_deleted }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+          end
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an audited endpoint' do
