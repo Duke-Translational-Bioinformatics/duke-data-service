@@ -12,6 +12,10 @@ module DDS
       prefix :api
       paginate offset: false
 
+      before do
+        logger.info "User-Agent: #{headers['User-Agent']}"
+      end
+
       helpers Pundit
       helpers do
         def logger
