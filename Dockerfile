@@ -30,7 +30,7 @@ RUN git checkout develop
 ADD Gemfile /var/www/app/Gemfile
 ADD Gemfile.lock /var/www/app/Gemfile.lock
 RUN ["bundle", "config", "build.nokogiri", "--use-system-libraries"]
-RUN ["bundle", "install"]
+RUN ["bundle", "install", "--jobs=4"]
 
 # run the app by defualt
 EXPOSE 3000
