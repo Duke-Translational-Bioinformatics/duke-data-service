@@ -45,12 +45,12 @@ gem "faker"
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-group :development do
+group :development, :docker do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 end
 
-group :development, :test do
+group :development, :docker, :test do
   gem 'rspec-rails'
 end
 
@@ -63,5 +63,7 @@ group :test do
 end
 
 #heroku requires this
-gem 'rails_12factor', group: :production
+group :docker, :development, :ua_test, :production do
+  gem 'rails_12factor'
+end
 ruby "2.2.2"
