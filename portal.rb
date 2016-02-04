@@ -10,6 +10,7 @@ class Portal < Sinatra::Base
   end
 
   get '/*' do
+    env["rack.errors"].puts "User-Agent: #{request.user_agent}"
     @asset_path = "/portal/asset/"
     @serviceID = ENV['SERVICE_ID']
     @baseUrl = request.url.gsub(request.path, '')
