@@ -4,13 +4,14 @@ require 'newrelic_rpm'
 class Portal < Sinatra::Base
   set :root, File.dirname(__FILE__)
   set :views, settings.root + '/portal'
+  set :logging, true
 
   get /asset\/*(.*)/ do |asset|
     send_file "#{settings.root}/portal/#{asset}"
   end
 
   get '/*' do
-    env["rack.errors"].puts "User-Agent: #{request.user_agent}"
+    logger.info "User-Agent: #{request.user_agent}"
     @asset_path = "/portal/asset/"
     @serviceID = ENV['SERVICE_ID']
     @baseUrl = request.url.gsub(request.path, '')
