@@ -32,21 +32,25 @@ deployment:
  development:
    branch: develop
    commands:
+    - heroku maintenance:on --app 'dukeds-dev'
     # - heroku run --exit-code rake assets:clobber --app 'dukeds-dev'
     - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
     - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
         timeout: 54000
-    - heroku run --exit-code rake db:migrate --app 'dukeds-dev'
-    - heroku run --exit-code rake db:seed --app 'dukeds-dev'
+    - heroku run rake db:migrate --app 'dukeds-dev'
+    - heroku run rake db:seed --app 'dukeds-dev'
+    - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
    commands:
+    - heroku maintenance:on --app 'dukeds-uatest'
     # - heroku run --exit-code rake assets:clobber --app 'dukeds-uatest'
     - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
     - git push git@heroku.com:dukeds-uatest.git $CIRCLE_SHA1:refs/heads/master:
         timeout: 54000
-    - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
-    - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
+    - heroku run rake db:migrate --app 'dukeds-uatest'
+    - heroku run rake db:seed --app 'dukeds-uatest'
+    - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
    commands:
