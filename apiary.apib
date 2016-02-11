@@ -172,6 +172,182 @@ Represents set of discrete permissions that may be granted to a user.
             "is_deprecated": false
         }
 
+## Group Service Account
+Represents a service account and associated secret that can be used to access the API endpoints from external applications, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of stored chunks for failed uploads).
+
+## Service Accounts collection [/service_accounts]
+
+## Create service account [POST]
+Creates service account and an associated secret API key.
+
+>**Permission:** system_admin
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **name (string)** - A short name for the service account.
++ **accept_ips (string[], optional)** - An array of ip addresses that the API will accept HTTPS requests from for this service account.  If none are specified, then all ip addresses are accepted.  For production service accounts, this should be specified.
+
+>**Response Properties**
+- - - - -
++ **api_key.key (jwt)** - A secret key (JWT) to be injected into the request authorization header by external applications and system maintenance tasks.
++ **api_key.created_on (datetime)** - The date the service account key was generated.
++ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid) for user level API keys.
+
+
+>**Rules**
+- - - - -
++ There will be a system level setting `SERVICE_API_KEY_EXPIRE_DAYS` that dictates when service level API keys expire.
++ In current implementation, service account inherits the permissions of the owning (i.e. creating user); the immediate utility is to provide a mechanism to authorize system maintenance background tasks (computing file hashes, deletion of swift storage, etc.).
+
++ Request (application/json)
+
+        {
+            "name": "Service account for hash computation"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Service account for hash computation",
+            "accept_ips": [],
+            "api_key": { 
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-01-01T12:00:00Z",
+                "expire_on": "2015-06-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            },
+            "audit": { }
+        }
+
+## List service accounts [GET]
+>**Permission:** system_admin
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [ 
+                {
+                    "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                    "name": "Service account for hash computation",
+                    "accept_ips": [],
+                    "api_key": { 
+                        "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                        "created_on": "2015-01-01T12:00:00Z",
+                        "expire_on": "2015-06-01T12:00:00Z"
+                    },
+                    "owner": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",   
+                        "full_name": "Matthew Gardner", 
+                        "email": "mrgardner01@duke.edu"
+                    },
+                    "audit": { } 
+                } 
+            ]
+        }
+
+## Service Accounts instance [/service_accounts/{id}]
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a service account.
+
+## View service account [GET]
+>**Permission:** system_admin
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Service account for hash computation",
+            "accept_ips": [],
+            "api_key": { 
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-01-01T12:00:00Z",
+                "expire_on": "2015-06-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            },
+            "audit": { }
+        }
+
+## Update service account [PUT]
+>**Permission:** system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ Only `name`, `accept_ips` can be updated; all other properties are immutable. 
+
++ Request (application/json)
+
+        {
+            "name": "Compute and confirm file hash account",
+            "accept_ips": ["173.194.207.113", "173.194.207.114"]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Compute and confirm file hash account",
+            "accept_ips": ["173.194.207.113", "173.194.207.114"],
+            "api_key": { 
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-01-01T12:00:00Z",
+                "expire_on": "2015-06-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            },
+            "audit": { }
+        }
+
+## Generate service account API key [PUT /service_accounts/{id}/api_key]
+Generates a new secret API key for the service account.
+
+>**Permission:** system_admin
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Compute and confirm file hash account",
+            "accept_ips": ["173.194.207.113", "173.194.207.114"],
+            "api_key": { 
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-06-01T12:00:00Z",
+                "expire_on": "2015-12-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            },
+            "audit": { }
+        }
+
+## Delete service account [DELETE]
+>**Permission:** system_admin
+
++ Response 204
+
 ## Group Current User
 Represents the currently authenticated user.
 
@@ -198,7 +374,7 @@ Represents the currently authenticated user.
             "audit": { }
         }
 
-## Current Users Usage [GET /current_user/usage]
+## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 
 >**Permission:** view_project
@@ -222,6 +398,67 @@ View summary usage for current user across all projects.
             "file_count": 126,
             "storage_bytes": 304006007009
         }
+
+## Generate current user API key [PUT /current_user/api_key]
+Generates a secret API key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...)
+
+>**Permission:** authenticated
+- - - - -
+
+>**Response Properties**
+- - - - -
++ **api_key.key (jwt)** - A secret key (JWT) to be injected into the request authorization header by client applications/scripts when calling API endpoints.
++ **api_key.created_on (datetime)** - The date the key was generated.
++ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid) for user level API keys.
+
+>**Rules**
+- - - - -
++ There will be a system level setting `USER_API_KEY_EXPIRE_DAYS` that dictates when user level API keys expire.
++ If the current user already has an API key, invoking this endpoint deletes their exisiting key and generates a new key.
+
++ Response 200 (application/json)
+
+        {
+            "id": "ef39c1b7-5618-4e43-b021-41af9ac6ed10",
+            "api_key": {
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-01-01T12:00:00Z",
+                "expire_on": "2015-06-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            }
+        }
+
+## Get current user API key [GET /current_user/api_key]
+>**Permission:** authenticated
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "ef39c1b7-5618-4e43-b021-41af9ac6ed10",
+            "api_key": {
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "created_on": "2015-01-01T12:00:00Z",
+                "expire_on": "2015-06-01T12:00:00Z"
+            },
+            "owner": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",   
+                "full_name": "Matthew Gardner", 
+                "email": "mrgardner01@duke.edu"
+            }
+        }
+
+## Delete current user API key [DELETE /current_user/api_key]
+>**Permission:** authenticated
+- - - - -
+
++ Response 204 
 
 ## Group Users
 Represents registered users.
@@ -902,7 +1139,10 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
+            "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "md5" 
+            }
         }
 
 + Response 201 (application/json)
@@ -913,9 +1153,18 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": false 
+            },
             "chunks": [ ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", "description": 
+                "Duke OIT Storage" 
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -939,9 +1188,18 @@ This is the first step in uploading a large file. An upload objects is created a
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
                     "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+                    "hash": { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5", 
+                        "client_reported": true, 
+                        "confirmed": false 
+                    },
                     "chunks": [ ],
-                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    },
                     "status": {
                         "initiated_on": "2015-07-10T13:00:00Z",
                         "completed_on": null,
@@ -969,15 +1227,28 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": false 
+                },
             "chunks": [
-              {
-                "number": 1,
-                "size": 10000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
-              }
+                {
+                    "number": 1,
+                    "size": 10000,
+                    "hash": { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5" 
+                    }
+                }
             ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": 
+                "Duke OIT Storage" 
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -1025,7 +1296,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             "host": "duke_data_service_prod.s3.amazonaws.com",
             "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
             "http_headers": [
-                    { "Content-Length": "5024000" }
+                { "Content-Length": "5024000" }
             ]
         }
 
@@ -1053,20 +1324,35 @@ This operation is called by the client after all file chunks have been successfu
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": true },
+            "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": true 
+            },
             "chunks": [
                 {
                     "number": 1,
                     "size": 5024000,
-                    "hash": { "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", "algorithm": "md5" }
+                    "hash": { 
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
+                        "algorithm": "md5" 
+                    }
                 },
                 {
                     "number": 2,
                     "size": 5024000,
-                    "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
+                    "hash": { 
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
+                        "algorithm": "md5" 
+                    }
                 }
             ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": "Duke OIT Storage" 
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": "2015-07-10T13:00:00Z",
@@ -1372,6 +1658,7 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
 
+<!--API features for future sprints...
 ## Group Tags
 A tag is a term (i.e. word or phrase) that can be associated to a DDS object to faciliate classification and searching. 
 
@@ -2010,3 +2297,4 @@ We will support searching tags initially, and then extend to support searching p
                 }
             ]
         }
+-->
