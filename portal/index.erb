@@ -29,26 +29,6 @@
             securityState:'<%= @securityState -%>',
             environment:'<%= @environment -%>'
         };
-        var bhKey = '';
-        switch(DDS_PORTAL_CONFIG.environment){
-            case 'production':
-                bhKey = 'j2s1wpj2nvjb4s4lxxakpg';
-                break;
-            case 'ua_test':
-                bhKey = 'zhcaqqrxbp37fy04xao8yg';
-                break;
-            case 'development':
-                bhKey = 'xoxx827zgfmyshoeipgrbg';
-                break
-        }
-        if (DDS_PORTAL_CONFIG.environment != 'development') {
-            (function (d, t) {
-                var bh = d.createElement(t), s = d.getElementsByTagName(t)[0];
-                bh.type = 'text/javascript';
-                bh.src = '//www.bugherd.com/sidebarv2.js?apikey='+bhKey;
-                s.parentNode.insertBefore(bh, s);
-            })(document, 'script');
-        }
     </script>
 </head>
 <body>
