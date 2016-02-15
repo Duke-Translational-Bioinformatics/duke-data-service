@@ -997,12 +997,14 @@ Represents an external service that provides physical storage space for DDS file
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
                     "name": "duke_oit_swift",
                     "description": "Duke OIT Storage",
+                    "default_hash_algorithm": "md5",
                     "is_deprecated": false
                 },
                 {
                     "id": "t4479f73-0774-4f96-afc7-9d251e65by88",
                     "name": "amazon_s3_glacier",
                     "description": "Amazon Glacier Cloud Storage",
+                    "default_hash_algorithm": "sha1",
                     "is_deprecated": false
                 }
             ]
@@ -1023,6 +1025,7 @@ Represents an external service that provides physical storage space for DDS file
             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
             "name": "duke_oit_swift",
             "description": "Duke Office of Information Technology Storage",
+            "default_hash_algorithm": "md5",
             "is_deprecated": false
         }
 
@@ -1183,15 +1186,19 @@ This is the first step in uploading a large file. An upload objects is created a
 - - - - -
 + **name (string, required)** - The name of the client file to upload.
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
-+ **size (number, required)** - The size in bytes (computed by client).
-+ **hash.value (number, required)** - The files hash (computed by client).
-+ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by the target storage provider.
++ **size (number, required)** - The size in bytes of entire file (computed by client).
++ **hash.value (number, required)** - The entire file hash (computed by client).
++ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.) - only `sha1` is currently supported.
 
 >**Response Properties**
 - - - - -
 + **chunks (object)** - The chunks the client has requested to upload.
 + **storage_location (object)** - Object that contains physical file storage details.
 + **status (object)** - Object used to track status of overall file upload.
+
+>**Rules**
+- - - - -
++ The client reported hash of entire file must be a `sha1`; the server reported hash will be computed as a `sha1` - this will allow client reported hash verification.
 
 + Request (application/json)
 
@@ -1201,7 +1208,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "size": 30024000,
             "hash": { 
                 "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5" 
+                "algorithm": "sha1" 
             }
         }
 
@@ -1214,10 +1221,12 @@ This is the first step in uploading a large file. An upload objects is created a
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": false 
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1"
+                },
+                "server_reported": null
+                }
             },
             "chunks": [ ],
             "storage_provider": { 
@@ -1247,12 +1256,13 @@ This is the first step in uploading a large file. An upload objects is created a
                     "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
-                    "size": 30024000,
                     "hash": { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5", 
-                        "client_reported": true, 
-                        "confirmed": false 
+                        "client_reported": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "sha1"
+                        },
+                        "server_reported": null
+                        }
                     },
                     "chunks": [ ],
                     "storage_provider": { 
@@ -1288,11 +1298,13 @@ This is the first step in uploading a large file. An upload objects is created a
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": false 
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1"
                 },
+                "server_reported": null
+                }
+            },
             "chunks": [
                 {
                     "number": 1,
@@ -1329,7 +1341,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
 + **number (number, required)** - The chunk number.
 + **size (number, required)** - The size of the chunk in bytes (computed by client).
 + **hash.value (string, required)** - The chunk hash (computed by client).
-+ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by storage provider.
++ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by storage provider (i.e. `storage_provider.default_hash_algorithm`)
 
 >**Response Properties**
 - - - - -
@@ -1337,6 +1349,10 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
 + **host (string)** - The storage provider host.
 + **url (string)** - The signed URL endpoint for uploading the next chunk to the storage provider.
 + **http_headers (object[ ])** - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
+
+>**Rules**
+- - - - -
++ The client specified `hash.algorithm` must match the `storage_provider.default_hash_algorithm`.
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -1346,7 +1362,10 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
         {
             "number": 1,
             "size": 5024000,
-            "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
+            "hash": { 
+                "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", 
+                "algorithm": "md5" 
+            }
         }
 
 + Response 200 (application/json)
@@ -1385,10 +1404,12 @@ This operation is called by the client after all file chunks have been successfu
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": true 
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1"
+                },
+                "server_reported": null
+                }
             },
             "chunks": [
                 {
@@ -1420,6 +1441,122 @@ This operation is called by the client after all file chunks have been successfu
                 "error_message": null
             },
             "audit": { }
+        }
+
+## Report server computed hash [PUT /uploads/{id}/server_hash]
+This action is called by a background task that computes a `sha1` hash for completed file uploads.
+
+>**Permission:** system_admin
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **hash.value (string, required)** - The entire file hash (computed by server task).
++ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - only `sha1` is currenlty supported.
+
++ Request (application/json)
+
+        {
+            "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "sha1" 
+            }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": { 
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1"
+                },
+                "server_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1"
+                }
+            },
+            "chunks": [
+                {
+                    "number": 1,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
+                        "algorithm": "md5" 
+                    }
+                },
+                {
+                    "number": 2,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
+                        "algorithm": "md5" 
+                    }
+                }
+            ],
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": "Duke OIT Storage" 
+            },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": "2015-07-10T13:00:00Z",
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
+## Group Search Uploads
+Represents endpoints for searching uploads across projects.
+
+## Search uploads [GET /uploads{?server_hash_pending}]
+Search for project uploads; this endpoint will facilitate finding uploads that are the target of background jobs/tasks (e.g. hash computation, etc.).  This endpoint may be deprecated when we integrate queueing framework.
+
+>**Permission:** system_admin
+- - - - -
+
++ Parameters
+    + server_hash_pending (boolean, required, `true`) ... If true specified, returns all completed uploads (`status.completed_on is not null`) that have not had their server hash computed (`hash.server_reported is null`).
+   
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "content_type": "application/octet-stream",
+                    "hash": { 
+                        "client_reported": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "sha1"
+                        },
+                        "server_reported": null
+                        }
+                    },
+                    "chunks": [ ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    },
+                    "status": {
+                        "initiated_on": "2015-07-10T13:00:00Z",
+                        "completed_on": null,
+                        "error_on": null,
+                        "error_message": null
+                    },
+                    "audit": { }
+                }
+            ]
         }
 
 ## Group Files
