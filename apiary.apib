@@ -202,7 +202,7 @@ Creates software agent and an associated secret API key; the secret key is visib
             "name": "Hash computation agent",
             "description": null,
             "repo_url": null,
-            "owner": {
+            "created_by": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
@@ -225,7 +225,7 @@ Creates software agent and an associated secret API key; the secret key is visib
                     "name": "Hash computation agent",
                     "description": null,
                     "repo_url": null,
-                    "owner": {
+                    "created_by": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "username": "mrgardner01",   
                         "full_name": "Matthew Gardner", 
@@ -252,7 +252,7 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "name": "Hash computation agent",
                 "description": null,
                 "repo_url": null,
-                "owner": {
+                "created_by": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "username": "mrgardner01",   
                     "full_name": "Matthew Gardner", 
@@ -279,7 +279,7 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "name": "Hash computation agent",
                 "description": null,
                 "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
-                "owner": {
+                "created_by": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "username": "mrgardner01",   
                     "full_name": "Matthew Gardner", 
@@ -316,8 +316,7 @@ Shows the current secret key for the software agent.
 
 >**Rules**
 - - - - -
-+ There will be a system level setting `AGENT_API_KEY_EXPIRE_DAYS` that dictates when software agent API keys expire.
-+ For this initial implementation, only the agent owner and users with the system_admin permissions have visibility to the secret key for the agent.
++ For this initial implementation, only the agent owner (creator) and users with the system_admin permissions have visibility to the secret key for the agent.
 
 + Response 200 (application/json)
 
@@ -326,7 +325,7 @@ Shows the current secret key for the software agent.
                 "name": "Hash computation agent",
                 "description": null,
                 "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
-                "owner": {
+                "created_by": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "username": "mrgardner01",   
                     "full_name": "Matthew Gardner", 
@@ -335,8 +334,7 @@ Shows the current secret key for the software agent.
                 "is_deleted": false,
                 "api_key": { 
                     "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
-                    "created_on": "2015-01-01T12:00:00Z",
-                    "expire_on": "2015-06-01T12:00:00Z"
+                    "created_on": "2015-01-01T12:00:00Z"
                 },
                 "audit": { }
             }
@@ -354,7 +352,7 @@ Generates a new secret key for the software agent.
             "name": "Hash computation agent",
             "description": null,
             "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
-            "owner": {
+            "created_by": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
@@ -363,8 +361,7 @@ Generates a new secret key for the software agent.
             "is_deleted": false,
             "api_key": { 
                 "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                "created_on": "2015-06-01T12:00:00Z",
-                "expire_on": "2015-12-01T12:00:00Z"
+                "created_on": "2015-06-01T12:00:00Z"
             },
             "audit": { }
         }
@@ -471,7 +468,6 @@ Generates a secret key for the current user that can be used to access the API e
 
 >**Rules**
 - - - - -
-+ There will be a system level setting `USER_API_KEY_EXPIRE_DAYS` that dictates when user level API keys expire.
 + If the current user already has an API key, invoking this endpoint deletes their exisiting key and generates a new key.
 
 + Response 200 (application/json)
@@ -480,10 +476,9 @@ Generates a secret key for the current user that can be used to access the API e
             "id": "ef39c1b7-5618-4e43-b021-41af9ac6ed10",
             "api_key": {
                 "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                "created_on": "2015-01-01T12:00:00Z",
-                "expire_on": "2015-06-01T12:00:00Z"
+                "created_on": "2015-01-01T12:00:00Z"
             },
-            "owner": {
+            "created_by": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
@@ -502,10 +497,9 @@ Generates a secret key for the current user that can be used to access the API e
             "id": "ef39c1b7-5618-4e43-b021-41af9ac6ed10",
             "api_key": {
                 "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-01-01T12:00:00Z",
-                "expire_on": "2015-06-01T12:00:00Z"
+                "created_on": "2015-01-01T12:00:00Z"
             },
-            "owner": {
+            "created_by": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
@@ -1226,7 +1220,6 @@ This is the first step in uploading a large file. An upload objects is created a
                     "algorithm": "sha1"
                 },
                 "server_reported": null
-                }
             },
             "chunks": [ ],
             "storage_provider": { 
@@ -1262,7 +1255,6 @@ This is the first step in uploading a large file. An upload objects is created a
                             "algorithm": "sha1"
                         },
                         "server_reported": null
-                        }
                     },
                     "chunks": [ ],
                     "storage_provider": { 
@@ -1303,7 +1295,6 @@ This is the first step in uploading a large file. An upload objects is created a
                     "algorithm": "sha1"
                 },
                 "server_reported": null
-                }
             },
             "chunks": [
                 {
@@ -1409,7 +1400,6 @@ This operation is called by the client after all file chunks have been successfu
                     "algorithm": "sha1"
                 },
                 "server_reported": null
-                }
             },
             "chunks": [
                 {
@@ -1453,6 +1443,9 @@ This action is called by a background task that computes a `sha1` hash for compl
 - - - - -
 + **hash.value (string, required)** - The entire file hash (computed by server task).
 + **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - only `sha1` is currenlty supported.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
 + Request (application/json)
 
@@ -1540,7 +1533,6 @@ Search for project uploads; this endpoint will facilitate finding uploads that a
                             "algorithm": "sha1"
                         },
                         "server_reported": null
-                        }
                     },
                     "chunks": [ ],
                     "storage_provider": { 
