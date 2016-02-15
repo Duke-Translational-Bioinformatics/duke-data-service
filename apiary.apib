@@ -173,12 +173,12 @@ Represents set of discrete permissions that may be granted to a user.
         }
 
 ## Group Software Agents
-Represents a software agent and associated secret that can be used to access the API endpoints from external applications, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of failed upload storage, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent in tandem with a user level API secret (see `Current User API Key`).
+Represents a software agent and associated secret that can be used to access the API endpoints from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of failed upload storage, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret in tandem with a user level secret (see `Current User Secret Key`).
 
 ## Software Agents collection [/software_agents]
 
 ## Create software agent [POST]
-Creates software agent and an associated secret API key.
+Creates software agent and an associated secret API key; the secret key is visible and managed through the `/software_agents/{id}/api_key` action.
 
 >**Permission:** authenticated
 - - - - -
@@ -188,17 +188,6 @@ Creates software agent and an associated secret API key.
 + **name (string)** - A short name for the software agent.
 + **description (string, optional)** - A verbose description for the software agent.
 + **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
-
->**Response Properties**
-- - - - -
-+ **api_key.key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
-+ **api_key.created_on (datetime)** - The date the software agent key was generated.
-+ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
-
->**Rules**
-- - - - -
-+ There will be a system level setting `AGENT_API_KEY_EXPIRE_DAYS` that dictates when software agent API keys expire.
-+ For this initial implementation, only the agent owner and users with the system_admin permissions have visibility to the secret key for the agent.
 
 + Request (application/json)
 
@@ -252,7 +241,7 @@ Creates software agent and an associated secret API key.
 + Parameters
     + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
 
-## View software_agent [GET]
+## View software agent [GET]
 >**Permission:** authenticated
 - - - - -
 
@@ -305,7 +294,7 @@ Creates software agent and an associated secret API key.
 
 >**Rules**
 - - - - -
-+ Logically deletes software agent (i.e. sets `"is_deleted": true`); deleted agents are not retrieved by list/view endpoints.
++ Logically deletes software agent (i.e. sets `"is_deleted": true`); deleted agents are not returned by list/view endpoints.
 
 + Response 204
 
@@ -318,6 +307,17 @@ Shows the current secret key for the software agent.
 
 >**Permission:** owner or system_admin
 - - - - -
+
+>**Response Properties**
+- - - - -
++ **api_key.key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
++ **api_key.created_on (datetime)** - The date the software agent key was generated.
++ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
+
+>**Rules**
+- - - - -
++ There will be a system level setting `AGENT_API_KEY_EXPIRE_DAYS` that dictates when software agent API keys expire.
++ For this initial implementation, only the agent owner and users with the system_admin permissions have visibility to the secret key for the agent.
 
 + Response 200 (application/json)
 
@@ -458,7 +458,7 @@ View summary usage for current user across all projects.
 ## Current User Secret Key [/current_user/api_key]
 
 ## Generate current user API key [PUT]
-Generates a secret key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see `Software Agents`).
+Generates a secret key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see `Software Agent Secret Key`).
 
 >**Permission:** authenticated
 - - - - -
