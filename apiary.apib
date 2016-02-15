@@ -312,7 +312,6 @@ Shows the current secret key for the software agent.
 - - - - -
 + **api_key.key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
 + **api_key.created_on (datetime)** - The date the software agent key was generated.
-+ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
 
 >**Rules**
 - - - - -
@@ -464,7 +463,6 @@ Generates a secret key for the current user that can be used to access the API e
 - - - - -
 + **api_key.key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
 + **api_key.created_on (datetime)** - The date the user key was generated.
-+ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
 
 >**Rules**
 - - - - -
