@@ -172,62 +172,59 @@ Represents set of discrete permissions that may be granted to a user.
             "is_deprecated": false
         }
 
-## Group Service Account
-Represents a service account and associated secret that can be used to access the API endpoints from external applications, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of stored chunks for failed uploads).
+## Group Software Agents
+Represents a software agent and associated secret that can be used to access the API endpoints from external applications, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of failed upload storage, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent in tandem with a user level API secret (see `Current User API Key`).
 
-## Service Accounts collection [/service_accounts]
+## Software Agents collection [/software_agents]
 
-## Create service account [POST]
-Creates service account and an associated secret API key.
+## Create software agent [POST]
+Creates software agent and an associated secret API key.
 
->**Permission:** system_admin
+>**Permission:** authenticated
 - - - - -
 
 >**Request Properties**
 - - - - -
-+ **name (string)** - A short name for the service account.
-+ **accept_ips (string[], optional)** - An array of ip addresses that the API will accept HTTPS requests from for this service account.  If none are specified, then all ip addresses are accepted.  For production service accounts, this should be specified.
++ **name (string)** - A short name for the software agent.
++ **description (string, optional)** - A verbose description for the software agent.
++ **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
 
 >**Response Properties**
 - - - - -
-+ **api_key.key (jwt)** - A secret key (JWT) to be injected into the request authorization header by external applications and system maintenance tasks.
-+ **api_key.created_on (datetime)** - The date the service account key was generated.
-+ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid) for user level API keys.
-
++ **api_key.key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
++ **api_key.created_on (datetime)** - The date the software agent key was generated.
++ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
 
 >**Rules**
 - - - - -
-+ There will be a system level setting `SERVICE_API_KEY_EXPIRE_DAYS` that dictates when service level API keys expire.
-+ In current implementation, service account inherits the permissions of the owning (i.e. creating user); the immediate utility is to provide a mechanism to authorize system maintenance background tasks (computing file hashes, deletion of swift storage, etc.).
++ There will be a system level setting `AGENT_API_KEY_EXPIRE_DAYS` that dictates when software agent API keys expire.
++ For this initial implementation, only the agent owner and users with the system_admin permissions have visibility to the secret key for the agent.
 
 + Request (application/json)
 
         {
-            "name": "Service account for hash computation"
+            "name": "Hash computation agent"
         }
 
 + Response 200 (application/json)
 
         {
             "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-            "name": "Service account for hash computation",
-            "accept_ips": [],
-            "api_key": { 
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-01-01T12:00:00Z",
-                "expire_on": "2015-06-01T12:00:00Z"
-            },
+            "name": "Hash computation agent",
+            "description": null,
+            "repo_url": null,
             "owner": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
                 "email": "mrgardner01@duke.edu"
             },
+            "is_deleted": false,
             "audit": { }
         }
 
-## List service accounts [GET]
->**Permission:** system_admin
+## List software agents [GET]
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
@@ -236,117 +233,176 @@ Creates service account and an associated secret API key.
             "results": [ 
                 {
                     "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-                    "name": "Service account for hash computation",
-                    "accept_ips": [],
-                    "api_key": { 
-                        "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                        "created_on": "2015-01-01T12:00:00Z",
-                        "expire_on": "2015-06-01T12:00:00Z"
-                    },
+                    "name": "Hash computation agent",
+                    "description": null,
+                    "repo_url": null,
                     "owner": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "username": "mrgardner01",   
                         "full_name": "Matthew Gardner", 
                         "email": "mrgardner01@duke.edu"
                     },
-                    "audit": { } 
+                    "is_deleted": false,
+                    "audit": { }
                 } 
             ]
         }
 
-## Service Accounts instance [/service_accounts/{id}]
+## Software Agent instance [/software_agents/{id}]
 + Parameters
-    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a service account.
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
 
-## View service account [GET]
->**Permission:** system_admin
+## View software_agent [GET]
+>**Permission:** authenticated
 - - - - -
 
 + Response 200 (application/json)
 
-        {
-            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-            "name": "Service account for hash computation",
-            "accept_ips": [],
-            "api_key": { 
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-01-01T12:00:00Z",
-                "expire_on": "2015-06-01T12:00:00Z"
-            },
-            "owner": {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "username": "mrgardner01",   
-                "full_name": "Matthew Gardner", 
-                "email": "mrgardner01@duke.edu"
-            },
-            "audit": { }
-        }
+           {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": null,
+                "owner": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",   
+                    "full_name": "Matthew Gardner", 
+                    "email": "mrgardner01@duke.edu"
+                },
+                "is_deleted": false,
+                "audit": { }
+            }
 
-## Update service account [PUT]
->**Permission:** system_admin
+## Update software agent [PUT]
+>**Permission:** owner or system_admin
 - - - - -
-
->**Rules**
-- - - - -
-+ Only `name`, `accept_ips` can be updated; all other properties are immutable. 
 
 + Request (application/json)
 
         {
-            "name": "Compute and confirm file hash account",
-            "accept_ips": ["173.194.207.113", "173.194.207.114"]
+            "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd"
         }
 
 + Response 200 (application/json)
 
-        {
-            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-            "name": "Compute and confirm file hash account",
-            "accept_ips": ["173.194.207.113", "173.194.207.114"],
-            "api_key": { 
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-01-01T12:00:00Z",
-                "expire_on": "2015-06-01T12:00:00Z"
-            },
-            "owner": {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "username": "mrgardner01",   
-                "full_name": "Matthew Gardner", 
-                "email": "mrgardner01@duke.edu"
-            },
-            "audit": { }
-        }
+            {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
+                "owner": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",   
+                    "full_name": "Matthew Gardner", 
+                    "email": "mrgardner01@duke.edu"
+                },
+                "is_deleted": false,
+                "audit": { }
+            }
 
-## Generate service account API key [PUT /service_accounts/{id}/api_key]
-Generates a new secret API key for the service account.
+## Delete software agent [DELETE]
+>**Permission:** owner or system_admin
 
->**Permission:** system_admin
+>**Rules**
+- - - - -
++ Logically deletes software agent (i.e. sets `"is_deleted": true`); deleted agents are not retrieved by list/view endpoints.
+
++ Response 204
+
+## Software Agent Secret Key [/software_agents/{id}/api_key]
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## View software agent API key [GET]
+Shows the current secret key for the software agent.
+
+>**Permission:** owner or system_admin
+- - - - -
+
++ Response 200 (application/json)
+
+            {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
+                "owner": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",   
+                    "full_name": "Matthew Gardner", 
+                    "email": "mrgardner01@duke.edu"
+                },
+                "is_deleted": false,
+                "api_key": { 
+                    "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
+                    "created_on": "2015-01-01T12:00:00Z",
+                    "expire_on": "2015-06-01T12:00:00Z"
+                },
+                "audit": { }
+            }
+
+## Re-generates software agent API key [PUT]
+Generates a new secret key for the software agent.
+
+>**Permission:** owner or system_admin
 - - - - -
 
 + Response 200 (application/json)
 
         {
             "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-            "name": "Compute and confirm file hash account",
-            "accept_ips": ["173.194.207.113", "173.194.207.114"],
-            "api_key": { 
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-06-01T12:00:00Z",
-                "expire_on": "2015-12-01T12:00:00Z"
-            },
+            "name": "Hash computation agent",
+            "description": null,
+            "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
             "owner": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
                 "email": "mrgardner01@duke.edu"
             },
+            "is_deleted": false,
+            "api_key": { 
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "created_on": "2015-06-01T12:00:00Z",
+                "expire_on": "2015-12-01T12:00:00Z"
+            },
             "audit": { }
         }
 
-## Delete service account [DELETE]
->**Permission:** system_admin
+## Software Agent Access Token [/software_agents/api_token]
 
-+ Response 204
+## Get software agent access token [GET]
+Using a software agent secret key and a user secret key, get an access token (i.e. JWT) that can be specified in the request authorization header.
+
+>**Permission:** public
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **agent_key (string)** - The secret key for a software agent.
++ **user_key (string)** - The secret key for a user.
++ **accept_ips (string[], optional)** - Array of ip addresses that API will accept HTTPS requests from for this instance of a software agent.  If not specified, then all ip addresses are accepted.  For production software agents, this is recommended.
+
+>**Response Properties**
+- - - - -
++ **api_token (string)** - The api token (i.e. JWT) for request authorization.
+
+>**Rules**
+- - - - -
++ The keys specified (agent_key, user_key) must not be expired or logically deleted.
+
++ Request 
+
+        { 
+            "agent_key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I..."
+        }
 
 ## Group Current User
 Represents the currently authenticated user.
@@ -399,19 +455,19 @@ View summary usage for current user across all projects.
             "storage_bytes": 304006007009
         }
 
-## Current User API key [/current_user/api_key]
+## Current User Secret Key [/current_user/api_key]
 
 ## Generate current user API key [PUT]
-Generates a secret API key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...)
+Generates a secret key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see `Software Agents`).
 
 >**Permission:** authenticated
 - - - - -
 
 >**Response Properties**
 - - - - -
-+ **api_key.key (jwt)** - A secret key (JWT) to be injected into the request authorization header by client applications/scripts when calling API endpoints.
-+ **api_key.created_on (datetime)** - The date the key was generated.
-+ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid) for user level API keys.
++ **api_key.key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
++ **api_key.created_on (datetime)** - The date the user key was generated.
++ **api_key.expire_on (datetime)** - This is a derived property based on the expiration policy (i.e. number of days key is valid).
 
 >**Rules**
 - - - - -
@@ -423,7 +479,7 @@ Generates a secret API key for the current user that can be used to access the A
         {
             "id": "ef39c1b7-5618-4e43-b021-41af9ac6ed10",
             "api_key": {
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
                 "created_on": "2015-01-01T12:00:00Z",
                 "expire_on": "2015-06-01T12:00:00Z"
             },
@@ -432,7 +488,8 @@ Generates a secret API key for the current user that can be used to access the A
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
                 "email": "mrgardner01@duke.edu"
-            }
+            },
+            "audit": { }
         }
 
 ## Get current user API key [GET]
@@ -453,7 +510,8 @@ Generates a secret API key for the current user that can be used to access the A
                 "username": "mrgardner01",   
                 "full_name": "Matthew Gardner", 
                 "email": "mrgardner01@duke.edu"
-            }
+            },
+            "audit": { }
         }
 
 ## Delete current user API key [DELETE]
