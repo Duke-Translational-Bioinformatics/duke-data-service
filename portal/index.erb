@@ -42,5 +42,16 @@
     <script type="text/javascript" src="<%= @asset_path -%>lib/framework7.min.js"></script>
     <script src="<%= @asset_path -%>js/main.js"></script>
 </div>
+<script type="text/javascript">
+    (function() {
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = '//api.usersnap.com/load/'+
+                '96becafa-8f00-4f58-a27c-2d0ebfc7c4b9.js';
+        var x = document.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+    })();
+</script>
 </body>
 </html>
