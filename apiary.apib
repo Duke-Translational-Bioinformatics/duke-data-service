@@ -310,8 +310,8 @@ Shows the secret key for the software agent.
 
 >**Response Properties**
 - - - - -
-+ **api_key.key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
-+ **api_key.created_on (datetime)** - The date the software agent key was generated.
++ **key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
++ **created_on (datetime)** - The date the software agent key was generated.
 
 >**Rules**
 - - - - -
@@ -320,13 +320,11 @@ Shows the secret key for the software agent.
 + Response 200 (application/json)
 
             {
-                "api_key": { 
-                    "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
-                    "created_on": "2015-01-01T12:00:00Z"
-                }
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
+                "created_on": "2015-01-01T12:00:00Z"
             }
 
-## Re-generates software agent API key [PUT]
+## Re-generate software agent API key [PUT]
 Generates a new secret key for the software agent.
 
 >**Permission:** owner or system_admin
@@ -335,10 +333,8 @@ Generates a new secret key for the software agent.
 + Response 200 (application/json)
 
         {
-            "api_key": { 
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                "created_on": "2015-06-01T12:00:00Z"
-            }
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-06-01T12:00:00Z"
         }
 
 ## Software Agent Access Token [/software_agents/api_token]
@@ -358,6 +354,7 @@ Using a software agent secret key and a user secret key, get an access token (i.
 >**Response Properties**
 - - - - -
 + **api_token (string)** - The api token (i.e. JWT) for request authorization.
++ **expire_on (seconds)** - When the token will expire expressed as posix/epoch time.
 
 >**Rules**
 - - - - -
@@ -438,8 +435,8 @@ Generates a secret key for the current user that can be used to access the API e
 
 >**Response Properties**
 - - - - -
-+ **api_key.key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
-+ **api_key.created_on (datetime)** - The date the user key was generated.
++ **key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
++ **created_on (datetime)** - The date the user key was generated.
 
 >**Rules**
 - - - - -
@@ -448,10 +445,8 @@ Generates a secret key for the current user that can be used to access the API e
 + Response 200 (application/json)
 
         {
-            "api_key": {
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                "created_on": "2015-01-01T12:00:00Z"
-            }
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-01-01T12:00:00Z"
         }
 
 ## View current user API key [GET]
@@ -461,10 +456,8 @@ Generates a secret key for the current user that can be used to access the API e
 + Response 200 (application/json)
 
         {
-            "api_key": {
-                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
-                "created_on": "2015-01-01T12:00:00Z"
-            }
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+            "created_on": "2015-01-01T12:00:00Z"
         }
 
 ## Delete current user API key [DELETE]
