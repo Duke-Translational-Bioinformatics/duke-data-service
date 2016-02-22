@@ -29,26 +29,6 @@
             securityState:'<%= @securityState -%>',
             environment:'<%= @environment -%>'
         };
-        var bhKey = '';
-        switch(DDS_PORTAL_CONFIG.environment){
-            case 'production':
-                bhKey = 'j2s1wpj2nvjb4s4lxxakpg';
-                break;
-            case 'ua_test':
-                bhKey = 'zhcaqqrxbp37fy04xao8yg';
-                break;
-            case 'development':
-                bhKey = 'xoxx827zgfmyshoeipgrbg';
-                break
-        }
-        if (DDS_PORTAL_CONFIG.environment != 'development') {
-            (function (d, t) {
-                var bh = d.createElement(t), s = d.getElementsByTagName(t)[0];
-                bh.type = 'text/javascript';
-                bh.src = '//www.bugherd.com/sidebarv2.js?apikey='+bhKey;
-                s.parentNode.insertBefore(bh, s);
-            })(document, 'script');
-        }
     </script>
 </head>
 <body>
@@ -62,5 +42,16 @@
     <script type="text/javascript" src="<%= @asset_path -%>lib/framework7.min.js"></script>
     <script src="<%= @asset_path -%>js/main.js"></script>
 </div>
+<script type="text/javascript">
+    (function() {
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = '//api.usersnap.com/load/'+
+                '96becafa-8f00-4f58-a27c-2d0ebfc7c4b9.js';
+        var x = document.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+    })();
+</script>
 </body>
 </html>
