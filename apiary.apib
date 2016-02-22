@@ -1,7 +1,7 @@
 FORMAT: 1A
-HOST: https://dukeds-dev.herokuapp.com/api/v1/
+HOST: https://uatest.dataservice.duke.edu/api/v1/
 
-# Duke Data Services
+# Duke Data Services 
 
 The Duke Data Service (DDS) API allows Duke researchers to store, organize, retrieve and share data.
 
@@ -9,24 +9,23 @@ This the documentation for the Data Service API. Key focuses are on API endpoint
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
-## Group API Usage
+## Group Web Services API Usage
 
-Client API Key
+Web portal
 --------------
-Authorized users may generate a secret API key via the Web interface.  This will not be part of the initial API release, referred to herein as the "Minimally Viable Product" (MVP).
+There is a [Web portal application](https://dataservice.duke.edu) that allows users to interact with the DDS platform.  The application is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
 
-User Authentication
+Programmatic API keys
 --------------
-Users will be required to authenticate via a trusted authentication provider (i.e. Duke Shibboleth for MVP).
+In an effort to promote provenance, all programmatic access to the API must be via a software agent secret key in tandem with a user account secret key.  From the Web portal application, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys are used from a programmatic environement to get an access token.  For usage details, see endpoints for **Software Agents** and **Current User**.
 
-**Some design assumptions for the MVP:**
-* A authentication token (i.e. JWT) will be generated for client applications via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.
-* Tokens will have an expiration policy of X hours/days.
-* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will be created in the DDS local user data store.
+Exploring the API
+--------------
+In addition to the API usage documentation herein, users may experiment with the live API endpoints in the test environment using the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
-For endpoints that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters 'page', and 'per_page'.  For example: `/projects?per_page=25`; would return the first 25 projects, and `/projects?page=3&per_page=25` would return the third batch of 25 projects.  Collection payloads will always be returned in an envelope with the 'results' key tied to an array of objects.
+For endpoints that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25`; would return the first 25 projects, and `/projects?page=3&per_page=25` would return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` key will reference the array as follows:
 
     {
         "results": [
@@ -46,20 +45,25 @@ To make it easy for clients to manage pagination, the following headers will alw
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced as `<audit_object>` in resource specific payloads.
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` key in resource specific payloads.
 
-    {
+    "audit": {
         "created_on": "2015-01-01T12:00:00Z",
         "created_by": {
             "id": "ce245d81-bae1-452b-8589-24f736ca7735",
             "username": "mrgardner01",
             "full_name": "Matthew Gardner"
+            "agent": {
+                "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hashing computation agent"
+            }
         },
         "last_updated_on": "2015-01-01T13:00:00Z",
         "last_updated_by": {
             "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
             "username": "jturner01",
-            "full_name": "Jon Turner"
+            "full_name": "Jon Turner",
+            "agent": null
         },
         "deleted_on": null,
         "deleted_by": null
@@ -173,7 +177,7 @@ Represents set of discrete permissions that may be granted to a user.
         }
 
 ## Group Software Agents
-Represents a software agent and associated secret that can be used to access the API endpoints from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of failed upload storage, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret in tandem with a user level secret (see `Current User Secret Key`).
+Represents a software agent and associated secret that can be used to access the API endpoints from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of failed upload storage, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see **Current User**).
 
 ## Software Agents collection [/software_agents]
 
@@ -202,12 +206,6 @@ Creates software agent and an associated secret API key; the secret key is visib
             "name": "Hash computation agent",
             "description": null,
             "repo_url": null,
-            "created_by": {
-                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                "username": "mrgardner01",   
-                "full_name": "Matthew Gardner", 
-                "email": "mrgardner01@duke.edu"
-            },
             "is_deleted": false,
             "audit": { }
         }
@@ -225,12 +223,6 @@ Creates software agent and an associated secret API key; the secret key is visib
                     "name": "Hash computation agent",
                     "description": null,
                     "repo_url": null,
-                    "created_by": {
-                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                        "username": "mrgardner01",   
-                        "full_name": "Matthew Gardner", 
-                        "email": "mrgardner01@duke.edu"
-                    },
                     "is_deleted": false,
                     "audit": { }
                 } 
@@ -252,18 +244,12 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "name": "Hash computation agent",
                 "description": null,
                 "repo_url": null,
-                "created_by": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "username": "mrgardner01",   
-                    "full_name": "Matthew Gardner", 
-                    "email": "mrgardner01@duke.edu"
-                },
                 "is_deleted": false,
                 "audit": { }
             }
 
 ## Update software agent [PUT]
->**Permission:** owner or system_admin
+>**Permission:** creator or system_admin
 - - - - -
 
 + Request (application/json)
@@ -279,18 +265,12 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "name": "Hash computation agent",
                 "description": null,
                 "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
-                "created_by": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "username": "mrgardner01",   
-                    "full_name": "Matthew Gardner", 
-                    "email": "mrgardner01@duke.edu"
-                },
                 "is_deleted": false,
                 "audit": { }
             }
 
 ## Delete software agent [DELETE]
->**Permission:** owner or system_admin
+>**Permission:** creator or system_admin
 
 >**Rules**
 - - - - -
@@ -305,7 +285,7 @@ Creates software agent and an associated secret API key; the secret key is visib
 ## View software agent API key [GET]
 Shows the secret key for the software agent.
 
->**Permission:** owner or system_admin
+>**Permission:** creator or system_admin
 - - - - -
 
 >**Response Properties**
@@ -327,7 +307,7 @@ Shows the secret key for the software agent.
 ## Re-generate software agent API key [PUT]
 Generates a new secret key for the software agent.
 
->**Permission:** owner or system_admin
+>**Permission:** creator or system_admin
 - - - - -
 
 + Response 200 (application/json)
@@ -340,7 +320,7 @@ Generates a new secret key for the software agent.
 ## Software Agent Access Token [/software_agents/api_token]
 
 ## Get software agent access token [GET]
-Using a software agent secret key and a user secret key, get an access token (i.e. JWT) that can be specified in the request authorization header.
+Using a software agent secret key and a user secret key, get an access token.
 
 >**Permission:** public
 - - - - -
@@ -353,12 +333,12 @@ Using a software agent secret key and a user secret key, get an access token (i.
 
 >**Response Properties**
 - - - - -
-+ **api_token (string)** - The api token (i.e. JWT) for request authorization.
-+ **expire_on (seconds)** - When the token will expire expressed as posix/epoch time.
++ **api_token (string)** - The access token.
++ **expire_on (number)** - Token expiration as posix/epoch time.
 
 >**Rules**
 - - - - -
-+ The agent associated with the agent key must not be logically deleted.
++ The agent associated with the agent key must not have been logically deleted.
 
 + Request 
 
@@ -428,7 +408,7 @@ View summary usage for current user across all projects.
 ## Current User Secret Key [/current_user/api_key]
 
 ## Generate current user API key [PUT]
-Generates a secret key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see `Software Agent Secret Key`).
+Generates a secret key for the current user that can be used to access the API endpoints from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents**).
 
 >**Permission:** authenticated
 - - - - -
