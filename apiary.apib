@@ -13,15 +13,15 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 
 Web portal
 --------------
-There is a [Web portal application](https://dataservice.duke.edu) that allows users to interact with the DDS platform.  The application is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
+There is a [Web portal](https://dataservice.duke.edu) that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
 
 Programmatic API keys
 --------------
-In an effort to promote provenance, all programmatic access to the API must be via a software agent secret key in tandem with a user account secret key.  From the Web portal application, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys are used from a programmatic environement to get an access token.  For usage details, see endpoints for **Software Agents** and **Current User**.
+In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token.  For usage details, see the endpoints for **Software Agents** and **Current User**.
 
 Exploring the API
 --------------
-In addition to the API usage documentation herein, users may experiment with the live API endpoints in the test environment using the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
+In addition to the API usage documentation herein, users may experiment with the live API endpoints in a test environment via the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
@@ -52,7 +52,7 @@ Resource payloads may include a composite audit object. An example structure of 
         "created_by": {
             "id": "ce245d81-bae1-452b-8589-24f736ca7735",
             "username": "mrgardner01",
-            "full_name": "Matthew Gardner"
+            "full_name": "Matthew Gardner",
             "agent": {
                 "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
                 "name": "Hashing computation agent"
