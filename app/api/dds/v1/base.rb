@@ -160,6 +160,7 @@ module DDS
       mount DDS::V1::ProjectRolesAPI
       mount DDS::V1::StorageProvidersAPI
       mount DDS::V1::ChildrenAPI
+      mount DDS::V1::SoftwareAgentsAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true
