@@ -47,6 +47,24 @@ module DDS
           end
         end
       end
+
+      desc 'View software agent details' do
+        detail 'Returns the software agent details for a given UUID.'
+        named 'view software agent'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software agent UUID'
+      end
+      get '/software_agents/:id', root: false do
+        authenticate!
+        SoftwareAgent.find(params[:id])
+      end
     end
   end
 end

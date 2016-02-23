@@ -59,4 +59,13 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
     end
   end
+  describe 'SoftwareAgent instance' do
+    let(:url) { "/api/v1/software_agents/#{resource.id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+    end
+  end
 end
