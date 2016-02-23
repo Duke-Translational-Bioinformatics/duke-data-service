@@ -9,13 +9,13 @@ This the documentation for the Data Service API. Key focuses are on API endpoint
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
-## Group Web Services API Usage
+## Group API Usage
 
-Web portal
+Web Portal
 --------------
 There is a [Web portal](https://dataservice.duke.edu) that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
 
-Programmatic API keys
+Programmatic Keys
 --------------
 In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token.  For usage details, see the endpoints for **Software Agents** and **Current User**.
 
