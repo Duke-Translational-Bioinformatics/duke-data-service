@@ -52,6 +52,10 @@ RSpec.describe User, type: :model do
     it 'should have one system_permission' do
       should have_one(:system_permission)
     end
+
+    it 'should have one api_secret' do
+      should have_one(:user_api_secret)
+    end
   end
 
   describe 'validations' do
