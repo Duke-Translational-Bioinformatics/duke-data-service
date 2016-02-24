@@ -8,5 +8,9 @@ FactoryGirl.define do
     trait :deleted do
       is_deleted true
     end
+
+    trait :with_key do
+      api_key
+    end
   end
 end
