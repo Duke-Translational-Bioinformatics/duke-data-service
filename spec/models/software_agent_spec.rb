@@ -11,6 +11,7 @@ RSpec.describe SoftwareAgent, type: :model do
 
   describe 'associations' do
     it { should belong_to(:creator) }
+    it { should have_one(:api_key) }
   end
 
   describe 'validations' do
