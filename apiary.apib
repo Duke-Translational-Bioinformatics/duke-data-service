@@ -1378,7 +1378,7 @@ This operation is called by the client after all file chunks have been successfu
 + If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider actions to assemble the parts into a single file object.
 + The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.
 + The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
-+ If there are no errors, the `upload_status.complete_on` is set to the current timestamp.
++ If there are no errors, the `upload_status.completed_on` is set to the current timestamp.
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -1564,6 +1564,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + **parent.kind (string, required)** - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
 + **parent.id (string, required)** - The unique id of the parent.
 + **upload.id (string, required)** - The unique id for an upload that completed successfully.
++ **label (string, optional)** - An optional short display label for the file.
 
 >**Rules**
 - - - - -
@@ -1578,7 +1579,8 @@ Creates a file metadata resource; the client is responsible for the creation of 
                 "kind": "dds-folder", 
                 "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" 
             },
-            "upload": {"id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"}
+            "upload": {"id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"},
+            "label": "Initial raw data from device"
         }
 
 + Response 201 (application/json)
@@ -1603,6 +1605,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "name": "Sequencing Core" 
                 }
             ],
+            "label": "Initial raw data from device",
             "is_deleted": false,
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
@@ -1651,6 +1654,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "name": "Sequencing Core" 
                 }
             ],
+            "label": "Initial raw data from device",
             "is_deleted": false,
             "upload": {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
@@ -1668,6 +1672,74 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
+## Update file [PUT]
+Updates one or more file resource properties; if this action modifies the `upload` property, the previous file resource is transitioned to version history (see **File Versions**).
+
+*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+
+>**Permission:** update_file
+- - - - -
+
+>**Properties**
+- - - - -
++ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully.
++ **label (string, optional)** - An optional short display label for the file.
+
+>**Rules**
+- - - - -
++ The current user must be the user who uploaded the file.
++ The upload must be in a completed state (i.e. `upload.completed_on != null`).
++ Only `upload.id`, `label` properties can be updated via this action.
++ Prior versions are assigned the next sequential `version` number. (see **File Versions**)
+
++ Request (application/json)
+
+        {
+            "upload": {"id": "422f8778-a62c-4918-8b1b-f398a041345a"},
+            "label": "Post pairwise sequence alignment"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file",
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
+            },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "ancestors": [
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
+                },
+                { 
+                    "kind": "dds-folder", 
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                    "name": "Sequencing Archive" 
+                }
+            ],
+            "label": "Post pairwise sequence alignment",
+            "is_deleted": false,
+            "upload": {
+                "id": "422f8778-a62c-4918-8b1b-f398a041345a",
+                "size": 30024038,
+                "hash": { 
+                    "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt", 
+                    "algorithm": "sha1" 
+                },
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", "description": 
+                    "Duke OIT Storage" 
+                }
+            },
+            "audit": { }
+        }
+
 ### Delete file [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -1678,7 +1750,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 
 + Response 204
 
-## Get pre-signed download URL [GET /files/{id}/url{?version_number}]
+## Get file download URL [GET /files/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download file.
 
 >**Permission:** download_file
@@ -1686,8 +1758,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
-    + version_number (number, optional, `1`) ... A previous version of this file to generate download url for.
-
+   
 + Response 200 (application/json)
 
         {
@@ -1812,86 +1883,35 @@ Generates and returns a storage provider specific pre-signed URL that client can
         }
 
 ## Group File Versions
-When a file resource is updated/associated with a new `upload`, the version history of the file is automatically retained.  The actions herein can be used to create new versions and access previous versions.
+The actions herein are used to interact with prior versions of a file resource.
 
-*Note: Only the uploads for the file is versioned; all the referenced metatdata, such as tags, properties, etc. are not versioned, and they will not vary from version to version.*
+*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
 ## File Versions collection [/files/{id}/versions]
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-## Create file version [PUT]
-This action is used to create a new version of an existing file; the file name will remain the same as the previous version.  The action `files/{id}/rename` can be used to modify the file name.  
+## List file versions [GET]
+If there are previous versions of a file, this action can be used to retrieve information about the older versions.
 
->**Permission:** create_file
+>**Permission:** view_project
 - - - - -
-
->**Properties**
-- - - - -
-+ **upload.id (string, required)** - The unique id for an upload that completed successfully; this will become the `current version` referenced by the file resource.
 
 >**Rules**
 - - - - -
-+ The current user must be the user who uploaded the file.
-+ The upload must be in a completed state (i.e. `upload.completed_on != null`).
-+ The previous upload referenced by the file is transitioned to version history.
-
-+ Request (application/json)
-
-        {
-            "upload": {"id": "422f8778-a62c-4918-8b1b-f398a041345a"}
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "kind": "dds-file",
-            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": { 
-                "kind": "dds-folder", 
-                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
-            },
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
-            "ancestors": [
-                { 
-                    "kind": "dds-project", 
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
-                    "name": "Knockout Mouse Project (KOMP)" 
-                },
-                { 
-                    "kind": "dds-folder", 
-                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
-                    "name": "Sequencing Archive" 
-                }
-            ],
-            "is_deleted": false,
-            "upload": {
-                "id": "422f8778-a62c-4918-8b1b-f398a041345a",
-                "size": 30024038,
-                "hash": { 
-                    "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt", 
-                    "algorithm": "sha1" 
-                },
-                "storage_provider": { 
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                    "name": "duke_oit_swift", "description": 
-                    "Duke OIT Storage" 
-                }
-            },
-            "audit": { }
-        }
-
-## List file versions [GET]
-If there are previous versions of a file, this action can be used to retrieve information about the older versions.  To download a specific version, use the `files\{id}\url` action and specify the `version_number` url parameter.
++ File versions that have been deleted (i.e. `"is_deleted": true`) are included in this listing, but are immutable.
 
 + Response 200 (application/json)
 
         {
             "results": [
                 {
+                    "kind": "dds-file-version",
+                    "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                     "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
-                    "version_number": 1,
+                    "version": 1,
+                    "label": "Initial raw data from device",
+                    "is_deleted": false,
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                         "size": 30024000,
@@ -1904,11 +1924,112 @@ If there are previous versions of a file, this action can be used to retrieve in
                             "name": "duke_oit_swift", 
                             "description": "Duke OIT Storage" 
                         }
-                    }
+                    },
+                    "audit": { }
                 }
             ]
         }
 
+## File Version instance [/file_versions/{id}]
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
+
+## View file version [GET]
+**Permissions** view_project
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+            "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
+            "version": 1,
+            "label": "Initial raw data from device",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": { 
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1" 
+                },
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
+                }
+            },
+            "audit": { }
+        }
+
+## Update file version [POST] 
+**Permission:** create_file
+- - - - -
+
+>**Rules**
+- - - - -
++ Only the `label` property for a file version can be updated via this action.
+
++ Request (application/json)
+
+        {
+            "label": "Post pairwise sequence alignment (piecewise)"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+            "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
+            "version": 1,
+            "label": "Post pairwise sequence alignment (piecewise)",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": { 
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "sha1" 
+                },
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
+                }
+            },
+            "audit": { }
+        }
+
+### Delete file version [DELETE]
+>**Permission:** delete_file
+- - - - -
+
+>**Rules**
+- - - - -
++ Logically deletes file version (i.e. sets `"is_deleted": true`).
+
++ Response 204
+
+## Get file version download URL [GET /file_versions/{id}/url]
+Generates and returns a storage provider specific pre-signed URL that client can use to download a file version.
+
+>**Permission:** download_file
+- - - - -
+
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
+   
++ Response 200 (application/json)
+
+        {
+            "http_verb": "GET",
+            "host": "swift.oit.duke.edu",
+            "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
+            "http_headers": []
+        }
+            
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
@@ -1976,6 +2097,7 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "name": "Sequencing Archive" 
                         }
                     ],
+                    "label": "Initial raw data from device",
                     "is_deleted": false,
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
@@ -2059,6 +2181,7 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "name": "Sequencing Archive" 
                         }
                     ],
+                    "label": "Initial raw data from device",
                     "is_deleted": false,
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
