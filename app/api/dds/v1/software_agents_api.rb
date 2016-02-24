@@ -65,6 +65,39 @@ module DDS
         authenticate!
         SoftwareAgent.find(params[:id])
       end
+
+      desc 'Update Software Agent' do
+        detail 'Updates the software agent details for a given UUID.'
+        named 'update software agent'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [400, 'Validation Error'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software Agent UUID'
+        optional :name, type: String, desc: 'The Name of the Software Agent'
+        optional :description, type: String, desc: 'The Description of the Software Agent'
+        optional :repo_url, type: String, desc: 'The Repo url of the Software Agent'
+      end
+      put '/software_agents/:id', root: false do
+        authenticate!
+        software_agent_params = declared(params, include_missing: false)
+        software_agent = hide_logically_deleted SoftwareAgent.find(params[:id])
+        authorize software_agent, :update?
+        Audited.audit_class.as_user(current_user) do
+          if software_agent.update(software_agent_params)
+            annotate_audits [software_agent.audits.last]
+            software_agent
+          else
+            validation_error!(software_agent)
+          end
+        end
+      end
+
     end
   end
 end
