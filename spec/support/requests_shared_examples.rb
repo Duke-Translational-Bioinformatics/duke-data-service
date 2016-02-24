@@ -165,6 +165,39 @@ shared_examples 'a creatable resource' do
   end
 end
 
+shared_examples 'a regeneratable resource' do
+  before do
+    expect(resource).to be_persisted
+  end
+  let (:new_resource) {
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key(changed_key.to_s)
+    resource_class.where(changed_key => response_json[changed_key.to_s]).take
+  }
+  let (:changed_key) { :id }
+
+  it 'should return success' do
+    is_expected.to eq(200)
+    expect(response.status).to eq(200)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+  end
+
+  it 'should destroy original resource and create a new one' do
+    expect {
+      is_expected.to eq(200)
+    }.not_to change{resource_class.count}
+    expect(resource_class.where(changed_key => resource.send(changed_key))).not_to exist
+    expect(new_resource).to be
+    expect(resource.send(changed_key)).not_to eq(new_resource.send(changed_key))
+  end
+
+  it 'should return a serialized resource' do
+    is_expected.to eq(200)
+    expect(response.body).to include(resource_serializer.new(new_resource).to_json)
+  end
+end
+
 shared_examples 'a viewable resource' do
   it 'should return a serialized resource' do
     is_expected.to eq(200)
