@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20160223145153) do
     t.datetime "updated_at",      null: false
   end
 
-  create_table "api_keys", force: :cascade do |t|
+  create_table "api_keys", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "user_id"
     t.uuid     "software_agent_id"
     t.string   "key"
