@@ -3,7 +3,7 @@ require 'rails_helper'
 describe DDS::V1::SoftwareAgentsAPI do
   include_context 'with authentication'
 
-  let(:software_agent) { FactoryGirl.create(:software_agent) }
+  let(:software_agent) { FactoryGirl.create(:software_agent, :with_key) }
   let(:deleted_software_agent) { FactoryGirl.create(:software_agent, :deleted) }
   let(:software_agent_stub) { FactoryGirl.build(:software_agent) }
 
@@ -34,9 +34,12 @@ describe DDS::V1::SoftwareAgentsAPI do
       }}
       it_behaves_like 'a creatable resource' do
         let(:resource) { resource_stub }
-        it 'should set creator to current_user' do
-          is_expected.to eq(201)
+        it 'should set creator to current_user and create a new api_key' do
+          expect {
+            is_expected.to eq(201)
+          }.to change{ ApiKey.count }.by(1)
           expect(new_object.creator_id).to eq(current_user.id)
+          expect(new_object.api_key).to be
         end
       end
 
@@ -66,6 +69,22 @@ describe DDS::V1::SoftwareAgentsAPI do
       subject { get(url, nil, headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+    end
+
+    describe 'api_key' do
+      let(:url) { "/api/v1/software_agents/#{software_agent.id}/api_key" }
+      let(:resource) { ApiKey.find(software_agent.api_key.id) }
+      let(:resource_class) { ApiKey }
+      let(:resource_serializer) { ApiKeySerializer }
+
+      describe 'PUT' do
+        subject { put(url, nil, headers) }
+        it_behaves_like 'a regeneratable resource' do
+          let(:new_resource) { ApiKey.where(software_agent_id: software_agent.id).take }
+          let(:changed_key) { :key }
+        end
+        it_behaves_like 'an authenticated resource'
+      end
     end
   end
 end

@@ -37,12 +37,15 @@ module DDS
       end
       put '/current_user/api_key', serializer: ApiKeySerializer do
         authenticate!
-        ApiKey.transaction do
-          if current_user.api_key
-            current_user.api_key.destroy!
+        Audited.audit_class.as_user(current_user) do
+          ApiKey.transaction do
+            if current_user.api_key
+              current_user.api_key.destroy!
+            end
+            current_user.build_api_key(key: SecureRandom.hex)
+            current_user.save
+            annotate_audits [current_user.api_key.audits.last]
           end
-          current_user.build_api_key(key: SecureRandom.hex)
-          current_user.save
         end
         current_user.api_key
       end

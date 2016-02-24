@@ -38,9 +38,10 @@ module DDS
           repo_url: software_agent_params[:repo_url],
           creator: current_user
         })
+        software_agent.build_api_key(key: SecureRandom.hex)
         Audited.audit_class.as_user(current_user) do
           if software_agent.save
-            annotate_audits [software_agent.audits.last]
+            annotate_audits [software_agent.audits.last, software_agent.api_key.audits.last]
             software_agent
           else
             validation_error!(software_agent)
@@ -64,6 +65,33 @@ module DDS
       get '/software_agents/:id', root: false do
         authenticate!
         SoftwareAgent.find(params[:id])
+      end
+
+      desc 'Re-generate software agent API key' do
+        detail 'regenerates software_agent api_key'
+        named 'regenerate software_agent api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software agent UUID'
+      end
+      put '/software_agents/:id/api_key', serializer: ApiKeySerializer do
+        authenticate!
+        software_agent = SoftwareAgent.find(params[:id])
+        Audited.audit_class.as_user(current_user) do
+          ApiKey.transaction do
+            software_agent.api_key.destroy!
+            software_agent.build_api_key(key: SecureRandom.hex)
+            software_agent.save
+            annotate_audits [software_agent.api_key.audits.last]
+          end
+        end
+        software_agent.api_key
       end
     end
   end
