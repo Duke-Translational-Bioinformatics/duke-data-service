@@ -98,6 +98,29 @@ module DDS
         end
       end
 
+      desc 'Delete a Software Agent' do
+        detail 'Marks a software agent as being deleted.'
+        named 'delete software agent'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software Agent UUID'
+      end
+      delete '/software_agents/:id', root: false do
+        authenticate!
+        software_agent = hide_logically_deleted SoftwareAgent.find(params[:id])
+        authorize software_agent, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          software_agent.update(is_deleted: true)
+          annotate_audits [software_agent.audits.last]
+        end
+        body false
+      end
     end
   end
 end

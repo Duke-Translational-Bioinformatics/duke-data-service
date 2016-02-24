@@ -90,5 +90,27 @@ describe DDS::V1::SoftwareAgentsAPI do
       it_behaves_like 'an audited endpoint'
       it_behaves_like 'a logically deleted resource'
     end
+
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
+      it_behaves_like 'a removable resource' do
+        let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+        it 'should be marked as deleted' do
+          expect(resource).to be_persisted
+          is_expected.to eq(204)
+          resource.reload
+          expect(resource.is_deleted?).to be_truthy
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+      end
+      it_behaves_like 'a logically deleted resource'
+    end
   end
 end
