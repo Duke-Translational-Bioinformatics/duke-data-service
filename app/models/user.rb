@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   has_many :uploads, through: :created_files
   has_many :affiliations
   has_one :system_permission
-  has_one :user_api_secret
+  has_one :api_key
   has_one :auth_role, through: :system_permission
 
   validates :username, presence: true, uniqueness: true

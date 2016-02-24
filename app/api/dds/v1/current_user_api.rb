@@ -35,16 +35,16 @@ module DDS
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"]
         ]
       end
-      put '/current_user/api_key', serializer: UserApiSecretSerializer do
+      put '/current_user/api_key', serializer: ApiKeySerializer do
         authenticate!
-        UserApiSecret.transaction do
-          if current_user.user_api_secret
-            current_user.user_api_secret.destroy!
+        ApiKey.transaction do
+          if current_user.api_key
+            current_user.api_key.destroy!
           end
-          current_user.build_user_api_secret(key: SecureRandom.hex)
+          current_user.build_api_key(key: SecureRandom.hex)
           current_user.save
         end
-        current_user.user_api_secret
+        current_user.api_key
       end
     end
   end

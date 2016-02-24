@@ -12,7 +12,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20160223145153) do
-  
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -23,6 +23,14 @@ ActiveRecord::Schema.define(version: 20160223145153) do
     t.string   "project_role_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+  end
+
+  create_table "api_keys", force: :cascade do |t|
+    t.uuid     "user_id"
+    t.uuid     "software_agent_id"
+    t.string   "key"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   create_table "audits", force: :cascade do |t|
@@ -168,13 +176,6 @@ ActiveRecord::Schema.define(version: 20160223145153) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.uuid     "creator_id"
-  end
-
-  create_table "user_api_secrets", force: :cascade do |t|
-    t.uuid     "user_id"
-    t.string   "key"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "user_authentication_services", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

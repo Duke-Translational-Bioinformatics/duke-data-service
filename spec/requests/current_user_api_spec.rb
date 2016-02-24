@@ -97,15 +97,15 @@ describe DDS::V1::CurrentUserAPI do
 
     let(:url) { '/api/v1/current_user/api_key' }
     subject { put(url, nil, headers) }
-    let(:resource_class) { UserApiSecret }
-    let(:resource_serializer) { UserApiSecretSerializer }
+    let(:resource_class) { ApiKey }
+    let(:resource_serializer) { ApiKeySerializer }
 
     context 'without an existing token' do
       it_behaves_like 'a creatable resource' do
         let(:expected_response_status) {200}
         let(:new_object) {
           current_user.reload
-          current_user.user_api_secret
+          current_user.api_key
         }
       end
       it_behaves_like 'an authenticated resource'
@@ -113,33 +113,14 @@ describe DDS::V1::CurrentUserAPI do
 
     context 'with existing token' do
       let(:resource) {
-        UserApiSecret.create(key: SecureRandom.hex, user_id: current_user.id)
+        FactoryGirl.create(:api_key, user_id: current_user.id)
       }
-      before do
-        expect(resource).to be_persisted
+      it_behaves_like 'a regeneratable resource' do
+        let(:new_resource) {
+          current_user.api_key
+        }
+        let(:changed_key) { :key }
       end
-
-      it 'should return success' do
-        is_expected.to eq(200)
-        expect(response.status).to eq(200)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-      end
-
-      it 'should destroy original key and create a new one' do
-        expect {
-          is_expected.to eq(200)
-        }.not_to change{resource_class.count}
-        expect(UserApiSecret.where(id: resource.id)).not_to exist
-        expect(current_user.user_api_secret).to be
-        expect(resource.key).not_to eq(current_user.user_api_secret.key)
-      end
-
-      it 'should return a serialized resource' do
-        is_expected.to eq(200)
-        expect(response.body).to include(resource_serializer.new(current_user.user_api_secret).to_json)
-      end
-
       it_behaves_like 'an authenticated resource'
     end
   end
