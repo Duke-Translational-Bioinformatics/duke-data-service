@@ -19,5 +19,10 @@ FactoryGirl.define do
     trait :deleted do
       is_deleted true
     end
+
+    trait :invalid do
+      to_create {|instance| instance.save(validate: false) }
+      creator { nil }
+    end
   end
 end

@@ -5,6 +5,8 @@ RSpec.describe DataFile, type: :model do
   let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
+  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid) }
+  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted) }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
@@ -101,6 +103,19 @@ RSpec.describe DataFile, type: :model do
 
     it 'should require a creator_id' do
       should validate_presence_of :creator_id
+    end
+
+    it 'should allow is_deleted to be set' do
+      should allow_value(true).for(:is_deleted)
+      should allow_value(false).for(:is_deleted)
+    end
+
+    context 'when .is_deleted=true' do
+      subject { deleted_file }
+      it { is_expected.not_to validate_presence_of(:name) }
+      it { is_expected.not_to validate_presence_of(:project_id) }
+      it { is_expected.not_to validate_presence_of(:upload_id) }
+      it { is_expected.not_to validate_presence_of(:creator_id) }
     end
   end
 

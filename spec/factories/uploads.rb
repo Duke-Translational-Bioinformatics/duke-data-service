@@ -10,6 +10,10 @@ FactoryGirl.define do
     storage_provider
     association :creator, factory: :user
 
+    trait :without_fingerprint do
+      fingerprint_value nil
+    end
+
     trait :with_chunks do
       chunks { [ build(:chunk, number: 1) ] }
     end

@@ -6,6 +6,7 @@ RSpec.describe Folder, type: :model do
   let(:root_folder) { FactoryGirl.create(:folder, :root) }
   let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
   let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
+  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, parent: child_folder) }
   let(:is_logically_deleted) { true }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
@@ -77,6 +78,16 @@ RSpec.describe Folder, type: :model do
         should_not allow_value(child_folder.id).for(:parent_id)
       end
     end
+
+    context 'with invalid child file' do
+      subject { invalid_file.parent }
+
+      it 'should allow is_deleted to be set to true' do
+        should allow_value(true).for(:is_deleted)
+        expect(subject.is_deleted?).to be_truthy
+        should allow_value(false).for(:is_deleted)
+      end
+    end
   end
 
   describe '.parent=' do
@@ -123,6 +134,18 @@ RSpec.describe Folder, type: :model do
       expect(grand_child_file.reload).to be_truthy
       expect(grand_child_folder.is_deleted?).to be_truthy
       expect(grand_child_file.is_deleted?).to be_truthy
+    end
+
+    context 'with invalid child file' do
+      subject { invalid_file.parent }
+
+      it 'should set is_deleted on children' do
+        expect(invalid_file.is_deleted?).to be_falsey
+        should allow_value(true).for(:is_deleted)
+        expect(subject.save).to be_truthy
+        expect(invalid_file.reload).to be_truthy
+        expect(invalid_file.is_deleted?).to be_truthy
+      end
     end
   end
 end

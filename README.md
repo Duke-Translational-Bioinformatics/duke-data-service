@@ -17,17 +17,8 @@ This is an open source project for building a "data service" for researchers tha
 * https://github.com/Duke-Translational-Bioinformatics/duke-storage-service
 * https://github.com/Duke-Translational-Bioinformatics/repository-dashboard-shiny
 
-## draft api
+## api blueprint
 http://docs.dukedataservices.apiary.io
-
-## throughput graph
-[![Throughput Graph](https://graphs.waffle.io/duke-translational-bioinformatics/duke-data-service/throughput.svg)](https://waffle.io/duke-translational-bioinformatics/duke-data-service/metrics)
-
-## burndown app
-http://colab-sbx-97.oit.duke.edu:3838/sample-apps/dashboard/
-
-### waffle.io
-[![Stories in Ready](https://badge.waffle.io/Duke-Translational-Bioinformatics/duke-data-service.png?label=ready&title=Ready)](https://waffle.io/Duke-Translational-Bioinformatics/duke-data-service)
 
 ### circleci development 
 [![Development Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)

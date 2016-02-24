@@ -18,4 +18,13 @@ RSpec.describe UploadPreviewSerializer, type: :serializer do
       })
     end
   end
+
+  context 'upload without fingerprint' do
+    let(:resource) { FactoryGirl.create(:upload, :without_fingerprint, :with_chunks, :completed, :with_error) }
+
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to have_key "hash" }
+      it { expect(subject["hash"]).to eq(nil) }
+    end
+  end
 end
