@@ -53,8 +53,8 @@ RSpec.describe User, type: :model do
       should have_one(:system_permission)
     end
 
-    it 'should have one api_secret' do
-      should have_one(:user_api_secret)
+    it 'should have one api_key' do
+      should have_one(:api_key)
     end
   end
 
