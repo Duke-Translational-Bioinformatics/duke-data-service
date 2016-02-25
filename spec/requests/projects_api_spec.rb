@@ -13,6 +13,7 @@ describe DDS::V1::ProjectsAPI do
   let(:resource_class) { Project }
   let(:resource_serializer) { ProjectSerializer }
   let!(:resource) { project }
+  let(:resource_stub) { project_stub }
   let!(:resource_permission) { project_permission }
 
   before do
@@ -42,7 +43,7 @@ describe DDS::V1::ProjectsAPI do
         description: resource.description
       }}
       it_behaves_like 'a creatable resource' do
-        let(:resource) { project_stub }
+        let(:resource) { resource_stub }
         it 'should set creator to current_user and make them a project_admin' do
 
           expect {
@@ -74,13 +75,13 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an audited endpoint' do
-        let(:resource) { project_stub }
+        let(:resource) { resource_stub }
         let(:expected_status) { 201 }
         let(:expected_audits) { 2 }
       end
 
       it_behaves_like 'an audited endpoint' do
-        let(:resource) { project_stub }
+        let(:resource) { resource_stub }
         let(:resource_class) { ProjectPermission }
         let(:expected_status) { 201 }
       end
@@ -103,8 +104,8 @@ describe DDS::V1::ProjectsAPI do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
-        name: project_stub.name,
-        description: project_stub.description
+        name: resource_stub.name,
+        description: resource_stub.description
       }}
       it_behaves_like 'an updatable resource'
 
