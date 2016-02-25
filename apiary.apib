@@ -18,10 +18,10 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
 + Extended *Current User* resource actions - added actions for maintaining user secret API key.
 + For *Projects* resource - removed unique contraint rule on `project.name`.
-+ For *Storage Providers* resource - added `default_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
++ For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
 + Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
-+ Modified `hash` property for **Upload** resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of the optionally reported client hash. **Note: This change will break existing clients that reference the** `upload.hash` **property.** 
-+ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated - the significant extension here is that when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
++ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of the optionally reported client hash. 
++ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
 + Added `label` property to *Files* resource to help users differentiate file versions.
 + Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
 
@@ -958,14 +958,14 @@ Represents an external service that provides physical storage space for files.
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
                     "name": "duke_oit_swift",
                     "description": "Duke OIT Storage",
-                    "default_hash_algorithm": "md5",
+                    "chunk_hash_algorithm": "md5",
                     "is_deprecated": false
                 },
                 {
                     "id": "t4479f73-0774-4f96-afc7-9d251e65by88",
                     "name": "amazon_s3_glacier",
                     "description": "Amazon Glacier Cloud Storage",
-                    "default_hash_algorithm": "sha1",
+                    "chunk_hash_algorithm": "sha1",
                     "is_deprecated": false
                 }
             ]
@@ -986,7 +986,7 @@ Represents an external service that provides physical storage space for files.
             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
             "name": "duke_oit_swift",
             "description": "Duke Office of Information Technology Storage",
-            "default_hash_algorithm": "md5",
+            "chunk_hash_algorithm": "md5",
             "is_deprecated": false
         }
 
@@ -1355,7 +1355,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
 + **number (number, required)** - The chunk number.
 + **size (number, required)** - The size of the chunk in bytes (computed by client).
 + **hash.value (string, required)** - The chunk hash (computed by client).
-+ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.); this must be the default algorithm (i.e. `default_hash_algorithm`) supported by storage provider (see **Storage Providers** actions)
++ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.); this must be the default algorithm (i.e. `chunk_hash_algorithm`) supported by storage provider (see **Storage Providers** actions)
 
 >**Response Properties**
 - - - - -
