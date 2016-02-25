@@ -92,36 +92,48 @@ describe DDS::V1::CurrentUserAPI do
     it_behaves_like 'an authenticated resource'
   end
 
-  describe 'get /current_user/api_key' do
+  describe '/current_user/api_key' do
     include_context 'with authentication'
-
     let(:url) { '/api/v1/current_user/api_key' }
-    subject { put(url, nil, headers) }
-    let(:resource_class) { ApiKey }
-    let(:resource_serializer) { ApiKeySerializer }
 
-    context 'without an existing token' do
-      it_behaves_like 'a creatable resource' do
-        let(:expected_response_status) {200}
-        let(:new_object) {
-          current_user.reload
-          current_user.api_key
-        }
-      end
-      it_behaves_like 'an authenticated resource'
-    end
+    describe 'PUT' do
+      subject { put(url, nil, headers) }
+      let(:resource_class) { ApiKey }
+      let(:resource_serializer) { ApiKeySerializer }
 
-    context 'with existing token' do
-      let(:resource) {
-        FactoryGirl.create(:api_key, user_id: current_user.id)
-      }
-      it_behaves_like 'a regeneratable resource' do
-        let(:new_resource) {
-          current_user.api_key
-        }
-        let(:changed_key) { :key }
+      context 'without an existing token' do
+        it_behaves_like 'a creatable resource' do
+          let(:expected_response_status) {200}
+          let(:new_object) {
+            current_user.reload
+            current_user.api_key
+          }
+        end
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an audited endpoint' do
+          let(:called_action) { 'PUT' }
+        end
       end
-      it_behaves_like 'an authenticated resource'
+
+      context 'with existing token' do
+        let(:resource) {
+          FactoryGirl.create(:api_key, user_id: current_user.id)
+        }
+        it_behaves_like 'a regeneratable resource' do
+          let(:new_resource) {
+            current_user.api_key
+          }
+          let(:changed_key) { :key }
+        end
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an audited endpoint' do
+          let(:called_action) { 'PUT' }
+          let(:expected_audits) { 2 }
+          before do
+            expect(resource).to be_persisted
+          end
+        end
+      end
     end
   end
 end
