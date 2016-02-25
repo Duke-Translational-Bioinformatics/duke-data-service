@@ -149,6 +149,23 @@ module DDS
         end
         software_agent.api_key
       end
+      desc 'View software agent API key' do
+        detail 'View software_agent api_key'
+        named 'view software_agent api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software agent UUID'
+      end
+      get '/software_agents/:id/api_key', serializer: ApiKeySerializer do
+        authenticate!
+        SoftwareAgent.find(params[:id]).api_key
+      end
     end
   end
 end
