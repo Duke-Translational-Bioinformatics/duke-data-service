@@ -20,7 +20,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + For *Projects* resource - removed unique contraint rule on `project.name`.
 + For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
 + Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
-+ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of the optionally reported client hash. 
++ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash. 
 + For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
 + Added `label` property to *Files* resource to help users differentiate file versions.
 + Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
