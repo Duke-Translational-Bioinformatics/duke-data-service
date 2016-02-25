@@ -8,7 +8,7 @@ class SystemPermissionPolicy < ApplicationPolicy
   end
 
   def destroy?
-    permission.exists?
+    permission.exists? && record.user != user
   end
 
   class Scope < Scope
