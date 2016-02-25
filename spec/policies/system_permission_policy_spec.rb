@@ -78,5 +78,9 @@ describe SystemPermissionPolicy do
       is_expected.to permit(user, system_permission)
       is_expected.to permit(user, other_system_permission)
     end
+
+    it 'denies access for current user permission' do
+      is_expected.not_to permit(user, permission)
+    end
   end
 end
