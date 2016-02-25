@@ -9,6 +9,22 @@ This the documentation for the Data Service API. Key focuses are on API endpoint
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
+## API Release Notes
+
+24-Feb-2016
+--------------
++ Updated API usage details - included convenience links to *Web Portal* and *API Explorer*.
++ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*. 
++ Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
++ Extended *Current User* resource actions - added actions for maintaining user secret API key.
++ For *Projects* resource - removed unique contraint rule on `project.name`.
++ For *Storage Providers* resource - added `default_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
++ Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
++ Modified `hash` property for **Upload** resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of the optionally reported client hash. **Note: This change will break existing clients that reference the** `upload.hash` **property.** 
++ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated - the significant extension here is that when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
++ Added `label` property to *Files* resource to help users differentiate file versions.
++ Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
+
 ## Group API Usage
 
 Web Portal
@@ -25,7 +41,7 @@ In addition to the API usage documentation herein, users may experiment with the
 
 Collection Pagination
 --------------
-For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` key will reference the array as follows:
+For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` property will reference the array as follows:
 
     {
         "results": [
@@ -1216,6 +1232,8 @@ This is the first step in uploading a large file. An upload objects is created a
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "sha1",
                 "client_reported": {
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                     "algorithm": "sha1"
@@ -1251,6 +1269,8 @@ This is the first step in uploading a large file. An upload objects is created a
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
                     "hash": { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "sha1",
                         "client_reported": {
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                             "algorithm": "sha1"
@@ -1291,6 +1311,8 @@ This is the first step in uploading a large file. An upload objects is created a
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "sha1",
                 "client_reported": {
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                     "algorithm": "sha1"
@@ -1392,6 +1414,8 @@ This operation is called by the client after all file chunks have been successfu
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "sha1",
                 "client_reported": {
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                     "algorithm": "sha1"
@@ -1462,6 +1486,8 @@ This action is called by a hash computation agent, run as a background task, tha
             "content_type": "application/octet-stream",
             "size": 30024000,
             "hash": { 
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                "algorithm": "sha1",
                 "client_reported": {
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                     "algorithm": "sha1"
@@ -1524,7 +1550,9 @@ Search for project uploads; this action will facilitate finding uploads that are
                     "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
-                    "hash": { 
+                    "hash": {
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "sha1", 
                         "client_reported": {
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
                             "algorithm": "sha1"
@@ -1964,7 +1992,7 @@ If there are previous versions of a file, this action can be used to retrieve in
         }
 
 ## Update file version [POST] 
-**Permission:** create_file
+**Permission:** update_file
 - - - - -
 
 >**Rules**
@@ -2013,7 +2041,7 @@ If there are previous versions of a file, this action can be used to retrieve in
 + Response 204
 
 ## Get file version download URL [GET /file_versions/{id}/url]
-Generates and returns a storage provider specific pre-signed URL that client can use to download a file version.
+Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
 
 >**Permission:** download_file
 - - - - -
