@@ -62,6 +62,10 @@ describe DDS::V1::SoftwareAgentsAPI do
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 201 }
       end
+      it_behaves_like 'an audited endpoint' do
+        let(:resource_class) { ApiKey }
+        let(:expected_status) { 201 }
+      end
     end
   end
   describe 'SoftwareAgent instance' do
@@ -129,6 +133,9 @@ describe DDS::V1::SoftwareAgentsAPI do
           let(:changed_key) { :key }
         end
         it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an audited endpoint' do
+          let(:called_action) { 'PUT' }
+        end
       end
 
       describe 'GET' do

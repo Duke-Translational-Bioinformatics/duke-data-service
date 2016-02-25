@@ -109,6 +109,9 @@ describe DDS::V1::CurrentUserAPI do
         }
       end
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:called_action) { 'GET' }
+      end
     end
 
     context 'with existing token' do
@@ -122,6 +125,9 @@ describe DDS::V1::CurrentUserAPI do
         let(:changed_key) { :key }
       end
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:called_action) { 'GET' }
+      end
     end
   end
 end
