@@ -39,12 +39,16 @@ module DDS
         authenticate!
         Audited.audit_class.as_user(current_user) do
           ApiKey.transaction do
+            audits_to_annotate = []
             if current_user.api_key
+              original_api_key_id = current_user.api_key.id
               current_user.api_key.destroy!
+              audits_to_annotate << Audited.audit_class.where(auditable_id: original_api_key_id).last
             end
             current_user.build_api_key(key: SecureRandom.hex)
             current_user.save
-            annotate_audits [current_user.api_key.audits.last]
+            audits_to_annotate << current_user.api_key.audits.last
+            annotate_audits audits_to_annotate
           end
         end
         current_user.api_key

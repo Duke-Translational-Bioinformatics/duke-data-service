@@ -135,6 +135,7 @@ describe DDS::V1::SoftwareAgentsAPI do
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'an audited endpoint' do
           let(:called_action) { 'PUT' }
+          let(:expected_audits) { 2 }
         end
       end
 

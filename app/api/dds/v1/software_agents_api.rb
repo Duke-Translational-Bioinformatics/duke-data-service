@@ -141,10 +141,12 @@ module DDS
         software_agent = SoftwareAgent.find(params[:id])
         Audited.audit_class.as_user(current_user) do
           ApiKey.transaction do
+            original_api_key_id = software_agent.api_key.id
             software_agent.api_key.destroy!
+            delete_audit = Audited.audit_class.where(auditable_id: original_api_key_id).last
             software_agent.build_api_key(key: SecureRandom.hex)
             software_agent.save
-            annotate_audits [software_agent.api_key.audits.last]
+            annotate_audits [software_agent.api_key.audits.last, delete_audit]
           end
         end
         software_agent.api_key
