@@ -130,6 +130,12 @@ describe DDS::V1::SoftwareAgentsAPI do
         end
         it_behaves_like 'an authenticated resource'
       end
+
+      describe 'GET' do
+        subject{ get(url, nil, headers) }
+        it_behaves_like 'a viewable resource'
+        it_behaves_like 'an authenticated resource'
+      end
     end
   end
 end
