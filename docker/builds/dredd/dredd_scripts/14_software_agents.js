@@ -29,3 +29,24 @@ hooks.before(SA_CREATE, function (transaction) {
   // stringify the new body to request
   transaction.request.body = JSON.stringify(requestBody);
 });
+
+hooks.before(SA_LIST, function (transaction) {
+});
+
+hooks.before(SA_VIEW, function (transaction) {
+});
+
+hooks.before(SA_UPDATE, function (transaction) {
+});
+
+hooks.before(SA_DELETE, function (transaction) {
+});
+
+hooks.before(SA_VIEW_APIKEY, function (transaction) {
+});
+
+hooks.before(SA_REGENERATE, function (transaction) {
+});
+
+hooks.before(SA_GET_TOKEN, function (transaction) {
+});
