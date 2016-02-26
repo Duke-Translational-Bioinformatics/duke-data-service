@@ -25,6 +25,10 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Added `label` property to *Files* resource to help users differentiate file versions.
 + Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
 
+26-Feb-2016
+--------------
++ Added provenance *Activities* resource/actions - includes actions for creating, retrieving, updating and removing provenance activties.
+
 ## Group API Usage
 
 Web Portal
@@ -2229,3 +2233,126 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
         
+## Group Activities
+Represents the main record of provenance in DDS; it is analogous to *Activity* defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Activities are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
+
+*Note: Provenance relations to an activity, such as `Used` and `WasGeneratedBy` are managed through the `Relations` API actions.*
+
+## Activities collection [/activities]
+
+### Create activity [POST]
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **name (string, required)** - A short name for this activity.
++ **description (string, optional)** - A verbose description for this activity.
++ **started_on (string, optional)** - The time this activity was started; defaults to the current datetime if not specified.
++ **ended_on (string, optional)** - The time this activity ended.
+
+>**Rules**
+- - - - -
++ The `ended_on` time must be greater than or equal to the `started_on` time. 
+
++ Request (application/json)
+
+        { 
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### List activities [GET]
+>**Permission:** 
+- - - - -
++ creator *or* visiblity (i.e. `view_project`) to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
+
+>**Rules**
+- - - - -
++ Activities that have been deleted (i.e. `"is_deleted": true`) are not included.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-activity",
+                    "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                    "name": "RF PI3-Kinase",
+                    "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                    "started_on": "2015-01-01T12:00:00Z",
+                    "ended_on": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Activities instance [/activities/{id}]
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
+### View activity [GET]
+>**Permission:** 
+- - - - -
++ creator *or* visiblity (i.e. `view_project`) to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Update activity [PUT]
+>**Permission:** 
+- - - - -
++ creator *or* visiblity (i.e. `view_project`) to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
+
+>**Rules**
+- - - - -
++ Only `name`, `description`, `started_on`, and `updated_on` properties may be updated via this action.
+
++ Request (application/json)
+
+        {
+            "ended_on": "2015-01-01T114:30:00"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": "2015-01-01T114:30:00Z",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Delete activity [DELETE]
+>**Permission:** creator
+- - - - -
+
++ Response 204
