@@ -29,7 +29,7 @@ module DDS
           suggestion: 'token not properly signed'
         },401)
       end
-      get '/user/api_token', root: false do
+      get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
         encoded_access_token = token_info_params[:access_token]
         if access_token = JWT.decode(encoded_access_token, Rails.application.secrets.secret_key_base)[0]
@@ -60,7 +60,7 @@ module DDS
                 annotate_audits([last_audit], {user: new_user})
               end
             end
-            {'api_token' => authorized_user.api_token}
+            ApiToken.new(user: authorized_user.user, user_authentication_service: authorized_user)
           else
             error!({
               error: 401,
