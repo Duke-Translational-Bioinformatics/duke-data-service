@@ -5,21 +5,34 @@ class ApiToken
     unless params && params[:user]
       raise 'a User is required'
     end
-    unless params[:user_authentication_service]
-      raise 'Users current UserAuthenticationService is required'
-    end
     @user = params[:user]
-    @current_user_authentication_service = params[:user_authentication_service]
+
+    if params[:user_authentication_service]
+      @current_user_authentication_service = params[:user_authentication_service]
+    elsif params[:software_agent]
+      @current_software_agent = params[:software_agent]
+    else
+      raise 'UserAuthenticationService or SoftwareAgent is required'
+    end
     @expires_on = Time.now.to_i
   end
 
   def api_token
     @expires_on = Time.now.to_i + 2.hours
-    JWT.encode({
-      'id' => @user.id,
-      'service_id' => @current_user_authentication_service.authentication_service.service_id,
-      'exp' => @expires_on
-    }, Rails.application.secrets.secret_key_base)
+
+    if @current_user_authentication_service
+      JWT.encode({
+        'id' => @user.id,
+        'service_id' => @current_user_authentication_service.authentication_service.service_id,
+        'exp' => @expires_on
+      }, Rails.application.secrets.secret_key_base)
+    else
+      JWT.encode({
+        'id' => @user.id,
+        'software_agent_id' => @current_software_agent.id,
+        'exp' => @expires_on
+      }, Rails.application.secrets.secret_key_base)
+    end
   end
 
   def expires_on
