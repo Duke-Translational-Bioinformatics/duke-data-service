@@ -1,4 +1,6 @@
 class ApiToken
+  include ActiveModel::Serialization
+
   def initialize(params = nil)
     unless params && params[:user]
       raise 'a User is required'
