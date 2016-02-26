@@ -10,6 +10,7 @@ require('events').EventEmitter.defaultMaxListeners = Infinity;
 configuration = {
   server: process.env.HOST_NAME, // your URL to API endpoint the tests will run against
   //For debug: export HOST_NAME=https://dukeds-dev.herokuapp.com/api/v1
+  //For debug: export HOST_NAME=https://uatest.dataservice.duke.edu/api/v1
   //Get JWT: https://dukeds-dev.herokuapp.com/apiexplorer
   //export MY_GENERATED_JWT=
   options: {
@@ -26,7 +27,7 @@ configuration = {
              //"Authorization Roles > Authorization Roles collection > List roles", //r2g
              //"Authorization Roles > Authorization Role instance > View role",     //r2g
              //Current Users
-             //"Current User > Current User instance > View current user",          //r2g
+            //  "Current User > Current User instance > View current user",          //r2g
              //Users
              //"Users > Users collection > List users",
              //"Users > User instance > View user",
@@ -69,6 +70,7 @@ configuration = {
             // "Uploads > Upload instance > View chunked upload",
             // "Uploads > Upload instance > Get pre-signed chunk URL",
             // "Uploads > Upload instance > Complete chunked file upload",
+            // "Uploads > Upload instance > Report server computed hash",
             //files
             // "Files > Files collection > Create file",
             // "Files > File instance > View file",
@@ -76,9 +78,17 @@ configuration = {
             // "Files > File instance > Get pre-signed download URL",
             // "Files > File instance > Move file",
             // "Files > File instance > Rename file",
-             //"Search Project/Folder Children > Search Project Children > Search Project Children", //r2g
-             //"Search Project/Folder Children > Search Folder Children > Search Folder Children"    //r2g
-
+            //  "Search Project/Folder Children > Search Project Children > Search Project Children", //r2g
+            //  "Search Project/Folder Children > Search Folder Children > Search Folder Children",    //r2g
+             //software_agents
+            //  "Software Agents > Software Agents collection > Create software agent",
+            //  "Software Agents > Software Agents collection > List software agents",
+            //  "Software Agents > Software Agent instance > View software agent",
+            //  "Software Agents > Software Agent instance > Update software agent",
+            //  "Software Agents > Software Agent instance > Delete software agent",
+            //  "Software Agents > Software Agent Secret Key > View software agent API key",
+            //  "Software Agents > Software Agent Secret Key > Re-generate software agent API key",
+            //  "Software Agents > Software Agent Access Token > Get software agent access token",
             ], // Array of Strings, run only transaction that match these names
 
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
@@ -97,10 +107,11 @@ configuration = {
                   '10_folders_hooks.js',             //r2g
                   '11_uploads_hooks.js',             //r2g
                   '12_files_hooks.js',
-                  '13_search_project_folder_hooks.js'
+                  '13_search_project_folder_hooks.js',
+                  // '14_software_agents.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
