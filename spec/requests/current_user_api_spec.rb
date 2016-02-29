@@ -148,7 +148,6 @@ describe DDS::V1::CurrentUserAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an audited endpoint' do
         let(:expected_status) { 204 }
-        #let(:with_audited_parent) { User }
       end
     end
 
