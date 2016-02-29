@@ -3,6 +3,7 @@ require 'jwt'
 require 'securerandom'
 
 describe DDS::V1::CurrentUserAPI do
+  include_context 'with authentication'
   let(:resource) { current_user }
   let(:resource_class) { User }
   let(:resource_serializer) { UserSerializer }
@@ -12,7 +13,6 @@ describe DDS::V1::CurrentUserAPI do
     subject { get(url, nil, headers) }
 
     context 'with valid api_token' do
-      include_context 'with authentication'
       it_behaves_like 'a viewable resource'
     end
 
@@ -33,7 +33,6 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     context 'when the api_token has not been signed by the secret_key_base' do
-      include_context 'with authentication'
       let(:api_token) {
         JWT.encode({
           'id' => current_user.id,
@@ -56,7 +55,6 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     context 'when the api_token has expired' do
-      include_context 'with authentication'
       let(:api_token) {
         JWT.encode({
           'id' => current_user.id,
@@ -80,11 +78,8 @@ describe DDS::V1::CurrentUserAPI do
   end
 
   describe 'get /current_user/usage' do
-    include_context 'with authentication'
-
     let(:url) { '/api/v1/current_user/usage' }
     subject { get(url, nil, headers) }
-    let(:resource) { current_user }
     let(:resource_serializer) { UserUsageSerializer }
 
     it_behaves_like 'a viewable resource'
@@ -92,7 +87,6 @@ describe DDS::V1::CurrentUserAPI do
   end
 
   describe '/current_user/api_key' do
-    include_context 'with authentication'
     let(:url) { '/api/v1/current_user/api_key' }
 
     describe 'PUT' do
