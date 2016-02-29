@@ -17,18 +17,18 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     context 'when not provided an api_token' do
-      include_context 'without authentication'
-
-      it 'should respond with an error' do
-        is_expected.to eq(401)
-        expect(response.body).to be
-        error_response = JSON.parse(response.body)
-        %w(error reason suggestion).each do |expected_key|
-          expect(error_response).to have_key expected_key
+      it_behaves_like 'an authenticated resource' do
+        it 'should respond with an error' do
+          is_expected.to eq(401)
+          expect(response.body).to be
+          error_response = JSON.parse(response.body)
+          %w(error reason suggestion).each do |expected_key|
+            expect(error_response).to have_key expected_key
+          end
+          expect(error_response['error']).to eq(401)
+          expect(error_response['reason']).to eq('no api_token')
+          expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')
         end
-        expect(error_response['error']).to eq(401)
-        expect(error_response['reason']).to eq('no api_token')
-        expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')
       end
     end
 
