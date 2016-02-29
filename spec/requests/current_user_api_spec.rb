@@ -95,11 +95,11 @@ describe DDS::V1::CurrentUserAPI do
   describe '/current_user/api_key' do
     include_context 'with authentication'
     let(:url) { '/api/v1/current_user/api_key' }
+    let(:resource_class) { ApiKey }
+    let(:resource_serializer) { ApiKeySerializer }
 
     describe 'PUT' do
       subject { put(url, nil, headers) }
-      let(:resource_class) { ApiKey }
-      let(:resource_serializer) { ApiKeySerializer }
 
       context 'without an existing token' do
         it_behaves_like 'a creatable resource' do
@@ -134,6 +134,14 @@ describe DDS::V1::CurrentUserAPI do
           end
         end
       end
+    end
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+      let!(:resource) {
+        FactoryGirl.create(:api_key, user_id: current_user.id)
+      }
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
     end
   end
 end

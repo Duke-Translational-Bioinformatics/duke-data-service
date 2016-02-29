@@ -53,6 +53,21 @@ module DDS
         end
         current_user.api_key
       end
+
+      desc 'View Current User API key' do
+        detail 'View current_user api_key.'
+        named 'view current_user api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Current User Does not Exist']
+        ]
+      end
+      get '/current_user/api_key', serializer: ApiKeySerializer do
+        authenticate!
+        current_user.api_key
+      end
     end
   end
 end
