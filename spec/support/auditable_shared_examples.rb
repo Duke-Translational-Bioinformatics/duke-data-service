@@ -102,32 +102,28 @@ shared_examples 'with a serialized audit' do
   end
 end
 
-shared_examples 'an audited endpoint' do
+shared_examples 'an annotate_audits endpoint' do
   let(:expected_status) { 200 }
-  let(:with_current_user) { true }
-  let(:with_audited_parent) { false }
   let(:expected_audits) { 1 }
   let(:expected_auditable_type) { resource_class.base_class.to_s }
+  let(:audit_should_include) { {user: current_user} }
 
-  it 'should create an audit with the current_user as user, and url as audit_comment' do
-    expect(current_user).to be_persisted
+  it 'should create expected audit types' do
     expect {
       is_expected.to eq(expected_status)
     }.to change{
       Audited.audit_class.where(
         auditable_type: expected_auditable_type
-      ).where(
-        'comment @> ?', {action: called_action, endpoint: url}.to_json
       ).count }.by(expected_audits)
+  end
+
+  it 'audit should record the remote address, uuid, endpoint action' do
+    is_expected.to eq(expected_status)
     last_audit = Audited.audit_class.where(
       auditable_type: expected_auditable_type
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last
-    if with_current_user
-      expect(last_audit.user).to be
-      expect(last_audit.user.id).to eq(current_user.id)
-    end
     expect(last_audit.remote_address).to be_truthy
     expect(last_audit.request_uuid).to be_truthy
     expect(last_audit.comment).to have_key("endpoint")
@@ -138,48 +134,39 @@ shared_examples 'an audited endpoint' do
     expect(last_audit.comment["action"]).to eq(called_action)
   end
 
-  it 'should create an audit for an audited_parent with the current_user as user, and url as audit_comment if with_audited_parent' do
-    if with_audited_parent
-      expect(current_user).to be_persisted
-      expect {
-        is_expected.to eq(expected_status)
-      }.to change{
-        Audited.audit_class.where(
-          auditable_type: expected_auditable_type
-          ).where(
-            'comment @> ?', {action: called_action, endpoint: url}.to_json
-          ).count
-      }.by(1)
-      last_audit = Audited.audit_class.where(
-        auditable_type: expected_auditable_type
+  it 'audit should include other expected attributes' do
+    is_expected.to eq(expected_status)
+    last_audit = Audited.audit_class.where(
+      auditable_type: expected_auditable_type
+    ).where(
+      'comment @> ?', {action: called_action, endpoint: url}.to_json
+    ).order(:created_at).last
+
+    if audit_should_include[:user]
+      user = audit_should_include[:user]
+      expect(last_audit.user).to be
+      expect(last_audit.user.id).to eq(user.id)
+    end
+
+    if audit_should_include[:software_agent]
+      software_agent = audit_should_include[:software_agent]
+      expect(last_audit.comment).to have_key("software_agent_id")
+      expect(last_audit.comment["software_agent_id"]).to eq(software_agent.id)
+    end
+
+    if audit_should_include[:audited_parent]
+      parent_audit = Audited.audit_class.where(
+        auditable_type: audit_should_include[:audited_parent]
       ).where(
         'comment @> ?', {action: called_action, endpoint: url}.to_json
       ).order(:created_at).last
-      last_audit_parent_audit = Audited.audit_class.where(
-        auditable_type: with_audited_parent.to_s
-      ).where(
-        'comment @> ?', {action: called_action, endpoint: url}.to_json
-      ).order(:created_at).last
-      if with_current_user
-        expect(last_audit_parent_audit.user).to be
-        expect(last_audit_parent_audit.user.id).to eq(current_user.id)
-      end
-      expect(last_audit.request_uuid).to be_truthy
-      expect(last_audit_parent_audit.request_uuid).to be_truthy
-      expect(last_audit.remote_address).to be_truthy
-      expect(last_audit_parent_audit.remote_address).to be_truthy
-      expect(last_audit_parent_audit.remote_address).to eq(last_audit.remote_address)
-      expect(last_audit_parent_audit.request_uuid).to eq(last_audit.request_uuid)
-      audit_comment = last_audit_parent_audit.comment
-      expect(audit_comment).to have_key("endpoint")
-      expect(audit_comment).to have_key("action")
+      audit_comment = parent_audit.comment
       expect(audit_comment).to have_key("raised_by_audit")
-      expect(audit_comment["endpoint"]).to be_truthy
-      expect(audit_comment["endpoint"]).to eq(url)
-      expect(audit_comment["action"]).to be_truthy
-      expect(audit_comment["action"]).to eq(called_action)
       expect(audit_comment["raised_by_audit"]).to be_truthy
       expect(audit_comment["raised_by_audit"]).to eq(last_audit.id)
+      child_audit = Audited.audit_class.where(id: audit_comment['raised_by_audit']).take
+      expect(child_audit).to be
+      expect(child_audit.request_uuid).to eq(parent_audit.request_uuid)
     end
   end
 end

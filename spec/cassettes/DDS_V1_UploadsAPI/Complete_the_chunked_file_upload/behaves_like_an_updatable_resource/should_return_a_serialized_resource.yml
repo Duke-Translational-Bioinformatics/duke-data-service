@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx38b549bb2c2a499ca7267-005690120d
+      - txeaa43faf7d604aeb954fe-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:21 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:21 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90
+    uri: http://192.168.99.100:12345/v1/AUTH_test/d1df5509-dd0a-4b6a-9fcc-89d6deda6233
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txb3e9c43d175e443b91b30-005690120d
+      - txd309a32ddc4d411f88766-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:21 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:21 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed/1
+    uri: http://192.168.99.100:12345/v1/AUTH_test/d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Fri, 08 Jan 2016 19:46:22 GMT
+      - Tue, 01 Mar 2016 22:26:29 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,14 +87,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txd98c89e2d617455da6640-005690120d
+      - txbfa480c2bb2941fba5989-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:21 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:21 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: get
     uri: http://192.168.99.100:12345/auth/v1.0
@@ -114,42 +114,42 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx0f062b46300742c5a102c-005690120e
+      - txb7baebc58d6a4a7389251-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:22 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:22 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed?multipart-manifest=put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: '[{"path":"1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+      string: '[{"path":"d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
       Content-Type:
       - text/plain
       Content-Disposition:
-      - attachment; filename=impedit_necessitatibus
+      - attachment; filename=assumenda-deleniti
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Fri, 08 Jan 2016 19:46:23 GMT
+      - Tue, 01 Mar 2016 22:26:29 GMT
       Content-Length:
       - '0'
       Etag:
@@ -157,23 +157,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx2f20b5aabb594c3f8802d-005690120e
+      - tx9ecc6b32d95a4cc0999a8-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:22 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:22 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed
+    uri: http://192.168.99.100:12345/v1/AUTH_test/d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
   response:
     status:
       code: 200
@@ -182,37 +182,37 @@ http_interactions:
       Content-Length:
       - '15'
       Content-Disposition:
-      - attachment; filename=impedit_necessitatibus
+      - attachment; filename=assumenda-deleniti
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Fri, 08 Jan 2016 19:46:23 GMT
+      - Tue, 01 Mar 2016 22:26:29 GMT
       Etag:
       - '"b77622f6f760a1bed182840a7c02a53c"'
       X-Timestamp:
-      - '1452282382.06767'
+      - '1456871188.67330'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx44b945b64e7e44feaccb4-005690120e
+      - tx284da99f12ce43ef9ff58-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:22 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:22 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 - request:
     method: delete
-    uri: http://192.168.99.100:12345/v1/AUTH_test/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed/1?multipart-manifest=delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b/1?multipart-manifest=delete
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk7b880f82ecdf4bc28f40338691253570
+      - AUTH_tk8c20c605ff4c4c8b8fd847531890b220
   response:
     status:
       code: 200
@@ -221,16 +221,16 @@ http_interactions:
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - txe35bd54ee82340f5a7d6a-005690120e
+      - tx884cafe47d7a4721b0791-0056d61714
       Date:
-      - Fri, 08 Jan 2016 19:46:22 GMT
+      - Tue, 01 Mar 2016 22:26:28 GMT
       Transfer-Encoding:
       - chunked
     body:
       encoding: UTF-8
       string: "Number Deleted: 0\nNumber Not Found: 0\nResponse Body: \nResponse Status:
-        400 Bad Request\nErrors:\n/1bbea3fe-f1b6-46b3-9f2d-20e6dc09de90/6908ea44-705c-47a3-a903-a51f880deaed/1,
+        400 Bad Request\nErrors:\n/d1df5509-dd0a-4b6a-9fcc-89d6deda6233/799ae6c9-7a9d-49c1-b895-a1234553298b/1,
         Not an SLO manifest"
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:46:22 GMT
+  recorded_at: Tue, 01 Mar 2016 22:26:28 GMT
 recorded_with: VCR 3.0.0

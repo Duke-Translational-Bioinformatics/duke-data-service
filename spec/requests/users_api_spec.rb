@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 describe DDS::V1::UsersAPI do
-  include_context 'with authentication'
-  let (:auth_service) { user_auth.authentication_service }
   let(:resource_class) { User }
   let(:resource) { FactoryGirl.create(:user) }
   let(:resource_serializer) { UserSerializer }
@@ -11,7 +9,9 @@ describe DDS::V1::UsersAPI do
     let(:url) { '/api/v1/user/api_token' }
 
     describe 'for first time users' do
+      include_context 'without authentication'
       let(:new_user) { FactoryGirl.attributes_for(:user) }
+      let (:auth_service) { FactoryGirl.create(:authentication_service)}
       let(:new_user_token) {
         {
           'service_id' => auth_service.service_id,
@@ -32,8 +32,6 @@ describe DDS::V1::UsersAPI do
       let(:called_action) { "GET" }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-        expect(current_user).to be_persisted
-        expect(user_auth).to be_persisted
         expect(auth_service).to be_persisted
         pre_time = DateTime.now.to_i
         expect{
@@ -69,15 +67,27 @@ describe DDS::V1::UsersAPI do
         expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
       end
 
-      it_behaves_like 'an audited endpoint' do
-        let!(:with_current_user) { false }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) {{}}
+
+        it 'should set the newly created user as the user' do
+          is_expected.to eq(expected_status)
+          last_audit = Audited.audit_class.where(
+            auditable_type: expected_auditable_type
+          ).where(
+            'comment @> ?', {action: called_action, endpoint: url}.to_json
+          ).order(:created_at).last
+          expect(last_audit.user).to be
+          expect(last_audit.user.username).to eq(new_user_token['uid'])
+        end
       end
     end
 
     describe 'for all users' do
+      include_context 'with authentication'
       let (:user_token) {
         {
-          'service_id' => auth_service.service_id,
+          'service_id' => user_auth.authentication_service.service_id,
           'uid' => user_auth.uid,
           'display_name' => current_user.display_name,
           'first_name' => current_user.first_name,
@@ -122,7 +132,7 @@ describe DDS::V1::UsersAPI do
           expect(decoded_token).to have_key(expected_key)
         end
         expect(decoded_token['id']).to eq(current_user.id)
-        expect(decoded_token['service_id']).to eq(auth_service.service_id)
+        expect(decoded_token['service_id']).to eq(user_auth.authentication_service.service_id)
         existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
         expect(existing_user.id).to eq(current_user.id)
@@ -179,6 +189,7 @@ describe DDS::V1::UsersAPI do
   end
 
   describe 'get /api/v1/users' do
+    include_context 'with authentication'
     let(:url) { "/api/v1/users" }
     let(:resource_serializer) {UserSerializer}
 
@@ -358,6 +369,7 @@ describe DDS::V1::UsersAPI do
   end
 
   describe 'User instance' do
+    include_context 'with authentication'
     let(:url) { "/api/v1/users/#{resource.id}" }
 
     describe 'GET' do
