@@ -1,13 +1,7 @@
 require 'rails_helper'
 
 describe AffiliationPolicy do
-  subject { described_class }
-  let(:record_class) { 
-    described_class.name.gsub(/Policy$/,'').constantize 
-  }
-  let(:resolved_scope) {
-    described_class::Scope.new(user, record_class.all).resolve
-  }
+  include_context 'policy declarations'
 
   let(:project_permission) { FactoryGirl.create(:project_permission) }
   let(:affiliation) { FactoryGirl.create(:affiliation, project: project_permission.project) }
