@@ -168,6 +168,43 @@ module DDS
         authenticate!
         SoftwareAgent.find(params[:id]).api_key
       end
+
+      desc 'Get software agent access token'do
+        detail 'Get software agent access token'
+        named 'get software_agent access token'
+        failure [
+          [200, 'This will never happen'],
+          [201, 'Success'],
+          [400, 'Missing Required Keys'],
+          [404, 'Software Agent or User Does not Exist']
+        ]
+      end
+      params do
+        requires :agent_key, type: String, desc: 'Software agent secret key'
+        requires :user_key, type: String, desc: 'User secret key'
+      end
+      rescue_from Grape::Exceptions::ValidationErrors do |e|
+        error_json = {
+          "error" => 400,
+          "reason" => 'missing key or keys',
+          "suggestion" => 'api_key and user_key are required'
+        }
+        error!(error_json, 400)
+      end
+      rescue_from ActiveRecord::RecordNotFound do |e|
+        error_json = {
+          "error" => 404,
+          "reason" => "invalid key",
+          "suggestion" => "ensure both keys are valid"
+        }
+        error!(error_json, 404)
+      end
+      post '/software_agents/api_token', serializer: ApiTokenSerializer do
+        user_key = ApiKey.where(key: params[:user_key]).joins(:user).take!
+        software_key = ApiKey.where(key: params[:agent_key]).joins(:software_agent).take!
+        user_key.user.update_attribute(:last_login_at, DateTime.now)
+        ApiToken.new(user: user_key.user, software_agent: software_key.software_agent)
+      end
     end
   end
 end
