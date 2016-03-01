@@ -78,9 +78,15 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint' do
-        let(:with_audited_parent) { Project }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) {
+          {user: current_user, audited_parent: 'Project'}
+        }
       end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_auditable_type) { Project }
+      end
+
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
@@ -92,10 +98,18 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint' do
+
+      it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_status) { 204 }
-        let(:with_audited_parent) { Project}
+        let(:audit_should_include) {
+          {user: current_user, audited_parent: 'Project'}
+        }
       end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_status) { 204 }
+        let(:expected_auditable_type) { Project }
+      end
+
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end

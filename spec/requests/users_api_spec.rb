@@ -67,8 +67,19 @@ describe DDS::V1::UsersAPI do
         expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
       end
 
-      it_behaves_like 'an audited endpoint' do
-        let!(:with_current_user) { false }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) {{}}
+
+        it 'should set the newly created user as the user' do
+          is_expected.to eq(expected_status)
+          last_audit = Audited.audit_class.where(
+            auditable_type: expected_auditable_type
+          ).where(
+            'comment @> ?', {action: called_action, endpoint: url}.to_json
+          ).order(:created_at).last
+          expect(last_audit.user).to be
+          expect(last_audit.user.username).to eq(new_user_token['uid'])
+        end
       end
     end
 

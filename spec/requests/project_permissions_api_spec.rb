@@ -82,8 +82,13 @@ describe DDS::V1::ProjectPermissionsAPI do
         let(:resource_class) {'AuthRole'}
       end
 
-      it_behaves_like 'an audited endpoint' do
-        let(:with_audited_parent) { Project }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) {
+          {user: current_user, audited_parent: 'Project'}
+        }
+      end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_auditable_type) { Project }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -121,10 +126,18 @@ describe DDS::V1::ProjectPermissionsAPI do
         let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
-      it_behaves_like 'an audited endpoint' do
+
+      it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_status) { 204 }
-        let(:with_audited_parent) { Project}
+        let(:audit_should_include) {
+          {user: current_user, audited_parent: 'Project'}
+        }
       end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_status) { 204 }
+        let(:expected_auditable_type) { Project }
+      end
+
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { resource_project }
       end
