@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 describe DDS::V1::UsersAPI do
-  include_context 'with authentication'
-  let (:auth_service) { user_auth.authentication_service }
   let(:resource_class) { User }
   let(:resource) { FactoryGirl.create(:user) }
   let(:resource_serializer) { UserSerializer }
@@ -11,7 +9,9 @@ describe DDS::V1::UsersAPI do
     let(:url) { '/api/v1/user/api_token' }
 
     describe 'for first time users' do
+      include_context 'without authentication'
       let(:new_user) { FactoryGirl.attributes_for(:user) }
+      let (:auth_service) { FactoryGirl.create(:authentication_service)}
       let(:new_user_token) {
         {
           'service_id' => auth_service.service_id,
@@ -32,8 +32,6 @@ describe DDS::V1::UsersAPI do
       let(:called_action) { "GET" }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-        expect(current_user).to be_persisted
-        expect(user_auth).to be_persisted
         expect(auth_service).to be_persisted
         pre_time = DateTime.now.to_i
         expect{
@@ -75,9 +73,10 @@ describe DDS::V1::UsersAPI do
     end
 
     describe 'for all users' do
+      include_context 'with authentication'
       let (:user_token) {
         {
-          'service_id' => auth_service.service_id,
+          'service_id' => user_auth.authentication_service.service_id,
           'uid' => user_auth.uid,
           'display_name' => current_user.display_name,
           'first_name' => current_user.first_name,
@@ -122,7 +121,7 @@ describe DDS::V1::UsersAPI do
           expect(decoded_token).to have_key(expected_key)
         end
         expect(decoded_token['id']).to eq(current_user.id)
-        expect(decoded_token['service_id']).to eq(auth_service.service_id)
+        expect(decoded_token['service_id']).to eq(user_auth.authentication_service.service_id)
         existing_user = User.find(decoded_token['id'])
         expect(existing_user).to be
         expect(existing_user.id).to eq(current_user.id)
@@ -179,6 +178,7 @@ describe DDS::V1::UsersAPI do
   end
 
   describe 'get /api/v1/users' do
+    include_context 'with authentication'
     let(:url) { "/api/v1/users" }
     let(:resource_serializer) {UserSerializer}
 
@@ -358,6 +358,7 @@ describe DDS::V1::UsersAPI do
   end
 
   describe 'User instance' do
+    include_context 'with authentication'
     let(:url) { "/api/v1/users/#{resource.id}" }
 
     describe 'GET' do
