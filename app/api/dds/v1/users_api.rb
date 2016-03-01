@@ -37,7 +37,6 @@ module DDS
           if auth_service
             authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
             if authorized_user
-              new_login_at = DateTime.now
               authorized_user.user.update_attribute(:last_login_at, DateTime.now)
             else
               auth_service.with_lock do
