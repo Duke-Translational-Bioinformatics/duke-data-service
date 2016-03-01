@@ -1,61 +1,46 @@
 require 'rails_helper'
 
 describe ProjectPolicy do
+  include_context 'policy declarations'
+
   let(:project_permission) { FactoryGirl.create(:project_permission) }
-  let(:user) { project_permission.user }
   let(:project) { project_permission.project }
   let(:other_project) { FactoryGirl.create(:project) }
+  let(:unsaved_project) { FactoryGirl.build(:project) }
   
-  let(:scope) { subject.new(user, project).scope }
+  context 'when user has project_permission' do
+    let(:user) { project_permission.user }
 
-  subject { described_class }
-
-  permissions ".scope" do
-    it 'returns projects with project permissions' do
-      expect(project).to be_persisted
-      expect(other_project).to be_persisted
-      expect(scope.all).to include(project)
-      expect(scope.all).not_to include(other_project)
+    describe '.scope' do
+      it { expect(resolved_scope).to include(project) }
+      it { expect(resolved_scope).not_to include(other_project) }
+    end
+    permissions :show?, :update?, :destroy? do
+      it { is_expected.to permit(user, project) }
+      it { is_expected.not_to permit(user, other_project) }
+    end
+    permissions :create? do
+      it { is_expected.to permit(user, project) }
+      it { is_expected.to permit(user, other_project) }
+      it { is_expected.to permit(user, unsaved_project) }
     end
   end
 
-  permissions :show? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_project)
-    end
+  context 'when user does not have project_permission' do
+    let(:user) { FactoryGirl.create(:user) }
 
-    it 'grants access with project permission' do
-      is_expected.to permit(user, project)
+    describe '.scope' do
+      it { expect(resolved_scope).not_to include(project) }
+      it { expect(resolved_scope).not_to include(other_project) }
     end
-  end
-
-  permissions :create? do
-    it 'grants access without project permission' do
-      is_expected.to permit(user, other_project)
+    permissions :show?, :update?, :destroy? do
+      it { is_expected.not_to permit(user, project) }
+      it { is_expected.not_to permit(user, other_project) }
     end
-
-    it 'grants access with project permission' do
-      is_expected.to permit(user, project)
-    end
-  end
-
-  permissions :update? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_project)
-    end
-
-    it 'grants access with project permission' do
-      is_expected.to permit(user, project)
-    end
-  end
-
-  permissions :destroy? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_project)
-    end
-
-    it 'grants access with project permission' do
-      is_expected.to permit(user, project)
+    permissions :create? do
+      it { is_expected.to permit(user, project) }
+      it { is_expected.to permit(user, other_project) }
+      it { is_expected.to permit(user, unsaved_project) }
     end
   end
 end
