@@ -1,19 +1,27 @@
 class AffiliationPolicy < ApplicationPolicy
+  def show?
+    user.system_permission || permission.exists?
+  end
+
   def create?
-    permission.exists?
+    user.system_permission || permission.exists?
   end
 
   def update?
-    permission.exists?
+    user.system_permission || permission.exists?
   end
 
   def destroy?
-    permission.exists?
+    user.system_permission || permission.exists?
   end
 
   class Scope < Scope
     def resolve
-      scope.joins(:project_permissions).where(project_permissions: {user: user})
+      if user.system_permission
+        scope
+      else
+        scope.joins(:project_permissions).where(project_permissions: {user: user})
+      end
     end
   end
 end
