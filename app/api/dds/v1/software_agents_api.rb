@@ -175,7 +175,7 @@ module DDS
         failure [
           [200, 'This will never happen'],
           [201, 'Success'],
-          [401, 'Unauthorized'],
+          [400, 'Missing Required Keys'],
           [404, 'Software Agent or User Does not Exist']
         ]
       end
@@ -193,7 +193,7 @@ module DDS
       end
       rescue_from ActiveRecord::RecordNotFound do |e|
         error_json = {
-          "error" => "404",
+          "error" => 404,
           "reason" => "invalid key",
           "suggestion" => "ensure both keys are valid"
         }
@@ -202,6 +202,7 @@ module DDS
       post '/software_agents/api_token', serializer: ApiTokenSerializer do
         user_key = ApiKey.where(key: params[:user_key]).joins(:user).take!
         software_key = ApiKey.where(key: params[:agent_key]).joins(:software_agent).take!
+        user_key.user.update_attribute(:last_login_at, DateTime.now)
         ApiToken.new(user: user_key.user, software_agent: software_key.software_agent)
       end
     end

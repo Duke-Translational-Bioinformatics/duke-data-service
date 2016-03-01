@@ -193,10 +193,11 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     context 'with missing agent_key' do
-      let(:user_key) {
-        FactoryGirl.create(:api_key, user_id: current_user.id).key
+      let(:body) {
+        {
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
       }
-      let(:agent_key) { '' }
 
       it 'should respond with an error' do
         is_expected.to eq(400)
@@ -212,8 +213,11 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     context 'with missing user_key' do
-      let(:agent_key) { resource.api_key.key }
-      let(:user_key) { '' }
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key
+        }
+      }
 
       it 'should respond with an error' do
         is_expected.to eq(400)
