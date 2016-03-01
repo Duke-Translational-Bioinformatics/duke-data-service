@@ -128,5 +128,28 @@ describe DDS::V1::CurrentUserAPI do
         end
       end
     end
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+      let!(:resource) {
+        FactoryGirl.create(:api_key, user_id: current_user.id)
+      }
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+    end
+
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+      let!(:resource) {
+        FactoryGirl.create(:api_key, user_id: current_user.id)
+      }
+      let(:called_action) { 'DELETE' }
+      it_behaves_like 'a removable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
+      end
+    end
+
   end
 end

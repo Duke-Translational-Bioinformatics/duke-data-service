@@ -53,6 +53,40 @@ module DDS
         end
         current_user.api_key
       end
+
+      desc 'View Current User API key' do
+        detail 'View current_user api_key.'
+        named 'view current_user api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Current User Does not Exist']
+        ]
+      end
+      get '/current_user/api_key', serializer: ApiKeySerializer do
+        authenticate!
+        current_user.api_key
+      end
+
+      desc 'Delete a Current User API key' do
+        detail 'Delete a Current User API key'
+        named 'delete current_user api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Current User Does not Exist']
+        ]
+      end
+      delete '/current_user/api_key', root: false do
+        authenticate!
+        Audited.audit_class.as_user(current_user) do
+          current_user.api_key.destroy!
+          annotate_audits [current_user.api_key.audits.last]
+        end
+        body false
+      end
     end
   end
 end

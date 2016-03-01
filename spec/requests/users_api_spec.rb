@@ -112,6 +112,7 @@ describe DDS::V1::UsersAPI do
         expect(response.body).to be
         expect(response.body).not_to eq('null')
         token_wrapper = JSON.parse(response.body)
+        expect(token_wrapper).to have_key('expires_on')
         expect(token_wrapper).to have_key('api_token')
         decoded_token = JWT.decode(token_wrapper['api_token'],
           Rails.application.secrets.secret_key_base
