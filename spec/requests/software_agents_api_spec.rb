@@ -148,20 +148,17 @@ describe DDS::V1::SoftwareAgentsAPI do
   end
 
   describe 'Software Agent Access Token' do
+    include_context 'without authentication'
     let(:url) { "/api/v1/software_agents/api_token" }
-    let(:body) {
-      {
-        "agent_key": agent_key,
-        "user_key": user_key
-      }
-    }
     subject{ post(url, body.to_json, headers) }
 
     context 'with valid agent_key and user_key' do
-      let(:user_key) {
-        FactoryGirl.create(:api_key, user_id: current_user.id).key
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key,
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
       }
-      let(:agent_key) { resource.api_key.key }
 
       it 'should update user.last_login_at and return an api JWT' do
         original_last_login_at = current_user.last_login_at.to_i
@@ -233,10 +230,13 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     context 'with invalid agent_key' do
-      let(:user_key) {
-        FactoryGirl.create(:api_key, user_id: current_user.id).key
+      let(:body) {
+        {
+          "agent_key": SecureRandom.hex,
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
       }
-      let(:agent_key) { SecureRandom.hex }
+
       it 'should respond with an error' do
         is_expected.to eq(404)
         expect(response.body).to be
@@ -251,8 +251,13 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     context 'with invalid user_key' do
-      let(:agent_key) { resource.api_key.key }
-      let(:user_key) { SecureRandom.hex }
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key,
+          "user_key": SecureRandom.hex
+        }
+      }
+
       it 'should respond with an error' do
         is_expected.to eq(404)
         expect(response.body).to be
