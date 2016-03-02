@@ -12,7 +12,7 @@ class ApplicationPolicy
   end
 
   def show?
-    permission.exists?
+    permission
   end
 
   def create?
@@ -55,6 +55,14 @@ class ApplicationPolicy
   private
 
   def permission
-    record.project_permissions.where(user: user)
+    project_permission
+  end
+
+  def project_permission
+    record.project_permissions.where(user: user).take
+  end
+
+  def system_permission
+    user.system_permission
   end
 end
