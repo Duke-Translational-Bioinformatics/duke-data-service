@@ -61,4 +61,8 @@ class ApplicationPolicy
   def project_permission
     record.project_permissions.where(user: user).take
   end
+
+  def system_permission
+    user.system_permission
+  end
 end
