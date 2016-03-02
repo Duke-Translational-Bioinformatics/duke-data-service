@@ -1,18 +1,18 @@
 class AffiliationPolicy < ApplicationPolicy
   def show?
-    user.system_permission || permission.exists?
+    user.system_permission || permission
   end
 
   def create?
-    user.system_permission || permission.exists?
+    user.system_permission || permission
   end
 
   def update?
-    user.system_permission || permission.exists?
+    user.system_permission || permission
   end
 
   def destroy?
-    user.system_permission || permission.exists?
+    user.system_permission || permission
   end
 
   class Scope < Scope
