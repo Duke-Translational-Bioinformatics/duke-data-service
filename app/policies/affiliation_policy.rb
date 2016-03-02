@@ -1,18 +1,18 @@
 class AffiliationPolicy < ApplicationPolicy
   def show?
-    user.system_permission || permission
+    permission
   end
 
   def create?
-    user.system_permission || permission
+    permission
   end
 
   def update?
-    user.system_permission || permission
+    permission
   end
 
   def destroy?
-    user.system_permission || permission
+    permission
   end
 
   class Scope < Scope
@@ -23,5 +23,9 @@ class AffiliationPolicy < ApplicationPolicy
         scope.joins(:project_permissions).where(project_permissions: {user: user})
       end
     end
+  end
+
+  def permission
+    user.system_permission || project_permission
   end
 end
