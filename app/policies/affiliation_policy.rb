@@ -17,7 +17,7 @@ class AffiliationPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      if user.system_permission
+      if system_permission
         scope
       else
         scope.joins(:project_permissions).where(project_permissions: {user: user})
@@ -26,6 +26,6 @@ class AffiliationPolicy < ApplicationPolicy
   end
 
   def permission
-    user.system_permission || project_permission
+    system_permission || project_permission
   end
 end

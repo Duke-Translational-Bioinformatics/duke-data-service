@@ -24,6 +24,6 @@ class SystemPermissionPolicy < ApplicationPolicy
   private
 
   def permission
-    scope.take
+    system_permission
   end
 end
