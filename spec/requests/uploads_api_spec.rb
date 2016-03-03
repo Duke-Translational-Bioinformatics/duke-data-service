@@ -46,6 +46,7 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     #Initiate a chunked file upload for a project
@@ -67,12 +68,12 @@ describe DDS::V1::UploadsAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
         end
-        
+
         it 'should set fingerprint_value' do
           is_expected.to eq(expected_response_status)
           expect(new_object.fingerprint_value).to eq(payload[:hash][:value])
         end
-        
+
         it 'should set fingerprint_algorithm' do
           is_expected.to eq(expected_response_status)
           expect(new_object.fingerprint_algorithm).to eq(payload[:hash][:algorithm])
@@ -114,10 +115,15 @@ describe DDS::V1::UploadsAPI do
         let(:resource_class) { 'Project' }
       end
 
-      it_behaves_like 'an audited endpoint' do
-        let(:expected_status) { 201 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
       end
-
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 201 }
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 201 }
+        end
+      end
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
@@ -134,6 +140,7 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
@@ -199,8 +206,19 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a storage_provider backed resource'
 
-      it_behaves_like 'an audited endpoint' do
-        let(:with_audited_parent) { Upload }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) { {user: current_user, audited_parent: 'Upload'} }
+      end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:resource_class) { Chunk }
+      end
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:audit_should_include) { {user: current_user, audited_parent: 'Upload', software_agent: software_agent} }
+        end
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource_class) { Chunk }
+        end
       end
     end
   end
@@ -245,8 +263,10 @@ describe DDS::V1::UploadsAPI do
       let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
     end
 
-    it_behaves_like 'an audited endpoint'
-
+    it_behaves_like 'an annotate_audits endpoint'
+    it_behaves_like 'a software_agent accessible resource' do
+      it_behaves_like 'an annotate_audits endpoint'
+    end
     it_behaves_like 'a storage_provider backed resource' do
       it 'should return an error if the reported size does not match storage_provider computed size' do
         resource.update_attribute(:size, resource.size - 1)

@@ -59,12 +59,12 @@ describe DDS::V1::SoftwareAgentsAPI do
         end
       end
 
-      it_behaves_like 'an audited endpoint' do
-        let(:expected_status) { 201 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
       end
-      it_behaves_like 'an audited endpoint' do
+      it_behaves_like 'an annotate_audits endpoint' do
         let(:resource_class) { ApiKey }
-        let(:expected_status) { 201 }
+        let(:expected_response_status) { 201 }
       end
     end
   end
@@ -94,7 +94,7 @@ describe DDS::V1::SoftwareAgentsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint'
+      it_behaves_like 'an annotate_audits endpoint'
       it_behaves_like 'a logically deleted resource'
     end
 
@@ -114,8 +114,8 @@ describe DDS::V1::SoftwareAgentsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an audited endpoint' do
-        let(:expected_status) { 204 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 204 }
       end
       it_behaves_like 'a logically deleted resource'
     end
@@ -133,7 +133,7 @@ describe DDS::V1::SoftwareAgentsAPI do
           let(:changed_key) { :key }
         end
         it_behaves_like 'an authenticated resource'
-        it_behaves_like 'an audited endpoint' do
+        it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'PUT' }
           let(:expected_audits) { 2 }
         end

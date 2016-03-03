@@ -22,6 +22,18 @@ RSpec.describe User, type: :model do
     expect(audited_user_info[:full_name]).to eq(subject.display_name)
   end
 
+  context 'current_software_agent attribute' do
+    let (:software_agent) {
+      FactoryGirl.create(:software_agent, :with_key, creator: subject)
+    }
+
+    it 'should be an accessor' do
+      should respond_to('current_software_agent')
+      subject.current_software_agent = software_agent
+      expect(subject.current_software_agent.id).to eq(software_agent.id)
+    end
+  end
+
   describe 'associations' do
     subject {FactoryGirl.create(:user)}
 

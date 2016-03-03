@@ -27,17 +27,17 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx664312d049c44813ab41a-0056d86401
+      - txcfec434e28bc4e29a3aa6-0056d8642c
       Date:
-      - Thu, 03 Mar 2016 16:19:13 GMT
+      - Thu, 03 Mar 2016 16:19:56 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:19:13 GMT
+  recorded_at: Thu, 03 Mar 2016 16:19:56 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5b4be9e5-56c3-4eec-87f8-e0fffc3fdc21
+    uri: http://192.168.99.100:12345/v1/AUTH_test/a7b49825-357e-4d08-a67a-9da8fcda5194
     body:
       encoding: UTF-8
       string: ''
@@ -56,12 +56,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx644a6cce10e240fe93b62-0056d86401
+      - tx957aa9865c2e467e9e0c5-0056d8642c
       Date:
-      - Thu, 03 Mar 2016 16:19:13 GMT
+      - Thu, 03 Mar 2016 16:19:56 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:19:13 GMT
+  recorded_at: Thu, 03 Mar 2016 16:19:56 GMT
 recorded_with: VCR 3.0.0
