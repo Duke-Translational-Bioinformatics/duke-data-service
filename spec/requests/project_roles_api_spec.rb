@@ -23,6 +23,7 @@ describe DDS::V1::ProjectRolesAPI do
     end
 
     it_behaves_like 'an authenticated resource'
+    it_behaves_like 'a software_agent accessible resource'
   end
 
   describe 'View authorization role details' do
@@ -33,6 +34,7 @@ describe DDS::V1::ProjectRolesAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) {"/api/v1/project_roles/notexists_projectrole_id"}

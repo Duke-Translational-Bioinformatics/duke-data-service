@@ -9,9 +9,9 @@ describe DDS::V1::UsersAPI do
     let(:url) { '/api/v1/user/api_token' }
 
     describe 'for first time users' do
-      include_context 'without authentication'
+      include_context 'common headers'
       let(:new_user) { FactoryGirl.attributes_for(:user) }
-      let (:auth_service) { FactoryGirl.create(:authentication_service)}
+      let(:auth_service) { FactoryGirl.create(:authentication_service)}
       let(:new_user_token) {
         {
           'service_id' => auth_service.service_id,
@@ -22,12 +22,13 @@ describe DDS::V1::UsersAPI do
           'email' => new_user[:email],
         }
       }
-      let (:access_token) {
+      let(:access_token) {
         JWT.encode(
           new_user_token,
           Rails.application.secrets.secret_key_base
         )
       }
+
       subject { get(url, {access_token: access_token}, common_headers) }
       let(:called_action) { "GET" }
 
@@ -71,7 +72,7 @@ describe DDS::V1::UsersAPI do
         let(:audit_should_include) {{}}
 
         it 'should set the newly created user as the user' do
-          is_expected.to eq(expected_status)
+          is_expected.to eq(expected_response_status)
           last_audit = Audited.audit_class.where(
             auditable_type: expected_auditable_type
           ).where(
@@ -241,6 +242,7 @@ describe DDS::V1::UsersAPI do
       it_behaves_like 'a listable resource'
       it_behaves_like 'a paginated resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'with last_name_begins_with filter' do
@@ -283,6 +285,7 @@ describe DDS::V1::UsersAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'with first_name_begins_with' do
@@ -324,6 +327,7 @@ describe DDS::V1::UsersAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'with full_name_contains' do
@@ -365,6 +369,7 @@ describe DDS::V1::UsersAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
   end
 
@@ -377,6 +382,7 @@ describe DDS::V1::UsersAPI do
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
   end
 end

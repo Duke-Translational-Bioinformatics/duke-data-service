@@ -32,6 +32,7 @@ describe DDS::V1::ProjectsAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'POST' do
@@ -75,17 +76,35 @@ describe DDS::V1::ProjectsAPI do
 
       it_behaves_like 'an annotate_audits endpoint' do
         let(:resource) { project_stub }
-        let(:expected_status) { 201 }
+        let(:expected_response_status) { 201 }
         let(:expected_audits) { 2 }
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
         let(:resource) { project_stub }
         let(:expected_auditable_type) { ProjectPermission }
-        let(:expected_status) { 201 }
+        let(:expected_response_status) { 201 }
         let(:audit_should_include) {
           {user: current_user, audited_parent: 'Project'}
         }
+      end
+      it_behaves_like 'a software_agent accessible resource' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 201 }
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:resource) { project_stub }
+            let(:expected_response_status) { 201 }
+            let(:expected_audits) { 2 }
+          end
+
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:resource) { project_stub }
+            let(:expected_auditable_type) { ProjectPermission }
+            let(:expected_response_status) { 201 }
+            let(:audit_should_include) {
+              {user: current_user, audited_parent: 'Project', software_agent: software_agent}
+            }
+          end
       end
     end
   end
@@ -121,6 +140,9 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
       it_behaves_like 'a logically deleted resource'
     end
 
@@ -160,7 +182,13 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 204 }
+        let(:expected_response_status) { 204 }
+      end
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 204 }
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 204 }
+        end
       end
       it_behaves_like 'a logically deleted resource'
     end

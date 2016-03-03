@@ -37,6 +37,7 @@ describe DDS::V1::AuthRolesAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
 
       describe 'that does not exist' do
         let!(:payload) {{context: 'notexists'}}
@@ -61,6 +62,7 @@ describe DDS::V1::AuthRolesAPI do
       it_behaves_like 'a listable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
   end
 
@@ -72,6 +74,7 @@ describe DDS::V1::AuthRolesAPI do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
         let(:url) {"/api/v1/auth_roles/notexists_authrole_id"}

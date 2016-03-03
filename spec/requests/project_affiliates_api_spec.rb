@@ -100,13 +100,13 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 204 }
+        let(:expected_response_status) { 204 }
         let(:audit_should_include) {
           {user: current_user, audited_parent: 'Project'}
         }
       end
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 204 }
+        let(:expected_response_status) { 204 }
         let(:expected_auditable_type) { Project }
       end
 

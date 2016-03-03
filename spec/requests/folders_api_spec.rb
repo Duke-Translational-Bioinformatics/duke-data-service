@@ -6,7 +6,7 @@ describe DDS::V1::FoldersAPI do
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
-  
+
   let(:child_file) { FactoryGirl.create(:data_file, parent: folder) }
   let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
@@ -88,7 +88,14 @@ describe DDS::V1::FoldersAPI do
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 201 }
+        let(:expected_response_status) { 201 }
+      end
+
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 201 }
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 201 }
+        end
       end
     end
 
@@ -111,6 +118,7 @@ describe DDS::V1::FoldersAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -182,8 +190,15 @@ describe DDS::V1::FoldersAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 204 }
+        let(:expected_response_status) { 204 }
       end
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 204 }
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 204 }
+        end
+      end
+
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
@@ -206,6 +221,9 @@ describe DDS::V1::FoldersAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
@@ -238,6 +256,9 @@ describe DDS::V1::FoldersAPI do
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'an authorized resource'
         it_behaves_like 'an annotate_audits endpoint'
+        it_behaves_like 'a software_agent accessible resource' do
+          it_behaves_like 'an annotate_audits endpoint'
+        end
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
         end
@@ -277,6 +298,9 @@ describe DDS::V1::FoldersAPI do
         let(:resource_id) {'notfoundid'}
       end
       it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
       it_behaves_like 'a logically deleted resource'
     end
   end

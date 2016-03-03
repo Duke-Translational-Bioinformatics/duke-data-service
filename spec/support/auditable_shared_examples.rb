@@ -103,14 +103,14 @@ shared_examples 'with a serialized audit' do
 end
 
 shared_examples 'an annotate_audits endpoint' do
-  let(:expected_status) { 200 }
+  let(:expected_response_status) { 200 }
   let(:expected_audits) { 1 }
   let(:expected_auditable_type) { resource_class.base_class.to_s }
   let(:audit_should_include) { {user: current_user} }
 
   it 'should create expected audit types' do
     expect {
-      is_expected.to eq(expected_status)
+      is_expected.to eq(expected_response_status)
     }.to change{
       Audited.audit_class.where(
         auditable_type: expected_auditable_type
@@ -118,7 +118,7 @@ shared_examples 'an annotate_audits endpoint' do
   end
 
   it 'audit should record the remote address, uuid, endpoint action' do
-    is_expected.to eq(expected_status)
+    is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
       auditable_type: expected_auditable_type
     ).where(
@@ -135,7 +135,7 @@ shared_examples 'an annotate_audits endpoint' do
   end
 
   it 'audit should include other expected attributes' do
-    is_expected.to eq(expected_status)
+    is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
       auditable_type: expected_auditable_type
     ).where(

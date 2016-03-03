@@ -147,7 +147,7 @@ describe DDS::V1::CurrentUserAPI do
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_status) { 204 }
+        let(:expected_response_status) { 204 }
       end
     end
 
