@@ -1,61 +1,48 @@
 require 'rails_helper'
 
 describe AffiliationPolicy do
+  include_context 'policy declarations'
+
   let(:project_permission) { FactoryGirl.create(:project_permission) }
-  let(:user) { project_permission.user }
-  let(:affiliation) { FactoryGirl.build(:affiliation, project: project_permission.project) }
+  let(:affiliation) { FactoryGirl.create(:affiliation, project: project_permission.project) }
   let(:other_affiliation) { FactoryGirl.create(:affiliation) }
 
-  let(:scope) { subject.new(user, affiliation).scope }
+  context 'when user has project_permission' do
+    let(:user) { project_permission.user }
 
-  subject { described_class }
-
-  permissions ".scope" do
-    it 'returns affiliations with project permissions' do
-      expect(affiliation.save).to be_truthy
-      expect(other_affiliation).to be_persisted
-      expect(scope.all).to include(affiliation)
-      expect(scope.all).not_to include(other_affiliation)
+    describe '.scope' do
+      it { expect(resolved_scope).to include(affiliation) }
+      it { expect(resolved_scope).not_to include(other_affiliation) }
+    end
+    permissions :show?, :create?, :update?, :destroy? do
+      it { is_expected.to permit(user, affiliation) }
+      it { is_expected.not_to permit(user, other_affiliation) }
     end
   end
 
-  permissions :show? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_affiliation)
-    end
+  context 'when user does not have project_permission' do
+    let(:user) { FactoryGirl.create(:user) }
 
-    it 'grants access with project permission' do
-      is_expected.to permit(user, affiliation)
+    describe '.scope' do
+      it { expect(resolved_scope).not_to include(affiliation) }
+      it { expect(resolved_scope).not_to include(other_affiliation) }
     end
-  end
-
-  permissions :create? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_affiliation)
-    end
-
-    it 'grants access with project permission' do
-      is_expected.to permit(user, affiliation)
+    permissions :show?, :create?, :update?, :destroy? do
+      it { is_expected.not_to permit(user, affiliation) }
+      it { is_expected.not_to permit(user, other_affiliation) }
     end
   end
 
-  permissions :update? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_affiliation)
-    end
+  context 'when user has system_permission' do
+    let(:user) { FactoryGirl.create(:system_permission).user }
 
-    it 'grants access with project permission' do
-      is_expected.to permit(user, affiliation)
+    describe '.scope' do
+      it { expect(resolved_scope).to include(affiliation) }
+      it { expect(resolved_scope).to include(other_affiliation) }
     end
-  end
-
-  permissions :destroy? do
-    it 'denies access without project permission' do
-      is_expected.not_to permit(user, other_affiliation)
-    end
-
-    it 'grants access with project permission' do
-      is_expected.to permit(user, affiliation)
+    permissions :show?, :create?, :update?, :destroy? do
+      it { is_expected.to permit(user, affiliation) }
+      it { is_expected.to permit(user, other_affiliation) }
     end
   end
 end

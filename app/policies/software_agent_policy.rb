@@ -4,7 +4,7 @@ class SoftwareAgentPolicy < ApplicationPolicy
   end
 
   def update?
-    record.creator == user || user.system_permission
+    record.creator == user || system_permission
   end
 
   def show?
@@ -13,7 +13,7 @@ class SoftwareAgentPolicy < ApplicationPolicy
 
 
   def destroy?
-    record.creator == user || user.system_permission
+    record.creator == user || system_permission
   end
 
   class Scope < Scope

@@ -1,14 +1,14 @@
 class SystemPermissionPolicy < ApplicationPolicy
   def create?
-    permission.exists?
+    permission
   end
 
   def update?
-    permission.exists?
+    permission
   end
 
   def destroy?
-    permission.exists? && record.user != user
+    permission && record.user != user
   end
 
   class Scope < Scope
@@ -24,6 +24,6 @@ class SystemPermissionPolicy < ApplicationPolicy
   private
 
   def permission
-    scope
+    system_permission
   end
 end
