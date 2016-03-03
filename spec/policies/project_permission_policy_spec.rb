@@ -4,11 +4,11 @@ describe ProjectPermissionPolicy do
   include_context 'policy declarations'
 
   let(:permission) { FactoryGirl.create(:project_permission) }
-  let(:user) { permission.user }
   let(:project_permission) { FactoryGirl.create(:project_permission, project: permission.project) }
   let(:other_project_permission) { FactoryGirl.create(:project_permission) }
-  
-  let(:scope) { subject.new(user, project_permission).scope }
+
+  it_behaves_like 'system_permission can access', :project_permission
+  it_behaves_like 'system_permission can access', :other_project_permission
 
   context 'when user has project_permission' do
     let(:user) { permission.user }

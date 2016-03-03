@@ -5,23 +5,9 @@ describe SystemPermissionPolicy do
 
   let(:system_permission) { FactoryGirl.create(:system_permission) }
   let(:other_system_permission) { FactoryGirl.create(:system_permission) }
-  
-  context 'when user has system_permission' do
-    let(:user) { system_permission.user }
 
-    describe '.scope' do
-      it { expect(resolved_scope).to include(system_permission) }
-      it { expect(resolved_scope).to include(other_system_permission) }
-    end
-    permissions :show?, :create?, :update? do
-      it { is_expected.to permit(user, system_permission) }
-      it { is_expected.to permit(user, other_system_permission) }
-    end
-    permissions :destroy? do
-      it { is_expected.not_to permit(user, system_permission) }
-      it { is_expected.to permit(user, other_system_permission) }
-    end
-  end
+  it_behaves_like 'system_permission can access', :system_permission
+  it_behaves_like 'system_permission can access', :other_system_permission
 
   context 'when user does not have system_permission' do
     let(:user) { FactoryGirl.create(:user) }

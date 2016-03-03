@@ -7,6 +7,9 @@ describe UploadPolicy do
   let(:upload) { FactoryGirl.create(:upload, project: project_permission.project) }
   let(:other_upload) { FactoryGirl.create(:upload) }
 
+  it_behaves_like 'system_permission can access', :upload
+  it_behaves_like 'system_permission can access', :other_upload
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 

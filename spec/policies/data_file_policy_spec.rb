@@ -7,6 +7,9 @@ describe DataFilePolicy do
   let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
   let(:other_data_file) { FactoryGirl.create(:data_file) }
 
+  it_behaves_like 'system_permission can access', :data_file
+  it_behaves_like 'system_permission can access', :other_data_file
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 
