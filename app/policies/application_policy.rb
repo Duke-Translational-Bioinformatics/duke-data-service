@@ -48,7 +48,11 @@ class ApplicationPolicy
     end
 
     def resolve
-      scope
+      if user.system_permission
+        scope
+      else
+        scope.joins(:project_permissions).where(project_permissions: {user: user})
+      end
     end
   end
 
