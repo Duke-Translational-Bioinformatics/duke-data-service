@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include SerializedAudit
   audited except: :last_login_at
+  attr_accessor :current_software_agent
 
   has_many :user_authentication_services
   accepts_nested_attributes_for :user_authentication_services

@@ -103,7 +103,7 @@ describe DDS::V1::CurrentUserAPI do
           }
         end
         it_behaves_like 'an authenticated resource'
-        it_behaves_like 'an audited endpoint' do
+        it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'PUT' }
         end
       end
@@ -119,7 +119,7 @@ describe DDS::V1::CurrentUserAPI do
           let(:changed_key) { :key }
         end
         it_behaves_like 'an authenticated resource'
-        it_behaves_like 'an audited endpoint' do
+        it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'PUT' }
           let(:expected_audits) { 2 }
           before do
@@ -146,8 +146,8 @@ describe DDS::V1::CurrentUserAPI do
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an audited endpoint' do
-        let(:expected_status) { 204 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 204 }
       end
     end
 
