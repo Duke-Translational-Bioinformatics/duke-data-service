@@ -25,7 +25,11 @@ class DataFilePolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      scope.joins(:project_permissions).where(project_permissions: {user: user})
+      if user.system_permission
+        scope
+      else
+        scope.joins(:project_permissions).where(project_permissions: {user: user})
+      end
     end
   end
 end
