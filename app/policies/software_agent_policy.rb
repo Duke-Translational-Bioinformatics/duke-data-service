@@ -11,7 +11,6 @@ class SoftwareAgentPolicy < ApplicationPolicy
     true
   end
 
-
   def destroy?
     record.creator == user || system_permission
   end
