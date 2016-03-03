@@ -7,6 +7,9 @@ describe AffiliationPolicy do
   let(:affiliation) { FactoryGirl.create(:affiliation, project: project_permission.project) }
   let(:other_affiliation) { FactoryGirl.create(:affiliation) }
 
+  it_behaves_like 'system_permission can access', :affiliation
+  it_behaves_like 'system_permission can access', :other_affiliation
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 

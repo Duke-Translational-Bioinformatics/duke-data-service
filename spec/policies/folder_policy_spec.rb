@@ -7,6 +7,9 @@ describe FolderPolicy do
   let(:folder) { FactoryGirl.create(:folder, project: project_permission.project) }
   let(:other_folder) { FactoryGirl.create(:folder) }
 
+  it_behaves_like 'system_permission can access', :folder
+  it_behaves_like 'system_permission can access', :other_folder
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 

@@ -8,6 +8,9 @@ describe ChunkPolicy do
   let(:chunk) { FactoryGirl.create(:chunk, upload: upload) }
   let(:other_chunk) { FactoryGirl.create(:chunk) }
 
+  it_behaves_like 'system_permission can access', :chunk
+  it_behaves_like 'system_permission can access', :other_chunk
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 

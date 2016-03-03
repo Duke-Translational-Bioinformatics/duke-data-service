@@ -7,7 +7,18 @@ describe ProjectPolicy do
   let(:project) { project_permission.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:unsaved_project) { FactoryGirl.build(:project) }
-  
+
+  it_behaves_like 'system_permission can access', :project
+  it_behaves_like 'system_permission can access', :other_project
+
+  context 'when user has system_permission' do
+    let(:user) { FactoryGirl.create(:system_permission).user }
+
+    permissions :show?, :create?, :update?, :destroy? do
+      it { is_expected.to permit(user, unsaved_project) }
+    end
+  end
+
   context 'when user has project_permission' do
     let(:user) { project_permission.user }
 

@@ -55,7 +55,7 @@ class ApplicationPolicy
   private
 
   def permission
-    project_permission
+    system_permission || project_permission
   end
 
   def project_permission
