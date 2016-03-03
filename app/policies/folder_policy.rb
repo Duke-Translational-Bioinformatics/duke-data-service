@@ -1,14 +1,14 @@
 class FolderPolicy < ApplicationPolicy
   def create?
-    permission.exists?
+    permission
   end
 
   def update?
-    permission.exists?
+    permission
   end
 
   def destroy?
-    permission.exists?
+    permission
   end
 
   class Scope < Scope

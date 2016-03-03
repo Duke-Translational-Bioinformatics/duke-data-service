@@ -1,26 +1,26 @@
 class DataFilePolicy < ApplicationPolicy
   def download?
-    permission.exists?
+    permission
   end
 
   def move?
-    permission.exists?
+    permission
   end
 
   def rename?
-    permission.exists?
+    permission
   end
 
   def create?
-    permission.exists?
+    permission
   end
 
   def update?
-    permission.exists?
+    permission
   end
 
   def destroy?
-    permission.exists?
+    permission
   end
 
   class Scope < Scope

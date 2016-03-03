@@ -4,11 +4,11 @@ class ProjectPolicy < ApplicationPolicy
   end
 
   def update?
-    scope.where(:id => record.id).exists?
+    permission
   end
 
   def destroy?
-    scope.where(:id => record.id).exists?
+    permission
   end
 
   class Scope < Scope
