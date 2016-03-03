@@ -146,4 +146,129 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
     end
   end
+
+  describe 'Software Agent Access Token' do
+    include_context 'without authentication'
+    let(:url) { "/api/v1/software_agents/api_token" }
+    subject{ post(url, body.to_json, headers) }
+
+    context 'with valid agent_key and user_key' do
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key,
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
+      }
+
+      it 'should update user.last_login_at and return an api JWT' do
+        original_last_login_at = current_user.last_login_at.to_i
+        pre_time = DateTime.now.to_i
+        is_expected.to eq(201)
+        post_time = DateTime.now.to_i
+        expect(response.body).to be
+        expect(response.body).not_to eq('null')
+        token_wrapper = JSON.parse(response.body)
+        expect(token_wrapper).to have_key('expires_on')
+        expect(token_wrapper).to have_key('api_token')
+        decoded_token = JWT.decode(token_wrapper['api_token'],
+          Rails.application.secrets.secret_key_base
+        )[0]
+        expect(decoded_token).to be
+        %w(id software_agent_id exp).each do |expected_key|
+          expect(decoded_token).to have_key(expected_key)
+        end
+        expect(decoded_token['id']).to eq(current_user.id)
+        expect(decoded_token['software_agent_id']).to eq(resource.id)
+        existing_software_agent = SoftwareAgent.find(decoded_token['software_agent_id'])
+        existing_user = User.find(decoded_token['id'])
+        expect(existing_user).to be
+        expect(existing_user.id).to eq(current_user.id)
+        expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
+        expect(existing_user.last_login_at.to_i).to be >= pre_time
+        expect(existing_user.last_login_at.to_i).to be <= post_time
+      end
+    end
+
+    context 'with missing agent_key' do
+      let(:body) {
+        {
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
+      }
+
+      it 'should respond with an error' do
+        is_expected.to eq(400)
+        expect(response.body).to be
+        error_response = JSON.parse(response.body)
+        %w(error reason suggestion).each do |expected_key|
+          expect(error_response).to have_key expected_key
+        end
+        expect(error_response['error']).to eq(400)
+        expect(error_response['reason']).to eq('missing key or keys')
+        expect(error_response['suggestion']).to eq('api_key and user_key are required')
+      end
+    end
+
+    context 'with missing user_key' do
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key
+        }
+      }
+
+      it 'should respond with an error' do
+        is_expected.to eq(400)
+        expect(response.body).to be
+        error_response = JSON.parse(response.body)
+        %w(error reason suggestion).each do |expected_key|
+          expect(error_response).to have_key expected_key
+        end
+        expect(error_response['error']).to eq(400)
+        expect(error_response['reason']).to eq('missing key or keys')
+        expect(error_response['suggestion']).to eq('api_key and user_key are required')
+      end
+    end
+
+    context 'with invalid agent_key' do
+      let(:body) {
+        {
+          "agent_key": SecureRandom.hex,
+          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+        }
+      }
+
+      it 'should respond with an error' do
+        is_expected.to eq(404)
+        expect(response.body).to be
+        error_response = JSON.parse(response.body)
+        %w(error reason suggestion).each do |expected_key|
+          expect(error_response).to have_key expected_key
+        end
+        expect(error_response['error']).to eq(404)
+        expect(error_response['reason']).to eq('invalid key')
+        expect(error_response['suggestion']).to eq('ensure both keys are valid')
+      end
+    end
+
+    context 'with invalid user_key' do
+      let(:body) {
+        {
+          "agent_key": resource.api_key.key,
+          "user_key": SecureRandom.hex
+        }
+      }
+
+      it 'should respond with an error' do
+        is_expected.to eq(404)
+        expect(response.body).to be
+        error_response = JSON.parse(response.body)
+        %w(error reason suggestion).each do |expected_key|
+          expect(error_response).to have_key expected_key
+        end
+        expect(error_response['error']).to eq(404)
+        expect(error_response['reason']).to eq('invalid key')
+        expect(error_response['suggestion']).to eq('ensure both keys are valid')
+      end
+    end
+  end
 end
