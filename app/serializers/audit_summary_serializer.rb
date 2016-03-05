@@ -1,14 +1,14 @@
-module SerializedAudit
+module AuditSummarySerializer
   def audit
-    creation_audit = audits.where(action: "create").last
-    last_update_audit = audits.where(action: "update").last
+    creation_audit = object.audits.where(action: "create").last
+    last_update_audit = object.audits.where(action: "update").last
     delete_audit = nil
-    if respond_to?('is_deleted') && is_deleted
-      delete_audit = audits.where(action: "update").where(
+    if object.respond_to?('is_deleted') && object.is_deleted
+      delete_audit = object.audits.where(action: "update").where(
         'comment @> ?', {action: 'DELETE'}.to_json
       ).last
     else
-      delete_audit = audits.where(action: "destroy").last
+      delete_audit = object.audits.where(action: "destroy").last
     end
     creator = creation_audit ?
         User.where(id: creation_audit.user_id).first :
