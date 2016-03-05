@@ -1,4 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
+  include AuditSummarySerializer
   attributes :id,
              :username,
              :full_name,
@@ -7,7 +8,8 @@ class UserSerializer < ActiveModel::Serializer
              :email,
              :audit,
              :auth_provider,
-             :last_login_on
+             :last_login_on,
+             :audit
 
   def last_login_on
     object.last_login_at

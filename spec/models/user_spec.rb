@@ -4,12 +4,8 @@ require 'jwt'
 RSpec.describe User, type: :model do
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   subject { user_authentication_service.user }
-  let(:is_logically_deleted) { false }
 
-  it_behaves_like 'an audited model' do
-    it_behaves_like 'with a serialized audit'
-  end
-
+  it_behaves_like 'an audited model'
   it 'should have an audited_user_info method to return the information required by audit _by methods' do
     should respond_to('audited_user_info')
     audited_user_info = subject.audited_user_info
