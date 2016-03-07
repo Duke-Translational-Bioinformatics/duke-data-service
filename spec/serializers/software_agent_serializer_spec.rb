@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SoftwareAgentSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:software_agent) }
+  let(:is_logically_deleted) { true }
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
@@ -19,5 +20,6 @@ RSpec.describe SoftwareAgentSerializer, type: :serializer do
       expect(subject['is_deleted']).to eq(resource.is_deleted)
       expect(subject['audit']).to be_a Hash
     end
+    it_behaves_like 'a serializer with a serialized audit'
   end
 end
