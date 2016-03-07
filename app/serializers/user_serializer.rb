@@ -6,7 +6,6 @@ class UserSerializer < ActiveModel::Serializer
              :first_name,
              :last_name,
              :email,
-             :audit,
              :auth_provider,
              :last_login_on,
              :audit
