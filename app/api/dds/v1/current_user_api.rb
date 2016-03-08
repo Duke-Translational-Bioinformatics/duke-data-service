@@ -32,7 +32,8 @@ module DDS
         named 'manage current_user api_key'
         failure [
           [201, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"]
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [403, 'Forbidden (software_agent restricted)']
         ]
       end
       put '/current_user/api_key', serializer: ApiKeySerializer do
@@ -62,7 +63,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Current User Does not Exist']
         ]
       end
@@ -78,7 +79,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Current User Does not Exist']
         ]
       end
