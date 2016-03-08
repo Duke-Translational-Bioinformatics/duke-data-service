@@ -41,11 +41,13 @@ module DDS
           ApiKey.transaction do
             audits_to_annotate = []
             if current_user.api_key
+              authorize current_user.api_key, :update?
               original_api_key_id = current_user.api_key.id
               current_user.api_key.destroy!
               audits_to_annotate << Audited.audit_class.where(auditable_id: original_api_key_id).last
             end
             current_user.build_api_key(key: SecureRandom.hex)
+            authorize current_user.api_key, :create?
             current_user.save
             audits_to_annotate << current_user.api_key.audits.last
             annotate_audits audits_to_annotate
@@ -66,6 +68,7 @@ module DDS
       end
       get '/current_user/api_key', serializer: ApiKeySerializer do
         authenticate!
+        authorize current_user.api_key, :show?
         current_user.api_key
       end
 
@@ -81,6 +84,7 @@ module DDS
       end
       delete '/current_user/api_key', root: false do
         authenticate!
+        authorize current_user.api_key, :destroy?
         Audited.audit_class.as_user(current_user) do
           current_user.api_key.destroy!
           annotate_audits [current_user.api_key.audits.last]
