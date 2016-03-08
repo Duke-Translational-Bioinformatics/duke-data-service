@@ -106,6 +106,7 @@ describe DDS::V1::CurrentUserAPI do
         it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'PUT' }
         end
+        it_behaves_like 'a software_agent restricted resource'
       end
 
       context 'with existing token' do
@@ -126,6 +127,7 @@ describe DDS::V1::CurrentUserAPI do
             expect(resource).to be_persisted
           end
         end
+        it_behaves_like 'a software_agent restricted resource'
       end
     end
 
@@ -136,6 +138,7 @@ describe DDS::V1::CurrentUserAPI do
       }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent restricted resource'
     end
 
     describe 'DELETE' do
@@ -149,6 +152,7 @@ describe DDS::V1::CurrentUserAPI do
       it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_response_status) { 204 }
       end
+      it_behaves_like 'a software_agent restricted resource'
     end
 
   end

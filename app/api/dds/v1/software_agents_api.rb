@@ -6,12 +6,13 @@ module DDS
         named 'list software agents'
         failure [
           [200, 'Success'],
-          [401, 'Unauthorized']
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restrictured)']
         ]
       end
       get '/software_agents', root: 'results' do
         authenticate!
-        SoftwareAgent.where(is_deleted: false)
+        policy_scope(SoftwareAgent).where(is_deleted: false)
       end
 
       desc 'Create a software agent' do
@@ -21,7 +22,8 @@ module DDS
           [200, 'This will never actually happen'],
           [201, 'Created Successfully'],
           [400, 'Software agent requires a name'],
-          [401, 'Unauthorized']
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restrictured)']
         ]
       end
       params do
@@ -38,6 +40,7 @@ module DDS
           repo_url: software_agent_params[:repo_url],
           creator: current_user
         })
+        authorize software_agent, :create?
         software_agent.build_api_key(key: SecureRandom.hex)
         Audited.audit_class.as_user(current_user) do
           if software_agent.save
@@ -55,7 +58,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Software Agent Does not Exist']
         ]
       end
@@ -64,7 +67,9 @@ module DDS
       end
       get '/software_agents/:id', root: false do
         authenticate!
-        SoftwareAgent.find(params[:id])
+        sa = SoftwareAgent.find(params[:id])
+        authorize sa, :show?
+        sa
       end
 
       desc 'Update Software Agent' do
@@ -73,7 +78,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [400, 'Validation Error'],
           [404, 'Software Agent Does not Exist']
         ]
@@ -105,7 +110,7 @@ module DDS
         failure [
           [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Software Agent Does not Exist']
         ]
       end
@@ -129,7 +134,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Software Agent Does not Exist']
         ]
       end
@@ -139,6 +144,7 @@ module DDS
       put '/software_agents/:id/api_key', serializer: ApiKeySerializer do
         authenticate!
         software_agent = SoftwareAgent.find(params[:id])
+        authorize software_agent.api_key, :update?
         Audited.audit_class.as_user(current_user) do
           ApiKey.transaction do
             original_api_key_id = software_agent.api_key.id
@@ -157,7 +163,7 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden'],
+          [403, 'Forbidden (software_agent restricted)'],
           [404, 'Software Agent Does not Exist']
         ]
       end
@@ -166,7 +172,9 @@ module DDS
       end
       get '/software_agents/:id/api_key', serializer: ApiKeySerializer do
         authenticate!
-        SoftwareAgent.find(params[:id]).api_key
+        ak = SoftwareAgent.find(params[:id]).api_key
+        authorize ak, :show?
+        ak
       end
 
       desc 'Get software agent access token'do

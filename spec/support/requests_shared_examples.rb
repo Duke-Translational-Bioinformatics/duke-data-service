@@ -366,3 +366,11 @@ shared_examples 'a software_agent accessible resource' do
     expect(response.status).to eq(expected_response_status)
   end
 end
+
+shared_examples 'a software_agent restricted resource' do
+  include_context 'with software_agent authentication'
+  it 'should return forbidden' do
+    is_expected.to eq(403)
+    expect(response.status).to eq(403)
+  end
+end
