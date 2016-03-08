@@ -66,6 +66,7 @@ describe DDS::V1::SoftwareAgentsAPI do
         let(:resource_class) { ApiKey }
         let(:expected_response_status) { 201 }
       end
+      it_behaves_like 'a software_agent restricted resource'
     end
   end
   describe 'SoftwareAgent instance' do
@@ -75,6 +76,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       subject { get(url, nil, headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent restricted resource'
     end
 
     describe 'PUT' do
@@ -96,6 +98,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint'
       it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'a software_agent restricted resource'
     end
 
     describe 'DELETE' do
@@ -118,6 +121,7 @@ describe DDS::V1::SoftwareAgentsAPI do
         let(:expected_response_status) { 204 }
       end
       it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'a software_agent restricted resource'
     end
 
     describe 'api_key' do
@@ -137,12 +141,14 @@ describe DDS::V1::SoftwareAgentsAPI do
           let(:called_action) { 'PUT' }
           let(:expected_audits) { 2 }
         end
+        it_behaves_like 'a software_agent restricted resource'
       end
 
       describe 'GET' do
         subject{ get(url, nil, headers) }
         it_behaves_like 'a viewable resource'
         it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent restricted resource'
       end
     end
   end
