@@ -9,8 +9,9 @@ var md5 = require('md5');
 
 var CREATE_FILE = "Files > Files collection > Create file";
 var VIEW_FILE = "Files > File instance > View file";
+var UPDATE_FILE = "Files > File instance > Update file";
 var DELETE_FILE = "Files > File instance > Delete file";
-var GET_FILE_URL = "Files > File instance > Get pre-signed download URL";
+var GET_FILE_URL = "Files > File instance > Get file download URL";
 var MOVE_FILE = "Files > File instance > Move file";
 var RENAME_FILE = "Files > File instance > Rename file";
 var responseStash = {};
@@ -56,6 +57,10 @@ hooks.before(VIEW_FILE, function (transaction) {
   transaction.fullPath = url.replace('777be35a-98e0-4c2e-9a17-7bc009f9b111', fileId);
   // set global id for downstream tests
   g_fileId = fileId;
+});
+
+hooks.before(UPDATE_FILE, function (transaction) {
+
 });
 
 hooks.before(DELETE_FILE, function (transaction, done) {

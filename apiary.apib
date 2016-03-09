@@ -1,32 +1,51 @@
 FORMAT: 1A
-HOST: https://dukeds-dev.herokuapp.com/api/v1/
+HOST: https://uatest.dataservice.duke.edu/api/v1/
 
 # Duke Data Services
 
 The Duke Data Service (DDS) API allows Duke researchers to store, organize, retrieve and share data.
 
-The intent here is to create a strawman for the data service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
+This the documentation for the Data Service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
+## API Release Notes
+
+24-Feb-2016
+--------------
++ Updated API usage details - included convenience links to *Web Portal* and *API Explorer*.
++ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*.
++ Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
++ Extended *Current User* resource actions - added actions for maintaining user secret API key.
++ For *Projects* resource - removed unique contraint rule on `project.name`.
++ For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
++ Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
++ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash.
++ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
++ Added `label` property to *Files* resource to help users differentiate file versions.
++ Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
+
+26-Feb-2016
+--------------
++ Added provenance *Activities* resource/actions - includes actions for creating, retrieving, updating and removing provenance activties.
+
 ## Group API Usage
 
-Client API Key
+Web Portal
 --------------
-Authorized users may generate a secret API key via the Web interface.  This will not be part of the initial API release, referred to herein as the "Minimally Viable Product" (MVP).
+There is a [Web portal](https://dataservice.duke.edu) that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
 
-User Authentication
+Programmatic Keys
 --------------
-Users will be required to authenticate via a trusted authentication provider (i.e. Duke Shibboleth for MVP).
+In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token from a programmatic context.  For usage details, see the actions for **Software Agents** and **Current User**.
 
-**Some design assumptions for the MVP:**
-* A authentication token (i.e. JWT) will be generated for client applications via a successful HTTPS callback from Duke Shibboleth single sign-on service.  This token must be supplied in header for subsequent API calls.
-* Tokens will have an expiration policy of X hours/days.
-* When a user authenticates successfully for the fist time via Duke Shibboleth, their user profile will be created in the DDS local user data store.
+Exploring the API
+--------------
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
-For endpoints that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters 'page', and 'per_page'.  For example: `/projects?per_page=25`; would return the first 25 projects, and `/projects?page=3&per_page=25` would return the third batch of 25 projects.  Collection payloads will always be returned in an envelope with the 'results' key tied to an array of objects.
+For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` property will reference the array as follows:
 
     {
         "results": [
@@ -46,20 +65,25 @@ To make it easy for clients to manage pagination, the following headers will alw
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced as `<audit_object>` in resource specific payloads.
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` key in resource specific payloads.
 
-    {
+    "audit": {
         "created_on": "2015-01-01T12:00:00Z",
         "created_by": {
             "id": "ce245d81-bae1-452b-8589-24f736ca7735",
             "username": "mrgardner01",
-            "full_name": "Matthew Gardner"
+            "full_name": "Matthew Gardner",
+            "agent": {
+                "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hashing computation agent"
+            }
         },
         "last_updated_on": "2015-01-01T13:00:00Z",
         "last_updated_by": {
             "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
             "username": "jturner01",
-            "full_name": "Jon Turner"
+            "full_name": "Jon Turner",
+            "agent": null
         },
         "deleted_on": null,
         "deleted_by": null
@@ -82,8 +106,7 @@ All error responses should include a JSON response that provides the HTTP status
         "suggestion": "You may have chosen the wrong ID."
     }
 
-Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the
-error encountered.
+Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the error encountered.
 
     {
         "error": "400",
@@ -102,11 +125,11 @@ error encountered.
     }
 
 ## Group Authorization Roles
-Represents set of discrete permissions that may be granted to a user.
+Represents the set of discrete permissions that can be granted to a user.
 
 **Authorization Roles:**
 
-| Role | Name | Description | Permission(s) |
+| role | name | description | permission(s) |
 |:-----|:-----|:------------|:--------------|
 | **system_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system_admin |
 | **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
@@ -118,7 +141,7 @@ Represents set of discrete permissions that may be granted to a user.
 
 **Permissions:**
 
-| Permission | Description |
+| permission | description |
 |:------------|:------------|
 | **system_admin** | Can manage system level permissions and perform all operations across all projects |
 | **view_project** | Can view project and file metadata |
@@ -132,7 +155,7 @@ Represents set of discrete permissions that may be granted to a user.
 
 ## Authorization Roles collection [/auth_roles{?context}]
 + Parameters
-    + context (string, optional, `system`) ... The `context` or scope in which permission can be granted; valid context values are "system" or "project".
+    + context (string, optional, `system`) ... The `context` or scope in which permission can be granted; valid context values are `system` or `project`.
 
 ### List roles [GET]
 >**Permission:** authenticated
@@ -146,8 +169,10 @@ Represents set of discrete permissions that may be granted to a user.
                     "id": "system_admin",
                     "name": "System Admin",
                     "description": "Can manage system level permissions and perform all operations across all projects",
-                    "permissions": [ { "id": "system_admin" } ],
-                    "contexts": [ "system" ],
+                    "permissions": [
+                        {"id": "system_admin"}
+                    ],
+                    "contexts": ["system"],
                     "is_deprecated": false
                 }
             ]
@@ -167,9 +192,185 @@ Represents set of discrete permissions that may be granted to a user.
             "id": "file_editor",
             "name": "File Editor",
             "description": "Can view, download, create, update and delete files",
-            "permissions": [ { "id": "view_project" }, { "id": "download_file" } ],
-            "contexts": [ "project" ],
+            "permissions": [
+                {"id": "view_project"},
+                {"id": "download_file"}
+            ],
+            "contexts": ["project"],
             "is_deprecated": false
+        }
+
+## Group Software Agents
+Represents a software agent and associated secret that can be used to access the API actions from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of storage for failed uploads, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see **Current User** actions).
+
+## Software Agents collection [/software_agents]
+
+## Create software agent [POST]
+Creates software agent and an associated secret API key; the secret key is visible and managed through the `software_agents/{id}/api_key` action.
+
+>**Permission:** authenticated
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **name (string)** - A short name for the software agent.
++ **description (string, optional)** - A verbose description for the software agent.
++ **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
+
++ Request (application/json)
+
+        {
+            "name": "Hash computation agent"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Hash computation agent",
+            "description": null,
+            "repo_url": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+## List software agents [GET]
+>**Permission:** authenticated
+- - - - -
+
+>**Rules**
+- - - - -
++ Software Agents that have been deleted (i.e. `"is_deleted": true`) are not included.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                    "name": "Hash computation agent",
+                    "description": null,
+                    "repo_url": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Software Agent instance [/software_agents/{id}]
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## View software agent [GET]
+>**Permission:** authenticated
+- - - - -
+
++ Response 200 (application/json)
+
+           {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": null,
+                "is_deleted": false,
+                "audit": { }
+            }
+
+## Update software agent [PUT]
+>**Permission:** creator or system_admin
+- - - - -
+
++ Request (application/json)
+
+        {
+            "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd"
+        }
+
++ Response 200 (application/json)
+
+            {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
+                "is_deleted": false,
+                "audit": { }
+            }
+
+## Delete software agent [DELETE]
+>**Permission:** creator or system_admin
+
++ Response 204
+
+## Software Agent Secret Key [/software_agents/{id}/api_key]
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## View software agent API key [GET]
+Shows the secret key for the software agent.
+
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Response Properties**
+- - - - -
++ **key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
++ **created_on (datetime)** - The date the software agent key was generated.
+
++ Response 200 (application/json)
+
+            {
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
+                "created_on": "2015-01-01T12:00:00Z"
+            }
+
+## Re-generate software agent API key [PUT]
+Generates a new secret key for the software agent.
+
+>**Permission:** creator or system_admin
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-06-01T12:00:00Z"
+        }
+
+## Software Agent Access Token [/software_agents/api_token]
+
+## Get software agent access token [POST]
+Using a software agent secret key and a user secret key, get an access token.
+
+>**Permission:** public
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **agent_key (string)** - The secret key for a software agent.
++ **user_key (string)** - The secret key for a user.
+
+>**Response Properties**
+- - - - -
++ **api_token (string)** - The access token.
++ **expire_on (number)** - Token expiration as posix/epoch time.
+
+>**Rules**
+- - - - -
++ The agent associated with the agent key must not have been logically deleted.
+
++ Request
+
+        {
+            "agent_key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
+            "expire_on": 1455571739
         }
 
 ## Group Current User
@@ -198,7 +399,7 @@ Represents the currently authenticated user.
             "audit": { }
         }
 
-## Current Users Usage [GET /current_user/usage]
+## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 
 >**Permission:** view_project
@@ -206,9 +407,9 @@ View summary usage for current user across all projects.
 
 >**Response Properties**
 - - - - -
-+ project_count (number) - Total number of projects where the user has been granted a project level authorization role.
-+ file_count (integer) - Total number of files the user has created (i.e. uploaded) across all projects.
-+ storage_bytes (integer) - Total bytes for files the user has created (i.e. uploaded) across all projects.
++ **project_count (number)** - Total number of projects where the user has been granted a project level authorization role.
++ **file_count (integer)** - Total number of files the user has created (i.e. uploaded) across all projects.
++ **storage_bytes (integer)** - Total bytes for files the user has created (i.e. uploaded) across all projects.
 
 >**Rules**
 - - - - -
@@ -222,6 +423,47 @@ View summary usage for current user across all projects.
             "file_count": 126,
             "storage_bytes": 304006007009
         }
+
+## Current User Secret Key [/current_user/api_key]
+
+## Generate current user API key [PUT]
+Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents** actions).
+
+>**Permission:** authenticated
+- - - - -
+
+>**Response Properties**
+- - - - -
++ **key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
++ **created_on (datetime)** - The date the user key was generated.
+
+>**Rules**
+- - - - -
++ If the current user already has an API key, this action deletes their exisiting key and generates a new key.
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-01-01T12:00:00Z"
+        }
+
+## View current user API key [GET]
+>**Permission:** authenticated
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+            "created_on": "2015-01-01T12:00:00Z"
+        }
+
+## Delete current user API key [DELETE]
+>**Permission:** authenticated
+- - - - -
+
++ Response 204
 
 ## Group Users
 Represents registered users.
@@ -302,7 +544,11 @@ Represents system level authorization roles that have been granted to a user.
                         "username": "mrgardner01",
                         "full_name": "Matthew Gardner"
                     },
-                    "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
+                    "auth_role": {
+                        "id": "system_admin",
+                        "name": "System Admin",
+                        "description": "Can manage system level permissions and perform all operations across all projects"
+                    }
                 }
             ]
         }
@@ -321,7 +567,11 @@ Represents system level authorization roles that have been granted to a user.
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "system_admin", "name": "System Admin", "description": "Can manage system level permissions and perform all operations across all projects" }
+                "auth_role": {
+                    "id": "system_admin",
+                    "name": "System Admin",
+                    "description": "Can manage system level permissions and perform all operations across all projects"
+                }
             }
 
 ### Grant system permission [PUT]
@@ -330,13 +580,13 @@ Represents system level authorization roles that have been granted to a user.
 
 >**Rules**
 - - - - -
-+ Revokes (deletes) any existing system level authorization role for the user and grants new role.
-+ The role specified must be a system level authorization role (i.e. "system" in `auth_role.contexts`).
++ Revokes any existing system level authorization role for the user and grants the new role.
++ The role specified must be a system level authorization role (i.e. `system` in `auth_role.contexts`).
 
 + Request (application/json)
 
         {
-            "auth_role": { "id": "system_admin" }
+            "auth_role": {"id": "system_admin"}
         }
 
 + Response 200
@@ -369,7 +619,6 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + User who creates project is granted the `project_admin` authorization role.
-+ The `project.name` must be unique.
 
 + Request (application/json)
 
@@ -441,6 +690,10 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Permission:** update_project
 - - - - -
 
+>**Rules**
+- - - - -
++ Only `name` and `description` properties may be updated via this action.
+
 + Request (application/json)
 
         {
@@ -459,7 +712,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + Logically deletes project (i.e. sets `"is_deleted": true`).
-+ This operation recursively deletes (logical delete) all of the project children (folders and files).
++ This operation recursively deletes all of the project children (i.e. folders and files).
 
 + Response 204
 
@@ -479,13 +732,17 @@ Represents project level authorization roles that have been granted to a user.
         {
             "results": [
                 {
-                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                     "user": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "username": "mrgardner01",
                         "full_name": "Matthew Gardner"
                     },
-                    "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
+                    "auth_role": {
+                        "id": "file_editor",
+                        "name": "File Editor",
+                        "description": "Can view, download, create, update and delete files"
+                    }
                 }
             ]
         }
@@ -500,13 +757,17 @@ Represents project level authorization roles that have been granted to a user.
     + Body
 
              {
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": { "id": "file_editor", "name": "File Editor", "description": "Can view, download, create, update and delete files" }
+                "auth_role": {
+                    "id": "file_editor",
+                    "name": "File Editor",
+                    "description": "Can view, download, create, update and delete files"
+                }
             }
 
 ### Grant project permission [PUT]
@@ -515,15 +776,14 @@ Represents project level authorization roles that have been granted to a user.
 
 >**Rules**
 - - - - -
-+ Revokes (deletes) any existing project level authorization role for the user and grants new role.
-+ The role specified must be a project level authorization role (i.e. "project" in `auth_role.contexts`).
-+ The project must have at least one user with the `project_admin` role.
++ Revokes any existing project level authorization role for the user and grants the new role.
++ The role specified must be a project level authorization role (i.e. `project` in `auth_role.contexts`).
 + The current user cannot grant or revoke their own project level role.
 
 + Request (application/json)
 
         {
-            "auth_role": { "id": "file_editor" }
+            "auth_role": {"id": "file_editor"}
         }
 
 + Response 200
@@ -554,7 +814,7 @@ Represents an organizational role that an individual (i.e. user) may assume in t
 
 **Project Roles:**
 
-| Role | Name | Description |
+| role | name | description |
 |:-----|:-----|:------------|
 | **principal_investigator** | Principal Investigator | Lead investigator for the research project |
 | **research_coordinator** | Research Coordinator | Coordinator for the research project |
@@ -602,7 +862,7 @@ Represents an organizational role that an individual (i.e. user) may assume in t
         }
 
 ### Group Affiliates
-Represents an individual that plays some project level role of interest from a collaboration perspective.  The affiliate may be internal (i.e. a DDS user) or external (i.e. non-DDS user).  For the MVP, we will assume all affiliates must be a DDS user.
+Represents an individual that plays some project level role of interest from a collaboration perspective.  The affiliate must be a registered user.
 
 ## Affiliates collection [/projects/{id}/affiliates]
 + Parameters
@@ -617,13 +877,16 @@ Represents an individual that plays some project level role of interest from a c
         {
             "results": [
                 {
-                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                     "user": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "full_name": "Matthew Gardner",
                         "email": "mrgardner01@duke.edu"
                     },
-                    "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
+                    "project_role": {
+                        "id": "principal_investigator",
+                        "name": "Principal Investigator"
+                    }
                 }
             ]
         }
@@ -638,13 +901,16 @@ Represents an individual that plays some project level role of interest from a c
     + Body
 
             {
-                "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                 "user": {
                     "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                     "full_name": "Matthew Gardner",
                     "email": "mrgardner01@duke.edu"
                 },
-                "project_role": { "id": "principal_investigator", "name": "Principal Investigator" }
+                "project_role": {
+                    "id": "principal_investigator",
+                    "name": "Principal Investigator"
+                }
             }
 
 ### Associate affiliate [PUT]
@@ -658,7 +924,7 @@ Represents an individual that plays some project level role of interest from a c
 + Request (application/json)
 
         {
-            "project_role": { "id": "principal_investigator" }
+            "project_role": {"id": "principal_investigator"}
         }
 
 + Response 200
@@ -680,7 +946,7 @@ Represents an individual that plays some project level role of interest from a c
 + Response 204
 
 ## Group Storage Providers
-Represents an external service that provides physical storage space for DDS files.
+Represents an external service that provides physical storage space for files.
 
 ## Storage Providers collection [/storage_providers]
 
@@ -696,12 +962,14 @@ Represents an external service that provides physical storage space for DDS file
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
                     "name": "duke_oit_swift",
                     "description": "Duke OIT Storage",
+                    "chunk_hash_algorithm": "md5",
                     "is_deprecated": false
                 },
                 {
                     "id": "t4479f73-0774-4f96-afc7-9d251e65by88",
                     "name": "amazon_s3_glacier",
                     "description": "Amazon Glacier Cloud Storage",
+                    "chunk_hash_algorithm": "sha1",
                     "is_deprecated": false
                 }
             ]
@@ -722,6 +990,7 @@ Represents an external service that provides physical storage space for DDS file
             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
             "name": "duke_oit_swift",
             "description": "Duke Office of Information Technology Storage",
+            "chunk_hash_algorithm": "md5",
             "is_deprecated": false
         }
 
@@ -734,17 +1003,23 @@ A folder is a container for files and sub-folders; folders are located in the to
 >**Permission:** create_file
 - - - - -
 
->**Properties**
+>**Request Properties**
 - - - - -
-+ parent.kind (string, required) - The kind of parent container for the folder; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
-+ parent.id (string, required) - The unique id of the parent.
-+ name (string, required) - A short name for the folder.
-+ ancestors (array) - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
++ **parent.kind (string, required)** - The kind of parent container for the folder; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
++ **parent.id (string, required)** - The unique id of the parent.
++ **name (string, required)** - A short name for the folder.
+
+>**Response Properties**
+- - - - -
++ **ancestors (object[ ])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
 
 + Request (application/json)
 
         {
-            "parent": { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            },
             "name": "Raw Data"
         }
 
@@ -753,12 +1028,23 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
             "name": "Raw Data",
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
             ],
             "is_deleted": false,
             "audit": { }
@@ -777,12 +1063,23 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
             "name": "Raw Data",
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
             ],
             "is_deleted": false,
             "audit": { }
@@ -795,7 +1092,7 @@ A folder is a container for files and sub-folders; folders are located in the to
 >**Rules**
 - - - - -
 + Logically deletes folder (i.e. sets `"is_deleted": true`).
-+ This operation recursively deletes (logical delete) all of the folder children (folders and files).
++ This operation recursively deletes all of the folder children (i.e. folders and files).
 
 + Response 204
 
@@ -805,7 +1102,7 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Rules**
 - - - - -
-+ Folders can only be moved within the context of the current project - cross project moves are currently not supported.
++ Folders can only be moved within the context of the folders current project.
 + The destination folder cannot be a child of the folder being moved.
 
 + Parameters
@@ -814,7 +1111,10 @@ A folder is a container for files and sub-folders; folders are located in the to
 + Request (application/json)
 
         {
-            "parent": { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" }
+            "parent": {
+                "kind": "dds-folder",
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            }
         }
 
 + Response 200 (application/json)
@@ -822,12 +1122,23 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            },
             "name": "Raw Data",
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc", "name": "Flow Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc",
+                    "name": "Flow Core"
+                }
             ],
             "is_deleted": false,
             "audit": { }
@@ -851,43 +1162,58 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            },
             "name": "Model Data",
-            "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc", "name": "Flow Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc",
+                    "name": "Flow Core"
+                }
             ],
             "is_deleted": false,
             "audit": { }
         }
 
 ## Group Uploads
-All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following endpoints must be used by the client to manage the chunked upload process.
+All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following actions must be used by the client to manage the chunked upload process.
 
 ## Uploads collection [/projects/{id}/uploads]
 + Parameters
     + id (required, string, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... Globally unique `id` of the project.
 
 ### Initiate chunked upload [POST]
-This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client to track the progress of the chunked upload.
+This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.
 
 >**Permission:** create_file
 - - - - -
 
 >**Request Properties**
 - - - - -
-+ name (string, required) - The name of the client file to upload.
-+ content_type (string, optional) - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
-+ size (number, required) - The size in bytes (computed by client).
-+ hash.value (number, required) - The files hash (computed by client).
-+ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by the target storage provider.
++ **name (string, required)** - The name of the client file to upload.
++ **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
++ **size (number, required)** - The size in bytes of entire file (computed by client).
++ **hash.value (number, required)** - The entire file hash (computed by client).
++ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.) - only `sha1` is currently supported.
 
 >**Response Properties**
 - - - - -
-+ chunks (object) - The chunks the client has requested to upload.
-+ storage_location (object) - Object that contains physical file storage details.
-+ status (object) - Object used to track status of overall file upload.
++ **chunks (object)** - The chunks the client has requested to upload.
++ **storage_location (object)** - Object that contains target storage details.
++ **status (object)** - Object used to track status of overall file upload.
+
+>**Rules**
+- - - - -
++ The client reported hash of the entire file must be a `sha1`.  A server agent will compute the `sha1` as a background task.  If there is a hash discrepancyt between client reported and server reported - the upload owner (i.e. creator) will be notified.
 
 + Request (application/json)
 
@@ -895,20 +1221,35 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1"
+            }
         }
 
 + Response 201 (application/json)
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1",
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "server_reported": null
+            },
             "chunks": [ ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                "name": "duke_oit_swift", "description":
+                "Duke OIT Storage"
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -928,13 +1269,24 @@ This is the first step in uploading a large file. An upload objects is created a
             "results": [
                 {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
-                    "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+                    "hash": {
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                        "algorithm": "sha1",
+                        "client_reported": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "sha1"
+                        },
+                        "server_reported": null
+                    },
                     "chunks": [ ],
-                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+                    "storage_provider": {
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                        "name": "duke_oit_swift",
+                        "description": "Duke OIT Storage"
+                    },
                     "status": {
                         "initiated_on": "2015-07-10T13:00:00Z",
                         "completed_on": null,
@@ -951,7 +1303,6 @@ This is the first step in uploading a large file. An upload objects is created a
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
 ## View chunked upload [GET]
-
 >**Permission:** create_file
 - - - - -
 
@@ -959,19 +1310,35 @@ This is the first step in uploading a large file. An upload objects is created a
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": false },
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1",
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "server_reported": null
+            },
             "chunks": [
-              {
-                "number": 1,
-                "size": 10000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" }
-              }
+                {
+                    "number": 1,
+                    "size": 10000,
+                    "hash": {
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                        "algorithm": "md5"
+                    }
+                }
             ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                "name": "duke_oit_swift",
+                "description":
+                "Duke OIT Storage"
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": null,
@@ -982,24 +1349,24 @@ This is the first step in uploading a large file. An upload objects is created a
         }
 
 ## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
-Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this endpoint again to get a new pre-signed URL for the chunk number, then retry the upload.
+Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
 
 >**Permission:** create_file
 - - - - -
 
 >**Request Properties**
 - - - - -
-+ number (number, required) - The chunk number.
-+ size (number, required) - The size of the chunk in bytes (computed by client)
-+ hash.value (string, required) - The chunk hash (computed by client).
-+ hash.algorithm (string, required) - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - this must be the default algorithm supported by storage provider.
++ **number (number, required)** - The chunk number.
++ **size (number, required)** - The size of the chunk in bytes (computed by client).
++ **hash.value (string, required)** - The chunk hash (computed by client).
++ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.); this must be the default algorithm (i.e. `chunk_hash_algorithm`) supported by storage provider (see **Storage Providers** actions)
 
 >**Response Properties**
 - - - - -
-+ http_verb (string) - The http verb to use for uploading the next chunk.
-+ host (string) - The storage provider host.
-+ url (string) - The signed URL endpoint for uploading the next chunk to the storage provider.
-+ http_headers (array) - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
++ **http_verb (string)** - The http verb to use for uploading the next chunk.
++ **host (string)** - The storage provider host.
++ **url (string)** - The pre-signed URL for uploading the chunk to the storage provider.
++ **http_headers (object[ ])** - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -1009,7 +1376,10 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
         {
             "number": 1,
             "size": 5024000,
-            "hash": { "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", "algorithm": "md5" }
+            "hash": {
+                "value": "ey23df2207d99a74fbe169e3eba035e633b65d76",
+                "algorithm": "md5"
+            }
         }
 
 + Response 200 (application/json)
@@ -1019,7 +1389,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             "host": "duke_data_service_prod.s3.amazonaws.com",
             "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&uploadId=EXAMPLEJZ6e0YupT2...&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
             "http_headers": [
-                    { "Content-Length": "5024000" }
+                { "Content-Length": "5024000" }
             ]
         }
 
@@ -1031,10 +1401,10 @@ This operation is called by the client after all file chunks have been successfu
 
 >**Rules**
 - - - - -
-+ If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider endpoint to assemble the parts into a single file object.
-+ The client reported file hash for each chunk must equal the storage provider computed file hash for the same chunk, or an upload error is reported.
++ If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider actions to assemble the parts into a single file object.
++ The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.
 + The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
-+ If there are no errors, the `upload_status.complete_on` is set to the current timestamp.
++ If there are no errors, the `upload_status.completed_on` is set to the current timestamp.
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -1043,24 +1413,42 @@ This operation is called by the client after all file chunks have been successfu
 
         {
             "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5", "client_reported": true, "confirmed": true },
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1",
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "server_reported": null
+            },
             "chunks": [
                 {
                     "number": 1,
                     "size": 5024000,
-                    "hash": { "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", "algorithm": "md5" }
+                    "hash": {
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88",
+                        "algorithm": "md5"
+                    }
                 },
                 {
                     "number": 2,
                     "size": 5024000,
-                    "hash": { "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", "algorithm": "md5" }
+                    "hash": {
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq",
+                        "algorithm": "md5"
+                    }
                 }
             ],
-            "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" },
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                "name": "duke_oit_swift",
+                "description": "Duke OIT Storage"
+            },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
                 "completed_on": "2015-07-10T13:00:00Z",
@@ -1070,34 +1458,161 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
+## Report server computed hash [PUT /uploads/{id}/server_hash]
+This action is called by a hash computation agent, run as a background task, that computes a `sha1` hash for completed file uploads.
+
+>**Permission:** system_admin
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **hash.value (string, required)** - The entire file hash (computed by agent).
++ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - only `sha1` is currenlty supported/computed.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Request (application/json)
+
+        {
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1"
+            }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "sha1",
+                "client_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "server_reported": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                }
+            },
+            "chunks": [
+                {
+                    "number": 1,
+                    "size": 5024000,
+                    "hash": {
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88",
+                        "algorithm": "md5"
+                    }
+                },
+                {
+                    "number": 2,
+                    "size": 5024000,
+                    "hash": {
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq",
+                        "algorithm": "md5"
+                    }
+                }
+            ],
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                "name": "duke_oit_swift",
+                "description": "Duke OIT Storage"
+            },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": "2015-07-10T13:00:00Z",
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
+## Group Search Uploads
+Represents actions for searching uploads across projects.
+
+## Search uploads [GET /uploads{?server_hash_pending}]
+Search for project uploads; this action will facilitate finding uploads that are the target of background jobs/tasks (e.g. hash computation, etc.).
+
+>**Permission:** system_admin
+- - - - -
+
++ Parameters
+    + server_hash_pending (boolean, optional, `true`) ... If true specified, returns only completed uploads (`status.completed_on is not null`) that have not had their server hash computed (`hash.server_reported is null`).
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "content_type": "application/octet-stream",
+                    "hash": {
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                        "algorithm": "sha1",
+                        "client_reported": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "sha1"
+                        },
+                        "server_reported": null
+                    },
+                    "chunks": [ ],
+                    "storage_provider": {
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                        "name": "duke_oit_swift",
+                        "description": "Duke OIT Storage"
+                    },
+                    "status": {
+                        "initiated_on": "2015-07-10T13:00:00Z",
+                        "completed_on": null,
+                        "error_on": null,
+                        "error_message": null
+                    },
+                    "audit": { }
+                }
+            ]
+        }
+
 ## Group Files
-A research data file; a file resource represents the descriptive metadata about a physical data file.
+A file resource represents a virtual container for a pyhsical data file (i.e. `upload`) that is located in a storage backend supported by Duke Data Services (i.e. Duke OIT Swift).
 
 ## Files collection [/files]
 
 ### Create file [POST]
-Creates a file metadata object; The client is responsible for the creation of this object after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads`).
+Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads` actions).
 
 >**Permission:** create_file
 - - - - -
 
 >**Properties**
 - - - - -
-+ parent.kind (string, required) - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
-+ parent.id (string, required) - The unique id of the parent.
-+ upload.id (string, required) - The unique id for an upload that completed successfully.
++ **parent.kind (string, required)** - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
++ **parent.id (string, required)** - The unique id of the parent.
++ **upload.id (string, required)** - The unique id for an upload that completed successfully.
++ **label (string, optional)** - An optional short display label for the file.
 
 >**Rules**
 - - - - -
 + The current user must be the user who uploaded the file.
-+ The parent object (`dds-project` or `dds-folder`) must be associated with the same project that the upload object is associated with.
++ The parent object (`dds-project` or `dds-folder`) must be associated with the same project that the upload is associated with.
 + The upload must be in a completed state (i.e. `upload.completed_on != null`).
 
 + Request (application/json)
 
         {
-            "parent": { "kind": "dds-folder", "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" },
-            "upload": { "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23" }
+            "parent": {
+                "kind": "dds-folder",
+                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1"
+            },
+            "upload": {"id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"},
+            "label": "Initial raw data from device"
         }
 
 + Response 201 (application/json)
@@ -1105,20 +1620,38 @@ Creates a file metadata object; The client is responsible for the creation of th
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
             ],
+            "label": "Initial raw data from device",
             "is_deleted": false,
             "upload": {
-                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
                 },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage"
+                }
+            },
             "audit": { }
         }
 
@@ -1135,20 +1668,107 @@ Creates a file metadata object; The client is responsible for the creation of th
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
             ],
+            "label": "Initial raw data from device",
             "is_deleted": false,
             "upload": {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                     "size": 30024000,
-                    "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                    "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                    "hash": {
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                        "algorithm": "sha1"
+                    },
+                    "storage_provider": {
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                        "name": "duke_oit_swift",
+                        "description": "Duke OIT Storage"
+                    }
                 },
+            "audit": { }
+        }
+
+## Update file [PUT]
+Updates one or more file resource properties; if this action modifies the `upload` property, the previous file resource is transitioned to version history (see **File Versions**).
+
+*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+
+>**Permission:** update_file
+- - - - -
+
+>**Properties**
+- - - - -
++ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully.
++ **label (string, optional)** - An optional short display label for the file.
+
+>**Rules**
+- - - - -
++ The current user must be the user who uploaded the file.
++ The upload must be in a completed state (i.e. `upload.completed_on != null`).
++ Only `upload.id`, `label` properties can be updated via this action.
++ Prior versions are assigned the next sequential `version` number. (see **File Versions**)
+
++ Request (application/json)
+
+        {
+            "upload": {"id": "422f8778-a62c-4918-8b1b-f398a041345a"},
+            "label": "Post pairwise sequence alignment"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file",
+            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+            "parent": {
+                "kind": "dds-folder",
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            },
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "ancestors": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                    "name": "Sequencing Archive"
+                }
+            ],
+            "label": "Post pairwise sequence alignment",
+            "is_deleted": false,
+            "upload": {
+                "id": "422f8778-a62c-4918-8b1b-f398a041345a",
+                "size": 30024038,
+                "hash": {
+                    "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt",
+                    "algorithm": "sha1"
+                },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift", "description":
+                    "Duke OIT Storage"
+                }
+            },
             "audit": { }
         }
 
@@ -1162,7 +1782,7 @@ Creates a file metadata object; The client is responsible for the creation of th
 
 + Response 204
 
-## Get pre-signed download URL [GET /files/{id}/url]
+## Get file download URL [GET /files/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download file.
 
 >**Permission:** download_file
@@ -1186,7 +1806,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
 
 >**Rules**
 - - - - -
-+ Files can only be moved within the context of the current project - cross project moves are currently not supported.
++ Files can only be moved within the context of the files current project.
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -1194,7 +1814,10 @@ Generates and returns a storage provider specific pre-signed URL that client can
 + Request (application/json)
 
         {
-            "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" }
+            "parent": {
+                "kind": "dds-folder",
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            }
         }
 
 + Response 200 (application/json)
@@ -1202,19 +1825,37 @@ Generates and returns a storage provider specific pre-signed URL that client can
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                    "name": "Sequencing Archive"
+                }
             ],
             "is_deleted": false,
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                "hash": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage"
+                }
             },
             "audit": { }
         }
@@ -1238,27 +1879,193 @@ Generates and returns a storage provider specific pre-signed URL that client can
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+            "parent": {
+                "kind": "dds-folder",
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
             "ancestors": [
-                { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                    "name": "Sequencing Archive"
+                }
             ],
             "is_deleted": false,
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                "hash": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage"
+                }
             },
             "audit": { }
         }
 
-## Group Search Project/Folder Children
+## Group File Versions
+The actions herein are used to interact with prior versions of a file resource.
+
+*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+
+## File Versions collection [/files/{id}/versions]
++ Parameters
+    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
+
+## List file versions [GET]
+If there are previous versions of a file, this action can be used to retrieve information about the older versions.
+
+>**Permission:** view_project
+- - - - -
+
+>**Rules**
+- - - - -
++ File versions that have been deleted (i.e. `"is_deleted": true`) are included in this listing, but are immutable.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-file-version",
+                    "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                    "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
+                    "version": 1,
+                    "label": "Initial raw data from device",
+                    "is_deleted": false,
+                    "upload": {
+                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                        "size": 30024000,
+                        "hash": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "sha1"
+                        },
+                        "storage_provider": {
+                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                            "name": "duke_oit_swift",
+                            "description": "Duke OIT Storage"
+                        }
+                    },
+                    "audit": { }
+                }
+            ]
+        }
+
+## File Version instance [/file_versions/{id}]
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
+
+## View file version [GET]
+**Permissions** view_project
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+            "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
+            "version": 1,
+            "label": "Initial raw data from device",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage"
+                }
+            },
+            "audit": { }
+        }
+
+## Update file version [POST]
+**Permission:** update_file
+- - - - -
+
+>**Rules**
+- - - - -
++ Only the `label` property for a file version can be updated via this action.
+
++ Request (application/json)
+
+        {
+            "label": "Post pairwise sequence alignment (piecewise)"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+            "file": {"id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"},
+            "version": 1,
+            "label": "Post pairwise sequence alignment (piecewise)",
+            "is_deleted": false,
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                "size": 30024000,
+                "hash": {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "sha1"
+                },
+                "storage_provider": {
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                    "name": "duke_oit_swift",
+                    "description": "Duke OIT Storage"
+                }
+            },
+            "audit": { }
+        }
+
+### Delete file version [DELETE]
+>**Permission:** delete_file
+- - - - -
+
+>**Rules**
+- - - - -
++ Logically deletes file version (i.e. sets `"is_deleted": true`).
+
++ Response 204
+
+## Get file version download URL [GET /file_versions/{id}/url]
+Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
+
+>**Permission:** download_file
+- - - - -
+
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
+
++ Response 200 (application/json)
+
+        {
+            "http_verb": "GET",
+            "host": "swift.oit.duke.edu",
+            "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
+            "http_headers": []
+        }
+
+## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
-## Search Project Children [GET /projects/{id}/children{?name_contains,kind}]
+## Search project children [GET /projects/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -1280,12 +2087,23 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-folder",
                     "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                    "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+                    },
                     "name": "Raw Data",
-                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                     "ancestors": [
-                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                        { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                            "name": "Sequencing Core"
+                        }
                     ],
                     "is_deleted": false,
                     "audit": { }
@@ -1293,26 +2111,45 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+                    },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "ancestors": [
-                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                        { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                            "name": "Sequencing Archive"
+                        }
                     ],
+                    "label": "Initial raw data from device",
                     "is_deleted": false,
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                         "size": 30024000,
-                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                        "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                        "hash": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "sha1"
+                        },
+                        "storage_provider": {
+                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                            "name": "duke_oit_swift",
+                            "description": "Duke OIT Storage"
+                        }
                     },
                     "audit": { }
                 }
             ]
         }
 
-## Search Folder Children [GET /folders/{id}/children{?name_contains,kind}]
+## Search folder children [GET /folders/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -1334,12 +2171,23 @@ Search for the children (i.e. folders and files) of a project or folder.
                  {
                     "kind": "dds-folder",
                     "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                    "parent": { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" },
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+                    },
                     "name": "Raw Data",
-                    "project": { "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1" },
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
                     "ancestors": [
-                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                        { "kind": "dds-folder", "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", "name": "Sequencing Core" }
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                            "name": "Sequencing Core"
+                        }
                     ],
                     "is_deleted": false,
                     "audit": { }
@@ -1347,21 +2195,163 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "parent": { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" },
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+                    },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": { "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a" },
+                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "ancestors": [
-                        { "kind": "dds-project", "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" },
-                        { "kind": "dds-folder", "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", "name": "Sequencing Archive" }
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                            "name": "Sequencing Archive"
+                        }
                     ],
+                    "label": "Initial raw data from device",
                     "is_deleted": false,
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                         "size": 30024000,
-                        "hash": { "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", "algorithm": "md5" },
-                        "storage_provider": { "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", "name": "duke_oit_swift", "description": "Duke OIT Storage" }
+                        "hash": {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "sha1"
+                        },
+                        "storage_provider": {
+                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                            "name": "duke_oit_swift",
+                            "description": "Duke OIT Storage"
+                        }
                     },
                     "audit": { }
                 }
             ]
         }
+
+## Group Activities
+Represents the main record of provenance in DDS; it is analogous to *Activity* defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Activities are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
+
+*Note: Provenance relations to an activity, such as `Used` and `WasGeneratedBy` are managed through the `Relations` API actions.*
+
+## Activities collection [/activities]
+
+### Create activity [POST]
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **name (string, required)** - A short name for this activity.
++ **description (string, optional)** - A verbose description for this activity.
++ **started_on (string, optional)** - The time this activity was started; defaults to the current datetime if not specified.
++ **ended_on (string, optional)** - The time this activity ended.
+
+>**Rules**
+- - - - -
++ The `ended_on` time must be greater than or equal to the `started_on` time.
+
++ Request (application/json)
+
+        {
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### List activities [GET]
+>**Permission:**
+- - - - -
++ creator *or* visiblity (i.e. `view_project`) to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
+
+>**Rules**
+- - - - -
++ Activities that have been deleted (i.e. `"is_deleted": true`) are not included.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-activity",
+                    "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                    "name": "RF PI3-Kinase",
+                    "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                    "started_on": "2015-01-01T12:00:00Z",
+                    "ended_on": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Activities instance [/activities/{id}]
++ Parameters
+    + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
+
+### View activity [GET]
+>**Permission:**
+- - - - -
++ creator *or* visiblity (i.e. `view_project`) to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Update activity [PUT]
+>**Permission:** creator
+- - - - -
+
+>**Rules**
+- - - - -
++ Only `name`, `description`, `started_on`, and `updated_on` properties may be updated via this action.
+
++ Request (application/json)
+
+        {
+            "ended_on": "2015-01-01T114:30:00"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-activity",
+            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+            "name": "RF PI3-Kinase",
+            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "started_on": "2015-01-01T12:00:00Z",
+            "ended_on": "2015-01-01T114:30:00Z",
+            "is_deleted": false,
+            "audit": { }
+        }
+
+### Delete activity [DELETE]
+>**Permission:** creator
+- - - - -
+
++ Response 204
