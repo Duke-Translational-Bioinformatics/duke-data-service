@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe ProjectSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:project) }
-  let(:is_logically_deleted) { true }
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
@@ -15,6 +14,5 @@ RSpec.describe ProjectSerializer, type: :serializer do
       expect(subject['description']).to eq(resource.description)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
-    it_behaves_like 'a serializer with a serialized audit'
   end
 end

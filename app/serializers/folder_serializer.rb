@@ -1,5 +1,4 @@
 class FolderSerializer < ActiveModel::Serializer
-  include AuditSummarySerializer
   attributes :kind, :id, :parent, :name, :is_deleted, :audit
 
   has_one :project, serializer: ProjectPreviewSerializer

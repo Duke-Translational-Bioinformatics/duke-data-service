@@ -3,8 +3,8 @@ var shortid = require('shortid32');
 var _ = require('underscore');
 var tools = require('./tools');
 
-var SEARCH_PROJECT_CHILDREN = "Search Children > Search project children > Search project children";
-var SEARCH_FOLDER_CHILDREN = "Search Children > Search folder children > Search folder children";
+var SEARCH_PROJECT_CHILDREN = "Search Project/Folder Children > Search Project Children > Search Project Children";
+var SEARCH_FOLDER_CHILDREN = "Search Project/Folder Children > Search Folder Children > Search Folder Children";
 
 hooks.before(SEARCH_PROJECT_CHILDREN, function (transaction, done) {
   //first create a project

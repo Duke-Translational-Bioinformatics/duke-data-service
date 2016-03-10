@@ -9,32 +9,10 @@ end
 
 shared_context 'with authentication' do
   include_context 'common headers'
-  let(:user_auth) {
-    FactoryGirl.create(:user_authentication_service, :populated)
-  }
+  let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:current_user) { user_auth.user }
-  let(:api_token) {
-    ApiToken.new(user: current_user, user_authentication_service: user_auth).api_token
-  }
+  let(:api_token) { user_auth.api_token }
   let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
-end
-
-shared_context 'with software_agent authentication' do
-  include_context 'common headers'
-  let(:current_user) {
-    FactoryGirl.create(:user, :with_key)
-  }
-  let (:software_agent) {
-    FactoryGirl.create(:software_agent, :with_key, creator: current_user)
-  }
-  let(:api_token) {
-    ApiToken.new(user: current_user, software_agent: software_agent).api_token
-  }
-  let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
-  let(:audit_should_include) {{
-    user: current_user,
-    software_agent: software_agent
-  }}
 end
 
 shared_examples 'a listable resource' do
@@ -187,39 +165,6 @@ shared_examples 'a creatable resource' do
   end
 end
 
-shared_examples 'a regeneratable resource' do
-  before do
-    expect(resource).to be_persisted
-  end
-  let (:new_resource) {
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key(changed_key.to_s)
-    resource_class.where(changed_key => response_json[changed_key.to_s]).take
-  }
-  let (:changed_key) { :id }
-
-  it 'should return success' do
-    is_expected.to eq(200)
-    expect(response.status).to eq(200)
-    expect(response.body).to be
-    expect(response.body).not_to eq('null')
-  end
-
-  it 'should destroy original resource and create a new one' do
-    expect {
-      is_expected.to eq(200)
-    }.not_to change{resource_class.count}
-    expect(resource_class.where(changed_key => resource.send(changed_key))).not_to exist
-    expect(new_resource).to be
-    expect(resource.send(changed_key)).not_to eq(new_resource.send(changed_key))
-  end
-
-  it 'should return a serialized resource' do
-    is_expected.to eq(200)
-    expect(response.body).to include(resource_serializer.new(new_resource).to_json)
-  end
-end
-
 shared_examples 'a viewable resource' do
   it 'should return a serialized resource' do
     is_expected.to eq(200)
@@ -355,22 +300,5 @@ shared_examples 'a logically deleted resource' do
     expect(response_json['reason']).to eq("#{deleted_resource.class.name} Not Found")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq("you may have mistyped the #{deleted_resource.class.name} id")
-  end
-end
-
-shared_examples 'a software_agent accessible resource' do
-  include_context 'with software_agent authentication'
-  let(:expected_response_status) {200}
-  it 'should return success' do
-    is_expected.to eq(expected_response_status)
-    expect(response.status).to eq(expected_response_status)
-  end
-end
-
-shared_examples 'a software_agent restricted resource' do
-  include_context 'with software_agent authentication'
-  it 'should return forbidden' do
-    is_expected.to eq(403)
-    expect(response.status).to eq(403)
   end
 end

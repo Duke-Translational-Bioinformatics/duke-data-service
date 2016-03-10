@@ -1,23 +1,19 @@
 class ProjectPermissionPolicy < ApplicationPolicy
   def create?
-    permission
+    permission.exists?
   end
 
   def update?
-    permission && record.user != user
+    permission.exists? && record.user != user
   end
 
   def destroy?
-    permission && record.user != user
+    permission.exists? && record.user != user
   end
 
   class Scope < Scope
     def resolve
-      if user.system_permission
-        scope
-      else
-        scope.joins(project_permissions: :user).where(users: {id: user.id})
-      end
+      scope.joins(project_permissions: :user).where(users: {id: user.id})
     end
   end
 end

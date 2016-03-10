@@ -2,8 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Affiliation, type: :model do
   subject { FactoryGirl.build(:affiliation) }
+  let(:is_logically_deleted) { false }
 
   it_behaves_like 'an audited model'
+
   describe 'associations' do
     it 'should belong_to a project' do
       should belong_to(:project)

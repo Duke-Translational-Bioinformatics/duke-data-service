@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
   subject { child_file }
+  let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid) }
@@ -11,7 +12,10 @@ RSpec.describe DataFile, type: :model do
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
   let(:uri_encoded_name) { URI.encode(subject.name) }
 
-  it_behaves_like 'an audited model'
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
+
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file' }
   end

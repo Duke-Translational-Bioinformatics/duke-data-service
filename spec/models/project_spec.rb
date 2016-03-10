@@ -2,10 +2,14 @@ require 'rails_helper'
 
 RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
+  let(:is_logically_deleted) { true }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
 
-  it_behaves_like 'an audited model'
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
+
   it_behaves_like 'a kind'
 
   describe 'associations' do

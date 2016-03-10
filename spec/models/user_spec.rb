@@ -4,8 +4,12 @@ require 'jwt'
 RSpec.describe User, type: :model do
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   subject { user_authentication_service.user }
+  let(:is_logically_deleted) { false }
 
-  it_behaves_like 'an audited model'
+  it_behaves_like 'an audited model' do
+    it_behaves_like 'with a serialized audit'
+  end
+
   it 'should have an audited_user_info method to return the information required by audit _by methods' do
     should respond_to('audited_user_info')
     audited_user_info = subject.audited_user_info
@@ -16,18 +20,6 @@ RSpec.describe User, type: :model do
     expect(audited_user_info[:id]).to eq(subject.id)
     expect(audited_user_info[:username]).to eq(subject.username)
     expect(audited_user_info[:full_name]).to eq(subject.display_name)
-  end
-
-  context 'current_software_agent attribute' do
-    let (:software_agent) {
-      FactoryGirl.create(:software_agent, :with_key, creator: subject)
-    }
-
-    it 'should be an accessor' do
-      should respond_to('current_software_agent')
-      subject.current_software_agent = software_agent
-      expect(subject.current_software_agent.id).to eq(software_agent.id)
-    end
   end
 
   describe 'associations' do
@@ -59,10 +51,6 @@ RSpec.describe User, type: :model do
 
     it 'should have one system_permission' do
       should have_one(:system_permission)
-    end
-
-    it 'should have one api_key' do
-      should have_one(:api_key)
     end
   end
 

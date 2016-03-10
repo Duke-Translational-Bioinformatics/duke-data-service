@@ -2,8 +2,8 @@ require 'jwt'
 
 class User < ActiveRecord::Base
   default_scope { order('created_at DESC') }
+  include SerializedAudit
   audited except: :last_login_at
-  attr_accessor :current_software_agent
 
   has_many :user_authentication_services
   accepts_nested_attributes_for :user_authentication_services
@@ -23,7 +23,6 @@ class User < ActiveRecord::Base
   has_many :uploads, through: :created_files
   has_many :affiliations
   has_one :system_permission
-  has_one :api_key
   has_one :auth_role, through: :system_permission
 
   validates :username, presence: true, uniqueness: true

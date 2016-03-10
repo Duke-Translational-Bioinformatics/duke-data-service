@@ -1,25 +1,31 @@
 class DataFilePolicy < ApplicationPolicy
   def download?
-    permission
+    permission.exists?
   end
 
   def move?
-    permission
+    permission.exists?
   end
 
   def rename?
-    permission
+    permission.exists?
   end
 
   def create?
-    permission
+    permission.exists?
   end
 
   def update?
-    permission
+    permission.exists?
   end
 
   def destroy?
-    permission
+    permission.exists?
+  end
+
+  class Scope < Scope
+    def resolve
+      scope.joins(:project_permissions).where(project_permissions: {user: user})
+    end
   end
 end
