@@ -1,24 +1,32 @@
 class SoftwareAgentPolicy < ApplicationPolicy
   def create?
-    true
+    no_agents && true
   end
 
   def update?
-    record.creator == user || user.system_permission
+    no_agents && (record.creator == user || system_permission)
   end
 
   def show?
-    true
+    no_agents && true
   end
 
-
   def destroy?
-    record.creator == user || user.system_permission
+    no_agents && (record.creator == user || system_permission)
   end
 
   class Scope < Scope
     def resolve
-      scope
+      if user.current_software_agent
+        scope.none
+      else
+        scope
+      end
     end
+  end
+
+  private
+  def no_agents
+    return !user.current_software_agent
   end
 end

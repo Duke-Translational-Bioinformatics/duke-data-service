@@ -43,7 +43,6 @@ module DDS
           unless permission.auth_role
             raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
           end
-          permission.audit_comment = {action: request.env["REQUEST_URI"]}
           authorize permission, :create?
           if permission.save
             annotate_audits [permission.audits.last, project.audits.last]

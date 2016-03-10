@@ -193,6 +193,8 @@ describe DDS::V1::ChildrenAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
         let(:parent_id) { 'notfoundid' }
@@ -363,6 +365,8 @@ describe DDS::V1::ChildrenAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
         let(:parent_id) { 'notfoundid' }

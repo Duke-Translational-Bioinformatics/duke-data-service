@@ -9,10 +9,32 @@ end
 
 shared_context 'with authentication' do
   include_context 'common headers'
-  let(:user_auth) { FactoryGirl.create(:user_authentication_service, :populated) }
+  let(:user_auth) {
+    FactoryGirl.create(:user_authentication_service, :populated)
+  }
   let(:current_user) { user_auth.user }
-  let(:api_token) { user_auth.api_token }
+  let(:api_token) {
+    ApiToken.new(user: current_user, user_authentication_service: user_auth).api_token
+  }
   let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
+end
+
+shared_context 'with software_agent authentication' do
+  include_context 'common headers'
+  let(:current_user) {
+    FactoryGirl.create(:user, :with_key)
+  }
+  let (:software_agent) {
+    FactoryGirl.create(:software_agent, :with_key, creator: current_user)
+  }
+  let(:api_token) {
+    ApiToken.new(user: current_user, software_agent: software_agent).api_token
+  }
+  let(:headers) {{'Authorization' => api_token}.merge(common_headers)}
+  let(:audit_should_include) {{
+    user: current_user,
+    software_agent: software_agent
+  }}
 end
 
 shared_examples 'a listable resource' do
@@ -333,5 +355,22 @@ shared_examples 'a logically deleted resource' do
     expect(response_json['reason']).to eq("#{deleted_resource.class.name} Not Found")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq("you may have mistyped the #{deleted_resource.class.name} id")
+  end
+end
+
+shared_examples 'a software_agent accessible resource' do
+  include_context 'with software_agent authentication'
+  let(:expected_response_status) {200}
+  it 'should return success' do
+    is_expected.to eq(expected_response_status)
+    expect(response.status).to eq(expected_response_status)
+  end
+end
+
+shared_examples 'a software_agent restricted resource' do
+  include_context 'with software_agent authentication'
+  it 'should return forbidden' do
+    is_expected.to eq(403)
+    expect(response.status).to eq(403)
   end
 end

@@ -32,22 +32,65 @@ module DDS
         named 'manage current_user api_key'
         failure [
           [201, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"]
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [403, 'Forbidden (software_agent restricted)']
         ]
       end
       put '/current_user/api_key', serializer: ApiKeySerializer do
         authenticate!
         Audited.audit_class.as_user(current_user) do
           ApiKey.transaction do
+            audits_to_annotate = []
             if current_user.api_key
+              authorize current_user.api_key, :update?
+              original_api_key_id = current_user.api_key.id
               current_user.api_key.destroy!
+              audits_to_annotate << Audited.audit_class.where(auditable_id: original_api_key_id).last
             end
             current_user.build_api_key(key: SecureRandom.hex)
+            authorize current_user.api_key, :create?
             current_user.save
-            annotate_audits [current_user.api_key.audits.last]
+            audits_to_annotate << current_user.api_key.audits.last
+            annotate_audits audits_to_annotate
           end
         end
         current_user.api_key
+      end
+
+      desc 'View Current User API key' do
+        detail 'View current_user api_key.'
+        named 'view current_user api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restricted)'],
+          [404, 'Current User Does not Exist']
+        ]
+      end
+      get '/current_user/api_key', serializer: ApiKeySerializer do
+        authenticate!
+        authorize current_user.api_key, :show?
+        current_user.api_key
+      end
+
+      desc 'Delete a Current User API key' do
+        detail 'Delete a Current User API key'
+        named 'delete current_user api_key'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restricted)'],
+          [404, 'Current User Does not Exist']
+        ]
+      end
+      delete '/current_user/api_key', root: false do
+        authenticate!
+        authorize current_user.api_key, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          current_user.api_key.destroy!
+          annotate_audits [current_user.api_key.audits.last]
+        end
+        body false
       end
     end
   end
