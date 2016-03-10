@@ -26,7 +26,8 @@ RUN ["mkdir","-p","/var/www"]
 WORKDIR /var/www
 RUN git clone https://github.com/Duke-Translational-Bioinformatics/duke-data-service.git app
 WORKDIR /var/www/app
-RUN git checkout develop
+ARG GIT_BRANCH=develop
+RUN git checkout ${GIT_BRANCH}
 ADD Gemfile /var/www/app/Gemfile
 ADD Gemfile.lock /var/www/app/Gemfile.lock
 RUN ["bundle", "config", "build.nokogiri", "--use-system-libraries"]
