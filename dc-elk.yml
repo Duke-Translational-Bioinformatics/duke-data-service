@@ -1,12 +1,17 @@
-server:
-  log_driver: gelf
-  log_opt:
-      gelf-address: "udp://192.168.99.100:12201"
-db:
-  log_driver: gelf
-  log_opt:
-      gelf-address: "udp://192.168.99.100:12201"
-swift:
-  log_driver: gelf
-  log_opt:
-      gelf-address: "udp://192.168.99.100:12201"
+version: '2'
+services:
+  server:
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.99.100:12201"
+  db:
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.99.100:12201"
+  swift:
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://192.168.99.100:12201"

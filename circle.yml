@@ -26,6 +26,7 @@ dependencies:
 test:
  post:
   #- './workflow/workflow.circle.sh'
+  - git checkout -- config/database.yml
   - 'docker-compose run dredd'
 
 deployment:
