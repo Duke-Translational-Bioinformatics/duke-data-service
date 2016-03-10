@@ -28,32 +28,4 @@ RSpec.describe UserAuthenticationService, type: :model do
             .scoped_to(:authentication_service_id)
             .with_message('your uid is not unique in the authentication service')
   end
-
-  describe 'api_token' do
-    let(:authentication_service) {
-      a = FactoryGirl.create(:authentication_service)
-      FactoryGirl.create(:user_authentication_service,
-        authentication_service: a,
-        user: subject)
-      a
-    }
-    it 'should not require arguments' do
-      expect(subject).to respond_to 'api_token'
-      expect{
-        subject.api_token
-      }.not_to raise_error
-    end
-
-    it 'should return a JWT signed with the secret_key_base' do
-      token = subject.api_token
-      decoded_token = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
-      expect(decoded_token).to be
-      expect(decoded_token).to have_key('id')
-      expect(decoded_token['id']).to eq(subject.user_id)
-      expect(decoded_token).to have_key('service_id')
-      expect(decoded_token['service_id']).to eq(subject.authentication_service.service_id)
-      expect(decoded_token).to have_key('exp')
-      expect(decoded_token['exp']).to eq(Time.now.to_i + 2.hours.to_i)
-    end
-  end
 end

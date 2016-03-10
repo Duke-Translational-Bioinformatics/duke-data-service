@@ -7,15 +7,11 @@ RSpec.describe Folder, type: :model do
   let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
   let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, parent: child_folder) }
-  let(:is_logically_deleted) { true }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
-  it_behaves_like 'an audited model' do
-    it_behaves_like 'with a serialized audit'
-  end
-
+  it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
 
   describe 'associations' do

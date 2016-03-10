@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160111142052) do
+ActiveRecord::Schema.define(version: 20160223145153) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,14 @@ ActiveRecord::Schema.define(version: 20160111142052) do
     t.string   "project_role_id"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
+  end
+
+  create_table "api_keys", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "user_id"
+    t.uuid     "software_agent_id"
+    t.string   "key"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
   end
 
   create_table "audits", force: :cascade do |t|
@@ -115,6 +123,16 @@ ActiveRecord::Schema.define(version: 20160111142052) do
     t.string   "description"
     t.uuid     "creator_id"
     t.string   "etag"
+    t.boolean  "is_deleted",  default: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  create_table "software_agents", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.uuid     "creator_id"
+    t.string   "repo_url"
     t.boolean  "is_deleted",  default: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false

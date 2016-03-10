@@ -1,0 +1,236 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx13aa9728f63e4ad1b9f8b-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/86abd637-d868-4986-a846-ac0246c3ff15
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx32b1cd6ecc8f485b8cfdf-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304/1
+    body:
+      encoding: UTF-8
+      string: this is a chunk
+    headers:
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Thu, 03 Mar 2016 16:20:04 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - 2b1f638751fa49d7fba5a64fecf48bb2
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx0a6a0817db5c41f6b0829-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx3880c6f0dd9d4b34b6df3-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      Content-Type:
+      - text/plain
+      Content-Disposition:
+      - attachment; filename=iure-optio
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Thu, 03 Mar 2016 16:20:04 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"b77622f6f760a1bed182840a7c02a53c"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txc53955f8d3db455ab6653-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: head
+    uri: http://192.168.99.100:12345/v1/AUTH_test/86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '15'
+      Content-Disposition:
+      - attachment; filename=iure-optio
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Thu, 03 Mar 2016 16:20:04 GMT
+      Etag:
+      - '"b77622f6f760a1bed182840a7c02a53c"'
+      X-Timestamp:
+      - '1457022003.22987'
+      X-Static-Large-Object:
+      - 'True'
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - tx5db6fd55dd854662ae629-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+- request:
+    method: delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304/1?multipart-manifest=delete
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - tx9eced34a2d8a41419e7cf-0056d86433
+      Date:
+      - Thu, 03 Mar 2016 16:20:03 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: "Number Deleted: 0\nNumber Not Found: 0\nResponse Body: \nResponse Status:
+        400 Bad Request\nErrors:\n/86abd637-d868-4986-a846-ac0246c3ff15/33cab80c-8cef-4c2d-8689-9e7770799304/1,
+        Not an SLO manifest"
+    http_version: 
+  recorded_at: Thu, 03 Mar 2016 16:20:03 GMT
+recorded_with: VCR 3.0.0

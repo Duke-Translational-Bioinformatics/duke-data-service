@@ -26,6 +26,7 @@ describe DDS::V1::StorageProvidersAPI do
       end
 
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
   end
 
@@ -37,6 +38,7 @@ describe DDS::V1::StorageProvidersAPI do
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/storage_providers/notexists_id" }
       end

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe FolderSerializer, type: :serializer do
   let(:resource) { child_folder }
+  let(:is_logically_deleted) { true }
   let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:root_folder) { FactoryGirl.create(:folder, :root) }
 
