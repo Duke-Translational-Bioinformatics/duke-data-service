@@ -8,6 +8,8 @@ server:
     - swift:swift.circle.host
   ports:
     - 3001:3000
+  volumes:
+    - .:/var/www/app  
 db:
   build: ./docker/builds/db
   env_file:
