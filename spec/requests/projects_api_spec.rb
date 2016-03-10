@@ -105,7 +105,6 @@ describe DDS::V1::ProjectsAPI do
               {user: current_user, audited_parent: 'Project', software_agent: software_agent}
             }
           end
->>>>>>> official/develop
       end
     end
   end
