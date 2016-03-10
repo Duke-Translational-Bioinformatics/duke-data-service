@@ -12,7 +12,7 @@ class ApplicationPolicy
   end
 
   def show?
-    permission.exists?
+    permission
   end
 
   def create?
@@ -48,13 +48,25 @@ class ApplicationPolicy
     end
 
     def resolve
-      scope
+      if user.system_permission
+        scope
+      else
+        scope.joins(:project_permissions).where(project_permissions: {user: user})
+      end
     end
   end
 
   private
 
   def permission
-    record.project_permissions.where(user: user)
+    system_permission || project_permission
+  end
+
+  def project_permission
+    record.project_permissions.where(user: user).take
+  end
+
+  def system_permission
+    user.system_permission
   end
 end
