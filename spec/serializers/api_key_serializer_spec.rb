@@ -5,7 +5,7 @@ RSpec.describe ApiKeySerializer, type: :serializer do
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('key')
-      is_expected.to have_key('created_at')
+      is_expected.to have_key('created_on')
       expect(subject['key']).to eq(resource.key)
     end
   end
