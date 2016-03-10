@@ -1,5 +1,7 @@
 server:
   build: .
+  volumes:
+    - .:/var/www/app
   env_file:
     - circle/swift.circle.env
     - circle/webapp.circle.env
