@@ -1,14 +1,17 @@
 version: '2'
 services:
   server:
-    log_driver: gelf
-    log_opt:
+    logging:
+      driver: gelf
+      options:
         gelf-address: "udp://192.168.99.100:12201"
   db:
-    log_driver: gelf
-    log_opt:
+    logging:
+      driver: gelf
+      options:
         gelf-address: "udp://192.168.99.100:12201"
   swift:
-    log_driver: gelf
-    log_opt:
+    logging:
+      driver: gelf
+      options:
         gelf-address: "udp://192.168.99.100:12201"
