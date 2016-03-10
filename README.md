@@ -21,13 +21,10 @@ This is an open source project for building a "data service" for researchers tha
 http://docs.dukedataservices.apiary.io
 
 ### circleci development 
-[![Circle CI](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.svg?style=svg)](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop)
-
-### circleci ua-test
-[![Circle CI](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/ua_test.svg?style=svg)](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/ua_test)
+[![Development Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.png?circle-token=:circle-token)](https://circleci.com/)
 
 ### circleci production
-[![Circle CI](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/production.svg?style=svg)](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/production)
+[![Master Branch build status](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service.png?circle-token=:circle-token)](https://circleci.com/)
 
 ### converse
 [![Join the chat at https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

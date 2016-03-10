@@ -24,7 +24,6 @@ describe DDS::V1::SystemPermissionsAPI do
       it_behaves_like 'a listable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource'
     end
   end
 
@@ -65,7 +64,6 @@ describe DDS::V1::SystemPermissionsAPI do
         }}
         let(:resource_class) {'AuthRole'}
       end
-      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'GET' do
@@ -78,7 +76,6 @@ describe DDS::V1::SystemPermissionsAPI do
         let(:url) { "/api/v1/system/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
-      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'DELETE' do
@@ -90,9 +87,6 @@ describe DDS::V1::SystemPermissionsAPI do
       it_behaves_like 'an identified resource' do
         let(:url) { "/api/v1/system/permissions/notexists_userid" }
         let(:resource_class) {'User'}
-      end
-      it_behaves_like 'a software_agent accessible resource' do
-        let(:expected_response_status) { 204 }
       end
     end
   end

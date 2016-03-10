@@ -1,38 +1,61 @@
 require 'rails_helper'
 
 describe FolderPolicy do
-  include_context 'policy declarations'
-
   let(:project_permission) { FactoryGirl.create(:project_permission) }
-  let(:folder) { FactoryGirl.create(:folder, project: project_permission.project) }
+  let(:user) { project_permission.user }
+  let(:folder) { FactoryGirl.build(:folder, project: project_permission.project) }
   let(:other_folder) { FactoryGirl.create(:folder) }
 
-  it_behaves_like 'system_permission can access', :folder
-  it_behaves_like 'system_permission can access', :other_folder
+  let(:scope) { subject.new(user, folder).scope }
 
-  context 'when user has project_permission' do
-    let(:user) { project_permission.user }
+  subject { described_class }
 
-    describe '.scope' do
-      it { expect(resolved_scope).to include(folder) }
-      it { expect(resolved_scope).not_to include(other_folder) }
-    end
-    permissions :show?, :create?, :update?, :destroy? do
-      it { is_expected.to permit(user, folder) }
-      it { is_expected.not_to permit(user, other_folder) }
+  permissions ".scope" do
+    it 'returns folders with project permissions' do
+      expect(folder.save).to be_truthy
+      expect(other_folder).to be_persisted
+      expect(scope.all).to include(folder)
+      expect(scope.all).not_to include(other_folder)
     end
   end
 
-  context 'when user does not have project_permission' do
-    let(:user) { FactoryGirl.create(:user) }
-
-    describe '.scope' do
-      it { expect(resolved_scope).not_to include(folder) }
-      it { expect(resolved_scope).not_to include(other_folder) }
+  permissions :show? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_folder)
     end
-    permissions :show?, :create?, :update?, :destroy? do
-      it { is_expected.not_to permit(user, folder) }
-      it { is_expected.not_to permit(user, other_folder) }
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, folder)
+    end
+  end
+
+  permissions :create? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_folder)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, folder)
+    end
+  end
+
+  permissions :update? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_folder)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, folder)
+    end
+  end
+
+  permissions :destroy? do
+    it 'denies access without project permission' do
+      is_expected.not_to permit(user, other_folder)
+    end
+
+    it 'grants access with project permission' do
+      is_expected.to permit(user, folder)
     end
   end
 end

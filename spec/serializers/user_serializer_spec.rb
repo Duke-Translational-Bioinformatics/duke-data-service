@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe UserSerializer, type: :serializer do
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:resource) { user_authentication_service.user }
-  let(:is_logically_deleted) { false }
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
@@ -27,6 +26,5 @@ RSpec.describe UserSerializer, type: :serializer do
       expect(subject['auth_provider']['source']).to eq(user_authentication_service.authentication_service.name)
       expect(subject['last_login_on'].to_json).to eq(resource.last_login_at.to_json)
     end
-    it_behaves_like 'a serializer with a serialized audit'
   end
 end

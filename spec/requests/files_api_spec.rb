@@ -45,9 +45,6 @@ describe DDS::V1::FilesAPI do
       end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource' do
-        let(:expected_response_status) { 201 }
-      end
 
       context 'with incomplete upload' do
         let(:payload_upload) {{ id: incomplete_upload.id }}
@@ -94,8 +91,8 @@ describe DDS::V1::FilesAPI do
         end
       end
 
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_response_status) { 201 }
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 201 }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -126,7 +123,6 @@ describe DDS::V1::FilesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -174,15 +170,8 @@ describe DDS::V1::FilesAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_response_status) { 204 }
-      end
-      it_behaves_like 'a software_agent accessible resource' do
-        let(:expected_response_status) {204}
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:expected_response_status) { 204 }
-        end
+      it_behaves_like 'an audited endpoint' do
+        let(:expected_status) { 204 }
       end
       it_behaves_like 'a logically deleted resource'
     end
@@ -198,7 +187,6 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -222,11 +210,7 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an annotate_audits endpoint'
-      it_behaves_like 'a software_agent accessible resource' do
-        it_behaves_like 'an annotate_audits endpoint'
-      end
-
+      it_behaves_like 'an audited endpoint'
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -259,10 +243,7 @@ describe DDS::V1::FilesAPI do
         it_behaves_like 'an updatable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'an authorized resource'
-        it_behaves_like 'an annotate_audits endpoint'
-        it_behaves_like 'a software_agent accessible resource' do
-          it_behaves_like 'an annotate_audits endpoint'
-        end
+        it_behaves_like 'an audited endpoint'
         it_behaves_like 'a logically deleted resource'
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
@@ -295,10 +276,7 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'an annotate_audits endpoint'
-      it_behaves_like 'a software_agent accessible resource' do
-        it_behaves_like 'an annotate_audits endpoint'
-      end
+      it_behaves_like 'an audited endpoint'
       it_behaves_like 'a logically deleted resource'
 
       it_behaves_like 'an identified resource' do

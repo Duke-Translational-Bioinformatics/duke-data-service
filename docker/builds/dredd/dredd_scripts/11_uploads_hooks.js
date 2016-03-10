@@ -13,7 +13,6 @@ var LIST_CHUNKED_UPLOADS = "Uploads > Uploads collection > List chunked uploads"
 var VIEW_CHUNKED_UPLOAD = "Uploads > Upload instance > View chunked upload";
 var GET_CHUNK_URL = "Uploads > Upload instance > Get pre-signed chunk URL";
 var COMPLETE_CHUNKED_UPLOAD = "Uploads > Upload instance > Complete chunked file upload";
-var SERVER_HASH_UPLOAD = "Uploads > Upload instance > Report server computed hash";
 var responseStash = {};
 var g_uploadId = null;
 // get a sample chunk to upload
@@ -57,14 +56,6 @@ hooks.before(LIST_CHUNKED_UPLOADS, function (transaction) {
   transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', responseStash['createdProject']);
 });
 
-hooks.after(LIST_CHUNKED_UPLOADS, function (transaction) {
-  // replacing id in URL with stashed id from previous response
-  var requestBody = JSON.parse(transaction.real.body);
-  // var requestBody = JSON.parse(transaction.real.test);
-
-  // console.log(requestBody);
-});
-
 hooks.before(VIEW_CHUNKED_UPLOAD, function (transaction) {
   // reusing data from previous response here
   var uploadId = JSON.parse(responseStash[INIT_CHUNKED_UPLOAD])['id'];
@@ -101,12 +92,6 @@ hooks.after(GET_CHUNK_URL, function (transaction, done) {
 });
 
 hooks.before(COMPLETE_CHUNKED_UPLOAD, function (transaction) {
-  // replacing id in URL with stashed id from previous response
-  var url = transaction.fullPath;
-  transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', g_uploadId);
-});
-
-hooks.before(SERVER_HASH_UPLOAD, function (transaction) {
   // replacing id in URL with stashed id from previous response
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', g_uploadId);

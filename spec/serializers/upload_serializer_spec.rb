@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe UploadSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
-  let(:is_logically_deleted) { false }
   let(:expected_keys) {
     %w(
       id
@@ -43,7 +42,6 @@ RSpec.describe UploadSerializer, type: :serializer do
       expect(DateTime.parse(subject["status"]["error_on"]).to_i).to eq(resource.error_at.to_i)
       expect(subject["status"]["error_message"]).to eq(resource.error_message)
     end
-    it_behaves_like 'a serializer with a serialized audit'
   end
 
   context 'upload without fingerprint' do

@@ -29,12 +29,6 @@ module DDS
           end
         end
 
-        def current_software_agent
-          if @current_user
-            @current_user.current_software_agent
-          end
-        end
-
         def current_user
           if @current_user
             return @current_user
@@ -69,11 +63,7 @@ module DDS
         end
 
         def find_user_with_token(decoded_token)
-          user = User.find(decoded_token['id'])
-          if decoded_token['software_agent_id']
-            user.current_software_agent = SoftwareAgent.find(decoded_token['software_agent_id'])
-          end
-          user
+          User.find(decoded_token['id'])
         end
 
         def validation_error!(object)
@@ -103,9 +93,6 @@ module DDS
             endpoint: request.env["REQUEST_URI"],
             action: request.env["REQUEST_METHOD"]
           }
-          if current_software_agent
-            comment_annotation['software_agent_id'] = current_software_agent.id
-          end
           audit_annotation = additional_annotation ?
             additional_annotation.merge(request_annotation) :
             request_annotation
@@ -173,7 +160,6 @@ module DDS
       mount DDS::V1::ProjectRolesAPI
       mount DDS::V1::StorageProvidersAPI
       mount DDS::V1::ChildrenAPI
-      mount DDS::V1::SoftwareAgentsAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true
