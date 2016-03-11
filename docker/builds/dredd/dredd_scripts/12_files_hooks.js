@@ -60,7 +60,6 @@ hooks.before(VIEW_FILE, function (transaction) {
 });
 
 hooks.before(UPDATE_FILE, function (transaction) {
-  // reusing data from previous response here
 
 });
 

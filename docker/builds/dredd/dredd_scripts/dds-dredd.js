@@ -151,7 +151,7 @@ var dredd = new Dredd(configuration);
 
 dredd.run(function (err, stats) {
   // uncomment for production stop
-  //if (stats.failures>0 | stats.error>0) process.exit(1);
+  // if (stats.failures>0 | stats.error>0) process.exit(1);
   // uncomment for production uninterrupted
   if (stats.failures>0 | stats.error>0) process.exit(0);
 });

@@ -3,11 +3,8 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
-  let(:is_logically_deleted) { false }
 
-  it_behaves_like 'an audited model' do
-    it_behaves_like 'with a serialized audit'
-  end
+  it_behaves_like 'an audited model'
 
   describe 'associations' do
     it 'should belong_to a project' do
