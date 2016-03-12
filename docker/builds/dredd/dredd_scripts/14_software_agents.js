@@ -85,30 +85,34 @@ hooks.after(SA_REGENERATE, function (transaction) {
 hooks.before(SA_GET_TOKEN, function (transaction,done) {
   var payload = {
   };
-  var request = tools.createResource('GET', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
+  var request = tools.createResource('PUT', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
   request.then(function(data) {
-    current_user_id = data['key'];
-    var payload2 = {
-        "name": "Hash computation agent"
-    }
-    var request2 = tools.createResource('POST', '/software_agents', JSON.stringify(payload2),hooks.configuration.server);
-    request2.then(function(data2) {
-      sa_id = data2['id'];
-      console.log('/software_agents/'+sa_id+'/api_key');
-      var request3 = tools.createResource('GET', '/software_agents/'+sa_id+'/api_key', JSON.stringify(payload),hooks.configuration.server);
-      request3.then(function(data3) {
-        sa_key = data3['key'];
-        // parse request body from blueprint
-        var requestBody = JSON.parse(transaction.request.body);
-        // modify request body here
-        requestBody['agent_key'] = sa_key;
-        requestBody['user_key'] = current_user_id;
-        // stringify the new body to request
-        transaction.request.body = JSON.stringify(requestBody);
-        console.log(requestBody);
-        console.log(transaction);
-        done();
+    var request = tools.createResource('GET', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
+    request.then(function(data) {
+      current_user_id = data['key'];
+      var payload2 = {
+          "name": "Hash computation agent"
+      }
+      var request2 = tools.createResource('POST', '/software_agents', JSON.stringify(payload2),hooks.configuration.server);
+      request2.then(function(data2) {
+        sa_id = data2['id'];
+        var request3 = tools.createResource('GET', '/software_agents/'+sa_id+'/api_key', JSON.stringify(payload),hooks.configuration.server);
+        request3.then(function(data3) {
+          sa_key = data3['key'];
+          // parse request body from blueprint
+          var requestBody = JSON.parse(transaction.request.body);
+          // modify request body here
+          requestBody['agent_key'] = sa_key;
+          requestBody['user_key'] = current_user_id;
+          // stringify the new body to request
+          transaction.request.body = JSON.stringify(requestBody);
+          done();
+        });
       });
     });
   });
+});
+
+hooks.after(SA_GET_TOKEN, function (transaction) {
+console.log(transaction.request);
 });
