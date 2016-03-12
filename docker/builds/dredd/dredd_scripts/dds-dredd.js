@@ -90,14 +90,14 @@ configuration = {
             //  "Search Children > Search project children > Search project children", //r2g
             //  "Search Children > Search folder children > Search folder children",    //r2g
              //software_agents
-             "Software Agents > Software Agents collection > Create software agent",
-             "Software Agents > Software Agents collection > List software agents",
-             "Software Agents > Software Agent instance > View software agent",
-             "Software Agents > Software Agent instance > Update software agent",
-             "Software Agents > Software Agent instance > Delete software agent",
-             "Software Agents > Software Agent Secret Key > View software agent API key",
-             "Software Agents > Software Agent Secret Key > Re-generate software agent API key",
-             "Software Agents > Software Agent Access Token > Get software agent access token",
+            //  "Software Agents > Software Agents collection > Create software agent",
+            //  "Software Agents > Software Agents collection > List software agents",
+            //  "Software Agents > Software Agent instance > View software agent",
+            //  "Software Agents > Software Agent instance > Update software agent",
+            //  "Software Agents > Software Agent instance > Delete software agent",
+            //  "Software Agents > Software Agent Secret Key > View software agent API key",
+            //  "Software Agents > Software Agent Secret Key > Re-generate software agent API key",
+            //  "Software Agents > Software Agent Access Token > Get software agent access token",
             //current user api
             // "Current User > Current User Secret Key > Generate current user API key",
             // "Current User > Current User Secret Key > View current user API key",
@@ -108,23 +108,23 @@ configuration = {
     'user': null,    // String, Basic Auth credentials in the form username:password
 
     'hookfiles': [ //'99_learnclient.js',
-                  // '01_auth_hooks.js',                 //r2g
-                  // '02_current_user_hooks.js',         //r2g
-                  // '03_users_hooks.js',                //r2g
-                  // '04_system_permissions_hooks.js',   //r2g
-                  // '05_projects_hooks.js',             //r2g
-                  // '06_project_permissions_hooks.js', //r2g
-                  // '07_project_roles_hooks.js',       //r2g
-                  // '08_affiliates_hooks.js',          //r2g
-                  // '09_storage_providers_hooks.js',   //r2g
-                  // '10_folders_hooks.js',             //r2g
-                  // '11_uploads_hooks.js',             //r2g
-                  // '12_files_hooks.js',
-                  // '13_search_project_folder_hooks.js',
+                  '01_auth_hooks.js',                 //r2g
+                  '02_current_user_hooks.js',         //r2g
+                  '03_users_hooks.js',                //r2g
+                  '04_system_permissions_hooks.js',   //r2g
+                  '05_projects_hooks.js',             //r2g
+                  '06_project_permissions_hooks.js', //r2g
+                  '07_project_roles_hooks.js',       //r2g
+                  '08_affiliates_hooks.js',          //r2g
+                  '09_storage_providers_hooks.js',   //r2g
+                  '10_folders_hooks.js',             //r2g
+                  '11_uploads_hooks.js',             //r2g
+                  '12_files_hooks.js',
+                  '13_search_project_folder_hooks.js',
                   '14_software_agents.js',
-                  // '15_current_user_api_hooks.js',
-                  // '16_search_uploads.js',
-                  // '17_file_versions.js',
+                  '15_current_user_api_hooks.js',
+                  '16_search_uploads.js',
+                  '17_file_versions.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
     'reporter': [], // Array of possible reporters, see folder src/reporters
