@@ -127,7 +127,7 @@ configuration = {
                   '17_file_versions.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
+    'reporter': [], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
