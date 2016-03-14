@@ -58,12 +58,8 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
-  describe 'swift methods', :vcr do
-    subject { FactoryGirl.create(:chunk, :swift) }
-
-    it 'should have a url method' do
-      should respond_to :url
-      expect(subject.url).to eq expected_url
-    end
+  it 'should have a url method' do
+    should respond_to :url
+    expect(subject.url).to eq expected_url
   end
 end

@@ -1,4 +1,4 @@
-require 'rails_helper'
+ require 'rails_helper'
 
 RSpec.describe StorageProvider, type: :model do
   let(:chunk) { FactoryGirl.create(:chunk) }
@@ -68,6 +68,36 @@ RSpec.describe StorageProvider, type: :model do
       expect { put_container_meta }.not_to raise_error
       expect(put_container_meta.headers).to have_key 'x-container-meta-access-control-allow-origin'
       expect(put_container_meta.headers['x-container-meta-access-control-allow-origin']).to eq '*'
+    end
+
+    describe '.get_container_meta' do
+      let(:get_container_meta) {
+        subject.get_container_meta(container_name)
+      }
+
+      context 'before container exists' do
+        it 'should return null' do
+          r = nil
+          expect {
+            r = get_container_meta
+          }.not_to raise_error
+          expect(r).to be_nil
+        end
+      end
+
+      context 'when container exists' do
+        before do
+          subject.put_container(container_name)
+        end
+
+        it 'should return null' do
+          r = nil
+          expect {
+            r = get_container_meta
+          }.not_to raise_error
+          expect(r).not_to be_nil
+        end
+      end
     end
 
     let(:put_object) { subject.put_object(container_name, segment_name, object_body) }
