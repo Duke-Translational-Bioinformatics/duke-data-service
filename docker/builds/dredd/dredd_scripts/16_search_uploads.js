@@ -13,5 +13,5 @@ var responseStash = {};
 var g_uploadId = null;
 
 hooks.before(SEARCH_UPLOADS, function (transaction) {
-
+  transaction.skip = true;
 });
