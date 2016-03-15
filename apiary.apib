@@ -39,7 +39,8 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 
 15-Mar-2016
 --------------
-+ For resource actions not yet implemented - added *NOT_IMPLEMENTED* prefix to the action to inform API consumers as well a dredd testing workflow.
++ For resource actions not yet implemented - added *NOT_IMPLEMENTED* prefix to inform API consumers as well a dredd testing workflow.
++ Revereted design changes to support server hashing agent back to current production implementation.  This will be addressed in later sprint.
 
 ## Group API Usage
 
@@ -1213,17 +1214,13 @@ This is the first step in uploading a large file. An upload objects is created a
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
 + **hash.value (number, required)** - The entire file hash (computed by client).
-+ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.) - only `sha1` is currently supported.
++ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.).
 
 >**Response Properties**
 - - - - -
 + **chunks (object)** - The chunks the client has requested to upload.
 + **storage_location (object)** - Object that contains target storage details.
 + **status (object)** - Object used to track status of overall file upload.
-
->**Rules**
-- - - - -
-+ The client reported hash of the entire file must be a `sha1`.  A server agent will compute the `sha1` as a background task.  If there is a hash discrepancyt between client reported and server reported - the upload owner (i.e. creator) will be notified.
 
 + Request (application/json)
 
@@ -1233,7 +1230,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "size": 30024000,
             "hash": { 
                 "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1" 
+                "algorithm": "md5" 
             }
         }
 
@@ -1247,12 +1244,9 @@ This is the first step in uploading a large file. An upload objects is created a
             "size": 30024000,
             "hash": { 
                 "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1",
-                "client_reported": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1"
-                },
-                "server_reported": null
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": false 
             },
             "chunks": [ ],
             "storage_provider": { 
@@ -1284,12 +1278,9 @@ This is the first step in uploading a large file. An upload objects is created a
                     "content_type": "application/octet-stream",
                     "hash": { 
                         "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "sha1",
-                        "client_reported": {
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "sha1"
-                        },
-                        "server_reported": null
+                        "algorithm": "md5", 
+                        "client_reported": true, 
+                        "confirmed": false 
                     },
                     "chunks": [ ],
                     "storage_provider": { 
@@ -1326,12 +1317,9 @@ This is the first step in uploading a large file. An upload objects is created a
             "size": 30024000,
             "hash": { 
                 "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1",
-                "client_reported": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1"
-                },
-                "server_reported": null
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": false 
             },
             "chunks": [
                 {
@@ -1429,12 +1417,9 @@ This operation is called by the client after all file chunks have been successfu
             "size": 30024000,
             "hash": { 
                 "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1",
-                "client_reported": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1"
-                },
-                "server_reported": null
+                "algorithm": "md5", 
+                "client_reported": true, 
+                "confirmed": false 
             },
             "chunks": [
                 {
@@ -1466,128 +1451,6 @@ This operation is called by the client after all file chunks have been successfu
                 "error_message": null
             },
             "audit": { }
-        }
-
-## Report server computed hash [PUT /uploads/{id}/server_hash]
-This action is called by a hash computation agent, run as a background task, that computes a `sha1` hash for completed file uploads.
-
->**Permission:** system_admin
-- - - - -
-
->**Request Properties**
-- - - - -
-+ **hash.value (string, required)** - The entire file hash (computed by agent).
-+ **hash.algorithm (string, required)** - The hash algorithm used (i.e. md5, sha256, sha1, etc.) - only `sha1` is currenlty supported/computed.
-
-+ Parameters
-    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
-
-+ Request (application/json)
-
-        {
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1" 
-            }
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
-            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "sha1",
-                "client_reported": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1"
-                },
-                "server_reported": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1"
-                }
-            },
-            "chunks": [
-                {
-                    "number": 1,
-                    "size": 5024000,
-                    "hash": { 
-                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
-                        "algorithm": "md5" 
-                    }
-                },
-                {
-                    "number": 2,
-                    "size": 5024000,
-                    "hash": { 
-                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
-                        "algorithm": "md5" 
-                    }
-                }
-            ],
-            "storage_provider": { 
-                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                "name": "duke_oit_swift", 
-                "description": "Duke OIT Storage" 
-            },
-            "status": {
-                "initiated_on": "2015-07-10T13:00:00Z",
-                "completed_on": "2015-07-10T13:00:00Z",
-                "error_on": null,
-                "error_message": null
-            },
-            "audit": { }
-        }
-
-## Group Search Uploads
-Represents actions for searching uploads across projects.
-
-## Search uploads [GET /uploads{?server_hash_pending}]
-Search for project uploads; this action will facilitate finding uploads that are the target of background jobs/tasks (e.g. hash computation, etc.).
-
->**Permission:** system_admin
-- - - - -
-
-+ Parameters
-    + server_hash_pending (boolean, optional, `true`) ... If true specified, returns only completed uploads (`status.completed_on is not null`) that have not had their server hash computed (`hash.server_reported is null`).
-   
-+ Response 200 (application/json)
-
-        {
-            "results": [
-                {
-                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
-                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "content_type": "application/octet-stream",
-                    "hash": {
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "sha1", 
-                        "client_reported": {
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "sha1"
-                        },
-                        "server_reported": null
-                    },
-                    "chunks": [ ],
-                    "storage_provider": { 
-                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                        "name": "duke_oit_swift", 
-                        "description": "Duke OIT Storage" 
-                    },
-                    "status": {
-                        "initiated_on": "2015-07-10T13:00:00Z",
-                        "completed_on": null,
-                        "error_on": null,
-                        "error_message": null
-                    },
-                    "audit": { }
-                }
-            ]
         }
 
 ## Group Files
@@ -1654,7 +1517,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
                 "size": 30024000,
                 "hash": { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1703,7 +1566,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "size": 30024000,
                     "hash": { 
                         "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "sha1" 
+                        "algorithm": "md5" 
                     },
                     "storage_provider": { 
                         "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1771,7 +1634,7 @@ Updates one or more file resource properties; if this action modifies the `uploa
                 "size": 30024038,
                 "hash": { 
                     "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1856,7 +1719,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
                 "size": 30024000,
                 "hash": { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1911,7 +1774,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
                 "size": 30024000,
                 "hash": { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1960,7 +1823,7 @@ If there are previous versions of a file, this action can be used to retrieve in
                         "size": 30024000,
                         "hash": { 
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "sha1" 
+                            "algorithm": "md5" 
                         },
                         "storage_provider": { 
                             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1998,7 +1861,7 @@ If there are previous versions of a file, this action can be used to retrieve in
                 "size": 30024000,
                 "hash": { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -2040,7 +1903,7 @@ If there are previous versions of a file, this action can be used to retrieve in
                 "size": 30024000,
                 "hash": { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "sha1" 
+                    "algorithm": "md5" 
                 },
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -2149,7 +2012,7 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "size": 30024000,
                         "hash": { 
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "sha1" 
+                            "algorithm": "md5" 
                         },
                         "storage_provider": { 
                             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -2233,7 +2096,7 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "size": 30024000,
                         "hash": { 
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "sha1" 
+                            "algorithm": "md5" 
                         },
                         "storage_provider": { 
                             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
