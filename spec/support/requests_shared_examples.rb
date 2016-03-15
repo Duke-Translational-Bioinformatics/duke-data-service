@@ -325,6 +325,7 @@ shared_examples 'a validated resource' do
 end
 
 shared_examples 'an identified resource' do
+  let(:expected_suggestion) { "you may have mistyped the #{resource_class} id" }
   it 'should return 404 with error when resource not found with id' do
     is_expected.to eq(404)
     expect(response.body).to be
@@ -335,7 +336,7 @@ shared_examples 'an identified resource' do
     expect(response_json).to have_key('reason')
     expect(response_json['reason']).to eq("#{resource_class} Not Found")
     expect(response_json).to have_key('suggestion')
-    expect(response_json['suggestion']).to eq("you may have mistyped the #{resource_class} id")
+    expect(response_json['suggestion']).to eq(expected_suggestion)
   end
 end
 

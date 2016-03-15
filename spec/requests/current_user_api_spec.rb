@@ -133,12 +133,21 @@ describe DDS::V1::CurrentUserAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
-      let!(:resource) {
-        FactoryGirl.create(:api_key, user_id: current_user.id)
-      }
-      it_behaves_like 'a viewable resource'
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'a software_agent restricted resource'
+
+      context 'without api_key' do
+        it_behaves_like 'an identified resource' do
+          let(:expected_suggestion) { "you must create an ApiKey" }
+        end
+      end
+
+      context 'with existing api_key' do
+        let!(:resource) {
+          FactoryGirl.create(:api_key, user_id: current_user.id)
+        }
+        it_behaves_like 'a viewable resource'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent restricted resource'
+      end
     end
 
     describe 'DELETE' do
