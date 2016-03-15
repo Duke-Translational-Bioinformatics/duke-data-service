@@ -18,10 +18,25 @@ def get_user(auth_service)
 end
 
 def clean_artifacts(user)
-  user.system_permission.destroy if user.system_permission
-  user.affiliations.destroy_all
+  Container.auditing_enabled = false
+  Project.auditing_enabled = false
+  ApiKey.auditing_enabled = false
+  Affiliation.auditing_enabled = false
+  Chunk.auditing_enabled = false
+  ProjectPermission.auditing_enabled = false
+  SoftwareAgent.auditing_enabled = false
+  Upload.auditing_enabled = false
+  Audited.audit_class.as_user(user) do
+    user.system_permission.destroy if user.system_permission
+    user.api_key.destroy if user.api_key
+    SoftwareAgent.where(creator_id: user.id).all.each do |sa|
+      sa.api_key.destroy
+      sa.destroy
+    end
+    user.affiliations.destroy_all
+  end
+
   Audited.audit_class.where(user_id: user.id, auditable_type: "Upload").each do |ua|
-    $stderr.puts "Upload Audit #{ua.id}"
     if Upload.where(id: ua.auditable_id).exists?
       u = Upload.find(ua.auditable_id)
       $stderr.puts "Cleaning #{u.project_id} #{u.id}"
@@ -32,8 +47,10 @@ def clean_artifacts(user)
       rescue StorageProviderException => e
         $stderr.puts "error deleting storage_provider artifacts #{e.message}"
       end
-      u.chunks.destroy_all
-      u.destroy
+      Audited.audit_class.as_user(user) do
+        u.chunks.destroy_all
+        u.destroy
+      end
     end
     ua.destroy
   end
@@ -42,10 +59,14 @@ def clean_artifacts(user)
     if Project.where(id: up.auditable_id).exists?
       p = Project.find(up.auditable_id)
       $stderr.puts "Destroying project #{p.id}"
-      p.folders.destroy_all
-      p.project_permissions.destroy_all
-      p.affiliations.destroy_all
-      p.destroy
+      Audited.audit_class.as_user(user) do
+        p.folders.all.each do |pf|
+          pf.destroy
+        end
+        p.project_permissions.destroy_all
+        p.affiliations.destroy_all
+        p.destroy
+      end
     end
     up.destroy
   end
@@ -56,6 +77,9 @@ def clean_artifacts(user)
     end
     ra.destroy
   end
+  #try and get the User creation audits, which do not have user associated with them
+  $stderr.puts "looking for residual user audits that do not have userid"
+  Audited.audit_class.where(auditable_type: "User").where('audited_changes like ?', "%DDS_api_test_user%").destroy_all
 end
 
 namespace :api_test_user do
@@ -90,11 +114,13 @@ namespace :api_test_user do
 
   desc "destroys the 'DDS_api_test_user' and all of its artifacts"
   task destroy: :environment do
+    User.auditing_enabled = false
     auth_service = get_auth_service
     api_test_user = get_user(auth_service)
     if api_test_user
       clean_artifacts(api_test_user.user)
       api_test_user.user.destroy
+      api_test_user.user.audits.destroy_all
       api_test_user.destroy
     else
       $stderr.puts 'DDS_api_test_user not found'
@@ -107,6 +133,39 @@ namespace :api_test_user do
     api_test_user = get_user(auth_service)
     if api_test_user
       clean_artifacts(api_test_user.user)
+    else
+      $stderr.puts 'DDS_api_test_user not found'
+    end
+  end
+
+  desc "create or get the api_key for the test user"
+  task api_key: :environment do
+    auth_service = get_auth_service
+    api_test_user = get_user(auth_service)
+    if api_test_user
+      unless api_test_user.user.api_key
+        Audited.audit_class.as_user(api_test_user.user) do
+          api_test_user.user.create_api_key(key: SecureRandom.hex)
+        end
+      end
+      $stdout.print api_test_user.user.api_key.key
+    else
+      $stderr.puts 'DDS_api_test_user not found'
+    end
+  end
+
+  desc "create or get a software_agent and api_key"
+  task software_agent_api_key: :environment do
+    auth_service = get_auth_service
+    api_test_user = get_user(auth_service)
+    if api_test_user
+      software_agent = SoftwareAgent.where(creator_id: api_test_user.id).take
+      unless software_agent
+        Audited.audit_class.as_user(api_test_user.user) do
+          software_agent = FactoryGirl.create(:software_agent, :with_key, creator: api_test_user.user)
+        end
+      end
+      $stdout.print software_agent.api_key.key
     else
       $stderr.puts 'DDS_api_test_user not found'
     end
