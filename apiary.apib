@@ -35,7 +35,11 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 
 09-Mar-2016
 --------------
-+ Added *Search Provenance* resource/actions - supports graph query of provenance chains; returns graph results that are stuctured for visualization.
++ Added *Search Provenance* resource/actions - supports graph query of provenance chains; returns graph results that are structured for visualization.
+
+15-Mar-2016
+--------------
++ For resource actions not yet implmented - added *NOT_IMPLEMENTED* prefix to the action; this will inform API consumers as well a dredd testing workflow.
 
 ## Group API Usage
 
@@ -1710,7 +1714,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-## Update file [PUT]
+## NOT_IMPLEMENTED Update file [PUT]
 Updates one or more file resource properties; if this action modifies the `upload` property, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1927,7 +1931,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-## List file versions [GET]
+## NOT_IMPLEMENTED List file versions [GET]
 If there are previous versions of a file, this action can be used to retrieve information about the older versions.
 
 >**Permission:** view_project
@@ -1973,7 +1977,7 @@ If there are previous versions of a file, this action can be used to retrieve in
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
-## View file version [GET]
+## NOT_IMPLEMENTED View file version [GET]
 **Permissions** view_project
 - - - - -
 
@@ -2005,7 +2009,7 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-## Update file version [POST] 
+## NOT_IMPLEMENTED Update file version [POST] 
 **Permission:** update_file
 - - - - -
 
@@ -2047,13 +2051,13 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-### Delete file version [DELETE]
+### NOT_IMPLEMENTED Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
 
 + Response 204
 
-## Get file version download URL [GET /file_versions/{id}/url]
+## NOT_IMPLEMENTED Get file version download URL [GET /file_versions/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
 
 >**Permission:** download_file
@@ -2249,7 +2253,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 
 ## Activities collection [/activities]
 
-### (NOT_IMPLEMENTED) Create activity [POST]
+### NOT_IMPLEMENTED Create activity [POST]
 >**Permission:** authenticated
 - - - - -
 
@@ -2284,7 +2288,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### List activities [GET]
+### NOT_IMPLEMENTED List activities [GET]
 >**Permission:** 
 - - - - -
 + creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
@@ -2314,7 +2318,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 + Parameters
     + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
 
-### View activity [GET]
+### NOT_IMPLEMENTED View activity [GET]
 >**Permission:** 
 - - - - -
 + creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
@@ -2332,7 +2336,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### Update activity [PUT]
+### NOT_IMPLEMENTED Update activity [PUT]
 >**Permission:** creator
 - - - - -
 
@@ -2359,7 +2363,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### Delete activity [DELETE]
+### NOT_IMPLEMENTED Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
 
@@ -2412,7 +2416,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-### Create generated relation [POST /relations/generated]
+### NOT_IMPLEMENTED Create generated relation [POST /relations/generated]
 >**Permission:** creator of the activity *and* visibility to the `WasGeneratedBy` entity
 - - - - -
 
@@ -2457,7 +2461,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-# List provenance relations [GET /relations/{object_kind}/{object_id}]
+# NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the `Used` and `WasGeneratedBy` relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity (file or file version)
@@ -2521,7 +2525,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
 + Parameters
     + id (string, required, `372f25e1-01b0-4b8d-9524-e26dd573cc95`) ... The unique id of the provenance relation.
 
-## View relation [GET]
+## NOT_IMPLEMENTED View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity (i.e. file or file version)
 
 + Response 200 (application/json)
@@ -2549,7 +2553,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
             "audit": { }
         }
 
-## Delete relation [DELETE]
+## NOT_IMPLEMENTED Delete relation [DELETE]
 >**Permission:** creator
 
 + Response 204
@@ -2559,7 +2563,7 @@ The `Provenance Relations` API actions allows users and software agents to recor
 
 *Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-### Search Provenance [POST /search/provenance]
+### NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
 Given a starting node *(activity, file, o file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity (file or file version)
