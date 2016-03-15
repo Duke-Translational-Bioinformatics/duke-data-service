@@ -56,6 +56,10 @@ class Upload < ActiveRecord::Base
     end
   end
 
+  def initialize_storage_provider
+    storage_provider.put_container(project_id)
+  end
+
   private
   def integrity_exception(message)
     exactly_now = DateTime.now
