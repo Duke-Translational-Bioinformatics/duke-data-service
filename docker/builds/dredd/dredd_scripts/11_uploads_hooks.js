@@ -108,6 +108,5 @@ hooks.before(COMPLETE_CHUNKED_UPLOAD, function (transaction) {
 
 hooks.before(SERVER_HASH_UPLOAD, function (transaction) {
   // replacing id in URL with stashed id from previous response
-  var url = transaction.fullPath;
-  transaction.fullPath = url.replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23', g_uploadId);
+  transaction.skip = true;
 });

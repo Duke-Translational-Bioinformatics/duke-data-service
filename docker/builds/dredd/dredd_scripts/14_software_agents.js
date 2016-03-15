@@ -83,23 +83,36 @@ hooks.after(SA_REGENERATE, function (transaction) {
 });
 
 hooks.before(SA_GET_TOKEN, function (transaction,done) {
-  //Current user - 02)current_user_hooks.js is called before this with global
-  //I'm going to try that first - g_currentUserID before calling separately
-  // reusing data from previous response here
-  var sa_key = JSON.parse(responseStash[SA_REGENERATE])['key'];
-  // replacing id in URL with stashed id from previous response
-  //first we'll create a new software agent
   var payload = {
   };
-  var request = tools.createResource('GET', '/current_user', JSON.stringify(payload),hooks.configuration.server);
+  var request = tools.createResource('PUT', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
   request.then(function(data) {
-    current_user_id = data['id'];
-    var requestBody = JSON.parse(transaction.request.body);
-    // modify request body here
-    requestBody['agent_key'] = sa_key;
-    requestBody['user_key'] = current_user_id;
-    // stringify the new body to request
-    transaction.request.body = JSON.stringify(requestBody);
-    done();
+    var request = tools.createResource('GET', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
+    request.then(function(data) {
+      current_user_id = data['key'];
+      var payload2 = {
+          "name": "Hash computation agent"
+      }
+      var request2 = tools.createResource('POST', '/software_agents', JSON.stringify(payload2),hooks.configuration.server);
+      request2.then(function(data2) {
+        sa_id = data2['id'];
+        var request3 = tools.createResource('GET', '/software_agents/'+sa_id+'/api_key', JSON.stringify(payload),hooks.configuration.server);
+        request3.then(function(data3) {
+          sa_key = data3['key'];
+          // parse request body from blueprint
+          var requestBody = JSON.parse(transaction.request.body);
+          // modify request body here
+          requestBody['agent_key'] = sa_key;
+          requestBody['user_key'] = current_user_id;
+          // stringify the new body to request
+          transaction.request.body = JSON.stringify(requestBody);
+          done();
+        });
+      });
+    });
   });
+});
+
+hooks.after(SA_GET_TOKEN, function (transaction) {
+console.log(transaction.request);
 });

@@ -60,7 +60,7 @@ hooks.before(VIEW_FILE, function (transaction) {
 });
 
 hooks.before(UPDATE_FILE, function (transaction) {
-
+  transaction.skip = true;
 });
 
 hooks.before(DELETE_FILE, function (transaction, done) {
