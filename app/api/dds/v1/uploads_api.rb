@@ -45,6 +45,7 @@ module DDS
               end
               authorize upload, :create?
               if upload.save
+                upload.initialize_storage_provider
                 annotate_audits [upload.audits.last]
                 upload
               else
