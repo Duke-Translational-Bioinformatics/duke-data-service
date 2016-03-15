@@ -1,4 +1,5 @@
 class UploadSerializer < ActiveModel::Serializer
+  include AuditSummarySerializer
   attributes :id, :name, :content_type, :size, :etag, :hash, :chunks, :status, :audit
 
   has_one :project, serializer: ProjectPreviewSerializer

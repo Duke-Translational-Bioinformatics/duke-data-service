@@ -17,5 +17,9 @@ FactoryGirl.define do
       first_name 'Mark'
       last_name 'DeLong'
     end
+
+    trait :with_key do
+      api_key
+    end
   end
 end
