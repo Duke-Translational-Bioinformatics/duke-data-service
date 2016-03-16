@@ -727,7 +727,18 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
     [Project instance][]
 
-## NOT_IMPLEMENTED Current user usage [GET /projects/{id}/usage]
+
+### Delete project [DELETE]
+>**Permission:** delete_project
+- - - - -
+
+>**Rules**
+- - - - -
++ This operation recursively deletes all of the project children (i.e. folders,files and file versions).
+
++ Response 204
+
+## NOT_IMPLEMENTED Project usage [GET /projects/{id}/usage]
 View summary usage for the project.
 
 >**Permission:** view_project
@@ -744,6 +755,9 @@ View summary usage for the project.
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
 + Counts/totals are only for objects user has visibility to via the view_project permission.
 
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
 + Response 200 (application/json)
 
         {
@@ -751,16 +765,6 @@ View summary usage for the project.
             "file_count": 126,
             "storage_bytes": 804006007009
         }
-
-### Delete project [DELETE]
->**Permission:** delete_project
-- - - - -
-
->**Rules**
-- - - - -
-+ This operation recursively deletes all of the project children (i.e. folders,files and file versions).
-
-+ Response 204
 
 ## Group Project Permissions
 Represents project level authorization roles that have been granted to a user.
