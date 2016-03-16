@@ -12,6 +12,7 @@ RSpec.describe StorageProvider, type: :model do
     subject { swift_storage_provider }
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
+    let(:slo_name) { 'the_slo' }
     let(:segment_name) { [object_name, 1].join('/') }
     let(:segment_path) { [container_name, segment_name].join('/') }
     let(:object_body) { 'This is the object body!' }
@@ -118,7 +119,7 @@ RSpec.describe StorageProvider, type: :model do
       }.not_to raise_error
     end
 
-    let(:put_object_manifest) { subject.put_object_manifest(container_name, object_name, manifest_hash) }
+    let(:put_object_manifest) { subject.put_object_manifest(container_name, slo_name, manifest_hash) }
     it 'should respond to put_object_manifest' do
       is_expected.to respond_to :put_object_manifest
       expect { put_object_manifest }.not_to raise_error
@@ -126,41 +127,53 @@ RSpec.describe StorageProvider, type: :model do
     end
 
     let(:put_object_manifest_content_type) {
-      subject.put_object_manifest(container_name, object_name, manifest_hash, content_type)
+      subject.put_object_manifest(container_name, slo_name, manifest_hash, content_type)
     }
     it 'should store the content_type on the manifest object as the content-type' do
       expect { put_object_manifest_content_type }.not_to raise_error
       expect(put_object_manifest_content_type).to be_truthy
-      resp = subject.get_object_metadata(container_name, object_name)
+      resp = subject.get_object_metadata(container_name, slo_name)
       expect(resp['content-type']).to eq(content_type)
     end
 
     let(:put_object_manifest_filename) {
-      subject.put_object_manifest(container_name, object_name, manifest_hash, nil, filename)
+      subject.put_object_manifest(container_name, slo_name, manifest_hash, nil, filename)
     }
     it 'should store the filename on the manifest object in the content-disposition' do
       expect { put_object_manifest_filename }.not_to raise_error
       expect(put_object_manifest_filename).to be_truthy
-      resp = subject.get_object_metadata(container_name, object_name)
+      resp = subject.get_object_metadata(container_name, slo_name)
       expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
     end
 
     let(:put_object_manifest_content_type_filename) {
-      subject.put_object_manifest(container_name, object_name, manifest_hash, content_type, filename)
+      subject.put_object_manifest(container_name, slo_name, manifest_hash, content_type, filename)
     }
     it 'should store both the content_type and filename on the manifest object' do
       expect { put_object_manifest_content_type_filename }.not_to raise_error
       expect(put_object_manifest_content_type_filename).to be_truthy
-      resp = subject.get_object_metadata(container_name, object_name)
+      resp = subject.get_object_metadata(container_name, slo_name)
       expect(resp['content-type']).to eq(content_type)
       expect(resp['content-disposition']).to eq("attachment; filename=#{filename}")
     end
 
-    let(:delete_object) { subject.delete_object(container_name, object_name) }
+    let(:delete_object) { subject.delete_object(container_name, segment_name) }
     it 'should respond to delete_object' do
+      put_container
+      put_object
       is_expected.to respond_to :delete_object
       expect { delete_object }.not_to raise_error
       expect(delete_object).to be_truthy
+    end
+
+    let(:delete_object_manifest) { subject.delete_object_manifest(container_name, slo_name) }
+    it 'should respond to delete_object_manifest' do
+      put_container
+      put_object
+      put_object_manifest
+      is_expected.to respond_to :delete_object_manifest
+      expect { delete_object_manifest }.not_to raise_error
+      expect(delete_object_manifest).to be_truthy
     end
 
     let(:delete_container) { subject.delete_container(container_name) }
