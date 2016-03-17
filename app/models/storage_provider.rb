@@ -130,9 +130,18 @@ class StorageProvider < ActiveRecord::Base
       raise(StorageProviderException, resp.body)
   end
 
-  def delete_object(container, object)
+  def delete_object_manifest(container, object)
     resp = HTTParty.delete(
       "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
+      headers: auth_header
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_object(container, object)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}/#{object}",
       headers: auth_header
     )
     ([200,204].include?(resp.response.code.to_i)) ||

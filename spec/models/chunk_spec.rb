@@ -4,11 +4,11 @@ RSpec.describe Chunk, type: :model do
   subject { FactoryGirl.create(:chunk) }
   let(:storage_provider) { subject.storage_provider }
 
-  let(:expected_sub_path) { [subject.project_id, subject.upload_id, subject.number].join('/')}
+  let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
+  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
   let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
   let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
   let(:is_logically_deleted) { false }
-
   it_behaves_like 'an audited model'
 
   describe 'associations' do
@@ -55,6 +55,11 @@ RSpec.describe Chunk, type: :model do
     it 'should have a http_headers method' do
       should respond_to :http_headers
       expect(subject.http_headers).to eq []
+    end
+
+    it 'should have an object_path method' do
+      should respond_to :object_path
+      expect(subject.object_path).to eq(expected_object_path)
     end
   end
 

@@ -19,16 +19,21 @@ var responseStash = {};
 var g_fileId = null;
 
 hooks.before(LIST_VERSION, function (transaction) {
+  transaction.skip = true;
 });
 
 hooks.before(VIEW_VERSION, function (transaction) {
+  transaction.skip = true;
 });
 
 hooks.before(UPDATE_VERSION, function (transaction) {
+  transaction.skip = true;
 });
 
 hooks.before(DELETE_VERSION, function (transaction) {
+  transaction.skip = true;
 });
 
 hooks.before(VERSION_URL, function (transaction) {
+  transaction.skip = true;
 });

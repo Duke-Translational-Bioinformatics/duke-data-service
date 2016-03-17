@@ -2,12 +2,12 @@ module DDS
   module V1
     class SoftwareAgentsAPI < Grape::API
       desc 'List software agents' do
-        detail 'Lists all software agents'
+        detail 'Lists all software agents (software_agent gets empty list)'
         named 'list software agents'
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restrictured)']
+          [403, 'Forbidden']
         ]
       end
       get '/software_agents', root: 'results' do
@@ -23,7 +23,7 @@ module DDS
           [201, 'Created Successfully'],
           [400, 'Software agent requires a name'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restrictured)']
+          [403, 'Forbidden (software_agent restricted)']
         ]
       end
       params do

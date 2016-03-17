@@ -29,8 +29,12 @@ class Chunk < ActiveRecord::Base
     []
   end
 
+  def object_path
+    [upload_id, number].join('/')
+  end
+
   def sub_path
-    [project_id, upload_id, number].join('/')
+    [project_id, object_path].join('/')
   end
 
   def expiry
