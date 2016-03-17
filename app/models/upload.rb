@@ -15,6 +15,10 @@ class Upload < ActiveRecord::Base
 
   delegate :url_root, to: :storage_provider
 
+  def object_path
+    id
+  end
+  
   def sub_path
     [project_id, id].join('/')
   end
