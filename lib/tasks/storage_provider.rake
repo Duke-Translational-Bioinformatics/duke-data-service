@@ -45,37 +45,42 @@ namespace :storage_provider do
       puts "does not work in production"
       exit
     end
+    Rails.logger.level = 3
     Container.auditing_enabled = false
     storage_provider = StorageProvider.first
     Project.all.each do |project|
       project.data_files.each do |data_file|
         upload = data_file.upload
         #versions
-        upload.chunks.all.each do |chunk|
+        if upload
+          upload.chunks.all.each do |chunk|
+            begin
+              storage_provider.delete_object(project.id, chunk.object_path)
+              chunk.destroy
+              print "c."
+            rescue StorageProviderException => e
+              puts "#{chunk.sub_path} object could not be deleted #{e.message}"
+            end
+          end
           begin
-            storage_provider.delete_object(project.id, chunk.object_path)
-            chunk.destroy
-            puts "."
+            storage_provider.delete_object_manifest(project.id, upload.object_path)
+            upload.destroy if upload
+            print "u."
           rescue StorageProviderException => e
-            puts "#{chunk.sub_path} object could not be deleted #{e.message}"
+            puts "#{upload.sub_path} manifest could not be deleted #{e.message}"
           end
         end
-        begin
-          storage_provider.delete_object_manifest(project.id, upload.object_path)
-          upload.destroy
-          data_file.destroy
-          puts "."
-        rescue StorageProviderException => e
-          puts "#{upload.sub_path} manifest could not be deleted #{e.message}"
-        end
+        data_file.destroy
+        print "d."
       end
       begin
         storage_provider.delete_container(project.id)
-        puts "."
+        print "p."
       rescue StorageProviderException => e
         puts "#{project.id} container could not be deleted #{e.message}"
       end
     end
+    puts "\n"
     puts storage_provider.get_account_info.to_json
   end
 
