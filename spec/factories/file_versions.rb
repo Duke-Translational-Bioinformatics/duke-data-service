@@ -5,7 +5,6 @@ FactoryGirl.define do
     label { Faker::Hacker.say_something_smart }
     is_deleted false
     association :upload, :completed
-    creator { upload.creator }
 
     trait :deleted do
       is_deleted true

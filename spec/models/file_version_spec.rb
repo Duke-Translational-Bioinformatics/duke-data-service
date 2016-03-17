@@ -14,12 +14,10 @@ RSpec.describe FileVersion, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
     it { is_expected.to belong_to(:upload) }
-    it { is_expected.to belong_to(:creator) }
   end
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :upload_id }
-    it { is_expected.to validate_presence_of :creator_id }
 
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
@@ -29,7 +27,6 @@ RSpec.describe FileVersion, type: :model do
     context 'when #is_deleted=true' do
       subject { deleted_file_version }
       it { is_expected.not_to validate_presence_of(:upload_id) }
-      it { is_expected.not_to validate_presence_of(:creator_id) }
     end
   end
 

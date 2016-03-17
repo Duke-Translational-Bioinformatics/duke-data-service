@@ -17,25 +17,12 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'associations' do
-    it 'should be part of a project' do
-      should belong_to(:project)
-    end
-
-    it 'should have a parent' do
-      should belong_to(:parent)
-    end
-
-    it 'should be based on an upload' do
-      should belong_to(:upload)
-    end
-
-    it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:project)
-    end
-
-    it 'should belong to creator' do
-      should belong_to(:creator).class_name('User')
-    end
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:parent) }
+    it { is_expected.to belong_to(:upload) }
+    it { is_expected.to have_many(:project_permissions).through(:project) }
+    it { is_expected.to belong_to(:creator).class_name('User') }
+    it { is_expected.to have_many(:file_versions) }
   end
 
   describe 'validations' do
@@ -85,16 +72,6 @@ RSpec.describe DataFile, type: :model do
       expect(subject.valid?).to be_falsey
       expect(subject.errors.keys).to include(:upload)
       expect(subject.errors[:upload]).to include('must be completed successfully')
-    end
-
-    it 'should require creator equal upload.creator' do
-      should allow_value(completed_upload.id).for(:upload_id)
-      should_not allow_value(not_creator_of_upload.id).for(:upload_id)
-      should allow_value(completed_upload).for(:upload)
-      should_not allow_value(not_creator_of_upload).for(:upload)
-      expect(subject.valid?).to be_falsey
-      expect(subject.errors.keys).to include(:upload)
-      expect(subject.errors[:upload]).to include('created by another user')
     end
 
     it 'should require a creator_id' do
@@ -171,5 +148,36 @@ RSpec.describe DataFile, type: :model do
         end
       end
     end
+
+    describe '#build_file_version' do
+      it { is_expected.to respond_to(:build_file_version) }
+      it { expect(subject.build_file_version).to be_a FileVersion }
+      it 'builds a file_version' do
+        expect { 
+          subject.build_file_version
+        }.to change{subject.file_versions.length}.by(1)
+      end
+      it { expect(subject.build_file_version.label).to eq subject.label }
+      it { expect(subject.build_file_version.upload).to eq subject.upload }
+
+      context 'after subject attributes changed' do
+        let!(:original_upload) { subject.upload }
+        let!(:original_label) { subject.label }
+        let(:new_upload) { FactoryGirl.create(:upload, :completed) }
+        let(:new_label) { Faker::Hacker.say_something_smart }
+        before do
+          subject.upload = new_upload
+          subject.label = new_label
+        end
+        it { expect(subject.build_file_version.upload).not_to eq new_upload }
+        it { expect(subject.build_file_version.label).not_to eq new_label }
+        it { expect(subject.build_file_version.upload).to eq original_upload }
+        it { expect(subject.build_file_version.label).to eq original_label }
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:build_file_version).before(:update).if(:upload_id_changed?) }
   end
 end

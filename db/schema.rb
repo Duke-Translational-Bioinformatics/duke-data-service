@@ -94,11 +94,11 @@ ActiveRecord::Schema.define(version: 20160317152825) do
     t.string   "type"
     t.uuid     "parent_id"
     t.uuid     "project_id"
+    t.uuid     "creator_id"
+    t.uuid     "upload_id"
     t.boolean  "is_deleted", default: false
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
-    t.uuid     "creator_id"
-    t.uuid     "upload_id"
     t.string   "label"
   end
 
@@ -107,7 +107,6 @@ ActiveRecord::Schema.define(version: 20160317152825) do
     t.integer  "version"
     t.string   "label"
     t.uuid     "upload_id"
-    t.uuid     "creator_id"
     t.boolean  "is_deleted",   default: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false

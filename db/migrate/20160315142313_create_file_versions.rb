@@ -5,7 +5,6 @@ class CreateFileVersions < ActiveRecord::Migration
       t.integer :version
       t.string :label
       t.uuid :upload_id
-      t.uuid :creator_id
       t.boolean :is_deleted, default: false
 
       t.timestamps null: false
