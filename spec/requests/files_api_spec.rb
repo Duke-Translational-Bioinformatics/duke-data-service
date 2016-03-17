@@ -15,6 +15,7 @@ describe DDS::V1::FilesAPI do
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
   let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
 
+  let(:completed_upload) { FactoryGirl.create(:upload, :completed, project: project, creator: current_user) }
   let(:incomplete_upload) { FactoryGirl.create(:upload, project: project, creator: current_user) }
   let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project, creator: current_user) }
 
@@ -23,6 +24,7 @@ describe DDS::V1::FilesAPI do
   let!(:resource) { file }
   let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
+  let(:resource_stub) { FactoryGirl.build(:data_file, project: project, upload: upload) }
 
   describe 'Files collection' do
     let(:url) { "/api/v1/files" }
@@ -34,13 +36,18 @@ describe DDS::V1::FilesAPI do
       let(:payload_upload) {{ id: upload.id }}
       let!(:payload) {{
         parent: payload_parent,
-        upload: payload_upload
+        upload: payload_upload,
+        label: resource_stub.label
       }}
 
       it_behaves_like 'a creatable resource' do
         it 'should set creator' do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
+        end
+        it 'should set label' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.label).to eq(payload[:label])
         end
       end
       it_behaves_like 'an authenticated resource'
@@ -130,6 +137,53 @@ describe DDS::V1::FilesAPI do
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
+      end
+    end
+
+    describe 'PUT' do
+      subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
+      let(:payload_upload) {{ id: completed_upload.id }}
+      let(:payload) {{
+        upload: payload_upload,
+        label: resource_stub.label
+      }}
+
+      it_behaves_like 'an updatable resource' do
+        it 'creates a software_version' do
+          expect {
+            is_expected.to eq(200)
+          }.to change{resource.file_versions.count}.by(1)
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
+
+      context 'with incomplete upload' do
+        let(:payload_upload) {{ id: incomplete_upload.id }}
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with an error upload' do
+        let(:payload_upload) {{ id: error_upload.id }}
+        it_behaves_like 'a validated resource'
+      end
+
+      it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+
+      it_behaves_like 'an identified resource' do
+        let(:payload) {{
+          upload: { id: 'notfoundid' }
+        }}
+        let(:resource_class) { Upload }
       end
     end
 

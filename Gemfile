@@ -56,6 +56,7 @@ end
 
 group :test do
   gem 'shoulda-matchers', require: false
+  gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
   gem 'vcr', group: :test
   gem 'webmock', group: :test
