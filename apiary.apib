@@ -40,7 +40,14 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 15-Mar-2016
 --------------
 + For resource actions not yet implemented - added *NOT_IMPLEMENTED* prefix to inform API consumers and dredd testing workflow.
-+ Revereted design changes to support server hashing agent back to current production implementation.  This will be addressed in later sprint.
++ Reverted design changes to support server hashing agent back to current production implementation.  This will be addressed in later sprint.
+
+16-Mar-2016
+--------------
++ Added *Tags* resource/actions - current iteration assumes only file tagging is supported, but design supports extension to tag other objects.
++ For *Software Agents* resource - added `time_to_live` property to the `POST /software_agents/api_token` action response payload.
++ For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
++ Added `GET /pojects/{id}/usage` - returns summary usage details for the project.
 
 ## Group API Usage
 
@@ -367,6 +374,7 @@ Using a software agent secret key and a user secret key, get an access token.
 - - - - -
 + **api_token (string)** - The access token.
 + **expire_on (number)** - Token expiration as posix/epoch time.
++ **time_to_live (number)** - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.
 
 >**Rules**
 - - - - -
@@ -383,7 +391,8 @@ Using a software agent secret key and a user secret key, get an access token.
 
         {
             "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
-            "expire_on": 1455571739
+            "expire_on": 1455571739,
+            "time_to_live": 14400 
         }
 
 ## Group Current User
@@ -426,7 +435,7 @@ View summary usage for current user across all projects.
 
 >**Rules**
 - - - - -
-+ Deleted objects (i.e. `"is_deleted": true`) should be excluded from all counts/totals.
++ Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
 + Counts/totals are only for objects user has visibility to via the view_project permission.
 
 + Response 200 (application/json)
@@ -718,6 +727,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
     [Project instance][]
 
+
 ### Delete project [DELETE]
 >**Permission:** delete_project
 - - - - -
@@ -727,6 +737,34 @@ Represents a container for storing, organizing, retrieving and sharing research 
 + This operation recursively deletes all of the project children (i.e. folders,files and file versions).
 
 + Response 204
+
+## NOT_IMPLEMENTED Project usage [GET /projects/{id}/usage]
+View summary usage for the project.
+
+>**Permission:** view_project
+- - - - -
+
+>**Response Properties**
+- - - - -
++ **member_count (number)** - Total number of users granted a project level permission.
++ **file_count (integer)** - Total number of files contained in the project.
++ **storage_bytes (integer)** - Total bytes for all files contained in the project.
+
+>**Rules**
+- - - - -
++ Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
++ Counts/totals are only for objects user has visibility to via the view_project permission.
+
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
++ Response 200 (application/json)
+
+        {
+            "member_count": 10,
+            "file_count": 126,
+            "storage_bytes": 804006007009
+        }
 
 ## Group Project Permissions
 Represents project level authorization roles that have been granted to a user.
@@ -1113,7 +1151,6 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Rules**
 - - - - -
-+ Folders can only be moved within the context of the folders current project.
 + The destination folder cannot be a child of the folder being moved.
 
 + Parameters
@@ -1578,7 +1615,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
         }
 
 ## NOT_IMPLEMENTED Update file [PUT]
-Updates one or more file resource properties; if this action modifies the `upload` property, the previous file resource is transitioned to version history (see **File Versions**).
+Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
@@ -1587,7 +1624,7 @@ Updates one or more file resource properties; if this action modifies the `uploa
 
 >**Properties**
 - - - - -
-+ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully.
++ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully; if specified, the previous file resource is versioned.
 + **label (string, optional)** - An optional short display label for the file.
 
 >**Rules**
@@ -1649,6 +1686,10 @@ Updates one or more file resource properties; if this action modifies the `uploa
 >**Permission:** delete_file
 - - - - -
 
+>**Rules**
+- - - - -
++ This operation recursively deletes related file versions.
+
 + Response 204
 
 ## Get file download URL [GET /files/{id}/url]
@@ -1672,10 +1713,6 @@ Generates and returns a storage provider specific pre-signed URL that client can
 ## Move file [PUT /files/{id}/move]
 >**Permission:** create_file
 - - - - -
-
->**Rules**
-- - - - -
-+ Files can only be moved within the context of the files current project.
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2239,7 +2276,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 
 ## Relations collection [/relations]
 
-### Create used relation [POST /relations/used]
+### NOT_IMPLEMENTED Create used relation [POST /relations/used]
 >**Permission:** creator of the activity *and* visibility to the `Used` entity
 - - - - -
 
@@ -2515,3 +2552,122 @@ Given a starting node *(activity, file, o file version)*, returns a graph struct
                     }
                 ]
         }
+
+## Group Tags
+A tag is a label (i.e. word or phrase) that can be associated to an object to faciliate classification and searching. 
+
+*Note: Tags are composite metadata that become part of the tagged resource - they do not live in a global namespace. Only tagging of files* (i.e. `dds-file`) *is currently supported.*
+
+## Tags collection [/tags]
+
+### NOT_IMPLEMENTED Create object tag [POST]
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **object.kind (string, required)** - The kind of object to tag.
++ **object.id (string, required)** - The unique id of the object to tag.
++ **label (string, required)** - The textual tag content.
+
++ Request (application/json)
+
+        { 
+            "object": { 
+                "kind": "dds-file", 
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
+            },
+            "label": "SMRT sequencing"
+        }
+    
++ Response 201 (application/json)
+
+        { 
+            "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+            "object": { 
+                "kind": "dds-file", 
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
+            },
+            "label": "SMRT sequencing",
+            "audit": { }
+        }
+
+### NOT_IMPLEMENTED List object tags [GET /tags/{object_kind}/{object_id}]
+>**Permission:** view_project when tagged object is file (`dds-file`)
+- - - - -
+
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+    
++ Response 200 (application/json)
+
+        {
+            "results": [
+                { 
+                    "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+                    "object": { 
+                        "kind": "dds-file", "id": 
+                        "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
+                    },
+                    "label": "SMRT sequencing",
+                    "audit": { }
+                }
+            ]
+        }
+
+### NOT_IMPLEMENTED List tag labels [GET /tags/labels/{object_kind}/{?label_contains}]
+Get list of the **distinct** tag `label` values for a kind of DDS object.  
+
+*Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
+
+>**Permission:** view_project when tagged object is file (`dds-file`)
+- - - - -
+
++ Parameters
+    + object_kind (string, required, `dds-file`) ... Restricts search scope to tags for this kind of object.
+    + label_contains (string, optional, `sequen`) ... If provided, searches for tags that contain this text fragment.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                { 
+                    "label": "SMRT sequencing",
+                    "count": 47
+                },
+                {
+                    "label": "Polony sequencing",
+                    "count": 21
+                },
+                {
+                    "label": "DNA nanoball sequencing",
+                    "count": 13
+                }
+            ]
+        }
+
+## Tag instance [/tags/{id}]
++ Parameters
+    + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
+
+### NOT_IMPLEMENTED View tag [GET]
+>**Permission:** view_project when tagged object is file (`dds-file`)
+- - - - -
+
++ Response 200 (application/json)
+
+        { 
+            "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+            "object": { 
+                "kind": "dds-file", 
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" },
+            "label": "SMRT sequencing",
+            "audit": { }
+        }
+
+### NOT_IMPLEMENTED Delete tag [DELETE]
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
++ Response 204
