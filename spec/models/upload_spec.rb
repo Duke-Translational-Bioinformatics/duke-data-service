@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
-  let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
+  let(:expected_object_path) { subject.id }
+  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
 
@@ -52,6 +53,11 @@ RSpec.describe Upload, type: :model do
     it 'should have a sub_path method' do
       should respond_to :sub_path
       expect(subject.sub_path).to eq expected_sub_path
+    end
+
+    it 'should have an object_path method' do
+      should respond_to :object_path
+      expect(subject.object_path).to eq(expected_object_path)
     end
 
     describe '#temporary_url' do

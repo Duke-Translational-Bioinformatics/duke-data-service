@@ -27,14 +27,14 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx7ef53e40ea7149e69ded4-0056e9d648
+      - txbeaf253869dd4d82bee4b-0056e9d649
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 - request:
     method: put
     uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
@@ -56,14 +56,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx7bb7b012bf8d4f5c92c6f-0056e9d648
+      - tx17187a62d45c4e159d0d1-0056e9d649
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 - request:
     method: put
     uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object/1
@@ -79,7 +79,7 @@ http_interactions:
       message: Created
     headers:
       Last-Modified:
-      - Wed, 16 Mar 2016 21:55:21 GMT
+      - Wed, 16 Mar 2016 21:55:22 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,17 +87,48 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txc4efb8fa2ce04c0ca93db-0056e9d648
+      - tx2a5d453970924c5fa1a8f-0056e9d649
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 - request:
-    method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object/1
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Wed, 16 Mar 2016 21:55:22 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"70f457e8bdf12b30ed18c5b110740c2e"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txb7c5a4a670474ecc8d5ea-0056e9d649
+      Date:
+      - Wed, 16 Mar 2016 21:55:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
+- request:
+    method: delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=delete
     body:
       encoding: US-ASCII
       string: ''
@@ -109,25 +140,18 @@ http_interactions:
       code: 200
       message: OK
     headers:
-      Content-Length:
-      - '24'
-      Accept-Ranges:
-      - bytes
-      Last-Modified:
-      - Wed, 16 Mar 2016 21:55:21 GMT
-      Etag:
-      - 9e42a695a672299a8fd4e9b5195e7d70
-      X-Timestamp:
-      - '1458165320.91358'
       Content-Type:
-      - application/x-www-form-urlencoded
+      - text/plain
       X-Trans-Id:
-      - tx3ef7d0d42a1c4f288d0f8-0056e9d648
+      - txecc47b661e364d319dc9b-0056e9d649
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
+      Transfer-Encoding:
+      - chunked
     body:
       encoding: UTF-8
-      string: ''
+      string: "Number Deleted: 2\nNumber Not Found: 0\nResponse Body: \nResponse Status:
+        200 OK\nErrors:\n"
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 recorded_with: VCR 3.0.0
