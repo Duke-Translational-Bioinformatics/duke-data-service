@@ -44,11 +44,11 @@ module DDS
             begin
               decoded_token = JWT.decode(api_token, Rails.application.secrets.secret_key_base)[0]
               @current_user = find_user_with_token(decoded_token)
-            rescue JWT::DecodeError
+            rescue JWT::ExpiredSignature
               @current_user = nil
               @auth_error = {
-                reason: 'invalid api_token',
-                suggestion: 'token not properly signed'
+                reason: 'expired api_token',
+                suggestion: 'you need to login with your authenticaton service'
               }
             rescue JWT::VerificationError
               @current_user = nil
@@ -56,11 +56,11 @@ module DDS
                 reason: 'invalid api_token',
                 suggestion: 'token not properly signed'
               }
-            rescue JWT::ExpiredSignature
+            rescue JWT::DecodeError
               @current_user = nil
               @auth_error = {
-                reason: 'expired api_token',
-                suggestion: 'you need to login with your authenticaton service'
+                reason: 'invalid api_token',
+                suggestion: 'token not properly signed'
               }
             end
           else
