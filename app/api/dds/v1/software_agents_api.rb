@@ -23,7 +23,7 @@ module DDS
           [201, 'Created Successfully'],
           [400, 'Software agent requires a name'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restrictured)']
+          [403, 'Forbidden (software_agent restricted)']
         ]
       end
       params do
