@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :data_file do
     name { Faker::Team.name }
+    label { Faker::Hacker.say_something_smart }
     association :upload, :completed
     parent_id { SecureRandom.uuid }
     project

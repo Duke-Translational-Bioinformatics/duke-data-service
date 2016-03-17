@@ -20,6 +20,7 @@ module DDS
         requires :upload, desc: "Upload", type: Hash do
           requires :id, type: String, desc: "Upload UUID"
         end
+        optional :label
       end
       post '/files', root: false do
         authenticate!
@@ -35,6 +36,7 @@ module DDS
           parent: parent,
           upload: upload,
           name: upload.name,
+          label: file_params[:label],
           creator_id: current_user.id
         })
         authorize file, :create?

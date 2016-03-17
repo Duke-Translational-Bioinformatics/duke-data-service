@@ -23,6 +23,7 @@ describe DDS::V1::FilesAPI do
   let!(:resource) { file }
   let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
+  let(:resource_stub) { FactoryGirl.build(:data_file, project: project, upload: upload) }
 
   describe 'Files collection' do
     let(:url) { "/api/v1/files" }
@@ -34,13 +35,18 @@ describe DDS::V1::FilesAPI do
       let(:payload_upload) {{ id: upload.id }}
       let!(:payload) {{
         parent: payload_parent,
-        upload: payload_upload
+        upload: payload_upload,
+        label: resource_stub.label
       }}
 
       it_behaves_like 'a creatable resource' do
         it 'should set creator' do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
+        end
+        it 'should set label' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.label).to eq(payload[:label])
         end
       end
       it_behaves_like 'an authenticated resource'
