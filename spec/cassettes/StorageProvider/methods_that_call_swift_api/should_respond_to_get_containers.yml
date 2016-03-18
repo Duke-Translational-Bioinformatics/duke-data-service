@@ -1,0 +1,219 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx45e4d16187f64c6a9f8cf-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      Content-Length:
+      - '76'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx5222fce8eb7d4fffa4ec5-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '14'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458311121.01918'
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '1'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Account-Object-Count:
+      - '0'
+      X-Trans-Id:
+      - txcb274e87e60642438e379-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        the_container
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '14'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458311121.01918'
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '1'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Account-Object-Count:
+      - '0'
+      X-Trans-Id:
+      - tx2b53abc199034875bd4da-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        the_container
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '14'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458311121.01918'
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '1'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Account-Object-Count:
+      - '0'
+      X-Trans-Id:
+      - tx98db87a631b9401aaac75-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        the_container
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '14'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458311121.01918'
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '1'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Account-Object-Count:
+      - '0'
+      X-Trans-Id:
+      - txf81df19d39204aab812de-0056ec12ac
+      Date:
+      - Fri, 18 Mar 2016 14:37:32 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        the_container
+    http_version: 
+  recorded_at: Fri, 18 Mar 2016 14:37:32 GMT
+recorded_with: VCR 3.0.0
