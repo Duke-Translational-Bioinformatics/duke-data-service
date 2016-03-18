@@ -14,6 +14,7 @@ RSpec.describe FileVersion, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
     it { is_expected.to belong_to(:upload) }
+    it { is_expected.to have_many(:project_permissions).through(:data_file) }
   end
 
   describe 'validations' do
