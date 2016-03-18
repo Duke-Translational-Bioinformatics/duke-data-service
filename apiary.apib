@@ -49,6 +49,11 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
 + Added `GET /pojects/{id}/usage` - returns summary usage details for the project.
 
+18-Mar-2016
+--------------
++ For *Software Agents* resource - added action `DELETE /software_agents/{id}/api_key` - this allows agent key to be removed liken to user key actions.
++ For *Uploads* resource - reverted `hash` back to a required property - this aligns with Web portal now being able to hash "larger" files via streaming.
+
 ## Group API Usage
 
 Web Portal
@@ -322,9 +327,28 @@ Creates software agent and an associated secret API key; the secret key is visib
 
 + Response 204
 
-## Software Agent Secret Key [/software_agents/{id}/api_key]
+## Software Agent API Key [/software_agents/{id}/api_key]
+Generates a secret key for the software agent that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid user secret key (see **Current User** actions).
+
 + Parameters
     + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## Generate software agent API key [PUT]
+Generates a new secret key for the software agent.
+
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ If the software agent already has an API key, this action deletes exisiting key and generates a new key.
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-06-01T12:00:00Z"
+        }
 
 ## View software agent API key [GET]
 Shows the secret key for the software agent.
@@ -344,18 +368,11 @@ Shows the secret key for the software agent.
                 "created_on": "2015-01-01T12:00:00Z"
             }
 
-## Re-generate software agent API key [PUT]
-Generates a new secret key for the software agent.
-
+## Delete software agent API key [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
 
-+ Response 200 (application/json)
-
-        {
-            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-            "created_on": "2015-06-01T12:00:00Z"
-        }
++ Response 204 
 
 ## Software Agent Access Token [/software_agents/api_token]
 
@@ -446,7 +463,7 @@ View summary usage for current user across all projects.
             "storage_bytes": 304006007009
         }
 
-## Current User Secret Key [/current_user/api_key]
+## Current User API Key [/current_user/api_key]
 
 ## Generate current user API key [PUT]
 Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents** actions).
@@ -1045,7 +1062,7 @@ Represents an external service that provides physical storage space for files.
         }
 
 ## Group Folders
-A folder is a container for files and sub-folders; folders are located in the top-level project root or a a parent folder.
+A folder is a container for files and sub-folders; folders are located in the top-level project root or a parent folder.
 
 ## Folders collection [/folders]
 

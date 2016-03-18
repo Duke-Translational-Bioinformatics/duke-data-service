@@ -40,6 +40,30 @@ RSpec.describe StorageProvider, type: :model do
       expect(subject.storage_url).to be_a String
     end
 
+    let(:get_containers) { subject.get_containers }
+    let(:expected_container_count) { subject.get_account_info["x-account-container-count"].to_i }
+    it 'should respond to get_containers' do
+      is_expected.to respond_to :get_containers
+      put_container
+      expect(expected_container_count).to be > 0
+      expect { get_containers }.not_to raise_error
+      expect(get_containers).to be_a Array
+      expect(get_containers.length).to eq(expected_container_count)
+    end
+
+    let(:get_container_objects) { subject.get_container_objects(container_name) }
+    let(:expected_object_count) { subject.get_container_meta(container_name)["x-container-object-count"].to_i }
+    it 'should respond to get_container_objects' do
+      is_expected.to respond_to :get_container_objects
+      put_container
+      put_object
+      put_object_manifest
+      expect(expected_object_count).to be > 0
+      expect { get_container_objects }.not_to raise_error
+      expect(get_container_objects).to be_a Array
+      expect(get_container_objects.length).to eq(expected_object_count)
+    end
+
     let(:get_account_info) { subject.get_account_info }
     it 'should respond to get_account_info' do
       is_expected.to respond_to :get_account_info
