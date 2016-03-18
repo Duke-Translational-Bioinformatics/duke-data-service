@@ -86,7 +86,63 @@ namespace :storage_provider do
 
   desc 'print storage_provider usage information'
   task usage: :environment do
+    Rails.logger.level = 3
     sp = StorageProvider.first
     puts sp.get_account_info.to_json
+  end
+
+  desc 'destroys containers, manifests, and objects orphaned from destroyed or logically_deleted objects'
+  task prune: :environment do
+    Rails.logger.level = 3
+    to_prune = {
+      projects: [],
+      uploads: [],
+      chunks: []
+    }
+
+    storage_provider = StorageProvider.first
+    storage_provider.get_containers.each do |container|
+      unless Project.where(id: container).exists?
+        to_prune[:projects] << container
+      end
+
+      storage_provider.get_container_objects(container).each do |object|
+        if storage_provider.get_object_metadata(container, object)["x-static-large-object"]
+          unless Upload.where(id: object).exists?
+            to_prune[:uploads] << [container, object]
+          end
+        else
+          upload_id, chunk_number = object.split('/')
+          unless Chunk.where(upload_id: upload_id, number: chunk_number).exists?
+            to_prune[:chunks] << [container, object]
+          end
+        end
+      end
+    end
+
+    to_prune[:chunks].each do |chunk|
+      begin
+        storage_provider.delete_object(*chunk)
+        print 'c.'
+      rescue StorageProviderException => e
+        puts "#{chunk} object could not be deleted #{e.message}"
+      end
+    end
+    to_prune[:uploads].each do |upload|
+      begin
+        storage_provider.delete_object_manifest(*upload)
+        print 'u.'
+      rescue StorageProviderException => e
+        puts "#{object} manifest could not be deleted #{e.message}"
+      end
+    end
+    to_prune[:projects].each do |project|
+      begin
+        storage_provider.delete_container(project)
+        print 'p.'
+      rescue StorageProviderException => e
+        puts "#{project} container could not be deleted #{e.message}"
+      end
+    end
   end
 end
