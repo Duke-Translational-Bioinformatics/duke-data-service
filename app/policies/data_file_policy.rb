@@ -12,11 +12,11 @@ class DataFilePolicy < ApplicationPolicy
   end
 
   def create?
-    permission
+    system_permission || (project_permission && record.upload.creator == user)
   end
 
   def update?
-    permission
+    system_permission || (project_permission && record.upload.creator == user)
   end
 
   def destroy?
