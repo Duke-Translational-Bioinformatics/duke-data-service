@@ -4,6 +4,7 @@ class FileVersion < ActiveRecord::Base
   audited
   belongs_to :data_file
   belongs_to :upload
+  has_many :project_permissions, through: :data_file
 
   validates :upload_id, presence: true, unless: :is_deleted
 
