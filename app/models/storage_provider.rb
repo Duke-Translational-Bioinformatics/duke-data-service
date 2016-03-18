@@ -93,6 +93,17 @@ class StorageProvider < ActiveRecord::Base
      resp.headers
   end
 
+  def get_container_objects(container)
+    resp = HTTParty.get(
+      "#{storage_url}/#{container}",
+      headers: auth_header
+    )
+    return if resp.response.code.to_i == 404
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+     resp.body.split("\n")
+  end
+
   def put_container(container)
     resp = HTTParty.put(
       "#{storage_url}/#{container}",
