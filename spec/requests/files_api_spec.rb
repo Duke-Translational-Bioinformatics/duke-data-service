@@ -157,6 +157,19 @@ describe DDS::V1::FilesAPI do
         end
       end
 
+      context 'without upload in payload' do
+        let(:payload) {{
+          label: resource_stub.label
+        }}
+        it_behaves_like 'an updatable resource' do
+          it 'creates a software_version' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{resource.file_versions.count}.by(0)
+          end
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint'
