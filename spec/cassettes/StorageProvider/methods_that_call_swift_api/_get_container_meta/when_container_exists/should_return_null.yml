@@ -1,0 +1,104 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txaa5759178fd14090b3c7f-0056e9d649
+      Date:
+      - Wed, 16 Mar 2016 21:55:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
+- request:
+    method: put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx06ce785ab00045f89eb0a-0056e9d649
+      Date:
+      - Wed, 16 Mar 2016 21:55:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
+- request:
+    method: head
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      X-Container-Object-Count:
+      - '0'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458165320.75943'
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+      X-Container-Bytes-Used:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Trans-Id:
+      - txcbe59312b7af4729b36ca-0056e9d649
+      Date:
+      - Wed, 16 Mar 2016 21:55:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
+recorded_with: VCR 3.0.0

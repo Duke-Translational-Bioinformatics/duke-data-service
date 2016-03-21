@@ -2,12 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
-  let(:expected_sub_path) { [subject.project_id, subject.id].join('/')}
-  let(:is_logically_deleted) { false }
+  let(:expected_object_path) { subject.id }
+  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
-  it_behaves_like 'an audited model' do
-    it_behaves_like 'with a serialized audit'
-  end
+  it_behaves_like 'an audited model'
 
   describe 'associations' do
     it 'should belong_to a project' do
@@ -57,6 +55,11 @@ RSpec.describe Upload, type: :model do
       expect(subject.sub_path).to eq expected_sub_path
     end
 
+    it 'should have an object_path method' do
+      should respond_to :object_path
+      expect(subject.object_path).to eq(expected_object_path)
+    end
+
     describe '#temporary_url' do
       it { is_expected.to respond_to :temporary_url }
       it { expect(subject.temporary_url).to be_a String }
@@ -91,6 +94,16 @@ RSpec.describe Upload, type: :model do
 
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
+
+    describe '.initialize_storage_provider' do
+      it { is_expected.to respond_to 'initialize_storage_provider' }
+
+      it 'should create the upload container in the storage provider' do
+        expect(subject.storage_provider.get_container_meta(subject.project_id)).to be_nil
+        subject.initialize_storage_provider
+        expect(subject.storage_provider.get_container_meta(subject.project_id)).to be
+      end
+    end
 
     describe 'complete' do
       it 'should be implemented' do

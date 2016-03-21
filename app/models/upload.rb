@@ -1,6 +1,5 @@
 class Upload < ActiveRecord::Base
   default_scope { order('created_at DESC') }
-  include SerializedAudit
   audited
   belongs_to :project
   belongs_to :storage_provider
@@ -16,6 +15,10 @@ class Upload < ActiveRecord::Base
 
   delegate :url_root, to: :storage_provider
 
+  def object_path
+    id
+  end
+  
   def sub_path
     [project_id, id].join('/')
   end
@@ -55,6 +58,10 @@ class Upload < ActiveRecord::Base
         raise e
       end
     end
+  end
+
+  def initialize_storage_provider
+    storage_provider.put_container(project_id)
   end
 
   private

@@ -72,6 +72,38 @@ class StorageProvider < ActiveRecord::Base
     resp.headers
   end
 
+  def get_containers
+    resp = HTTParty.get(
+      "#{storage_url}",
+      headers: auth_header
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+    return resp.body ? resp.body.split("\n") : []
+  end
+
+  def get_container_meta(container)
+    resp = HTTParty.head(
+      "#{storage_url}/#{container}",
+      headers: auth_header
+    )
+    return if resp.response.code.to_i == 404
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+     resp.headers
+  end
+
+  def get_container_objects(container)
+    resp = HTTParty.get(
+      "#{storage_url}/#{container}",
+      headers: auth_header
+    )
+    return if resp.response.code.to_i == 404
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+     return resp.body ? resp.body.split("\n") : [] 
+  end
+
   def put_container(container)
     resp = HTTParty.put(
       "#{storage_url}/#{container}",
@@ -119,9 +151,18 @@ class StorageProvider < ActiveRecord::Base
       raise(StorageProviderException, resp.body)
   end
 
-  def delete_object(container, object)
+  def delete_object_manifest(container, object)
     resp = HTTParty.delete(
       "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
+      headers: auth_header
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_object(container, object)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}/#{object}",
       headers: auth_header
     )
     ([200,204].include?(resp.response.code.to_i)) ||

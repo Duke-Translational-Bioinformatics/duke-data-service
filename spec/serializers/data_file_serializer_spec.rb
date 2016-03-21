@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DataFileSerializer, type: :serializer do
   let(:resource) { child_file }
+  let(:is_logically_deleted) { true }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
 
@@ -14,10 +15,12 @@ RSpec.describe DataFileSerializer, type: :serializer do
       is_expected.to have_key('id')
       is_expected.to have_key('parent')
       is_expected.to have_key('name')
+      is_expected.to have_key('label')
       is_expected.to have_key('is_deleted')
       expect(subject['id']).to eq(resource.id)
       expect(subject['parent']['id']).to eq(resource.parent_id)
       expect(subject['name']).to eq(resource.name)
+      expect(subject['label']).to eq(resource.label)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
   end
