@@ -36,6 +36,31 @@ module DDS
         authorize file_version, :show?
         file_version
       end
+
+      desc 'Update file version' do
+        detail 'update file version'
+        named 'update file version'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'File does not exist']
+        ]
+      end
+      params do
+        optional :label
+      end
+      put '/file_versions/:id', root: false do
+        authenticate!
+        file_version_params = declared(params, include_missing: false)
+        file_version = hide_logically_deleted(FileVersion.find(params[:id]))
+        authorize file_version, :update?
+        file_version.label = file_version_params[:label] if file_version_params[:label]
+        Audited.audit_class.as_user(current_user) do
+          file_version.save
+          annotate_audits [file_version.audits.last]
+          file_version
+        end
+      end
     end
   end
 end
