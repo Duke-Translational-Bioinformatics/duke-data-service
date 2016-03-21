@@ -94,5 +94,24 @@ describe DDS::V1::FileVersionsAPI do
         let(:resource_id) {'notfoundid'}
       end
     end
+
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
+      it_behaves_like 'a removable resource' do
+        let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+        it 'should be marked as deleted' do
+          expect(resource).to be_persisted
+          is_expected.to eq(204)
+          resource.reload
+          expect(resource.is_deleted?).to be_truthy
+        end
+
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+      end
+    end
   end
 end
