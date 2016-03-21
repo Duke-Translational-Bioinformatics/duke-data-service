@@ -57,7 +57,7 @@ describe DDS::V1::FileVersionsAPI do
     end
   end
 
-  describe 'File versions collection' do
+  describe 'File version instance' do
     let(:url) { "/api/v1/file_versions/#{resource_id}" }
 
     describe 'GET' do
@@ -67,6 +67,28 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
+
+    describe 'PUT' do
+      subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
+      let(:payload) {{
+        label: resource_stub.label
+      }}
+
+      it_behaves_like 'an updatable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a logically deleted resource'
+
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
