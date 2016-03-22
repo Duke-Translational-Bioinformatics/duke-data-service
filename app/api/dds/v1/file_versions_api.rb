@@ -82,6 +82,23 @@ module DDS
         end
         body false
       end
+
+      desc 'Download a file_version' do
+        detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.'
+        named 'download file_version'
+        failure [
+          [200, "This will never happen"],
+          [301, 'Redirect to file version'],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'File version does not exist']
+        ]
+      end
+      get '/file_versions/:id/url', root: false, serializer: FileVersionUrlSerializer do
+        authenticate!
+        file_version = hide_logically_deleted(FileVersion.find(params[:id]))
+        authorize file_version, :download?
+        file_version
+      end
     end
   end
 end
