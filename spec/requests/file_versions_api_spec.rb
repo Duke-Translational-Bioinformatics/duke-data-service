@@ -42,7 +42,7 @@ describe DDS::V1::FileVersionsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource' 
+      it_behaves_like 'a software_agent accessible resource'
 
       context 'with invalid file_id' do
         let(:file_id) { 'notfoundid' }
@@ -115,23 +115,23 @@ describe DDS::V1::FileVersionsAPI do
     end
   end
 
-  describe 'Get file version download url' do
-    let(:url) { "/api/v1/file_versions/#{resource_id}/url" }
-    let(:resource_serializer) { FileVersionUrlSerializer }
-
-    describe 'GET' do
-      subject { get(url, nil, headers) }
-
-      it_behaves_like 'a viewable resource'
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource'
-
-      it_behaves_like 'an identified resource' do
-        let(:resource_id) {'notfoundid'}
-      end
-
-      it_behaves_like 'a logically deleted resource'
-    end
-  end
+  # describe 'Get file version download url' do
+  #   let(:url) { "/api/v1/file_versions/#{resource_id}/url" }
+  #   let(:resource_serializer) { FileVersionUrlSerializer }
+  #
+  #   describe 'GET' do
+  #     subject { get(url, nil, headers) }
+  #
+  #     it_behaves_like 'a viewable resource'
+  #     it_behaves_like 'an authenticated resource'
+  #     it_behaves_like 'an authorized resource'
+  #     it_behaves_like 'a software_agent accessible resource'
+  #
+  #     it_behaves_like 'an identified resource' do
+  #       let(:resource_id) {'notfoundid'}
+  #     end
+  #
+  #     it_behaves_like 'a logically deleted resource'
+  #   end
+  # end
 end
