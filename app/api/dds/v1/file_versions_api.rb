@@ -76,11 +76,11 @@ module DDS
         authenticate!
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :destroy?
-        # Audited.audit_class.as_user(current_user) do
-        #   file_version.update_attribute(:is_deleted, true)
-        #   annotate_audits [file_version.audits.last]
-        # end
-         body false
+        Audited.audit_class.as_user(current_user) do
+          file_version.update_attribute(:is_deleted, true)
+          annotate_audits [file_version.audits.last]
+        end
+        body false
       end
     end
   end
