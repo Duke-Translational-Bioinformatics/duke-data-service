@@ -61,6 +61,44 @@ module DDS
           file_version
         end
       end
+
+      desc 'Delete a file version metadata object' do
+        detail 'Deletes the file version from view'
+        named 'delete file version metadata'
+        failure [
+          [200, "This will never happen"],
+          [204, 'Successfully Deleted'],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'File version does not exist']
+        ]
+      end
+      delete '/file_versions/:id/', root: false do
+        authenticate!
+        file_version = hide_logically_deleted(FileVersion.find(params[:id]))
+        authorize file_version, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          file_version.update_attribute(:is_deleted, true)
+          annotate_audits [file_version.audits.last]
+        end
+        body false
+      end
+
+      desc 'Download a file_version' do
+        detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.'
+        named 'download file_version'
+        failure [
+          [200, "This will never happen"],
+          [301, 'Redirect to file version'],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'File version does not exist']
+        ]
+      end
+      get '/file_versions/:id/url', root: false, serializer: FileVersionUrlSerializer do
+        authenticate!
+        file_version = hide_logically_deleted(FileVersion.find(params[:id]))
+        authorize file_version, :download?
+        file_version
+      end
     end
   end
 end
