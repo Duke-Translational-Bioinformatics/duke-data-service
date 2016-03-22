@@ -10,6 +10,7 @@ FactoryGirl.define do
     service_pass { Faker::Internet.password }
     primary_key { SecureRandom.hex }
     secondary_key { SecureRandom.hex }
+    chunk_hash_algorithm { Faker::Hacker.abbreviation }
 
     trait :swift do
       name { ENV['SWIFT_ACCT'] || Faker::Name.name }
@@ -20,19 +21,7 @@ FactoryGirl.define do
       auth_uri { ENV['SWIFT_AUTH_URI'] || '/auth/v1.0' }
       service_user { ENV["SWIFT_USER"] || Faker::Internet.user_name }
       service_pass { ENV['SWIFT_PASS'] || Faker::Internet.password }
-    end
-
-    trait :swift_env do
-      name { ENV['SWIFT_ACCT'] }
-      display_name { ENV['SWIFT_DISPLAY_NAME'] }
-      description { ENV['SWIFT_DESCRIPTION'] }
-      url_root { ENV['SWIFT_URL_ROOT'] }
-      provider_version { ENV['SWIFT_VERSION'] }
-      auth_uri { ENV['SWIFT_AUTH_URI'] }
-      service_user { ENV["SWIFT_USER"] }
-      service_pass { ENV['SWIFT_PASS'] }
-      primary_key { ENV['SWIFT_PRIMARY_KEY'] }
-      secondary_key { ENV['SWIFT_SECONDARY_KEY'] }
+      chunk_hash_algorithm { ENV['SWIFT_CHUNK_HASH_ALGORITHM'] || Faker::Hacker.abbreviation }
     end
   end
 end

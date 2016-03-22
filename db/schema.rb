@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160317152825) do
+ActiveRecord::Schema.define(version: 20160322150600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -160,9 +160,10 @@ ActiveRecord::Schema.define(version: 20160317152825) do
     t.string   "service_pass"
     t.string   "primary_key"
     t.string   "secondary_key"
-    t.boolean  "is_deprecated",    default: false, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.boolean  "is_deprecated",        default: false, null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.string   "chunk_hash_algorithm", default: "md5"
   end
 
   create_table "system_permissions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
