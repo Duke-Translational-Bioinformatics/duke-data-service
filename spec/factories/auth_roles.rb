@@ -16,7 +16,7 @@ FactoryGirl.define do
       name "Project Admin"
       description "Can update project details, delete project, manage project level permissions and perform all file operations"
       contexts %w(project)
-      permissions %w(view_project update_project delete_project manage_project_permissions download_file create_file update_file delete_file)
+      permissions { AuthRole.available_permissions(:project) }
     end
 
     trait :deprecated do
