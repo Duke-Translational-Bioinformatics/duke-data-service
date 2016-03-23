@@ -96,7 +96,7 @@ RSpec.describe User, type: :model do
     let!(:other_project) { FactoryGirl.create(:project, creator: subject) }
     let!(:other_upload) { FactoryGirl.create(:upload, :completed, creator: subject) }
     let!(:other_file) { FactoryGirl.create(:data_file, upload: other_upload) }
-    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted, user: subject).project }
+    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted_project, user: subject).project }
     let(:deleted_upload) { FactoryGirl.create(:upload, :completed, creator: subject, project: projects.first)}
     let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator: subject, project: deleted_upload.project, upload: deleted_upload) }
 

@@ -17,7 +17,7 @@ FactoryGirl.define do
       end
     }
 
-    trait :deleted do
+    trait :deleted_project do
       association :project, factory: [:project, :deleted]
     end
   end
