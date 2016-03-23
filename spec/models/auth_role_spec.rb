@@ -46,4 +46,26 @@ RSpec.describe AuthRole, type: :model do
       end
     end
   end
+
+  describe 'class methods' do
+    subject { described_class }
+    describe '.available_permissions' do
+      let(:expected_available_permissions) { %w(
+        system_admin
+        view_project
+        update_project
+        delete_project
+        manage_project_permissions
+        download_file
+        create_file
+        update_file
+        delete_file
+      ) }
+      it { is_expected.to respond_to :available_permissions }
+      it { expect(subject.available_permissions).to eq expected_available_permissions }
+      it { expect(subject.available_permissions(:project)).not_to include 'system_admin'}
+      it { expect(subject.available_permissions(:system)).to include 'system_admin'}
+      it { expect(subject.available_permissions('system')).to include 'system_admin'}
+    end
+  end
 end
