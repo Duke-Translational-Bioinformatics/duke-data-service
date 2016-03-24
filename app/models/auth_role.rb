@@ -9,6 +9,7 @@ class AuthRole < ActiveRecord::Base
   validates :contexts, presence: true
 
   scope :with_context, ->(context) { where('contexts @> ?', [context].to_json) }
+  scope :with_permission, ->(permission) { where('permissions @> ?', [permission].to_json) }
 
   def self.available_permissions(context=nil)
     context = context.to_sym if context
