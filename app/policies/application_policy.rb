@@ -47,11 +47,15 @@ class ApplicationPolicy
       @scope = scope
     end
 
-    def resolve
+    def resolve(auth_role_permission=nil)
       if user.system_permission
         scope
       else
-        scope.joins(:project_permissions).where(project_permissions: {user: user})
+        permission_scope = scope.joins(project_permissions: :auth_role).where(project_permissions: {user: user})
+        if auth_role_permission
+          permission_scope = permission_scope.merge(AuthRole.with_permission(auth_role_permission))
+        end
+        permission_scope
       end
     end
   end
