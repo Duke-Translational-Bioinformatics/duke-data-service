@@ -1,14 +1,25 @@
 FactoryGirl.define do
   factory :auth_role do
+    transient do
+      without_permissions false
+    end
+
     id { "#{Faker::Internet.domain_word}_#{rand(10**3)}" }
     name { Faker::App.name }
     description { Faker::Hacker.say_something_smart }
-    permissions { (0..Faker::Number.digit.to_i).collect { Faker::Internet.domain_word } }
     contexts  { (0..Faker::Number.digit.to_i).collect { Faker::Internet.slug } }
+
+    permissions { 
+      if without_permissions
+        AuthRole.available_permissions - without_permissions
+      else
+        (0..Faker::Number.digit.to_i).collect { Faker::Internet.domain_word }
+      end
+    }
 
     trait :system do
       contexts %w(system)
-      permissions %w(system_admin)
+      permissions { AuthRole.available_permissions(:system) }
     end
 
     trait :project_admin do
