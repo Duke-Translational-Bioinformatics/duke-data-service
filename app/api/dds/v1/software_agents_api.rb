@@ -208,8 +208,9 @@ module DDS
         error!(error_json, 404)
       end
       post '/software_agents/api_token', serializer: ApiTokenSerializer do
-        user_key = ApiKey.where(key: params[:user_key]).joins(:user).take!
-        software_key = ApiKey.where(key: params[:agent_key]).joins(:software_agent).take!
+        secret_params = declared(params, include_missing: false)
+        user_key = ApiKey.where(key: secret_params[:user_key]).joins(:user).take!
+        software_key = ApiKey.where(key: secret_params[:agent_key]).joins(:software_agent).take!
         user_key.user.update_attribute(:last_login_at, DateTime.now)
         ApiToken.new(user: user_key.user, software_agent: software_key.software_agent)
       end

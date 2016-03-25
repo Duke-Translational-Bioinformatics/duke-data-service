@@ -77,6 +77,7 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}",
       headers: auth_header
     )
+    return [] if resp.response.code.to_i == 404
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
     return resp.body ? resp.body.split("\n") : []
@@ -98,10 +99,10 @@ class StorageProvider < ActiveRecord::Base
       "#{storage_url}/#{container}",
       headers: auth_header
     )
-    return if resp.response.code.to_i == 404
+    return [] if resp.response.code.to_i == 404
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
-     return resp.body ? resp.body.split("\n") : [] 
+     return resp.body ? resp.body.split("\n") : []
   end
 
   def put_container(container)

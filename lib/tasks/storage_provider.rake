@@ -108,15 +108,19 @@ namespace :storage_provider do
       end
 
       storage_provider.get_container_objects(container).each do |object|
-        if storage_provider.get_object_metadata(container, object)["x-static-large-object"]
-          unless Upload.where(id: object).exists?
-            to_prune[:uploads] << [container, object]
+        begin
+          if storage_provider.get_object_metadata(container, object)["x-static-large-object"]
+            unless Upload.where(id: object).exists?
+              to_prune[:uploads] << [container, object]
+            end
+          else
+            upload_id, chunk_number = object.split('/')
+            unless Chunk.where(upload_id: upload_id, number: chunk_number).exists?
+              to_prune[:chunks] << [container, object]
+            end
           end
-        else
-          upload_id, chunk_number = object.split('/')
-          unless Chunk.where(upload_id: upload_id, number: chunk_number).exists?
-            to_prune[:chunks] << [container, object]
-          end
+        rescue StorageProviderException => e
+          puts "container #{container} object #{object} returned by get_container_objects, but metadata not accessible? #{e.message}"
         end
       end
     end
