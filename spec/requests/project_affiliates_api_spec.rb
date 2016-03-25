@@ -7,7 +7,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let(:project) { affiliation.project }
   let(:user) { affiliation.user }
   let(:project_role) { FactoryGirl.create(:project_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, :project_admin, user: current_user, project: project) }
   let(:other_affiliation) { FactoryGirl.create(:affiliation) }
 
   let(:resource_class) { Affiliation }

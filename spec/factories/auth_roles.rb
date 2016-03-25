@@ -30,6 +30,10 @@ FactoryGirl.define do
       permissions { AuthRole.available_permissions(:project) }
     end
 
+    trait :random_id do
+      id { "#{Faker::Internet.domain_word}_#{rand(10**3)}" }
+    end
+
     trait :deprecated do
       is_deprecated true
     end
