@@ -27,14 +27,15 @@ configuration = {
              //"Authorization Roles > Authorization Roles collection > List roles",
              //"Authorization Roles > Authorization Role instance > View role",
              //14_software_agents.js
-            //  "Software Agents > Software Agents collection > Create software agent",
-            //  "Software Agents > Software Agents collection > List software agents",
-            //  "Software Agents > Software Agent instance > View software agent",
-            //  "Software Agents > Software Agent instance > Update software agent",
-            //  "Software Agents > Software Agent instance > Delete software agent",
-            //  "Software Agents > Software Agent Secret Key > View software agent API key",
-            //  "Software Agents > Software Agent Secret Key > Re-generate software agent API key",
-            //  "Software Agents > Software Agent Access Token > Get software agent access token",
+             "Software Agents > Software Agents collection > Create software agent",
+             "Software Agents > Software Agents collection > List software agents",
+             "Software Agents > Software Agent instance > View software agent",
+             "Software Agents > Software Agent instance > Update software agent",
+             "Software Agents > Software Agent instance > Delete software agent",
+             "Software Agents > Software Agent API Key > Generate software agent API key",
+             "Software Agents > Software Agent API Key > View software agent API key",
+             "Software Agents > Software Agent API Key > Delete software agent API key",
+             "Software Agents > Software Agent Access Token > Get software agent access token",
             //15_current_user_api_hooks.js
             // "Current User > Current User instance > View current user",
             // "Current User > Current User instance > Current user usage",
@@ -125,29 +126,29 @@ configuration = {
     'user': null,    // String, Basic Auth credentials in the form username:password
 
     'hookfiles': [ //'99_learnclient.js',
-                  '01_auth_hooks.js',                 //r2g
-                  '02_current_user_hooks.js',         //r2g
-                  '03_users_hooks.js',                //r2g
-                  '04_system_permissions_hooks.js',   //r2g
-                  '05_projects_hooks.js',             //r2g
-                  '06_project_permissions_hooks.js', //r2g
-                  '07_project_roles_hooks.js',       //r2g
-                  '08_affiliates_hooks.js',          //r2g
-                  '09_storage_providers_hooks.js',   //r2g
-                  '10_folders_hooks.js',             //r2g
-                  '11_uploads_hooks.js',             //r2g
-                  '12_files_hooks.js',
-                  '13_search_project_folder_hooks.js',
+                  // '01_auth_hooks.js',
+                  // '02_current_user_hooks.js',
+                  // '03_users_hooks.js',
+                  // '04_system_permissions_hooks.js',
+                  // '05_projects_hooks.js',
+                  // '06_project_permissions_hooks.js',
+                  // '07_project_roles_hooks.js',
+                  // '08_affiliates_hooks.js',
+                  // '09_storage_providers_hooks.js',
+                  // '10_folders_hooks.js',
+                  // '11_uploads_hooks.js',
+                  // '12_files_hooks.js',
+                  // '13_search_project_folder_hooks.js',
                   '14_software_agents.js',
-                  '15_current_user_api_hooks.js',
-                  '16_search_uploads.js',
-                  '17_file_versions.js',
-                  '18_provenance_activities.js',
-                  '19_provenance_relations.js',
-                  '20_search_provenance.js',
+                  // '15_current_user_api_hooks.js',
+                  // '16_search_uploads.js',
+                  // '17_file_versions.js',
+                  // '18_provenance_activities.js',
+                  // '19_provenance_relations.js',
+                  // '20_search_provenance.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
+    'reporter': [], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 

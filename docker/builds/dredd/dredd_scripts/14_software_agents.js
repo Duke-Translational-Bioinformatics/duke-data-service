@@ -11,8 +11,9 @@ var SA_LIST = "Software Agents > Software Agents collection > List software agen
 var SA_VIEW = "Software Agents > Software Agent instance > View software agent";
 var SA_UPDATE = "Software Agents > Software Agent instance > Update software agent";
 var SA_DELETE = "Software Agents > Software Agent instance > Delete software agent";
-var SA_VIEW_APIKEY = "Software Agents > Software Agent Secret Key > View software agent API key";
-var SA_REGENERATE = "Software Agents > Software Agent Secret Key > Re-generate software agent API key";
+var SA_GEN_APIKEY = "Software Agents > Software Agent API Key > Generate software agent API key";
+var SA_VIEW_APIKEY = "Software Agents > Software Agent API Key > View software agent API key";
+var SA_DEL_APIKEY = "Software Agents > Software Agent API Key > Delete software agent API key";
 var SA_GET_TOKEN = "Software Agents > Software Agent Access Token > Get software agent access token";
 var responseStash = {};
 var g_sa_Id = null;
@@ -67,19 +68,27 @@ hooks.before(SA_DELETE, function (transaction,done) {
   });
 });
 
+hooks.before(SA_GEN_APIKEY , function (transaction) {
+  var url = transaction.fullPath;
+  transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
+});
+
 hooks.before(SA_VIEW_APIKEY, function (transaction) {
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
 });
 
-hooks.before(SA_REGENERATE, function (transaction) {
-  var url = transaction.fullPath;
-  transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
+hooks.after(SA_VIEW_APIKEY, function (transaction) {
+  // saving HTTP response to the stash
+  responseStash[SA_VIEW_APIKEY] = transaction.real.body;
 });
 
-hooks.after(SA_REGENERATE, function (transaction) {
+hooks.after(SA_DEL_APIKEY, function (transaction) {
   // saving HTTP response to the stash
-  responseStash[SA_REGENERATE] = transaction.real.body;
+  var sa_keyy = JSON.parse(responseStash[SA_CREATE])['key'];
+  console.log(sa_keyy);
+  var url = transaction.fullPath;
+  transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
 });
 
 hooks.before(SA_GET_TOKEN, function (transaction,done) {
@@ -111,8 +120,4 @@ hooks.before(SA_GET_TOKEN, function (transaction,done) {
       });
     });
   });
-});
-
-hooks.after(SA_GET_TOKEN, function (transaction) {
-console.log(transaction.request);
 });
