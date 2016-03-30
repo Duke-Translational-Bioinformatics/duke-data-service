@@ -22,6 +22,58 @@ shared_examples 'system_permission can access' do |record_sym|
   end
 end
 
+shared_examples 'a user with project_permission' do |auth_role_permission, allows: [:show?, :create?, :update?, :destroy?], on:|
+  let(:user) { project_permission.user }
+  let(:record) { send(on) }
+  let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [auth_role_permission].flatten) }
+
+  expected_permissions = [:show?, :create?, :update?, :destroy?]
+  allowed_permissions = [allows].flatten.select {|i| expected_permissions.include? i}
+  denied_permissions = expected_permissions.reject {|i| [allows].flatten.include? i}
+
+  context auth_role_permission.to_s do
+    context "for #{on}" do
+      if allows.include? :scope
+        describe '.scope' do
+          it { expect(resolved_scope).to include(record) }
+        end
+      else
+        describe '.scope' do
+          it { expect(resolved_scope).not_to include(record) }
+        end
+      end
+      permissions *allowed_permissions do
+        it { is_expected.to permit(user, record) }
+      end
+      permissions *denied_permissions do
+        it { is_expected.not_to permit(user, record) }
+      end
+    end
+  end
+end
+
+shared_examples 'a user without project_permission' do |auth_role_permission, denies:, on:|
+  let(:user) { project_permission.user }
+  let(:record) { send(on) }
+  let(:auth_role) { FactoryGirl.create(:auth_role, without_permissions: [auth_role_permission].flatten) }
+
+  expected_permissions = [:show?, :create?, :update?, :destroy?]
+  denied_permissions = [denies].flatten.select {|i| expected_permissions.include? i}
+
+  context auth_role_permission.to_s do
+    context "for #{on}" do
+      if denies.include? :scope
+        describe '.scope' do
+          it { expect(resolved_scope).not_to include(record) }
+        end
+      end
+      permissions *denied_permissions do
+        it { is_expected.not_to permit(user, record) }
+      end
+    end
+  end
+end
+
 shared_examples 'system_permission cannot access' do |record_sym, with_software_agent|
   let(:user) { FactoryGirl.create(:system_permission).user }
   if with_software_agent
