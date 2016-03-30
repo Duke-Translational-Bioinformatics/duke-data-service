@@ -8,7 +8,7 @@ var fs = require("fs");
 var md5 = require('md5');
 
 
-var SEARCH_PROV = "Search Provenance > Search Provenance > Search Provenance";
+var SEARCH_PROV = "Search Provenance > NOT_IMPLEMENTED Search Provenance > NOT_IMPLEMENTED Search Provenance";
 
 var responseStash = {};
 
