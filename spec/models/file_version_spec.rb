@@ -40,5 +40,55 @@ RSpec.describe FileVersion, type: :model do
     describe '#url' do
       it { expect(subject.url).to include uri_encoded_name }
     end
+
+    describe '#next_version_number' do
+      subject { FactoryGirl.create(:file_version, version_number: 1) }
+      it { is_expected.to respond_to(:next_version_number) }
+
+      context 'when versions do not exist for file' do
+        subject { FactoryGirl.build(:file_version) }
+        it { expect(subject.data_file.file_versions.count).to eq 0 }
+        it { expect(subject.next_version_number).to eq 1 }
+      end
+
+      context 'when file_version exists' do
+        let(:expected_next_version_number) { subject.version_number + 1 }
+        before { expect(subject).to be_persisted }
+        it { expect(subject.data_file.file_versions.count).to eq 1 }
+        it { expect(subject.next_version_number).to eq expected_next_version_number }
+
+        context 'with versions for other files' do
+          let!(:other_file_version) { FactoryGirl.create(:file_version) }
+          it { expect(subject.data_file.file_versions.count).to eq 1 }
+          it { expect(subject.next_version_number).to eq expected_next_version_number }
+        end
+      end
+    end
+
+    describe '#set_version_number' do
+      subject { FactoryGirl.build(:file_version) }
+      let!(:existing_file_version) { FactoryGirl.create(:file_version, data_file: subject.data_file) }
+      it { is_expected.not_to be_persisted }
+      it { is_expected.to respond_to(:set_version_number) }
+      it { expect(subject.set_version_number).to eq subject.next_version_number }
+      context 'when called' do
+        before { subject.set_version_number }
+        it { expect(subject.version_number).to eq subject.next_version_number }
+      end
+      context 'with persisted file_version' do
+        subject { FactoryGirl.create(:file_version, version_number: 123) }
+        let!(:original_version) { subject.version_number }
+        before { is_expected.to be_persisted }
+        it { expect(subject.set_version_number).to eq original_version }
+        context 'when called' do
+          before { subject.set_version_number }
+          it { expect(subject.version_number).to eq original_version }
+        end
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:set_version_number).before(:create) }
   end
 end
