@@ -81,12 +81,10 @@ hooks.before(SA_VIEW_APIKEY, function (transaction) {
 hooks.after(SA_VIEW_APIKEY, function (transaction) {
   // saving HTTP response to the stash
   responseStash[SA_VIEW_APIKEY] = transaction.real.body;
-  console.log(transaction);
 });
 
-hooks.after(SA_DEL_APIKEY, function (transaction) {
+hooks.before(SA_DEL_APIKEY, function (transaction) {
   // saving HTTP response to the stash
-  var sa_keyy = JSON.parse(responseStash[SA_CREATE])['key'];
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
 });
