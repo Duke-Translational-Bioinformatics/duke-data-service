@@ -248,7 +248,7 @@ Creates software agent and an associated secret API key; the secret key is visib
             "name": "Hash computation agent"
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
             "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
@@ -404,7 +404,7 @@ Using a software agent secret key and a user secret key, get an access token.
             "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
             "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
@@ -1631,7 +1631,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Update file [PUT]
+### Update file [PUT]
 Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1848,7 +1848,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-### NOT_IMPLEMENTED List file versions [GET]
+### List file versions [GET]
 If there are previous versions of a file, this action can be used to retrieve information about the older versions.
 
 >**Permission:** view_project
@@ -1894,7 +1894,7 @@ If there are previous versions of a file, this action can be used to retrieve in
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
-### NOT_IMPLEMENTED View file version [GET]
+### View file version [GET]
 **Permissions** view_project
 - - - - -
 
@@ -1926,7 +1926,7 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Update file version [PUT] 
+### Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -1968,13 +1968,13 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete file version [DELETE]
+### Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
 
 + Response 204
 
-## NOT_IMPLEMENTED Get file version download URL [GET /file_versions/{id}/url]
+## Get file version download URL [GET /file_versions/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
 
 >**Permission:** download_file
