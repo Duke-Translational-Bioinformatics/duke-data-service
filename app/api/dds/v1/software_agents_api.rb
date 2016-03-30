@@ -189,7 +189,7 @@ module DDS
       params do
         requires :id, type: String, desc: 'Software agent UUID'
       end
-      delete '/software_agents/:id/api_key' do
+      delete '/software_agents/:id/api_key', root: false do
         authenticate!
         ak = SoftwareAgent.find(params[:id]).api_key
         authorize ak, :destroy?
