@@ -1631,7 +1631,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Update file [PUT]
+### NOT_IMPLEMENTED Update file [PUT]
 Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1848,7 +1848,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-## NOT_IMPLEMENTED List file versions [GET]
+### NOT_IMPLEMENTED List file versions [GET]
 If there are previous versions of a file, this action can be used to retrieve information about the older versions.
 
 >**Permission:** view_project
@@ -1894,7 +1894,7 @@ If there are previous versions of a file, this action can be used to retrieve in
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
-## NOT_IMPLEMENTED View file version [GET]
+### NOT_IMPLEMENTED View file version [GET]
 **Permissions** view_project
 - - - - -
 
@@ -1926,7 +1926,7 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Update file version [PUT] 
+### NOT_IMPLEMENTED Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -2378,7 +2378,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-# NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
+### NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the `Used` and `WasGeneratedBy` relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity (file or file version)
@@ -2442,7 +2442,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
 + Parameters
     + id (string, required, `372f25e1-01b0-4b8d-9524-e26dd573cc95`) ... The unique id of the provenance relation.
 
-## NOT_IMPLEMENTED View relation [GET]
+### NOT_IMPLEMENTED View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity (i.e. file or file version)
 
 + Response 200 (application/json)
@@ -2470,7 +2470,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Delete relation [DELETE]
+### NOT_IMPLEMENTED Delete relation [DELETE]
 >**Permission:** creator
 
 + Response 204
