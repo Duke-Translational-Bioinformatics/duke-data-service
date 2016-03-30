@@ -22,14 +22,14 @@ shared_examples 'system_permission can access' do |record_sym|
   end
 end
 
-shared_examples 'a user with project_permission' do |auth_role_permission, allows: [:show?, :create?, :update?, :destroy?], on:|
+shared_examples 'a user with project_permission' do |auth_role_permission, allows:, denies:[], on:|
   let(:user) { project_permission.user }
   let(:record) { send(on) }
   let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [auth_role_permission].flatten) }
 
   expected_permissions = [:show?, :create?, :update?, :destroy?]
-  allowed_permissions = [allows].flatten.select {|i| expected_permissions.include? i}
-  denied_permissions = expected_permissions.reject {|i| [allows].flatten.include? i}
+  allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
+  denied_permissions = [expected_permissions + denies].flatten.reject {|i| [allows].flatten.include? i}
 
   context auth_role_permission.to_s do
     context "for #{on}" do
@@ -57,8 +57,7 @@ shared_examples 'a user without project_permission' do |auth_role_permission, de
   let(:record) { send(on) }
   let(:auth_role) { FactoryGirl.create(:auth_role, without_permissions: [auth_role_permission].flatten) }
 
-  expected_permissions = [:show?, :create?, :update?, :destroy?]
-  denied_permissions = [denies].flatten.select {|i| expected_permissions.include? i}
+  denied_permissions = [denies].flatten.reject {|i| i.to_s == 'scope'}
 
   context auth_role_permission.to_s do
     context "for #{on}" do
