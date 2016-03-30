@@ -280,18 +280,19 @@ shared_examples 'a serializer with a serialized audit' do
   end
 end
 
-shared_examples 'a has_one association with' do |association_root, serialized_with|
-  it "#{association_root} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(association_root)
-    expect(described_class._associations[association_root]).to be_a(ActiveModel::Serializer::Association::HasOne)
-    expect(described_class._associations[association_root].serializer_from_options).to eq(serialized_with)
+shared_examples 'a has_one association with' do |name, serialized_with, root: name|
+  it "#{name} serialized using #{serialized_with}" do
+    expect(described_class._associations).to have_key(name)
+    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasOne)
+    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
+    expect(described_class._associations[name].embedded_key).to eq(root)
   end
 end
 
-shared_examples 'a has_many association with' do |association_root, serialized_with|
-  it "#{association_root} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(association_root)
-    expect(described_class._associations[association_root]).to be_a(ActiveModel::Serializer::Association::HasMany)
-    expect(described_class._associations[association_root].serializer_from_options).to eq(serialized_with)
+shared_examples 'a has_many association with' do |name, serialized_with|
+  it "#{name} serialized using #{serialized_with}" do
+    expect(described_class._associations).to have_key(name)
+    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasMany)
+    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
   end
 end
