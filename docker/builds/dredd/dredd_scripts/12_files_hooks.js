@@ -9,7 +9,7 @@ var md5 = require('md5');
 
 var CREATE_FILE = "Files > Files collection > Create file";
 var VIEW_FILE = "Files > File instance > View file";
-var UPDATE_FILE = "Files > File instance > Update file";
+var UPDATE_FILE = "Files > File instance > NOT_IMPLEMENTED Update file";
 var DELETE_FILE = "Files > File instance > Delete file";
 var GET_FILE_URL = "Files > File instance > Get file download URL";
 var MOVE_FILE = "Files > File instance > Move file";

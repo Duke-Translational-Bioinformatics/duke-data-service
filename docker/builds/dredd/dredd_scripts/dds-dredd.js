@@ -27,15 +27,15 @@ configuration = {
              //"Authorization Roles > Authorization Roles collection > List roles",
              //"Authorization Roles > Authorization Role instance > View role",
              //14_software_agents.js
-             "Software Agents > Software Agents collection > Create software agent",
-             "Software Agents > Software Agents collection > List software agents",
-             "Software Agents > Software Agent instance > View software agent",
-             "Software Agents > Software Agent instance > Update software agent",
-             "Software Agents > Software Agent instance > Delete software agent",
-             "Software Agents > Software Agent API Key > Generate software agent API key",
-             "Software Agents > Software Agent API Key > View software agent API key",
-             "Software Agents > Software Agent API Key > Delete software agent API key",
-             "Software Agents > Software Agent Access Token > Get software agent access token",
+            //  "Software Agents > Software Agents collection > Create software agent",
+            //  "Software Agents > Software Agents collection > List software agents",
+            //  "Software Agents > Software Agent instance > View software agent",
+            //  "Software Agents > Software Agent instance > Update software agent",
+            //  "Software Agents > Software Agent instance > Delete software agent",
+            //  "Software Agents > Software Agent API Key > Generate software agent API key",
+            //  "Software Agents > Software Agent API Key > View software agent API key",
+            //  "Software Agents > Software Agent API Key > Delete software agent API key",
+            //  "Software Agents > Software Agent Access Token > Get software agent access token",
             //15_current_user_api_hooks.js
             // "Current User > Current User instance > View current user",
             // "Current User > Current User instance > Current user usage",
@@ -96,11 +96,11 @@ configuration = {
             // "Files > File instance > Move file",
             // "Files > File instance > Rename file",
             //17_file_versions.js
-            // "File Versions > File Versions collection > List file versions",
-            // "File Versions > File Version instance > View file version",
-            // "File Versions > File Version instance > Update file version",
-            // "File Versions > File Version instance > Delete file version",
-            // "File Versions > File Version instance > Get file version download URL",
+            "File Versions > File Versions collection > List file versions",
+            "File Versions > File Version instance > View file version",
+            "File Versions > File Version instance > Update file version",
+            "File Versions > File Version instance > Delete file version",
+            "File Versions > File Version instance > Get file version download URL",
             //13_search_project_folder_hooks.js
             // "Search Children > Search project children > Search project children",
             // "Search Children > Search folder children > Search folder children",
@@ -139,16 +139,16 @@ configuration = {
                   // '11_uploads_hooks.js',
                   // '12_files_hooks.js',
                   // '13_search_project_folder_hooks.js',
-                  '14_software_agents.js',
+                  // '14_software_agents.js',
                   // '15_current_user_api_hooks.js',
                   // '16_search_uploads.js',
-                  // '17_file_versions.js',
+                  '17_file_versions.js',
                   // '18_provenance_activities.js',
                   // '19_provenance_relations.js',
                   // '20_search_provenance.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
