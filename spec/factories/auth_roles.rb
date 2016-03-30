@@ -11,7 +11,7 @@ FactoryGirl.define do
 
     permissions { 
       if without_permissions
-        AuthRole.available_permissions - without_permissions
+        AuthRole.available_permissions - (without_permissions.collect {|x| x.to_s})
       else
         (0..Faker::Number.digit.to_i).collect { Faker::Internet.domain_word }
       end
