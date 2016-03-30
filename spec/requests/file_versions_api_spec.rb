@@ -42,7 +42,7 @@ describe DDS::V1::FileVersionsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
-      it_behaves_like 'a software_agent accessible resource' 
+      it_behaves_like 'a software_agent accessible resource'
 
       context 'with invalid file_id' do
         let(:file_id) { 'notfoundid' }
@@ -57,7 +57,7 @@ describe DDS::V1::FileVersionsAPI do
     end
   end
 
-  describe 'File versions collection' do
+  describe 'File version instance' do
     let(:url) { "/api/v1/file_versions/#{resource_id}" }
 
     describe 'GET' do
@@ -71,6 +71,81 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
       end
+    end
+
+    describe 'PUT' do
+      subject { put(url, payload.to_json, headers) }
+      let(:called_action) { 'PUT' }
+      let(:payload) {{
+        label: resource_stub.label
+      }}
+
+      it_behaves_like 'an updatable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an annotate_audits endpoint'
+      it_behaves_like 'a logically deleted resource'
+
+      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an annotate_audits endpoint'
+      end
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
+
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
+      it_behaves_like 'a removable resource' do
+        let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+        it 'should be marked as deleted' do
+          expect(resource).to be_persisted
+          is_expected.to eq(204)
+          resource.reload
+          expect(resource.is_deleted?).to be_truthy
+        end
+
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 204 }
+      end
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) {204}
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 204 }
+        end
+      end
+      it_behaves_like 'a logically deleted resource'
+    end
+  end
+
+  describe 'Get file version download url' do
+    let(:url) { "/api/v1/file_versions/#{resource_id}/url" }
+    let(:resource_serializer) { FileVersionUrlSerializer }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+
+      it_behaves_like 'a logically deleted resource'
     end
   end
 end

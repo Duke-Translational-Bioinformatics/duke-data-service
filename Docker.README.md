@@ -427,6 +427,8 @@ the swift service system administrator.
 DDS client to the swift service.  These must be set up by
 the swift service system administrator.
 * SWIFT_PRIMARY_KEY: A long random string which can be generated using
+* SWIFT_CHUNK_HASH_ALGORITHM: A string representation of the chunking algorithm to be 
+used by client applications. [Default value is 'md5']
 ```
 docker-compose run rake secret
 ```
