@@ -176,6 +176,29 @@ module DDS
         authorize ak, :show?
         ak
       end
+      desc 'Delete software agent API key' do
+        detail 'delete software_agent api_key'
+        named 'delete software_agent api_key'
+        failure [
+          [204, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restricted)'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software agent UUID'
+      end
+      delete '/software_agents/:id/api_key', root: false do
+        authenticate!
+        ak = SoftwareAgent.find(params[:id]).api_key
+        authorize ak, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          ak.destroy
+          annotate_audits [ak.audits.last]
+        end
+        body false
+      end
 
       desc 'Get software agent access token'do
         detail 'Get software agent access token'
