@@ -88,13 +88,13 @@ configuration = {
             //16_search_uploads.js
             // "Search Uploads > Search uploads > Search uploads",
             //12_files_hooks.js
-            "Files > Files collection > Create file",
-            "Files > File instance > View file",
-            "Files > File instance > Update file",
-            "Files > File instance > Delete file",
-            "Files > File instance > Get file download URL",
-            "Files > File instance > Move file",
-            "Files > File instance > Rename file",
+            // "Files > Files collection > Create file",
+            // "Files > File instance > View file",
+            // "Files > File instance > Update file",
+            // "Files > File instance > Delete file",
+            // "Files > File instance > Get file download URL",
+            // "Files > File instance > Move file",
+            // "Files > File instance > Rename file",
             //17_file_versions.js
             // "File Versions > File Versions collection > List file versions",
             // "File Versions > File Version instance > View file version",
@@ -126,29 +126,30 @@ configuration = {
     'user': null,    // String, Basic Auth credentials in the form username:password
 
     'hookfiles': [ //'99_learnclient.js',
-                  // '01_auth_hooks.js',
-                  // '02_current_user_hooks.js',
-                  // '03_users_hooks.js',
-                  // '04_system_permissions_hooks.js',
-                  // '05_projects_hooks.js',
-                  // '06_project_permissions_hooks.js',
-                  // '07_project_roles_hooks.js',
-                  // '08_affiliates_hooks.js',
-                  // '09_storage_providers_hooks.js',
-                  // '10_folders_hooks.js',
-                  // '11_uploads_hooks.js',
+                  '01_auth_hooks.js',
+                  '02_current_user_hooks.js',
+                  '03_users_hooks.js',
+                  '04_system_permissions_hooks.js',
+                  '05_projects_hooks.js',
+                  '06_project_permissions_hooks.js',
+                  '07_project_roles_hooks.js',
+                  '08_affiliates_hooks.js',
+                  '09_storage_providers_hooks.js',
+                  '10_folders_hooks.js',
+                  '11_uploads_hooks.js',
                   '12_files_hooks.js',
-                  // '13_search_project_folder_hooks.js',
-                  // '14_software_agents.js',
-                  // '15_current_user_api_hooks.js',
-                  // '16_search_uploads.js',
-                  // '17_file_versions.js',
-                  // '18_provenance_activities.js',
-                  // '19_provenance_relations.js',
-                  // '20_search_provenance.js',
+                  '13_search_project_folder_hooks.js',
+                  '14_software_agents.js',
+                  '15_current_user_api_hooks.js',
+                  '16_search_uploads.js',
+                  '17_file_versions.js',
+                  '18_provenance_activities.js',
+                  '19_provenance_relations.js',
+                  '20_search_provenance.js',
+                  '21_tags.js',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
