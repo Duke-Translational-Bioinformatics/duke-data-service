@@ -1926,7 +1926,7 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Update file version [POST] 
+## NOT_IMPLEMENTED Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -2480,8 +2480,8 @@ The `Provenance Relations` API actions allows users and software agents to recor
 
 *Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-### NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
-Given a starting node *(activity, file, o file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
+## NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
+Given a starting node *(activity, file, or file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity (file or file version)
 - - - - -
