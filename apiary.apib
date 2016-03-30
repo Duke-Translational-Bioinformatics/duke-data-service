@@ -248,7 +248,7 @@ Creates software agent and an associated secret API key; the secret key is visib
             "name": "Hash computation agent"
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
             "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
@@ -404,7 +404,7 @@ Using a software agent secret key and a user secret key, get an access token.
             "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
             "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
@@ -1631,7 +1631,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-## Update file [PUT]
+### Update file [PUT]
 Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1848,7 +1848,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-## List file versions [GET]
+### List file versions [GET]
 If there are previous versions of a file, this action can be used to retrieve information about the older versions.
 
 >**Permission:** view_project
@@ -1894,7 +1894,7 @@ If there are previous versions of a file, this action can be used to retrieve in
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
-## View file version [GET]
+### View file version [GET]
 **Permissions** view_project
 - - - - -
 
@@ -1926,7 +1926,7 @@ If there are previous versions of a file, this action can be used to retrieve in
             "audit": { }
         }
 
-## Update file version [POST]
+### Update file version [PUT]
 **Permission:** update_file
 - - - - -
 
@@ -2378,7 +2378,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-# NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
+### NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the `Used` and `WasGeneratedBy` relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity (file or file version)
@@ -2442,7 +2442,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
 + Parameters
     + id (string, required, `372f25e1-01b0-4b8d-9524-e26dd573cc95`) ... The unique id of the provenance relation.
 
-## NOT_IMPLEMENTED View relation [GET]
+### NOT_IMPLEMENTED View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity (i.e. file or file version)
 
 + Response 200 (application/json)
@@ -2470,7 +2470,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Delete relation [DELETE]
+### NOT_IMPLEMENTED Delete relation [DELETE]
 >**Permission:** creator
 
 + Response 204
@@ -2480,8 +2480,8 @@ The `Provenance Relations` API actions allows users and software agents to recor
 
 *Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-### NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
-Given a starting node *(activity, file, o file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
+## NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
+Given a starting node *(activity, file, or file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity (file or file version)
 - - - - -
