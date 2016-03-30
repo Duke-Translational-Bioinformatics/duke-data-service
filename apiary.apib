@@ -1631,7 +1631,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Update file [PUT]
+## Update file [PUT]
 Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
