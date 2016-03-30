@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :file_version do
     data_file
-    version { SecureRandom.random_number(20) }
     label { Faker::Hacker.say_something_smart }
     is_deleted false
     association :upload, :completed
