@@ -12,33 +12,11 @@ describe ChunkPolicy do
   it_behaves_like 'system_permission can access', :chunk
   it_behaves_like 'system_permission can access', :other_chunk
 
-  context 'when user has project_permission' do
-    let(:user) { project_permission.user }
+  it_behaves_like 'a user with project_permission', :create_file, allows: [:scope, :show?, :create?, :update?, :destroy?], on: :chunk
+  it_behaves_like 'a user with project_permission', :create_file, allows: [], on: :other_chunk
 
-    context 'without create_file' do
-      let(:auth_role) { FactoryGirl.create(:auth_role, without_permissions: %w(create_file)) }
-      describe '.scope' do
-        it { expect(resolved_scope).not_to include(chunk) }
-        it { expect(resolved_scope).not_to include(other_chunk) }
-      end
-      permissions :show?, :create?, :update?, :destroy? do
-        it { is_expected.not_to permit(user, chunk) }
-        it { is_expected.not_to permit(user, other_chunk) }
-      end
-    end
-
-    context 'with create_file' do
-      let(:auth_role) { FactoryGirl.create(:auth_role, permissions: %w(create_file)) }
-      describe '.scope' do
-        it { expect(resolved_scope).to include(chunk) }
-        it { expect(resolved_scope).not_to include(other_chunk) }
-      end
-      permissions :show?, :create?, :update?, :destroy? do
-        it { is_expected.to permit(user, chunk) }
-        it { is_expected.not_to permit(user, other_chunk) }
-      end
-    end
-  end
+  it_behaves_like 'a user without project_permission', :create_file, denies: [:scope, :show?, :create?, :update?, :destroy?], on: :chunk
+  it_behaves_like 'a user without project_permission', :create_file, denies: [:scope, :show?, :create?, :update?, :destroy?], on: :other_chunk
 
   context 'when user does not have project_permission' do
     let(:user) { FactoryGirl.create(:user) }
