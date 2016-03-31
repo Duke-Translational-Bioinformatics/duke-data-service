@@ -3,7 +3,8 @@ require 'rails_helper'
 describe FolderPolicy do
   include_context 'policy declarations'
 
-  let(:project_permission) { FactoryGirl.create(:project_permission) }
+  let(:auth_role) { FactoryGirl.create(:auth_role) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
   let(:folder) { FactoryGirl.create(:folder, project: project_permission.project) }
   let(:other_folder) { FactoryGirl.create(:folder) }
 

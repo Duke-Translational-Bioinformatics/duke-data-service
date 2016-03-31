@@ -3,7 +3,8 @@ require 'rails_helper'
 describe UploadPolicy do
   include_context 'policy declarations'
 
-  let(:project_permission) { FactoryGirl.create(:project_permission) }
+  let(:auth_role) { FactoryGirl.create(:auth_role) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
   let(:upload) { FactoryGirl.create(:upload, project: project_permission.project) }
   let(:other_upload) { FactoryGirl.create(:upload) }
 
