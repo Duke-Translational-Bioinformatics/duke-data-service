@@ -8,10 +8,6 @@ FactoryGirl.define do
     last_name { Faker::Name.last_name }
     last_login_at { Faker::Time.backward(14, :evening) }
 
-    trait :with_auth_role do
-      auth_role { FactoryGirl.create(:auth_role, :system) }
-    end
-
     trait :delong do
       display_name 'Mark Randall DeLong'
       first_name 'Mark'

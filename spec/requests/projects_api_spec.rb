@@ -8,7 +8,7 @@ describe DDS::V1::ProjectsAPI do
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:project_stub) { FactoryGirl.build(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   let(:resource_class) { Project }
   let(:resource_serializer) { ProjectSerializer }
@@ -162,7 +162,7 @@ describe DDS::V1::ProjectsAPI do
 
       context 'with invalid resource' do
         let(:resource) { FactoryGirl.create(:project, :invalid) }
-        let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: resource) }
+        let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: resource) }
 
         it { expect(resource).to be_invalid }
         it { expect(resource).not_to be_is_deleted }

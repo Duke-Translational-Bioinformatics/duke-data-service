@@ -1,17 +1,23 @@
 class AffiliationPolicy < ApplicationPolicy
   def show?
-    permission
+    permission :view_project
   end
 
   def create?
-    permission
+    permission :update_project
   end
 
   def update?
-    permission
+    permission :update_project
   end
 
   def destroy?
-    permission
+    permission :update_project
+  end
+
+  class Scope < Scope
+    def resolve
+      super :view_project
+    end
   end
 end
