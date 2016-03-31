@@ -104,7 +104,7 @@ module DDS
         else
           update_params[:parent] = hide_logically_deleted Folder.find(folder_params[:parent][:id])
         end
-        authorize folder, :create?
+        authorize folder, :move?
         Audited.audit_class.as_user(current_user) do
           if folder.update(update_params)
             annotate_audits [folder.audits.last]
@@ -132,7 +132,7 @@ module DDS
         folder_params = declared(params, include_missing: false)
         new_name = folder_params[:name]
         folder = hide_logically_deleted Folder.find(params[:id])
-        authorize folder, :create?
+        authorize folder, :rename?
         Audited.audit_class.as_user(current_user) do
           if folder.update(name: new_name)
             annotate_audits [folder.audits.last]
