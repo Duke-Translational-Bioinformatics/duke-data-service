@@ -18,3 +18,7 @@ swift:
   build: ./docker/builds/swift
   ports:
     - 12345:8080
+neo4j:
+  image: neo4j:latest
+  ports:
+    - '7474:7474'

@@ -22,6 +22,10 @@ swift:
     service: swift
   volumes_from:
     - swiftvol
+neo4j:
+  extends:
+    file: dc-base.yml
+    service: neo4j
 swiftcli:
   image: dukedataservice_server
   volumes_from:
