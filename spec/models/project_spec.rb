@@ -2,8 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
-  let(:other_project) { FactoryGirl.create(:project) }
-  let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
@@ -39,21 +37,17 @@ RSpec.describe Project, type: :model do
   end
 
   describe 'validations' do
-    it 'should have a unique project name' do
-      expect(other_project).to be_persisted
-      expect(deleted_project).to be_persisted
-      should validate_presence_of(:name)
-      should validate_uniqueness_of(:name).case_insensitive
-      should_not allow_value(other_project.name).for(:name)
-      should allow_value(deleted_project.name).for(:name)
-    end
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.not_to validate_uniqueness_of(:name).case_insensitive }
+    it { is_expected.not_to validate_uniqueness_of(:name) }
+    it { is_expected.to validate_presence_of(:description) }
+    it { is_expected.to validate_presence_of(:creator_id) }
 
-    it 'should have a description' do
-      should validate_presence_of(:description)
-    end
-
-    it 'should have a creator_id' do
-      should validate_presence_of(:creator_id)
+    context 'when is_deleted true' do
+      subject { FactoryGirl.create(:project, :deleted) }
+      it { is_expected.not_to validate_presence_of(:name) }
+      it { is_expected.not_to validate_presence_of(:description) }
+      it { is_expected.not_to validate_presence_of(:creator_id) }
     end
   end
 
