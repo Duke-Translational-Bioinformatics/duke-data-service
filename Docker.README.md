@@ -427,8 +427,6 @@ the swift service system administrator.
 DDS client to the swift service.  These must be set up by
 the swift service system administrator.
 * SWIFT_PRIMARY_KEY: A long random string which can be generated using
-* SWIFT_CHUNK_HASH_ALGORITHM: A string representation of the chunking algorithm to be 
-used by client applications. [Default value is 'md5']
 ```
 docker-compose run rake secret
 ```
@@ -501,7 +499,7 @@ docker rm $(docker ps -aq)
 
 Run Dredd
 ===
-Dredd is a python application that runs against the official [Duke Data Services Apiary Documentation](http://docs.dukedataservices.apiary.io/) using the apiary.apib file
+Dredd is a node application that runs against the official [Duke Data Services Apiary Documentation](http://docs.dukedataservices.apiary.io/) using the apiary.apib file
 that is located in the Application Root, which should be up to date (if not, it should
 be updated and committed to the master branch of the repo, and merged into all other
 branches where dredd should run).
@@ -536,6 +534,9 @@ rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
 ln -s circle/webapp.circle.env webapp.env
+rm dredd.env
+ln -s dredd.local.env dredd.env
+export COMPOSE_FILE=docker-compose.circle.yml
 ./launch_application.sh
 echo "MY_GENERATED_JWT="$(docker-compose run rake api_test_user:create | tail -1) >> dredd.env
 docker-compose run dredd

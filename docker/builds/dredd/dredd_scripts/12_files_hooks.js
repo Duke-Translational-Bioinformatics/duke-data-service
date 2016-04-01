@@ -59,8 +59,21 @@ hooks.before(VIEW_FILE, function (transaction) {
   g_fileId = fileId;
 });
 
-hooks.before(UPDATE_FILE, function (transaction) {
-  transaction.skip = true;
+hooks.before(UPDATE_FILE, function (transaction,done) {
+  var request = tools.createUploadResource(responseStash['createdProject'],hooks.configuration.server);
+  request.then(function(data) {
+    uploadId = data['id']
+    var requestBody = JSON.parse(transaction.request.body);
+    requestBody['upload']['id'] = uploadId;
+    requestBody['label'] = "just a test";
+    transaction.request.body = JSON.stringify(requestBody);
+    var url = transaction.fullPath;
+    transaction.fullPath = url.replace('777be35a-98e0-4c2e-9a17-7bc009f9b111', g_fileId);
+    console.log(transaction);
+    console.log(g_fileId);
+    console.log(uploadId);
+    done();
+  });
 });
 
 hooks.before(DELETE_FILE, function (transaction, done) {

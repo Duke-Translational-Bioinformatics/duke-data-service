@@ -8,13 +8,17 @@ var fs = require("fs");
 var md5 = require('md5');
 
 
-
-var PROV_LIST = "Provenance Activities > Activities collection > List activities";
-var PROV_VIEW = "Provenance Activities > Activities instance > View activity";
-var PROV_UPDATE = "Provenance Activities > Activities instance > Update activity";
-var PROV_DELETE = "Provenance Activities > Activities instance > Delete activity";
+var PROV_CREATE   = "Provenance Activities > Activities collection > NOT_IMPLEMENTED Create activity"
+var PROV_LIST     = "Provenance Activities > Activities collection > NOT_IMPLEMENTED List activities";
+var PROV_VIEW     = "Provenance Activities > Activities instance > NOT_IMPLEMENTED View activity";
+var PROV_UPDATE   = "Provenance Activities > Activities instance > NOT_IMPLEMENTED Update activity";
+var PROV_DELETE   = "Provenance Activities > Activities instance > NOT_IMPLEMENTED Delete activity";
 
 var responseStash = {};
+
+hooks.before(PROV_CREATE, function (transaction) {
+  transaction.skip = true;
+});
 
 hooks.before(PROV_LIST, function (transaction) {
   transaction.skip = true;

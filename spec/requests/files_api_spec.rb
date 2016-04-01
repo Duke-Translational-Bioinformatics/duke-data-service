@@ -8,9 +8,9 @@ describe DDS::V1::FilesAPI do
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent) { folder }
-  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
   let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }

@@ -8,11 +8,11 @@ var fs = require("fs");
 var md5 = require('md5');
 
 
-var PROV_CREATE_USED = "Provenance Relations > Relations collection > Create used relation";
-var PROV_CREATE_GENERATED = "Provenance Relations > Relations collection > Create generated relation";
-var PROV_REL_LIST = "Provenance Relations > Relations collection > List provenance relations";
-var PROV_REL_VIEW = "Provenance Relations > Relation instance > View relation";
-var PROV_REL_DELETE = "Provenance Relations > Relation instance > Delete relation";
+var PROV_CREATE_USED      = "Provenance Relations > Relations collection > NOT_IMPLEMENTED Create used relation";
+var PROV_CREATE_GENERATED = "Provenance Relations > Relations collection > NOT_IMPLEMENTED Create generated relation";
+var PROV_REL_LIST         = "Provenance Relations > Relations collection > NOT_IMPLEMENTED List provenance relations";
+var PROV_REL_VIEW         = "Provenance Relations > Relation instance > NOT_IMPLEMENTED View relation";
+var PROV_REL_DELETE       = "Provenance Relations > Relation instance > NOT_IMPLEMENTED Delete relation";
 
 var responseStash = {};
 
