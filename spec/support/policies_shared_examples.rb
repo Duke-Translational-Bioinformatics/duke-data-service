@@ -16,7 +16,7 @@ shared_examples 'system_permission can access' do |record_sym|
     describe '.scope' do
       it { expect(resolved_scope).to include(record) }
     end
-    permissions :show?, :create?, :update?, :destroy? do
+    permissions :index?, :show?, :create?, :update?, :destroy? do
       it { is_expected.to permit(user, record) }
     end
   end
@@ -27,7 +27,7 @@ shared_examples 'a user with project_permission' do |auth_role_permission, allow
   let(:record) { send(on) }
   let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [auth_role_permission].flatten) }
 
-  expected_permissions = [:show?, :create?, :update?, :destroy?]
+  expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
   allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
   denied_permissions = [expected_permissions + denies].flatten.reject {|i| [allows].flatten.include? i}
 
@@ -93,7 +93,7 @@ shared_examples 'system_permission cannot access' do |record_sym, with_software_
   describe '.scope' do
     it { expect(resolved_scope).not_to include(record) }
   end
-  permissions :show?, :create?, :update?, :destroy? do
+  permissions :index?, :show?, :create?, :update?, :destroy? do
     it { is_expected.not_to permit(user, record) }
   end
 end
@@ -112,7 +112,7 @@ shared_examples 'software_agent cannot access' do |record_sym|
   describe '.scope' do
     it { expect(resolved_scope).not_to include(record) }
   end
-  permissions :show?, :create?, :update?, :destroy? do
+  permissions :index?, :show?, :create?, :update?, :destroy? do
     it { is_expected.not_to permit(user, record) }
   end
 end

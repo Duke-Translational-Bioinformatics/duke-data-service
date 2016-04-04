@@ -1,6 +1,6 @@
 class ApiKeyPolicy < ApplicationPolicy
   def index?
-    false
+    no_agents && system_permission
   end
 
   def create?

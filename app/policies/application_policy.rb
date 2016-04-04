@@ -8,7 +8,7 @@ class ApplicationPolicy
   end
 
   def index?
-    false
+    system_permission
   end
 
   def show?
