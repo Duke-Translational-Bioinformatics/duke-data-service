@@ -12,7 +12,7 @@ describe FileVersionPolicy do
   it_behaves_like 'system_permission can access', :file_version
   it_behaves_like 'system_permission can access', :other_file_version
 
-  it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :show?], denies: [:download?], on: :file_version
+  it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:download?], on: :file_version
   it_behaves_like 'a user with project_permission', :update_file, allows: [:update?, :create?], denies: [:download?], on: :file_version
   it_behaves_like 'a user with project_permission', :delete_file, allows: [:destroy?], denies: [:download?], on: :file_version
   it_behaves_like 'a user with project_permission', :download_file, allows: [:download?], on: :file_version
@@ -22,8 +22,8 @@ describe FileVersionPolicy do
   it_behaves_like 'a user with project_permission', :delete_file, allows: [], denies: [:download?], on: :other_file_version
   it_behaves_like 'a user with project_permission', :download_file, allows: [], denies: [:download?], on: :other_file_version
 
-  it_behaves_like 'a user without project_permission', [:view_project, :update_file, :delete_file, :download_file], denies: [:scope, :show?, :create?, :update?, :destroy?, :download?], on: :file_version
-  it_behaves_like 'a user without project_permission', [:view_project, :update_file, :delete_file, :download_file], denies: [:scope, :show?, :create?, :update?, :destroy?, :download?], on: :other_file_version
+  it_behaves_like 'a user without project_permission', [:view_project, :update_file, :delete_file, :download_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :download?], on: :file_version
+  it_behaves_like 'a user without project_permission', [:view_project, :update_file, :delete_file, :download_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :download?], on: :other_file_version
 
   context 'when user does not have project_permission' do
     let(:user) { FactoryGirl.create(:user) }
@@ -32,7 +32,7 @@ describe FileVersionPolicy do
       it { expect(resolved_scope).not_to include(file_version) }
       it { expect(resolved_scope).not_to include(other_file_version) }
     end
-    permissions :show?, :create?, :update?, :destroy? do
+    permissions :index?, :show?, :create?, :update?, :destroy? do
       it { is_expected.not_to permit(user, file_version) }
       it { is_expected.not_to permit(user, other_file_version) }
     end

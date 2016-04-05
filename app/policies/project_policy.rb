@@ -1,4 +1,8 @@
 class ProjectPolicy < ApplicationPolicy
+  def index?
+    true
+  end
+
   def show?
     permission :view_project
   end
