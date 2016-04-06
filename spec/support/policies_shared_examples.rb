@@ -8,16 +8,27 @@ shared_context 'policy declarations' do
   }
 end
 
-shared_examples 'system_permission can access' do |record_sym|
+shared_examples 'system_permission can access' do |record_sym, allows: [:scope, :index?, :show?, :create?, :update?, :destroy?], denies: []|
   let(:user) { FactoryGirl.create(:system_permission).user }
   let(:record) { send(record_sym) }
 
+  expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
+  allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
+  denied_permissions = [expected_permissions + denies].flatten.reject {|i| [allows].flatten.include? i}
+
   context record_sym.to_s do
     describe '.scope' do
-      it { expect(resolved_scope).to include(record) }
+      if allows.include? :scope
+        it { expect(resolved_scope).to include(record) }
+      else
+        it { expect(resolved_scope).not_to include(record) }
+      end
     end
-    permissions :index?, :show?, :create?, :update?, :destroy? do
+    permissions *allowed_permissions do
       it { is_expected.to permit(user, record) }
+    end
+    permissions *denied_permissions do
+      it { is_expected.not_to permit(user, record) }
     end
   end
 end
