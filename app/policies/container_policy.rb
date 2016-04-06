@@ -1,22 +1,30 @@
-class ProjectPolicy < ApplicationPolicy
-  def index?
-    true
-  end
-
+class ContainerPolicy < ApplicationPolicy
   def show?
     permission :view_project
   end
 
+  def download?
+    false
+  end
+
+  def move?
+    false
+  end
+
+  def rename?
+    false
+  end
+
   def create?
-    true
+    false
   end
 
   def update?
-    permission :update_project
+    false
   end
 
   def destroy?
-    permission :delete_project
+    false
   end
 
   class Scope < Scope
