@@ -13,7 +13,7 @@ module DDS
       get '/projects/:project_id/permissions', root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
-        authorize project, :show?
+        authorize ProjectPermission.new(project: project), :index?
         policy_scope(ProjectPermission).where(project: project)
       end
 
