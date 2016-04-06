@@ -4,14 +4,14 @@ describe DDS::V1::FileVersionsAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
   let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
   let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
   let(:deleted_data_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
   let(:other_file_version) { FactoryGirl.create(:file_version, data_file: other_data_file) }
 

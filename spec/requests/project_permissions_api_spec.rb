@@ -11,7 +11,7 @@ describe DDS::V1::ProjectPermissionsAPI do
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
   let!(:resource) { project_permission }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: resource.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: resource.project) }
   let(:resource_project) { resource.project }
   let(:resource_user) { resource.user }
 
@@ -24,7 +24,7 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           other_permission,
-          FactoryGirl.create(:project_permission, user: current_user)
+          FactoryGirl.create(:project_permission, :project_admin, user: current_user)
         ] }
       end
 

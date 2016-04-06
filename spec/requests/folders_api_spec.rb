@@ -11,7 +11,7 @@ describe DDS::V1::FoldersAPI do
   let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
   let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
-  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
 
@@ -19,7 +19,7 @@ describe DDS::V1::FoldersAPI do
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
   let(:resource_id) { resource.id }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   let(:project_id) { project.id}
 
