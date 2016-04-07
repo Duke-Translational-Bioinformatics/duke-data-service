@@ -47,8 +47,8 @@ module DDS
       get '/projects/:project_id/affiliates', root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
-        authorize project, :show?
-        project.affiliations
+        authorize Affiliation.new(project: project), :index?
+        policy_scope(project.affiliations)
       end
 
       desc 'View project level affiliation for a user' do

@@ -70,8 +70,9 @@ module DDS
           get '/uploads', root: 'results' do
             authenticate!
             project = hide_logically_deleted Project.find(params[:project_id])
-            authorize project, :show?
-            paginate(project.uploads.all)
+            authorize Upload.new(project: project), :index?
+            uploads = policy_scope(project.uploads)
+            paginate(uploads.all)
           end
         end
       end

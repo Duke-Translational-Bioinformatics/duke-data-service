@@ -16,12 +16,12 @@ module DDS
       get '/folders/:id/children', root: 'results' do
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
-        authorize folder, :show?
+        authorize folder, :index?
         name_contains = params[:name_contains]
         if name_contains.nil?
-          descendants = folder.children
+          descendants = policy_scope(folder.children)
         else
-          descendants = folder.descendants.where("lower(name) like lower(?)", "%#{name_contains}%")
+          descendants = policy_scope(folder.descendants).where(Container.arel_table[:name].matches("%#{name_contains}%"))
         end
         descendants.where(is_deleted: false)
       end
@@ -42,13 +42,13 @@ module DDS
         authenticate!
         name_contains = params[:name_contains]
         project = hide_logically_deleted Project.find(params[:id])
-        authorize project, :show?
+        authorize DataFile.new(project: project), :index?
         if name_contains.nil?
           descendants = project.children
         else
-          descendants = project.containers.where("lower(name) like lower(?)", "%#{name_contains}%")
+          descendants = project.containers.where(Container.arel_table[:name].matches("%#{name_contains}%"))
         end
-        descendants.where(is_deleted: false)
+        policy_scope(descendants).where(is_deleted: false)
       end
     end
   end
