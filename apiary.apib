@@ -47,12 +47,19 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Added *Tags* resource/actions - current iteration assumes only file tagging is supported, but design supports extension to tag other objects.
 + For *Software Agents* resource - added `time_to_live` property to the `POST /software_agents/api_token` action response payload.
 + For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
-+ Added `GET /pojects/{id}/usage` - returns summary usage details for the project.
++ Added `GET /projects/{id}/usage` - returns summary usage details for the project.
 
 18-Mar-2016
 --------------
 + For *Software Agents* resource - added action `DELETE /software_agents/{id}/api_key` - this allows agent key to be removed liken to user key actions.
 + For *Uploads* resource - reverted `hash` back to a required property - this aligns with Web portal now being able to hash "larger" files via streaming.
+
+07-Apr-2016
+--------------
++ Refactored file versioning - the biggest change here is file resource now has a `current_version` property that contains version details - including the referenced `upload` (see *Files* and *File Versions* actions).
++ For *File Versions* resource - added new action `POST /file_versions/{id}/current` that promotes a prior file version to top of version stack.
++ For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
++ For *Uploads* resource - removed hash related properties (`hash.value` and `hash.algorithm`) from initiate upload request properties - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  The upload resource now contains the collection of reported `hashes`.
 
 ## Group API Usage
 
@@ -418,8 +425,14 @@ Represents the currently authenticated user.
 ## Current User instance [/current_user]
 
 ### View current user [GET]
+Get profile for the currently authenticated user.
+
 >**Permission:** authenticated
 - - - - -
+
+>**Rules**
+- - - - -
++ The `agent` property is populated if user is authenticated via software agent token, otherwise the `agent` property is `null`.
 
 + Response 200 (application/json)
 
@@ -434,6 +447,10 @@ Represents the currently authenticated user.
                 "source": "duke_shibboleth",
                 "uid": "gardner100"
             },
+            "agent": {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hashing computation agent"
+            },
             "last_login_on": "2015-01-01T12:00:00Z",
             "audit": { }
         }
@@ -441,7 +458,7 @@ Represents the currently authenticated user.
 ## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 
->**Permission:** view_project
+>**Permission:** authenticated [scope: view_project]
 - - - - -
 
 >**Response Properties**
@@ -453,7 +470,7 @@ View summary usage for current user across all projects.
 >**Rules**
 - - - - -
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
-+ Counts/totals are only for objects user has visibility to via the view_project permission.
++ Counts/totals are only for project resources that are visible to the current user.
 
 + Response 200 (application/json)
 
@@ -633,7 +650,7 @@ Represents system level authorization roles that have been granted to a user.
     [System Permission instance][]
 
 ### View system permission [GET]
->**Permission:** system_admin OR system permissions are for the current user
+>**Permission:** system_admin
 - - - - -
 
 + Response 200
@@ -678,7 +695,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
         }
 
 ### List projects [GET]
->**Permission:** view_project
+>**Permission:** authenticated [scope: view_project]
 - - - - -
 
 >**Rules**
@@ -770,7 +787,6 @@ View summary usage for the project.
 >**Rules**
 - - - - -
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
-+ Counts/totals are only for objects user has visibility to via the view_project permission.
 
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
@@ -1273,8 +1289,6 @@ This is the first step in uploading a large file. An upload objects is created a
 + **name (string, required)** - The name of the client file to upload.
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
-+ **hash.value (number, optional)** - The entire file hash (computed by client).
-+ **hash.algorithm (string, optional)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.).
 
 >**Response Properties**
 - - - - -
@@ -1287,11 +1301,7 @@ This is the first step in uploading a large file. An upload objects is created a
         {
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5" 
-            }
+            "size": 30024000
         }
 
 + Response 201 (application/json)
@@ -1302,12 +1312,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": false 
-            },
+            "hashes": [ ],
             "chunks": [ ],
             "storage_provider": { 
                 "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1324,7 +1329,7 @@ This is the first step in uploading a large file. An upload objects is created a
         }
 
 ### List chunked uploads [GET]
->**Permission:** create_file
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -1336,12 +1341,7 @@ This is the first step in uploading a large file. An upload objects is created a
                     "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
-                    "hash": { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5", 
-                        "client_reported": true, 
-                        "confirmed": false 
-                    },
+                    "hashes": [ ],
                     "chunks": [ ],
                     "storage_provider": { 
                         "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
@@ -1363,8 +1363,8 @@ This is the first step in uploading a large file. An upload objects is created a
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
-## View chunked upload [GET]
->**Permission:** create_file
+### View chunked upload [GET]
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -1375,12 +1375,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": false 
-            },
+            "hashes": [ ],
             "chunks": [
                 {
                     "number": 1,
@@ -1475,12 +1470,7 @@ This operation is called by the client after all file chunks have been successfu
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": { 
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                "algorithm": "md5", 
-                "client_reported": true, 
-                "confirmed": false 
-            },
+            "hashes": [ ],
             "chunks": [
                 {
                     "number": 1,
@@ -1512,6 +1502,79 @@ This operation is called by the client after all file chunks have been successfu
             },
             "audit": { }
         }
+
+## NOT_IMPLEMENTED Report upload hash [PUT /uploads/{id}/hashes]
+Report hash (fingerprint) for the uploaded (or to be uploaded) file.
+
+>**Permission:** update_file
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **value (number, required)** - The entire file hash (computed by client).
++ **algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
+
+>**Rules**
+- - - - -
++ The reported `value` must be a valid algorithm - supported/valid algorithms are: `md5`, `sha256`, and `sha1`.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Request 
+
+        {
+            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+            "algorithm": "md5"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hashes": [
+                { 
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "md5",
+                    "audit": { }
+                }
+            ],
+            "chunks": [
+                {
+                    "number": 1,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
+                        "algorithm": "md5" 
+                    }
+                },
+                {
+                    "number": 2,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
+                        "algorithm": "md5" 
+                    }
+                }
+            ],
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": "Duke OIT Storage" 
+            },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": "2015-07-10T13:00:00Z",
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
 
 ## Group Files
 A file resource represents a virtual container for a physical data file (i.e. `upload`) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).
@@ -1586,9 +1649,9 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "size": 30024000,
                     "hashes": [
                         { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5",
-                        "audit": { }
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
                         }
                     ],
                     "storage_provider": { 
@@ -1644,9 +1707,9 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "size": 30024000,
                     "hashes": [
                         { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5",
-                        "audit": { }
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
                         }
                     ],
                     "storage_provider": { 
@@ -1723,9 +1786,9 @@ Updates one or more file resource properties; if this action includes an `upload
                     "size": 30024000,
                     "hashes": [
                         { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5",
-                        "audit": { }
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
                         }
                     ],
                     "storage_provider": { 
@@ -1765,7 +1828,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_verb": "GET",
             "host": "swift.oit.duke.edu",
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
-            "http_headers": []
+            "http_headers": [ ]
         }
 
 ## Move file [PUT /files/{id}/move]
@@ -1821,9 +1884,9 @@ Move file to a different parent project or parent folder.
                     "size": 30024000,
                     "hashes": [
                         { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5",
-                        "audit": { }
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
                         }
                     ],
                     "storage_provider": { 
@@ -1887,9 +1950,9 @@ Change the name of a file.
                     "size": 30024000,
                     "hashes": [
                         { 
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5",
-                        "audit": { }
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
                         }
                     ],
                     "storage_provider": { 
@@ -1940,9 +2003,9 @@ This action can be used to list all prior versions of a file, including the curr
                         "size": 30024000,
                         "hashes": [
                             { 
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "md5",
-                            "audit": { }
+                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                "algorithm": "md5",
+                                "audit": { }
                             }
                         ],
                         "storage_provider": { 
@@ -1981,9 +2044,9 @@ This action can be used to list all prior versions of a file, including the curr
                 "size": 30024000,
                 "hashes": [
                     { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5",
-                    "audit": { }
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
                     }
                 ],
                 "storage_provider": { 
@@ -2026,9 +2089,9 @@ This action can be used to list all prior versions of a file, including the curr
                 "size": 30024000,
                 "hashes": [
                     { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5",
-                    "audit": { }
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
                     }
                 ],
                 "storage_provider": { 
@@ -2065,10 +2128,10 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_verb": "GET",
             "host": "swift.oit.duke.edu",
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
-            "http_headers": []
+            "http_headers": [ ]
         }
 
-## Promote file version [POST /file_versions/{id}/current_version]
+## NOT_IMPLEMENTED Promote file version [POST /file_versions/{id}/current]
 This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the versions stack. 
 
 >**Permission:** update_file
@@ -2098,9 +2161,9 @@ This action can be used to promote a prior file version to the current version. 
                 "size": 30024000,
                 "hashes": [
                     { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5",
-                    "audit": { }
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
                     }
                 ],
                 "storage_provider": { 
@@ -2193,9 +2256,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "size": 30024000,
                             "hashes": [
                                 { 
-                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                                "algorithm": "md5",
-                                "audit": { }
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
                                 }
                             ],
                             "storage_provider": { 
@@ -2288,9 +2351,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "size": 30024000,
                             "hashes": [
                                 { 
-                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                                "algorithm": "md5",
-                                "audit": { }
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
                                 }
                             ],
                             "storage_provider": { 
@@ -2350,7 +2413,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ### NOT_IMPLEMENTED List activities [GET]
 >**Permission:** 
 - - - - -
-+ creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
++ authenticated [scope: creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity]
 
 >**Rules**
 - - - - -
@@ -2396,7 +2459,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
         }
 
 ### NOT_IMPLEMENTED Update activity [PUT]
->**Permission:** creator
+>**Permission:** authenticated [scope: creator]
 - - - - -
 
 >**Rules**
@@ -2423,7 +2486,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
         }
 
 ### NOT_IMPLEMENTED Delete activity [DELETE]
->**Permission:** creator
+>**Permission:** authenticated [scope: creator]
 - - - - -
 
 + Response 204
@@ -2436,7 +2499,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 ## Relations collection [/relations]
 
 ### NOT_IMPLEMENTED Create used relation [POST /relations/used]
->**Permission:** creator of the activity *and* visibility to the `Used` entity
+>**Permission:** authenticated [scope: creator of the activity *and* visibility to the `Used` entity]
 - - - - -
 
 >**Properties**
@@ -2780,7 +2843,7 @@ Get list of the **distinct** tag `label` values for a kind of DDS object.
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
 
->**Permission:** view_project when tagged object is file (`dds-file`)
+>**Permission:** authenticated [scope: view_project when tagged object is file (`dds-file`)]
 - - - - -
 
 + Parameters
