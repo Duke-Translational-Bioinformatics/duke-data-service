@@ -1078,7 +1078,7 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Response Properties**
 - - - - -
-+ **ancestors (object[ ])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
++ **ancestors (object[])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
 
 + Request (application/json)
 
@@ -1100,7 +1100,9 @@ A folder is a container for files and sub-folders; folders are located in the to
                 "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1135,7 +1137,9 @@ A folder is a container for files and sub-folders; folders are located in the to
                 "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1192,7 +1196,9 @@ A folder is a container for files and sub-folders; folders are located in the to
                 "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1267,8 +1273,8 @@ This is the first step in uploading a large file. An upload objects is created a
 + **name (string, required)** - The name of the client file to upload.
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
-+ **hash.value (number, required)** - The entire file hash (computed by client).
-+ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.).
++ **hash.value (number, optional)** - The entire file hash (computed by client).
++ **hash.algorithm (string, optional)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.).
 
 >**Response Properties**
 - - - - -
@@ -1508,12 +1514,14 @@ This operation is called by the client after all file chunks have been successfu
         }
 
 ## Group Files
-A file resource represents a virtual container for a pyhsical data file (i.e. `upload`) that is located in a storage backend supported by Duke Data Services (i.e. Duke OIT Swift).
+A file resource represents a virtual container for a physical data file (i.e. `upload`) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).
 
 ## Files collection [/files]
 
 ### Create file [POST]
 Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads` actions).
+
+*Note: A file is a versionable resource; this action creates the initial version of a file.  New file versions can be created (uploaded) via the* `/file/{id}/update` *action.  Versions can be managed via the* **File Versions** *actions.*
 
 >**Permission:** create_file
 - - - - -
@@ -1523,7 +1531,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + **parent.kind (string, required)** - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
 + **parent.id (string, required)** - The unique id of the parent.
 + **upload.id (string, required)** - The unique id for an upload that completed successfully.
-+ **label (string, optional)** - An optional short display label for the file.
++ **label (string, optional)** - An optional version label for the file; defaults to "Initial version" if not provided by client. 
 
 >**Rules**
 - - - - -
@@ -1538,7 +1546,9 @@ Creates a file metadata resource; the client is responsible for the creation of 
                 "kind": "dds-folder", 
                 "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" 
             },
-            "upload": {"id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"},
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"
+            },
             "label": "Initial raw data from device"
         }
 
@@ -1552,7 +1562,9 @@ Creates a file metadata resource; the client is responsible for the creation of 
                 "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1564,19 +1576,26 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "name": "Sequencing Core" 
                 }
             ],
-            "label": "Initial raw data from device",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5" 
-                },
-                "storage_provider": { 
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                    "name": "duke_oit_swift", 
-                    "description": "Duke OIT Storage" 
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 1,
+                "label": "Initial raw data from device",
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1600,7 +1619,9 @@ Creates a file metadata resource; the client is responsible for the creation of 
                 "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1613,26 +1634,33 @@ Creates a file metadata resource; the client is responsible for the creation of 
                     "name": "Sequencing Core" 
                 }
             ],
-            "label": "Initial raw data from device",
             "is_deleted": false,
-            "upload": {
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 1,
+                "label": "Initial raw data from device",
+                "upload": {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                     "size": 30024000,
-                    "hash": { 
+                    "hashes": [
+                        { 
                         "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                        "algorithm": "md5" 
-                    },
+                        "algorithm": "md5",
+                        "audit": { }
+                        }
+                    ],
                     "storage_provider": { 
                         "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
                         "name": "duke_oit_swift", 
                         "description": "Duke OIT Storage" 
                     }
-                },
+                }
+            },
             "audit": { }
         }
 
 ### Update file [PUT]
-Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
+Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
 *Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
@@ -1641,20 +1669,22 @@ Updates one or more file resource properties; if this action includes and `uploa
 
 >**Properties**
 - - - - -
-+ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully; if specified, the previous file resource is versioned.
-+ **label (string, optional)** - An optional short display label for the file.
++ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully; if specified, a new file version is created.
++ **label (string, optional)** - An optional version label for the file.
 
 >**Rules**
 - - - - -
 + The current user must be the user who uploaded the file.
 + The upload must be in a completed state (i.e. `upload.completed_on != null`).
 + Only `upload.id`, `label` properties can be updated via this action.
-+ Prior versions are assigned the next sequential `version` number. (see **File Versions**)
++ New versions are assigned the next sequential `version` number. (see **File Versions**)
 
 + Request (application/json)
 
         {
-            "upload": {"id": "422f8778-a62c-4918-8b1b-f398a041345a"},
+            "upload": {
+                "id": "422f8778-a62c-4918-8b1b-f398a041345a"
+            },
             "label": "Post pairwise sequence alignment"
         }
 
@@ -1668,7 +1698,9 @@ Updates one or more file resource properties; if this action includes and `uploa
                 "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1681,19 +1713,26 @@ Updates one or more file resource properties; if this action includes and `uploa
                     "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "422f8778-a62c-4918-8b1b-f398a041345a",
-                "size": 30024038,
-                "hash": { 
-                    "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt", 
-                    "algorithm": "md5" 
-                },
-                "storage_provider": { 
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                    "name": "duke_oit_swift", "description": 
-                    "Duke OIT Storage" 
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1705,12 +1744,14 @@ Updates one or more file resource properties; if this action includes and `uploa
 
 >**Rules**
 - - - - -
-+ This operation recursively deletes related file versions.
++ This operation recursively deletes all the related file versions.
 
 + Response 204
 
 ## Get file download URL [GET /files/{id}/url]
-Generates and returns a storage provider specific pre-signed URL that client can use to download file.
+Generates and returns a storage provider specific pre-signed URL that client can use to download file; the download URL is for the current version of the specified file.  
+
+*Note: This action returns URL to download current version of the file - to download a prior version see* **File Versions** *actions.*
 
 >**Permission:** download_file
 - - - - -
@@ -1728,6 +1769,8 @@ Generates and returns a storage provider specific pre-signed URL that client can
         }
 
 ## Move file [PUT /files/{id}/move]
+Move file to a different parent project or parent folder.
+
 >**Permission:** create_file
 - - - - -
 
@@ -1753,7 +1796,9 @@ Generates and returns a storage provider specific pre-signed URL that client can
                 "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1766,26 +1811,35 @@ Generates and returns a storage provider specific pre-signed URL that client can
                     "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5" 
-                },
-                "storage_provider": { 
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                    "name": "duke_oit_swift", 
-                    "description": "Duke OIT Storage" 
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
         }
 
 ## Rename file [PUT /files/{id}/rename]
->**Permission:** create_file
+Change the name of a file.
+
+>**Permission:** update_file
 - - - - -
 
 + Parameters
@@ -1808,7 +1862,9 @@ Generates and returns a storage provider specific pre-signed URL that client can
                 "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
                 { 
                     "kind": "dds-project", 
@@ -1821,19 +1877,26 @@ Generates and returns a storage provider specific pre-signed URL that client can
                     "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": { 
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5" 
-                },
-                "storage_provider": { 
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                    "name": "duke_oit_swift", 
-                    "description": "Duke OIT Storage" 
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1849,7 +1912,7 @@ The actions herein are used to interact with prior versions of a file resource.
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
 ### List file versions [GET]
-If there are previous versions of a file, this action can be used to retrieve information about the older versions.
+This action can be used to list all prior versions of a file, including the current version.
 
 >**Permission:** view_project
 - - - - -
@@ -1875,10 +1938,13 @@ If there are previous versions of a file, this action can be used to retrieve in
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                         "size": 30024000,
-                        "hash": { 
+                        "hashes": [
+                            { 
                             "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "md5" 
-                        },
+                            "algorithm": "md5",
+                            "audit": { }
+                            }
+                        ],
                         "storage_provider": { 
                             "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
                             "name": "duke_oit_swift", 
@@ -1913,10 +1979,13 @@ If there are previous versions of a file, this action can be used to retrieve in
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": { 
+                "hashes": [
+                    { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5" 
-                },
+                    "algorithm": "md5",
+                    "audit": { }
+                    }
+                ],
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
                     "name": "duke_oit_swift", 
@@ -1955,10 +2024,13 @@ If there are previous versions of a file, this action can be used to retrieve in
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": { 
+                "hashes": [
+                    { 
                     "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                    "algorithm": "md5" 
-                },
+                    "algorithm": "md5",
+                    "audit": { }
+                    }
+                ],
                 "storage_provider": { 
                     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
                     "name": "duke_oit_swift", 
@@ -1971,6 +2043,10 @@ If there are previous versions of a file, this action can be used to retrieve in
 ### Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
+
+>**Rules**
+- - - - -
++ The current file version cannot be deleted.
 
 + Response 204
 
@@ -1991,7 +2067,51 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
             "http_headers": []
         }
-            
+
+## Promote file version [POST /file_versions/{id}/current_version]
+This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the versions stack. 
+
+>**Permission:** update_file
+- - - - -
+
+>**Rules**
+- - - - -
++ The current file version cannot be promoted.
+
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version to be promoted to the current version.
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "66ed147e-2312-4974-999a-58ec77230182",
+            "file": {
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+            },
+            "version": 3,
+            "label": "Post pairwise sequence alignment (piecewise)",
+            "is_deleted": false,
+            "upload": {
+                "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                "size": 30024000,
+                "hashes": [
+                    { 
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "md5",
+                    "audit": { }
+                    }
+                ],
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
+                }
+            },
+            "audit": { }
+        }
+               
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
@@ -2022,7 +2142,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
                     },
                     "name": "Raw Data",
-                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
                     "ancestors": [
                         { 
                             "kind": "dds-project", 
@@ -2046,7 +2168,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
                     },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
                     "ancestors": [
                         { 
                             "kind": "dds-project", 
@@ -2059,19 +2183,26 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "name": "Sequencing Archive" 
                         }
                     ],
-                    "label": "Initial raw data from device",
                     "is_deleted": false,
-                    "upload": {
-                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                        "size": 30024000,
-                        "hash": { 
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "md5" 
-                        },
-                        "storage_provider": { 
-                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                            "name": "duke_oit_swift", 
-                            "description": "Duke OIT Storage" 
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                "algorithm": "md5",
+                                "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
                         }
                     },
                     "audit": { }
@@ -2106,7 +2237,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
                     },
                     "name": "Raw Data",
-                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
                     "ancestors": [
                         { 
                             "kind": "dds-project", 
@@ -2130,7 +2263,9 @@ Search for the children (i.e. folders and files) of a project or folder.
                         "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
                     },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
                     "ancestors": [
                         { 
                             "kind": "dds-project", 
@@ -2143,19 +2278,26 @@ Search for the children (i.e. folders and files) of a project or folder.
                             "name": "Sequencing Archive" 
                         }
                     ],
-                    "label": "Initial raw data from device",
                     "is_deleted": false,
-                    "upload": {
-                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                        "size": 30024000,
-                        "hash": { 
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
-                            "algorithm": "md5" 
-                        },
-                        "storage_provider": { 
-                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
-                            "name": "duke_oit_swift", 
-                            "description": "Duke OIT Storage" 
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                "algorithm": "md5",
+                                "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
                         }
                     },
                     "audit": { }
