@@ -17,7 +17,7 @@ describe DDS::V1::ChildrenAPI do
   let(:named_root_file) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root file', project: project) }
   let(:named_child_file) { FactoryGirl.create(:data_file, name: 'The XXXX child file', parent: folder, project: project) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
   let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project, parent: folder) }
   let(:other_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
@@ -29,7 +29,7 @@ describe DDS::V1::ChildrenAPI do
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent_id) { parent.id }
 
   describe 'Folder children collection' do

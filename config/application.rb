@@ -26,9 +26,12 @@ module DukeDataService
     config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
 
     config.force_ssl = false
+    cors_origins = '*'
+    cors_origins = ENV['CORS_ORIGINS'].split(',') if ENV['CORS_ORIGINS']
+
     config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
       allow do
-        origins '*'
+        origins cors_origins
 
         resource '*',
           :headers => :any,

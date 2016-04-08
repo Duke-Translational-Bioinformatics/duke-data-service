@@ -11,8 +11,8 @@ module DDS
       end
       get '/system/permissions', root: :results do
         authenticate!
-        authorize SystemPermission.new, :show?
-        SystemPermission.all
+        authorize SystemPermission.new, :index?
+        policy_scope(SystemPermission).all
       end
 
       desc 'Grant system level permission to user' do

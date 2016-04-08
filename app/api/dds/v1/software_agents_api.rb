@@ -12,6 +12,7 @@ module DDS
       end
       get '/software_agents', root: 'results' do
         authenticate!
+        authorize SoftwareAgent.new, :index?
         policy_scope(SoftwareAgent).where(is_deleted: false)
       end
 

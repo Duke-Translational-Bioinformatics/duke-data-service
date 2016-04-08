@@ -16,7 +16,7 @@ describe DDS::V1::UploadsAPI do
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: upload.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: upload.project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }

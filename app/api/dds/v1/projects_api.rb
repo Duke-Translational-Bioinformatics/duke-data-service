@@ -49,6 +49,7 @@ module DDS
       end
       get '/projects', root: 'results' do
         authenticate!
+        authorize Project.new, :index?
         policy_scope(Project).where(is_deleted: false)
       end
 

@@ -1,22 +1,30 @@
-class FileVersionPolicy < ApplicationPolicy
+class ContainerPolicy < ApplicationPolicy
   def show?
     permission :view_project
   end
 
   def download?
-    permission :download_file
+    false
+  end
+
+  def move?
+    false
+  end
+
+  def rename?
+    false
   end
 
   def create?
-    permission :update_file
+    false
   end
 
   def update?
-    permission :update_file
+    false
   end
 
   def destroy?
-    permission :delete_file
+    false
   end
 
   class Scope < Scope
