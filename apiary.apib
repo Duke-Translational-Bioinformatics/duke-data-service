@@ -31,7 +31,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 
 08-Mar-2016
 --------------
-+ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `Used` and `WasGeneratedBy` provenance relations.
++ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `used` and `wasGeneratedBy` provenance relations.
 
 09-Mar-2016
 --------------
@@ -59,7 +59,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Refactored file versioning - the biggest change here is file resource now has a `current_version` property that contains version details - including the referenced `upload` (see *Files* and *File Versions* actions).
 + For *File Versions* resource - added new action `POST /file_versions/{id}/current` that promotes a prior file version to top of version stack.
 + For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
-+ For *Uploads* resource - removed hash related properties (`hash.value` and `hash.algorithm`) from initiate upload request properties - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  The upload resource now contains the collection of reported `hashes`.
++ For *Uploads* resource - removed hash related properties (`hash.value` and `hash.algorithm`) from initiate upload request properties - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  A new property `hashes` was added to the upload resource - this property contains the collection of client reported hashes.
 
 ## Group API Usage
 
@@ -1725,7 +1725,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 ### Update file [PUT]
 Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
-*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+*Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
 >**Permission:** update_file
 - - - - -
@@ -1968,7 +1968,7 @@ Change the name of a file.
 ## Group File Versions
 The actions herein are used to interact with prior versions of a file resource.
 
-*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+*Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
 ## File Versions collection [/files/{id}/versions]
 + Parameters
@@ -2371,7 +2371,7 @@ Search for the children (i.e. folders and files) of a project or folder.
 ## Group Provenance Activities
 Represents the main record of provenance in DDS; it is analogous to *Activity* defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Activities are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
-*Note: Provenance relations to an activity, such as `Used` and `WasGeneratedBy` are managed through the `Provenance Relations` API actions.*
+*Note: Provenance relations to an activity, such as* `used` *and* `wasGeneratedBy` *are managed through the* **Provenance Relations** *API actions.*
 
 ## Activities collection [/activities]
 
@@ -2413,7 +2413,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ### NOT_IMPLEMENTED List activities [GET]
 >**Permission:** 
 - - - - -
-+ authenticated [scope: creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity]
++ authenticated [scope: creator *or* visiblity to single entity that has a provenance relation to the activity]
 
 >**Rules**
 - - - - -
@@ -2443,7 +2443,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ### NOT_IMPLEMENTED View activity [GET]
 >**Permission:** 
 - - - - -
-+ creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
++ creator *or* visiblity to single entity that has a provenance relation to the activity
 
 + Response 200 (application/json)
 
@@ -2459,7 +2459,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
         }
 
 ### NOT_IMPLEMENTED Update activity [PUT]
->**Permission:** authenticated [scope: creator]
+>**Permission:** creator
 - - - - -
 
 >**Rules**
@@ -2486,7 +2486,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
         }
 
 ### NOT_IMPLEMENTED Delete activity [DELETE]
->**Permission:** authenticated [scope: creator]
+>**Permission:** creator
 - - - - -
 
 + Response 204
@@ -2494,27 +2494,27 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ## Group Provenance Relations
 Represents provenance relations as defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Relations are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
-*Note: Provenance relations currently supported are `Used` and `WasGeneratedBy`.*
-
 ## Relations collection [/relations]
 
 ### NOT_IMPLEMENTED Create used relation [POST /relations/used]
->**Permission:** authenticated [scope: creator of the activity *and* visibility to the `Used` entity]
+>**Permission:** creator of the activity *and* visibility to the `used` entity
 - - - - -
 
 >**Properties**
 - - - - -
 + **activity.id (string, required)** - The activity that used the entity.
-+ **entity.kind (string, optional)** - The kind of entity that was used; this is one of `dds-file` or `dds-file-version`.
++ **entity.kind (string, optional)** - The kind of entity that was used; this must be a file versions (i.e. `dds-file-version`).
 + **entity.id (string, optional)** - The unique id of the used entity.
 
 + Request (application/json)
 
         {
-            "activity": {"id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"},
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
+            },
             "entity": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                "kind": "dds-file-version",
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b"
             }
         }
 
@@ -2526,46 +2526,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "activity": {
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "audit": { }
-            },
-            "entity": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "audit": { }
-            },
-            "is_deleted": false,
-            "audit": { }
-        }
-
-### NOT_IMPLEMENTED Create generated relation [POST /relations/generated]
->**Permission:** creator of the activity *and* visibility to the `WasGeneratedBy` entity
-- - - - -
-
->**Properties**
-- - - - -
-+ **activity.id (string, required)** - The activity that generated the entity.
-+ **entity.kind (string, optional)** - The kind of entity that was generated; this is one of `dds-file` or `dds-file-version`.
-+ **entity.id (string, optional)** - The unique id of the generated entity.
-
-+ Request (application/json)
-
-        {
-            "activity": {"id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"},
-            "entity": {
-                "kind": "dds-file-version",
-                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b"
-            }
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "kind": "dds-relation-generated", 
-            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-            "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                "name": "RF PI3-Kinase",
+                "is_deleted": false,
                 "audit": { }
             },
             "entity": {
@@ -2573,20 +2534,68 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "name": "RF PI3-Kinase"
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                 },
                 "version": 1,
-                "label": "Post pairwise sequence alignment (piecewise)",
+                "label": "Initial raw data from device",
+                "is_deleted": false,
                 "audit": { }
             },
-            "is_deleted": false,
+            "audit": { }
+        }
+
+### NOT_IMPLEMENTED Create generated relation [POST /relations/was_generated_by]
+>**Permission:** creator of the activity *and* visibility to the `wasGeneratedBy` entity
+- - - - -
+
+>**Properties**
+- - - - -
++ **activity.id (string, required)** - The activity that generated the entity.
++ **entity.kind (string, optional)** - The kind of entity that was generated; this must be a file versions (i.e. `dds-file-version`).
++ **entity.id (string, optional)** - The unique id of the generated entity.
+
++ Request (application/json)
+
+        {
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
+            },
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-relation-was-generated-by", 
+            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "audit": { }
+            },
             "audit": { }
         }
 
 ### NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
-List the `Used` and `WasGeneratedBy` relations for a provenance node; this only lists direct relations for the node that are a single hop away.
+List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 
->**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity (file or file version)
+>**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
 - - - - -
 
 >**Rules**
@@ -2594,7 +2603,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
 + Provenance relations that have been deleted (i.e. `"is_deleted": true`) are not included.
 
 + Parameters
-    + object_kind (string, required, `dds-activity`) ... The kind of provenance node; can be one of `dds-activity`, `dds-file` or `dds-file-version`.
+    + object_kind (string, required, `dds-activity`) ... The kind of provenance node; can be one of dds-activity or dds-file-version.
     + object_id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the node.
 
 + Response 200 (application/json)
@@ -2607,23 +2616,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
                     "activity": {
                         "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                         "name": "RF PI3-Kinase",
-                        "audit": { }
-                    },
-                    "entity": {
-                        "kind": "dds-file",
-                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                        "audit": { }
-                    },
-                    "is_deleted": false,
-                    "audit": { }
-                },
-                {
-                    "kind": "dds-relation-generated", 
-                    "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-                    "activity": {
-                        "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                        "name": "RF PI3-Kinase",
+                        "is_deleted": false,
                         "audit": { }
                     },
                     "entity": {
@@ -2631,33 +2624,34 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
                         "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                         "file": {
                             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                            "name": "RF PI3-Kinase"
+                            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                         },
                         "version": 1,
-                        "label": "Post pairwise sequence alignment (piecewise)",
+                        "label": "Initial raw data from device",
+                        "is_deleted": false,
                         "audit": { }
                     },
-                    "is_deleted": false,
                     "audit": { }
-                }
+                }            
             ]
         }
 
 ## Relation instance [/relations/{id}]
 + Parameters
-    + id (string, required, `372f25e1-01b0-4b8d-9524-e26dd573cc95`) ... The unique id of the provenance relation.
+    + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
 ### NOT_IMPLEMENTED View relation [GET]
->**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity (i.e. file or file version)
+>**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
 
 + Response 200 (application/json)
 
-         {
-            "kind": "dds-relation-generated", 
-            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+        {
+            "kind": "dds-relation-used", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
             "activity": {
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
+                "is_deleted": false,
                 "audit": { }
             },
             "entity": {
@@ -2665,13 +2659,13 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "name": "RF PI3-Kinase"
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                 },
                 "version": 1,
-                "label": "Post pairwise sequence alignment (piecewise)",
+                "label": "Initial raw data from device",
+                "is_deleted": false,
                 "audit": { }
             },
-            "is_deleted": false,
             "audit": { }
         }
 
@@ -2686,9 +2680,9 @@ The `Provenance Relations` API actions allows users and software agents to recor
 *Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
 ## NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
-Given a starting node *(activity, file, or file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
+Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
->**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity (file or file version)
+>**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity
 - - - - -
 
 >**Rule:**
@@ -2697,7 +2691,7 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
 
 >**Search Properties**
 - - - - -
-+ **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity`, `dds-file` or `dds-file-version`.
++ **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity` or `dds-file-version`.
 + **start_node.id (string, required)** - The unique id of the node.
 + **max_hops (number, optional)** -  The max number of hops (degree of node separation) to traverse from the starting node; defaults to infinity.
 
@@ -2717,21 +2711,12 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
                 "nodes": [
                     {
                         "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
-                        "labels": ["Actvity"], 
+                        "labels": ["Activity"], 
                         "properties": {
                             "kind": "dds-activity",
                             "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                             "name": "RF PI3-Kinase",
-                            "audit": { }
-                        }
-                    },
-                    {
-                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111", 
-                        "labels": ["File"], 
-                        "properties": {
-                            "kind": "dds-file",
-                            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                            "is_deleted": false,
                             "audit": { }
                         }
                     },
@@ -2743,10 +2728,27 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
                             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                             "file": {
                                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                                "name": "RF PI3-Kinase"
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                             },
                             "version": 1,
-                            "label": "Post pairwise sequence alignment (piecewise)",
+                            "label": "Initial raw data from device",
+                            "is_deleted": false,
+                            "audit": { }
+                        }
+                    },
+                    {
+                        "id": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
+                        "labels": ["File Version"], 
+                        "properties": {
+                            "kind": "dds-file-version",
+                            "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                            "file": {
+                                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                            },
+                            "version": 2,
+                            "label": "Alignment performed on raw data",
+                            "is_deleted": false,
                             "audit": { }
                         }
                     }
@@ -2754,8 +2756,8 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
                 "relationships": [
                     {
                         "id": "ac242faf-fba0-4293-a949-0b82ae7ba810", 
-                        "type": "Used", 
-                        "start_node": "777be35a-98e0-4c2e-9a17-7bc009f9b111", 
+                        "type": "used", 
+                        "start_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
                         "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
                         "properties": {
                             "kind": "dds-relation-used", 
@@ -2763,11 +2765,11 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
                             "audit": { }
                         },
                         "id": "ac242faf-fba0-4293-a949-0b82ae7ba810", 
-                        "type": "WasGeneratedBy", 
+                        "type": "wasGeneratedBy", 
                         "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
-                        "end_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
+                        "end_node": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
                         "properties": {
-                            "kind": "dds-relation-generated", 
+                            "kind": "dds-relation-was-generated-by", 
                             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
                             "audit": { }
                         }
