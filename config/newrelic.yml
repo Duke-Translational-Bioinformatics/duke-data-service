@@ -34,8 +34,8 @@ development:
 
   # NOTE: There is substantial overhead when running in developer mode.
   # Do not use for production or load testing.
-  developer_mode: true
-  monitor_mode: <% ENV['LOCALDEV'] ? false : true %>
+  # developer_mode: true
+  # monitor_mode: <% ENV['LOCALDEV'] ? false : true %>
 
 test:
   <<: *default_settings
