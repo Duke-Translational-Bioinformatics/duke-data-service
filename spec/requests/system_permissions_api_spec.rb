@@ -78,7 +78,18 @@ describe DDS::V1::SystemPermissionsAPI do
         let(:url) { "/api/v1/system/permissions/notexists_userid" }
         let(:resource_class) {'User'}
       end
+      it_behaves_like 'an identified resource' do
+        let(:resource_user) {FactoryGirl.create(:user)}
+      end
+
       it_behaves_like 'a software_agent accessible resource'
+
+      context 'system_permission for current_user' do
+        let!(:resource) { resource_permission }
+        let(:resource_user) { current_user }
+
+        it_behaves_like 'an authorized resource'
+      end
     end
 
     describe 'DELETE' do
