@@ -202,7 +202,9 @@ Represents the set of discrete permissions that can be granted to a user.
                     "name": "System Admin",
                     "description": "Can manage system level permissions and perform all operations across all projects",
                     "permissions": [ 
-                        {"id": "system_admin"}
+                        {
+                            "id": "system_admin"
+                        }
                     ],
                     "contexts": ["system"],
                     "is_deprecated": false
@@ -225,8 +227,12 @@ Represents the set of discrete permissions that can be granted to a user.
             "name": "File Editor",
             "description": "Can view, download, create, update and delete files",
             "permissions": [ 
-                {"id": "view_project"}, 
-                {"id": "download_file"} 
+                {
+                    "id": "view_project"
+                }, 
+                {
+                    "id": "download_file"
+                } 
             ],
             "contexts": ["project"],
             "is_deprecated": false
@@ -424,7 +430,7 @@ Represents the currently authenticated user.
 
 ## Current User instance [/current_user]
 
-### View current user [GET]
+### NOT_IMPLEMENTED_CHANGE View current user [GET]
 Get profile for the currently authenticated user.
 
 >**Permission:** authenticated
@@ -772,7 +778,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
 + Response 204
 
-## NOT_IMPLEMENTED Project usage [GET /projects/{id}/usage]
+## NOT_IMPLEMENTED_NEW Project usage [GET /projects/{id}/usage]
 View summary usage for the project.
 
 >**Permission:** view_project
@@ -1278,7 +1284,7 @@ All files must be uploaded using a multi-part/chunked upload process.  Although 
 + Parameters
     + id (required, string, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... Globally unique `id` of the project.
 
-### Initiate chunked upload [POST]
+### NOT_IMPLEMENTED_CHANGE Initiate chunked upload [POST]
 This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.
 
 >**Permission:** create_file
@@ -1328,7 +1334,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
-### List chunked uploads [GET]
+### NOT_IMPLEMENTED_CHANGE List chunked uploads [GET]
 >**Permission:** view_project
 - - - - -
 
@@ -1363,7 +1369,7 @@ This is the first step in uploading a large file. An upload objects is created a
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
-### View chunked upload [GET]
+### NOT_IMPLEMENTED_CHANGE View chunked upload [GET]
 >**Permission:** view_project
 - - - - -
 
@@ -1446,7 +1452,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-## Complete chunked file upload [PUT /uploads/{id}/complete]
+## NOT_IMPLEMENTED_CHANGE Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 
 >**Permission:** create_file
@@ -1503,7 +1509,7 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
-## NOT_IMPLEMENTED Report upload hash [PUT /uploads/{id}/hashes]
+## NOT_IMPLEMENTED_NEW Report upload hash [PUT /uploads/{id}/hashes]
 Report hash (fingerprint) for the uploaded (or to be uploaded) file.
 
 >**Permission:** update_file
@@ -1581,7 +1587,7 @@ A file resource represents a virtual container for a physical data file (i.e. `u
 
 ## Files collection [/files]
 
-### Create file [POST]
+### NOT_IMPLEMENTED_CHANGE Create file [POST]
 Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads` actions).
 
 *Note: A file is a versionable resource; this action creates the initial version of a file.  New file versions can be created (uploaded) via the* `/file/{id}/update` *action.  Versions can be managed via the* **File Versions** *actions.*
@@ -1664,7 +1670,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-## File instance [/files/{id}]
+## NOT_IMPLEMENTED_CHANGE File instance [/files/{id}]
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
@@ -1722,7 +1728,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-### Update file [PUT]
+### NOT_IMPLEMENTED_CHANGE Update file [PUT]
 Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
 *Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1831,7 +1837,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-## Move file [PUT /files/{id}/move]
+## NOT_IMPLEMENTED_CHANGE Move file [PUT /files/{id}/move]
 Move file to a different parent project or parent folder.
 
 >**Permission:** create_file
@@ -1899,7 +1905,7 @@ Move file to a different parent project or parent folder.
             "audit": { }
         }
 
-## Rename file [PUT /files/{id}/rename]
+## NOT_IMPLEMENTED_CHANGE Rename file [PUT /files/{id}/rename]
 Change the name of a file.
 
 >**Permission:** update_file
@@ -1974,7 +1980,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-### List file versions [GET]
+### NOT_IMPLEMENTED_CHANGE List file versions [GET]
 This action can be used to list all prior versions of a file, including the current version.
 
 >**Permission:** view_project
@@ -2019,7 +2025,7 @@ This action can be used to list all prior versions of a file, including the curr
             ]
         }
 
-## File Version instance [/file_versions/{id}]
+## NOT_IMPLEMENTED_CHANGE File Version instance [/file_versions/{id}]
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
@@ -2058,7 +2064,7 @@ This action can be used to list all prior versions of a file, including the curr
             "audit": { }
         }
 
-### Update file version [PUT] 
+### NOT_IMPLEMENTED_CHANGE Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -2131,7 +2137,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-## NOT_IMPLEMENTED Promote file version [POST /file_versions/{id}/current]
+## NOT_IMPLEMENTED_NEW Promote file version [POST /file_versions/{id}/current]
 This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the versions stack. 
 
 >**Permission:** update_file
@@ -2178,7 +2184,7 @@ This action can be used to promote a prior file version to the current version. 
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
-## Search project children [GET /projects/{id}/children{?name_contains,kind}]
+## NOT_IMPLEMENTED_CHANGE Search project children [GET /projects/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -2273,7 +2279,7 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
 
-## Search folder children [GET /folders/{id}/children{?name_contains,kind}]
+## NOT_IMPLEMENTED_CHANGE Search folder children [GET /folders/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -2375,7 +2381,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 
 ## Activities collection [/activities]
 
-### NOT_IMPLEMENTED Create activity [POST]
+### NOT_IMPLEMENTED_NEW Create activity [POST]
 >**Permission:** authenticated
 - - - - -
 
@@ -2410,7 +2416,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List activities [GET]
+### NOT_IMPLEMENTED_NEW List activities [GET]
 >**Permission:** 
 - - - - -
 + authenticated [scope: creator *or* visiblity to single entity that has a provenance relation to the activity]
@@ -2440,7 +2446,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 + Parameters
     + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
 
-### NOT_IMPLEMENTED View activity [GET]
+### NOT_IMPLEMENTED_NEW View activity [GET]
 >**Permission:** 
 - - - - -
 + creator *or* visiblity to single entity that has a provenance relation to the activity
@@ -2458,7 +2464,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Update activity [PUT]
+### NOT_IMPLEMENTED_NEW Update activity [PUT]
 >**Permission:** creator
 - - - - -
 
@@ -2485,7 +2491,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete activity [DELETE]
+### NOT_IMPLEMENTED_NEW Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
 
@@ -2496,7 +2502,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 
 ## Relations collection [/relations]
 
-### NOT_IMPLEMENTED Create used relation [POST /relations/used]
+### NOT_IMPLEMENTED_NEW Create used relation [POST /relations/used]
 >**Permission:** creator of the activity *and* visibility to the `used` entity
 - - - - -
 
@@ -2544,7 +2550,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Create generated relation [POST /relations/was_generated_by]
+### NOT_IMPLEMENTED_NEW Create generated relation [POST /relations/was_generated_by]
 >**Permission:** creator of the activity *and* visibility to the `wasGeneratedBy` entity
 - - - - -
 
@@ -2592,7 +2598,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
+### NOT_IMPLEMENTED_NEW List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
@@ -2640,7 +2646,7 @@ List the relations for a provenance node; this only lists direct relations for t
 + Parameters
     + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
-### NOT_IMPLEMENTED View relation [GET]
+### NOT_IMPLEMENTED_NEW View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
 
 + Response 200 (application/json)
@@ -2669,7 +2675,7 @@ List the relations for a provenance node; this only lists direct relations for t
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete relation [DELETE]
+### NOT_IMPLEMENTED_NEW Delete relation [DELETE]
 >**Permission:** creator
 
 + Response 204
@@ -2679,7 +2685,7 @@ The `Provenance Relations` API actions allows users and software agents to recor
 
 *Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-## NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
+## NOT_IMPLEMENTED_NEW Search Provenance [POST /search/provenance]
 Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity
@@ -2784,7 +2790,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
 
 ## Tags collection [/tags]
 
-### NOT_IMPLEMENTED Create object tag [POST]
+### NOT_IMPLEMENTED_NEW Create object tag [POST]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
@@ -2816,7 +2822,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List object tags [GET /tags/{object_kind}/{object_id}]
+### NOT_IMPLEMENTED_NEW List object tags [GET /tags/{object_kind}/{object_id}]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
@@ -2840,7 +2846,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-### NOT_IMPLEMENTED List tag labels [GET /tags/labels/{object_kind}/{?label_contains}]
+### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels/{object_kind}/{?label_contains}]
 Get list of the **distinct** tag `label` values for a kind of DDS object.  
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
@@ -2875,7 +2881,7 @@ Get list of the **distinct** tag `label` values for a kind of DDS object.
 + Parameters
     + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
 
-### NOT_IMPLEMENTED View tag [GET]
+### NOT_IMPLEMENTED_NEW View tag [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
@@ -2890,7 +2896,7 @@ Get list of the **distinct** tag `label` values for a kind of DDS object.
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete tag [DELETE]
+### NOT_IMPLEMENTED_NEW Delete tag [DELETE]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
