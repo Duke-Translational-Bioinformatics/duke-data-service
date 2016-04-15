@@ -25,6 +25,11 @@ common: &default_settings
   log_level: info
 
 
+# local docker development does not need monitoring
+docker:
+  <<: *default_settings
+  monitor_mode: false
+
 # Environment-specific settings are in this section.
 # RAILS_ENV or RACK_ENV (as appropriate) is used to determine the environment.
 # If your application has other named environments, configure them here.
