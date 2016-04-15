@@ -56,9 +56,10 @@ module DDS
       get '/system/permissions/:user_id', root: false do
         authenticate!
         user = User.find(params[:user_id])
-        permission = user.system_permission
+        permission = user.system_permission ||
+          SystemPermission.new(user: user)
         authorize permission, :show?
-        permission
+        SystemPermission.find_by!(user: user)
       end
 
       desc 'Revoke system permissions to user' do
