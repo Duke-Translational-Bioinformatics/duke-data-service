@@ -17,8 +17,10 @@ RSpec.describe ApiTokenSerializer, type: :serializer do
       it 'should have expected keys and values' do
         is_expected.to have_key('api_token')
         is_expected.to have_key('expires_on')
+        is_expected.to have_key('time_to_live')
         expect(subject['api_token']).to be
         expect(subject['expires_on']).to be
+        expect(subject['time_to_live']).to be
       end
     end
   end

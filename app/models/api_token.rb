@@ -14,10 +14,12 @@ class ApiToken
     else
       raise 'UserAuthenticationService or SoftwareAgent is required'
     end
+    @time_to_live = 2.hours.to_i
     @expires_on = Time.now.to_i
   end
 
   def api_token
+    @time_to_live = 2.hours.to_i
     @expires_on = Time.now.to_i + 2.hours
 
     if @current_user_authentication_service
@@ -37,5 +39,9 @@ class ApiToken
 
   def expires_on
     @expires_on
+  end
+
+  def time_to_live
+    @time_to_live
   end
 end
