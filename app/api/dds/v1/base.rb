@@ -135,7 +135,7 @@ module DDS
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         missing_object = ''
-        m = e.message.match(/find\s(\w+)\swith.*/)
+        m = e.message.match(/find\s(\w+)/)
         if m
           missing_object = m[1]
         end
