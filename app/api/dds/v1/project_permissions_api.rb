@@ -36,14 +36,19 @@ module DDS
         permission_params = declared(params)
         project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        Audited.audit_class.as_user(current_user) do
-          permission = ProjectPermission.find_by(project: project, user: user) ||
-          ProjectPermission.new(project: project, user: user)
-          permission.auth_role = AuthRole.find(permission_params[:auth_role][:id])
-          unless permission.auth_role
-            raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
-          end
+        if permission = ProjectPermission.find_by(project: project, user: user) 
+          authorize permission, :update?
+        else
+          permission = ProjectPermission.new(project: project, user: user)
           authorize permission, :create?
+        end
+        
+        permission.auth_role = AuthRole.find(permission_params[:auth_role][:id])
+        unless permission.auth_role
+          raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
+        end
+        
+        Audited.audit_class.as_user(current_user) do
           if permission.save
             annotate_audits [permission.audits.last, project.audits.last]
             permission
