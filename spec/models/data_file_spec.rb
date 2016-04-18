@@ -23,6 +23,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to belong_to(:creator).class_name('User') }
     it { is_expected.to have_many(:file_versions) }
+    it { is_expected.to have_many(:taggable) }
   end
 
   describe 'validations' do
@@ -153,7 +154,7 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.to respond_to(:build_file_version) }
       it { expect(subject.build_file_version).to be_a FileVersion }
       it 'builds a file_version' do
-        expect { 
+        expect {
           subject.build_file_version
         }.to change{subject.file_versions.length}.by(1)
       end
