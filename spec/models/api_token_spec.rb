@@ -30,9 +30,11 @@ RSpec.describe ApiToken do
       it 'should not require arguments' do
         expect(subject).to respond_to 'api_token'
         expect(subject).to respond_to 'expires_on'
+        expect(subject).to respond_to 'time_to_live'
         expect{
           subject.api_token
           subject.expires_on
+          subject.time_to_live
         }.not_to raise_error
       end
 
@@ -71,16 +73,21 @@ RSpec.describe ApiToken do
       it 'should not require arguments' do
         expect(subject).to respond_to 'api_token'
         expect(subject).to respond_to 'expires_on'
+        expect(subject).to respond_to 'time_to_live'
         expect{
           subject.api_token
           subject.expires_on
+          subject.time_to_live
         }.not_to raise_error
       end
 
       it 'api_token should return JWT signed with the secret_key_base for the user and authentication_service expiring expires_on seconds into the future' do
         token = subject.api_token
         expires_on = subject.expires_on
+        time_to_live = subject.time_to_live
+        expected_time = Time.now.to_i + 2.hours
         expect(expires_on).to eq(Time.now.to_i + 2.hours)
+        expect(time_to_live).to eq(2.hours.to_i)
         decoded_token = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
         expect(decoded_token).to be
         expect(decoded_token).to have_key('id')

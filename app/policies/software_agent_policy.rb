@@ -1,6 +1,10 @@
 class SoftwareAgentPolicy < ApplicationPolicy
+  def index?
+    no_agents
+  end
+
   def create?
-    no_agents && true
+    no_agents
   end
 
   def update?
@@ -8,7 +12,7 @@ class SoftwareAgentPolicy < ApplicationPolicy
   end
 
   def show?
-    no_agents && true
+    no_agents
   end
 
   def destroy?
