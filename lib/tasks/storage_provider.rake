@@ -1,5 +1,5 @@
 namespace :storage_provider do
-  desc "creates a storage_provider using ENV[SWIFT_ACCT,SWIFT_URL_ROOT,SWIFT_VERSION,SWIFT_AUTH_URI,SWIFT_USER,SWIFT_PASS,SWIFT_PRIMARY_KEY,SWIFT_SECONDARY_KEY]"
+  desc "creates a storage_provider using ENV[SWIFT_ACCT,SWIFT_URL_ROOT,SWIFT_VERSION,SWIFT_AUTH_URI,SWIFT_USER,SWIFT_PASS,SWIFT_PRIMARY_KEY,SWIFT_SECONDARY_KEY,SWIFT_CHUNK_HASH_ALGORITHM]"
   task create: :environment do
     unless ENV['SWIFT_ACCT']
       $stderr.puts "YOU DO NOT HAVE YOUR SWIFT ENVIRONMENT VARIABLES SET"
@@ -16,7 +16,8 @@ namespace :storage_provider do
         service_user: ENV["SWIFT_USER"],
         service_pass: ENV['SWIFT_PASS'],
         primary_key: ENV['SWIFT_PRIMARY_KEY'],
-        secondary_key: ENV['SWIFT_SECONDARY_KEY']
+        secondary_key: ENV['SWIFT_SECONDARY_KEY'],
+        chunk_hash_algorithm: (ENV['SWIFT_CHUNK_HASH_ALGORITHM'] || 'md5')
       )
       if sp.valid?
         begin
@@ -107,15 +108,19 @@ namespace :storage_provider do
       end
 
       storage_provider.get_container_objects(container).each do |object|
-        if storage_provider.get_object_metadata(container, object)["x-static-large-object"]
-          unless Upload.where(id: object).exists?
-            to_prune[:uploads] << [container, object]
+        begin
+          if storage_provider.get_object_metadata(container, object)["x-static-large-object"]
+            unless Upload.where(id: object).exists?
+              to_prune[:uploads] << [container, object]
+            end
+          else
+            upload_id, chunk_number = object.split('/')
+            unless Chunk.where(upload_id: upload_id, number: chunk_number).exists?
+              to_prune[:chunks] << [container, object]
+            end
           end
-        else
-          upload_id, chunk_number = object.split('/')
-          unless Chunk.where(upload_id: upload_id, number: chunk_number).exists?
-            to_prune[:chunks] << [container, object]
-          end
+        rescue StorageProviderException => e
+          puts "container #{container} object #{object} returned by get_container_objects, but metadata not accessible? #{e.message}"
         end
       end
     end

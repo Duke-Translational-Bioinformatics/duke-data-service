@@ -2,9 +2,13 @@ FactoryGirl.define do
   factory :project_permission do
     project
     user
-    auth_role
+    auth_role 
 
-    trait :deleted do
+    trait :project_admin do
+      association :auth_role, factory: [:auth_role, :project_admin, :random_id]
+    end
+
+    trait :deleted_project do
       association :project, factory: [:project, :deleted]
     end
   end

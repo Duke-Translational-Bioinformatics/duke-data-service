@@ -17,7 +17,7 @@ describe SoftwareAgentPolicy do
       it { expect(resolved_scope).to include(software_agent) }
       it { expect(resolved_scope).to include(other_software_agent) }
     end
-    permissions :show?, :create? do
+    permissions :index?, :show?, :create? do
       it { is_expected.to permit(user, software_agent) }
       it { is_expected.to permit(user, other_software_agent) }
     end
@@ -37,7 +37,7 @@ describe SoftwareAgentPolicy do
       it { expect(resolved_scope).to include(software_agent) }
       it { expect(resolved_scope).to include(other_software_agent) }
     end
-    permissions :show?, :create? do
+    permissions :index?, :show?, :create? do
       it { is_expected.to permit(user, software_agent) }
       it { is_expected.to permit(user, other_software_agent) }
     end

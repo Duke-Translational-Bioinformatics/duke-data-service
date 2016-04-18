@@ -15,8 +15,8 @@ module DDS
       get '/files/:id/versions', root: 'results' do
         authenticate!
         file = DataFile.find(params[:id])
-        authorize file, :show?
-        file.file_versions
+        authorize FileVersion.new(data_file: file), :index?
+        policy_scope(file.file_versions)
       end
 
       desc 'View file version' do

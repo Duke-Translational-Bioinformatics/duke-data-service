@@ -16,7 +16,7 @@ describe SystemPermissionPolicy do
       it { expect(resolved_scope).not_to include(system_permission) }
       it { expect(resolved_scope).not_to include(other_system_permission) }
     end
-    permissions :show?, :create?, :update?, :destroy? do
+    permissions :index?, :show?, :create?, :update?, :destroy? do
       it { is_expected.not_to permit(user, system_permission) }
       it { is_expected.not_to permit(user, other_system_permission) }
     end

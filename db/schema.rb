@@ -104,12 +104,12 @@ ActiveRecord::Schema.define(version: 20160418182708) do
 
   create_table "file_versions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "data_file_id"
-    t.integer  "version"
+    t.integer  "version_number"
     t.string   "label"
     t.uuid     "upload_id"
-    t.boolean  "is_deleted",   default: false
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.boolean  "is_deleted",     default: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   create_table "project_permissions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
@@ -160,9 +160,10 @@ ActiveRecord::Schema.define(version: 20160418182708) do
     t.string   "service_pass"
     t.string   "primary_key"
     t.string   "secondary_key"
-    t.boolean  "is_deprecated",    default: false, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.boolean  "is_deprecated",        default: false, null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.string   "chunk_hash_algorithm", default: "md5"
   end
 
   create_table "system_permissions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

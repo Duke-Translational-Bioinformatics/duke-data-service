@@ -12,7 +12,7 @@ class Project < ActiveRecord::Base
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
 
-  validates :name, presence: true, uniqueness: {case_sensitive: false, conditions: -> { where(is_deleted: false) }}, unless: :is_deleted
+  validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
 

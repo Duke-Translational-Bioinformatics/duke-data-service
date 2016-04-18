@@ -15,8 +15,8 @@ class Folder < Container
 
   def descendants
     descendants = project.containers.select { |c| c.ancestors.include?(self) }
-    descendants_id = descendants.collect { |d| d.id }
-    project.containers.where( 'id in (?)', descendants_id )
+    descendants_ids = descendants.collect { |d| d.id }
+    project.containers.where(id: descendants_ids)
   end
 
   def is_deleted=(val)
