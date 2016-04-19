@@ -29,8 +29,20 @@ shared_examples 'a graphed model' do
   end
 
   context 'does not exist in graphDB' do
-    it 'should create a Graph::Agent of with model_id user.id and model_kind user.kind' do
+    it 'should create a graphed model with model_id user.id and model_kind user.kind' do
       expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
+      graph_agent = subject.graph_node
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+      expect(graph_agent).to be
+      expect(graph_agent.model_id).to eq(subject.id)
+      expect(graph_agent.model_kind).to eq(subject.kind)
+    end
+  end
+  context 'does exist in graphDB' do
+    let(:graphed_node) { subject.graph_node }
+    it 'should not create a graphed model with model_id user.id and model_kind user.kind' do
+      expect(graphed_node).to be
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
       graph_agent = subject.graph_node
       expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
       expect(graph_agent).to be
