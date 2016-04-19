@@ -19,3 +19,23 @@ shared_examples 'a kind' do
     end
   end
 end
+
+shared_examples 'a graphed model' do
+  let(:kind_name) {subject.class.name}
+  let(:graph_node_name) { "Graph::#{kind_name}" }
+
+  it 'should support graph_node method' do
+    is_expected.to respond_to 'graph_node'
+  end
+
+  context 'does not exist in graphDB' do
+    it 'should create a Graph::Agent of with model_id user.id and model_kind user.kind' do
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
+      graph_agent = subject.graph_node
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+      expect(graph_agent).to be
+      expect(graph_agent.model_id).to eq(subject.id)
+      expect(graph_agent.model_kind).to eq(subject.kind)
+    end
+  end
+end

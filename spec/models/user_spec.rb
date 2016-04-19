@@ -139,22 +139,7 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe 'graph_node' do
-    subject { FactoryGirl.create(:user) }
-
-    it 'should be supported' do
-      is_expected.to respond_to 'graph_node'
-    end
-
-    context 'does not exist in graphDB' do
-      it 'should create a Graph::Agent of with model_id user.id and model_kind user.kind' do
-        expect(Graph::Agent.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
-        graph_agent = subject.graph_node
-        expect(Graph::Agent.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-        expect(graph_agent).to be
-        expect(graph_agent.model_id).to eq(subject.id)
-        expect(graph_agent.model_kind).to eq(subject.kind)
-      end
-    end
+  it_behaves_like 'a graphed model' do
+    let(:kind_name) { 'Agent' }
   end
 end
