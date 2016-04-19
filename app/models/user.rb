@@ -1,6 +1,8 @@
 require 'jwt'
 
 class User < ActiveRecord::Base
+  include Kinded
+  include Graphed
   default_scope { order('created_at DESC') }
   audited except: :last_login_at
   attr_accessor :current_software_agent
@@ -46,5 +48,9 @@ class User < ActiveRecord::Base
       username: username,
       full_name: display_name
     }
+  end
+
+  def graph_node
+    super('Agent')
   end
 end

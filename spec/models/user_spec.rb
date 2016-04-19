@@ -6,6 +6,10 @@ RSpec.describe User, type: :model do
   subject { user_authentication_service.user }
 
   it_behaves_like 'an audited model'
+  it_behaves_like 'a kind' do
+    let(:serialized_kind) { false }
+  end
+
   it 'should have an audited_user_info method to return the information required by audit _by methods' do
     should respond_to('audited_user_info')
     audited_user_info = subject.audited_user_info
@@ -131,6 +135,25 @@ RSpec.describe User, type: :model do
         expect(subject).to respond_to('storage_bytes')
         expect(expected_size).to be > 0
         expect(subject.storage_bytes).to eq(expected_size)
+      end
+    end
+  end
+
+  describe 'graph_node' do
+    subject { FactoryGirl.create(:user) }
+
+    it 'should be supported' do
+      is_expected.to respond_to 'graph_node'
+    end
+
+    context 'does not exist in graphDB' do
+      it 'should create a Graph::Agent of with model_id user.id and model_kind user.kind' do
+        expect(Graph::Agent.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
+        graph_agent = subject.graph_node
+        expect(Graph::Agent.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+        expect(graph_agent).to be
+        expect(graph_agent.model_id).to eq(subject.id)
+        expect(graph_agent.model_kind).to eq(subject.kind)
       end
     end
   end
