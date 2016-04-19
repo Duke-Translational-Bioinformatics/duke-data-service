@@ -8,6 +8,7 @@ server:
     - .:/var/www/app
   links:
     - db:postgres.db.host
+    - neo4j:neo4j.db.host
 db:
   extends:
     file: dc-base.yml
@@ -38,9 +39,11 @@ rails:
   entrypoint: ['rails']
   links:
     - db:postgres.db.host
+    - neo4j:neo4j.db.host
   env_file:
     - webapp.env
     - swift.env
+    - neo4j.client.env
 bundle:
   image: dukedataservice_server
   volumes_from:
@@ -53,9 +56,11 @@ rake:
   entrypoint: ['rake']
   links:
     - db:postgres.db.host
+    - neo4j:neo4j.db.host
   env_file:
     - webapp.env
     - swift.env
+    - neo4j.client.env
 authservice:
   image: dukedataservice_server
   env_file:
@@ -74,9 +79,11 @@ rspec:
     - server
   links:
     - db:postgres.db.host
+    - neo4j:neo4j.db.host
   env_file:
     - webapp.env
     - swift.env
+    - neo4j.client.env
   entrypoint: ['rspec']
   command: spec
 deploysecrets:
@@ -109,8 +116,10 @@ dredd:
    - server:dds.host
    - swift:swift.circle.host
    - db:postgres.db.host
+   - neo4j:neo4j.db.host
   env_file:
     - dredd.env
+    - neo4j.client.env
   volumes:
     - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
     - ./apiary.apib:/home/dredd_scripts/apiary.apib
