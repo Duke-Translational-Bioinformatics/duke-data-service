@@ -23,7 +23,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to belong_to(:creator).class_name('User') }
     it { is_expected.to have_many(:file_versions) }
-    it { is_expected.to have_many(:taggable) }
+    it { is_expected.to have_many(:tags) }
   end
 
   describe 'validations' do
