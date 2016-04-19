@@ -1,5 +1,7 @@
 class FileVersion < ActiveRecord::Base
   include Kinded
+  include Graphed
+  after_create :graph_node
 
   audited
   belongs_to :data_file
