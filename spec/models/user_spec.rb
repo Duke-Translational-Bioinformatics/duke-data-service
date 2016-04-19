@@ -139,7 +139,7 @@ RSpec.describe User, type: :model do
     end
   end
 
-  it_behaves_like 'a graphed model' do
+  it_behaves_like 'a graphed model', auto_create: true do
     let(:kind_name) { 'Agent' }
   end
 end

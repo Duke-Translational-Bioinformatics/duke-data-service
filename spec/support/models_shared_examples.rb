@@ -20,7 +20,7 @@ shared_examples 'a kind' do
   end
 end
 
-shared_examples 'a graphed model' do
+shared_examples 'a graphed model' do |auto_create: false|
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
 
@@ -28,8 +28,24 @@ shared_examples 'a graphed model' do
     is_expected.to respond_to 'graph_node'
   end
 
+  if auto_create
+    it 'should auto_create' do
+      expect(subject).to be
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+    end
+  else
+    it 'should not auto_create' do
+      expect(subject).to be
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
+    end
+  end
+
   context 'does not exist in graphDB' do
     it 'should create a graphed model with model_id user.id and model_kind user.kind' do
+      existing_node = subject.graph_node
+      if existing_node
+        existing_node.destroy
+      end
       expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
       graph_agent = subject.graph_node
       expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
