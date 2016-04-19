@@ -1,5 +1,5 @@
 module Graphed
-  def graph_node(node_name)
+  def graph_node(node_name=nil)
     node_name ||= self.class.name
     node_class = "Graph::#{node_name}"
     node = node_class.constantize.find_by(model_id: id, model_kind: kind)
