@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Tag, type: :model do
   subject { FactoryGirl.create(:tag) }
 
+  it_behaves_like 'an audited model'
+
   describe 'associations' do
     it { is_expected.to belong_to(:taggable) }
     it { is_expected.to have_many(:project_permissions).through(:taggable) }

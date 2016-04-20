@@ -1,4 +1,6 @@
 class Tag < ActiveRecord::Base
+  audited
+
   belongs_to :taggable, class_name: 'DataFile'
   has_many :project_permissions, through: :taggable
 

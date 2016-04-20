@@ -1,5 +1,6 @@
 class TagSerializer < ActiveModel::Serializer
-  attributes :label
+  include AuditSummarySerializer
+  attributes :id, :label, :audit
 
   has_one :taggable, serializer: TaggableSerializer, root: :object
 
