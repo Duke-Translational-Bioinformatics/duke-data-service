@@ -13,4 +13,8 @@ RSpec.describe Tag, type: :model do
     it { is_expected.to validate_presence_of(:taggable) }
   end
 
+  it 'should set default attribute' do
+    expect(subject.taggable_type).to eq('DataFile')
+  end
+
 end
