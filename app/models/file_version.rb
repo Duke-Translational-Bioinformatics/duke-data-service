@@ -3,6 +3,7 @@ class FileVersion < ActiveRecord::Base
   include Graphed
   after_create :graph_node
   after_save :logically_delete_graph_node
+  after_destroy :delete_graph_node
 
   audited
   belongs_to :data_file

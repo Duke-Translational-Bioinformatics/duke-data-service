@@ -83,14 +83,13 @@ shared_examples 'a graphed model' do |auto_create: false, logically_deleted: fal
         expect(subject.graph_node).to be
         expect(subject.graph_node.is_deleted).to be_truthy
       end
-    else
-      it { is_expected.to respond_to :delete_graph_node }
-      it { is_expected.to callback(:delete_graph_node).after(:destroy) }
-      it 'should destroy graph_node with the model' do
-        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-        subject.destroy
-        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
-      end
+    end
+    it { is_expected.to respond_to :delete_graph_node }
+    it { is_expected.to callback(:delete_graph_node).after(:destroy) }
+    it 'should destroy graph_node with the model' do
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+      subject.destroy
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(0)
     end
   end
 end
