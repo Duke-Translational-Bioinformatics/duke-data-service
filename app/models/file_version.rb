@@ -2,7 +2,7 @@ class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed
   after_create :graph_node
-  after_save :delete_graph_node
+  after_save :logically_delete_graph_node
 
   audited
   belongs_to :data_file
@@ -36,9 +36,5 @@ class FileVersion < ActiveRecord::Base
 
   def kind
     super('file-version')
-  end
-
-  def delete_graph_node
-    super(true)
   end
 end

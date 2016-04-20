@@ -9,17 +9,17 @@ module Graphed
     node
   end
 
-  def delete_graph_node(logical=false)
-    if logical
-      if self.is_deleted
-        node = self.graph_node
-        unless node.is_deleted
-          node.is_deleted = self.is_deleted
-          node.save
-        end
+  def delete_graph_node
+    self.graph_node.destroy
+  end
+
+  def logically_delete_graph_node
+    if self.is_deleted
+      node = self.graph_node
+      unless node.is_deleted
+        node.is_deleted = self.is_deleted
+        node.save
       end
-    else
-      self.graph_node.destroy
     end
   end
 end
