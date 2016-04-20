@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   include Kinded
   include Graphed
   after_create :graph_node
+  after_destroy :delete_graph_node
 
   default_scope { order('created_at DESC') }
   audited except: :last_login_at

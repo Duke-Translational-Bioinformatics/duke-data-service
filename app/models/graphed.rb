@@ -8,4 +8,18 @@ module Graphed
     end
     node
   end
+
+  def delete_graph_node(logical=false)
+    if logical
+      if self.is_deleted
+        node = self.graph_node
+        unless node.is_deleted
+          node.is_deleted = self.is_deleted
+          node.save
+        end
+      end
+    else
+      self.graph_node.destroy
+    end
+  end
 end
