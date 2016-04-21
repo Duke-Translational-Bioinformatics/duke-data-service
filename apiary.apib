@@ -61,6 +61,11 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
 + For *Uploads* resource - removed hash related properties (`hash.value` and `hash.algorithm`) from initiate upload request properties - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  A new property `hashes` was added to the upload resource - this property contains the collection of client reported hashes.
 
+21-Apr-2016
+--------------
++ Added `update_file` permission to the Project Uploader role.
++ Added *Provenance Relations* actions for `wasDerivedFrom` and `wasInvalidatedBy`.
+
 ## Group API Usage
 
 Web Portal
@@ -167,7 +172,7 @@ Represents the set of discrete permissions that can be granted to a user.
 | **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
 | **project_viewer** | Project Viewer | Can only view project and file metadata | view_project |
 | **file_downloader** | File Downloader | Can download files | view_project, download_file |
-| **file_uploader** | File Uploader | Can upload files | view_project, create_file |
+| **file_uploader** | File Uploader | Can upload files | view_project, create_file, update_file |
 | **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
 
 
@@ -2653,6 +2658,59 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             },
             "audit": { }
         }
+
+### NOT_IMPLEMENTED_NEW Create was invalidated by relation [POST /relations/was_invalidated_by]
+>**Permission:** creator of the activity *and* visibility to the `wasInvalidatedBy` entity
+- - - - -
+
+>**Properties**
+- - - - -
++ **activity.id (string, required)** - The activity that invalidated the entity.
++ **entity.kind (string, optional)** - The kind of entity that was invalidated; this must be a file version (i.e. `dds-file-version`).
++ **entity.id (string, optional)** - The unique id of the invalidated entity.
+
+>**Rules**
+- - - - -
++ If the `entity` is not already in deleted state (i.e. `"is_deleted": true`), this action deletes the `entity`.
+
++ Request (application/json)
+
+        {
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
+            },
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-relation-was-generated-by", 
+            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": true,
+                "audit": { }
+            },
+            "audit": { }
+        }
+
 
 ### NOT_IMPLEMENTED_NEW List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
