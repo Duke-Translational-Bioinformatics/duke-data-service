@@ -36,11 +36,11 @@ rake:
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
-    - neo4j.client.local.env
+    - neo4j:neo4j.db.host
   env_file:
     - circle/webapp.circle.env
     - circle/swift.circle.env
-    - neo4j:neo4j.db.host
+    - neo4j.client.local.env
   volumes:
     - .:/var/www/app
 authservice:
