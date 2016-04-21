@@ -37,6 +37,21 @@ module DDS
           end
         end
       end
+
+      desc 'List tag objects' do
+        detail 'Lists tag objects for which the current user has the "view_project" permission.'
+        named 'list tag objects'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      get '/tags/:object_kind/:object_id', root: 'results' do
+        authenticate!
+        data_file = DataFile.find(params[:object_id])
+        authorize Tag.new(taggable: data_file), :index?
+        policy_scope(Tag).where(taggable: data_file)
+      end
     end
   end
 end
