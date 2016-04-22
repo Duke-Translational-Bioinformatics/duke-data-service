@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: http://192.168.64.3:12345/v1/AUTH_test
+    uri: http://192.168.99.100:12345/v1/AUTH_test
     body:
       encoding: UTF-8
       string: ''
@@ -33,7 +33,7 @@ http_interactions:
   recorded_at: Thu, 21 Apr 2016 20:43:48 GMT
 - request:
     method: get
-    uri: http://192.168.64.3:12345/auth/v1.0
+    uri: http://192.168.99.100:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -48,7 +48,7 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.64.3:12345/v1/AUTH_test
+      - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
       - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
       Content-Type:
@@ -68,7 +68,7 @@ http_interactions:
   recorded_at: Thu, 21 Apr 2016 20:50:11 GMT
 - request:
     method: post
-    uri: http://192.168.64.3:12345/v1/AUTH_test
+    uri: http://192.168.99.100:12345/v1/AUTH_test
     body:
       encoding: UTF-8
       string: ''
@@ -99,7 +99,7 @@ http_interactions:
   recorded_at: Thu, 21 Apr 2016 20:50:11 GMT
 - request:
     method: get
-    uri: http://192.168.64.3:12345/auth/v1.0
+    uri: http://192.168.99.100:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -114,7 +114,7 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.64.3:12345/v1/AUTH_test
+      - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
       - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
       Content-Type:
@@ -134,7 +134,7 @@ http_interactions:
   recorded_at: Thu, 21 Apr 2016 20:50:11 GMT
 - request:
     method: get
-    uri: http://192.168.64.3:12345/v1/AUTH_test
+    uri: http://192.168.99.100:12345/v1/AUTH_test
     body:
       encoding: US-ASCII
       string: ''

@@ -36,12 +36,16 @@ module DDS
           end
 
           # storage_provider must be configured
-          if ENV["SWIFT_ACCT"] &&
+          if ENV['SWIFT_DESCRIPTION'] &&
+             ENV["SWIFT_ACCT"] &&
              ENV["SWIFT_URL_ROOT"] &&
+             ENV['SWIFT_VERSION'] &&
+             ENV['SWIFT_AUTH_URI'] &&
              ENV["SWIFT_USER"] &&
              ENV["SWIFT_PASS"] &&
              ENV["SWIFT_PRIMARY_KEY"] &&
-             ENV["SWIFT_SECONDARY_KEY"]
+             ENV["SWIFT_SECONDARY_KEY"] &&
+             ENV['SWIFT_CHUNK_HASH_ALGORITHM']
             #storage_provider must be created
             sp = StorageProvider.first
             if sp
@@ -68,21 +72,23 @@ module DDS
 
           #graphdb must be configured
           if ENV["GRAPHSTORY_URL"]
-            #graphdb must be accessible with configured authentication
+            #graphdb must be accessible with configured authentication or this will throw a Faraday::ConnectionFailed exception
             count = Neo4j::Session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
-            if count >= 0
-              status[:graphdb] = 'ok'
-            end
+            status[:graphdb] = 'ok'
           else
             status[:status] = 'error'
             status[:graphdb] = 'environment is not set'
           end
 
-          status
+          if status[:status] == 'ok'
+            status
+          else
+            error!(status,503)
+          end
         rescue StorageProviderException => e
           logger.error("StorageProvider error #{e.message}")
           status[:status] = 'error'
-          status[:storage_provider] = "not connected"
+          status[:storage_provider] = "is not connected"
           error!(status,503)
         rescue Faraday::ConnectionFailed => e
           logger.error("GraphDB Connection error #{e.message}")
@@ -90,7 +96,7 @@ module DDS
           status[:graphdb] = 'is not connected'
           error!(status,503)
         rescue Exception => e
-          logger.error("GOT Exception "+e.inspect)
+          logger.error("GOT UNKOWNN Exception "+e.inspect)
           status[:status] = 'error'
           error!(status,503)
         end
