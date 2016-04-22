@@ -52,6 +52,24 @@ module DDS
         authorize Tag.new(taggable: data_file), :index?
         policy_scope(Tag).where(taggable: data_file)
       end
+
+      desc 'View tag' do
+        detail 'view tag'
+        named 'view tag'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Tag does not exist']
+        ]
+      end
+      params do
+      end
+      get '/tags/:id', root: false do
+        authenticate!
+        tag = Tag.find(params[:id])
+        authorize tag, :show?
+        tag
+      end
     end
   end
 end

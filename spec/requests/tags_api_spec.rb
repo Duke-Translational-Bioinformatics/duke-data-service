@@ -60,8 +60,7 @@ describe DDS::V1::TagsAPI do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { [
-          tag,
-          # other_tag
+          tag
         ]}
         let!(:unexpected_resources) { [
           other_tag
@@ -81,7 +80,20 @@ describe DDS::V1::TagsAPI do
   end
 
   describe 'Tag instance' do
+    let(:url) { "/api/v1/tags/#{resource_id}" }
 
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
   end
 
 end
