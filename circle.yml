@@ -32,7 +32,7 @@ dependencies:
 test:
  post:
   #- './workflow/workflow.circle.sh'
-  - 'docker-compose run dredd'
+  #- 'docker-compose run dredd'
 
 deployment:
  development:
