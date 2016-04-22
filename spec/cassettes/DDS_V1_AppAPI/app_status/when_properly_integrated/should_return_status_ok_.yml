@@ -1,0 +1,145 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx181e85e8c02a422f9e6fd-0057193d04
+      Date:
+      - Thu, 21 Apr 2016 20:50:12 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 21 Apr 2016 20:50:12 GMT
+- request:
+    method: post
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+      X-Account-Meta-Temp-Url-Key:
+      - d9922d85b150543ee029e98e9f4a90db
+      X-Account-Meta-Temp-Url-Key-2:
+      - a87ffbafa15871468cce57e477a92b17
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txac8a56251b0645a8a102a-0057193d04
+      Date:
+      - Thu, 21 Apr 2016 20:50:12 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 21 Apr 2016 20:50:12 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://192.168.99.100:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txbf2fcc82eee44adbb6809-0057193d04
+      Date:
+      - Thu, 21 Apr 2016 20:50:12 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 21 Apr 2016 20:50:12 GMT
+- request:
+    method: get
+    uri: http://192.168.99.100:12345/v1/AUTH_test
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk0841f2476c924f9db12fc6c5463f1ffc
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      X-Account-Object-Count:
+      - '0'
+      X-Account-Meta-Temp-Url-Key-2:
+      - a87ffbafa15871468cce57e477a92b17
+      X-Timestamp:
+      - '1461271811.69928'
+      X-Account-Meta-Temp-Url-Key:
+      - d9922d85b150543ee029e98e9f4a90db
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Accept-Ranges:
+      - bytes
+      X-Trans-Id:
+      - tx181cd5584efd43fea36a2-0057193d04
+      Date:
+      - Thu, 21 Apr 2016 20:50:12 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 21 Apr 2016 20:50:12 GMT
+recorded_with: VCR 3.0.0
