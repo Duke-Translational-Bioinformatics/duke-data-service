@@ -4,6 +4,7 @@ server:
     - circle/swift.circle.env
     - circle/webapp.circle.env
     - neo4j.client.local.env
+    - auth_service.local.env
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
@@ -66,6 +67,7 @@ rspec:
   env_file:
     - circle/swift.circle.env
     - neo4j.client.env
+    - circle/swift.circle.env
   entrypoint: ['rspec']
   command: spec
   volumes:
