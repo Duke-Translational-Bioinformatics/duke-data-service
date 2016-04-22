@@ -6,6 +6,7 @@ class DataFile < Container
   has_many :file_versions
 
   after_set_parent_attribute :set_project_to_parent_project
+  before_create :build_file_version
   before_update :build_file_version, if: :upload_id_changed?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
@@ -37,9 +38,12 @@ class DataFile < Container
   end
 
   def build_file_version
-    file_versions.build(
-      upload_id: upload_id_was,
-      label: label_was
-    )
+    if file_versions.empty? || file_versions.last.persisted?
+      file_versions.build(
+        upload_id: upload_id_was || upload_id,
+        label: label_was || label
+      )
+    end
+    file_versions.last
   end
 end

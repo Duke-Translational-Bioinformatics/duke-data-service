@@ -174,10 +174,26 @@ RSpec.describe DataFile, type: :model do
         it { expect(subject.build_file_version.upload).to eq original_upload }
         it { expect(subject.build_file_version.label).to eq original_label }
       end
+
+      context 'before subject is created' do
+        subject { FactoryGirl.build(:data_file) }
+        
+        it { is_expected.not_to be_persisted }
+        it { is_expected.to be_valid }
+        it { expect(subject.build_file_version).to be_valid }
+        it { expect(subject.build_file_version.upload).to eq subject.upload }
+        it { expect(subject.build_file_version.label).to eq subject.label }
+
+        context 'after being called once' do
+          before { subject.build_file_version }
+          it { expect {subject.build_file_version}.not_to change{subject.file_versions.length}}
+        end
+      end
     end
   end
 
   describe 'callbacks' do
+    it { is_expected.to callback(:build_file_version).before(:create) }
     it { is_expected.to callback(:build_file_version).before(:update).if(:upload_id_changed?) }
   end
 end

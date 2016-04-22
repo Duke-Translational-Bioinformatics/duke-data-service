@@ -49,6 +49,11 @@ describe DDS::V1::FilesAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.label).to eq(payload[:label])
         end
+        it 'creates a software_version' do
+          expect {
+            is_expected.to eq(201)
+          }.to change{FileVersion.count}.by(1)
+        end
       end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
