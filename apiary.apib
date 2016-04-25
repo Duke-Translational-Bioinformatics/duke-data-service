@@ -69,6 +69,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 25-Apr-2016
 --------------
 + For *File Versions* resource - added `project` property to facilitate portal acccess to project permissions for the current user.
++ Added *Search Objects* action - this allows robust search of DDS objects using Elasticsearch Query DSL. 
 
 ## Group API Usage
 
@@ -2813,7 +2814,7 @@ List the relations for a provenance node; this only lists direct relations for t
 ## Group Search Provenance
 The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation. 
 
-*Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
+*Note: The provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and ubiquitous JavaScript libraries can be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
 ## NOT_IMPLEMENTED_NEW Search Provenance [POST /search/provenance]
 Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
@@ -3031,3 +3032,96 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 - - - - -
 
 + Response 204
+
+## Group Search Objects
+The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages [Elasticsearch](https://www.elastic.co/) to perform document based searches.  All queries must be specified in [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html).
+
+*Note: Only search for DDS folders and files* (i.e. `dds-folder`, `dds-file`) *is currently supported.  These objects are replicated to Elasticsearch as indexed documents.  The objects (i.e. documents) are extended with a* `meta` *property when stored in Elaticsearch.  This property contains composite metadata to facilitate search.  See response payload for concrete example of the* `meta` *property.*
+
+*Deprecation: The* **Search Children** *actions will be deprecated once this action has been implemented.*
+
+## NOT_IMPLEMENTED_NEW Search Objects [POST /search]
+Search for DDS objects (i.e. Elasticsearch documents).
+
+>**Permission:** authenticated [scope: view_project for objects of kind (`dds-folder`, `dds-file`)]
+- - - - -
+
+>**Search Properties**
+- - - - -
++ **include_kinds (string[], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
++ **search_query (object, required)** - The Elastisearch query criteria (i.e. Query DSL).
+
++ Request (application/json)
+
+        {
+            "include_kinds": ["dds-file"],
+            "search_query": {
+                "query": {
+                    "match" : {
+                        "_all" : "SMRT sequencing"
+                }
+            }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { 
+                        "kind": "dds-folder", 
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
+                    },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
+                    "ancestors": [
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" 
+                        },
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                            "name": "Sequencing Core" 
+                        }
+                    ],
+                    "is_deleted": false,
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
+                        }
+                    },
+                    "audit": { }
+                },
+                "meta": {
+                    "tags": [
+                        {
+                            "label": "SMRT sequencing"
+                        },
+                        {
+                            "label": "GCB lab"
+                        }
+                    ]
+                }
+            ]
+        }
