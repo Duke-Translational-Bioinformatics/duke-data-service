@@ -1,5 +1,7 @@
 #!/bin/bash
 
+docker-compose up -d neo4j
+sleep 5
 docker-compose up -d server
 sleep 10
 docker-compose ps

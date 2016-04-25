@@ -10,6 +10,7 @@ RSpec.describe FileVersion, type: :model do
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file-version' }
   end
+  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
 
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
