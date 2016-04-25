@@ -41,10 +41,6 @@ describe DDS::V1::FilesAPI do
       }}
 
       it_behaves_like 'a creatable resource' do
-        it 'should set creator' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.creator_id).to eq(current_user.id)
-        end
         it 'should set label' do
           is_expected.to eq(expected_response_status)
           expect(new_object.label).to eq(payload[:label])

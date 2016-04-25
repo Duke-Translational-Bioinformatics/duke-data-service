@@ -2,7 +2,6 @@
 
 class DataFile < Container
   belongs_to :upload
-  belongs_to :creator, class_name: 'User'
   has_many :file_versions
 
   after_set_parent_attribute :set_project_to_parent_project
@@ -11,7 +10,6 @@ class DataFile < Container
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload_id, presence: true, unless: :is_deleted
-  validates :creator_id, presence: true, unless: :is_deleted
 
   validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
     if record.upload

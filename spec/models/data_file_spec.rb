@@ -21,22 +21,16 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
-    it { is_expected.to belong_to(:creator).class_name('User') }
     it { is_expected.to have_many(:file_versions) }
   end
 
   describe 'validations' do
-    let(:completed_upload) { FactoryGirl.create(:upload, :completed, creator: subject.creator, project: subject.project) }
-    let(:incomplete_upload) { FactoryGirl.create(:upload, creator: subject.creator, project: subject.project) }
-    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, creator: subject.creator, project: subject.project) }
-    let(:not_creator_of_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
-    it 'should have a name' do
-      should validate_presence_of(:name)
-    end
+    let(:completed_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
+    let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
+    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
 
-    it 'should have a project_id' do
-      should validate_presence_of(:project_id)
-    end
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:project_id) }
 
     it 'should not allow project_id to be changed' do
       should allow_value(project).for(:project)
@@ -74,10 +68,6 @@ RSpec.describe DataFile, type: :model do
       expect(subject.errors[:upload]).to include('must be completed successfully')
     end
 
-    it 'should require a creator_id' do
-      should validate_presence_of :creator_id
-    end
-
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
       should allow_value(false).for(:is_deleted)
@@ -88,7 +78,6 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
       it { is_expected.not_to validate_presence_of(:upload_id) }
-      it { is_expected.not_to validate_presence_of(:creator_id) }
     end
   end
 
