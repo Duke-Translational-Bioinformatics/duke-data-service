@@ -59,12 +59,16 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Refactored file versioning - the biggest change here is file resource now has a `current_version` property that contains version details - including the referenced `upload` (see *Files* and *File Versions* actions).
 + For *File Versions* resource - added new action `POST /file_versions/{id}/current` that promotes a prior file version to top of version stack.
 + For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
-+ For *Uploads* resource - removed hash related properties (`hash.value` and `hash.algorithm`) from initiate upload request properties - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  A new property `hashes` was added to the upload resource - this property contains the collection of client reported hashes.
++ For *Uploads* resource - removed hash properties (`hash.value` and `hash.algorithm`) from initiate chunked upload request - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  The upload resource now contains a `hashes` property - this is a collection of client reported hashes.
 
 21-Apr-2016
 --------------
 + Added `update_file` permission to the Project Uploader role.
 + Added *Provenance Relations* actions for `wasDerivedFrom` and `wasInvalidatedBy`.
+
+25-Apr-2016
+--------------
++ For *File Versions* resource - added `project` property to facilitate portal acccess to project permissions for the current user.
 
 ## Group API Usage
 
@@ -2004,7 +2008,10 @@ This action can be used to list all prior versions of a file, including the curr
                     "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                     "file": {
                         "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                        "project": {
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                        }
                     },
                     "version": 1,
                     "label": "Initial raw data from device",
@@ -2045,7 +2052,10 @@ This action can be used to list all prior versions of a file, including the curr
             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
             "file": {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
             },
             "version": 1,
             "label": "Initial raw data from device",
@@ -2090,7 +2100,10 @@ This action can be used to list all prior versions of a file, including the curr
             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
             "file": {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
             },
             "version": 1,
             "label": "Post pairwise sequence alignment (piecewise)",
@@ -2162,7 +2175,10 @@ This action can be used to promote a prior file version to the current version. 
             "id": "66ed147e-2312-4974-999a-58ec77230182",
             "file": {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
             },
             "version": 3,
             "label": "Post pairwise sequence alignment (piecewise)",
@@ -2960,8 +2976,8 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels/{object_kind}/{?label_contains}]
-Get list of the **distinct** tag `label` values for a kind of DDS object.  
+### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels{?object_kind, label_contains}]
+Get a list of the **distinct** tag `label` values visible to the current user.  
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
 
@@ -2969,7 +2985,7 @@ Get list of the **distinct** tag `label` values for a kind of DDS object.
 - - - - -
 
 + Parameters
-    + object_kind (string, required, `dds-file`) ... Restricts search scope to tags for this kind of object.
+    + object_kind (string, optional, `dds-file`) ... Restricts search scope to tags for this kind of object.
     + label_contains (string, optional, `sequen`) ... If provided, searches for tags that contain this text fragment.
 
 + Response 200 (application/json)
