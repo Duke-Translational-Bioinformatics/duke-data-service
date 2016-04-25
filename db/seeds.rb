@@ -40,6 +40,13 @@
       description: "Can view download create update and delete files",
       contexts: %w(project),
       permissions: %w(view_project download_file create_file update_file delete_file)
+    },
+    {
+      id: "file_uploader",
+      name: "File Uploader",
+      description: "Can update files",
+      contexts: %w(project),
+      permissions: %w(view_project create_file)
     }
 ].each do |role|
   AuthRole.create(role)
