@@ -94,6 +94,21 @@ describe DDS::V1::TagsAPI do
         let(:resource_id) {'notfoundid'}
       end
     end
-  end
 
+    describe 'DELETE' do
+      subject { delete(url, nil, headers) }
+      let(:called_action) { 'DELETE' }
+      it_behaves_like 'a removable resource'
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) {204}
+      end
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
+  end
 end
