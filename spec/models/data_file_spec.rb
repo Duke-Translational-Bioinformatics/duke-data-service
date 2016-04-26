@@ -21,7 +21,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
-    it { is_expected.to have_many(:file_versions) }
+    it { is_expected.to have_many(:file_versions).order('version_number DESC') }
   end
 
   describe 'validations' do
@@ -138,6 +138,18 @@ RSpec.describe DataFile, type: :model do
       end
     end
 
+    describe '#current_file_version' do
+      it { is_expected.to respond_to(:current_file_version) }
+      it { expect(subject.current_file_version).to be_persisted }
+      it { expect(subject.current_file_version).to eq subject.file_versions.last }
+
+      context 'with unsaved file_version' do
+        before { subject.build_file_version }
+        it { expect(subject.current_file_version).not_to be_persisted }
+        it { expect(subject.current_file_version).to eq subject.file_versions.last }
+      end
+    end
+
     describe '#build_file_version' do
       it { is_expected.to respond_to(:build_file_version) }
       it { expect(subject.build_file_version).to be_a FileVersion }
@@ -146,43 +158,66 @@ RSpec.describe DataFile, type: :model do
           subject.build_file_version
         }.to change{subject.file_versions.length}.by(1)
       end
-      it { expect(subject.build_file_version.label).to eq subject.label }
-      it { expect(subject.build_file_version.upload).to eq subject.upload }
+    end
 
-      context 'after subject attributes changed' do
+    describe '#set_current_file_version_attributes' do
+      let(:latest_version) { subject.file_versions.last }
+      it { is_expected.to respond_to(:set_current_file_version_attributes) }
+      it { expect(subject.set_current_file_version_attributes).to be_a FileVersion }
+      it { expect(subject.set_current_file_version_attributes).to eq latest_version }
+      context 'with persisted file_version' do
+        it { expect(latest_version).to be_persisted }
+        it { expect(subject.set_current_file_version_attributes.changed?).to be_falsey }
+      end
+      context 'with new file_version' do
+        before { subject.build_file_version }
+        it { expect(subject.set_current_file_version_attributes.changed?).to be_truthy }
+        it { expect(subject.set_current_file_version_attributes.upload).to eq subject.upload }
+        it { expect(subject.set_current_file_version_attributes.label).to eq subject.label }
+      end
+    end
+
+    describe '#new_file_version_needed?' do
+      it { is_expected.to respond_to(:new_file_version_needed?) }
+      it { expect(subject.upload_id_changed?).to be_falsey }
+      it { expect(subject.new_file_version_needed?).to be_falsey }
+
+      context 'when upload changed' do
         let!(:original_upload) { subject.upload }
-        let!(:original_label) { subject.label }
         let(:new_upload) { FactoryGirl.create(:upload, :completed) }
-        let(:new_label) { Faker::Hacker.say_something_smart }
-        before do
-          subject.upload = new_upload
-          subject.label = new_label
+        before { subject.upload = new_upload }
+        it { expect(subject.file_versions.last).to be_persisted }
+        it { expect(subject.upload_id_changed?).to be_truthy }
+        it { expect(subject.new_file_version_needed?).to be_truthy }
+
+        context 'after call to build_file_version' do
+          before { subject.build_file_version }
+          it { expect(subject.file_versions.last).not_to be_persisted }
+          it { expect(subject.upload_id_changed?).to be_truthy }
+          it { expect(subject.new_file_version_needed?).to be_falsey }
         end
-        it { expect(subject.build_file_version.upload).not_to eq new_upload }
-        it { expect(subject.build_file_version.label).not_to eq new_label }
-        it { expect(subject.build_file_version.upload).to eq original_upload }
-        it { expect(subject.build_file_version.label).to eq original_label }
       end
 
       context 'before subject is created' do
         subject { FactoryGirl.build(:data_file) }
         
         it { is_expected.not_to be_persisted }
-        it { is_expected.to be_valid }
-        it { expect(subject.build_file_version).to be_valid }
-        it { expect(subject.build_file_version.upload).to eq subject.upload }
-        it { expect(subject.build_file_version.label).to eq subject.label }
-
-        context 'after being called once' do
+        context 'without file_versions' do
+          it { expect(subject.file_versions).to be_empty }
+          it { expect(subject.new_file_version_needed?).to be_truthy }
+        end
+        context 'with a file_version' do
           before { subject.build_file_version }
-          it { expect {subject.build_file_version}.not_to change{subject.file_versions.length}}
+          it { expect(subject.file_versions).not_to be_empty }
+          it { expect(subject.new_file_version_needed?).to be_falsey }
         end
       end
     end
   end
 
   describe 'callbacks' do
-    it { is_expected.to callback(:build_file_version).before(:create) }
-    it { is_expected.to callback(:build_file_version).before(:update).if(:upload_id_changed?) }
+    it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
+    it { is_expected.to callback(:build_file_version).before(:save).if(:new_file_version_needed?) }
+    it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 end

@@ -2,11 +2,11 @@
 
 class DataFile < Container
   belongs_to :upload
-  has_many :file_versions
+  has_many :file_versions, -> { order('version_number DESC') }
 
   after_set_parent_attribute :set_project_to_parent_project
-  before_create :build_file_version
-  before_update :build_file_version, if: :upload_id_changed?
+  before_save :build_file_version, if: :new_file_version_needed?
+  before_save :set_current_file_version_attributes
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload_id, presence: true, unless: :is_deleted
@@ -35,13 +35,24 @@ class DataFile < Container
     super('file')
   end
 
-  def build_file_version
-    if file_versions.empty? || file_versions.last.persisted?
-      file_versions.build(
-        upload_id: upload_id_was || upload_id,
-        label: label_was || label
-      )
-    end
+  def current_file_version
     file_versions.last
+  end
+
+  def build_file_version
+    file_versions.build
+  end
+
+  def set_current_file_version_attributes
+    current_file_version.attributes = {
+      upload: upload,
+      label: label
+    }
+    current_file_version
+  end
+
+  def new_file_version_needed?
+    file_versions.empty? ||
+      upload_id_changed? && current_file_version.persisted?
   end
 end
