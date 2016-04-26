@@ -9,6 +9,9 @@ class AgentActivityAssociation < ActiveRecord::Base
   belongs_to :activity
 
   validates :agent, presence: true
+  validates :agent_type, inclusion: { in: %w(User SoftwareAgent),
+    message: "Agent must be a User or a SoftwareAgent" }
+
   validates :activity, presence: true
 
   def graph_relation

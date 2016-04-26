@@ -14,6 +14,9 @@ RSpec.describe AgentActivityAssociation, type: :model do
     describe 'validations' do
       it { is_expected.to validate_presence_of :agent }
       it { is_expected.to validate_presence_of :activity }
+      it { is_expected.to allow_value('User').for(:agent_type) }
+      it { is_expected.to allow_value('SoftwareAgent').for(:agent_type) }
+      it { is_expected.not_to allow_value('Project').for(:agent_type) }
     end
   end
 
