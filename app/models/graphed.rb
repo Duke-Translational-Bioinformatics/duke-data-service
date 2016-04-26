@@ -22,4 +22,18 @@ module Graphed
       end
     end
   end
+
+  def graph_relation(rel_type, from_model, to_model)
+    from_node = from_model.graph_node
+    to_node = to_model.graph_node
+    graphed_relationship = from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first
+    unless graphed_relationship
+      graphed_relationship = "Graph::#{rel_type}".constantize.create(from_node: from_node, to_node: to_node)
+    end
+    graphed_relationship
+  end
+
+  def delete_graph_relation
+    self.graph_relation.destroy
+  end
 end
