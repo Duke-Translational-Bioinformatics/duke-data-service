@@ -35,15 +35,15 @@ ActiveRecord::Schema.define(version: 20160425202330) do
     t.datetime "updated_at",      null: false
   end
 
-  create_table "agent_activity_associations", force: :cascade do |t|
-    t.integer  "agent_id"
+  create_table "agent_activity_associations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "agent_id"
     t.string   "agent_type"
     t.uuid     "activity_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
 
-  add_index "agent_activity_associations", ["agent_type", "agent_id"], name: "index_agent_activity_associations_on_agent_type_and_agent_id", using: :btree
+  add_index "agent_activity_associations", ["agent_id"], name: "index_agent_activity_associations_on_agent_id", using: :btree
 
   create_table "api_keys", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "user_id"
