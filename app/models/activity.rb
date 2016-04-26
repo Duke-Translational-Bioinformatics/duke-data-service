@@ -8,4 +8,11 @@ class Activity < ActiveRecord::Base
   audited
 
   validates :name, presence: true
+  validate :valid_dates
+
+  def valid_dates
+    if  started_on && ended_on && started_on > ended_on
+      self.errors.add :ended_on, ' must be >= started_on'
+    end
+  end
 end

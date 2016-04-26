@@ -16,5 +16,17 @@ RSpec.describe Activity, type: :model do
       should allow_value(true).for(:is_deleted)
       should allow_value(false).for(:is_deleted)
     end
+
+    it 'should require ended_on to be greater than or equal to started_on' do
+      subject.started_on = DateTime.now
+      subject.ended_on = DateTime.now
+      expect(subject).to be_valid
+
+      subject.ended_on = subject.started_on + 10.minutes
+      expect(subject).to be_valid
+
+      subject.ended_on = subject.started_on - 10.minutes
+      expect(subject).not_to be_valid
+    end
   end
 end
