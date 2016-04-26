@@ -2677,7 +2677,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
         }
 
 ### NOT_IMPLEMENTED_NEW Create was invalidated by relation [POST /relations/was_invalidated_by]
->**Permission:** creator of the activity *and* visibility to the `wasInvalidatedBy` entity
+>**Permission:** creator of the activity *and* delete_file for `wasInvalidatedBy` entity
 - - - - -
 
 >**Properties**
@@ -3048,7 +3048,7 @@ Search for DDS objects (i.e. Elasticsearch documents).
 
 >**Search Properties**
 - - - - -
-+ **include_kinds (string[], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
++ **include_kinds (string[ ], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
 + **search_query (object, required)** - The Elasticsearch query criteria (i.e. Query DSL).
 
 + Request (application/json)
