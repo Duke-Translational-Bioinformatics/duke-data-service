@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425143741) do
+ActiveRecord::Schema.define(version: 20160425202330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,16 @@ ActiveRecord::Schema.define(version: 20160425143741) do
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end
+
+  create_table "agent_activity_associations", force: :cascade do |t|
+    t.integer  "agent_id"
+    t.string   "agent_type"
+    t.uuid     "activity_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "agent_activity_associations", ["agent_type", "agent_id"], name: "index_agent_activity_associations_on_agent_type_and_agent_id", using: :btree
 
   create_table "api_keys", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "user_id"
