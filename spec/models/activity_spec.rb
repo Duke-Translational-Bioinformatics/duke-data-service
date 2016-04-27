@@ -11,6 +11,10 @@ RSpec.describe Activity, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
+    it { is_expected.to validate_presence_of :creator_id }
+    it 'should belong to creator' do
+      should belong_to(:creator).class_name('User')
+    end
 
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)

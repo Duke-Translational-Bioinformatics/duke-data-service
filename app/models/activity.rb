@@ -7,7 +7,10 @@ class Activity < ActiveRecord::Base
 
   audited
 
+  belongs_to :creator, class_name: 'User'
+
   validates :name, presence: true
+  validates :creator_id, presence: true
   validate :valid_dates
 
   def valid_dates
