@@ -9,7 +9,7 @@ RUN apt-get -qq update && apt-get install -y \
 #Symlink
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
-# install dredd
+# install dredd version older
 RUN npm install -g dredd@1.0.8
 
 #install node modules
