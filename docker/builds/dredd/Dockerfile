@@ -20,7 +20,7 @@ RUN npm install node-rest-client
 RUN npm install node-promise
 RUN npm install fs
 RUN npm install md5
-RUN npm install dredd
+RUN npm install dredd@1.0.8
 
 #COPY Files
 #These files are now mounted via docker-compose.circle.yml
