@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 20160425202330) do
   create_table "activities", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
     t.string   "description"
+    t.uuid     "creator_id"
     t.datetime "started_on"
     t.datetime "ended_on"
     t.boolean  "is_deleted"
