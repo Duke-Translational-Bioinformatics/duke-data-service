@@ -53,6 +53,7 @@ class DataFile < Container
 
   def new_file_version_needed?
     file_versions.empty? ||
-      upload_id_changed? && current_file_version.persisted?
+      current_file_version.upload != upload && 
+      current_file_version.persisted?
   end
 end
