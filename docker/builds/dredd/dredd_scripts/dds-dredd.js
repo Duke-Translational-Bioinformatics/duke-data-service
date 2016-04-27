@@ -3,7 +3,7 @@ var Dredd = require('dredd');
 // allow self-signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-// suppress warning messages if more than 10 listeners are added to an event - this is needed here to suppress
+// suppress warning message if more than 10 listeners are added to an event - this is needed here to suppress
 // warning messages from the node-rest-client package...
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 

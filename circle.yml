@@ -30,7 +30,7 @@ dependencies:
     - ./circle/launch_application.circle.sh
 
 test:
- override:
+ post:
   #- './workflow/workflow.circle.sh'
   - 'docker-compose run dredd'
 
