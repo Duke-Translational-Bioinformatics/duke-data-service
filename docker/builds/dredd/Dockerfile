@@ -10,7 +10,7 @@ RUN apt-get -qq update && apt-get install -y \
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # install dredd
-RUN npm install -g dredd
+RUN npm install -g dredd@1.0.8
 
 #install node modules
 RUN npm install hooks
