@@ -27,8 +27,7 @@ dependencies:
     - ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.5.0
-    - export COMPOSE_FILE=docker-compose.circle.yml
-#    - ./launch_application.sh
+    - ./circle/launch_application.circle.sh
 
 test:
  override:
