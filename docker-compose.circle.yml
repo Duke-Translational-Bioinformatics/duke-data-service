@@ -49,11 +49,12 @@ services:
     image: dukedataservice_server
     env_file:
       - auth_service.env
+      - neo4j.client.env
     entrypoint: ['rake']
     command: authentication_service:create
     links:
       - db:postgres.db.host
-      - neo4j.client.env
+      - neo4j:neo4j.db.host
   rspec:
     image: dukedataservice_server
     environment:
