@@ -20,7 +20,7 @@ swift:
   ports:
     - 12345:8080
 neo4j:
-  image: neo4j:latest
+  image: neo4j:2.3.2
   ports:
     - '7474:7474'
   env_file:
