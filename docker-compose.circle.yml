@@ -11,8 +11,6 @@ server:
     - neo4j:neo4j.db.host
   ports:
     - 3001:3000
-  volumes:
-    - .:/var/www/app
 db:
   build: ./docker/builds/db
   env_file:
@@ -42,8 +40,6 @@ rake:
     - circle/webapp.circle.env
     - circle/swift.circle.env
     - neo4j.client.local.env
-  volumes:
-    - .:/var/www/app
 authservice:
   image: dukedataservice_server
   env_file:
@@ -54,8 +50,6 @@ authservice:
   links:
     - db:postgres.db.host
     - neo4j:neo4j.db.host
-  volumes:
-    - .:/var/www/app
 rspec:
   image: dukedataservice_server
   environment:
@@ -69,8 +63,6 @@ rspec:
     - neo4j.client.env
   entrypoint: ['rspec']
   command: spec
-  volumes:
-    - .:/var/www/app
 dredd:
   build: ./docker/builds/dredd
   links:
