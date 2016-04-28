@@ -2,20 +2,21 @@ require 'rails_helper'
 
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
+  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
 
-  let(:chunk) { FactoryGirl.create(:chunk, :swift, number: 1) }
-  let(:upload) { chunk.upload }
   let(:project) { upload.project }
-  let!(:storage_provider) { upload.storage_provider }
-  let(:other_upload) { FactoryGirl.create(:upload) }
+  let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
+
   let(:user) { FactoryGirl.create(:user) }
-  let(:upload_stub) { FactoryGirl.build(:upload) }
-  let(:chunk_stub) { FactoryGirl.build(:chunk) }
+  let(:upload_stub) { FactoryGirl.build(:upload, storage_provider_id: storage_provider.id) }
+  let(:chunk_stub) { FactoryGirl.build(:chunk, upload_id: upload.id) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: upload.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: upload.project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
@@ -40,7 +41,7 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.uploads.count }
-        let(:extras) { FactoryGirl.create_list(:upload, 5, project_id: project.id) }
+        let(:extras) { FactoryGirl.create_list(:upload, 5, project: project, storage_provider_id: storage_provider.id) }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -50,7 +51,7 @@ describe DDS::V1::UploadsAPI do
     end
 
     #Initiate a chunked file upload for a project
-    describe 'POST' do
+    describe 'POST', :vcr do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { "POST" }
       let!(:payload) {{
@@ -78,7 +79,15 @@ describe DDS::V1::UploadsAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.fingerprint_algorithm).to eq(payload[:hash][:algorithm])
         end
+
+        it 'should create the project container in the storage_provider' do
+          expect(storage_provider.get_container_meta(project.id)).to be_nil
+          is_expected.to eq(expected_response_status)
+          expect(storage_provider.get_container_meta(project.id)).to be
+        end
       end
+
+      it_behaves_like 'a storage_provider backed resource'
 
       context 'without hash parameter in payload' do
         let!(:payload) {{
@@ -149,7 +158,7 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Get pre-signed URL to upload a chunk', :vcr do
+  describe 'Get pre-signed URL to upload a chunk' do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
@@ -204,8 +213,6 @@ describe DDS::V1::UploadsAPI do
         let(:resource_class) {"Upload"}
       end
 
-      it_behaves_like 'a storage_provider backed resource'
-
       it_behaves_like 'an annotate_audits endpoint' do
         let(:audit_should_include) { {user: current_user, audited_parent: 'Upload'} }
       end
@@ -229,6 +236,7 @@ describe DDS::V1::UploadsAPI do
     subject { put(url, nil, headers) }
 
     before do
+      expect(chunk).to be_persisted
       actual_size = 0
       storage_provider.put_container(project.id)
       resource.chunks.each do |chunk|

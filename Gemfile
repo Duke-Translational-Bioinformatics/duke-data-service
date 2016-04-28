@@ -4,6 +4,10 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.1'
 # Use postgresql as the database for Active Record
 gem 'pg'
+
+# Use neo4j for PROV graph relationships
+gem 'neo4j'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4'
@@ -56,6 +60,7 @@ end
 
 group :test do
   gem 'shoulda-matchers', require: false
+  gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
   gem 'vcr', group: :test
   gem 'webmock', group: :test

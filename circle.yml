@@ -3,8 +3,10 @@ machine:
     LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
     COMPOSE_FILE: docker-compose.circle.yml
+    GRAPHSTORY_URL: http://neo4j.circle.host:7474
   hosts:
     swift.circle.host: 0.0.0.0
+    neo4j.circle.host: 0.0.0.0
   services:
     - docker
 
@@ -17,9 +19,13 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-    - ./docker/circle/cache_ruby.sh
+    - ./docker/circle/cache_docker_image.sh ruby 2.2.2
+    - ./docker/circle/cache_docker_image.sh postgres 9.4
+    - ./docker/circle/cache_docker_image.sh ubuntu 14.04
     - ./docker/circle/cache_dredd.sh
-    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
+    - ./docker/circle/cache_docker_image.sh neo4j 2.3.2
+    - ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
+#    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.6.0
     - ./circle/launch_application.circle.sh
 

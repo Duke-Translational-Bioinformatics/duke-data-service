@@ -5,7 +5,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Duke Data Service API Doc</title>
-  <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
   <%= stylesheet_link_tag 'bootstrap.min.css', media: 'screen', 'data-turbolinks-track' => true %>
   <%= stylesheet_link_tag 'swaggerui/typography.css', media: 'screen', 'data-turbolinks-track' => true %>
   <%= stylesheet_link_tag 'swaggerui/reset.css', media: 'screen', 'data-turbolinks-track' => true %>
@@ -30,6 +29,14 @@
       event.preventDefault();
       handleLogout();
       return false;
+    });
+
+    $('#UseAuthToken').click(function(e) {
+      e.preventDefault();
+      window.localStorage.api_token = $('#UserSuppliedToken').val();
+      $('#UserSuppliedToken').val('');
+      addApiKeyAuthorization();
+      $('#login').hide();
     });
 
     $('#current_user_info').hide();
@@ -204,11 +211,11 @@
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
         <div class="swagger-ui-wrap">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid"><%= @auth_service.name -%></a>
-            </li>
-          </ul>
+          <form class="form-inline">
+            <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid" class="btn btn-default">Use <%= @auth_service.name -%></a>
+            <button id="UseAuthToken" type="submit" class="btn btn-default" data-dismiss="modal">Use AuthToken</button>
+            <input id="UserSuppliedToken" type="textbox" class="form-control" placeholder="paste token here">
+          </form>
           <button type="button" class="btn btn-primary" data-dismiss="modal">Skip Authentication</button>
         </div>
       </div>

@@ -3,8 +3,10 @@
 class DataFile < Container
   belongs_to :upload
   belongs_to :creator, class_name: 'User'
+  has_many :file_versions
 
   after_set_parent_attribute :set_project_to_parent_project
+  before_update :build_file_version, if: :upload_id_changed?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload_id, presence: true, unless: :is_deleted
@@ -12,9 +14,7 @@ class DataFile < Container
 
   validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
     if record.upload
-      if record.upload.creator_id != record.creator_id
-        record.errors.add(attr, 'created by another user')
-      elsif record.upload.error_at
+      if record.upload.error_at
         record.errors.add(attr, 'cannot have an error')
       elsif !record.upload.completed_at
         record.errors.add(attr, 'must be completed successfully')
@@ -34,5 +34,12 @@ class DataFile < Container
 
   def kind
     super('file')
+  end
+
+  def build_file_version
+    file_versions.build(
+      upload_id: upload_id_was,
+      label: label_was
+    )
   end
 end

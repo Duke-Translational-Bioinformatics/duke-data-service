@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx39ca904151fa43e8bc546-0056900b79
+      - tx13c3d44f5be248bc91d75-0056e9d649
       Date:
-      - Fri, 08 Jan 2016 19:18:17 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object?multipart-manifest=put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
     body:
       encoding: UTF-8
       string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
       Content-Type:
       - text/plain
       Content-Disposition:
@@ -54,7 +54,7 @@ http_interactions:
       message: Created
     headers:
       Last-Modified:
-      - Fri, 08 Jan 2016 19:18:18 GMT
+      - Wed, 16 Mar 2016 21:55:22 GMT
       Content-Length:
       - '0'
       Etag:
@@ -62,23 +62,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txe94b2ba6c0a94a419f737-0056900b79
+      - tx58e2436e1dde4eff9d4a4-0056e9d649
       Date:
-      - Fri, 08 Jan 2016 19:18:17 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 - request:
     method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_object
+    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
   response:
     status:
       code: 200
@@ -91,22 +91,22 @@ http_interactions:
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Fri, 08 Jan 2016 19:18:18 GMT
+      - Wed, 16 Mar 2016 21:55:22 GMT
       Etag:
       - '"70f457e8bdf12b30ed18c5b110740c2e"'
       X-Timestamp:
-      - '1452280697.51237'
+      - '1458165321.08722'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - txedb39092c8404f9cb8590-0056900b79
+      - tx802c31b35e3446689c016-0056e9d649
       Date:
-      - Fri, 08 Jan 2016 19:18:17 GMT
+      - Wed, 16 Mar 2016 21:55:21 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
+  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
 recorded_with: VCR 3.0.0

@@ -5,11 +5,11 @@ Rails.application.configure do
   config.action_controller.perform_caching = ENV['RAILS_PERFORM_CACHING'].present?
   config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
   config.assets.js_compressor = :uglifier
-  config.assets.compile = false
-  config.assets.digest = true
-  config.assets.debug = false
-  config.assets.raise_runtime_errors = false
-  config.action_mailer.raise_delivery_errors = false
+  config.assets.compile = ENV['RAILS_COMPILE_ASSETS'].present?
+  config.assets.digest = ENV['RAILS_DIGEST_ASSETS'].present?
+  config.assets.debug = ENV['RAILS_DEBUG_ASSETS'].present?
+  config.assets.raise_runtime_errors = ENV['RAILS_ERRORS_ASSETS'].present?
+  config.action_mailer.raise_delivery_errors = ENV['RAILS_MAILER_ERRORS'].present?
   config.active_support.deprecation = :log
   config.active_record.migration_error = :page_load
   unless ENV['NOFORCESSL'].present?

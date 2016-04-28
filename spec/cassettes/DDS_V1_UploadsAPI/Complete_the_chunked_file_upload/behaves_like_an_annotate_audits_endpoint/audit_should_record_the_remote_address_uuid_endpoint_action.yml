@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx4b5a1a154ed6401da8661-0056d86432
+      - tx573e19bd47204386b993e-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78
+    uri: http://192.168.99.100:12345/v1/AUTH_test/7cddeb1b-bd0c-4b34-b19b-609782e9bf5d
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx4f98f26ed880497bbbffc-0056d86432
+      - txaf1e81b8173247fc82ba6-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64/1
+    uri: http://192.168.99.100:12345/v1/AUTH_test/7cddeb1b-bd0c-4b34-b19b-609782e9bf5d/f7c83923-710d-4ba9-a822-9faac4d8d06e/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Thu, 03 Mar 2016 16:20:03 GMT
+      - Wed, 16 Mar 2016 22:07:17 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,14 +87,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx6e06b0055d194a8dbf56c-0056d86432
+      - txc046dcc1bb9c4dd39720a-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: get
     uri: http://192.168.99.100:12345/auth/v1.0
@@ -114,42 +114,42 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx446289ba632b407988f4d-0056d86432
+      - tx6bd8a8b35b9843ebb1b09-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64?multipart-manifest=put
+    uri: http://192.168.99.100:12345/v1/AUTH_test/7cddeb1b-bd0c-4b34-b19b-609782e9bf5d/f7c83923-710d-4ba9-a822-9faac4d8d06e?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: '[{"path":"5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+      string: '[{"path":"7cddeb1b-bd0c-4b34-b19b-609782e9bf5d/f7c83923-710d-4ba9-a822-9faac4d8d06e/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
     headers:
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
       Content-Type:
       - text/plain
       Content-Disposition:
-      - attachment; filename=sunt-cumque
+      - attachment; filename=autem_deserunt
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Thu, 03 Mar 2016 16:20:03 GMT
+      - Wed, 16 Mar 2016 22:07:17 GMT
       Content-Length:
       - '0'
       Etag:
@@ -157,23 +157,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx85c8a73648824104a65a4-0056d86432
+      - txa9a0d5405fb0475692bb3-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64
+    uri: http://192.168.99.100:12345/v1/AUTH_test/7cddeb1b-bd0c-4b34-b19b-609782e9bf5d/f7c83923-710d-4ba9-a822-9faac4d8d06e
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
   response:
     status:
       code: 200
@@ -182,55 +182,53 @@ http_interactions:
       Content-Length:
       - '15'
       Content-Disposition:
-      - attachment; filename=sunt-cumque
+      - attachment; filename=autem_deserunt
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Thu, 03 Mar 2016 16:20:03 GMT
+      - Wed, 16 Mar 2016 22:07:17 GMT
       Etag:
       - '"b77622f6f760a1bed182840a7c02a53c"'
       X-Timestamp:
-      - '1457022002.11505'
+      - '1458166036.89269'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx77370acff1244b04b9c0d-0056d86432
+      - txe1ccecdbd94c4e65adfaa-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 - request:
     method: delete
-    uri: http://192.168.99.100:12345/v1/AUTH_test/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64/1?multipart-manifest=delete
+    uri: http://192.168.99.100:12345/v1/AUTH_test/7cddeb1b-bd0c-4b34-b19b-609782e9bf5d/f7c83923-710d-4ba9-a822-9faac4d8d06e/1
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkd7209c6ae1a148eaabb6b5f8991e5a25
+      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
   response:
     status:
-      code: 200
-      message: OK
+      code: 204
+      message: No Content
     headers:
+      Content-Length:
+      - '0'
       Content-Type:
-      - text/plain
+      - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx99eed90c13ee41ccba28f-0056d86432
+      - tx0042d08469ef45e3911cd-0056e9d914
       Date:
-      - Thu, 03 Mar 2016 16:20:02 GMT
-      Transfer-Encoding:
-      - chunked
+      - Wed, 16 Mar 2016 22:07:16 GMT
     body:
       encoding: UTF-8
-      string: "Number Deleted: 0\nNumber Not Found: 0\nResponse Body: \nResponse Status:
-        400 Bad Request\nErrors:\n/5ed80052-fb02-4d8b-bb3c-6d3d5a567d78/6ac15163-31ea-4f8a-8902-944a351b3d64/1,
-        Not an SLO manifest"
+      string: ''
     http_version: 
-  recorded_at: Thu, 03 Mar 2016 16:20:02 GMT
+  recorded_at: Wed, 16 Mar 2016 22:07:16 GMT
 recorded_with: VCR 3.0.0

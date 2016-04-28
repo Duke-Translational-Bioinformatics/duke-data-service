@@ -15,11 +15,14 @@ RSpec.describe DataFileSerializer, type: :serializer do
       is_expected.to have_key('id')
       is_expected.to have_key('parent')
       is_expected.to have_key('name')
+      is_expected.to have_key('label')
       is_expected.to have_key('is_deleted')
       expect(subject['id']).to eq(resource.id)
       expect(subject['parent']['id']).to eq(resource.parent_id)
       expect(subject['name']).to eq(resource.name)
+      expect(subject['label']).to eq(resource.label)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
+    it_behaves_like 'a serializer with a serialized audit'
   end
 end

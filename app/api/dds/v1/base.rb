@@ -44,17 +44,23 @@ module DDS
             begin
               decoded_token = JWT.decode(api_token, Rails.application.secrets.secret_key_base)[0]
               @current_user = find_user_with_token(decoded_token)
+            rescue JWT::ExpiredSignature
+              @current_user = nil
+              @auth_error = {
+                reason: 'expired api_token',
+                suggestion: 'you need to login with your authenticaton service'
+              }
             rescue JWT::VerificationError
               @current_user = nil
               @auth_error = {
                 reason: 'invalid api_token',
                 suggestion: 'token not properly signed'
               }
-            rescue JWT::ExpiredSignature
+            rescue JWT::DecodeError
               @current_user = nil
               @auth_error = {
-                reason: 'expired api_token',
-                suggestion: 'you need to login with your authenticaton service'
+                reason: 'invalid api_token',
+                suggestion: 'token not properly signed'
               }
             end
           else
@@ -129,7 +135,7 @@ module DDS
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         missing_object = ''
-        m = e.message.match(/find\s(\w+)\swith.*/)
+        m = e.message.match(/find\s(\w+)/)
         if m
           missing_object = m[1]
         end
@@ -174,6 +180,8 @@ module DDS
       mount DDS::V1::StorageProvidersAPI
       mount DDS::V1::ChildrenAPI
       mount DDS::V1::SoftwareAgentsAPI
+      mount DDS::V1::FileVersionsAPI
+      mount DDS::V1::ActivitiesAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

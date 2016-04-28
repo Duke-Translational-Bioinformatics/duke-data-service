@@ -64,13 +64,22 @@ module DDS
           [200, 'Success'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Current User Does not Exist']
+          [404, 'Current User or ApiKey Does not Exist']
         ]
       end
       get '/current_user/api_key', serializer: ApiKeySerializer do
         authenticate!
-        authorize current_user.api_key, :show?
-        current_user.api_key
+        if current_user.api_key
+          authorize current_user.api_key, :show?
+          current_user.api_key
+        else
+          error_json = {
+            "error" => "404",
+            "reason" => "ApiKey Not Found",
+            "suggestion" => "you must create an ApiKey"
+          }
+          error!(error_json, 404)
+        end
       end
 
       desc 'Delete a Current User API key' do

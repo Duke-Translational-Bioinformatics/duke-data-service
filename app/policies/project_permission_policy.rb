@@ -1,14 +1,18 @@
 class ProjectPermissionPolicy < ApplicationPolicy
+  def show?
+    permission :view_project
+  end
+
   def create?
-    permission
+    permission :manage_project_permissions
   end
 
   def update?
-    permission && record.user != user
+    permission(:manage_project_permissions) && record.user != user
   end
 
   def destroy?
-    permission && record.user != user
+    permission(:manage_project_permissions) && record.user != user
   end
 
   class Scope < Scope
@@ -16,7 +20,7 @@ class ProjectPermissionPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.joins(project_permissions: :user).where(users: {id: user.id})
+        scope.joins(project_permissions: [:user, :auth_role]).where(users: {id: user.id}).where('auth_roles.permissions @> ?', [:view_project].to_json)
       end
     end
   end

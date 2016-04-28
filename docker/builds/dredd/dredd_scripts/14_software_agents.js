@@ -11,8 +11,9 @@ var SA_LIST = "Software Agents > Software Agents collection > List software agen
 var SA_VIEW = "Software Agents > Software Agent instance > View software agent";
 var SA_UPDATE = "Software Agents > Software Agent instance > Update software agent";
 var SA_DELETE = "Software Agents > Software Agent instance > Delete software agent";
-var SA_VIEW_APIKEY = "Software Agents > Software Agent Secret Key > View software agent API key";
-var SA_REGENERATE = "Software Agents > Software Agent Secret Key > Re-generate software agent API key";
+var SA_GEN_APIKEY = "Software Agents > Software Agent API Key > Generate software agent API key";
+var SA_VIEW_APIKEY = "Software Agents > Software Agent API Key > View software agent API key";
+var SA_DEL_APIKEY = "Software Agents > Software Agent API Key > Delete software agent API key";
 var SA_GET_TOKEN = "Software Agents > Software Agent Access Token > Get software agent access token";
 var responseStash = {};
 var g_sa_Id = null;
@@ -67,39 +68,54 @@ hooks.before(SA_DELETE, function (transaction,done) {
   });
 });
 
+hooks.before(SA_GEN_APIKEY , function (transaction) {
+  var url = transaction.fullPath;
+  transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
+});
+
 hooks.before(SA_VIEW_APIKEY, function (transaction) {
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
 });
 
-hooks.before(SA_REGENERATE, function (transaction) {
+hooks.after(SA_VIEW_APIKEY, function (transaction) {
+  // saving HTTP response to the stash
+  responseStash[SA_VIEW_APIKEY] = transaction.real.body;
+});
+
+hooks.before(SA_DEL_APIKEY, function (transaction) {
+  // saving HTTP response to the stash
   var url = transaction.fullPath;
   transaction.fullPath = url.replace('9a4c28a2-ec18-40ed-b75c-3bf5b309715', g_sa_Id);
 });
 
-hooks.after(SA_REGENERATE, function (transaction) {
-  // saving HTTP response to the stash
-  responseStash[SA_REGENERATE] = transaction.real.body;
-});
-
 hooks.before(SA_GET_TOKEN, function (transaction,done) {
-  //Current user - 02)current_user_hooks.js is called before this with global
-  //I'm going to try that first - g_currentUserID before calling separately
-  // reusing data from previous response here
-  var sa_key = JSON.parse(responseStash[SA_REGENERATE])['key'];
-  // replacing id in URL with stashed id from previous response
-  //first we'll create a new software agent
   var payload = {
   };
-  var request = tools.createResource('GET', '/current_user', JSON.stringify(payload),hooks.configuration.server);
+  var request = tools.createResource('PUT', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
   request.then(function(data) {
-    current_user_id = data['id'];
-    var requestBody = JSON.parse(transaction.request.body);
-    // modify request body here
-    requestBody['agent_key'] = sa_key;
-    requestBody['user_key'] = current_user_id;
-    // stringify the new body to request
-    transaction.request.body = JSON.stringify(requestBody);
-    done();
+    var request = tools.createResource('GET', '/current_user/api_key', JSON.stringify(payload),hooks.configuration.server);
+    request.then(function(data) {
+      current_user_id = data['key'];
+      var payload2 = {
+          "name": "Hash computation agent"
+      }
+      var request2 = tools.createResource('POST', '/software_agents', JSON.stringify(payload2),hooks.configuration.server);
+      request2.then(function(data2) {
+        sa_id = data2['id'];
+        var request3 = tools.createResource('GET', '/software_agents/'+sa_id+'/api_key', JSON.stringify(payload),hooks.configuration.server);
+        request3.then(function(data3) {
+          sa_key = data3['key'];
+          // parse request body from blueprint
+          var requestBody = JSON.parse(transaction.request.body);
+          // modify request body here
+          requestBody['agent_key'] = sa_key;
+          requestBody['user_key'] = current_user_id;
+          // stringify the new body to request
+          transaction.request.body = JSON.stringify(requestBody);
+          done();
+        });
+      });
+    });
   });
 });

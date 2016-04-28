@@ -1,17 +1,27 @@
 class UploadPolicy < ApplicationPolicy
+  def show?
+    permission :view_project
+  end
+
   def create?
-    permission
+    permission :create_file
   end
 
   def update?
-    permission
+    permission :create_file
   end
 
   def complete?
-    permission
+    permission :create_file
   end
 
   def destroy?
-    permission
+    system_permission
+  end
+
+  class Scope < Scope
+    def resolve
+      super :view_project
+    end
   end
 end

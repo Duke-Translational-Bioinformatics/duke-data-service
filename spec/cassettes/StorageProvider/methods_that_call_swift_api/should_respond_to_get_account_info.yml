@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://192.168.99.100:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx8b09852c901942ad93f51-0056900b79
+      - tx888e8c20e7f44cc2963fa-0056ec1268
       Date:
-      - Fri, 08 Jan 2016 19:18:17 GMT
+      - Fri, 18 Mar 2016 14:36:24 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
+  recorded_at: Fri, 18 Mar 2016 14:36:24 GMT
 - request:
     method: get
     uri: http://192.168.99.100:12345/v1/AUTH_test
@@ -43,33 +43,34 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkd5efb75298bc4d82b4670cdb1f639fe5
+      - AUTH_tkdde542944fa445b9a791d5f42c40e371
   response:
     status:
-      code: 204
-      message: No Content
+      code: 200
+      message: OK
     headers:
+      Content-Length:
+      - '14'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1458311121.01918'
+      X-Account-Bytes-Used:
+      - '0'
+      X-Account-Container-Count:
+      - '1'
       Content-Type:
       - text/plain; charset=utf-8
       X-Account-Object-Count:
       - '0'
-      X-Timestamp:
-      - '1452280697.10353'
-      X-Account-Bytes-Used:
-      - '0'
-      X-Account-Container-Count:
-      - '0'
-      X-Put-Timestamp:
-      - '1452280697.10353'
-      Content-Length:
-      - '0'
       X-Trans-Id:
-      - txb9bd8f15b23443bbbe261-0056900b79
+      - tx181e34eddc874bfa807fd-0056ec1268
       Date:
-      - Fri, 08 Jan 2016 19:18:17 GMT
+      - Fri, 18 Mar 2016 14:36:24 GMT
     body:
       encoding: UTF-8
-      string: ''
+      string: |
+        the_container
     http_version: 
-  recorded_at: Fri, 08 Jan 2016 19:18:17 GMT
+  recorded_at: Fri, 18 Mar 2016 14:36:24 GMT
 recorded_with: VCR 3.0.0
