@@ -11,11 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425193145) do
+ActiveRecord::Schema.define(version: 20160425202330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
+
+  create_table "activities", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.uuid     "creator_id"
+    t.datetime "started_on"
+    t.datetime "ended_on"
+    t.boolean  "is_deleted"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "affiliations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "project_id"
@@ -24,6 +35,16 @@ ActiveRecord::Schema.define(version: 20160425193145) do
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end
+
+  create_table "agent_activity_associations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "agent_id"
+    t.string   "agent_type"
+    t.uuid     "activity_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "agent_activity_associations", ["agent_id"], name: "index_agent_activity_associations_on_agent_id", using: :btree
 
   create_table "api_keys", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "user_id"
