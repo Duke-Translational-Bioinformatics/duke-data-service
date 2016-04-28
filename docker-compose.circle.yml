@@ -67,7 +67,6 @@ rspec:
   env_file:
     - circle/swift.circle.env
     - neo4j.client.env
-    - circle/swift.circle.env
   entrypoint: ['rspec']
   command: spec
   volumes:
