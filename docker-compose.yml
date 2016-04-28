@@ -1,22 +1,23 @@
-server:
-  extends:
-    file: dc-base.yml
-    service: webapp
-  volumes:
-    - .:/var/www/app
-  links:
-    - db:postgres.db.host
-db:
-  extends:
-    file: dc-base.yml
-    service: db
-swiftvol:
-  extends:
-    file: dc-base.yml
-    service: swiftvol
-swift:
-  extends:
-    file: dc-base.yml
-    service: swift
-  volumes_from:
-    - swiftvol
+services:
+  server:
+    extends:
+      file: dc-base.yml
+      service: webapp
+    volumes:
+      - .:/var/www/app
+    links:
+      - db:postgres.db.host
+  db:
+    extends:
+      file: dc-base.yml
+      service: db
+  swiftvol:
+    extends:
+      file: dc-base.yml
+      service: swiftvol
+  swift:
+    extends:
+      file: dc-base.yml
+      service: swift
+    volumes_from:
+      - swiftvol
