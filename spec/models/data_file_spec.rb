@@ -21,7 +21,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
-    it { is_expected.to have_many(:file_versions).order('version_number DESC') }
+    it { is_expected.to have_many(:file_versions).order('version_number ASC') }
   end
 
   describe 'validations' do
@@ -147,6 +147,15 @@ RSpec.describe DataFile, type: :model do
         before { subject.build_file_version }
         it { expect(subject.current_file_version).not_to be_persisted }
         it { expect(subject.current_file_version).to eq subject.current_file_version }
+      end
+
+      context 'with multiple file_versions' do
+        let(:last_file_version) { FactoryGirl.create(:file_version, data_file: subject) }
+        before do
+          expect(last_file_version).to be_persisted
+          subject.reload
+        end
+        it { expect(subject.current_file_version).to eq last_file_version }
       end
     end
 

@@ -2,7 +2,7 @@
 
 class DataFile < Container
   belongs_to :upload
-  has_many :file_versions, -> { order('version_number DESC') }
+  has_many :file_versions, -> { order('version_number ASC') }
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :build_file_version, if: :new_file_version_needed?
