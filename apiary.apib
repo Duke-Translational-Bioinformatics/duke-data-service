@@ -69,7 +69,12 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 25-Apr-2016
 --------------
 + For *File Versions* resource - added `project` property to facilitate portal acccess to project permissions for the current user.
-+ Added *Search Objects* action - this allows robust search of DDS objects using Elasticsearch Query DSL. 
++ Added *Search Objects* action - this allows robust search of DDS objects using Elasticsearch Query DSL.
+
+02-May-2016
+--------------
++ For *Provenance Relations* resource - added "to" and "from" properties to resource - this provides clients with insight to the W3C relationship direction.
++ Added *Provenance Inferred* section - provides overview of inferred relations for initial provenance release.  
 
 ## Group API Usage
 
@@ -2893,13 +2898,15 @@ List the relations for a provenance node; this only lists direct relations for t
         }
 
 ## Group Provenance Inferred
-The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations, need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when "Erich Huang" -> "Python Agent" creates "Experiment A" and uploads "Data File A" - the following provenance transactions would be inferred (i.e. generated):
-+ Experiment A -> *wasAssociatedWith* -> Erich Huang
-+ Data File A -> *wasAttributedTo* -> Erich Huang
-+ Data File A -> *wasAttributedTo* -> Python Agent
-To complete the provenance picture - client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* endpoints where relevant in their pipelines - these are not inferred from audit trail.
+The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when *Erich Huang -> Python Agent* creates *Experiment A* and uploads *Data File A*, the following provenance relations would be inferred (i.e. generated):
 
-*Note: To view JSON response for generated wasAssociatedWith and wasAttributedTo relations, see* `/relations/{id}` *action responses.*
++ *Experiment A* -> **wasAssociatedWith** -> *Erich Huang*
++ *Data File A* -> **wasAttributedTo** -> *Erich Huang*
++ *Data File A* -> **wasAttributedTo** -> *Python Agent*
+
+To complete the provenance picture, client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* actions where relevant in their pipelines, these are not inferred from audit trail.
+
+*Note: To view JSON response for generated* `wasAssociatedWith` *and* `wasAttributedTo` *relations, see* `/relations/{id}` *action responses.*
 
 ### NOT_IMPLEMENTED_NEW Delete relation [DELETE]
 >**Permission:** creator
