@@ -2897,6 +2897,11 @@ List the relations for a provenance node; this only lists direct relations for t
             "audit": { }
         }
 
+### NOT_IMPLEMENTED_NEW Delete relation [DELETE]
+>**Permission:** creator
+
++ Response 204
+
 ## Group Provenance Inferred
 The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when **Erich Huang -> Python Agent** creates **Experiment A** and uploads **Data File A**, the following provenance relations would be inferred (i.e. generated):
 
@@ -2907,11 +2912,6 @@ The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDer
 To complete the provenance picture, client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* actions where relevant in their pipelines, these are not inferred from audit trail.
 
 *Note: To view sample JSON payload for the generated* `wasAssociatedWith` *and* `wasAttributedTo` *relations, see* `/relations/{id}` *action responses.*
-
-### NOT_IMPLEMENTED_NEW Delete relation [DELETE]
->**Permission:** creator
-
-+ Response 204
 
 ## Group Search Provenance
 The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation. 
