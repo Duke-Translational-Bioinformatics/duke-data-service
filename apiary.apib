@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://uatest.dataservice.duke.edu/api/v1/
+HOST: https://apiuatest.dataservice.duke.edu/api/v1/
 
 # Duke Data Service 
 
@@ -83,7 +83,7 @@ In an effort to promote provenance, all programmatic access to the API must util
 
 Exploring the API
 --------------
-In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://apiuatest.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
@@ -107,7 +107,7 @@ To make it easy for clients to manage pagination, the following headers will alw
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` key in resource specific payloads.
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` property in resource specific payloads.
 
     "audit": {
         "created_on": "2015-01-01T12:00:00Z",
@@ -2522,6 +2522,8 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ## Group Provenance Relations
 Represents provenance relations as defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Relations are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
+
+
 ## Relations collection [/relations]
 
 ### NOT_IMPLEMENTED_NEW Create used relation [POST /relations/used]
@@ -2551,13 +2553,14 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
         {
             "kind": "dds-relation-used", 
             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-            "activity": {
+            "from": {
+                "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
                 "is_deleted": false,
                 "audit": { }
             },
-            "entity": {
+            "to": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
@@ -2578,19 +2581,19 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 
 >**Properties**
 - - - - -
-+ **activity.id (string, required)** - The activity that generated the entity.
 + **entity.kind (string, optional)** - The kind of entity that was generated; this must be a file version (i.e. `dds-file-version`).
 + **entity.id (string, optional)** - The unique id of the generated entity.
++ **activity.id (string, required)** - The activity that generated the entity.
 
 + Request (application/json)
 
         {
-            "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
-            },
             "entity": {
                 "kind": "dds-file-version",
                 "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            },
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
             }
         }
 
@@ -2599,13 +2602,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
         {
             "kind": "dds-relation-was-generated-by", 
             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-            "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                "name": "RF PI3-Kinase",
-                "is_deleted": false,
-                "audit": { }
-            },
-            "entity": {
+            "from": {
                 "kind": "dds-file-version",
                 "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
                 "file": {
@@ -2614,6 +2611,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 },
                 "version": 2,
                 "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -2649,7 +2653,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
         {
             "kind": "dds-relation-was-derived-from", 
             "id": "6bf31123-b078-4655-ae4e-be599d52adc5",
-            "generated_entity": {
+            "from": {
                 "kind": "dds-file-version",
                 "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
                 "file": {
@@ -2661,7 +2665,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "is_deleted": false,
                 "audit": { }
             },
-            "used_entity": {
+            "to": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
@@ -2682,9 +2686,9 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 
 >**Properties**
 - - - - -
-+ **activity.id (string, required)** - The activity that invalidated the entity.
 + **entity.kind (string, optional)** - The kind of entity that was invalidated; this must be a file version (i.e. `dds-file-version`).
 + **entity.id (string, optional)** - The unique id of the invalidated entity.
++ **activity.id (string, required)** - The activity that invalidated the entity.
 
 >**Rules**
 - - - - -
@@ -2693,12 +2697,12 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 + Request (application/json)
 
         {
-            "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
-            },
             "entity": {
                 "kind": "dds-file-version",
                 "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            },
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
             }
         }
 
@@ -2707,13 +2711,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
         {
             "kind": "dds-relation-was-generated-by", 
             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-            "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                "name": "RF PI3-Kinase",
-                "is_deleted": false,
-                "audit": { }
-            },
-            "entity": {
+            "from": {
                 "kind": "dds-file-version",
                 "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
                 "file": {
@@ -2723,6 +2721,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "version": 2,
                 "label": "Alignment performed on raw data",
                 "is_deleted": true,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "is_deleted": false,
                 "audit": { }
             },
             "audit": { }
@@ -2750,13 +2755,14 @@ List the relations for a provenance node; this only lists direct relations for t
                 {
                     "kind": "dds-relation-used", 
                     "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                    "activity": {
+                    "from": {
+                        "kind": "dds-activity",
                         "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                         "name": "RF PI3-Kinase",
                         "is_deleted": false,
                         "audit": { }
                     },
-                    "entity": {
+                    "to": {
                         "kind": "dds-file-version",
                         "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                         "file": {
@@ -2785,13 +2791,14 @@ List the relations for a provenance node; this only lists direct relations for t
         {
             "kind": "dds-relation-used", 
             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-            "activity": {
+            "from": {
+                "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
                 "is_deleted": false,
                 "audit": { }
             },
-            "entity": {
+            "to": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
@@ -2805,6 +2812,94 @@ List the relations for a provenance node; this only lists direct relations for t
             },
             "audit": { }
         }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-associated-with", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-user",
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                "audit": { }
+            },
+            "audit": { }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-attributed-to", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-user",
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                "audit": { }
+            },
+            "audit": { }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-attributed-to", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-software-agent",
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "audit": { }
+        }
+
+## Group Provenance Inferred
+The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations, need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when "Erich Huang" -> "Python Agent" creates "Experiment A" and uploads "Data File A" - the following provenance transactions would be inferred (i.e. generated):
++ Experiment A -> *wasAssociatedWith* -> Erich Huang
++ Data File A -> *wasAttributedTo* -> Erich Huang
++ Data File A -> *wasAttributedTo* -> Python Agent
+To complete the provenance picture - client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* endpoints where relevant in their pipelines - these are not inferred from audit trail.
+
+*Note: To view JSON response for generated wasAssociatedWith and wasAttributedTo relations, see* `/relations/{id}` *action responses.*
 
 ### NOT_IMPLEMENTED_NEW Delete relation [DELETE]
 >**Permission:** creator
@@ -2894,17 +2989,17 @@ Given a starting node, returns a graph structure for the provenance chain.  This
                     {
                         "id": "ac242faf-fba0-4293-a949-0b82ae7ba810", 
                         "type": "used", 
-                        "start_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
-                        "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
+                        "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
+                        "end_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
                         "properties": {
                             "kind": "dds-relation-used", 
                             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
                             "audit": { }
                         },
-                        "id": "ac242faf-fba0-4293-a949-0b82ae7ba810", 
+                        "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95", 
                         "type": "wasGeneratedBy", 
-                        "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
-                        "end_node": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
+                        "start_node": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
+                        "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
                         "properties": {
                             "kind": "dds-relation-was-generated-by", 
                             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
