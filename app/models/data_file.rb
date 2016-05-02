@@ -4,7 +4,6 @@ class DataFile < Container
   belongs_to :upload
   belongs_to :creator, class_name: 'User'
   has_many :file_versions
-  has_many :tags, as: :taggable
 
   after_set_parent_attribute :set_project_to_parent_project
   before_update :build_file_version, if: :upload_id_changed?
