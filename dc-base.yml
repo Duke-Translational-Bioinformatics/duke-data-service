@@ -4,7 +4,6 @@ webapp:
     - swift.env
     - webapp.env
     - portal.env
-    - neo4j.client.env
   ports:
     - 3001:3000
 db:
@@ -19,9 +18,3 @@ swift:
   build: ./docker/builds/swift
   ports:
     - 12345:8080
-neo4j:
-  image: neo4j:latest
-  ports:
-    - '7474:7474'
-  env_file:
-    - neo4j.server.env
