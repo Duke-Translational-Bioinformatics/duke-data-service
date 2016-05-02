@@ -45,6 +45,7 @@ deployment:
         timeout: 54000
     - heroku run rake --exit-code db:migrate --app 'dukeds-dev'
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -56,6 +57,7 @@ deployment:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -66,3 +68,4 @@ deployment:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds'
     - heroku run --exit-code rake db:seed --app 'dukeds'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds'
