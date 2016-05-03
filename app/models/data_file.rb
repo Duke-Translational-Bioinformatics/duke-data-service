@@ -2,7 +2,6 @@
 
 class DataFile < Container
   belongs_to :upload
-  belongs_to :creator, class_name: 'User'
   has_many :file_versions, -> { order('version_number ASC') }
   has_many :tags, as: :taggable
 
