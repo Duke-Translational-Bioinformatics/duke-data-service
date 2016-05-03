@@ -36,8 +36,7 @@ module DDS
           parent: parent,
           upload: upload,
           name: upload.name,
-          label: file_params[:label],
-          creator_id: current_user.id
+          label: file_params[:label]
         })
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
