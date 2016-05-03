@@ -22,6 +22,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:file_versions).order('version_number ASC') }
+    it { is_expected.to have_many(:tags) }
   end
 
   describe 'validations' do
@@ -163,7 +164,7 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.to respond_to(:build_file_version) }
       it { expect(subject.build_file_version).to be_a FileVersion }
       it 'builds a file_version' do
-        expect { 
+        expect {
           subject.build_file_version
         }.to change{subject.file_versions.length}.by(1)
       end
@@ -209,8 +210,8 @@ RSpec.describe DataFile, type: :model do
 
       context 'when current_file_version.upload differs' do
         let(:different_upload) { FactoryGirl.create(:upload, :completed) }
-        before do 
-          subject.current_file_version.update_attribute(:upload, different_upload) 
+        before do
+          subject.current_file_version.update_attribute(:upload, different_upload)
           subject.reload
         end
         it { expect(subject.current_file_version).to be_persisted }
@@ -220,7 +221,7 @@ RSpec.describe DataFile, type: :model do
 
       context 'before subject is created' do
         subject { FactoryGirl.build(:data_file) }
-        
+
         it { is_expected.not_to be_persisted }
         context 'without file_versions' do
           it { expect(subject.file_versions).to be_empty }
