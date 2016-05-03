@@ -1,4 +1,5 @@
 class Tag < ActiveRecord::Base
+  default_scope { order('created_at DESC') }
   audited
 
   belongs_to :taggable, class_name: 'DataFile'
