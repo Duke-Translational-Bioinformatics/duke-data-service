@@ -193,6 +193,14 @@ ActiveRecord::Schema.define(version: 20160425202330) do
     t.datetime "updated_at",   null: false
   end
 
+  create_table "tags", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "label"
+    t.string   "taggable_type"
+    t.uuid     "taggable_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
   create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "project_id"
     t.string   "name"

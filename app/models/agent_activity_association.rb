@@ -1,6 +1,6 @@
 class AgentActivityAssociation < ActiveRecord::Base
   include Graphed
-  after_create :graph_relation
+  after_create :create_graph_relation
   after_destroy :delete_graph_relation
 
   audited
@@ -13,6 +13,10 @@ class AgentActivityAssociation < ActiveRecord::Base
     message: "Agent must be a User or a SoftwareAgent" }
 
   validates :activity, presence: true
+
+  def create_graph_relation
+    super('WasAssociatedWith', agent, activity)
+  end
 
   def graph_relation
     super('WasAssociatedWith', agent, activity)
