@@ -23,5 +23,6 @@ RSpec.describe DataFileSerializer, type: :serializer do
       expect(subject['label']).to eq(resource.label)
       expect(subject['is_deleted']).to eq(resource.is_deleted)
     end
+    it_behaves_like 'a serializer with a serialized audit'
   end
 end
