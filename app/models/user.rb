@@ -3,7 +3,7 @@ require 'jwt'
 class User < ActiveRecord::Base
   include Kinded
   include Graphed
-  after_create :graph_node
+  after_create :create_graph_node
   after_destroy :delete_graph_node
 
   default_scope { order('created_at DESC') }
@@ -51,6 +51,10 @@ class User < ActiveRecord::Base
       username: username,
       full_name: display_name
     }
+  end
+
+  def create_graph_node
+    super('Agent')
   end
 
   def graph_node
