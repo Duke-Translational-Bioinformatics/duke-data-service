@@ -6,7 +6,7 @@ describe DDS::V1::FileVersionsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
+  let(:file_version) { data_file.file_versions.last }
   let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
   let(:deleted_data_file) { FactoryGirl.create(:data_file, :deleted, project: project) }

@@ -3,15 +3,15 @@
 class DataFile < Container
   belongs_to :upload
   belongs_to :creator, class_name: 'User'
-  has_many :file_versions
+  has_many :file_versions, -> { order('version_number ASC') }
   has_many :tags, as: :taggable
 
   after_set_parent_attribute :set_project_to_parent_project
-  before_update :build_file_version, if: :upload_id_changed?
+  before_save :build_file_version, if: :new_file_version_needed?
+  before_save :set_current_file_version_attributes
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload_id, presence: true, unless: :is_deleted
-  validates :creator_id, presence: true, unless: :is_deleted
 
   validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
     if record.upload
@@ -37,10 +37,25 @@ class DataFile < Container
     super('file')
   end
 
+  def current_file_version
+    file_versions.last
+  end
+
   def build_file_version
-    file_versions.build(
-      upload_id: upload_id_was,
-      label: label_was
-    )
+    file_versions.build
+  end
+
+  def set_current_file_version_attributes
+    current_file_version.attributes = {
+      upload: upload,
+      label: label
+    }
+    current_file_version
+  end
+
+  def new_file_version_needed?
+    file_versions.empty? ||
+      current_file_version.upload != upload &&
+      current_file_version.persisted?
   end
 end

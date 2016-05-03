@@ -5,7 +5,6 @@ FactoryGirl.define do
     association :upload, :completed
     parent_id { SecureRandom.uuid }
     project
-    creator { upload.creator }
     is_deleted false
 
     trait :with_parent do
@@ -23,7 +22,7 @@ FactoryGirl.define do
 
     trait :invalid do
       to_create {|instance| instance.save(validate: false) }
-      creator { nil }
+      name { nil }
     end
   end
 end
