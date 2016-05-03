@@ -43,24 +43,17 @@ RSpec.describe FileVersion, type: :model do
     end
 
     describe '#next_version_number' do
-      subject { FactoryGirl.create(:file_version, version_number: 1) }
+      let(:data_file) { FactoryGirl.create(:data_file) }
+      subject { data_file.file_versions.last }
       it { is_expected.to respond_to(:next_version_number) }
-
-      context 'when versions do not exist for file' do
-        subject { FactoryGirl.build(:file_version) }
-        it { expect(subject.data_file.file_versions.count).to eq 0 }
-        it { expect(subject.next_version_number).to eq 1 }
-      end
 
       context 'when file_version exists' do
         let(:expected_next_version_number) { subject.version_number + 1 }
         before { expect(subject).to be_persisted }
-        it { expect(subject.data_file.file_versions.count).to eq 1 }
         it { expect(subject.next_version_number).to eq expected_next_version_number }
 
         context 'with versions for other files' do
           let!(:other_file_version) { FactoryGirl.create(:file_version) }
-          it { expect(subject.data_file.file_versions.count).to eq 1 }
           it { expect(subject.next_version_number).to eq expected_next_version_number }
         end
       end
