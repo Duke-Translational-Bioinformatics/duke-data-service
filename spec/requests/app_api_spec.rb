@@ -180,12 +180,11 @@ describe DDS::V1::AppAPI do
           ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
           ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
           ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-#          swift_storage_provider.register_keys
+          stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
         end
         it 'should return response.status 503' do
           expect(swift_storage_provider).to be_persisted
           expect(authentication_service).to be_persisted
-          #vcr is used to record a not connected event
           get '/api/v1/app/status', json_headers
           expect(response.status).to eq(503)
           expect(response.body).to be
@@ -227,6 +226,7 @@ describe DDS::V1::AppAPI do
       let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
 
       before do
+        WebMock.reset!
         ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
         ENV['AUTH_SERVICE_BASE_URI'] = 'https://192.168.99.100:3000'
         ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
