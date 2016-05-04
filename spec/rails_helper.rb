@@ -51,6 +51,9 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+  config.after(:each) do
+    Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
+  end
 end
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

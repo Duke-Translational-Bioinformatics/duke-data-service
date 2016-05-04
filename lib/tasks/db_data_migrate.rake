@@ -18,7 +18,7 @@ namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
     task migrate: :environment do
-      Rails.logger.level = 3
+      Rails.logger.level = 3 unless Rails.env == 'test'
       create_current_file_versions
     end
   end
