@@ -19,20 +19,15 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-    - ./docker/circle/cache_docker_image.sh ruby 2.2.2
-    - ./docker/circle/cache_docker_image.sh postgres 9.4
-    - ./docker/circle/cache_docker_image.sh ubuntu 14.04
-    - ./docker/circle/cache_dredd.sh
     - ./docker/circle/cache_docker_image.sh neo4j 2.3.2
-    - ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.5.0
-    - ./circle/launch_application.circle.sh
+    - docker-compose up -d neo4j
 
 test:
- post:
-  #- './workflow/workflow.circle.sh'
-  - 'docker-compose run dredd'
+  override:
+    - ./circle/parallelize_test_suite.sh:
+        parallel: true
 
 deployment:
  development:
