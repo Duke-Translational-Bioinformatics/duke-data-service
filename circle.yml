@@ -26,7 +26,7 @@ dependencies:
 
 test:
   override:
-    - case $CIRCLE_NODE_INDEX in 0) bundle exec rspec ;; 1) ./circle/run_dredd.circle.sh ;; esac:
+    - ./circle/parallelize_test_suite.sh:
         parallel: true
 
 deployment:
