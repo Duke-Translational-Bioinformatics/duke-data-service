@@ -7,21 +7,21 @@ describe "db:data:migrate" do
   let(:file_version_audits) { Audited.audit_class.where(auditable: FileVersion.all) }
   let(:data_file_audits) { Audited.audit_class.where(auditable: DataFile.all) }
 
-  before do
-    Audited.audit_class.as_user(current_user) do
-      FactoryGirl.create_list(:data_file, 4)
-      FileVersion.last.destroy
-      FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
-      f = FactoryGirl.create(:data_file)
-      f.upload = FactoryGirl.create(:upload, :completed)
-      f.save
-    end
-  end
-
   it { expect(subject.prerequisites).to  include("environment") }
 
   describe "#invoke" do
     let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
+
+    before do
+      Audited.audit_class.as_user(current_user) do
+        FactoryGirl.create_list(:data_file, 3)
+        FileVersion.last.destroy
+        FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
+        f = FactoryGirl.create(:data_file)
+        f.upload = FactoryGirl.create(:upload, :completed)
+        f.save
+      end
+    end
 
     it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
     it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
