@@ -27,12 +27,12 @@ dependencies:
     - ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.5.0
-    - ./circle/launch_application.circle.sh
+    - docker-compose up -d neo4j
 
 test:
- post:
-  #- './workflow/workflow.circle.sh'
-  - 'docker-compose run dredd'
+  override:
+    - case $CIRCLE_NODE_INDEX in 0) bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec.xml ;; 1) ./circle/run_dredd.circle.sh ;; esac:
+        parallel: true
 
 deployment:
  development:
