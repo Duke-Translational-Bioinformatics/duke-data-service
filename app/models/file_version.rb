@@ -11,7 +11,9 @@ class FileVersion < ActiveRecord::Base
   has_many :project_permissions, through: :data_file
 
   validates :upload_id, presence: true, unless: :is_deleted
-  validates :is_deleted, absence: true, unless: :deletion_allowed?
+  validates :is_deleted, 
+    absence: { message: 'The current file version cannot be deleted.' },
+    unless: :deletion_allowed?
 
   before_create :set_version_number
 

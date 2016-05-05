@@ -30,7 +30,7 @@ RSpec.describe FileVersion, type: :model do
 
     context 'when deletion_allowed? is false' do
       before { allow(subject).to receive(:deletion_allowed?).and_return(false) }
-      it { is_expected.not_to allow_value(true).for(:is_deleted) }
+      it { is_expected.not_to allow_value(true).for(:is_deleted).with_message('The current file version cannot be deleted.') }
       it { is_expected.to allow_value(false).for(:is_deleted) }
     end
 
