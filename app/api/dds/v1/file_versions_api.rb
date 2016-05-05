@@ -77,8 +77,11 @@ module DDS
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :destroy?
         Audited.audit_class.as_user(current_user) do
-          file_version.update_attribute(:is_deleted, true)
-          annotate_audits [file_version.audits.last]
+          if file_version.update(is_deleted: true)
+            annotate_audits [file_version.audits.last]
+          else
+            validation_error!(file_version)
+          end
         end
         body false
       end
