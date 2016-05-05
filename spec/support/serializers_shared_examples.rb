@@ -64,7 +64,7 @@ shared_context 'with destroy' do |with_software_agent|
       Audited.audit_class.as_user(auditor) do
         resource.audit_comment = {"action": destroy_action}
         if is_logically_deleted
-          resource.update(is_deleted: true)
+          resource.update_attribute(:is_deleted, true)
           resource.audits.last.update(comment: {action: 'DELETE', software_agent_id: software_agent.id})
         else
           resource.destroy
@@ -77,7 +77,7 @@ shared_context 'with destroy' do |with_software_agent|
       Audited.audit_class.as_user(auditor) do
         resource.audit_comment = {"action": destroy_action}
         if is_logically_deleted
-          resource.update(is_deleted: true)
+          resource.update_attribute(:is_deleted, true)
           resource.audits.last.update(comment: {action: 'DELETE'})
         else
           resource.destroy

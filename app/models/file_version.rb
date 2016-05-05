@@ -11,6 +11,9 @@ class FileVersion < ActiveRecord::Base
   has_many :project_permissions, through: :data_file
 
   validates :upload_id, presence: true, unless: :is_deleted
+  validates :is_deleted, 
+    absence: { message: 'The current file version cannot be deleted.' },
+    unless: :deletion_allowed?
 
   before_create :set_version_number
 
@@ -26,8 +29,7 @@ class FileVersion < ActiveRecord::Base
   end
 
   def next_version_number
-    max_version = data_file.file_versions.maximum(:version_number) || 0
-    max_version + 1
+    current_version_number + 1
   end
 
   def set_version_number
@@ -35,7 +37,18 @@ class FileVersion < ActiveRecord::Base
     self.version_number
   end
 
+  def deletion_allowed?
+    self.version_number != current_version_number ||
+      data_file.is_deleted?
+  end
+
   def kind
     super('file-version')
+  end
+
+  private
+
+  def current_version_number
+    data_file.file_versions.maximum(:version_number) || 0
   end
 end
