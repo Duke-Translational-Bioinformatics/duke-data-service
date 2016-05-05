@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe FileVersion, type: :model do
   subject { file_version }
   let(:file_version) { FactoryGirl.create(:file_version) }
+  let(:data_file) { file_version.data_file }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
 
@@ -21,9 +22,16 @@ RSpec.describe FileVersion, type: :model do
   describe 'validations' do
     it { is_expected.to validate_presence_of :upload_id }
 
-    it 'should allow is_deleted to be set' do
-      should allow_value(true).for(:is_deleted)
-      should allow_value(false).for(:is_deleted)
+    context 'when deletion_allowed? is true' do
+      before { allow(subject).to receive(:deletion_allowed?).and_return(true) }
+      it { is_expected.to allow_value(true).for(:is_deleted) }
+      it { is_expected.to allow_value(false).for(:is_deleted) }
+    end
+
+    context 'when deletion_allowed? is false' do
+      before { allow(subject).to receive(:deletion_allowed?).and_return(false) }
+      it { is_expected.not_to allow_value(true).for(:is_deleted).with_message('The current file version cannot be deleted.') }
+      it { is_expected.to allow_value(false).for(:is_deleted) }
     end
 
     context 'when #is_deleted=true' do
@@ -77,6 +85,28 @@ RSpec.describe FileVersion, type: :model do
         context 'when called' do
           before { subject.set_version_number }
           it { expect(subject.version_number).to eq original_version }
+        end
+      end
+    end
+    
+    describe '#deletion_allowed?' do
+      it { is_expected.to respond_to(:deletion_allowed?) }
+
+      context 'when not current_file_version' do
+        subject { data_file.file_versions.first }
+        before { data_file.reload }
+        it { is_expected.not_to eq data_file.current_file_version }
+        it { expect(subject.deletion_allowed?).to be_truthy }
+      end
+
+      context 'when current_file_version' do
+        before { data_file.reload }
+        it { is_expected.to eq data_file.current_file_version }
+        it { expect(subject.deletion_allowed?).to be_falsey }
+
+        context 'with data_file.is_deleted true' do
+          before { data_file.is_deleted = true }
+          it { expect(subject.deletion_allowed?).to be_truthy }
         end
       end
     end
