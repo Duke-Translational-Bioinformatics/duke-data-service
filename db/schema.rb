@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(version: 20160505163200) do
   end
 
   create_table "prov_relations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "type"
     t.uuid     "creator_id"
     t.uuid     "relatable_from_id"
     t.string   "relatable_from_type"
