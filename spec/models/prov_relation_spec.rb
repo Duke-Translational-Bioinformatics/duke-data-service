@@ -11,6 +11,11 @@ RSpec.describe ProvRelation, type: :model do
       it { is_expected.to validate_presence_of :relatable_to }
     end
 
+    it 'should allow is_deleted to be set' do
+      should allow_value(true).for(:is_deleted)
+      should allow_value(false).for(:is_deleted)
+    end
+
     it_behaves_like 'an audited model'
     it_behaves_like 'a kind' do
       let!(:kind_name) { "relation-#{subject.relationship_type}" }

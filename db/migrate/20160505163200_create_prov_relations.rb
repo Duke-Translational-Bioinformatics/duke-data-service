@@ -10,6 +10,8 @@ class CreateProvRelations < ActiveRecord::Migration
       t.uuid :relatable_to_id
       t.string :relatable_to_type
 
+      t.boolean :is_deleted, :default => false
+      
       t.timestamps null: false
     end
     add_index :prov_relations, :relatable_from_id

@@ -166,8 +166,9 @@ ActiveRecord::Schema.define(version: 20160505163200) do
     t.string   "relationship_type"
     t.uuid     "relatable_to_id"
     t.string   "relatable_to_type"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
+    t.boolean  "is_deleted",          default: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   add_index "prov_relations", ["relatable_from_id"], name: "index_prov_relations_on_relatable_from_id", using: :btree

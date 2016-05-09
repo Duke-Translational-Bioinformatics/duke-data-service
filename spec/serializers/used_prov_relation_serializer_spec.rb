@@ -1,7 +1,7 @@
 require 'rails_helper'
 RSpec.describe UsedProvRelationSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:used_prov_relation) }
-  let(:is_logically_deleted) { false }
+  let(:is_logically_deleted) { true }
 
   it_behaves_like 'a has_one association with', :relatable_from, ActivitySerializer, root: :from
   it_behaves_like 'a has_one association with', :relatable_to, FileVersionSerializer, root: :to
