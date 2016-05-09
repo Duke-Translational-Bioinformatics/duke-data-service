@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TagSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:tag) }
+  let(:resource) { FactoryGirl.create(:tagged_file) }
 
   it_behaves_like 'a has_one association with', :taggable, TaggableSerializer, root: :object
 

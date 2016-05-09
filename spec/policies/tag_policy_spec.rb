@@ -6,8 +6,8 @@ describe TagPolicy do
   let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
-  let(:other_tag) { FactoryGirl.create(:tag) }
+  let(:tag) { FactoryGirl.create(:tagged_file, taggable: data_file) }
+  let(:other_tag) { FactoryGirl.create(:tagged_file) }
 
   it_behaves_like 'system_permission can access', :tag
   it_behaves_like 'system_permission can access', :other_tag
