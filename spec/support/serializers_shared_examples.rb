@@ -296,3 +296,22 @@ shared_examples 'a has_many association with' do |name, serialized_with|
     expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
   end
 end
+
+shared_examples 'a ProvRelationSerializer' do |from:, to:|
+  let(:is_logically_deleted) { true }
+
+  it_behaves_like 'a has_one association with', :relatable_from, from, root: :from
+  it_behaves_like 'a has_one association with', :relatable_to, to, root: :to
+
+  it_behaves_like 'a json serializer' do
+    it 'should have expected keys and values' do
+      is_expected.to have_key('kind')
+      expect(subject["kind"]).to eq(resource.kind)
+      is_expected.to have_key('id')
+      expect(subject['id']).to eq(resource.id)
+      is_expected.to have_key('from')
+      is_expected.to have_key('to')
+    end
+    it_behaves_like 'a serializer with a serialized audit'
+  end
+end
