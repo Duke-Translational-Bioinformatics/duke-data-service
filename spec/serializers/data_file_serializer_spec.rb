@@ -6,7 +6,7 @@ RSpec.describe DataFileSerializer, type: :serializer do
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
 
-  it_behaves_like 'a has_one association with', :current_file_version, FileVersionPreviewSerializer
+  it_behaves_like 'a has_one association with', :current_file_version, FileVersionPreviewSerializer, root: :current_version
   it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
   it_behaves_like 'a has_many association with', :ancestors, AncestorSerializer
 
