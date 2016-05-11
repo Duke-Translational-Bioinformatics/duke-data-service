@@ -127,3 +127,30 @@ shared_examples 'software_agent cannot access' do |record_sym|
     it { is_expected.not_to permit(user, record) }
   end
 end
+
+shared_examples 'a policy for' do |user_sym, on:, allows: [:scope, :index?, :show?, :create?, :update?, :destroy?], denies: []|
+  let(:record) { send(on) }
+  let(:user) { send(user_sym) }
+
+  expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
+  allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
+  denied_permissions = [expected_permissions + denies].flatten.reject {|i| [allows].flatten.include? i}
+
+  context " #{on}" do
+    if allows.include? :scope
+      describe '.scope' do
+        it { expect(resolved_scope).to include(record) }
+      end
+    else
+      describe '.scope' do
+        it { expect(resolved_scope).not_to include(record) }
+      end
+    end
+    permissions *allowed_permissions do
+      it { is_expected.to permit(user, record) }
+    end
+    permissions *denied_permissions do
+      it { is_expected.not_to permit(user, record) }
+    end
+  end
+end
