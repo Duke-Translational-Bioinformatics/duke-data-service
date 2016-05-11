@@ -21,10 +21,18 @@ class ProvRelation < ActiveRecord::Base
   end
 
   def create_graph_relation
-    super(relationship_type.capitalize, relatable_from, relatable_to)
+    super(
+      relationship_type.split('-').map{|part| part.capitalize}.join(''),
+      relatable_from,
+      relatable_to
+    )
   end
 
   def graph_relation
-    super(relationship_type.capitalize, relatable_from, relatable_to)
+    super(
+      relationship_type.split('-').map{|part| part.capitalize}.join(''),
+      relatable_from,
+      relatable_to
+    )
   end
 end

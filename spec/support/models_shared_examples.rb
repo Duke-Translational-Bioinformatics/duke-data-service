@@ -191,6 +191,6 @@ shared_examples 'a ProvRelation' do
   it_behaves_like 'a graphed relation', auto_create: true do
     let(:from_model) { subject.relatable_from }
     let(:to_model) { subject.relatable_to }
-    let(:rel_type) { subject.relationship_type.capitalize }
+    let(:rel_type) { subject.relationship_type.split('-').map{|part| part.capitalize}.join('') }
   end
 end
