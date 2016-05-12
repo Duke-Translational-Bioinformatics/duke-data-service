@@ -130,7 +130,7 @@ end
 
 shared_examples 'a policy for' do |user_sym, on:, allows: [:scope, :index?, :show?, :create?, :update?, :destroy?], denies: []|
   let(:record) { send(on) }
-  let(:user) { send(user_sym) }
+  let(:authenticated_user) { send(user_sym) }
 
   expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
   allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
@@ -147,10 +147,10 @@ shared_examples 'a policy for' do |user_sym, on:, allows: [:scope, :index?, :sho
       end
     end
     permissions *allowed_permissions do
-      it { is_expected.to permit(user, record) }
+      it { is_expected.to permit(authenticated_user, record) }
     end
     permissions *denied_permissions do
-      it { is_expected.not_to permit(user, record) }
+      it { is_expected.not_to permit(authenticated_user, record) }
     end
   end
 end
