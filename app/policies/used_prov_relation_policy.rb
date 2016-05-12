@@ -16,7 +16,7 @@ class UsedProvRelationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    permission :view_project
+    system_permission || record.creator_id == user.id
   end
 
   class Scope < Scope
