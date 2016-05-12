@@ -16,7 +16,7 @@ class AssociatedWithSoftwareAgentProvRelationPolicy < ApplicationPolicy
   end
 
   def destroy?
-    permission
+    system_permission || record.creator_id == user.id
   end
 
   class Scope < Scope
