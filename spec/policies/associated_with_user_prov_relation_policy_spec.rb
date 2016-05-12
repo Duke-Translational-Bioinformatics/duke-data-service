@@ -26,8 +26,8 @@ describe AssociatedWithUserProvRelationPolicy do
       relatable_from: user,
       relatable_to: users_activity)
     }
-    it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?], denies: [:index?, :update?]
+    it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?]
   end
 
   context 'activity created by other user' do
@@ -35,7 +35,7 @@ describe AssociatedWithUserProvRelationPolicy do
       relatable_from: other_activity_creator,
       relatable_to: other_users_activity)
     }
-    it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
+    it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [], denies: [:index?, :update?, :show?, :create?, :destroy?]
   end
 end
