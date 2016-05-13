@@ -46,11 +46,19 @@ module DDS
         authorize activity, :create?
         Audited.audit_class.as_user(current_user) do
           if activity.save
-            uaa = AgentActivityAssociation.create(agent: current_user, activity: activity)
+            uaa = AssociatedWithUserProvRelation.create(
+              creator: current_user,
+              relatable_from: current_user,
+              relationship_type: 'was-associated-with',
+              relatable_to: activity)
             audits = [activity.audits.last, uaa.audits.last]
             if current_user.current_software_agent
-              saa = AgentActivityAssociation.create(agent: current_user.current_software_agent, activity: activity)
-              audits << saa.audits.last
+              saa = AssociatedWithSoftwareAgentProvRelation.create(
+                creator: current_user,
+                relatable_from: current_user.current_software_agent,
+                relationship_type: 'was-associated-with',
+                relatable_to: activity)
+                audits << saa.audits.last
             end
             annotate_audits audits
             activity

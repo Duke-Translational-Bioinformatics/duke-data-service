@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425202330) do
+ActiveRecord::Schema.define(version: 20160505163200) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -158,6 +158,22 @@ ActiveRecord::Schema.define(version: 20160425202330) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
   end
+
+  create_table "prov_relations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "type"
+    t.uuid     "creator_id"
+    t.uuid     "relatable_from_id"
+    t.string   "relatable_from_type"
+    t.string   "relationship_type"
+    t.uuid     "relatable_to_id"
+    t.string   "relatable_to_type"
+    t.boolean  "is_deleted",          default: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "prov_relations", ["relatable_from_id"], name: "index_prov_relations_on_relatable_from_id", using: :btree
+  add_index "prov_relations", ["relatable_to_id"], name: "index_prov_relations_on_relatable_to_id", using: :btree
 
   create_table "software_agents", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"

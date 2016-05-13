@@ -41,12 +41,12 @@ describe DDS::V1::ActivitiesAPI do
         it 'should set creator to current_user and create an agent_activity_association' do
           expect {
             is_expected.to eq(201)
-          }.to change{ AgentActivityAssociation.count }.by(1)
+          }.to change{ AssociatedWithUserProvRelation.count }.by(1)
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('id')
           new_object = resource_class.find(response_json['id'])
           expect(new_object.creator_id).to eq(current_user.id)
-          expect(AgentActivityAssociation.where(agent_id: current_user.id, activity_id: new_object.id).first).to be
+          expect(AssociatedWithUserProvRelation.where(relatable_from: current_user, relatable_to: new_object).first).to be
         end
       end
 
@@ -55,27 +55,32 @@ describe DDS::V1::ActivitiesAPI do
       it_behaves_like 'a software_agent accessible resource' do
         let(:resource) { activity_stub }
         let(:expected_response_status) { 201 }
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:resource) { activity_stub }
-          let(:expected_response_status) { 201 }
+
+        context 'Activity Audit' do
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:resource) { activity_stub }
+            let(:expected_response_status) { 201 }
+          end
         end
 
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:resource) { activity_stub }
-          let(:expected_auditable_type) { AgentActivityAssociation }
-          let(:expected_response_status) { 201 }
-          let(:expected_audits) { 2 }
-        end
+        context 'ProvRelations' do
+          it 'should be created' do
+            expect {
+              is_expected.to eq(201)
+            }.to change{ AssociatedWithUserProvRelation.count }.by(1)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('id')
+            new_object = resource_class.find(response_json['id'])
+            expect(AssociatedWithUserProvRelation.where(relatable_from: current_user, relatable_to: new_object).first).to be
+            expect(AssociatedWithSoftwareAgentProvRelation.where(relatable_from: software_agent, relatable_to: new_object).first).to be
+          end
 
-        it 'should create two agent_activity_associations' do
-          expect {
-            is_expected.to eq(201)
-          }.to change{ AgentActivityAssociation.count }.by(2)
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('id')
-          new_object = resource_class.find(response_json['id'])
-          expect(AgentActivityAssociation.where(agent_id: current_user.id, activity_id: new_object.id).first).to be
-          expect(AgentActivityAssociation.where(agent_id: software_agent.id, activity_id: new_object.id).first).to be
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:resource) { activity_stub }
+            let(:expected_auditable_type) { ProvRelation }
+            let(:expected_response_status) { 201 }
+            let(:expected_audits) { 2 }
+          end
         end
       end
 
@@ -98,7 +103,7 @@ describe DDS::V1::ActivitiesAPI do
 
       it_behaves_like 'an annotate_audits endpoint' do
         let(:resource) { activity_stub }
-        let(:expected_auditable_type) { AgentActivityAssociation }
+        let(:expected_auditable_type) { ProvRelation }
         let(:expected_response_status) { 201 }
       end
     end #POST
@@ -140,16 +145,16 @@ describe DDS::V1::ActivitiesAPI do
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
-        let(:agent_activity_association) { FactoryGirl.create(:user_activity_association, agent: current_user, activity_id: resource.id) }
+        let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
 
-        it 'should be marked as deleted and not delete agent_activity_association' do
+        it 'should be marked as deleted and not delete associated_with_user_prov_relation' do
           expect(resource).to be_persisted
-          expect(agent_activity_association).to be_persisted
+          expect(associated_with_user_prov_relation).to be_persisted
           is_expected.to eq(204)
           resource.reload
           expect(resource.is_deleted?).to be_truthy
-          agent_activity_association.reload
-          expect(agent_activity_association).to be_persisted
+          associated_with_user_prov_relation.reload
+          expect(associated_with_user_prov_relation).to be_persisted
         end
       end
 
@@ -161,19 +166,19 @@ describe DDS::V1::ActivitiesAPI do
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }
-        let(:agent_activity_association) { FactoryGirl.create(:user_activity_association, agent: current_user, activity_id: resource.id) }
-        let(:software_agent_activity_association) { FactoryGirl.create(:software_agent_activity_association, agent: software_agent, activity_id: resource.id) }
-        it 'should not delete any agent_activity_associations' do
+        let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
+        let(:associated_with_software_agent_prov_relation) { FactoryGirl.create(:associated_with_software_agent_prov_relation, relatable_from: software_agent, relatable_to: resource) }
+        it 'should not delete any associated_with prov_relations' do
           expect(resource).to be_persisted
-          expect(agent_activity_association).to be_persisted
-          expect(software_agent_activity_association).to be_persisted
+          expect(associated_with_user_prov_relation).to be_persisted
+          expect(associated_with_software_agent_prov_relation).to be_persisted
           is_expected.to eq(204)
           resource.reload
           expect(resource.is_deleted?).to be_truthy
-          agent_activity_association.reload
-          expect(agent_activity_association).to be_persisted
-          software_agent_activity_association.reload
-          expect(software_agent_activity_association).to be_persisted
+          associated_with_user_prov_relation.reload
+          expect(associated_with_user_prov_relation).to be_persisted
+          associated_with_software_agent_prov_relation.reload
+          expect(associated_with_software_agent_prov_relation).to be_persisted
         end
         it_behaves_like 'an annotate_audits endpoint' do
           let(:expected_response_status) { 204 }
