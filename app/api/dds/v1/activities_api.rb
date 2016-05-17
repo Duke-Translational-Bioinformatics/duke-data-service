@@ -49,14 +49,12 @@ module DDS
             uaa = AssociatedWithUserProvRelation.create(
               creator: current_user,
               relatable_from: current_user,
-              relationship_type: 'was-associated-with',
               relatable_to: activity)
             audits = [activity.audits.last, uaa.audits.last]
             if current_user.current_software_agent
               saa = AssociatedWithSoftwareAgentProvRelation.create(
                 creator: current_user,
                 relatable_from: current_user.current_software_agent,
-                relationship_type: 'was-associated-with',
                 relatable_to: activity)
                 audits << saa.audits.last
             end
