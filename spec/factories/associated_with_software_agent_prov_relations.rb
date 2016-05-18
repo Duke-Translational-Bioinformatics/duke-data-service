@@ -3,7 +3,6 @@ FactoryGirl.define do
     association :creator, factory: :user
     is_deleted false
     association :relatable_from, factory: :software_agent
-    relationship_type { 'was-associated-with' }
     association :relatable_to, factory: :activity
   end
 end

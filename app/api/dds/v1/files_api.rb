@@ -44,7 +44,6 @@ module DDS
             aupr = AttributedToUserProvRelation.create(
               creator: current_user,
               relatable_from: file.current_file_version,
-              relationship_type: 'was-attributed-to',
               relatable_to: current_user)
             audits = [
                 file.audits.last,
@@ -55,7 +54,6 @@ module DDS
               ausr = AttributedToSoftwareAgentProvRelation.create(
                 creator: current_user,
                 relatable_from: file.current_file_version,
-                relationship_type: 'was-attributed-to',
                 relatable_to: current_user.current_software_agent)
                 audits << ausr.audits.last
             end
@@ -114,14 +112,12 @@ module DDS
               aupr = AttributedToUserProvRelation.create(
                 creator: current_user,
                 relatable_from: file.current_file_version,
-                relationship_type: 'was-attributed-to',
                 relatable_to: current_user)
               audits << aupr.audits.last
               if current_user.current_software_agent
                 ausr = AttributedToSoftwareAgentProvRelation.create(
                   creator: current_user,
                   relatable_from: file.current_file_version,
-                  relationship_type: 'was-attributed-to',
                   relatable_to: current_user.current_software_agent)
                   audits << ausr.audits.last
               end
