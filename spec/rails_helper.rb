@@ -79,10 +79,17 @@ VCR.configure do |c|
     match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
   }
 end
-Graphed.module_eval do
-  attr_writer :skip_graphing
+module SkipGraphed
+  def self.prepended(mod)
+    mod.instance_methods.each do |m|
+      define_method m, ->(*args){ super(*args) unless skip_graphing; }
+    end
 
-  def skip_graphing
-    @skip_graphing || @skip_graphing.nil?
+    attr_writer :skip_graphing
+
+    def skip_graphing
+      @skip_graphing || @skip_graphing.nil?
+    end
   end
 end
+Graphed.prepend SkipGraphed

@@ -1,29 +1,21 @@
 module Graphed
-  def skip_graphing
-    false
-  end
-
   def create_graph_node(node_name=nil)
-    return if skip_graphing
     node_name ||= self.class.name
     node_class = "Graph::#{node_name}"
     node_class.constantize.create(model_id: id, model_kind: kind)
   end
 
   def graph_node(node_name=nil)
-    return if skip_graphing
     node_name ||= self.class.name
     node_class = "Graph::#{node_name}"
     node_class.constantize.find_by(model_id: id, model_kind: kind)
   end
 
   def delete_graph_node
-    return if skip_graphing
     self.graph_node.destroy
   end
 
   def logically_delete_graph_node
-    return if skip_graphing
     if self.is_deleted
       node = self.graph_node
       unless node.is_deleted
@@ -34,14 +26,12 @@ module Graphed
   end
 
   def create_graph_relation(rel_type, from_model, to_model)
-    return if skip_graphing
     from_node = from_model.graph_node
     to_node = to_model.graph_node
     "Graph::#{rel_type}".constantize.create(from_node: from_node, to_node: to_node)
   end
 
   def graph_relation(rel_type, from_model, to_model)
-    return if skip_graphing
     from_node = from_model.graph_node
     to_node = to_model.graph_node
     from_node.query_as(:from)
@@ -52,7 +42,6 @@ module Graphed
   end
 
   def delete_graph_relation
-    return if skip_graphing
     self.graph_relation.destroy
   end
 end
