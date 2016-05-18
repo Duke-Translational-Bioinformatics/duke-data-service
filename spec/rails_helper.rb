@@ -51,7 +51,7 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
-  config.after(:each) do
+  config.after(:suite) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
 end
@@ -78,4 +78,11 @@ VCR.configure do |c|
   c.default_cassette_options = {
     match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
   }
+end
+Graphed.module_eval do
+  attr_writer :skip_graphing
+
+  def skip_graphing
+    @skip_graphing || @skip_graphing.nil?
+  end
 end

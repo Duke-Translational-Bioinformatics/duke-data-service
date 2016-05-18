@@ -4,7 +4,9 @@ RSpec.describe AttributedToUserProvRelation, type: :model do
   subject { FactoryGirl.create(:attributed_to_user_prov_relation) }
   let(:resource_serializer) { AttributedToUserProvRelationSerializer }
 
-  it_behaves_like 'a ProvRelation'
+  it_behaves_like 'a ProvRelation' do
+    subject { FactoryGirl.create(:attributed_to_user_prov_relation, :graphed) }
+  end
 
   describe 'validations' do
     it { is_expected.to validate_inclusion_of( :relationship_type ).in_array(['was-attributed-to']) }

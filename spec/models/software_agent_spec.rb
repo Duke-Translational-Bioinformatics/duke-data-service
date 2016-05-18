@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe SoftwareAgent, type: :model do
   subject { FactoryGirl.create(:software_agent) }
   let(:deleted_software_agent) { FactoryGirl.create(:software_agent, :deleted) }
+  let(:graphed_software_agent) { FactoryGirl.create(:software_agent, :graphed) }
 
   it_behaves_like 'an audited model'
 
@@ -10,6 +11,7 @@ RSpec.describe SoftwareAgent, type: :model do
     let(:serialized_kind) { false }
   end
   it_behaves_like 'a graphed model', auto_create: true do
+    subject { graphed_software_agent }
     let(:kind_name) { 'Agent' }
   end
 
