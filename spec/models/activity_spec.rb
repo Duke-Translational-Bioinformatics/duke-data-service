@@ -4,10 +4,13 @@ RSpec.describe Activity, type: :model do
   subject { activity }
   let(:activity) { FactoryGirl.create(:activity) }
   let(:deleted_activity) { FactoryGirl.create(:activity, :deleted) }
+  let(:graphed_activity) { FactoryGirl.create(:activity, :graphed) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
-  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true do
+    subject { graphed_activity }
+  end
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }

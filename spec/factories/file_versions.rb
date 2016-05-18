@@ -4,6 +4,11 @@ FactoryGirl.define do
     label { Faker::Hacker.say_something_smart }
     is_deleted false
     association :upload, :completed
+    skip_graphing { true }
+
+    trait :graphed do
+      skip_graphing { false }
+    end
 
     trait :deleted do
       is_deleted true

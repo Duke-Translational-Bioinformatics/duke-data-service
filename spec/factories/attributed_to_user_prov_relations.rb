@@ -5,5 +5,13 @@ FactoryGirl.define do
     association :relatable_from, factory: :file_version
     relationship_type { 'was-attributed-to' }
     association :relatable_to, factory: :user
+    skip_graphing { true }
+
+    trait :graphed do
+      skip_graphing { false }
+      association :creator, factory: [:user, :graphed]
+      association :relatable_from, factory: [:file_version, :graphed]
+      association :relatable_to, factory: [:user, :graphed]
+    end
   end
 end

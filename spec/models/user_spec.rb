@@ -10,6 +10,7 @@ RSpec.describe User, type: :model do
     let(:serialized_kind) { false }
   end
   it_behaves_like 'a graphed model', auto_create: true do
+    subject { FactoryGirl.create(:user, :graphed) }
     let(:kind_name) { 'Agent' }
   end
 

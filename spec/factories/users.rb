@@ -7,6 +7,11 @@ FactoryGirl.define do
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     last_login_at { Faker::Time.backward(14, :evening) }
+    skip_graphing { true }
+
+    trait :graphed do
+      skip_graphing { false }
+    end
 
     trait :delong do
       display_name 'Mark Randall DeLong'

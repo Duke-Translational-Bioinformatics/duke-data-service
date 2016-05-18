@@ -4,7 +4,9 @@ RSpec.describe AttributedToSoftwareAgentProvRelation, type: :model do
   subject { FactoryGirl.create(:attributed_to_software_agent_prov_relation) }
   let(:resource_serializer) { AttributedToSoftwareAgentProvRelationSerializer }
 
-  it_behaves_like 'a ProvRelation'
+  it_behaves_like 'a ProvRelation' do
+    subject { FactoryGirl.create(:attributed_to_software_agent_prov_relation, :graphed) }
+  end
 
   describe 'validations' do
     it { is_expected.to validate_inclusion_of( :relationship_type ).in_array(['was-attributed-to']) }

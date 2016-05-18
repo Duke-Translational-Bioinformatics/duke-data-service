@@ -6,12 +6,15 @@ RSpec.describe FileVersion, type: :model do
   let(:data_file) { file_version.data_file }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
+  let(:graphed_file_version) { FactoryGirl.create(:file_version, :graphed) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file-version' }
   end
-  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true do
+    subject { graphed_file_version }
+  end
 
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
