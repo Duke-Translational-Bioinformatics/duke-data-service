@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "graphdb", :unless => ENV['CIRCLECI'] do
+describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
   let(:current_user) { FactoryGirl.create(:user) }
   def annotate_audit(audit, audited_software_agent=nil)
     comment_annotation = {
