@@ -174,8 +174,16 @@ shared_examples 'a ProvRelation' do
   describe 'validations' do
     it { is_expected.to validate_presence_of :creator_id }
     it { is_expected.to validate_presence_of :relatable_from }
-    it { is_expected.to validate_presence_of :relationship_type }
     it { is_expected.to validate_presence_of :relatable_to }
+  end
+
+  it 'should implement set_relationship_type' do
+    is_expected.to respond_to(:set_relationship_type)
+    subject.relationship_type = nil
+    expect{
+      subject.set_relationship_type
+    }.to_not raise_error
+    expect(subject.relationship_type).to be
   end
 
   it 'should allow is_deleted to be set' do
@@ -192,5 +200,22 @@ shared_examples 'a ProvRelation' do
     let(:from_model) { subject.relatable_from }
     let(:to_model) { subject.relatable_to }
     let(:rel_type) { subject.relationship_type.split('-').map{|part| part.capitalize}.join('') }
+  end
+
+  it 'should set the relationship_type automatically' do
+    built_relation = described_class.new(
+      creator: subject.creator,
+      relatable_from: subject.relatable_from,
+      relatable_to: subject.relatable_to
+    )
+    built_relation.save
+    expect(built_relation.relationship_type).to eq(expected_relationship_type)
+
+    created_relation = described_class.create(
+      creator: subject.creator,
+      relatable_from: subject.relatable_from,
+      relatable_to: subject.relatable_to
+    )
+    expect(created_relation.relationship_type).to eq(expected_relationship_type)
   end
 end
