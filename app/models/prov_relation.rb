@@ -1,5 +1,7 @@
 class ProvRelation < ActiveRecord::Base
  default_scope { order('created_at DESC') }
+ before_validation :set_relationship_type
+
  include Kinded
  include Graphed
  after_create :create_graph_relation
@@ -9,7 +11,6 @@ class ProvRelation < ActiveRecord::Base
 
   validates :creator_id, presence: true
   validates :relatable_from, presence: true
-  validates :relationship_type, presence: true
   validates :relatable_to, presence: true
 
   belongs_to :creator, class_name: "User"
