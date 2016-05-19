@@ -12,7 +12,10 @@ module Graphed
   end
 
   def delete_graph_node
-    self.graph_node.destroy
+    graph_node =  self.graph_node
+    if graph_node
+      self.graph_node.destroy
+    end
   end
 
   def logically_delete_graph_node
@@ -42,6 +45,9 @@ module Graphed
   end
 
   def delete_graph_relation
-    self.graph_relation.destroy
+    graph_relation = self.graph_relation
+    if graph_relation
+      graph_relation.destroy
+    end
   end
 end
