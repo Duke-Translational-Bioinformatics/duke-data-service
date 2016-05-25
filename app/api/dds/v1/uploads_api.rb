@@ -20,10 +20,6 @@ module DDS
             requires :name, type: String, desc: "The name of the client file to upload."
             requires :content_type, type: String, desc: "Valid Media Type"
             requires :size, type: Integer, desc: "The size in bytes"
-            optional :hash, type: Hash do
-              requires :value, type: String, desc: "The files hash computed by the client."
-              requires :algorithm, type: String, desc: "The hash algorithm used (i.e. md5, sha256, sha1, etc.)"
-            end
           end
           post '/uploads', root: false do
             authenticate!
@@ -39,10 +35,6 @@ module DDS
                 storage_provider_id: storage_provider.id,
                 creator: current_user
               })
-              if upload_params[:hash]
-                upload.fingerprint_value = upload_params[:hash][:value]
-                upload.fingerprint_algorithm = upload_params[:hash][:algorithm]
-              end
               authorize upload, :create?
               if upload.save
                 upload.initialize_storage_provider
