@@ -161,6 +161,36 @@ module DDS
             end
             upload
           end
+
+          desc 'Report upload hash' do
+            detail 'Report hash (fingerprint) for the uploaded (or to be uploaded) file.'
+            named 'report upload hash'
+            failure [
+              [200, 'Success'],
+              [401, 'Unauthorized'],
+              [404, 'Upload Does not Exist'],
+              [400, 'Validation Error'],
+              [500, 'Unexpected StorageProviderException experienced']
+            ]
+          end
+          params do
+            requires :value, type: String, desc: "The entire file hash (computed by client)."
+            requires :algorithm, type: String, desc: "The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.)."
+          end
+          put '/hashes', root: false do
+            fingerprint_params = declared(params, include_missing: false)
+            upload = Upload.find(params[:id])
+            authorize upload, :update?
+            fingerprint = upload.fingerprints.build(fingerprint_params)
+            Audited.audit_class.as_user(current_user) do
+              if upload.save
+                annotate_audits [fingerprint.audits.last]
+                upload
+              else
+                validation_error!(fingerprint)
+              end
+            end
+          end
         end
       end
     end

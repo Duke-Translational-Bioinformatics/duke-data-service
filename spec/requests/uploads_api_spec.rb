@@ -12,6 +12,7 @@ describe DDS::V1::UploadsAPI do
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload, storage_provider_id: storage_provider.id) }
   let(:chunk_stub) { FactoryGirl.build(:chunk, upload_id: upload.id) }
+  let(:fingerprint_stub) { FactoryGirl.build(:fingerprint) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
@@ -275,6 +276,48 @@ describe DDS::V1::UploadsAPI do
         expect(response_json['reason']).to eq('IntegrityException')
         expect(response_json).to have_key('suggestion')
         expect(response_json['suggestion']).to eq('reported chunk hash does not match that computed by StorageProvider')
+      end
+    end
+  end
+
+  describe 'Report upload hash' do
+    subject { put(url, payload.to_json, headers) }
+    let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
+    let(:parent_id) { upload.id }
+    let(:called_action) { "PUT" }
+    let!(:payload) {{
+      value: upload_stub.name,
+      algorithm: upload_stub.content_type
+    }}
+    let(:resource_class) { Fingerprint }
+
+    it_behaves_like 'a creatable resource' do
+      let(:expected_response_status) {200}
+      let(:new_object) { upload.reload }
+    end
+    it_behaves_like 'an authenticated resource'
+    it_behaves_like 'an authorized resource'
+
+    it_behaves_like 'an identified resource' do
+      let(:parent_id) { "notexist" }
+      let(:resource_class) { Upload }
+    end
+
+    it_behaves_like 'an annotate_audits endpoint'
+
+    it_behaves_like 'a software_agent accessible resource' do
+      it_behaves_like 'an annotate_audits endpoint'
+    end
+    
+    it_behaves_like 'a validated resource' do
+      let(:payload) {{
+        value: nil,
+        algorithm: nil
+      }}
+      it 'should not persist changes' do
+        expect {
+          is_expected.to eq(400)
+        }.not_to change{resource_class.count}
       end
     end
   end
