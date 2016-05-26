@@ -13,7 +13,7 @@ class InvalidatedByActivityProvRelationPolicy < ApplicationPolicy
 
   def create?
     system_permission ||
-    (project_permission(:view_project) &&
+    (project_permission(:delete_file) &&
      record.relatable_to.creator_id == user.id)
   end
 
