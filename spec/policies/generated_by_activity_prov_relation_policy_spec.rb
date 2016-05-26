@@ -36,7 +36,7 @@ describe GeneratedByActivityProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:show?, :create?, :destroy?]
     end
 
     context 'to other users activity' do
@@ -57,7 +57,7 @@ describe GeneratedByActivityProvRelationPolicy do
         relatable_from: other_users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: []
+      it_behaves_like 'a user without project_permission', :view_project, on: :prov_relation, denies: [:index?, :show?, :create?, :destroy?]
     end
 
     context 'to other users activity' do
