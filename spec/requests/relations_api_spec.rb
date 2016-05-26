@@ -3,7 +3,6 @@ require 'rails_helper'
 describe DDS::V1::RelationsAPI do
   include_context 'with authentication'
 
-  let(:other_user) { FactoryGirl.create(:user) }
   let(:project) { FactoryGirl.create(:project) }
   let(:view_auth_role) { FactoryGirl.create(:auth_role,
       id: "project_viewer",
@@ -17,6 +16,8 @@ describe DDS::V1::RelationsAPI do
   let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
   let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
   let(:activity) { FactoryGirl.create(:activity, creator: current_user)}
+  let(:other_user) { FactoryGirl.create(:user) }
+  let(:other_users_activity) { FactoryGirl.create(:activity, creator: other_user) }
 
   describe 'Provenance Relations collection' do
     describe 'Create used relation' do
@@ -36,6 +37,22 @@ describe DDS::V1::RelationsAPI do
       let(:resource_serializer) { UsedProvRelationSerializer }
 
       it_behaves_like 'a creatable resource'
+
+      context 'with other users activity' do
+        let(:payload) {{
+          activity: {
+            id: other_users_activity.id
+          },
+          entity: {
+            kind: file_version.kind,
+            id: file_version.id
+          }
+        }}
+        it 'returns a Forbidden response' do
+          is_expected.to eq(403)
+          expect(response.status).to eq(403)
+        end
+      end
 
       context 'without activity in payload' do
         let(:payload) {{

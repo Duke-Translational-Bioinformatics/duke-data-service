@@ -183,6 +183,7 @@ module DDS
       mount DDS::V1::FileVersionsAPI
       mount DDS::V1::TagsAPI
       mount DDS::V1::ActivitiesAPI
+      mount DDS::V1::RelationsAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true
