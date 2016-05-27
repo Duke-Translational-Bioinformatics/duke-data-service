@@ -22,7 +22,6 @@ def create_missing_fingerprints
   ActiveRecord::Base.transaction do
     uploads.each do |u|
       Audited.audit_class.as_user(u.audits.last.user) do
-#        if u.fingerprints.empty?
           u.fingerprints.build(
             value: u.fingerprint_value,
             algorithm: u.fingerprint_algorithm
@@ -32,9 +31,6 @@ def create_missing_fingerprints
           else
             print 'F'
           end
-#        else
-#          print 'S'
-#        end
       end
     end
   end
