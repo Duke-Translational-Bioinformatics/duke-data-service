@@ -286,8 +286,8 @@ describe DDS::V1::UploadsAPI do
     let(:parent_id) { upload.id }
     let(:called_action) { "PUT" }
     let!(:payload) {{
-      value: upload_stub.name,
-      algorithm: upload_stub.content_type
+      value: fingerprint_stub.value,
+      algorithm: fingerprint_stub.algorithm
     }}
     let(:resource_class) { Fingerprint }
 
