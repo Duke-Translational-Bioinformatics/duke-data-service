@@ -14,12 +14,37 @@ def create_current_file_versions
   puts "Fin!"
 end
 
+def create_missing_fingerprints
+  #uploads = Upload.where.not(fingerprint_value: nil)
+  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil).unscope(:order)
+  fingerprint_count = Fingerprint.count
+  puts "Creating fingerprints for #{uploads.count} uploads"
+  ActiveRecord::Base.transaction do
+    uploads.each do |u|
+      Audited.audit_class.as_user(u.audits.last.user) do
+          u.fingerprints.build(
+            value: u.fingerprint_value,
+            algorithm: u.fingerprint_algorithm
+          )
+          if u.save
+            print '.'
+          else
+            print 'F'
+          end
+      end
+    end
+  end
+  puts "#{Fingerprint.count - fingerprint_count} fingerprints created."
+  puts "Fin!"
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
     task migrate: :environment do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_current_file_versions
+      create_missing_fingerprints
     end
   end
 end
