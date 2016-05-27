@@ -21,7 +21,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
-    it { is_expected.to have_many(:file_versions).order('version_number ASC') }
+    it { is_expected.to have_many(:file_versions).order('version_number ASC').autosave(true) }
     it { is_expected.to have_many(:tags) }
   end
 
@@ -79,6 +79,7 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
       it { is_expected.not_to validate_presence_of(:upload_id) }
+      it { expect(deleted_file.file_versions).to all( be_is_deleted ) }
     end
   end
 
