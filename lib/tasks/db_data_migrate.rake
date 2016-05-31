@@ -18,6 +18,7 @@ def create_missing_fingerprints
   #uploads = Upload.where.not(fingerprint_value: nil)
   uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil).unscope(:order)
   fingerprint_count = Fingerprint.count
+  failures = []
   puts "Creating fingerprints for #{uploads.count} uploads"
   ActiveRecord::Base.transaction do
     uploads.each do |u|
@@ -30,11 +31,18 @@ def create_missing_fingerprints
             print '.'
           else
             print 'F'
+            failures << u
           end
       end
     end
   end
   puts "#{Fingerprint.count - fingerprint_count} fingerprints created."
+  unless failures.empty?
+    puts "Failures!  :("
+    failures.each do |upload|
+      puts "Upload [#{upload.id}]: #{upload.errors}"
+    end
+  end
   puts "Fin!"
 end
 
