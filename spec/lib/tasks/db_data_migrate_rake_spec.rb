@@ -39,6 +39,7 @@ describe "db:data:migrate" do
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
       let(:upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_invalid_fingerprint_algorithm) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
       context 'for upload without fingerprint_value' do
         before { FactoryGirl.create(:upload) }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
@@ -48,6 +49,11 @@ describe "db:data:migrate" do
         before { expect(upload_with_fingerprint_value).to be_persisted }
         it { expect {invoke_task}.to change{Fingerprint.count}.by(1) }
         it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
+      end
+      context 'for upload with invalid fingerprint_algorithm' do
+        before { expect(upload_with_invalid_fingerprint_algorithm).to be_persisted }
+        it { expect {invoke_task}.to change{Fingerprint.count}.by(0) }
+        it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
       end
       context 'for upload with associated fingerprint' do
         before { expect(fingerprint_upload).to be_persisted }
