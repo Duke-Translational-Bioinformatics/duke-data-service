@@ -86,6 +86,13 @@ shared_examples 'a graphed model' do |auto_create: false, logically_deleted: fal
         expect(subject.graph_node).to be
         expect(subject.graph_node.is_deleted).to be_truthy
       end
+      context 'when graph_node does not exist' do
+        before do
+          subject.delete_graph_node
+          subject.is_deleted = true
+        end
+        it { expect{subject.logically_delete_graph_node}.not_to raise_error }
+      end
     end
     it { is_expected.to respond_to :delete_graph_node }
     it { is_expected.to callback(:delete_graph_node).after(:destroy) }
