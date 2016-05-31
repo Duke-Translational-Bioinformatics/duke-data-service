@@ -40,7 +40,7 @@ def create_missing_fingerprints
   unless failures.empty?
     puts "Failures!  :("
     failures.each do |upload|
-      puts "Upload [#{upload.id}]: #{upload.errors}"
+      puts "Upload [#{upload.id}]: #{upload.errors.full_messages}"
     end
   end
   puts "Fin!"
