@@ -42,7 +42,7 @@ def create_missing_fingerprints
     failures.each do |upload|
       message = upload.errors.full_messages
       message << upload.fingerprints.collect {|f| f.errors.full_messages}
-      puts "Upload [#{upload.id}]: #{upload.errors.full_messages}"
+      puts "Upload [#{upload.id}]: #{message}"
     end
   end
   puts "Fin!"
