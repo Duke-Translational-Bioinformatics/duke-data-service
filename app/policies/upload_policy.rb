@@ -8,7 +8,7 @@ class UploadPolicy < ApplicationPolicy
   end
 
   def update?
-    permission :create_file
+    permission :update_file
   end
 
   def complete?

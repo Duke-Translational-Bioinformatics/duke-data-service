@@ -21,7 +21,7 @@ module Graphed
   def logically_delete_graph_node
     if self.is_deleted
       node = self.graph_node
-      unless node.is_deleted
+      if node && !node.is_deleted
         node.is_deleted = self.is_deleted
         node.save
       end
