@@ -20,5 +20,12 @@ RSpec.describe InvalidatedByActivityProvRelation, type: :model do
     it { is_expected.not_to allow_value('Project').for(:relatable_to_type) }
     it { is_expected.not_to allow_value('FileVersion').for(:relatable_to_type) }
     it { is_expected.not_to allow_value('SoftwareAgent').for(:relatable_to_type) }
+
+    describe 'undeleted FileVersion' do
+      before do
+        subject.relatable_from.update_attribute(:is_deleted, false)
+      end
+      it { is_expected.not_to be_valid }
+    end
   end
 end
