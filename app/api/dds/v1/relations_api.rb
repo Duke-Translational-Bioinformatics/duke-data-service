@@ -133,6 +133,48 @@ module DDS
         end
       end
 
+      desc 'Create was invalidated by relation' do
+        detail 'Creates a WasInvalidatedBy relationship.'
+        named 'create was invalidated by relation'
+        failure [
+          [200, 'This will never actually happen'],
+          [201, 'Created Successfully'],
+          [400, 'Activity and Entity are required'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden']
+        ]
+      end
+      params do
+        requires :activity, desc: "Activity", type: Hash do
+          requires :id, type: String, desc: "Activity UUID"
+        end
+        requires :entity, desc: "Entity", type: Hash do
+          requires :kind, type: String, desc: "Entity kind"
+          requires :id, type: String, desc: "Entity UUID"
+        end
+      end
+      post '/relations/was_invalidated_by', root: false do
+        authenticate!
+        relation_params = declared(params, include_missing: false)
+        activity = Activity.find(relation_params[:activity][:id])
+        #todo change these when we allow other entities to be invalidated
+        entity = FileVersion.find(relation_params[:entity][:id])
+
+        relation = InvalidatedByActivityProvRelation.new(
+          creator: current_user,
+          relatable_from: entity,
+          relatable_to: activity
+        )
+        authorize relation, :create?
+        Audited.audit_class.as_user(current_user) do
+          if relation.save
+            annotate_audits [relation.audits.last]
+            relation
+          else
+            validation_error!(activity)
+          end
+        end
+      end
     end
   end
 end

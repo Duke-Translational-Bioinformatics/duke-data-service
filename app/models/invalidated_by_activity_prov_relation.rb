@@ -11,6 +11,14 @@ class InvalidatedByActivityProvRelation < ProvRelation
   validates :relatable_to_type, inclusion: { in: %w(Activity),
     message: "InvalidatedByActivityProvRelation must be to a Activity" }
 
+  validate :relatable_from_must_be_deleted
+
+  def relatable_from_must_be_deleted
+    if relatable_from && !relatable_from.is_deleted
+      errors.add(:relatable_from, "Invalidated Entity must be Deleted")
+    end
+  end
+
   def set_relationship_type
     self.relationship_type = 'was-invalidated-by'
   end

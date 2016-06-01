@@ -8,10 +8,10 @@ describe InvalidatedByActivityProvRelationPolicy do
   let(:user) { project_permission.user }
 
   let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:users_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
+  let(:users_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
   let(:users_activity) { FactoryGirl.create(:activity, creator: user) }
 
-  let(:other_users_file_version) { FactoryGirl.create(:file_version) }
+  let(:other_users_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:other_users_activity) { FactoryGirl.create(:activity, creator: other_users_file_version.data_file.upload.creator )}
   let(:other_file_version_creator) { other_users_file_version.data_file.upload.creator }
 
