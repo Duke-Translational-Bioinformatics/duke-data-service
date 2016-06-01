@@ -25,7 +25,7 @@ def create_missing_fingerprints
       Audited.audit_class.as_user(u.audits.last.user) do
           u.fingerprints.build(
             value: u.fingerprint_value,
-            algorithm: u.fingerprint_algorithm
+            algorithm: u.fingerprint_algorithm.downcase
           )
           if u.save
             print '.'
