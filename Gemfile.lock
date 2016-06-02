@@ -22,6 +22,8 @@ GEM
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
     active_model_serializers (0.9.3)
       activemodel (>= 3.2)
+    active_record_union (1.1.1)
+      activerecord (>= 4.0)
     activejob (4.2.1)
       activesupport (= 4.2.1)
       globalid (>= 0.3.0)
@@ -291,6 +293,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  active_record_union
   audited-activerecord
   factory_girl_rails
   faker

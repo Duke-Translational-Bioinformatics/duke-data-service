@@ -19,8 +19,9 @@ describe DDS::V1::RelationsAPI do
   let(:generated_file_version) { FactoryGirl.create(:file_version, data_file: viewable_data_file) }
 
   let(:activity) { FactoryGirl.create(:activity, creator: current_user)}
-  let(:other_user) { FactoryGirl.create(:user) }
-  let(:other_users_activity) { FactoryGirl.create(:activity, creator: other_user) }
+
+  let(:other_users_activity) { FactoryGirl.create(:activity) }
+  let(:other_user) { other_users_activity.creator }
 
   describe 'Provenance Relations collection' do
     describe 'Create used relation' do

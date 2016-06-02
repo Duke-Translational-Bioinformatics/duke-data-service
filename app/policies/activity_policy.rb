@@ -8,7 +8,8 @@ class ActivityPolicy < ApplicationPolicy
   end
 
   def show?
-    system_permission || permission
+    system_permission || record.creator == user ||
+    relatable_permission(:show?)
   end
 
   def update?
@@ -24,14 +25,40 @@ class ActivityPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.where(creator_id: user.id)
+        activity_scope = scope.where(creator: user)
+        activity_scope = activity_scope.union(
+          Activity.joins(:used_prov_relations).where(prov_relations: {
+            relatable_to_id: policy_scope(FileVersion.all)
+          }
+        ))
+        activity_scope = activity_scope.union(
+          Activity.joins(:generated_by_activity_prov_relations).where(prov_relations: {
+            relatable_from_id: policy_scope(FileVersion.all)
+          }
+        ))
+        activity_scope = activity_scope.union(
+          Activity.joins(:invalidated_by_activity_prov_relations).where(prov_relations: {
+            relatable_from_id: policy_scope(FileVersion.all)
+          }
+        ))
+        activity_scope
       end
+    end
+
+    def policy_scope(initial_scope)
+      Pundit::PolicyFinder.new(initial_scope).scope!.new(user, initial_scope).resolve
     end
   end
 
   private
 
-  def permission
-    record.creator == user
+  def relatable_permission(query)
+    ProvRelation.where(relatable_from: record).each do |pr|
+      return true if Pundit::PolicyFinder.new(pr).policy!.new(user, pr).public_send(query)
+    end
+    ProvRelation.where(relatable_to: record).each do |pr|
+      return true if Pundit::PolicyFinder.new(pr).policy!.new(user, pr).public_send(query)
+    end
+    false
   end
 end

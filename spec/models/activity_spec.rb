@@ -9,12 +9,16 @@ RSpec.describe Activity, type: :model do
   it_behaves_like 'a kind'
   it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
 
+  describe 'associations' do
+    it { is_expected.to belong_to(:creator).class_name('User') }
+    it { is_expected.to have_many(:generated_by_activity_prov_relations) }
+    it { is_expected.to have_many(:invalidated_by_activity_prov_relations) }
+    it { is_expected.to have_many(:used_prov_relations) }
+  end
+
   describe 'validations' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :creator_id }
-    it 'should belong to creator' do
-      should belong_to(:creator).class_name('User')
-    end
 
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
