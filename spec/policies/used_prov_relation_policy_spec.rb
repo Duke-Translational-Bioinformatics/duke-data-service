@@ -41,7 +41,7 @@ describe UsedProvRelationPolicy do
     end
 
   context 'user did not create the activity but has visibility to the file_version' do
-    it_behaves_like 'a user with project_permission', :view_project, allows: [], on: :without_relatable_from_prov_relation
+    it_behaves_like 'a user with project_permission', :view_project, allows: [:show?], on: :without_relatable_from_prov_relation
     it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?, :destroy?], on: :without_relatable_from_prov_relation
   end
 end
