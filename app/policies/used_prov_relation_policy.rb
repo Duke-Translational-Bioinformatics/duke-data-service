@@ -12,7 +12,9 @@ class UsedProvRelationPolicy < ApplicationPolicy
   end
 
   def create?
-    system_permission || (record.creator_id == user.id && permission(:view_project))
+    system_permission || (record.creator_id == user.id &&
+    record.relatable_from.creator_id == user.id &&
+    permission(:view_project))
   end
 
   def destroy?
