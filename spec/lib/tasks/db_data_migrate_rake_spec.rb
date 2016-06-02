@@ -39,6 +39,7 @@ describe "db:data:migrate" do
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
       let(:upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_capitalized_algorithm) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
       let(:upload_with_invalid_fingerprint_algorithm) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
       context 'for upload without fingerprint_value' do
         before { FactoryGirl.create(:upload) }
@@ -47,6 +48,11 @@ describe "db:data:migrate" do
       end
       context 'for upload with fingerprint_value' do
         before { expect(upload_with_fingerprint_value).to be_persisted }
+        it { expect {invoke_task}.to change{Fingerprint.count}.by(1) }
+        it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
+      end
+      context 'for upload with capitalized algorithm' do
+        before { expect(upload_with_capitalized_algorithm).to be_persisted }
         it { expect {invoke_task}.to change{Fingerprint.count}.by(1) }
         it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
       end

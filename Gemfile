@@ -20,6 +20,9 @@ gem 'grape-kaminari'
 # Auditing
 gem "audited-activerecord"
 
+# Unions in policy scopes
+gem 'active_record_union'
+
 # portal
 gem 'sinatra'
 
