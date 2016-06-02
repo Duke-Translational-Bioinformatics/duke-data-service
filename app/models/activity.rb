@@ -8,6 +8,9 @@ class Activity < ActiveRecord::Base
   audited
 
   belongs_to :creator, class_name: 'User'
+  has_many :generated_by_activity_prov_relations, as: :relatable_to
+  has_many :invalidated_by_activity_prov_relations, as: :relatable_to
+  has_many :used_prov_relations, as: :relatable_from
 
   validates :name, presence: true
   validates :creator_id, presence: true
