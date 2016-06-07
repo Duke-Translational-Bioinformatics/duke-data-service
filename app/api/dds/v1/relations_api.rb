@@ -175,6 +175,50 @@ module DDS
           end
         end
       end
+
+      desc 'View relation' do
+        detail 'Show information about a Relation. Requires ownership of the relation, or visibility to a single node for the specified relation'
+        named 'View relation'
+        failure [
+          [200, "Success"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [403, 'Forbidden'],
+          [404, 'Relation does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Relation UUID'
+      end
+      get '/relations/:id', root: false do
+        authenticate!
+        prov_relation = ProvRelation.find(params[:id])
+        authorize prov_relation, :show?
+        prov_relation
+      end
+
+      desc 'Delete relation' do
+        detail 'Marks a relation as being deleted.'
+        named 'delete relation'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Relation Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Relation UUID'
+      end
+      delete '/relations/:id', root: false do
+        authenticate!
+        prov_relation = hide_logically_deleted ProvRelation.find(params[:id])
+        authorize prov_relation, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          prov_relation.update(is_deleted: true)
+          annotate_audits [prov_relation.audits.last]
+        end
+        body false
+      end
     end
   end
 end
