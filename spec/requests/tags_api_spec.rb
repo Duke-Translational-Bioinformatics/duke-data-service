@@ -79,6 +79,26 @@ describe DDS::V1::TagsAPI do
     end
   end
 
+  describe 'Tags collection' do
+    let(:url) { "/api/v1/tags/labels" }
+    let(:resource_class) { TagLabel }
+    let(:resource_serializer) { TagLabelSerializer }
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a listable resource' do
+        let(:expected_list_length) { expected_resources.length }
+        let!(:expected_resources) { Tag.label_count }
+        let(:expected_resource) { expected_resources.first }
+        let!(:unexpected_resources) { [
+        ] }
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+    end
+  end
+
   describe 'Tag instance' do
     let(:url) { "/api/v1/tags/#{resource_id}" }
 

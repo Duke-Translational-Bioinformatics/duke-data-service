@@ -53,6 +53,19 @@ module DDS
         policy_scope(Tag).where(taggable: data_file)
       end
 
+      desc 'List tag labels' do
+        detail 'Get a list of the distinct tag label values visible to the current user.'
+        named 'list tag labels'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      get '/tags/labels', root: 'results' do
+        authenticate!
+        Tag.label_count
+      end
+
       desc 'View tag' do
         detail 'view tag'
         named 'view tag'
