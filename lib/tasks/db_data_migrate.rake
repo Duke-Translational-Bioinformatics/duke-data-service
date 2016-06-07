@@ -1,7 +1,7 @@
 def create_current_file_versions
-  files = DataFile.all
+  files = DataFile.eager_load(:file_versions).unscope(:order).joins('LEFT OUTER JOIN file_versions B ON B.data_file_id = containers.id AND B.version_number > file_versions.version_number').where('B.data_file_id IS NULL').where('file_versions.data_file_id IS NULL OR containers.upload_id != file_versions.upload_id')
   version_count = FileVersion.count
-  puts "Updating current_file_version for all #{files.count} files"
+  puts "Updating current_file_version for #{files.count} files"
   ActiveRecord::Base.transaction do
     files.each do |f|
       Audited.audit_class.as_user(f.audits.last.user) do

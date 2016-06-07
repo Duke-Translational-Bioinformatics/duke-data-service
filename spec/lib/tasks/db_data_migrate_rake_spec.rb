@@ -12,12 +12,10 @@ describe "db:data:migrate" do
   describe "#invoke" do
     let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
 
-    context 'with current_file_versions to create' do
+    context 'with correct current_versions' do
       before do
         Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create_list(:data_file, 3)
-          FileVersion.last.destroy
-          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
+          FactoryGirl.create(:data_file)
           f = FactoryGirl.create(:data_file)
           f.upload = FactoryGirl.create(:upload, :completed)
           f.save
@@ -26,12 +24,42 @@ describe "db:data:migrate" do
 
       it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
       it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(2) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(2) }
+      it { expect {invoke_task}.to change{FileVersion.count}.by(0) }
+      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
+    end
+    context 'without file_versions' do
+      before do
+        Audited.audit_class.as_user(current_user) do
+          FactoryGirl.create(:data_file)
+          FileVersion.last.destroy
+        end
+      end
+
+      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
+      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
+      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
+      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
 
       context 'once called' do
         before { invoke_task }
+        it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
+      end
+    end
+    context 'with current_file_version upload mismatch' do
+      before do
+        Audited.audit_class.as_user(current_user) do
+          FactoryGirl.create(:data_file)
+          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
+        end
+      end
 
+      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
+      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
+      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
+      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
+
+      context 'once called' do
+        before { invoke_task }
         it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
       end
     end
