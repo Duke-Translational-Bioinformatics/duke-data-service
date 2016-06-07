@@ -14,4 +14,9 @@ class Tag < ActiveRecord::Base
     self.taggable_type ||= 'DataFile'
   end
 
+  def self.label_count
+    unscope(:order).select(:label).group(:label).count.collect do |l|
+      TagLabel.new(label: l.first, count: l.second)
+    end
+  end
 end
