@@ -26,7 +26,13 @@ class AssociatedWithUserProvRelationPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.none
+        prov_relation_scope = scope.where(creator: user)
+        prov_relation_scope = prov_relation_scope.union(
+          AssociatedWithUserProvRelation.where(
+          relatable_to_type: 'Activity',
+          relatable_to_id: Activity.where(creator: user).select(:id).map {|a| a.id}
+        ))
+        prov_relation_scope
       end
     end
   end
