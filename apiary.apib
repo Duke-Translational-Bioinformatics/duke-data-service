@@ -1532,7 +1532,7 @@ Report hash (fingerprint) for the uploaded (or to be uploaded) file.
 
 >**Request Properties**
 - - - - -
-+ **value (number, required)** - The entire file hash (computed by client).
++ **value (string, required)** - The entire file hash (computed by client).
 + **algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
 
 >**Rules**
@@ -1615,7 +1615,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + **parent.kind (string, required)** - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
 + **parent.id (string, required)** - The unique id of the parent.
 + **upload.id (string, required)** - The unique id for an upload that completed successfully.
-+ **label (string, optional)** - An optional version label for the file; defaults to "Initial version" if not provided by client. 
++ **label (string, optional)** - An optional version label for the file.
 
 >**Rules**
 - - - - -
@@ -3184,7 +3184,9 @@ Given a starting node, returns a graph structure for the provenance chain.  This
                             "kind": "dds-relation-used", 
                             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
                             "audit": { }
-                        },
+                        }
+                    },
+                    {
                         "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95", 
                         "type": "wasGeneratedBy", 
                         "start_node": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
@@ -3196,6 +3198,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
                         }
                     }
                 ]
+            }
         }
 
 ## Group Tags
