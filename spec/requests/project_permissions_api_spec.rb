@@ -3,7 +3,8 @@ require 'rails_helper'
 describe DDS::V1::ProjectPermissionsAPI do
   include_context 'with authentication'
 
-  let(:project_permission) { FactoryGirl.create(:project_permission) }
+  let(:project) { FactoryGirl.create(:project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, project: project) }
   let(:other_permission) { FactoryGirl.create(:project_permission) }
   let!(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:other_user) { FactoryGirl.create(:user) }
@@ -11,8 +12,8 @@ describe DDS::V1::ProjectPermissionsAPI do
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
   let!(:resource) { project_permission }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: resource.project) }
-  let(:resource_project) { resource.project }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:resource_project) { project }
   let(:resource_user) { resource.user }
 
   describe 'Project Permissions collection' do
@@ -24,7 +25,7 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           other_permission,
-          FactoryGirl.create(:project_permission, user: current_user)
+          FactoryGirl.create(:project_permission, :project_admin, user: current_user)
         ] }
       end
 
@@ -105,6 +106,11 @@ describe DDS::V1::ProjectPermissionsAPI do
 
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { resource_project }
+      end
+
+      context 'permission belongs to current user' do
+        let(:resource) { resource_permission }
+        it { is_expected.to eq (403) }
       end
     end
 

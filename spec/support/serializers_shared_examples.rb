@@ -64,7 +64,7 @@ shared_context 'with destroy' do |with_software_agent|
       Audited.audit_class.as_user(auditor) do
         resource.audit_comment = {"action": destroy_action}
         if is_logically_deleted
-          resource.update(is_deleted: true)
+          resource.update_attribute(:is_deleted, true)
           resource.audits.last.update(comment: {action: 'DELETE', software_agent_id: software_agent.id})
         else
           resource.destroy
@@ -77,7 +77,7 @@ shared_context 'with destroy' do |with_software_agent|
       Audited.audit_class.as_user(auditor) do
         resource.audit_comment = {"action": destroy_action}
         if is_logically_deleted
-          resource.update(is_deleted: true)
+          resource.update_attribute(:is_deleted, true)
           resource.audits.last.update(comment: {action: 'DELETE'})
         else
           resource.destroy
@@ -280,18 +280,39 @@ shared_examples 'a serializer with a serialized audit' do
   end
 end
 
-shared_examples 'a has_one association with' do |association_root, serialized_with|
-  it "#{association_root} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(association_root)
-    expect(described_class._associations[association_root]).to be_a(ActiveModel::Serializer::Association::HasOne)
-    expect(described_class._associations[association_root].serializer_from_options).to eq(serialized_with)
+shared_examples 'a has_one association with' do |name, serialized_with, root: name|
+  it "#{name} serialized using #{serialized_with}" do
+    expect(described_class._associations).to have_key(name)
+    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasOne)
+    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
+    expect(described_class._associations[name].embedded_key).to eq(root)
   end
 end
 
-shared_examples 'a has_many association with' do |association_root, serialized_with|
-  it "#{association_root} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(association_root)
-    expect(described_class._associations[association_root]).to be_a(ActiveModel::Serializer::Association::HasMany)
-    expect(described_class._associations[association_root].serializer_from_options).to eq(serialized_with)
+shared_examples 'a has_many association with' do |name, serialized_with, root: name|
+  it "#{name} serialized using #{serialized_with}" do
+    expect(described_class._associations).to have_key(name)
+    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasMany)
+    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
+    expect(described_class._associations[name].embedded_key).to eq(root)
+  end
+end
+
+shared_examples 'a ProvRelationSerializer' do |from:, to:|
+  let(:is_logically_deleted) { true }
+
+  it_behaves_like 'a has_one association with', :relatable_from, from, root: :from
+  it_behaves_like 'a has_one association with', :relatable_to, to, root: :to
+
+  it_behaves_like 'a json serializer' do
+    it 'should have expected keys and values' do
+      is_expected.to have_key('kind')
+      expect(subject["kind"]).to eq(resource.kind)
+      is_expected.to have_key('id')
+      expect(subject['id']).to eq(resource.id)
+      is_expected.to have_key('from')
+      is_expected.to have_key('to')
+    end
+    it_behaves_like 'a serializer with a serialized audit'
   end
 end

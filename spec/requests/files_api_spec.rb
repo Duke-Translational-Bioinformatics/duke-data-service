@@ -8,9 +8,9 @@ describe DDS::V1::FilesAPI do
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, user: current_user, project: project) }
+  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent) { folder }
-  let(:other_permission) { FactoryGirl.create(:project_permission, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
   let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
@@ -41,19 +41,40 @@ describe DDS::V1::FilesAPI do
       }}
 
       it_behaves_like 'a creatable resource' do
-        it 'should set creator' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.creator_id).to eq(current_user.id)
-        end
         it 'should set label' do
           is_expected.to eq(expected_response_status)
           expect(new_object.label).to eq(payload[:label])
+        end
+        it 'creates a file_version and attributed_to_user' do
+          expect {
+            expect {
+              is_expected.to eq(201)
+            }.to change{AttributedToUserProvRelation.count}.by(1)
+          }.to change{FileVersion.count}.by(1)
         end
       end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 201 }
+        it 'creates an attributed_to_user and attributed_to_software_agent' do
+          expect {
+            expect {
+              is_expected.to eq(201)
+            }.to change{AttributedToSoftwareAgentProvRelation.count}.by(1)
+          }.to change{AttributedToUserProvRelation.count}.by(1)
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 201 }
+          let(:expected_auditable_type) { FileVersion }
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 201 }
+          let(:expected_auditable_type) { ProvRelation }
+          let(:expected_audits) { 2 }
+        end
       end
 
       context 'with incomplete upload' do
@@ -105,6 +126,15 @@ describe DDS::V1::FilesAPI do
         let(:expected_response_status) { 201 }
       end
 
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
+        let(:expected_auditable_type) { FileVersion }
+      end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
+        let(:expected_auditable_type) { ProvRelation }
+      end
+
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { parent }
       end
@@ -150,18 +180,73 @@ describe DDS::V1::FilesAPI do
       }}
 
       it_behaves_like 'an updatable resource' do
-        it 'creates a software_version' do
+        it 'creates a file_version and attributed_to_user' do
           expect {
-            is_expected.to eq(200)
-          }.to change{resource.file_versions.count}.by(1)
+            expect {
+              is_expected.to eq(200)
+            }.to change{resource.file_versions.count}.by(1)
+          }.to change{AttributedToUserProvRelation.count}.by(1)
+        end
+        it_behaves_like 'an annotate_audits endpoint'
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_auditable_type) { FileVersion }
+        end
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_auditable_type) { ProvRelation }
+        end
+
+        it_behaves_like 'a software_agent accessible resource' do
+          it 'creates a file_version, attributed_to_user and attributed_to_software_agent' do
+            expect {
+              expect {
+                expect {
+                  is_expected.to eq(200)
+                }.to change{resource.file_versions.count}.by(1)
+              }.to change{AttributedToSoftwareAgentProvRelation.count}.by(1)
+            }.to change{AttributedToUserProvRelation.count}.by(1)
+          end
+
+          it_behaves_like 'an annotate_audits endpoint'
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:expected_auditable_type) { FileVersion }
+          end
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:expected_auditable_type) { ProvRelation }
+            let(:expected_audits) { 2 }
+          end
         end
       end
 
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
-      it_behaves_like 'an annotate_audits endpoint'
-      it_behaves_like 'a software_agent accessible resource' do
+      context 'without upload in payload' do
+        let(:payload) {{
+          label: resource_stub.label
+        }}
+        it_behaves_like 'an updatable resource' do
+          it 'does not create a file_version or attributed_to_user' do
+            expect {
+              expect {
+                is_expected.to eq(200)
+              }.to change{resource.file_versions.count}.by(0)
+            }.to change{AttributedToUserProvRelation.count}.by(0)
+          end
+        end
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
         it_behaves_like 'an annotate_audits endpoint'
+        it_behaves_like 'a software_agent accessible resource' do
+          it 'does not create a file_version, attributed_to_user and attributed_to_software_agent' do
+            expect {
+              expect {
+                expect {
+                  is_expected.to eq(200)
+                }.to change{resource.file_versions.count}.by(0)
+              }.to change{AttributedToSoftwareAgentProvRelation.count}.by(0)
+            }.to change{AttributedToUserProvRelation.count}.by(0)
+          end
+
+          it_behaves_like 'an annotate_audits endpoint'
+        end
       end
 
       context 'with incomplete upload' do
@@ -198,6 +283,13 @@ describe DDS::V1::FilesAPI do
           is_expected.to eq(204)
           resource.reload
           expect(resource.is_deleted?).to be_truthy
+        end
+
+        it 'should mark file_versions as deleted' do
+          expect(resource).to be_persisted
+          expect {
+            is_expected.to eq(204)
+          }.to change{FileVersion.where(is_deleted: true).count}
         end
 
         it_behaves_like 'an identified resource' do

@@ -1,13 +1,27 @@
 class ProjectPolicy < ApplicationPolicy
+  def index?
+    true
+  end
+
+  def show?
+    permission :view_project
+  end
+
   def create?
     true
   end
 
   def update?
-    permission
+    permission :update_project
   end
 
   def destroy?
-    permission
+    permission :delete_project
+  end
+
+  class Scope < Scope
+    def resolve
+      super :view_project
+    end
   end
 end

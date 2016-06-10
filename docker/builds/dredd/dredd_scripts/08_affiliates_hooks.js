@@ -30,6 +30,7 @@ hooks.before(LIST_AFFILIATES, function (transaction, done) {
       //get the complete list of users
       var request3 = tools.createResource('GET', '/users', JSON.stringify(payload_na),hooks.configuration.server);
       request3.then(function(data3) {
+        console.log(data3)
         // grab somebody else's user id
         responseStash['other_user_id'] = _.sample(_.without(_.pluck(data3['results'], 'id'), responseStash['my_user_id']));
         // create sample affiliate resource in case none exist for listing

@@ -135,7 +135,7 @@ module DDS
 
       rescue_from ActiveRecord::RecordNotFound do |e|
         missing_object = ''
-        m = e.message.match(/find\s(\w+)\swith.*/)
+        m = e.message.match(/find\s(\w+)/)
         if m
           missing_object = m[1]
         end
@@ -180,6 +180,10 @@ module DDS
       mount DDS::V1::StorageProvidersAPI
       mount DDS::V1::ChildrenAPI
       mount DDS::V1::SoftwareAgentsAPI
+      mount DDS::V1::FileVersionsAPI
+      mount DDS::V1::TagsAPI
+      mount DDS::V1::ActivitiesAPI
+      mount DDS::V1::RelationsAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

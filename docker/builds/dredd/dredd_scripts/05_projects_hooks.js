@@ -12,6 +12,7 @@ var LIST_PROJECTS = "Projects > Projects collection > List projects";
 var VIEW_PROJECT = "Projects > Project instance > View project";
 var UPDATE_PROJECT = "Projects > Project instance > Update project";
 var DELETE_PROJECT = "Projects > Project instance > Delete project";
+var PROJ_USAGE = "Projects > Project instance > NOT_IMPLEMENTED Project usage"
 var responseStash = {};
 var g_projectId = null;
 
@@ -84,4 +85,8 @@ hooks.before(DELETE_PROJECT, function (transaction,done) {
     done();
   });
 
+});
+
+hooks.before(PROJ_USAGE, function (transaction) {
+  transaction.skip = true;
 });

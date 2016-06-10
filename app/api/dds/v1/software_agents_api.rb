@@ -12,6 +12,7 @@ module DDS
       end
       get '/software_agents', root: 'results' do
         authenticate!
+        authorize SoftwareAgent.new, :index?
         policy_scope(SoftwareAgent).where(is_deleted: false)
       end
 
@@ -176,6 +177,29 @@ module DDS
         authorize ak, :show?
         ak
       end
+      desc 'Delete software agent API key' do
+        detail 'delete software_agent api_key'
+        named 'delete software_agent api_key'
+        failure [
+          [204, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (software_agent restricted)'],
+          [404, 'Software Agent Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Software agent UUID'
+      end
+      delete '/software_agents/:id/api_key', root: false do
+        authenticate!
+        ak = SoftwareAgent.find(params[:id]).api_key
+        authorize ak, :destroy?
+        Audited.audit_class.as_user(current_user) do
+          ak.destroy
+          annotate_audits [ak.audits.last]
+        end
+        body false
+      end
 
       desc 'Get software agent access token'do
         detail 'Get software agent access token'
@@ -208,8 +232,9 @@ module DDS
         error!(error_json, 404)
       end
       post '/software_agents/api_token', serializer: ApiTokenSerializer do
-        user_key = ApiKey.where(key: params[:user_key]).joins(:user).take!
-        software_key = ApiKey.where(key: params[:agent_key]).joins(:software_agent).take!
+        secret_params = declared(params, include_missing: false)
+        user_key = ApiKey.where(key: secret_params[:user_key]).joins(:user).take!
+        software_key = ApiKey.where(key: secret_params[:agent_key]).joins(:software_agent).take!
         user_key.user.update_attribute(:last_login_at, DateTime.now)
         ApiToken.new(user: user_key.user, software_agent: software_key.software_agent)
       end

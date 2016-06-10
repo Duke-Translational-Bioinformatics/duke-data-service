@@ -4,15 +4,9 @@ FactoryGirl.define do
     name { Faker::Internet.slug }
     content_type "text/plain"
     size { Faker::Number.number(2) }
-    fingerprint_value { SecureRandom.hex(32) }
-    fingerprint_algorithm "md5"
     etag { SecureRandom.hex }
     storage_provider
     association :creator, factory: :user
-
-    trait :without_fingerprint do
-      fingerprint_value nil
-    end
 
     trait :with_chunks do
       chunks { [ build(:chunk, number: 1) ] }

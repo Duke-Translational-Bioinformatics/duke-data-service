@@ -12,11 +12,12 @@ describe DDS::V1::UploadsAPI do
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload, storage_provider_id: storage_provider.id) }
   let(:chunk_stub) { FactoryGirl.build(:chunk, upload_id: upload.id) }
+  let(:fingerprint_stub) { FactoryGirl.build(:fingerprint) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, user: current_user, project: upload.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: upload.project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
@@ -57,27 +58,13 @@ describe DDS::V1::UploadsAPI do
       let!(:payload) {{
         name: upload_stub.name,
         content_type: upload_stub.content_type,
-        size: upload_stub.size,
-        hash: {
-          value: upload_stub.fingerprint_value,
-          algorithm: upload_stub.fingerprint_algorithm
-        }
+        size: upload_stub.size
       }}
 
       it_behaves_like 'a creatable resource' do
         it 'should set creator' do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
-        end
-
-        it 'should set fingerprint_value' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.fingerprint_value).to eq(payload[:hash][:value])
-        end
-
-        it 'should set fingerprint_algorithm' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.fingerprint_algorithm).to eq(payload[:hash][:algorithm])
         end
 
         it 'should create the project container in the storage_provider' do
@@ -89,24 +76,11 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a storage_provider backed resource'
 
-      context 'without hash parameter in payload' do
-        let!(:payload) {{
-          name: upload_stub.name,
-          content_type: upload_stub.content_type,
-          size: upload_stub.size
-        }}
-        it_behaves_like 'a creatable resource'
-      end
-
       it_behaves_like 'a validated resource' do
         let(:payload) {{
           name: nil,
           content_type: nil,
-          size: nil,
-          hash: {
-            value: nil,
-            algorithm: nil
-          }
+          size: nil
         }}
         it 'should not persist changes' do
           expect(resource).to be_persisted
@@ -302,6 +276,48 @@ describe DDS::V1::UploadsAPI do
         expect(response_json['reason']).to eq('IntegrityException')
         expect(response_json).to have_key('suggestion')
         expect(response_json['suggestion']).to eq('reported chunk hash does not match that computed by StorageProvider')
+      end
+    end
+  end
+
+  describe 'Report upload hash' do
+    subject { put(url, payload.to_json, headers) }
+    let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
+    let(:parent_id) { upload.id }
+    let(:called_action) { "PUT" }
+    let!(:payload) {{
+      value: fingerprint_stub.value,
+      algorithm: fingerprint_stub.algorithm
+    }}
+    let(:resource_class) { Fingerprint }
+
+    it_behaves_like 'a creatable resource' do
+      let(:expected_response_status) {200}
+      let(:new_object) { upload.reload }
+    end
+    it_behaves_like 'an authenticated resource'
+    it_behaves_like 'an authorized resource'
+
+    it_behaves_like 'an identified resource' do
+      let(:parent_id) { "notexist" }
+      let(:resource_class) { Upload }
+    end
+
+    it_behaves_like 'an annotate_audits endpoint'
+
+    it_behaves_like 'a software_agent accessible resource' do
+      it_behaves_like 'an annotate_audits endpoint'
+    end
+    
+    it_behaves_like 'a validated resource' do
+      let(:payload) {{
+        value: nil,
+        algorithm: nil
+      }}
+      it 'should not persist changes' do
+        expect {
+          is_expected.to eq(400)
+        }.not_to change{resource_class.count}
       end
     end
   end
