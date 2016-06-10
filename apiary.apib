@@ -559,9 +559,9 @@ Represents registered users.
 - - - - -
 
 + Parameters
-    + full_name_contains (string, optional, `gardner`) ... Returns users where their `full_name` contains the specified string.
-    + first_name_begins_with (string, optional, `mat`) ... Returns users where their `first_name` begins with the specified string.
-    + last_name_begins_with (string, optional, `gar`) ... Returns users where their `last_name` begins with the specified string.
+    + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
+    + first_name_begins_with (string, optional, `mat`) ... Returns users where their first name begins with the specified string.
+    + last_name_begins_with (string, optional, `gar`) ... Returns users where their last name begins with the specified string.
 
 + Response 200 (application/json)
 
@@ -639,7 +639,7 @@ Represents system level authorization roles that have been granted to a user.
 
 ## System Permission instance [/system/permissions/{user_id}]
 + Parameters
-    + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `user_id` of the user.
+    + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the user.
 
 + Model (application/json)
 
@@ -860,8 +860,8 @@ Represents project level authorization roles that have been granted to a user.
 
 ## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
 + Parameters
-    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `project_id` of the project.
-    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `user_id` of the user.
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
 
 + Model (application/json)
 
@@ -1004,8 +1004,8 @@ Represents an individual that plays some project level role of interest from a c
 
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
 + Parameters
-    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `project_id` of the project.
-    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `user_id` of the user.
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
 
 + Model (application/json)
 
