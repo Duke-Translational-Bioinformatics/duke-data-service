@@ -76,6 +76,13 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 + For *Provenance Relations* resource - added `to` and `from` properties to resource - this provides clients with insight to the W3C relationship direction.
 + Added *Provenance Inferred* section - provides overview of inferred relations for initial provenance release.  
 
+10-Jun-2016
+--------------
++ For *Provenace Relations* resource - modified `to` and `from` properties to render complete JSON representation for the node vs. partial.
++ Added new rule - requires 'invalidated' entity to be deleted prior to recording 'wasInvalidatedBy' relation. 
++ Added new rule - cascades logical delete of provenance node to any direct (i.e. single hop away) provenance relations.
++ Change permission model for `wasGeneratedBy` and `wasDerivedFrom` relations - for both create operations, `update_file` permission is required for the `generated` entity.
+
 ## Group API Usage
 
 Web Portal
