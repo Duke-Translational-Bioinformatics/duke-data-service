@@ -196,8 +196,8 @@ Represents the set of discrete permissions that can be granted to a user.
 | **delete_project** | Can delete project |
 | **manage_project_permissions** | Can grant/revoke project level permissions |
 | **download_file** | Can download file |
-| **create_file** | Can upload new file |
-| **update_file** | Can upload new version of existing file |
+| **create_file** | Can upload new file and modify file metadata |
+| **update_file** | Can upload new version of existing file and modify file metadata |
 | **delete_file** | Can delete a file |
 
 ## Authorization Roles collection [/auth_roles{?context}]
@@ -445,7 +445,7 @@ Represents the currently authenticated user.
 
 ## Current User instance [/current_user]
 
-### NOT_IMPLEMENTED_CHANGE View current user [GET]
+### View current user [GET]
 Get profile for the currently authenticated user.
 
 >**Permission:** authenticated
@@ -1299,7 +1299,7 @@ All files must be uploaded using a multi-part/chunked upload process.  Although 
 + Parameters
     + id (required, string, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... Globally unique `id` of the project.
 
-### NOT_IMPLEMENTED_CHANGE Initiate chunked upload [POST]
+### Initiate chunked upload [POST]
 This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.
 
 >**Permission:** create_file
@@ -1349,7 +1349,7 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_CHANGE List chunked uploads [GET]
+### List chunked uploads [GET]
 >**Permission:** view_project
 - - - - -
 
@@ -1384,7 +1384,7 @@ This is the first step in uploading a large file. An upload objects is created a
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
-### NOT_IMPLEMENTED_CHANGE View chunked upload [GET]
+### View chunked upload [GET]
 >**Permission:** view_project
 - - - - -
 
@@ -1467,7 +1467,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-## NOT_IMPLEMENTED_CHANGE Complete chunked file upload [PUT /uploads/{id}/complete]
+## Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 
 >**Permission:** create_file
@@ -1524,7 +1524,7 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_NEW Report upload hash [PUT /uploads/{id}/hashes]
+## Report upload hash [PUT /uploads/{id}/hashes]
 Report hash (fingerprint) for the uploaded (or to be uploaded) file.
 
 >**Permission:** update_file
@@ -1602,7 +1602,7 @@ A file resource represents a virtual container for a physical data file (i.e. `u
 
 ## Files collection [/files]
 
-### NOT_IMPLEMENTED_CHANGE Create file [POST]
+### Create file [POST]
 Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads` actions).
 
 *Note: A file is a versionable resource; this action creates the initial version of a file.  New file versions can be created (uploaded) via the* `/file/{id}/update` *action.  Versions can be managed via the* **File Versions** *actions.*
@@ -1689,7 +1689,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-### NOT_IMPLEMENTED_CHANGE View file [GET]
+### View file [GET]
 >**Permission:** view_project
 - - - - -
 
@@ -1743,7 +1743,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_CHANGE Update file [PUT]
+### Update file [PUT]
 Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
 *Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
@@ -1852,7 +1852,7 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-## NOT_IMPLEMENTED_CHANGE Move file [PUT /files/{id}/move]
+## Move file [PUT /files/{id}/move]
 Move file to a different parent project or parent folder.
 
 >**Permission:** create_file
@@ -1920,7 +1920,7 @@ Move file to a different parent project or parent folder.
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_CHANGE Rename file [PUT /files/{id}/rename]
+## Rename file [PUT /files/{id}/rename]
 Change the name of a file.
 
 >**Permission:** update_file
@@ -1995,7 +1995,7 @@ The actions herein are used to interact with prior versions of a file resource.
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
-### NOT_IMPLEMENTED_CHANGE List file versions [GET]
+### List file versions [GET]
 This action can be used to list all prior versions of a file, including the current version.
 
 >**Permission:** view_project
@@ -2047,7 +2047,7 @@ This action can be used to list all prior versions of a file, including the curr
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
-### NOT_IMPLEMENTED_CHANGE View file version [GET]
+### View file version [GET]
 **Permissions** view_project
 - - - - -
 
@@ -2085,7 +2085,7 @@ This action can be used to list all prior versions of a file, including the curr
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_CHANGE Update file version [PUT] 
+### Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -2140,6 +2140,7 @@ This action can be used to list all prior versions of a file, including the curr
 >**Rules**
 - - - - -
 + The current file version cannot be deleted.
++ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
@@ -2211,7 +2212,7 @@ This action can be used to promote a prior file version to the current version. 
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
-## NOT_IMPLEMENTED_CHANGE Search project children [GET /projects/{id}/children{?name_contains,kind}]
+## Search project children [GET /projects/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -2306,7 +2307,7 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
 
-## NOT_IMPLEMENTED_CHANGE Search folder children [GET /folders/{id}/children{?name_contains,kind}]
+## Search folder children [GET /folders/{id}/children{?name_contains,kind}]
 
 >**Permission:** view_project
 - - - - -
@@ -2408,7 +2409,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 
 ## Activities collection [/activities]
 
-### NOT_IMPLEMENTED_NEW Create activity [POST]
+### Create activity [POST]
 >**Permission:** authenticated
 - - - - -
 
@@ -2443,7 +2444,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW List activities [GET]
+### List activities [GET]
 >**Permission:** 
 - - - - -
 + authenticated [scope: creator *or* visiblity to single entity that has a provenance relation to the activity]
@@ -2473,7 +2474,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 + Parameters
     + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
 
-### NOT_IMPLEMENTED_NEW View activity [GET]
+### View activity [GET]
 >**Permission:** 
 - - - - -
 + creator *or* visiblity to single entity that has a provenance relation to the activity
@@ -2491,7 +2492,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW Update activity [PUT]
+### Update activity [PUT]
 >**Permission:** creator
 - - - - -
 
@@ -2518,16 +2519,18 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW Delete activity [DELETE]
+### Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
+
+>**Rules**
+- - - - -
++ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
 ## Group Provenance Relations
 Represents provenance relations as defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Relations are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
-
-
 
 ## Relations collection [/relations]
 
@@ -3208,7 +3211,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
 
 ## Tags collection [/tags]
 
-### NOT_IMPLEMENTED_NEW Create object tag [POST]
+### Create object tag [POST]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
@@ -3240,7 +3243,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW List object tags [GET /tags/{object_kind}/{object_id}]
+## List object tags [GET /tags/{object_kind}/{object_id}]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
@@ -3299,7 +3302,7 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 + Parameters
     + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
 
-### NOT_IMPLEMENTED_NEW View tag [GET]
+### View tag [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
@@ -3314,7 +3317,7 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW Delete tag [DELETE]
+### Delete tag [DELETE]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
