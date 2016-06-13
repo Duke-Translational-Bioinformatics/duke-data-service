@@ -1,5 +1,21 @@
 class KindnessFactory
-  @@kinded_models = []
+  @@kinded_models = [
+    Activity,
+    User,
+    FileVersion,
+    Project,
+    DataFile,
+    Folder,
+    AssociatedWithUserProvRelation,
+    AssociatedWithSoftwareAgentProvRelation,
+    AttributedToUserProvRelation,
+    AttributedToSoftwareAgentProvRelation,
+    DerivedFromFileVersionProvRelation,
+    GeneratedByActivityProvRelation,
+    InvalidatedByActivityProvRelation,
+    SoftwareAgent,
+    UsedProvRelation
+  ]
 
   def self.kinded_models
     @@kinded_models
