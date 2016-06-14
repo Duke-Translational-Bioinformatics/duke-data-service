@@ -7,7 +7,6 @@ RSpec.describe Tag, type: :model do
 
   describe 'associations' do
     it { is_expected.to belong_to(:taggable) }
-    it { is_expected.to have_many(:project_permissions).through(:taggable) }
   end
 
   describe 'validations' do
@@ -15,8 +14,9 @@ RSpec.describe Tag, type: :model do
     it { is_expected.to validate_presence_of(:taggable) }
   end
 
-  it 'should set default attribute' do
-    expect(subject.taggable_type).to eq('DataFile')
+  describe '#project_permissions' do
+    it { is_expected.to respond_to(:project_permissions) }
+    it { expect(subject.project_permissions).to eq(subject.taggable.project_permissions) }
   end
 
   describe '::label_like' do

@@ -17,7 +17,8 @@ class TagPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      super :view_project
+      data_file_scope = Pundit::PolicyFinder.new(DataFile).scope!.new(user, DataFile).resolve.select(:id).unscope(:order)
+      scope.where(taggable_type: Container, taggable_id: data_file_scope)
     end
   end
 end
