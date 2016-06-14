@@ -61,9 +61,18 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
+      params do
+        optional :object_kind, type: String, desc: "Restricts search scope to tags for this kind of object"
+        optional :label_contains, type: String, desc: "Searches for tags that contain this text fragment"
+      end
       get '/tags/labels', root: 'results' do
         authenticate!
-        Tag.label_count
+        tag_params = declared(params, include_missing: false)
+        scoped_tags = Tag.where(id: policy_scope(Tag).select(:id).unscope(:order))
+        if tag_params[:label_contains]
+          scoped_tags = scoped_tags.where("label LIKE ?", "%#{tag_params[:label_contains]}%")
+        end
+        scoped_tags.label_count
       end
 
       desc 'View tag' do

@@ -13,6 +13,8 @@ describe DDS::V1::TagsAPI do
   let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
   let(:other_tag) { FactoryGirl.create(:tag, taggable: other_data_file) }
 
+  let(:not_allowed_tag) { FactoryGirl.create(:tag) }
+
   let(:resource_class) { Tag }
   let(:resource_serializer) { TagSerializer }
   let!(:resource) { tag }
@@ -80,9 +82,11 @@ describe DDS::V1::TagsAPI do
   end
 
   describe 'Tag labels collection' do
-    let(:url) { "/api/v1/tags/labels" }
+    let(:url) { "/api/v1/tags/labels#{query_params}" }
+    let(:query_params) { '' }
     let(:resource_class) { TagLabel }
     let(:resource_serializer) { TagLabelSerializer }
+    let(:not_allowed_tag_label) { TagLabel.new(label: not_allowed_tag.label, count: 1) }
     describe 'GET' do
       subject { get(url, nil, headers) }
 
@@ -91,11 +95,46 @@ describe DDS::V1::TagsAPI do
         let!(:expected_resources) { Tag.label_count }
         let(:serializable_resource) { expected_resources.first }
         let!(:unexpected_resources) { [
+          not_allowed_tag_label
         ] }
       end
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
+
+      context 'with object_kind parameter' do
+        let(:query_params) { "?object_kind=#{resource.taggable.kind}" }
+
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { Tag.label_count }
+          let(:serializable_resource) { expected_resources.first }
+          let!(:unexpected_resources) { [
+            not_allowed_tag_label
+          ] }
+        end
+      end
+
+      context 'with label_contains parameter' do
+        let(:label_query) { Faker::Lorem.word }
+        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: data_file) }
+        let(:resource_tag_label) { TagLabel.new(label: resource.label, count: 1) }
+        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: data_file) }
+        let!(:diff_tag_label) { TagLabel.new(label: diff_tag.label, count: 1) }
+        let(:query_params) { "?label_contains=#{label_query}" }
+
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            resource_tag_label
+          ]}
+          let(:serializable_resource) { expected_resources.first }
+          let!(:unexpected_resources) { [
+            diff_tag_label,
+            not_allowed_tag_label
+          ] }
+        end
+      end
     end
   end
 

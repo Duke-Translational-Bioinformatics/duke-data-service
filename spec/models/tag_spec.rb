@@ -19,6 +19,11 @@ RSpec.describe Tag, type: :model do
     expect(subject.taggable_type).to eq('DataFile')
   end
 
+  describe '::label_like' do
+    it { expect(described_class).to respond_to(:label_like).with(1).argument }
+    it { expect(described_class.label_like('label_to_find')).to be_a ActiveRecord::Relation }
+  end
+
   describe '::label_count' do
     it { expect(described_class).to respond_to(:label_count) }
     it { expect(described_class.label_count).to be_a Array }
