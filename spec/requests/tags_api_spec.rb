@@ -79,7 +79,7 @@ describe DDS::V1::TagsAPI do
     end
   end
 
-  describe 'Tags collection' do
+  describe 'Tag labels collection' do
     let(:url) { "/api/v1/tags/labels" }
     let(:resource_class) { TagLabel }
     let(:resource_serializer) { TagLabelSerializer }
@@ -89,7 +89,7 @@ describe DDS::V1::TagsAPI do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { Tag.label_count }
-        let(:expected_resource) { expected_resources.first }
+        let(:serializable_resource) { expected_resources.first }
         let!(:unexpected_resources) { [
         ] }
       end
