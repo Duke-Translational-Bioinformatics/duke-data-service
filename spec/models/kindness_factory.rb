@@ -11,12 +11,12 @@ RSpec.describe KindnessFactory do
     it { is_expected.to respond_to(:is_kinded_model?).with(1).argument }
 
     it 'should return false for models not kinded' do
-      expect(KindnessFactory.is_kinded_model?(not_kinded_model)).not_to be_truthy
+      expect(KindnessFactory.is_kinded_model?(not_kinded_model)).not_to be
     end
 
     it 'should return true for kinded models' do
       KindnessFactory.kinded_models.each do |kinded_model|
-        expect(KindnessFactory.is_kinded_model?(kinded_model)).to be_truthy
+        expect(KindnessFactory.is_kinded_model?(kinded_model)).to be
       end
     end
   end
@@ -31,9 +31,9 @@ RSpec.describe KindnessFactory do
     end
     it 'should take a valid kinded model "kind" and return the Class for that model' do
       KindnessFactory.kinded_models.each do |kinded_model|
-        expect(kinded_model).to be_a_kind_of(Kinded)
+        expect(kinded_model).to include(Kinded)
         klass = KindnessFactory.by_kind(kinded_model.new.kind)
-        expect(klass.class.name).to equal kinded_model.class.name
+        expect(klass.class.name).to eq(kinded_model.class.name)
       end
     end
   end

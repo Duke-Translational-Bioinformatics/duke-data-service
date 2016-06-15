@@ -29,13 +29,13 @@ class KindnessFactory
     end
   end
 
-  def self.is_kinded_model?(kind)
-    self.kind_map.keys.include? kind
+  def self.is_kinded_model?(klass)
+    @@kinded_models.include? klass
   end
 
   def self.by_kind(kind)
     kinded_model = kind_map[kind]
-    raise NameError.new("#{kind} is not recognized") unless kinded_model
+    raise NameError.new("object_kind #{kind} Not Supported") unless kinded_model
     kinded_model
   end
 end
