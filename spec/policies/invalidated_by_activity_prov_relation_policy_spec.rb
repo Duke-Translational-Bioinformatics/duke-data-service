@@ -24,7 +24,7 @@ describe InvalidatedByActivityProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:invalidated_by_activity_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: []
   end
 
@@ -36,8 +36,8 @@ describe InvalidatedByActivityProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a user with project_permission', :delete_file,  on: :prov_relation, allows: [:create?, :destroy?]
-      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:show?, :destroy?]
+      it_behaves_like 'a user with project_permission', :delete_file,  on: :prov_relation, allows: [:scope, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?, :destroy?]
     end
 
     context 'to other users activity' do
@@ -47,7 +47,7 @@ describe InvalidatedByActivityProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:show?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?]
     end
   end
 

@@ -147,6 +147,15 @@ module DDS
         error!(error_json, 404)
       end
 
+      rescue_from NameError do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => e.message,
+          "suggestion" => "Please supply a supported object_kind"
+        }
+        error!(error_json, 404)
+      end
+
       rescue_from Pundit::NotAuthorizedError do |e|
         error_json = {
           "error" => "403",

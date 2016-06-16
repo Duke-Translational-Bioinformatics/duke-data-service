@@ -26,7 +26,16 @@ class UsedProvRelationPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.none
+        prov_relation_scope = scope.where(creator: user)
+        prov_relation_scope = prov_relation_scope.union(
+          UsedProvRelation.where(
+            relatable_from_id: Activity.where(creator: user)
+        ))
+        prov_relation_scope = prov_relation_scope.union(
+          UsedProvRelation.where(
+            relatable_to_id: policy_scope(FileVersion.all)
+        ))
+        prov_relation_scope
       end
     end
   end

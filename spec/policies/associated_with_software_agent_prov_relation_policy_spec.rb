@@ -19,7 +19,7 @@ describe AssociatedWithSoftwareAgentProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:associated_with_software_agent_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: [], denies: [:show?, :create?, :index?, :update?, :destroy?]
   end
 
@@ -30,7 +30,7 @@ describe AssociatedWithSoftwareAgentProvRelationPolicy do
         relatable_to: users_activity)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
-      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?], denies: [:index?, :update?, :destroy?]
+      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?], denies: [:index?, :update?, :destroy?]
     end
 
     context 'with a software agent created by another user' do
@@ -39,7 +39,7 @@ describe AssociatedWithSoftwareAgentProvRelationPolicy do
         relatable_to: users_activity)
        }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?]
+      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?]
     end
   end
 
