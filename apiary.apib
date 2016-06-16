@@ -1,26 +1,26 @@
 FORMAT: 1A
-HOST: https://uatest.dataservice.duke.edu/api/v1/
+HOST: https://apiuatest.dataservice.duke.edu/api/v1/
 
-# Duke Data Service
+# Duke Data Service 
 
 The Duke Data Service (DDS) API allows Duke researchers to store, organize, retrieve and share data.
 
 This the documentation for the Data Service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
 
-Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
+Adhere as well as possible to the [Heroku API Design Best Practices:](https://geemus.gitbooks.io/http-api-design/content/en/index.html) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
 ## API Change Log
 
 24-Feb-2016
 --------------
 + Updated API usage details - included convenience links to *Web Portal* and *API Explorer*.
-+ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*.
++ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*. 
 + Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
 + Extended *Current User* resource actions - added actions for maintaining user secret API key.
 + For *Projects* resource - removed unique contraint rule on `project.name`.
 + For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
 + Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
-+ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash.
++ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash. 
 + For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
 + Added `label` property to *Files* resource to help users differentiate file versions.
 + Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
@@ -31,7 +31,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 
 08-Mar-2016
 --------------
-+ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `Used` and `WasGeneratedBy` provenance relations.
++ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `used` and `wasGeneratedBy` provenance relations.
 
 09-Mar-2016
 --------------
@@ -47,12 +47,41 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://gi
 + Added *Tags* resource/actions - current iteration assumes only file tagging is supported, but design supports extension to tag other objects.
 + For *Software Agents* resource - added `time_to_live` property to the `POST /software_agents/api_token` action response payload.
 + For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
-+ Added `GET /pojects/{id}/usage` - returns summary usage details for the project.
++ Added `GET /projects/{id}/usage` - returns summary usage details for the project.
 
 18-Mar-2016
 --------------
 + For *Software Agents* resource - added action `DELETE /software_agents/{id}/api_key` - this allows agent key to be removed liken to user key actions.
 + For *Uploads* resource - reverted `hash` back to a required property - this aligns with Web portal now being able to hash "larger" files via streaming.
+
+07-Apr-2016
+--------------
++ Refactored file versioning - the biggest change here is file resource now has a `current_version` property that contains version details - including the referenced `upload` (see *Files* and *File Versions* actions).
++ For *File Versions* resource - added new action `POST /file_versions/{id}/current` that promotes a prior file version to top of version stack.
++ For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
++ For *Uploads* resource - removed hash properties (`hash.value` and `hash.algorithm`) from initiate chunked upload request - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  The upload resource now contains a `hashes` property - this is a collection of client reported hashes.
+
+21-Apr-2016
+--------------
++ Added `update_file` permission to the Project Uploader role.
++ Added *Provenance Relations* actions for `wasDerivedFrom` and `wasInvalidatedBy`.
+
+25-Apr-2016
+--------------
++ For *File Versions* resource - added `project` property to facilitate portal acccess to project permissions for the current user.
++ Added *Search Objects* action - this allows robust search of DDS objects using Elasticsearch Query DSL.
+
+02-May-2016
+--------------
++ For *Provenance Relations* resource - added `to` and `from` properties to resource - this provides clients with insight to the W3C relationship direction.
++ Added *Provenance Inferred* section - provides overview of inferred relations for initial provenance release.  
+
+10-Jun-2016
+--------------
++ For *Provenace Relations* resource - modified `to` and `from` properties to render complete JSON representation for the node vs. partial.
++ Added new rule - requires 'invalidated' entity to be deleted prior to recording 'wasInvalidatedBy' relation. 
++ Added new rule - cascades logical delete of provenance node to any direct (i.e. single hop away) provenance relations.
++ Change permission model for `wasGeneratedBy` and `wasDerivedFrom` relations - for both create operations, `update_file` permission is required for the `generated` entity.
 
 ## Group API Usage
 
@@ -66,7 +95,7 @@ In an effort to promote provenance, all programmatic access to the API must util
 
 Exploring the API
 --------------
-In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://apiuatest.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
@@ -90,7 +119,7 @@ To make it easy for clients to manage pagination, the following headers will alw
 
 Audit Object
 --------------
-Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` key in resource specific payloads.
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` property in resource specific payloads.
 
     "audit": {
         "created_on": "2015-01-01T12:00:00Z",
@@ -160,7 +189,7 @@ Represents the set of discrete permissions that can be granted to a user.
 | **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
 | **project_viewer** | Project Viewer | Can only view project and file metadata | view_project |
 | **file_downloader** | File Downloader | Can download files | view_project, download_file |
-| **file_uploader** | File Uploader | Can upload files | view_project, create_file |
+| **file_uploader** | File Uploader | Can upload files | view_project, create_file, update_file |
 | **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
 
 
@@ -174,8 +203,8 @@ Represents the set of discrete permissions that can be granted to a user.
 | **delete_project** | Can delete project |
 | **manage_project_permissions** | Can grant/revoke project level permissions |
 | **download_file** | Can download file |
-| **create_file** | Can upload new file |
-| **update_file** | Can upload new version of existing file |
+| **create_file** | Can upload new file and modify file metadata |
+| **update_file** | Can upload new version of existing file and modify file metadata |
 | **delete_file** | Can delete a file |
 
 ## Authorization Roles collection [/auth_roles{?context}]
@@ -194,8 +223,10 @@ Represents the set of discrete permissions that can be granted to a user.
                     "id": "system_admin",
                     "name": "System Admin",
                     "description": "Can manage system level permissions and perform all operations across all projects",
-                    "permissions": [
-                        {"id": "system_admin"}
+                    "permissions": [ 
+                        {
+                            "id": "system_admin"
+                        }
                     ],
                     "contexts": ["system"],
                     "is_deprecated": false
@@ -217,9 +248,13 @@ Represents the set of discrete permissions that can be granted to a user.
             "id": "file_editor",
             "name": "File Editor",
             "description": "Can view, download, create, update and delete files",
-            "permissions": [
-                {"id": "view_project"},
-                {"id": "download_file"}
+            "permissions": [ 
+                {
+                    "id": "view_project"
+                }, 
+                {
+                    "id": "download_file"
+                } 
             ],
             "contexts": ["project"],
             "is_deprecated": false
@@ -270,7 +305,7 @@ Creates software agent and an associated secret API key; the secret key is visib
 + Response 200 (application/json)
 
         {
-            "results": [
+            "results": [ 
                 {
                     "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
                     "name": "Hash computation agent",
@@ -278,7 +313,7 @@ Creates software agent and an associated secret API key; the secret key is visib
                     "repo_url": null,
                     "is_deleted": false,
                     "audit": { }
-                }
+                } 
             ]
         }
 
@@ -372,7 +407,7 @@ Shows the secret key for the software agent.
 >**Permission:** creator or system_admin
 - - - - -
 
-+ Response 204
++ Response 204 
 
 ## Software Agent Access Token [/software_agents/api_token]
 
@@ -397,9 +432,9 @@ Using a software agent secret key and a user secret key, get an access token.
 - - - - -
 + The agent associated with the agent key must not have been logically deleted.
 
-+ Request
++ Request 
 
-        {
+        { 
             "agent_key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
             "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
         }
@@ -409,7 +444,7 @@ Using a software agent secret key and a user secret key, get an access token.
         {
             "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
             "expire_on": 1455571739,
-            "time_to_live": 14400
+            "time_to_live": 14400 
         }
 
 ## Group Current User
@@ -418,8 +453,14 @@ Represents the currently authenticated user.
 ## Current User instance [/current_user]
 
 ### View current user [GET]
+Get profile for the currently authenticated user.
+
 >**Permission:** authenticated
 - - - - -
+
+>**Rules**
+- - - - -
++ The `agent` property is populated if user is authenticated via software agent token, otherwise the `agent` property is `null`.
 
 + Response 200 (application/json)
 
@@ -434,6 +475,10 @@ Represents the currently authenticated user.
                 "source": "duke_shibboleth",
                 "uid": "gardner100"
             },
+            "agent": {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hashing computation agent"
+            },
             "last_login_on": "2015-01-01T12:00:00Z",
             "audit": { }
         }
@@ -441,7 +486,7 @@ Represents the currently authenticated user.
 ## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 
->**Permission:** view_project
+>**Permission:** authenticated [scope: view_project]
 - - - - -
 
 >**Response Properties**
@@ -453,7 +498,7 @@ View summary usage for current user across all projects.
 >**Rules**
 - - - - -
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
-+ Counts/totals are only for objects user has visibility to via the view_project permission.
++ Counts/totals are only for project resources that are visible to the current user.
 
 + Response 200 (application/json)
 
@@ -502,7 +547,7 @@ Generates a secret key for the current user that can be used to access the API a
 >**Permission:** authenticated
 - - - - -
 
-+ Response 204
++ Response 204 
 
 ## Group Users
 Represents registered users.
@@ -514,9 +559,9 @@ Represents registered users.
 - - - - -
 
 + Parameters
-    + full_name_contains (string, optional, `gardner`) ... Returns users where their `full_name` contains the specified string.
-    + first_name_begins_with (string, optional, `mat`) ... Returns users where their `first_name` begins with the specified string.
-    + last_name_begins_with (string, optional, `gar`) ... Returns users where their `last_name` begins with the specified string.
+    + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
+    + first_name_begins_with (string, optional, `mat`) ... Returns users where their first name begins with the specified string.
+    + last_name_begins_with (string, optional, `gar`) ... Returns users where their last name begins with the specified string.
 
 + Response 200 (application/json)
 
@@ -583,10 +628,10 @@ Represents system level authorization roles that have been granted to a user.
                         "username": "mrgardner01",
                         "full_name": "Matthew Gardner"
                     },
-                    "auth_role": {
-                        "id": "system_admin",
-                        "name": "System Admin",
-                        "description": "Can manage system level permissions and perform all operations across all projects"
+                    "auth_role": { 
+                        "id": "system_admin", 
+                        "name": "System Admin", 
+                        "description": "Can manage system level permissions and perform all operations across all projects" 
                     }
                 }
             ]
@@ -594,7 +639,7 @@ Represents system level authorization roles that have been granted to a user.
 
 ## System Permission instance [/system/permissions/{user_id}]
 + Parameters
-    + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `user_id` of the user.
+    + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the user.
 
 + Model (application/json)
 
@@ -606,10 +651,10 @@ Represents system level authorization roles that have been granted to a user.
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": {
-                    "id": "system_admin",
-                    "name": "System Admin",
-                    "description": "Can manage system level permissions and perform all operations across all projects"
+                "auth_role": { 
+                    "id": "system_admin", 
+                    "name": "System Admin", 
+                    "description": "Can manage system level permissions and perform all operations across all projects" 
                 }
             }
 
@@ -633,7 +678,7 @@ Represents system level authorization roles that have been granted to a user.
     [System Permission instance][]
 
 ### View system permission [GET]
->**Permission:** system_admin OR system permissions are for the current user
+>**Permission:** system_admin
 - - - - -
 
 + Response 200
@@ -678,7 +723,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
         }
 
 ### List projects [GET]
->**Permission:** view_project
+>**Permission:** authenticated [scope: view_project]
 - - - - -
 
 >**Rules**
@@ -755,7 +800,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
 + Response 204
 
-## NOT_IMPLEMENTED Project usage [GET /projects/{id}/usage]
+## NOT_IMPLEMENTED_NEW Project usage [GET /projects/{id}/usage]
 View summary usage for the project.
 
 >**Permission:** view_project
@@ -770,7 +815,6 @@ View summary usage for the project.
 >**Rules**
 - - - - -
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
-+ Counts/totals are only for objects user has visibility to via the view_project permission.
 
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
@@ -805,10 +849,10 @@ Represents project level authorization roles that have been granted to a user.
                         "username": "mrgardner01",
                         "full_name": "Matthew Gardner"
                     },
-                    "auth_role": {
-                        "id": "file_editor",
-                        "name": "File Editor",
-                        "description": "Can view, download, create, update and delete files"
+                    "auth_role": { 
+                        "id": "file_editor", 
+                        "name": "File Editor", 
+                        "description": "Can view, download, create, update and delete files" 
                     }
                 }
             ]
@@ -816,8 +860,8 @@ Represents project level authorization roles that have been granted to a user.
 
 ## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
 + Parameters
-    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `project_id` of the project.
-    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `user_id` of the user.
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
 
 + Model (application/json)
 
@@ -830,10 +874,10 @@ Represents project level authorization roles that have been granted to a user.
                     "username": "mrgardner01",
                     "full_name": "Matthew Gardner"
                 },
-                "auth_role": {
-                    "id": "file_editor",
-                    "name": "File Editor",
-                    "description": "Can view, download, create, update and delete files"
+                "auth_role": { 
+                    "id": "file_editor", 
+                    "name": "File Editor", 
+                    "description": "Can view, download, create, update and delete files" 
                 }
             }
 
@@ -950,9 +994,9 @@ Represents an individual that plays some project level role of interest from a c
                         "full_name": "Matthew Gardner",
                         "email": "mrgardner01@duke.edu"
                     },
-                    "project_role": {
-                        "id": "principal_investigator",
-                        "name": "Principal Investigator"
+                    "project_role": { 
+                        "id": "principal_investigator", 
+                        "name": "Principal Investigator" 
                     }
                 }
             ]
@@ -960,8 +1004,8 @@ Represents an individual that plays some project level role of interest from a c
 
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
 + Parameters
-    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `project_id` of the project.
-    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `user_id` of the user.
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
 
 + Model (application/json)
 
@@ -974,9 +1018,9 @@ Represents an individual that plays some project level role of interest from a c
                     "full_name": "Matthew Gardner",
                     "email": "mrgardner01@duke.edu"
                 },
-                "project_role": {
-                    "id": "principal_investigator",
-                    "name": "Principal Investigator"
+                "project_role": { 
+                    "id": "principal_investigator", 
+                    "name": "Principal Investigator" 
                 }
             }
 
@@ -1078,14 +1122,14 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Response Properties**
 - - - - -
-+ **ancestors (object[ ])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
++ **ancestors (object[])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
 
 + Request (application/json)
 
         {
-            "parent": {
-                "kind": "dds-folder",
-                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" 
             },
             "name": "Raw Data"
         }
@@ -1095,22 +1139,24 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                    "name": "Sequencing Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                    "name": "Sequencing Core" 
                 }
             ],
             "is_deleted": false,
@@ -1130,22 +1176,24 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                    "name": "Sequencing Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                    "name": "Sequencing Core" 
                 }
             ],
             "is_deleted": false,
@@ -1176,9 +1224,9 @@ A folder is a container for files and sub-folders; folders are located in the to
 + Request (application/json)
 
         {
-            "parent": {
-                "kind": "dds-folder",
-                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" 
             }
         }
 
@@ -1187,22 +1235,24 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" 
             },
             "name": "Raw Data",
-            "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc",
-                    "name": "Flow Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc", 
+                    "name": "Flow Core" 
                 }
             ],
             "is_deleted": false,
@@ -1227,22 +1277,22 @@ A folder is a container for files and sub-folders; folders are located in the to
         {
             "kind": "dds-folder",
             "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc" 
             },
             "name": "Model Data",
             "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc",
-                    "name": "Flow Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "482be8c5-209d-4e3b-afaf-cb66686ffbcc", 
+                    "name": "Flow Core" 
                 }
             ],
             "is_deleted": false,
@@ -1267,8 +1317,6 @@ This is the first step in uploading a large file. An upload objects is created a
 + **name (string, required)** - The name of the client file to upload.
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
-+ **hash.value (number, required)** - The entire file hash (computed by client).
-+ **hash.algorithm (string, required)** - The algorithm used to compute entire file hash (i.e. md5, sha256, sha1, etc.).
 
 >**Response Properties**
 - - - - -
@@ -1281,11 +1329,7 @@ This is the first step in uploading a large file. An upload objects is created a
         {
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
-            "size": 30024000,
-            "hash": {
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                "algorithm": "md5"
-            }
+            "size": 30024000
         }
 
 + Response 201 (application/json)
@@ -1296,17 +1340,12 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": {
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                "algorithm": "md5",
-                "client_reported": true,
-                "confirmed": false
-            },
+            "hashes": [ ],
             "chunks": [ ],
-            "storage_provider": {
-                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                "name": "duke_oit_swift", "description":
-                "Duke OIT Storage"
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", "description": 
+                "Duke OIT Storage" 
             },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
@@ -1318,7 +1357,7 @@ This is the first step in uploading a large file. An upload objects is created a
         }
 
 ### List chunked uploads [GET]
->**Permission:** create_file
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -1330,17 +1369,12 @@ This is the first step in uploading a large file. An upload objects is created a
                     "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
                     "content_type": "application/octet-stream",
-                    "hash": {
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                        "algorithm": "md5",
-                        "client_reported": true,
-                        "confirmed": false
-                    },
+                    "hashes": [ ],
                     "chunks": [ ],
-                    "storage_provider": {
-                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                        "name": "duke_oit_swift",
-                        "description": "Duke OIT Storage"
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
                     },
                     "status": {
                         "initiated_on": "2015-07-10T13:00:00Z",
@@ -1357,8 +1391,8 @@ This is the first step in uploading a large file. An upload objects is created a
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
-## View chunked upload [GET]
->**Permission:** create_file
+### View chunked upload [GET]
+>**Permission:** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -1369,27 +1403,22 @@ This is the first step in uploading a large file. An upload objects is created a
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": {
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                "algorithm": "md5",
-                "client_reported": true,
-                "confirmed": false
-            },
+            "hashes": [ ],
             "chunks": [
                 {
                     "number": 1,
                     "size": 10000,
-                    "hash": {
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                        "algorithm": "md5"
+                    "hash": { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5" 
                     }
                 }
             ],
-            "storage_provider": {
-                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                "name": "duke_oit_swift",
-                "description":
-                "Duke OIT Storage"
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": 
+                "Duke OIT Storage" 
             },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
@@ -1428,9 +1457,9 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
         {
             "number": 1,
             "size": 5024000,
-            "hash": {
-                "value": "ey23df2207d99a74fbe169e3eba035e633b65d76",
-                "algorithm": "md5"
+            "hash": { 
+                "value": "ey23df2207d99a74fbe169e3eba035e633b65d76", 
+                "algorithm": "md5" 
             }
         }
 
@@ -1469,34 +1498,29 @@ This operation is called by the client after all file chunks have been successfu
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hash": {
-                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                "algorithm": "md5",
-                "client_reported": true,
-                "confirmed": false
-            },
+            "hashes": [ ],
             "chunks": [
                 {
                     "number": 1,
                     "size": 5024000,
-                    "hash": {
-                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88",
-                        "algorithm": "md5"
+                    "hash": { 
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
+                        "algorithm": "md5" 
                     }
                 },
                 {
                     "number": 2,
                     "size": 5024000,
-                    "hash": {
-                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq",
-                        "algorithm": "md5"
+                    "hash": { 
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
+                        "algorithm": "md5" 
                     }
                 }
             ],
-            "storage_provider": {
-                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                "name": "duke_oit_swift",
-                "description": "Duke OIT Storage"
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": "Duke OIT Storage" 
             },
             "status": {
                 "initiated_on": "2015-07-10T13:00:00Z",
@@ -1507,13 +1531,88 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
+## Report upload hash [PUT /uploads/{id}/hashes]
+Report hash (fingerprint) for the uploaded (or to be uploaded) file.
+
+>**Permission:** update_file
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **value (string, required)** - The entire file hash (computed by client).
++ **algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
+
+>**Rules**
+- - - - -
++ The reported `value` must be a valid algorithm - supported/valid algorithms are: `md5`, `sha256`, and `sha1`.
+
++ Parameters
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Request 
+
+        {
+            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+            "algorithm": "md5"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hashes": [
+                { 
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                    "algorithm": "md5",
+                    "audit": { }
+                }
+            ],
+            "chunks": [
+                {
+                    "number": 1,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "jw23df2207d99a74fbe169e3eba035e633b65d88", 
+                        "algorithm": "md5" 
+                    }
+                },
+                {
+                    "number": 2,
+                    "size": 5024000,
+                    "hash": { 
+                        "value": "ry23df2207d99a74fbe169e3eba035e633b65dkq", 
+                        "algorithm": "md5" 
+                    }
+                }
+            ],
+            "storage_provider": { 
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                "name": "duke_oit_swift", 
+                "description": "Duke OIT Storage" 
+            },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": "2015-07-10T13:00:00Z",
+                "error_on": null,
+                "error_message": null
+            },
+            "audit": { }
+        }
+
+
 ## Group Files
-A file resource represents a virtual container for a pyhsical data file (i.e. `upload`) that is located in a storage backend supported by Duke Data Services (i.e. Duke OIT Swift).
+A file resource represents a virtual container for a physical data file (i.e. `upload`) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).
 
 ## Files collection [/files]
 
 ### Create file [POST]
 Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see `Uploads` actions).
+
+*Note: A file is a versionable resource; this action creates the initial version of a file.  New file versions can be created (uploaded) via the* `/file/{id}/update` *action.  Versions can be managed via the* **File Versions** *actions.*
 
 >**Permission:** create_file
 - - - - -
@@ -1523,7 +1622,7 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + **parent.kind (string, required)** - The kind of parent container for the file; this can be a project (i.e. `dds-project`) or a folder (i.e. `dds-folder`).
 + **parent.id (string, required)** - The unique id of the parent.
 + **upload.id (string, required)** - The unique id for an upload that completed successfully.
-+ **label (string, optional)** - An optional short display label for the file.
++ **label (string, optional)** - An optional version label for the file.
 
 >**Rules**
 - - - - -
@@ -1534,11 +1633,13 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + Request (application/json)
 
         {
-            "parent": {
-                "kind": "dds-folder",
-                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "ad9115b8-1e4a-4399-b606-56622eb462e1" 
             },
-            "upload": {"id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"},
+            "upload": {
+                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23"
+            },
             "label": "Initial raw data from device"
         }
 
@@ -1547,36 +1648,45 @@ Creates a file metadata resource; the client is responsible for the creation of 
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                    "name": "Sequencing Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                    "name": "Sequencing Core" 
                 }
             ],
-            "label": "Initial raw data from device",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift",
-                    "description": "Duke OIT Storage"
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 1,
+                "label": "Initial raw data from device",
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1595,66 +1705,77 @@ Creates a file metadata resource; the client is responsible for the creation of 
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                    "name": "Sequencing Core"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                    "name": "Sequencing Core" 
                 }
             ],
-            "label": "Initial raw data from device",
             "is_deleted": false,
-            "upload": {
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 1,
+                "label": "Initial raw data from device",
+                "upload": {
                     "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                     "size": 30024000,
-                    "hash": {
-                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                        "algorithm": "md5"
-                    },
-                    "storage_provider": {
-                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                        "name": "duke_oit_swift",
-                        "description": "Duke OIT Storage"
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
                     }
-                },
+                }
+            },
             "audit": { }
         }
 
 ### Update file [PUT]
-Updates one or more file resource properties; if this action includes and `upload` property in the request, the previous file resource is transitioned to version history (see **File Versions**).
+Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
-*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+*Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
 >**Permission:** update_file
 - - - - -
 
 >**Properties**
 - - - - -
-+ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully; if specified, the previous file resource is versioned.
-+ **label (string, optional)** - An optional short display label for the file.
++ **upload.id (string, optional)** - An optional unique id for an upload that completed successfully; if specified, a new file version is created.
++ **label (string, optional)** - An optional version label for the file.
 
 >**Rules**
 - - - - -
 + The current user must be the user who uploaded the file.
 + The upload must be in a completed state (i.e. `upload.completed_on != null`).
 + Only `upload.id`, `label` properties can be updated via this action.
-+ Prior versions are assigned the next sequential `version` number. (see **File Versions**)
++ New versions are assigned the next sequential `version` number. (see **File Versions**)
 
 + Request (application/json)
 
         {
-            "upload": {"id": "422f8778-a62c-4918-8b1b-f398a041345a"},
+            "upload": {
+                "id": "422f8778-a62c-4918-8b1b-f398a041345a"
+            },
             "label": "Post pairwise sequence alignment"
         }
 
@@ -1663,37 +1784,46 @@ Updates one or more file resource properties; if this action includes and `uploa
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
-                    "name": "Sequencing Archive"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                    "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "422f8778-a62c-4918-8b1b-f398a041345a",
-                "size": 30024038,
-                "hash": {
-                    "value": "jkl5df2207d99a74fbe169e3eba035e633b67drt",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift", "description":
-                    "Duke OIT Storage"
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1705,29 +1835,33 @@ Updates one or more file resource properties; if this action includes and `uploa
 
 >**Rules**
 - - - - -
-+ This operation recursively deletes related file versions.
++ This operation recursively deletes all the related file versions.
 
 + Response 204
 
 ## Get file download URL [GET /files/{id}/url]
-Generates and returns a storage provider specific pre-signed URL that client can use to download file.
+Generates and returns a storage provider specific pre-signed URL that client can use to download file; the download URL is for the current version of the specified file.  
+
+*Note: This action returns URL to download current version of the file - to download a prior version see* **File Versions** *actions.*
 
 >**Permission:** download_file
 - - - - -
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
-
+   
 + Response 200 (application/json)
 
         {
             "http_verb": "GET",
             "host": "swift.oit.duke.edu",
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
-            "http_headers": []
+            "http_headers": [ ]
         }
 
 ## Move file [PUT /files/{id}/move]
+Move file to a different parent project or parent folder.
+
 >**Permission:** create_file
 - - - - -
 
@@ -1737,9 +1871,9 @@ Generates and returns a storage provider specific pre-signed URL that client can
 + Request (application/json)
 
         {
-            "parent": {
-                "kind": "dds-folder",
-                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             }
         }
 
@@ -1748,44 +1882,55 @@ Generates and returns a storage provider specific pre-signed URL that client can
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
-                    "name": "Sequencing Archive"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                    "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift",
-                    "description": "Duke OIT Storage"
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
         }
 
 ## Rename file [PUT /files/{id}/rename]
->**Permission:** create_file
+Change the name of a file.
+
+>**Permission:** update_file
 - - - - -
 
 + Parameters
@@ -1803,37 +1948,46 @@ Generates and returns a storage provider specific pre-signed URL that client can
         {
             "kind": "dds-file",
             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-            "parent": {
-                "kind": "dds-folder",
-                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+            "parent": { 
+                "kind": "dds-folder", 
+                "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
             },
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata",
-            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "project": {
+                "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+            },
             "ancestors": [
-                {
-                    "kind": "dds-project",
-                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                    "name": "Knockout Mouse Project (KOMP)"
+                { 
+                    "kind": "dds-project", 
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                    "name": "Knockout Mouse Project (KOMP)" 
                 },
-                {
-                    "kind": "dds-folder",
-                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
-                    "name": "Sequencing Archive"
+                { 
+                    "kind": "dds-folder", 
+                    "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                    "name": "Sequencing Archive" 
                 }
             ],
-            "label": "Post pairwise sequence alignment",
             "is_deleted": false,
-            "upload": {
-                "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                "size": 30024000,
-                "hash": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift",
-                    "description": "Duke OIT Storage"
+            "current_version": {
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "version": 2,
+                "label": "Post pairwise sequence alignment",
+                "upload": {
+                    "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
                 }
             },
             "audit": { }
@@ -1842,14 +1996,14 @@ Generates and returns a storage provider specific pre-signed URL that client can
 ## Group File Versions
 The actions herein are used to interact with prior versions of a file resource.
 
-*Note: Only the `upload` and `label` properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
+*Note: Only the* `upload` *and* `label` *properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.*
 
 ## File Versions collection [/files/{id}/versions]
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
 
 ### List file versions [GET]
-If there are previous versions of a file, this action can be used to retrieve information about the older versions.
+This action can be used to list all prior versions of a file, including the current version.
 
 >**Permission:** view_project
 - - - - -
@@ -1867,7 +2021,10 @@ If there are previous versions of a file, this action can be used to retrieve in
                     "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                     "file": {
                         "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                        "project": {
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                        }
                     },
                     "version": 1,
                     "label": "Initial raw data from device",
@@ -1875,14 +2032,17 @@ If there are previous versions of a file, this action can be used to retrieve in
                     "upload": {
                         "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                         "size": 30024000,
-                        "hash": {
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                            "algorithm": "md5"
-                        },
-                        "storage_provider": {
-                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                            "name": "duke_oit_swift",
-                            "description": "Duke OIT Storage"
+                        "hashes": [
+                            { 
+                                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                "algorithm": "md5",
+                                "audit": { }
+                            }
+                        ],
+                        "storage_provider": { 
+                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                            "name": "duke_oit_swift", 
+                            "description": "Duke OIT Storage" 
                         }
                     },
                     "audit": { }
@@ -1905,7 +2065,10 @@ If there are previous versions of a file, this action can be used to retrieve in
             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
             "file": {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
             },
             "version": 1,
             "label": "Initial raw data from device",
@@ -1913,20 +2076,23 @@ If there are previous versions of a file, this action can be used to retrieve in
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift",
-                    "description": "Duke OIT Storage"
+                "hashes": [
+                    { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                    }
+                ],
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
                 }
             },
             "audit": { }
         }
 
-### Update file version [PUT]
+### Update file version [PUT] 
 **Permission:** update_file
 - - - - -
 
@@ -1947,7 +2113,10 @@ If there are previous versions of a file, this action can be used to retrieve in
             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
             "file": {
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
             },
             "version": 1,
             "label": "Post pairwise sequence alignment (piecewise)",
@@ -1955,14 +2124,17 @@ If there are previous versions of a file, this action can be used to retrieve in
             "upload": {
                 "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
                 "size": 30024000,
-                "hash": {
-                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                    "algorithm": "md5"
-                },
-                "storage_provider": {
-                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                    "name": "duke_oit_swift",
-                    "description": "Duke OIT Storage"
+                "hashes": [
+                    { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                    }
+                ],
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
                 }
             },
             "audit": { }
@@ -1971,6 +2143,11 @@ If there are previous versions of a file, this action can be used to retrieve in
 ### Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
+
+>**Rules**
+- - - - -
++ The current file version cannot be deleted.
++ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
@@ -1982,16 +2159,63 @@ Generates and returns a storage provider specific pre-signed URL that client can
 
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
-
+   
 + Response 200 (application/json)
 
         {
             "http_verb": "GET",
             "host": "swift.oit.duke.edu",
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
-            "http_headers": []
+            "http_headers": [ ]
         }
 
+## NOT_IMPLEMENTED_NEW Promote file version [POST /file_versions/{id}/current]
+This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the versions stack. 
+
+>**Permission:** update_file
+- - - - -
+
+>**Rules**
+- - - - -
++ The current file version cannot be promoted.
+
++ Parameters
+    + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version to be promoted to the current version.
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-file-version",
+            "id": "66ed147e-2312-4974-999a-58ec77230182",
+            "file": {
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                "project": {
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                }
+            },
+            "version": 3,
+            "label": "Post pairwise sequence alignment (piecewise)",
+            "is_deleted": false,
+            "upload": {
+                "id": "56a0431f-5a89-455a-aa2d-996ae9226601",
+                "size": 30024000,
+                "hashes": [
+                    { 
+                        "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                        "algorithm": "md5",
+                        "audit": { }
+                    }
+                ],
+                "storage_provider": { 
+                    "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                    "name": "duke_oit_swift", 
+                    "description": "Duke OIT Storage" 
+                }
+            },
+            "audit": { }
+        }
+               
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
@@ -2017,22 +2241,24 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-folder",
                     "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
-                    "parent": {
-                        "kind": "dds-folder",
-                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+                    "parent": { 
+                        "kind": "dds-folder", 
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
                     },
                     "name": "Raw Data",
-                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
                     "ancestors": [
-                        {
-                            "kind": "dds-project",
-                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                            "name": "Knockout Mouse Project (KOMP)"
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                            "name": "Knockout Mouse Project (KOMP)" 
                         },
-                        {
-                            "kind": "dds-folder",
-                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                            "name": "Sequencing Core"
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                            "name": "Sequencing Core" 
                         }
                     ],
                     "is_deleted": false,
@@ -2041,37 +2267,46 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "parent": {
-                        "kind": "dds-folder",
-                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+                    "parent": { 
+                        "kind": "dds-folder", 
+                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
                     },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
                     "ancestors": [
-                        {
-                            "kind": "dds-project",
-                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                            "name": "Knockout Mouse Project (KOMP)"
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                            "name": "Knockout Mouse Project (KOMP)" 
                         },
-                        {
-                            "kind": "dds-folder",
-                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
-                            "name": "Sequencing Archive"
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                            "name": "Sequencing Archive" 
                         }
                     ],
-                    "label": "Initial raw data from device",
                     "is_deleted": false,
-                    "upload": {
-                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                        "size": 30024000,
-                        "hash": {
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                            "algorithm": "md5"
-                        },
-                        "storage_provider": {
-                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                            "name": "duke_oit_swift",
-                            "description": "Duke OIT Storage"
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
                         }
                     },
                     "audit": { }
@@ -2102,21 +2337,23 @@ Search for the children (i.e. folders and files) of a project or folder.
                     "kind": "dds-folder",
                     "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
                     "parent": {
-                        "kind": "dds-folder",
-                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+                        "kind": "dds-folder", 
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
                     },
                     "name": "Raw Data",
-                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
                     "ancestors": [
-                        {
-                            "kind": "dds-project",
-                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                            "name": "Knockout Mouse Project (KOMP)"
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                            "name": "Knockout Mouse Project (KOMP)" 
                         },
-                        {
-                            "kind": "dds-folder",
-                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
-                            "name": "Sequencing Core"
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                            "name": "Sequencing Core" 
                         }
                     ],
                     "is_deleted": false,
@@ -2125,52 +2362,61 @@ Search for the children (i.e. folders and files) of a project or folder.
                 {
                     "kind": "dds-file",
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "parent": {
-                        "kind": "dds-folder",
-                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e"
+                    "parent": { 
+                        "kind": "dds-folder", 
+                        "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e" 
                     },
                     "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                    "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
                     "ancestors": [
-                        {
-                            "kind": "dds-project",
-                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                            "name": "Knockout Mouse Project (KOMP)"
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", 
+                            "name": "Knockout Mouse Project (KOMP)" 
                         },
-                        {
-                            "kind": "dds-folder",
-                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
-                            "name": "Sequencing Archive"
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e", 
+                            "name": "Sequencing Archive" 
                         }
                     ],
-                    "label": "Initial raw data from device",
                     "is_deleted": false,
-                    "upload": {
-                        "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
-                        "size": 30024000,
-                        "hash": {
-                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
-                            "algorithm": "md5"
-                        },
-                        "storage_provider": {
-                            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
-                            "name": "duke_oit_swift",
-                            "description": "Duke OIT Storage"
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
                         }
                     },
                     "audit": { }
                 }
             ]
         }
-
+        
 ## Group Provenance Activities
 Represents the main record of provenance in DDS; it is analogous to *Activity* defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Activities are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
-*Note: Provenance relations to an activity, such as `Used` and `WasGeneratedBy` are managed through the `Provenance Relations` API actions.*
+*Note: Provenance relations to an activity, such as* `used` *and* `wasGeneratedBy` *are managed through the* **Provenance Relations** *API actions.*
 
 ## Activities collection [/activities]
 
-### NOT_IMPLEMENTED Create activity [POST]
+### Create activity [POST]
 >**Permission:** authenticated
 - - - - -
 
@@ -2183,11 +2429,11 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 
 >**Rules**
 - - - - -
-+ The `ended_on` time must be greater than or equal to the `started_on` time.
++ The `ended_on` time must be greater than or equal to the `started_on` time. 
 
 + Request (application/json)
 
-        {
+        { 
             "name": "RF PI3-Kinase",
             "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity"
         }
@@ -2205,10 +2451,10 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List activities [GET]
->**Permission:**
+### List activities [GET]
+>**Permission:** 
 - - - - -
-+ creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
++ authenticated [scope: creator *or* visiblity to single entity that has a provenance relation to the activity]
 
 >**Rules**
 - - - - -
@@ -2235,10 +2481,10 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 + Parameters
     + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
 
-### NOT_IMPLEMENTED View activity [GET]
->**Permission:**
+### View activity [GET]
+>**Permission:** 
 - - - - -
-+ creator *or* visiblity to single entity that has a `Used` or `WasGeneratedBy` relation to the activity
++ creator *or* visiblity to single entity that has a provenance relation to the activity
 
 + Response 200 (application/json)
 
@@ -2253,7 +2499,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Update activity [PUT]
+### Update activity [PUT]
 >**Permission:** creator
 - - - - -
 
@@ -2280,73 +2526,37 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete activity [DELETE]
+### Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
+
+>**Rules**
+- - - - -
++ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
 ## Group Provenance Relations
 Represents provenance relations as defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Relations are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
-*Note: Provenance relations currently supported are `Used` and `WasGeneratedBy`.*
-
 ## Relations collection [/relations]
 
-### NOT_IMPLEMENTED Create used relation [POST /relations/used]
->**Permission:** creator of the activity *and* visibility to the `Used` entity
+### Create used relation [POST /relations/used]
+>**Permission:** creator of the activity *and* visibility to the `used` entity
 - - - - -
 
 >**Properties**
 - - - - -
 + **activity.id (string, required)** - The activity that used the entity.
-+ **entity.kind (string, optional)** - The kind of entity that was used; this is one of `dds-file` or `dds-file-version`.
-+ **entity.id (string, optional)** - The unique id of the used entity.
++ **entity.kind (string, required)** - The kind of entity that was used; this must be a file version (i.e. `dds-file-version`).
++ **entity.id (string, required)** - The unique id of the used entity.
 
 + Request (application/json)
 
         {
-            "activity": {"id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"},
-            "entity": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
-            }
-        }
-
-+ Response 201 (application/json)
-
-        {
-            "kind": "dds-relation-used",
-            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
             "activity": {
-                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                "name": "RF PI3-Kinase",
-                "audit": { }
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
             },
-            "entity": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                "audit": { }
-            },
-            "is_deleted": false,
-            "audit": { }
-        }
-
-### NOT_IMPLEMENTED Create generated relation [POST /relations/generated]
->**Permission:** creator of the activity *and* visibility to the `WasGeneratedBy` entity
-- - - - -
-
->**Properties**
-- - - - -
-+ **activity.id (string, required)** - The activity that generated the entity.
-+ **entity.kind (string, optional)** - The kind of entity that was generated; this is one of `dds-file` or `dds-file-version`.
-+ **entity.id (string, optional)** - The unique id of the generated entity.
-
-+ Request (application/json)
-
-        {
-            "activity": {"id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"},
             "entity": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b"
@@ -2356,32 +2566,297 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 + Response 201 (application/json)
 
         {
-            "kind": "dds-relation-generated",
-            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-            "activity": {
+            "kind": "dds-relation-used", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
+                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "started_on": "2015-01-01T12:00:00Z",
+                "ended_on": "2015-01-01T114:30:00Z",
+                "is_deleted": false,
                 "audit": { }
             },
-            "entity": {
+            "to": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "name": "RF PI3-Kinase"
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
                 },
                 "version": 1,
                 "label": "Post pairwise sequence alignment (piecewise)",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
                 "audit": { }
             },
-            "is_deleted": false,
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List provenance relations [GET /relations/{object_kind}/{object_id}]
-List the `Used` and `WasGeneratedBy` relations for a provenance node; this only lists direct relations for the node that are a single hop away.
+### Create was generated by relation [POST /relations/was_generated_by]
+>**Permission:** creator of the activity *and* update_file for the `wasGeneratedBy` entity
+- - - - -
 
->**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity (file or file version)
+>**Properties**
+- - - - -
++ **entity.kind (string, required)** - The kind of entity that was generated; this must be a file version (i.e. `dds-file-version`).
++ **entity.id (string, required)** - The unique id of the generated entity.
++ **activity.id (string, required)** - The activity that generated the entity.
+
++ Request (application/json)
+
+        {
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            },
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
+            }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-relation-was-generated-by", 
+            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "started_on": "2015-01-01T12:00:00Z",
+                "ended_on": "2015-01-01T114:30:00Z",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "audit": { }
+        }
+
+### Create was derived from relation [POST /relations/was_derived_from]
+>**Permission:** visibility to the `used` entity and update_file for the `generated` entity.
+- - - - -
+
+>**Properties**
+- - - - -
++ **generated_entity.kind (string, required)** - The kind of entity generated by the derivation; this must be a file version (i.e. `dds-file-version`).
++ **generated_entity.id (string, required)** - The unique id of the generated entity.
++ **used_entity.kind (string, required)** - The kind of entity used by the derivation; this must be a file version (i.e. `dds-file-version`).
++ **used_entity.id (string, required)** - The unique id of the used entity.
+
++ Request (application/json)
+
+        {
+            "generated_entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            },
+            "used_entity": {
+                "kind": "dds-file-version",
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b"
+            } 
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-relation-was-derived-from", 
+            "id": "6bf31123-b078-4655-ae4e-be599d52adc5",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-file-version",
+                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 1,
+                "label": "Initial raw data from device",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "audit": { }
+        }
+
+### Create was invalidated by relation [POST /relations/was_invalidated_by]
+>**Permission:** creator of the activity *and* delete_file for `wasInvalidatedBy` entity
+- - - - -
+
+>**Properties**
+- - - - -
++ **entity.kind (string, required)** - The kind of entity that was invalidated; this must be a file version (i.e. `dds-file-version`).
++ **entity.id (string, required)** - The unique id of the invalidated entity.
++ **activity.id (string, required)** - The activity that invalidated the entity.
+
+>**Rules**
+- - - - -
++ The `invalidated` entity must be in a deleted state (i.e. `"is_deleted": true`).
+
++ Request (application/json)
+
+        {
+            "entity": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+            },
+            "activity": {
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1"
+            }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "kind": "dds-relation-was-generated-by", 
+            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "started_on": "2015-01-01T12:00:00Z",
+                "ended_on": "2015-01-01T114:30:00Z",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "audit": { }
+        }
+
+
+### NOT_IMPLEMENTED_NEW List provenance relations [GET /relations/{object_kind}/{object_id}]
+List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
+
+>**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
 - - - - -
 
 >**Rules**
@@ -2389,7 +2864,7 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
 + Provenance relations that have been deleted (i.e. `"is_deleted": true`) are not included.
 
 + Parameters
-    + object_kind (string, required, `dds-activity`) ... The kind of provenance node; can be one of `dds-activity`, `dds-file` or `dds-file-version`.
+    + object_kind (string, required, `dds-activity`) ... The kind of provenance node; can be one of dds-activity or dds-file-version.
     + object_id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the node.
 
 + Response 200 (application/json)
@@ -2397,93 +2872,248 @@ List the `Used` and `WasGeneratedBy` relations for a provenance node; this only 
         {
             "results": [
                 {
-                    "kind": "dds-relation-used",
+                    "kind": "dds-relation-used", 
                     "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                    "activity": {
+                    "from": {
+                        "kind": "dds-activity",
                         "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                         "name": "RF PI3-Kinase",
+                        "is_deleted": false,
                         "audit": { }
                     },
-                    "entity": {
-                        "kind": "dds-file",
-                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                        "audit": { }
-                    },
-                    "is_deleted": false,
-                    "audit": { }
-                },
-                {
-                    "kind": "dds-relation-generated",
-                    "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-                    "activity": {
-                        "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                        "name": "RF PI3-Kinase",
-                        "audit": { }
-                    },
-                    "entity": {
+                    "to": {
                         "kind": "dds-file-version",
                         "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                         "file": {
                             "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                            "name": "RF PI3-Kinase"
+                            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                         },
                         "version": 1,
-                        "label": "Post pairwise sequence alignment (piecewise)",
+                        "label": "Initial raw data from device",
+                        "is_deleted": false,
                         "audit": { }
                     },
-                    "is_deleted": false,
                     "audit": { }
-                }
+                }            
             ]
         }
 
 ## Relation instance [/relations/{id}]
 + Parameters
-    + id (string, required, `372f25e1-01b0-4b8d-9524-e26dd573cc95`) ... The unique id of the provenance relation.
+    + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
-### NOT_IMPLEMENTED View relation [GET]
->**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity (i.e. file or file version)
+### View relation [GET]
+>**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
 
 + Response 200 (application/json)
 
-         {
-            "kind": "dds-relation-generated",
-            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-            "activity": {
+        {
+            "kind": "dds-relation-used", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
+                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "started_on": "2015-01-01T12:00:00Z",
+                "ended_on": "2015-01-01T114:30:00Z",
+                "is_deleted": false,
                 "audit": { }
             },
-            "entity": {
+            "to": {
                 "kind": "dds-file-version",
                 "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                 "file": {
                     "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                    "name": "RF PI3-Kinase"
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
                 },
                 "version": 1,
                 "label": "Post pairwise sequence alignment (piecewise)",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
                 "audit": { }
             },
-            "is_deleted": false,
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete relation [DELETE]
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-associated-with", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-activity",
+                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                "name": "RF PI3-Kinase",
+                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "started_on": "2015-01-01T12:00:00Z",
+                "ended_on": "2015-01-01T114:30:00Z",
+                "is_deleted": false,
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-user",
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                "auth_provider": {
+                    "source": "duke_shibboleth",
+                    "uid": "gardner100"
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": { }
+            },
+            "audit": { }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-attributed-to", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-user",
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "first_name": "Matthew",
+                "last_name": "Gardner",
+                "full_name": "Matthew Gardner",
+                "email": "mrgardner01@duke.edu",
+                "auth_provider": {
+                    "source": "duke_shibboleth",
+                    "uid": "gardner100"
+                },
+                "last_login_on": "2015-01-01T12:00:00Z",
+                "audit": { }
+            },
+            "audit": { }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-relation-was-attributed-to", 
+            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+            "from": {
+                "kind": "dds-file-version",
+                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                "file": {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    }
+                },
+                "version": 2,
+                "label": "Alignment performed on raw data",
+                "is_deleted": false,
+                "upload": {
+                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                    "size": 30024000,
+                    "hashes": [
+                        { 
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                            "algorithm": "md5",
+                            "audit": { }
+                        }
+                    ],
+                    "storage_provider": { 
+                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                        "name": "duke_oit_swift", 
+                        "description": "Duke OIT Storage" 
+                    }
+                },
+                "audit": { }
+            },
+            "to": {
+                "kind": "dds-software-agent",
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Sample pipeline agent",
+                "description": null,
+                "repo_url": null,
+                "is_deleted": false,
+                "audit": { }
+            },
+            "audit": { }
+        }
+
+### Delete relation [DELETE]
 >**Permission:** creator
 
 + Response 204
 
+## Group Provenance Inferred
+The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when **Erich Huang -> Python Agent** creates **Experiment A** and uploads **Data File A - Version 1**, the following provenance relations would be inferred (i.e. generated):
+
++ *Experiment A* -> **wasAssociatedWith** -> *Erich Huang*
++ *Data File A - Version 1* -> **wasAttributedTo** -> *Erich Huang*
++ *Data File A - Version 1* -> **wasAttributedTo** -> *Python Agent*
+
+To complete the provenance picture, client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* actions where relevant in their pipelines, these are not inferred from audit trail.
+
+*Note: To view sample JSON payload for the generated* `wasAssociatedWith` *and* `wasAttributedTo` *relations, see* `/relations/{id}` *action responses.*
+
 ## Group Search Provenance
-The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation.
+The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation. 
 
-*Note: The API design assumes the provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and that ubiquitous JavaScript libraries will be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
+*Note: The provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and ubiquitous JavaScript libraries can be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-## NOT_IMPLEMENTED Search Provenance [POST /search/provenance]
-Given a starting node *(activity, file, or file version)*, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
+## NOT_IMPLEMENTED_NEW Search Provenance [POST /search/provenance]
+Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
 
->**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity (file or file version)
+>**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity
 - - - - -
 
 >**Rule:**
@@ -2492,7 +3122,7 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
 
 >**Search Properties**
 - - - - -
-+ **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity`, `dds-file` or `dds-file-version`.
++ **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity` or `dds-file-version`.
 + **start_node.id (string, required)** - The unique id of the node.
 + **max_hops (number, optional)** -  The max number of hops (degree of node separation) to traverse from the starting node; defaults to infinity.
 
@@ -2507,77 +3137,88 @@ Given a starting node *(activity, file, or file version)*, returns a graph struc
 
 + Response 200 (application/json)
 
-        {
+        { 
             "graph": {
                 "nodes": [
                     {
-                        "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                        "labels": ["Actvity"],
+                        "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
+                        "labels": ["Activity"], 
                         "properties": {
                             "kind": "dds-activity",
                             "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                             "name": "RF PI3-Kinase",
+                            "is_deleted": false,
                             "audit": { }
                         }
                     },
                     {
-                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "labels": ["File"],
-                        "properties": {
-                            "kind": "dds-file",
-                            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
-                            "audit": { }
-                        }
-                    },
-                    {
-                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
-                        "labels": ["File Version"],
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
+                        "labels": ["File Version"], 
                         "properties": {
                             "kind": "dds-file-version",
                             "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                             "file": {
                                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                                "name": "RF PI3-Kinase"
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
                             },
                             "version": 1,
-                            "label": "Post pairwise sequence alignment (piecewise)",
+                            "label": "Initial raw data from device",
+                            "is_deleted": false,
+                            "audit": { }
+                        }
+                    },
+                    {
+                        "id": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
+                        "labels": ["File Version"], 
+                        "properties": {
+                            "kind": "dds-file-version",
+                            "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                            "file": {
+                                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                            },
+                            "version": 2,
+                            "label": "Alignment performed on raw data",
+                            "is_deleted": false,
                             "audit": { }
                         }
                     }
                 ],
                 "relationships": [
                     {
-                        "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                        "type": "Used",
-                        "start_node": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
-                        "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                        "id": "ac242faf-fba0-4293-a949-0b82ae7ba810", 
+                        "type": "used", 
+                        "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
+                        "end_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b", 
                         "properties": {
-                            "kind": "dds-relation-used",
+                            "kind": "dds-relation-used", 
                             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
                             "audit": { }
-                        },
-                        "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                        "type": "WasGeneratedBy",
-                        "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                        "end_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        }
+                    },
+                    {
+                        "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95", 
+                        "type": "wasGeneratedBy", 
+                        "start_node": "1b80a313-97cf-482d-8d17-9b911bf815b3", 
+                        "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1", 
                         "properties": {
-                            "kind": "dds-relation-generated",
+                            "kind": "dds-relation-was-generated-by", 
                             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
                             "audit": { }
                         }
                     }
                 ]
+            }
         }
 
 ## Group Tags
-A tag is a label (i.e. word or phrase) that can be associated to an object to faciliate classification and searching.
+A tag is a label (i.e. word or phrase) that can be associated to an object to faciliate classification and searching. 
 
 *Note: Tags are composite metadata that become part of the tagged resource - they do not live in a global namespace. Only tagging of files* (i.e. `dds-file`) *is currently supported.*
 
 ## Tags collection [/tags]
 
-### NOT_IMPLEMENTED Create object tag [POST]
+### Create object tag [POST]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
@@ -2589,43 +3230,43 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
 
 + Request (application/json)
 
-        {
-            "object": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+        { 
+            "object": { 
+                "kind": "dds-file", 
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
             },
             "label": "SMRT sequencing"
         }
-
+    
 + Response 201 (application/json)
 
-        {
+        { 
             "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
-            "object": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+            "object": { 
+                "kind": "dds-file", 
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
             },
             "label": "SMRT sequencing",
             "audit": { }
         }
 
-### NOT_IMPLEMENTED List object tags [GET /tags/{object_kind}/{object_id}]
+## List object tags [GET /tags/{object_kind}/{object_id}]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
-
+    
 + Response 200 (application/json)
 
         {
             "results": [
-                {
+                { 
                     "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
-                    "object": {
-                        "kind": "dds-file", "id":
-                        "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    "object": { 
+                        "kind": "dds-file", "id": 
+                        "777be35a-98e0-4c2e-9a17-7bc009f9b111" 
                     },
                     "label": "SMRT sequencing",
                     "audit": { }
@@ -2633,23 +3274,23 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-### NOT_IMPLEMENTED List tag labels [GET /tags/labels/{object_kind}/{?label_contains}]
-Get list of the **distinct** tag `label` values for a kind of DDS object.
+### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels{?object_kind, label_contains}]
+Get a list of the **distinct** tag `label` values visible to the current user.  
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
 
->**Permission:** view_project when tagged object is file (`dds-file`)
+>**Permission:** authenticated [scope: view_project when tagged object is file (`dds-file`)]
 - - - - -
 
 + Parameters
-    + object_kind (string, required, `dds-file`) ... Restricts search scope to tags for this kind of object.
+    + object_kind (string, optional, `dds-file`) ... Restricts search scope to tags for this kind of object.
     + label_contains (string, optional, `sequen`) ... If provided, searches for tags that contain this text fragment.
 
 + Response 200 (application/json)
 
         {
             "results": [
-                {
+                { 
                     "label": "SMRT sequencing",
                     "count": 47
                 },
@@ -2668,23 +3309,116 @@ Get list of the **distinct** tag `label` values for a kind of DDS object.
 + Parameters
     + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
 
-### NOT_IMPLEMENTED View tag [GET]
+### View tag [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
 + Response 200 (application/json)
 
-        {
+        { 
             "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
-            "object": {
-                "kind": "dds-file",
+            "object": { 
+                "kind": "dds-file", 
                 "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" },
             "label": "SMRT sequencing",
             "audit": { }
         }
 
-### NOT_IMPLEMENTED Delete tag [DELETE]
+### Delete tag [DELETE]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
 + Response 204
+
+## Group Search Objects
+The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages [Elasticsearch](https://www.elastic.co/) to perform document based searches.  All queries must be specified in [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html).
+
+*Note: Only search for DDS folders and files* (i.e. `dds-folder`, `dds-file`) *is currently supported.  These objects are replicated to Elasticsearch as indexed documents.  The objects (i.e. documents) are extended with a* `meta` *property when stored in Elaticsearch.  This property contains composite metadata to facilitate search.  See response payload for concrete example of the* `meta` *property.*
+
+*Deprecation: The* **Search Children** *actions will be deprecated once this action has been implemented.*
+
+## NOT_IMPLEMENTED_NEW Search Objects [POST /search]
+Search for DDS objects (i.e. Elasticsearch documents).
+
+>**Permission:** authenticated [scope: view_project for objects of kind (`dds-folder`, `dds-file`)]
+- - - - -
+
+>**Search Properties**
+- - - - -
++ **include_kinds (string[ ], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
++ **search_query (object, required)** - The Elasticsearch query criteria (i.e. Query DSL).
+
++ Request (application/json)
+
+        {
+            "include_kinds": ["dds-file"],
+            "search_query": {
+                "query": {
+                    "match" : {
+                        "_all" : "SMRT sequencing"
+                }
+            }
+        }
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": { 
+                        "kind": "dds-folder", 
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy" 
+                    },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
+                    "ancestors": [
+                        { 
+                            "kind": "dds-project", 
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)" 
+                        },
+                        { 
+                            "kind": "dds-folder", 
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy", 
+                            "name": "Sequencing Core" 
+                        }
+                    ],
+                    "is_deleted": false,
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                { 
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94", 
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": { 
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33", 
+                                "name": "duke_oit_swift", 
+                                "description": "Duke OIT Storage" 
+                            }
+                        }
+                    },
+                    "audit": { }
+                },
+                "meta": {
+                    "tags": [
+                        {
+                            "label": "SMRT sequencing"
+                        },
+                        {
+                            "label": "GCB lab"
+                        }
+                    ]
+                }
+            ]
+        }
