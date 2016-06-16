@@ -18,6 +18,14 @@ shared_examples 'a kind' do
       expect(parsed_json["kind"]).to eq(subject.kind)
     end
   end
+
+  it 'should be registered in KindnessFactory.kinded_models' do
+    expect(KindnessFactory.kinded_models).to include(subject.class)
+  end
+
+  it 'should be returned by KindnessFactory.by_kind(expected_kind)' do
+    expect(KindnessFactory.by_kind(expected_kind)).to eq(subject.class)
+  end
 end
 
 shared_examples 'a graphed model' do |auto_create: false, logically_deleted: false|
@@ -200,7 +208,7 @@ shared_examples 'a ProvRelation' do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
-    let!(:kind_name) { "relation-#{subject.relationship_type}" }
+    let!(:kind_name) { subject.class.name.underscore }
   end
 
   it_behaves_like 'a graphed relation', auto_create: true do

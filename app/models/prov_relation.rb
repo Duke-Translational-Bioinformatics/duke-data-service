@@ -18,7 +18,7 @@ class ProvRelation < ActiveRecord::Base
   belongs_to :relatable_to, polymorphic: true
 
   def kind
-    super("relation-#{ relationship_type }")
+    super(self.class.name.underscore)
   end
 
   def create_graph_relation

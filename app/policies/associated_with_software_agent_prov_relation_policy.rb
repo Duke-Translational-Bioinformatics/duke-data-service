@@ -24,7 +24,12 @@ class AssociatedWithSoftwareAgentProvRelationPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.none
+        prov_relation_scope = scope.where(creator: user)
+        prov_relation_scope = prov_relation_scope.union(
+          AssociatedWithSoftwareAgentProvRelation.where(
+            relatable_to_id: Activity.where(creator: user)
+        ))
+        prov_relation_scope
       end
     end
   end

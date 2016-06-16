@@ -29,12 +29,12 @@ describe UsedProvRelationPolicy do
   it_behaves_like 'system_permission can access', :from_other_users_activity_to_visible_file_version, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
 
   context 'destroy' do
-    it_behaves_like 'a policy for', :used_prov_relation_creator, on: :used_prov_relation, allows: [:destroy?]
+    it_behaves_like 'a policy for', :used_prov_relation_creator, on: :used_prov_relation, allows: [:scope, :destroy?]
     it_behaves_like 'a policy for', :used_prov_relation_creator, on: :other_used_prov_relation, allows: [], denies: [:show?, :create?, :index?, :update?, :destroy?]
   end
 
   context 'user created activity and has visibility to the file_version' do
-    it_behaves_like 'a user with project_permission', :view_project, allows: [:show?, :create?, :destroy?], on: :used_prov_relation
+    it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :show?, :create?, :destroy?], on: :used_prov_relation
     it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?], on: :used_prov_relation
   end
 
@@ -44,12 +44,11 @@ describe UsedProvRelationPolicy do
   end
 
   context 'user created the activity but does not have visbility to the file_version' do
-    it_behaves_like 'a user with project_permission', :view_project, allows: [], on: :from_users_activity_to_invisible_file_version
-    it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?, :destroy?], on: :from_users_activity_to_invisible_file_version
+    it_behaves_like 'a user without project_permission', :view_project, denies: [:create?, :destroy?], on: :from_users_activity_to_invisible_file_version
   end
 
   context 'user did not create the activity but has visibility to the file_version' do
-    it_behaves_like 'a user with project_permission', :view_project, allows: [:show?], on: :from_other_users_activity_to_visible_file_version
+    it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :show?], on: :from_other_users_activity_to_visible_file_version
     it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?, :destroy?], on: :from_other_users_activity_to_visible_file_version
   end
 end
