@@ -13,7 +13,7 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}"
+        logger.info "User-Agent: #{headers['User-Agent']}" if headers
       end
 
       helpers Pundit
