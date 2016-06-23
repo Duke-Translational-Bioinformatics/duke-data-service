@@ -149,6 +149,7 @@ shared_examples 'a storage_provider backed resource' do
 
   it 'should return a 500 error and JSON error when a StorageProviderException is experienced' do
     storage_provider.update_attribute(:url_root, "http://257.1.1.1")
+    stub_request(:any, "#{storage_provider.url_root}#{storage_provider.auth_uri}").to_timeout
     is_expected.to eq(500)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
