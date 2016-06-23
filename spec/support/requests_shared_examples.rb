@@ -80,14 +80,16 @@ shared_examples 'a searchable resource' do
   it 'should include expected resources' do
     is_expected.to eq(200)
     expected_resources.each do |expected_resource|
-      expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+      expect(response.body).to include(ActiveModel::Serializer.serializer_for(
+        expected_resource).new(expected_resource).to_json)
     end
   end
 
   it 'should not include unexpected resources' do
     is_expected.to eq(200)
     unexpected_resources.each do |unexpected_resource|
-      expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
+      expect(response.body).not_to include(ActiveModel::Serializer.serializer_for(
+        unexpected_resource).new(unexpected_resource).to_json)
     end
   end
 end
@@ -338,6 +340,21 @@ shared_examples 'an identified resource' do
     expect(response_json['reason']).to eq("#{resource_class} Not Found")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq(expected_suggestion)
+  end
+end
+
+shared_examples 'a kinded resource' do
+  it 'should return 404 with error when resource not found with id' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("object_kind #{resource_kind} Not Supported")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
   end
 end
 

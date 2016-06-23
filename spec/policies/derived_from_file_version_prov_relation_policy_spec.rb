@@ -23,7 +23,7 @@ describe DerivedFromFileVersionProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:derived_from_file_version_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: []
   end
 
@@ -35,7 +35,7 @@ describe DerivedFromFileVersionProvRelationPolicy do
         relatable_from: visible_from_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:show?, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     end
 
     context 'to file_version not visible to user' do
@@ -44,6 +44,7 @@ describe DerivedFromFileVersionProvRelationPolicy do
         relatable_from: visible_from_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?]
       it_behaves_like 'a user without project_permission', :view_project, on: :prov_relation, denies: [:index?, :show?, :create?, :destroy?]
     end
   end
@@ -55,6 +56,7 @@ describe DerivedFromFileVersionProvRelationPolicy do
         relatable_from: invisible_from_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?]
       it_behaves_like 'a user without project_permission', :view_project, on: :prov_relation, denies: [:index?, :show?, :create?, :destroy?]
     end
 

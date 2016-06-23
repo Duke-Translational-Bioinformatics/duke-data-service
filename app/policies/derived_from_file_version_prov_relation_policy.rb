@@ -8,11 +8,13 @@ class DerivedFromFileVersionProvRelationPolicy < ApplicationPolicy
   end
 
   def show?
-    permission :view_project
+    permission(record.relatable_from, :view_project) ||
+    permission(record.relatable_to, :view_project)
   end
 
   def create?
-    permission :view_project
+    permission(record.relatable_from, :view_project) &&
+    permission(record.relatable_to, :view_project)
   end
 
   def destroy?
@@ -24,15 +26,23 @@ class DerivedFromFileVersionProvRelationPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.none
+        prov_relation_scope = scope.where(creator: user)
+        prov_relation_scope = prov_relation_scope.union(
+          DerivedFromFileVersionProvRelation.where(
+            relatable_to_id: policy_scope(FileVersion.all)
+        ))
+        prov_relation_scope = prov_relation_scope.union(
+          DerivedFromFileVersionProvRelation.where(
+            relatable_from_id: policy_scope(FileVersion.all)
+        ))
+        prov_relation_scope
       end
     end
   end
 
-  def permission(auth_role_permission=nil)
+  def permission(relatable, auth_role_permission=nil)
     system_permission || (
-      project_permission(record.relatable_from, auth_role_permission) &&
-      project_permission(record.relatable_to, auth_role_permission)
+      project_permission(relatable, auth_role_permission)
     )
   end
 

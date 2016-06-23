@@ -17,7 +17,7 @@ describe AssociatedWithUserProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:associated_with_user_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: [], denies: [:show?, :create?, :index?, :update?, :destroy?]
   end
 
@@ -27,7 +27,7 @@ describe AssociatedWithUserProvRelationPolicy do
       relatable_to: users_activity)
     }
     it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?]
   end
 
   context 'activity created by other user' do
