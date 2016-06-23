@@ -44,10 +44,6 @@ class ActivityPolicy < ApplicationPolicy
         activity_scope
       end
     end
-
-    def policy_scope(initial_scope)
-      Pundit::PolicyFinder.new(initial_scope).scope!.new(user, initial_scope).resolve
-    end
   end
 
   private

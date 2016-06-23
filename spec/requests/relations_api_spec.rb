@@ -329,6 +329,233 @@ describe DDS::V1::RelationsAPI do
         let(:expected_auditable_type) { ProvRelation }
       end
     end # 'Create was invalidated by relation'
+
+    describe 'List provenance relations' do
+      let(:url) { "/api/v1/relations/#{resource_kind}/#{resource_id}" }
+      subject { get(url, nil, headers) }
+
+      let(:associated_with_user_prov_relation) {
+        FactoryGirl.create(:associated_with_user_prov_relation,
+          relatable_from: current_user,
+          creator: current_user,
+          relatable_to: activity)
+      }
+      let(:deleted_associated_with_user_prov_relation) {
+        FactoryGirl.create(:associated_with_user_prov_relation,
+          is_deleted: true,
+          relatable_from: current_user,
+          creator: current_user,
+          relatable_to: activity)
+      }
+      let(:associated_with_software_agent_prov_relation) {
+        FactoryGirl.create(:associated_with_software_agent_prov_relation,
+          relatable_from: users_sa,
+          creator: current_user,
+          relatable_to: activity)
+      }
+      let(:attributed_to_user_prov_relation) {
+        FactoryGirl.create(:attributed_to_user_prov_relation,
+          relatable_to: current_user,
+          creator: current_user,
+          relatable_from: used_file_version)
+      }
+      let(:attributed_to_software_agent_prov_relation) {
+        FactoryGirl.create(:attributed_to_software_agent_prov_relation,
+          relatable_to: users_sa,
+          creator: current_user,
+          relatable_from: used_file_version)
+      }
+      let(:used_prov_relation) {
+        FactoryGirl.create(:used_prov_relation,
+          creator: current_user,
+          relatable_from: activity,
+          relatable_to: used_file_version)
+      }
+      let(:generated_by_activity_prov_relation) {
+        FactoryGirl.create(:generated_by_activity_prov_relation,
+          relatable_to: activity,
+          creator: current_user,
+          relatable_from: generated_file_version)
+      }
+      let(:deleted_data_file) { FactoryGirl.create(:data_file,
+        project: view_project_permission.project) }
+
+      let(:invalidated_file_version) { FactoryGirl.create(:file_version, :deleted,
+        data_file: deleted_data_file) }
+
+      let(:invalidated_by_activity_prov_relation) {
+        FactoryGirl.create(:invalidated_by_activity_prov_relation,
+          relatable_to: activity,
+          creator: current_user,
+          relatable_from: invalidated_file_version)
+      }
+
+      let(:derived_from_file_version_prov_relation) {
+        FactoryGirl.create(:derived_from_file_version_prov_relation,
+          relatable_to: used_file_version,
+          creator: current_user,
+          relatable_from: generated_file_version)
+      }
+
+      describe 'for unknown resource_kind' do
+        let(:resource_kind) { 'dds-not-found' }
+        let(:resource_id) { activity.id }
+        it_behaves_like 'a kinded resource'
+      end
+
+      describe 'for Activity' do
+        let(:resource_kind) { activity.kind }
+        let(:resource_id) { activity.id }
+        let(:resource_class) { activity.class }
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent accessible resource'
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            associated_with_user_prov_relation,
+            associated_with_software_agent_prov_relation,
+            used_prov_relation,
+            generated_by_activity_prov_relation,
+            invalidated_by_activity_prov_relation
+          ] }
+          let(:unexpected_resources) { [
+            deleted_associated_with_user_prov_relation,
+            attributed_to_user_prov_relation,
+            attributed_to_software_agent_prov_relation,
+            derived_from_file_version_prov_relation
+          ] }
+        end
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { 'notexisting' }
+        end
+      end
+
+      describe 'for FileVersion' do
+        let(:resource_kind) { generated_file_version.kind }
+        let(:resource_class) { used_file_version.class }
+
+        describe 'with invalid id' do
+          it_behaves_like 'an identified resource' do
+            let(:resource_id) { 'notexisting' }
+          end
+        end
+
+        describe 'generated' do
+          let(:resource_id) { generated_file_version.id }
+
+          it_behaves_like 'an authenticated resource'
+          it_behaves_like 'a software_agent accessible resource'
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              generated_by_activity_prov_relation,
+              derived_from_file_version_prov_relation
+            ] }
+            let(:unexpected_resources) { [
+              associated_with_user_prov_relation,
+              associated_with_software_agent_prov_relation,
+              attributed_to_user_prov_relation,
+              attributed_to_software_agent_prov_relation,
+              used_prov_relation,
+              invalidated_by_activity_prov_relation
+            ] }
+          end
+        end
+
+        describe 'used' do
+          let(:resource_id) { used_file_version.id }
+
+          it_behaves_like 'an authenticated resource'
+          it_behaves_like 'a software_agent accessible resource'
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              attributed_to_user_prov_relation,
+              attributed_to_software_agent_prov_relation,
+              used_prov_relation,
+              derived_from_file_version_prov_relation
+            ] }
+            let(:unexpected_resources) { [
+              associated_with_user_prov_relation,
+              associated_with_software_agent_prov_relation,
+              generated_by_activity_prov_relation,
+              invalidated_by_activity_prov_relation
+            ] }
+          end
+        end
+
+        describe 'invalidated' do
+          let(:resource_id) { invalidated_file_version.id }
+
+          it_behaves_like 'an authenticated resource'
+          it_behaves_like 'a software_agent accessible resource'
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              invalidated_by_activity_prov_relation
+            ] }
+            let(:unexpected_resources) { [
+              associated_with_user_prov_relation,
+              associated_with_software_agent_prov_relation,
+              attributed_to_user_prov_relation,
+              attributed_to_software_agent_prov_relation,
+              generated_by_activity_prov_relation,
+              used_prov_relation,
+              derived_from_file_version_prov_relation
+            ] }
+          end
+        end
+      end
+
+      describe 'for User' do
+        let(:resource_kind) { current_user.kind }
+        let(:resource_class) { current_user.class }
+        let(:resource_id) { current_user.id }
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent accessible resource'
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            associated_with_user_prov_relation,
+            attributed_to_user_prov_relation
+          ] }
+          let(:unexpected_resources) { [
+            deleted_associated_with_user_prov_relation,
+            associated_with_software_agent_prov_relation,
+            attributed_to_software_agent_prov_relation,
+            generated_by_activity_prov_relation,
+            used_prov_relation,
+            derived_from_file_version_prov_relation,
+            invalidated_by_activity_prov_relation
+          ] }
+        end
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { 'notexisting' }
+        end
+      end
+
+      describe 'for SoftwareAgent' do
+        let(:resource_kind) { users_sa.kind }
+        let(:resource_id) { users_sa.id }
+        let(:resource_class) { users_sa.class }
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            associated_with_software_agent_prov_relation,
+            attributed_to_software_agent_prov_relation
+          ] }
+          let(:unexpected_resources) { [
+            associated_with_user_prov_relation,
+            attributed_to_user_prov_relation,
+            generated_by_activity_prov_relation,
+            used_prov_relation,
+            derived_from_file_version_prov_relation,
+            invalidated_by_activity_prov_relation
+          ] }
+        end
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { 'notexisting' }
+        end
+      end
+    end # List provenance relations
   end # 'Provenance Relations Relations collection'
 
   describe 'Relation instance' do

@@ -26,7 +26,12 @@ class AttributedToUserProvRelationPolicy < ApplicationPolicy
       if user.system_permission
         scope
       else
-        scope.none
+        prov_relation_scope = scope.where(creator: user)
+        prov_relation_scope = prov_relation_scope.union(
+          AttributedToUserProvRelation.where(
+            relatable_from_id: policy_scope(FileVersion.all)
+        ))
+        prov_relation_scope
       end
     end
   end

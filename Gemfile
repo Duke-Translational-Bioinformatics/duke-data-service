@@ -29,6 +29,7 @@ gem 'sinatra'
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
+gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
 gem 'turbolinks'
 gem 'uglifier'
@@ -65,8 +66,8 @@ group :test do
   gem 'shoulda-matchers', require: false
   gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
-  gem 'vcr', group: :test
-  gem 'webmock', group: :test
+  gem 'vcr'
+  gem 'webmock'
   gem 'pry-byebug'
 end
 
