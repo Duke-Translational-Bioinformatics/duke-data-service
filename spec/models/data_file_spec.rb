@@ -15,7 +15,8 @@ RSpec.describe DataFile, type: :model do
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file' }
   end
-
+  it_behaves_like 'a logically deleted model'
+  
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
