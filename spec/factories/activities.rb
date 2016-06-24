@@ -5,7 +5,6 @@ FactoryGirl.define do
     association :creator, factory: :user
     started_on "2016-04-25 14:37:42"
     ended_on "2016-04-25 14:37:42"
-    is_deleted false
 
     trait :deleted do
       is_deleted true

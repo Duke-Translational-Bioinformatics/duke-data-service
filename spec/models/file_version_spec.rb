@@ -11,6 +11,7 @@ RSpec.describe FileVersion, type: :model do
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file-version' }
   end
+  it_behaves_like 'a logically deleted model'
   it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
 
   describe 'associations' do
@@ -88,7 +89,7 @@ RSpec.describe FileVersion, type: :model do
         end
       end
     end
-    
+
     describe '#deletion_allowed?' do
       it { is_expected.to respond_to(:deletion_allowed?) }
 

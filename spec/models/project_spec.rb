@@ -5,6 +5,7 @@ RSpec.describe Project, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
+  it_behaves_like 'a logically deleted model'
 
   describe 'associations' do
     it 'should have many project permissions' do
