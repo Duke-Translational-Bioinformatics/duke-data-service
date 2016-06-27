@@ -1,0 +1,283 @@
+FORMAT: 1A
+HOST: https://uatest.dataservice.duke.edu/api/v1/
+
+# Duke Data Service
+
+The Duke Data Service (DDS) API allows Duke researchers to store, organize, retrieve and share data.
+
+This the documentation for the Data Service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
+
+Adhere as well as possible to the [Heroku API Design Best Practices:](https://github.com/interagent/http-api-design) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
+
+## API Change Log
+
+24-Feb-2016
+--------------
++ Updated API usage details - included convenience links to *Web Portal* and *API Explorer*.
++ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*.
++ Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
++ Extended *Current User* resource actions - added actions for maintaining user secret API key.
++ For *Projects* resource - removed unique contraint rule on `project.name`.
++ For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
++ Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
++ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash.
++ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
++ Added `label` property to *Files* resource to help users differentiate file versions.
++ Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
+
+26-Feb-2016
+--------------
++ Added provenance *Activities* resource/actions - includes actions for creating, retrieving, updating and removing provenance activties.
+
+08-Mar-2016
+--------------
++ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `Used` and `WasGeneratedBy` provenance relations.
+
+09-Mar-2016
+--------------
++ Added *Search Provenance* resource/actions - supports graph query of provenance chains; returns graph results that are structured for visualization.
+
+15-Mar-2016
+--------------
++ For resource actions not yet implemented - added *NOT_IMPLEMENTED* prefix to inform API consumers and dredd testing workflow.
++ Reverted design changes to support server hashing agent back to current production implementation.  This will be addressed in later sprint.
+
+16-Mar-2016
+--------------
++ Added *Tags* resource/actions - current iteration assumes only file tagging is supported, but design supports extension to tag other objects.
++ For *Software Agents* resource - added `time_to_live` property to the `POST /software_agents/api_token` action response payload.
++ For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
++ Added `GET /pojects/{id}/usage` - returns summary usage details for the project.
+
+18-Mar-2016
+--------------
++ For *Software Agents* resource - added action `DELETE /software_agents/{id}/api_key` - this allows agent key to be removed liken to user key actions.
++ For *Uploads* resource - reverted `hash` back to a required property - this aligns with Web portal now being able to hash "larger" files via streaming.
+
+## Group API Usage
+
+Web Portal
+--------------
+There is a [Web portal](https://dataservice.duke.edu) that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
+
+Programmatic Keys
+--------------
+In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token from a programmatic context.  For usage details, see the actions for **Software Agents** and **Current User**.
+
+Exploring the API
+--------------
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://uatest.dataservice.duke.edu/apiexplorer).
+
+Collection Pagination
+--------------
+For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` property will reference the array as follows:
+
+    {
+        "results": [
+            { },
+            { },
+        ]
+    }
+
+To make it easy for clients to manage pagination, the following headers will always be included in the response:
+
+* X-Total: The total number of objects that would be returned by the query unpaginated
+* X-Total-Pages: The total number of pages given X-Total and X-Per-Page
+* X-Page: Current Page (passed in as query parameter)
+* X-Per-Page: per_page (passed in as query parameter)
+* X-Next-Page: Next page to be collected
+* X-Prev-Page: Previous page (will be empty on first page)
+
+Audit Object
+--------------
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` key in resource specific payloads.
+
+    "audit": {
+        "created_on": "2015-01-01T12:00:00Z",
+        "created_by": {
+            "id": "ce245d81-bae1-452b-8589-24f736ca7735",
+            "username": "mrgardner01",
+            "full_name": "Matthew Gardner",
+            "agent": {
+                "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hashing computation agent"
+            }
+        },
+        "last_updated_on": "2015-01-01T13:00:00Z",
+        "last_updated_by": {
+            "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
+            "username": "jturner01",
+            "full_name": "Jon Turner",
+            "agent": null
+        },
+        "deleted_on": null,
+        "deleted_by": null
+    }
+
+API Errors
+----------------
+We should respond with context appropriate error codes, especially for 400 class errors, using the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+
+* 400: no API token, validation errors
+* 401: bad API token
+* 403: user performing request which they do not have permission to perform
+* 404: user requesting resource that does not exist
+
+All error responses should include a JSON response that provides the HTTP status code, details of the error that occurred, and possible steps to address the problem. For example:
+
+    {
+        "error": "404",
+        "reason": "Project does not exist",
+        "suggestion": "You may have chosen the wrong ID."
+    }
+
+Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the error encountered.
+
+    {
+        "error": "400",
+        "reason": "validation failed",
+        "suggestion": "Fix the following invalid fields and resubmit"
+        "errors" : [
+            {
+                "field" : "name",
+                "message" : "Project needs a name."
+            },
+            {
+                "field" : "principal_investigator",
+                "message" : "Principal Investigator must be specified for each project."
+            }
+        ]
+    }
+
+## Group Authorization Roles
+Represents the set of discrete permissions that can be granted to a user.
+
+**Authorization Roles:**
+
+| role | name | description | permission(s) |
+|:-----|:-----|:------------|:--------------|
+| **system_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system_admin |
+| **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
+| **project_viewer** | Project Viewer | Can only view project and file metadata | view_project |
+| **file_downloader** | File Downloader | Can download files | view_project, download_file |
+| **file_uploader** | File Uploader | Can upload files | view_project, create_file |
+| **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
+
+
+**Permissions:**
+
+| permission | description |
+|:------------|:------------|
+| **system_admin** | Can manage system level permissions and perform all operations across all projects |
+| **view_project** | Can view project and file metadata |
+| **update_project** | Can update project header details and project affiliations |
+| **delete_project** | Can delete project |
+| **manage_project_permissions** | Can grant/revoke project level permissions |
+| **download_file** | Can download file |
+| **create_file** | Can upload new file |
+| **update_file** | Can upload new version of existing file |
+| **delete_file** | Can delete a file |
+
+## Authorization Roles collection [/auth_roles{?context}]
++ Parameters
+    + context (string, optional, `system`) ... The `context` or scope in which permission can be granted; valid context values are `system` or `project`.
+
+### List roles [GET]
+>**Permission:** authenticated
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "system_admin",
+                    "name": "System Admin",
+                    "description": "Can manage system level permissions and perform all operations across all projects",
+                    "permissions": [
+                        {"id": "system_admin"}
+                    ],
+                    "contexts": ["system"],
+                    "is_deprecated": false
+                }
+            ]
+        }
+
+## Authorization Role instance [/auth_roles/{id}]
++ Parameters
+    + id (string, required, `file_editor`) ... The unique `id` for an authorization role.
+
+### View role [GET]
+>**Permission:** authenticated
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "file_editor",
+            "name": "File Editor",
+            "description": "Can view, download, create, update and delete files",
+            "permissions": [
+                {"id": "view_project"},
+                {"id": "download_file"}
+            ],
+            "contexts": ["project"],
+            "is_deprecated": false
+        }
+
+## Group Software Agents
+Represents a software agent and associated secret that can be used to access the API actions from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of storage for failed uploads, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see **Current User** actions).
+
+## Software Agents collection [/software_agents]
+
+## Create software agent [POST]
+Creates software agent and an associated secret API key; the secret key is visible and managed through the `software_agents/{id}/api_key` action.
+
+>**Permission:** authenticated
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **name (string)** - A short name for the software agent.
++ **description (string, optional)** - A verbose description for the software agent.
++ **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
+
++ Request (application/json)
+
+        {
+            "name": "Hash computation agent"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Hash computation agent",
+            "description": null,
+            "repo_url": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+## List software agents [GET]
+>**Permission:** authenticated
+- - - - -
+
+>**Rules**
+- - - - -
++ Software Agents that have been deleted (i.e. `"is_deleted": true`) are not included.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                    "name": "Hash computation agent",
+                    "description": null,
+                    "repo_url": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }

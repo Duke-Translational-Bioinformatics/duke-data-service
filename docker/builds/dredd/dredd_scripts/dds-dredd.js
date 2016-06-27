@@ -22,10 +22,11 @@ configuration = {
 
     'level': 'info', // String, log-level (info, silly, debug, verbose, ...)
     'silent': false, // Boolean, Silences all logging output
+    'language': 'python',
 
     'only': [//01_auth_hooks.js
-             //"Authorization Roles > Authorization Roles collection > List roles",
-             //"Authorization Roles > Authorization Role instance > View role",
+            //  "Authorization Roles > Authorization Roles collection > List roles",
+            //  "Authorization Roles > Authorization Role instance > View role",
              //14_software_agents.js
             //  "Software Agents > Software Agents collection > Create software agent",
             //  "Software Agents > Software Agents collection > List software agents",
@@ -39,9 +40,11 @@ configuration = {
             //15_current_user_api_hooks.js
             // "Current User > Current User instance > View current user",
             // "Current User > Current User instance > Current user usage",
-            // "Current User > Current User Secret Key > Generate current user API key",
-            // "Current User > Current User Secret Key > View current user API key",
-            // "Current User > Current User Secret Key > Delete current user API key",
+            // "Current User > Current User API Key > Generate current user API key",
+            // "Current User > Current User API Key > View current user API key",
+            // "Current User > Current User API Key > Delete current user API key",
+            // "Users > Users collection > List users",
+            // "Users > User instance > View user",
             //03_users_hooks.js
             // "Users > Users collection > List users",
             // "Users > User instance > View user",
@@ -79,12 +82,12 @@ configuration = {
             // "Folders > Folder instance > Move folder",
             // "Folders > Folder instance > Rename folder",
             //11_uploads_hooks.js
-            // "Uploads > Uploads collection > Initiate chunked upload",
-            // "Uploads > Uploads collection > List chunked uploads",
-            // "Uploads > Upload instance > View chunked upload",
-            // "Uploads > Upload instance > Get pre-signed chunk URL",
-            // "Uploads > Upload instance > Complete chunked file upload",
-            // "Uploads > Upload instance > Report server computed hash",
+            "Uploads > Uploads collection > Initiate chunked upload",
+            "Uploads > Uploads collection > List chunked uploads",
+            "Uploads > Upload instance > View chunked upload",
+            "Uploads > Upload instance > Get pre-signed chunk URL",
+            "Uploads > Upload instance > Complete chunked file upload",
+            "Uploads > Upload instance > Report server computed hash",
             //16_search_uploads.js
             // "Search Uploads > Search uploads > Search uploads",
             //12_files_hooks.js
@@ -125,31 +128,27 @@ configuration = {
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
     'user': null,    // String, Basic Auth credentials in the form username:password
 
-    'hookfiles': [ //'99_learnclient.js',
-                  '01_auth_hooks.js',
-                  '02_current_user_hooks.js',
-                  '03_users_hooks.js',
-                  '04_system_permissions_hooks.js',
-                  '05_projects_hooks.js',
-                  '06_project_permissions_hooks.js',
-                  '07_project_roles_hooks.js',
-                  '08_affiliates_hooks.js',
-                  '09_storage_providers_hooks.js',
-                  '10_folders_hooks.js',
-                  '11_uploads_hooks.js',
-                  '12_files_hooks.js',
-                  '13_search_project_folder_hooks.js',
-                  '14_software_agents.js',
-                  '15_current_user_api_hooks.js',
-                  '16_search_uploads.js',
-                  '17_file_versions.js',
-                  '18_provenance_activities.js',
-                  '19_provenance_relations.js',
-                  '20_search_provenance.js',
-                  '21_tags.js',
+    'hookfiles': [//'hook_endpoints.py'
+                  // '01_auth_hooks.py',
+                  //'02_software_agents.py',
+                  // '03_current_users.py',
+                  // '04_system_permission.py',
+                  // '05_projects.py',
+                  // '06_project_permissions.py',
+                  // '07_project_roles.py',
+                  // '08_affiliates.py',
+                  // '09_storage_providers.py',
+                  // '10_folders.py',
+                  '11_uploads.py',
+                  // '12_files.py',
+                  // '13_file_versions.py',
+                  // '14_children_search.py',
+                  // '15_provenance_activities.py',
+                  // '16_provenance_relations.py',
+                  // '17_tags.py',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
+    'reporter': [], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
