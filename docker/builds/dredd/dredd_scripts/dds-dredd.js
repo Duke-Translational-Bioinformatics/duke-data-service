@@ -88,6 +88,7 @@ configuration = {
             "Uploads > Upload instance > Get pre-signed chunk URL",
             "Uploads > Upload instance > Complete chunked file upload",
             "Uploads > Upload instance > Report server computed hash",
+            "Uploads > Upload instance > Report upload hash"
             //16_search_uploads.js
             // "Search Uploads > Search uploads > Search uploads",
             //12_files_hooks.js
