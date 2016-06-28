@@ -6,6 +6,9 @@ RSpec.describe Tag, type: :model do
     DataFile,
     Folder
   ]}
+  let(:file) { FactoryGirl.create(:data_file) }
+  let(:folder) { FactoryGirl.create(:folder) }
+  let(:tag) { FactoryGirl.create(:tag) }
 
   it_behaves_like 'an audited model'
 
@@ -16,6 +19,11 @@ RSpec.describe Tag, type: :model do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:label) }
     it { is_expected.to validate_presence_of(:taggable) }
+    it 'restrict taggable_type to taggable_classes' do
+      is_expected.to allow_value(file).for(:taggable)
+      is_expected.to allow_value(folder).for(:taggable)
+      is_expected.not_to allow_value(tag).for(:taggable)
+    end
   end
 
   describe '#project_permissions' do
@@ -23,9 +31,9 @@ RSpec.describe Tag, type: :model do
     it { expect(subject.project_permissions).to eq(subject.taggable.project_permissions) }
   end
 
-  describe '::taggable_classes' do
-    it { expect(described_class).to respond_to(:taggable_classes) }
-    it { expect(described_class.taggable_classes).to match_array(taggable_classes)}
+  describe '#taggable_classes' do
+    it { is_expected.to respond_to(:taggable_classes) }
+    it { expect(subject.taggable_classes).to match_array(taggable_classes)}
   end
 
   describe '::label_like' do
