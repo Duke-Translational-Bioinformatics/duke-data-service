@@ -68,9 +68,13 @@ module DDS
       get '/tags/labels', root: 'results' do
         authenticate!
         tag_params = declared(params, include_missing: false)
-        scoped_tags = Tag.where(id: policy_scope(Tag).select(:id).unscope(:order))
+        scoped_tags = policy_scope(Tag)
         if tag_params[:label_contains]
           scoped_tags = scoped_tags.where("label LIKE ?", "%#{tag_params[:label_contains]}%")
+        end
+        if tag_params[:object_kind]
+          object_kind = KindnessFactory.by_kind(tag_params[:object_kind])
+          scoped_tags = scoped_tags.where(taggable: object_kind.all)
         end
         scoped_tags.label_count
       end
