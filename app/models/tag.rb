@@ -11,6 +11,13 @@ class Tag < ActiveRecord::Base
     taggable.project_permissions
   end
 
+  def self.taggable_classes
+    [
+      DataFile,
+      Folder
+    ]
+  end
+
   def self.label_like(label_contains) 
     where("label LIKE ?", "%#{label_contains}%")
   end

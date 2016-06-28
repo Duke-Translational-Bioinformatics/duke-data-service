@@ -2,6 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
   subject { FactoryGirl.create(:tag) }
+  let(:taggable_classes) {[
+    DataFile,
+    Folder
+  ]}
 
   it_behaves_like 'an audited model'
 
@@ -17,6 +21,11 @@ RSpec.describe Tag, type: :model do
   describe '#project_permissions' do
     it { is_expected.to respond_to(:project_permissions) }
     it { expect(subject.project_permissions).to eq(subject.taggable.project_permissions) }
+  end
+
+  describe '::taggable_classes' do
+    it { expect(described_class).to respond_to(:taggable_classes) }
+    it { expect(described_class.taggable_classes).to match_array(taggable_classes)}
   end
 
   describe '::label_like' do
