@@ -30,7 +30,8 @@ describe DDS::V1::TagsAPI do
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
-      let(:taggable_object) {{ kind: data_file.kind, id: data_file.id }}
+      let(:resource_kind) { data_file.kind }
+      let(:taggable_object) {{ kind: resource_kind, id: data_file.id }}
       let!(:payload) {{
         object: taggable_object,
         label: resource_stub.label
@@ -49,15 +50,21 @@ describe DDS::V1::TagsAPI do
       end
 
       it_behaves_like 'an identified resource' do
-        let(:taggable_object) {{ kind: data_file.kind, id: 'notfoundid' }}
+        let(:taggable_object) {{ kind: resource_kind, id: 'notfoundid' }}
         let(:resource_class) {'DataFile'}
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
       end
     end
   end
 
   describe 'Tag collection for object'  do
-    let(:url) { "/api/v1/tags/#{data_file.kind}/#{file_id}" }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}" }
     let(:file_id) { data_file.id }
+    let(:resource_kind) { data_file.kind }
     describe 'GET' do
       subject { get(url, nil, headers) }
 
@@ -79,6 +86,11 @@ describe DDS::V1::TagsAPI do
         let(:file_id) { 'notfoundid' }
         let(:resource_class) { DataFile }
         it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
       end
     end
   end
