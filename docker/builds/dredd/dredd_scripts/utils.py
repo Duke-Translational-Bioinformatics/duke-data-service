@@ -9,6 +9,7 @@ import requests
 import os
 import sys
 import json
+import uuid
 import hashlib
 
 def skip_this_endpoint(transaction):
@@ -67,10 +68,13 @@ def get_user_id_notme(transaction):
     else:
         raise ValueError('PUT /software_agents returned: ' + str(r.status_code))
 
-def upload_a_file(proj_id):
+def upload_a_file(proj_id,unique=None):
     #define everything that dds/swift will need
     chunk = {};
-    chunk['content'] = 'This is sample chunk content for chunk number: \n';
+    if unique is not None:
+        chunk['content'] = 'This is sample chunk content for chunk number: \n' + str(uuid.uuid4())
+    else:
+        chunk['content'] = 'This is sample chunk content for chunk number: \n';
     chunk['content_type'] = 'text/plain';
     chunk['number'] = 1;
     chunk['size'] = len(chunk['content'])
@@ -106,10 +110,18 @@ def upload_a_file(proj_id):
     url = os.getenv('HOST_NAME') + "/uploads/" + upload_id + "/complete"
     r4 = requests.put(url, headers=headers)
     ##Complete the process by creating a file
+    return(upload_id)
+def create_a_file(proj_id,upload_id):
     body = {"parent":{"kind":"dds-project","id":proj_id},
             "upload":{"id":upload_id}}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
     url = os.getenv('HOST_NAME') + "/files"
     r5 = requests.post(url, headers=headers, data=json.dumps(body))
-    return_obj = {'upload_id':upload_id,
-                  'file_id':str(json.loads(r5.text)['id'])}
-    return(return_obj)
+    return(str(json.loads(r5.text)['id']))
+def create_a_folder(proj_id,name):
+    body = {"parent":{"kind":"dds-project","id":proj_id},
+            "name":name}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    url = os.getenv('HOST_NAME') + "/folders"
+    r = requests.post(url, headers=headers, data=json.dumps(body))
+    return(str(json.loads(r.text)['id']))
