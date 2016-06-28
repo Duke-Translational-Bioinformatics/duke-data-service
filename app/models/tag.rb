@@ -9,14 +9,14 @@ class Tag < ActiveRecord::Base
 
   validates_each :taggable do |record, attr, value|
     record.errors.add(attr, 'is not a taggable class') if value &&
-      !record.taggable_classes.include?(value.class)
+      !taggable_classes.include?(value.class)
   end
   
   def project_permissions
     taggable.project_permissions
   end
 
-  def taggable_classes
+  def self.taggable_classes
     [
       DataFile,
       Folder

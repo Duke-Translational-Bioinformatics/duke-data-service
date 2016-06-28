@@ -31,9 +31,9 @@ RSpec.describe Tag, type: :model do
     it { expect(subject.project_permissions).to eq(subject.taggable.project_permissions) }
   end
 
-  describe '#taggable_classes' do
-    it { is_expected.to respond_to(:taggable_classes) }
-    it { expect(subject.taggable_classes).to match_array(taggable_classes)}
+  describe '::taggable_classes' do
+    it { expect(described_class).to respond_to(:taggable_classes) }
+    it { expect(described_class.taggable_classes).to match_array(taggable_classes)}
   end
 
   describe '::label_like' do
