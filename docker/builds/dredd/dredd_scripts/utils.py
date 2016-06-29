@@ -125,3 +125,28 @@ def create_a_folder(proj_id,name):
     url = os.getenv('HOST_NAME') + "/folders"
     r = requests.post(url, headers=headers, data=json.dumps(body))
     return(str(json.loads(r.text)['id']))
+def create_provenance_activity():
+    name = "provenance activity" + str(uuid.uuid4())
+    description = "a dredd provenance activity creation"
+    body = {"name": name, "description":description}
+    url = os.getenv('HOST_NAME') + "/activities"
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    r = requests.post(url, headers=headers, data=json.dumps(body))
+    return(str(json.loads(r.text)['id']))
+def get_current_file_version(file_id):
+    url = os.getenv('HOST_NAME') + "/files/" + file_id + "/versions"
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    r = requests.get(url,headers=headers)
+    return(str(json.loads(r.text)[u'results'][0]['id']))
+def delete_a_file_version(file_version_id):
+    url = os.getenv('HOST_NAME') + "/files_versions/" + file_version_id
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    r = requests.delete(url,headers=headers)
+    if r.status_code != 204:
+        print("Could not delete the file version" + str(file_version_id))
+def delete_a_file(file_id):
+    url = os.getenv('HOST_NAME') + "/files/" + file_id
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    r = requests.delete(url,headers=headers)
+    if r.status_code != 204:
+        print("Could not delete the file" + str(file_id))
