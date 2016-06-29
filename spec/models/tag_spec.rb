@@ -3,11 +3,9 @@ require 'rails_helper'
 RSpec.describe Tag, type: :model do
   subject { FactoryGirl.create(:tag) }
   let(:taggable_classes) {[
-    DataFile,
-    Folder
+    DataFile
   ]}
   let(:file) { FactoryGirl.create(:data_file) }
-  let(:folder) { FactoryGirl.create(:folder) }
   let(:tag) { FactoryGirl.create(:tag) }
 
   it_behaves_like 'an audited model'
@@ -21,7 +19,6 @@ RSpec.describe Tag, type: :model do
     it { is_expected.to validate_presence_of(:taggable) }
     it 'restrict taggable_type to taggable_classes' do
       is_expected.to allow_value(file).for(:taggable)
-      is_expected.to allow_value(folder).for(:taggable)
       is_expected.not_to allow_value(tag).for(:taggable)
     end
   end

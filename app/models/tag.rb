@@ -18,8 +18,7 @@ class Tag < ActiveRecord::Base
 
   def self.taggable_classes
     [
-      DataFile,
-      Folder
+      DataFile
     ]
   end
 
