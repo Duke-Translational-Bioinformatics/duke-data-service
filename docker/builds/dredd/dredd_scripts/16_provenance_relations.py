@@ -46,7 +46,6 @@ def get_prov_rel_id(transaction):
     global prov_rel_id
     requestBody = json.loads(transaction[u'real'][u'body'])
     prov_rel_id = str(requestBody[u'id'])
-    print(prov_rel_id)
 @hooks.before("Provenance Relations > Relations collection > Create was invalidated by relation")
 def invalidate16_1(transaction):
     name = str(uuid.uuid4())
