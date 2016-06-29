@@ -13,6 +13,7 @@ import uuid
 import hashlib
 
 def skip_this_endpoint(transaction):
+    print(transaction['name'])
     transaction['skip'] = True
 
 def pass_this_endpoint(transaction):
@@ -26,7 +27,7 @@ def create_a_project(transaction,name,description):
     if r.status_code ==201:
         return(json.loads(r.text))
     else:
-        raise ValueError('POST /projects returned: ' + str(r.status_code))
+        print('POST /projects returned: ' + str(r.status_code))
 
 def create_a_sa(transaction,name):
     url = os.getenv('HOST_NAME') + "/software_agents"
@@ -36,7 +37,7 @@ def create_a_sa(transaction,name):
     if r.status_code ==201:
         return(json.loads(r.text))
     else:
-        raise ValueError('POST /software_agents returned: ' + str(r.status_code))
+        print('POST /software_agents returned: ' + str(r.status_code))
 
 def generate_sa_key(transaction,_id):
     url = os.getenv('HOST_NAME') + "/software_agents/" + _id + "/api_key"
@@ -46,7 +47,7 @@ def generate_sa_key(transaction,_id):
         text = json.loads(r.text)
         return(str(text['key']))
     else:
-        raise ValueError('PUT /software_agents returned: ' + str(r.status_code))
+        print('PUT /software_agents returned: ' + str(r.status_code))
 
 def generate_user_key(transaction):
     url = os.getenv('HOST_NAME') + "/current_user/api_key"
@@ -56,7 +57,7 @@ def generate_user_key(transaction):
         text = json.loads(r.text)
         return(str(text['key']))
     else:
-        raise ValueError('PUT /software_agents returned: ' + str(r.status_code))
+        print('PUT /software_agents returned: ' + str(r.status_code))
 
 def get_user_id_notme(transaction):
     url = os.getenv('HOST_NAME') + "/users"
@@ -66,7 +67,7 @@ def get_user_id_notme(transaction):
         text = json.loads(r.text)
         return(str(text['results'][0]['id']))
     else:
-        raise ValueError('PUT /software_agents returned: ' + str(r.status_code))
+        print('PUT /software_agents returned: ' + str(r.status_code))
 
 def upload_a_file(proj_id,unique=None):
     #define everything that dds/swift will need
@@ -91,7 +92,7 @@ def upload_a_file(proj_id,unique=None):
     headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
     r = requests.post(url, headers=headers, data=json.dumps(body))
     #if r.status_code != 201:
-    #    raise ValueError("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
+    #    print("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
     upload_id = str(json.loads(r.text)['id'])
     ## Now we need to get a pre-signed url to the swift storage facility
     body = {"number": 1,
@@ -106,7 +107,7 @@ def upload_a_file(proj_id,unique=None):
     r3 = requests.put(url, headers=headers, data=body)
     ##Let data service know the upload is complete
     #if r3.status_code != 201:
-    #    raise ValueError('Could not upload to swift, error ' + str(r3.status_code))
+    #    print('Could not upload to swift, error ' + str(r3.status_code))
     url = os.getenv('HOST_NAME') + "/uploads/" + upload_id + "/complete"
     r4 = requests.put(url, headers=headers)
     ##Complete the process by creating a file

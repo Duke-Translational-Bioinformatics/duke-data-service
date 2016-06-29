@@ -93,3 +93,6 @@ def view_this_version12_1(transaction):
 def view_this_version212_1(transaction):
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('89ef1e77-1a0b-40a8-aaca-260d13987f2b',cur_version_id)
+@hooks.before("File Versions > File Version instance > NOT_IMPLEMENTED_NEW Promote file version")
+def skip_this_y12_1(transaction):
+    utils.skip_this_endpoint(transaction)

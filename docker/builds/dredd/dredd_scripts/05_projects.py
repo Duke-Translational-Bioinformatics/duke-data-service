@@ -10,7 +10,7 @@ utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
 ###############################################################################
 #           PROJECTS
 ###############################################################################
-############################################################################### 
+###############################################################################
 @hooks.before("Projects > Projects collection > Create project")
 def change_proj_name(transaction):
     name = str(uuid.uuid4())
@@ -46,6 +46,6 @@ def create_a_del_project(transaction):
     neww = utils.create_a_project(transaction,name,description)
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1',neww['id'])
-@hooks.before("Projects > Project instance > NOT_IMPLEMENTED Project usage")
+@hooks.before("Projects > Project instance > NOT_IMPLEMENTED_NEW Project usage")
 def skippy3(transaction):
     utils.skip_this_endpoint(transaction)

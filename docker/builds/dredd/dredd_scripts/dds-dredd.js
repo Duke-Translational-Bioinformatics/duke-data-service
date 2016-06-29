@@ -45,9 +45,6 @@ configuration = {
             // "Current User > Current User API Key > Delete current user API key",
             // "Users > Users collection > List users",
             // "Users > User instance > View user",
-            //03_users_hooks.js
-            // "Users > Users collection > List users",
-            // "Users > User instance > View user",
             //04_system_permissions_hooks.js
             // "System Permissions > System Permissions collection > List system permissions",
             // "System Permissions > System Permission instance > Grant system permission",
@@ -59,6 +56,7 @@ configuration = {
             // "Projects > Project instance > View project",
             // "Projects > Project instance > Update project",
             // "Projects > Project instance > Delete project",
+            // "Projects > Project instance > NOT_IMPLEMENTED_NEW Project usage",
             //06_project_permissions_hooks.js
             // "Project Permissions > Project Permissions collection > List project permissions",
             // "Project Permissions > Project Permission instance > Grant project permission",
@@ -89,8 +87,6 @@ configuration = {
             // "Uploads > Upload instance > Complete chunked file upload",
             // "Uploads > Upload instance > Report server computed hash",
             // "Uploads > Upload instance > Report upload hash"
-            //16_search_uploads.js
-            // "Search Uploads > Search uploads > Search uploads",
             //12_files_hooks.js
             // "Files > Files collection > Create file",
             // "Files > File instance > View file",
@@ -104,6 +100,7 @@ configuration = {
             // "File Versions > File Version instance > Update file version",
             // "File Versions > File Version instance > Delete file version",
             // "File Versions > File Version instance > Get file version download URL",
+            // "File Versions > File Version instance > NOT_IMPLEMENTED_NEW Promote file version",
             //13_search_project_folder_hooks.js
             // "Search Children > Search project children > Search project children",
             // "Search Children > Search folder children > Search folder children",
@@ -122,37 +119,37 @@ configuration = {
             // "Provenance Relations > Relation instance > View relation",
             // "Provenance Relations > Relation instance > Delete relation",
             // "Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance",
-            "Tags > Tags collection > Create object tag",
-            "Tags > Tags collection > List object tags",
-            "Tags > Tags collection > NOT_IMPLEMENTED_NEW List tag labels",
-            "Tags > Tag instance > View tag",
-            "Tags > Tag instance > Delete tag",
-            "Search Objects > NOT_IMPLEMENTED_NEW Search Objects > NOT_IMPLEMENTED_NEW Search Objects",
+            // "Tags > Tags collection > Create object tag",
+            // "Tags > Tags collection > List object tags",
+            // "Tags > Tags collection > NOT_IMPLEMENTED_NEW List tag labels",
+            // "Tags > Tag instance > View tag",
+            // "Tags > Tag instance > Delete tag",
+            // "Search Objects > NOT_IMPLEMENTED_NEW Search Objects > NOT_IMPLEMENTED_NEW Search Objects",
             ], // Array of Strings, run only transaction that match these names
 
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
     'user': null,    // String, Basic Auth credentials in the form username:password
 
     'hookfiles': [//'hook_endpoints.py'
-                  // '01_auth_hooks.py',
-                  //'02_software_agents.py',
-                  // '03_current_users.py',
-                  // '04_system_permission.py',
-                  // '05_projects.py',
-                  // '06_project_permissions.py',
-                  // '07_project_roles.py',
-                  // '08_affiliates.py',
-                  // '09_storage_providers.py',
-                  // '10_folders.py',
-                  // '11_uploads.py',
-                  // '12_files.py',
-                  // '14_children_search.py',
-                  // '15_provenance_activities.py',
-                  // '16_provenance_relations.py',
+                  '01_auth_hooks.py',
+                  '02_software_agents.py',
+                  '03_current_users.py',
+                  '04_system_permission.py',
+                  '05_projects.py',
+                  '06_project_permissions.py',
+                  '07_project_roles.py',
+                  '08_affiliates.py',
+                  '09_storage_providers.py',
+                  '10_folders.py',
+                  '11_uploads.py',
+                  '12_files.py',
+                  '14_children_search.py',
+                  '15_provenance_activities.py',
+                  '16_provenance_relations.py',
                   '17_tags.py',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 

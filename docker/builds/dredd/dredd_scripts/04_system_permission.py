@@ -10,7 +10,7 @@ utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
 ###############################################################################
 #           SYSTEM PERMISSIONS
 ###############################################################################
-###############################################################################  
+###############################################################################
 @hooks.before("System Permissions > System Permissions collection > List system permissions")
 @hooks.before("System Permissions > System Permission instance > Grant system permission")
 @hooks.before("System Permissions > System Permission instance > View system permission")
