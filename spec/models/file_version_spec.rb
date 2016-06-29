@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe FileVersion, type: :model do
   subject { file_version }
   let(:file_version) { FactoryGirl.create(:file_version) }
+  let(:data_file) { file_version.data_file }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
 
@@ -10,6 +11,8 @@ RSpec.describe FileVersion, type: :model do
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file-version' }
   end
+  it_behaves_like 'a logically deleted model'
+  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
 
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
@@ -20,9 +23,16 @@ RSpec.describe FileVersion, type: :model do
   describe 'validations' do
     it { is_expected.to validate_presence_of :upload_id }
 
-    it 'should allow is_deleted to be set' do
-      should allow_value(true).for(:is_deleted)
-      should allow_value(false).for(:is_deleted)
+    context 'when deletion_allowed? is true' do
+      before { allow(subject).to receive(:deletion_allowed?).and_return(true) }
+      it { is_expected.to allow_value(true).for(:is_deleted) }
+      it { is_expected.to allow_value(false).for(:is_deleted) }
+    end
+
+    context 'when deletion_allowed? is false' do
+      before { allow(subject).to receive(:deletion_allowed?).and_return(false) }
+      it { is_expected.not_to allow_value(true).for(:is_deleted).with_message('The current file version cannot be deleted.') }
+      it { is_expected.to allow_value(false).for(:is_deleted) }
     end
 
     context 'when #is_deleted=true' do
@@ -42,24 +52,17 @@ RSpec.describe FileVersion, type: :model do
     end
 
     describe '#next_version_number' do
-      subject { FactoryGirl.create(:file_version, version_number: 1) }
+      let(:data_file) { FactoryGirl.create(:data_file) }
+      subject { data_file.file_versions.last }
       it { is_expected.to respond_to(:next_version_number) }
-
-      context 'when versions do not exist for file' do
-        subject { FactoryGirl.build(:file_version) }
-        it { expect(subject.data_file.file_versions.count).to eq 0 }
-        it { expect(subject.next_version_number).to eq 1 }
-      end
 
       context 'when file_version exists' do
         let(:expected_next_version_number) { subject.version_number + 1 }
         before { expect(subject).to be_persisted }
-        it { expect(subject.data_file.file_versions.count).to eq 1 }
         it { expect(subject.next_version_number).to eq expected_next_version_number }
 
         context 'with versions for other files' do
           let!(:other_file_version) { FactoryGirl.create(:file_version) }
-          it { expect(subject.data_file.file_versions.count).to eq 1 }
           it { expect(subject.next_version_number).to eq expected_next_version_number }
         end
       end
@@ -83,6 +86,28 @@ RSpec.describe FileVersion, type: :model do
         context 'when called' do
           before { subject.set_version_number }
           it { expect(subject.version_number).to eq original_version }
+        end
+      end
+    end
+
+    describe '#deletion_allowed?' do
+      it { is_expected.to respond_to(:deletion_allowed?) }
+
+      context 'when not current_file_version' do
+        subject { data_file.file_versions.first }
+        before { data_file.reload }
+        it { is_expected.not_to eq data_file.current_file_version }
+        it { expect(subject.deletion_allowed?).to be_truthy }
+      end
+
+      context 'when current_file_version' do
+        before { data_file.reload }
+        it { is_expected.to eq data_file.current_file_version }
+        it { expect(subject.deletion_allowed?).to be_falsey }
+
+        context 'with data_file.is_deleted true' do
+          before { data_file.is_deleted = true }
+          it { expect(subject.deletion_allowed?).to be_truthy }
         end
       end
     end

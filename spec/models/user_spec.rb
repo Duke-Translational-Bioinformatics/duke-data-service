@@ -6,6 +6,13 @@ RSpec.describe User, type: :model do
   subject { user_authentication_service.user }
 
   it_behaves_like 'an audited model'
+  it_behaves_like 'a kind' do
+    let(:serialized_kind) { false }
+  end
+  it_behaves_like 'a graphed model', auto_create: true do
+    let(:kind_name) { 'Agent' }
+  end
+
   it 'should have an audited_user_info method to return the information required by audit _by methods' do
     should respond_to('audited_user_info')
     audited_user_info = subject.audited_user_info
@@ -89,7 +96,7 @@ RSpec.describe User, type: :model do
     let!(:files) {
       files = []
       uploads.each do |upload|
-        files << FactoryGirl.create(:data_file, creator: subject, project: upload.project, upload: upload)
+        files << FactoryGirl.create(:data_file, project: upload.project, upload: upload)
       end
       files
     }
@@ -98,7 +105,7 @@ RSpec.describe User, type: :model do
     let!(:other_file) { FactoryGirl.create(:data_file, upload: other_upload) }
     let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted_project, user: subject).project }
     let(:deleted_upload) { FactoryGirl.create(:upload, :completed, creator: subject, project: projects.first)}
-    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, creator: subject, project: deleted_upload.project, upload: deleted_upload) }
+    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
 
     describe 'project_count' do
       let(:expected_count) { projects.count }

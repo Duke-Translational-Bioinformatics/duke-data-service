@@ -4,6 +4,10 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.1'
 # Use postgresql as the database for Active Record
 gem 'pg'
+
+# Use neo4j for PROV graph relationships
+gem 'neo4j'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4'
@@ -16,12 +20,16 @@ gem 'grape-kaminari'
 # Auditing
 gem "audited-activerecord"
 
+# Unions in policy scopes
+gem 'active_record_union'
+
 # portal
 gem 'sinatra'
 
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
+gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
 gem 'turbolinks'
 gem 'uglifier'
@@ -58,8 +66,8 @@ group :test do
   gem 'shoulda-matchers', require: false
   gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
-  gem 'vcr', group: :test
-  gem 'webmock', group: :test
+  gem 'vcr'
+  gem 'webmock'
   gem 'pry-byebug'
 end
 

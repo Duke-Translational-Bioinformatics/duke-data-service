@@ -7,6 +7,7 @@ require 'rspec/rails'
 require 'shoulda-matchers'
 require 'vcr'
 require 'pundit/rspec'
+require 'uri'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -50,6 +51,9 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+  config.after(:each) do
+    Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
+  end
 end
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -61,7 +65,7 @@ VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
   c.hook_into :webmock
   c.configure_rspec_metadata!
-
+  c.ignore_hosts URI(Rails.application.config.neo4j.session_path).host
   c.register_request_matcher :header_keys do |request_1, request_2|
     request_1.headers.keys == request_2.headers.keys
   end

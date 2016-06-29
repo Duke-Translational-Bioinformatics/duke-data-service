@@ -3,13 +3,14 @@ server:
   env_file:
     - circle/swift.circle.env
     - circle/webapp.circle.env
+    - neo4j.client.local.env
+    - auth_service.local.env
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
+    - neo4j:neo4j.db.host
   ports:
     - 3001:3000
-  volumes:
-    - .:/var/www/app
 db:
   build: ./docker/builds/db
   env_file:
@@ -22,27 +23,33 @@ swift:
   build: ./docker/builds/swift
   ports:
     - 8080:8080
+neo4j:
+  image: neo4j:2.3.2
+  ports:
+    - '7474:7474'
+  env_file:
+    - neo4j.server.local.env
 rake:
   image: dukedataservice_server
   entrypoint: ['rake']
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
+    - neo4j:neo4j.db.host
   env_file:
     - circle/webapp.circle.env
     - circle/swift.circle.env
-  volumes:
-    - .:/var/www/app
+    - neo4j.client.local.env
 authservice:
   image: dukedataservice_server
   env_file:
     - auth_service.env
+    - neo4j.client.env
   entrypoint: ['rake']
   command: authentication_service:create
   links:
     - db:postgres.db.host
-  volumes:
-    - .:/var/www/app
+    - neo4j:neo4j.db.host
 rspec:
   image: dukedataservice_server
   environment:
@@ -50,20 +57,22 @@ rspec:
   links:
     - db:postgres.db.host
     - swift:swift.circle.host
+    - neo4j:neo4j.db.host
   env_file:
     - circle/swift.circle.env
+    - neo4j.client.env
   entrypoint: ['rspec']
   command: spec
-  volumes:
-    - .:/var/www/app
 dredd:
   build: ./docker/builds/dredd
   links:
    - server:dds.host
    - swift:swift.circle.host
    - db:postgres.db.host
+   - neo4j:neo4j.db.host
   env_file:
     - dredd.env
+    - neo4j.client.env
   volumes:
     - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
     - ./apiary.apib:/home/dredd_scripts/apiary.apib

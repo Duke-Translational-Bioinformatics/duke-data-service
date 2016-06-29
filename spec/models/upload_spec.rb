@@ -8,25 +8,12 @@ RSpec.describe Upload, type: :model do
   it_behaves_like 'an audited model'
 
   describe 'associations' do
-    it 'should belong_to a project' do
-      should belong_to :project
-    end
-
-    it 'should belong_to a storage_provider' do
-      should belong_to :storage_provider
-    end
-
-    it 'should have_many chunks' do
-      should have_many :chunks
-    end
-
-    it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:project)
-    end
-
-    it 'should belong to creator' do
-      should belong_to(:creator).class_name('User')
-    end
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:storage_provider) }
+    it { is_expected.to have_many(:chunks) }
+    it { is_expected.to have_many(:project_permissions).through(:project) }
+    it { is_expected.to belong_to(:creator).class_name('User') }
+    it { is_expected.to have_many(:fingerprints) }
   end
 
   describe 'validations' do

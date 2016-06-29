@@ -13,7 +13,7 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}"
+        logger.info "User-Agent: #{headers['User-Agent']}" if headers
       end
 
       helpers Pundit
@@ -147,6 +147,15 @@ module DDS
         error!(error_json, 404)
       end
 
+      rescue_from NameError do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => e.message,
+          "suggestion" => "Please supply a supported object_kind"
+        }
+        error!(error_json, 404)
+      end
+
       rescue_from Pundit::NotAuthorizedError do |e|
         error_json = {
           "error" => "403",
@@ -181,6 +190,9 @@ module DDS
       mount DDS::V1::ChildrenAPI
       mount DDS::V1::SoftwareAgentsAPI
       mount DDS::V1::FileVersionsAPI
+      mount DDS::V1::TagsAPI
+      mount DDS::V1::ActivitiesAPI
+      mount DDS::V1::RelationsAPI
       add_swagger_documentation(
         api_version: 'v1',
         hide_format: true

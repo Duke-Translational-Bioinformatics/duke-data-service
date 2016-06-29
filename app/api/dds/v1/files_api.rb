@@ -36,13 +36,28 @@ module DDS
           parent: parent,
           upload: upload,
           name: upload.name,
-          label: file_params[:label],
-          creator_id: current_user.id
+          label: file_params[:label]
         })
         authorize file, :create?
         Audited.audit_class.as_user(current_user) do
           if file.save
-            annotate_audits [file.audits.last]
+            aupr = AttributedToUserProvRelation.create(
+              creator: current_user,
+              relatable_from: file.current_file_version,
+              relatable_to: current_user)
+            audits = [
+                file.audits.last,
+                file.current_file_version.audits.last,
+                aupr.audits.last
+            ]
+            if current_user.current_software_agent
+              ausr = AttributedToSoftwareAgentProvRelation.create(
+                creator: current_user,
+                relatable_from: file.current_file_version,
+                relatable_to: current_user.current_software_agent)
+                audits << ausr.audits.last
+            end
+            annotate_audits audits
             file
           else
             file
@@ -91,7 +106,23 @@ module DDS
         authorize file, :update?
         Audited.audit_class.as_user(current_user) do
           if file.save
-            annotate_audits [file.audits.last]
+            audits = [file.audits.last]
+            if params[:upload]
+              audits << file.current_file_version.audits.last
+              aupr = AttributedToUserProvRelation.create(
+                creator: current_user,
+                relatable_from: file.current_file_version,
+                relatable_to: current_user)
+              audits << aupr.audits.last
+              if current_user.current_software_agent
+                ausr = AttributedToSoftwareAgentProvRelation.create(
+                  creator: current_user,
+                  relatable_from: file.current_file_version,
+                  relatable_to: current_user.current_software_agent)
+                  audits << ausr.audits.last
+              end
+            end
+            annotate_audits audits
             file
           else
             validation_error! file

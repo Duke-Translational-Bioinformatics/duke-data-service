@@ -6,6 +6,15 @@ RSpec.describe SoftwareAgent, type: :model do
 
   it_behaves_like 'an audited model'
 
+  it_behaves_like 'a kind' do
+    let(:serialized_kind) { false }
+  end
+  it_behaves_like 'a graphed model', auto_create: true do
+    let(:kind_name) { 'Agent' }
+  end
+
+  it_behaves_like 'a logically deleted model'
+
   describe 'associations' do
     it { should belong_to(:creator) }
     it { should have_one(:api_key) }

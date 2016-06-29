@@ -6,7 +6,8 @@ describe DDS::V1::FileVersionsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
+  let(:file_version) { data_file.file_versions.first }
+  let(:current_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
   let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
   let(:deleted_data_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
@@ -98,6 +99,9 @@ describe DDS::V1::FileVersionsAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
+
+      before { expect(current_file_version).to be_persisted }
+      it { expect(resource.deletion_allowed?).to be_truthy }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 
@@ -111,6 +115,12 @@ describe DDS::V1::FileVersionsAPI do
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
         end
+      end
+
+      context 'resource is current_file_version' do
+        let(:resource) { current_file_version }
+        it { expect(resource.deletion_allowed?).to be_falsey }
+        it_behaves_like 'a validated resource'
       end
 
       it_behaves_like 'an authenticated resource'

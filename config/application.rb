@@ -5,6 +5,7 @@ require 'rails/all'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+require 'neo4j/railtie'
 
 module DukeDataService
   class Application < Rails::Application
@@ -39,5 +40,8 @@ module DukeDataService
           :max_age => 0
       end
     end
+    # Neo4j using Graph Story
+    config.neo4j.session_type = :server_db
+    config.neo4j.session_path = ENV["GRAPHSTORY_URL"]
   end
 end
