@@ -6,7 +6,6 @@ describe DDS::V1::TagsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
   let(:tag_stub) { FactoryGirl.build(:tag, taggable: data_file) }
 
@@ -14,7 +13,6 @@ describe DDS::V1::TagsAPI do
   let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
   let(:other_tag) { FactoryGirl.create(:tag, taggable: other_data_file) }
 
-  let(:folder_tag) { FactoryGirl.create(:tag, label: 'Tag on a folder', taggable: folder) }
   let(:not_allowed_tag) { FactoryGirl.create(:tag) }
 
   let(:resource_class) { Tag }
@@ -101,7 +99,6 @@ describe DDS::V1::TagsAPI do
     let(:resource_class) { TagLabel }
     let(:resource_serializer) { TagLabelSerializer }
     let!(:resource_tag_label) { TagLabel.new(label: resource.label, count: 1) }
-    let!(:folder_tag_label) { TagLabel.new(label: folder_tag.label, count: 1) }
     let!(:not_allowed_tag_label) { TagLabel.new(label: not_allowed_tag.label, count: 1) }
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -109,7 +106,6 @@ describe DDS::V1::TagsAPI do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { [
-          folder_tag_label,
           resource_tag_label
         ] }
         let(:serializable_resource) { expected_resources.first }
@@ -132,8 +128,7 @@ describe DDS::V1::TagsAPI do
           ] }
           let(:serializable_resource) { expected_resources.first }
           let!(:unexpected_resources) { [
-            not_allowed_tag_label,
-            folder_tag_label
+            not_allowed_tag_label
           ] }
         end
 
