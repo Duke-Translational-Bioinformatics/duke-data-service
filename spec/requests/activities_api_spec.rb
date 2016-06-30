@@ -128,12 +128,6 @@ describe DDS::V1::ActivitiesAPI do
       }}
       it_behaves_like 'an updatable resource'
 
-      it_behaves_like 'a validated resource' do
-        let(:payload) {{
-            name: nil
-        }}
-      end
-
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint'
