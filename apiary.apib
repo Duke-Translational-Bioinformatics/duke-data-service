@@ -2492,7 +2492,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "kind": "dds-activity",
             "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
             "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
             "started_on": "2015-01-01T12:00:00Z",
             "ended_on": null,
             "is_deleted": false,
@@ -2510,7 +2510,7 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 + Request (application/json)
 
         {
-            "ended_on": "2015-01-01T114:30:00"
+            "ended_on": "2015-01-01T14:30:00Z"
         }
 
 + Response 200 (application/json)
@@ -2519,9 +2519,9 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "kind": "dds-activity",
             "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
             "name": "RF PI3-Kinase",
-            "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+            "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
             "started_on": "2015-01-01T12:00:00Z",
-            "ended_on": "2015-01-01T114:30:00Z",
+            "ended_on": "2015-01-01T14:30:00Z",
             "is_deleted": false,
             "audit": { }
         }
@@ -2572,9 +2572,9 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
                 "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T114:30:00Z",
+                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -2674,9 +2674,9 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
                 "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T114:30:00Z",
+                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -2843,9 +2843,9 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
                 "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T114:30:00Z",
+                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -2914,9 +2914,9 @@ List the relations for a provenance node; this only lists direct relations for t
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
                 "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T114:30:00Z",
+                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -2963,9 +2963,9 @@ List the relations for a provenance node; this only lists direct relations for t
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
                 "name": "RF PI3-Kinase",
-                "decription": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
                 "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T114:30:00Z",
+                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -3274,7 +3274,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels{?object_kind, label_contains}]
+### NOT_IMPLEMENTED_NEW List tag labels [GET /tags/labels{?object_kind,label_contains}]
 Get a list of the **distinct** tag `label` values visible to the current user.  
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
