@@ -24,7 +24,7 @@ describe GeneratedByActivityProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:generated_by_activity_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?, :create?, :destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: []
   end
 
@@ -36,7 +36,7 @@ describe GeneratedByActivityProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:show?, :create?, :destroy?]
+      it_behaves_like 'a user with project_permission', :view_project,  on: :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
     end
 
     context 'to other users activity' do
@@ -46,7 +46,7 @@ describe GeneratedByActivityProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?]
-      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:show?]
+      it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :show?]
     end
   end
 

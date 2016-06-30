@@ -13,7 +13,7 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}"
+        logger.info "User-Agent: #{headers['User-Agent']}" if headers
       end
 
       helpers Pundit
@@ -143,6 +143,15 @@ module DDS
           "error" => "404",
           "reason" => "#{missing_object} Not Found",
           "suggestion" => "you may have mistyped the #{missing_object} id"
+        }
+        error!(error_json, 404)
+      end
+
+      rescue_from NameError do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => e.message,
+          "suggestion" => "Please supply a supported object_kind"
         }
         error!(error_json, 404)
       end

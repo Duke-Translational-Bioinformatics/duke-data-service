@@ -13,6 +13,8 @@ RSpec.describe SoftwareAgent, type: :model do
     let(:kind_name) { 'Agent' }
   end
 
+  it_behaves_like 'a logically deleted model'
+
   describe 'associations' do
     it { should belong_to(:creator) }
     it { should have_one(:api_key) }

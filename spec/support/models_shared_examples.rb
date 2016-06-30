@@ -18,6 +18,14 @@ shared_examples 'a kind' do
       expect(parsed_json["kind"]).to eq(subject.kind)
     end
   end
+
+  it 'should be registered in KindnessFactory.kinded_models' do
+    expect(KindnessFactory.kinded_models).to include(subject.class)
+  end
+
+  it 'should be returned by KindnessFactory.by_kind(expected_kind)' do
+    expect(KindnessFactory.by_kind(expected_kind)).to eq(subject.class)
+  end
 end
 
 shared_examples 'a graphed model' do |auto_create: false, logically_deleted: false|
@@ -200,8 +208,9 @@ shared_examples 'a ProvRelation' do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
-    let!(:kind_name) { "relation-#{subject.relationship_type}" }
+    let!(:kind_name) { subject.class.name.underscore }
   end
+  it_behaves_like 'a logically deleted model'
 
   it_behaves_like 'a graphed relation', auto_create: true do
     let(:from_model) { subject.relatable_from }
@@ -224,5 +233,16 @@ shared_examples 'a ProvRelation' do
       relatable_to: subject.relatable_to
     )
     expect(created_relation.relationship_type).to eq(expected_relationship_type)
+  end
+end
+
+shared_examples 'a logically deleted model' do
+  it { is_expected.to respond_to :is_deleted }
+
+  # if this fails, ensure that the default value for is_deleted
+  # in the migration creating the model is false, e.g.
+  # t.boolean :is_deleted, :default => false
+  it 'should ensure is_deleted is false even if not specified in create' do
+    expect(described_class.column_defaults['is_deleted']).not_to be_nil
   end
 end

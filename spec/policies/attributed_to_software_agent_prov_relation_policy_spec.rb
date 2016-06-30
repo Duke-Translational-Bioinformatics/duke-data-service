@@ -23,7 +23,7 @@ describe AttributedToSoftwareAgentProvRelationPolicy do
     let(:other_prov_relation) {
       FactoryGirl.create(:attributed_to_software_agent_prov_relation)
     }
-    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:destroy?]
+    it_behaves_like 'a policy for', :user, on: :prov_relation, allows: [:scope, :destroy?]
     it_behaves_like 'a policy for', :user, on: :other_prov_relation, allows: [], denies: [:show?, :create?, :index?, :update?, :destroy?]
   end
 
@@ -34,7 +34,7 @@ describe AttributedToSoftwareAgentProvRelationPolicy do
         relatable_from: users_file_version)
       }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
-      it_behaves_like 'a user with project_permission', :view_project, allows: [:show?, :create?], on: :prov_relation
+      it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :show?, :create?], on: :prov_relation
       it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?], on: :prov_relation
     end
 
@@ -44,7 +44,7 @@ describe AttributedToSoftwareAgentProvRelationPolicy do
         relatable_from: users_file_version)
        }
       it_behaves_like 'system_permission can access', :prov_relation, allows: [:scope, :show?, :create?, :destroy?], denies: [:index?, :update?]
-      it_behaves_like 'a user with project_permission', :view_project, allows: [:show?, :create?], on: :prov_relation
+      it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :show?, :create?], on: :prov_relation
       it_behaves_like 'a user without project_permission', :view_project, denies: [:show?, :create?], on: :prov_relation
     end
   end

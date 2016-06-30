@@ -13,7 +13,8 @@ RSpec.describe Folder, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
-
+  it_behaves_like 'a logically deleted model'
+  
   describe 'associations' do
     it 'should be part of a project' do
       should belong_to(:project)

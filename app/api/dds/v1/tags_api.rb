@@ -13,20 +13,21 @@ module DDS
         ]
       end
       params do
-        requires :object, desc: "DataFile ID", type: Hash do
-          requires :kind, type: String, desc: "DataFile kind"
-          requires :id, type: String, desc: "DataFile UUID"
+        requires :object, type: Hash do
+          requires :kind, type: String, desc: "The kind of object to tag"
+          requires :id, type: String, desc: "The unique id of object to tag"
         end
         requires :label
       end
       post '/tags', root: false do
         authenticate!
-        data_file = DataFile.find(params[:object][:id])
         tag_params = declared(params, include_missing: false)
+        object_kind = KindnessFactory.by_kind(tag_params[:object][:kind])
+        taggable_object = object_kind.find(tag_params[:object][:id])
         tag = Tag.new(
           label: tag_params[:label],
-          taggable: data_file
-          )
+          taggable: taggable_object
+        )
         authorize tag, :create?
         Audited.audit_class.as_user(current_user) do
           if tag.save
@@ -48,9 +49,36 @@ module DDS
       end
       get '/tags/:object_kind/:object_id', root: 'results' do
         authenticate!
-        data_file = DataFile.find(params[:object_id])
-        authorize Tag.new(taggable: data_file), :index?
-        policy_scope(Tag).where(taggable: data_file)
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        taggable_object = object_kind.find(params[:object_id])
+        authorize Tag.new(taggable: taggable_object), :index?
+        policy_scope(Tag).where(taggable: taggable_object)
+      end
+
+      desc 'List tag labels' do
+        detail 'Get a list of the distinct tag label values visible to the current user.'
+        named 'list tag labels'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      params do
+        optional :object_kind, type: String, desc: "Restricts search scope to tags for this kind of object"
+        optional :label_contains, type: String, desc: "Searches for tags that contain this text fragment"
+      end
+      get '/tags/labels', root: 'results' do
+        authenticate!
+        tag_params = declared(params, include_missing: false)
+        scoped_tags = policy_scope(Tag)
+        if tag_params[:label_contains]
+          scoped_tags = scoped_tags.where("label LIKE ?", "%#{tag_params[:label_contains]}%")
+        end
+        if tag_params[:object_kind]
+          object_kind = KindnessFactory.by_kind(tag_params[:object_kind])
+          scoped_tags = scoped_tags.where(taggable: object_kind.all)
+        end
+        scoped_tags.label_count
       end
 
       desc 'View tag' do
@@ -61,8 +89,6 @@ module DDS
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'Tag does not exist']
         ]
-      end
-      params do
       end
       get '/tags/:id', root: false do
         authenticate!
