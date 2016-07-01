@@ -30,7 +30,6 @@ RSpec.describe UserSerializer, type: :serializer do
       expect(subject['auth_provider']['source']).to eq(user_authentication_service.authentication_service.name)
       expect(subject['last_login_on'].to_json).to eq(resource.last_login_at.to_json)
       expect(subject['agent']).to be_nil
-      binding.pry
     end
     it_behaves_like 'a serializer with a serialized audit'
 
@@ -39,7 +38,6 @@ RSpec.describe UserSerializer, type: :serializer do
         resource.current_software_agent = FactoryGirl.create(:software_agent)
       end
       it { expect(subject['agent']).not_to be_nil }
-      it { binding.pry }
     end
   end
 end
