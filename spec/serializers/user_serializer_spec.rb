@@ -5,6 +5,8 @@ RSpec.describe UserSerializer, type: :serializer do
   let(:resource) { user_authentication_service.user }
   let(:is_logically_deleted) { false }
 
+  it_behaves_like 'a has_one association with', :current_software_agent, SoftwareAgentPreviewSerializer, root: :agent
+
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('id')
@@ -15,6 +17,7 @@ RSpec.describe UserSerializer, type: :serializer do
       is_expected.to have_key('email')
       is_expected.to have_key('auth_provider')
       is_expected.to have_key('last_login_on')
+      is_expected.to have_key('agent')
       expect(subject['id']).to eq(resource.id)
       expect(subject['username']).to eq(resource.username)
       expect(subject['full_name']).to eq(resource.display_name)
@@ -26,7 +29,17 @@ RSpec.describe UserSerializer, type: :serializer do
       expect(subject['auth_provider']['uid']).to eq(user_authentication_service.uid)
       expect(subject['auth_provider']['source']).to eq(user_authentication_service.authentication_service.name)
       expect(subject['last_login_on'].to_json).to eq(resource.last_login_at.to_json)
+      expect(subject['agent']).to be_nil
+      binding.pry
     end
     it_behaves_like 'a serializer with a serialized audit'
+
+    context 'with current_software_agent' do
+      before do
+        resource.current_software_agent = FactoryGirl.create(:software_agent)
+      end
+      it { expect(subject['agent']).not_to be_nil }
+      it { binding.pry }
+    end
   end
 end
