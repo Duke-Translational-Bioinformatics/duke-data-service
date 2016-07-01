@@ -1,6 +1,7 @@
 class Activity < ActiveRecord::Base
   include Kinded
   include Graphed
+  before_create :set_default_started_on
   after_create :create_graph_node
   after_save :logically_delete_graph_node
   after_destroy :delete_graph_node
@@ -20,5 +21,9 @@ class Activity < ActiveRecord::Base
     if  started_on && ended_on && started_on > ended_on
       self.errors.add :ended_on, ' must be >= started_on'
     end
+  end
+
+  def set_default_started_on
+    self.started_on = DateTime.now unless self.started_on
   end
 end
