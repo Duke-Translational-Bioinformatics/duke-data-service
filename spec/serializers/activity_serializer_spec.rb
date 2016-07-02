@@ -1,6 +1,9 @@
 require 'rails_helper'
 RSpec.describe ActivitySerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:activity) }
+  let(:resource) { FactoryGirl.create(:activity,
+    started_on: 10.minutes.ago,
+    ended_on: DateTime.now
+  ) }
   let(:is_logically_deleted) { true }
 
   it_behaves_like 'a json serializer' do

@@ -190,6 +190,11 @@ shared_examples 'a ProvRelation' do
     it { is_expected.to validate_presence_of :creator_id }
     it { is_expected.to validate_presence_of :relatable_from }
     it { is_expected.to validate_presence_of :relatable_to }
+    it {
+      is_expected.to validate_uniqueness_of(:relationship_type).scoped_to(
+        [:relatable_from_id, :relatable_to_id]
+      ).case_insensitive
+    }
   end
 
   it 'should implement set_relationship_type' do
