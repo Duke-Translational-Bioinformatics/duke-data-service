@@ -102,6 +102,32 @@ module DDS
         authorize file_version, :download?
         file_version
       end
+
+      desc 'Promote file version' do
+        detail 'promote file version'
+        named 'promote file version'
+        failure [
+          [201, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'File version does not exist']
+        ]
+      end
+      post '/file_versions/:id/current', root: false do
+        authenticate!
+        file_version_params = declared(params, include_missing: false)
+        file_version = FileVersion.find(params[:id])
+        authorize file_version, :create?
+        if file_version == file_version.data_file.current_file_version
+          file_version
+        else
+          dup_file_version = file_version.dup
+          Audited.audit_class.as_user(current_user) do
+            dup_file_version.save
+            annotate_audits [dup_file_version.audits.last]
+            dup_file_version
+          end
+        end
+      end
     end
   end
 end
