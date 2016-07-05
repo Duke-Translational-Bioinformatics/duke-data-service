@@ -50,8 +50,18 @@ describe DDS::V1::RelationsAPI do
         }
       }}
       let(:resource_serializer) { UsedProvRelationSerializer }
-
+      let(:duplicate_of_record) {
+        FactoryGirl.create(:used_prov_relation,
+          relatable_from: activity,
+          relatable_to: used_file_version
+        )
+      }
       it_behaves_like 'a creatable resource'
+      it_behaves_like 'a validated resource' do
+        before do
+          expect(duplicate_of_record).to be_persisted
+        end
+      end
 
       context 'with other users activity' do
         let(:payload) {{
@@ -128,8 +138,19 @@ describe DDS::V1::RelationsAPI do
         }
       }}
       let(:resource_serializer) { GeneratedByActivityProvRelationSerializer }
+      let(:duplicate_of_record) {
+        FactoryGirl.create(:generated_by_activity_prov_relation,
+          relatable_from: generated_file_version,
+          relatable_to: activity
+        )
+      }
 
       it_behaves_like 'a creatable resource'
+      it_behaves_like 'a validated resource' do
+        before do
+          expect(duplicate_of_record).to be_persisted
+        end
+      end
 
       context 'with other users activity' do
         let(:payload) {{
@@ -207,8 +228,19 @@ describe DDS::V1::RelationsAPI do
         }
       }}
       let(:resource_serializer) { DerivedFromFileVersionProvRelationSerializer }
+      let(:duplicate_of_record) {
+        FactoryGirl.create(:derived_from_file_version_prov_relation,
+          relatable_from: generated_file_version,
+          relatable_to: used_file_version
+        )
+      }
 
       it_behaves_like 'a creatable resource'
+      it_behaves_like 'a validated resource' do
+        before do
+          expect(duplicate_of_record).to be_persisted
+        end
+      end
 
       context 'without used_entity in payload' do
         let(:payload) {{
@@ -274,6 +306,12 @@ describe DDS::V1::RelationsAPI do
         }
       }}
       let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
+      let(:duplicate_of_record) {
+        FactoryGirl.create(:invalidated_by_activity_prov_relation,
+          relatable_from: invalidated_file_version,
+          relatable_to: activity
+        )
+      }
 
       context 'with entity that has not been deleted' do
         before do
@@ -312,6 +350,12 @@ describe DDS::V1::RelationsAPI do
       end
 
       it_behaves_like 'a creatable resource'
+      it_behaves_like 'a validated resource' do
+        before do
+          expect(duplicate_of_record).to be_persisted
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource' do
         let(:resource_permission) { delete_file_permission }
@@ -340,12 +384,13 @@ describe DDS::V1::RelationsAPI do
           creator: current_user,
           relatable_to: activity)
       }
+      let(:activity_for_deleted) { FactoryGirl.create(:activity, creator: current_user)}
       let(:deleted_associated_with_user_prov_relation) {
         FactoryGirl.create(:associated_with_user_prov_relation,
           is_deleted: true,
           relatable_from: current_user,
           creator: current_user,
-          relatable_to: activity)
+          relatable_to: activity_for_deleted)
       }
       let(:associated_with_software_agent_prov_relation) {
         FactoryGirl.create(:associated_with_software_agent_prov_relation,
