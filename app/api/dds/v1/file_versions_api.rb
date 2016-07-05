@@ -117,14 +117,13 @@ module DDS
         file_version_params = declared(params, include_missing: false)
         file_version = FileVersion.find(params[:id])
         authorize file_version, :create?
-        if file_version == file_version.data_file.current_file_version
-          file_version
-        else
-          dup_file_version = file_version.dup
-          Audited.audit_class.as_user(current_user) do
-            dup_file_version.save
+        dup_file_version = file_version.dup
+        Audited.audit_class.as_user(current_user) do
+          if dup_file_version.save
             annotate_audits [dup_file_version.audits.last]
             dup_file_version
+          else
+            validation_error!(dup_file_version)
           end
         end
       end

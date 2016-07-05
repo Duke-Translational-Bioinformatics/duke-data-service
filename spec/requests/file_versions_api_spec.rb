@@ -173,6 +173,16 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_response_status) { 201 }
       end
+      it 'promotes the file_version to the current_file_version' do
+        expect(data_file.reload).to be_truthy
+        expect(data_file.current_file_version).to eq(current_file_version)
+        is_expected.to eq(201)
+        expect(data_file.reload).to be_truthy
+        expect(data_file.current_file_version).not_to eq(current_file_version)
+        expect(data_file.current_file_version.upload).to eq(resource.upload)
+        expect(data_file.current_file_version.label).to eq(resource.label)
+        expect(data_file.current_file_version.version_number).to be > resource.version_number
+      end
 
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 201 }
@@ -189,14 +199,10 @@ describe DDS::V1::FileVersionsAPI do
         let(:resource) { current_file_version }
         it 'should not be duplicated' do
           expect {
-            is_expected.to eq(201)
+            is_expected.to eq(400)
           }.not_to change{resource_class.count}
         end
-
-        it 'should return a serialized object' do
-          is_expected.to eq(201)
-          expect(response.body).to include(resource_serializer.new(resource).to_json)
-        end
+        it_behaves_like 'a validated resource'
       end
     end
   end
