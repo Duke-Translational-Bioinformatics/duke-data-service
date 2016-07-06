@@ -38,7 +38,9 @@ shared_context 'with software_agent authentication' do
 end
 
 shared_examples 'a listable resource' do
-  let(:expected_list_length) { resource_class.all.count }
+  let(:expected_resources) { resource_class.all }
+  let(:serializable_resource) { resource }
+  let(:expected_list_length) { expected_resources.count }
   let(:unexpected_resources) { [] }
   before do
     expect(resource).to be_persisted
@@ -48,7 +50,7 @@ shared_examples 'a listable resource' do
     expect(response.status).to eq(200)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
-    expect(response.body).to include(resource_serializer.new(resource).to_json)
+    expect(response.body).to include(resource_serializer.new(serializable_resource).to_json)
   end
 
   it 'should include the expected number of results' do
