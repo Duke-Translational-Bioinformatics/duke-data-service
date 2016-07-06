@@ -115,7 +115,7 @@ module DDS
       post '/file_versions/:id/current', root: false do
         authenticate!
         file_version_params = declared(params, include_missing: false)
-        file_version = FileVersion.find(params[:id])
+        file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :create?
         dup_file_version = file_version.dup
         Audited.audit_class.as_user(current_user) do

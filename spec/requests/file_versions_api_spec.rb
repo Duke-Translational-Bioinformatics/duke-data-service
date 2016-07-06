@@ -170,6 +170,7 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'a creatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'a logically deleted resource'
       it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_response_status) { 201 }
       end
