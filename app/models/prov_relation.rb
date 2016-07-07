@@ -13,8 +13,9 @@ class ProvRelation < ActiveRecord::Base
   validates :relatable_from, presence: true
   validates :relationship_type, uniqueness: {
     scope: [:relatable_from_id, :relatable_to_id],
-    case_sensitive: false
-  }
+    case_sensitive: false,
+    conditions: -> { where(is_deleted: false) }
+  }, unless: :is_deleted
   validates :relatable_to, presence: true
 
   belongs_to :creator, class_name: "User"
