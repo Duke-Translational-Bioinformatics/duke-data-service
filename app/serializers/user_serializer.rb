@@ -10,6 +10,8 @@ class UserSerializer < ActiveModel::Serializer
              :last_login_on,
              :audit
 
+  has_one :current_software_agent, root: :agent, serializer: SoftwareAgentPreviewSerializer
+
   def last_login_on
     object.last_login_at
   end

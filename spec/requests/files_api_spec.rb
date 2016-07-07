@@ -229,6 +229,16 @@ describe DDS::V1::FilesAPI do
               }.to change{resource.file_versions.count}.by(0)
             }.to change{AttributedToUserProvRelation.count}.by(0)
           end
+          it 'sets data_file label' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource.label).to eq(payload[:label])
+          end
+          it 'sets current_file_version label' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource.current_file_version.label).to eq(payload[:label])
+          end
         end
 
         it_behaves_like 'an authenticated resource'
@@ -246,6 +256,33 @@ describe DDS::V1::FilesAPI do
           end
 
           it_behaves_like 'an annotate_audits endpoint'
+        end
+      end
+
+      context 'with current_file_version upload in payload' do
+        let(:payload_upload) {{ id: resource.current_file_version.upload.id }}
+
+        it_behaves_like 'an updatable resource' do
+          it 'sets data_file label' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource.label).to eq(payload[:label])
+          end
+          it 'sets current_file_version label' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource.current_file_version.label).to eq(payload[:label])
+          end
+          it 'does not create a file_version' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{resource.file_versions.count}.by(0)
+          end
+          it 'does not create a attributed_to_user' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{AttributedToUserProvRelation.count}.by(0)
+          end
         end
       end
 

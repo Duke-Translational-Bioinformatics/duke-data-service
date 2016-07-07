@@ -44,7 +44,7 @@ class DataFile < Container
   end
 
   def current_file_version
-    file_versions.last
+    file_versions[-1]
   end
 
   def build_file_version

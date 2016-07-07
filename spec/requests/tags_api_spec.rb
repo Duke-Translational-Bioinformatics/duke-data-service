@@ -139,7 +139,7 @@ describe DDS::V1::TagsAPI do
       end
 
       context 'with label_contains parameter' do
-        let(:label_query) { Faker::Lorem.word }
+        let(:label_query) { SecureRandom.hex }
         let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: data_file) }
         let(:resource_tag_label) { TagLabel.new(label: resource.label, count: 1) }
         let!(:diff_tag) { FactoryGirl.create(:tag, taggable: data_file) }

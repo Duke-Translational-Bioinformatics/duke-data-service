@@ -6,6 +6,8 @@ RSpec.describe FileVersion, type: :model do
   let(:data_file) { file_version.data_file }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
+  let(:upload) { file_version.upload }
+  let(:other_upload) { FactoryGirl.create(:upload, :completed) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -38,6 +40,23 @@ RSpec.describe FileVersion, type: :model do
     context 'when #is_deleted=true' do
       subject { deleted_file_version }
       it { is_expected.not_to validate_presence_of(:upload_id) }
+    end
+
+    it 'should not allow upload_id to be changed' do
+      should allow_value(upload).for(:upload)
+      expect(subject).to be_valid
+      should allow_value(upload.id).for(:upload_id)
+      should_not allow_value(other_upload.id).for(:upload_id)
+      should allow_value(upload.id).for(:upload_id)
+      expect(subject).to be_valid
+      should allow_value(other_upload).for(:upload)
+      expect(subject).not_to be_valid
+    end
+
+    context 'when duplicating current_version' do
+      before { expect(data_file.reload).to be_truthy }
+      subject { data_file.current_file_version.dup }
+      it { is_expected.not_to be_valid }
     end
   end
 

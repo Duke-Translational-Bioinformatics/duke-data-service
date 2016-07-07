@@ -10,10 +10,17 @@ class FileVersion < ActiveRecord::Base
   belongs_to :upload
   has_many :project_permissions, through: :data_file
 
-  validates :upload_id, presence: true, unless: :is_deleted
+  validates :upload_id, presence: true, immutable: true, unless: :is_deleted
   validates :is_deleted, 
     absence: { message: 'The current file version cannot be deleted.' },
     unless: :deletion_allowed?
+  validates_each :upload_id, on: :create do |record, attr, value|
+    if record.upload_id
+      if record.upload_id == record.data_file.current_file_version.upload_id
+        record.errors.add(attr, 'match current file version.')
+      end
+    end
+  end
 
   before_create :set_version_number
 
