@@ -125,6 +125,38 @@ module DDS
           end
         end
 
+        def audit_attributes(additional_annotation = {})
+          audit_attrs = {
+            request_uuid: SecureRandom.uuid,
+            remote_address: request.ip,
+            comment: {
+              endpoint: request.env["REQUEST_URI"],
+              action: request.env["REQUEST_METHOD"]
+            }
+          }
+          if current_software_agent
+            audit_attrs[:comment][:software_agent_id] = current_software_agent.id
+          end
+          additional_annotation.merge(audit_attrs)
+        end
+
+        def audit_store(audit_attrs = {})
+          audit_store_clear
+          Audited.store.merge!(audit_attrs)
+        end
+        def audit_store_clear
+          Audited.store.clear
+        end
+
+        def audit_as_current_user(additional_annotation = nil)
+          Audited.audit_class.as_user(current_user) do
+            audit_store({audit_attributes: audit_attributes})
+            yeild_result = yield
+            audit_store_clear
+            yeild_result
+          end
+        end
+
         def hide_logically_deleted(object)
           if object.is_deleted
             raise ActiveRecord::RecordNotFound.new("find #{object.class.name} with #{object.id} not found")

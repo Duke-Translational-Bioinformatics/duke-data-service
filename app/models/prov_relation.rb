@@ -21,6 +21,12 @@ class ProvRelation < ActiveRecord::Base
   belongs_to :relatable_from, polymorphic: true
   belongs_to :relatable_to, polymorphic: true
 
+  def after_audit
+    if Audited.store[:audit_attributes]
+      audits.last.update(Audited.store[:audit_attributes])
+    end
+  end
+
   def kind
     super(self.class.name.underscore)
   end

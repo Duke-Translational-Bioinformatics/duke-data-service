@@ -10,6 +10,12 @@ class Container < ActiveRecord::Base
   define_model_callbacks :set_parent_attribute
   validates :name, presence: true, unless: :is_deleted
 
+  def after_audit
+    if Audited.store[:audit_attributes]
+      audits.last.update(Audited.store[:audit_attributes])
+    end
+  end
+
   def ancestors
     if parent
       [parent.ancestors, parent].flatten

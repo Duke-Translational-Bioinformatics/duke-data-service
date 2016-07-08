@@ -22,6 +22,12 @@ class FileVersion < ActiveRecord::Base
     end
   end
 
+  def after_audit
+    if Audited.store[:audit_attributes]
+      audits.last.update(Audited.store[:audit_attributes])
+    end
+  end
+
   before_create :set_version_number
 
   delegate :name, to: :data_file
