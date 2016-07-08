@@ -61,9 +61,12 @@ def invalidate16_1(transaction):
     requestBody['entity']['id'] = file_version_id2
     requestBody['activity']['id'] = activity_id
     transaction[u'request'][u'body'] = json.dumps(requestBody)
-@hooks.before("Provenance Relations > Relations collection > NOT_IMPLEMENTED_NEW List provenance relations")
-def skippy16_2(transaction):
-    utils.skip_this_endpoint(transaction)
+@hooks.before("Provenance Relations > Relations collection > List provenance relations")
+def change_activity_id16_2(transaction):
+    print(transaction['name'])
+    activity_id = utils.create_provenance_activity()
+    url = transaction['fullPath']
+    transaction['fullPath'] = str(url).replace('a1ff02a4-b7e9-999d-87x1-66f4c881jka1',activity_id)
 @hooks.before("Provenance Relations > Relation instance > View relation")
 @hooks.before("Provenance Relations > Relation instance > Delete relation")
 def changeid216_2(transaction):

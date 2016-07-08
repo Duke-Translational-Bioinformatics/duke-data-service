@@ -24,7 +24,16 @@ def get_prov_activity(transaction):
 def justPass15_1(transaction):
     utils.pass_this_endpoint(transaction)
 @hooks.before("Provenance Activities > Activities instance > View activity")
+def changeid015_1(transaction):
+    url = transaction['fullPath']
+    transaction['fullPath'] = str(url).replace('a1ff02a4-b7e9-999d-87x1-66f4c881jka1',prov_id)
 @hooks.before("Provenance Activities > Activities instance > Update activity")
+def changeid_and_des15_1(transaction):
+    requestBody = json.loads(transaction[u'request'][u'body'])
+    requestBody['ended_on'] = ''
+    transaction[u'request'][u'body'] = json.dumps(requestBody)
+    url = transaction['fullPath']
+    transaction['fullPath'] = str(url).replace('a1ff02a4-b7e9-999d-87x1-66f4c881jka1',prov_id)
 @hooks.before("Provenance Activities > Activities instance > Delete activity")
 def changeid15_1(transaction):
     url = transaction['fullPath']

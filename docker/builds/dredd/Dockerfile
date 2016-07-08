@@ -12,7 +12,7 @@ RUN apt-get update
 RUN apt-get install -y python-pip
 #We've submitted 2 pull requests, until those are merged, we'll pull our own code in
 #RUN pip install dredd_hooks
-RUN git clone https://github.com/benneely/dredd-hooks-python.git
+RUN git clone https://github.com/apiaryio/dredd-hooks-python.git
 RUN cd /dredd-hooks-python && python setup.py install
 
 #Symlink

@@ -20,8 +20,9 @@ def change_an_id11_1(transaction):
     description = "Created by dredd under: Projects > Projects collection > Create project"
     neww = utils.create_a_project(transaction,name,description)
     url = transaction['fullPath']
-    transaction['fullPath'] = str(url).replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23',neww['id'])
+    transaction['fullPath'] = str(url).replace('d5ae02a4-b9e6-473d-87c4-66f4c881ae7a',neww['id'])
     proj_id = neww['id']
+    print(proj_id)
 @hooks.after("Uploads > Uploads collection > Initiate chunked upload")
 def get_the_id11_1(transaction):
     global upload_id
@@ -30,7 +31,7 @@ def get_the_id11_1(transaction):
 @hooks.before("Uploads > Uploads collection > List chunked uploads")
 def list_all_uploads(transaction):
     url = transaction['fullPath']
-    transaction['fullPath'] = str(url).replace('666be35a-98e0-4c2e-9a17-7bc009f9bb23',proj_id)
+    transaction['fullPath'] = str(url).replace('d5ae02a4-b9e6-473d-87c4-66f4c881ae7a',proj_id)
 @hooks.before("Uploads > Upload instance > View chunked upload")
 @hooks.before("Uploads > Upload instance > Get pre-signed chunk URL")
 def list_upload_id11_1(transaction):

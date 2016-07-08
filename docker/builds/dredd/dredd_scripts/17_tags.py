@@ -33,9 +33,9 @@ def get_tag_id(transaction):
 def change_url12_1(transaction):
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('777be35a-98e0-4c2e-9a17-7bc009f9b111',file_id)
-@hooks.before("Tags > Tags collection > NOT_IMPLEMENTED_NEW List tag labels")
-def skippy17_1(transaction):
-    utils.skip_this_endpoint(transaction)
+@hooks.before("Tags > Tags collection > List tag labels")
+def pass17_1(transaction):
+    utils.pass_this_endpoint(transaction)
 @hooks.before("Tags > Tag instance > View tag")
 @hooks.before("Tags > Tag instance > Delete tag")
 def change_url212_1(transaction):
