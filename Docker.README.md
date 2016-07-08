@@ -540,7 +540,7 @@ cp dredd.local.env dredd.env
 ./launch_application.sh
 echo "MY_GENERATED_JWT="$(docker-compose run rake api_test_user:create | tail -1) >> dredd.env
 docker-compose run rake api_test_user_pool:create
-docker-compose run dredd bash
+docker-compose run dredd
 ```
 
 To clean up after a dredd run (you should do this between runs, and also before committing
