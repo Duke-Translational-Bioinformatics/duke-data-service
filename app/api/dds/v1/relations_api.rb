@@ -40,7 +40,7 @@ module DDS
             annotate_audits [relation.audits.last]
             relation
           else
-            validation_error!(activity)
+            validation_error!(relation)
           end
         end
       end
@@ -84,7 +84,7 @@ module DDS
             annotate_audits [relation.audits.last]
             relation
           else
-            validation_error!(activity)
+            validation_error!(relation)
           end
         end
       end
@@ -128,7 +128,7 @@ module DDS
             annotate_audits [relation.audits.last]
             relation
           else
-            validation_error!(activity)
+            validation_error!(relation)
           end
         end
       end
@@ -171,7 +171,7 @@ module DDS
             annotate_audits [relation.audits.last]
             relation
           else
-            validation_error!(activity)
+            validation_error!(relation)
           end
         end
       end

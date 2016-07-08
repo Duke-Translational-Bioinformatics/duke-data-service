@@ -100,14 +100,15 @@ module DDS
       put '/files/:id/', root: false do
         authenticate!
         file = hide_logically_deleted(DataFile.find(params[:id]))
+        initial_file_version = file.current_file_version
         file_params = declared(params, include_missing: false)
-        file.upload = Upload.find(params[:upload][:id]) if params[:upload]
-        file.label = params[:label] if params[:label]
+        file.upload = Upload.find(file_params[:upload][:id]) if file_params[:upload]
+        file.label = file_params[:label] if file_params[:label]
         authorize file, :update?
         Audited.audit_class.as_user(current_user) do
           if file.save
             audits = [file.audits.last]
-            if params[:upload]
+            if file.current_file_version != initial_file_version
               audits << file.current_file_version.audits.last
               aupr = AttributedToUserProvRelation.create(
                 creator: current_user,

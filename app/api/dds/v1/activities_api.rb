@@ -99,7 +99,7 @@ module DDS
       end
       params do
         requires :id, type: String, desc: 'Activity UUID'
-        requires :name, type: String, desc: 'The Name of the activity'
+        optional :name, type: String, desc: 'The Name of the activity'
         optional :description, type: String, desc: 'The Description of the activity'
         optional :started_on, type: DateTime, desc: "DateTime when the activity started"
         optional :ended_on, type: DateTime, desc: "DateTime when the activity ended"
@@ -107,6 +107,7 @@ module DDS
       put '/activities/:id', root: false do
         authenticate!
         activity_params = declared(params, include_missing: false)
+        activity_params.delete(:id)
         activity = hide_logically_deleted Activity.find(params[:id])
         authorize activity, :update?
         Audited.audit_class.as_user(current_user) do

@@ -187,9 +187,31 @@ end #a graphed relation
 
 shared_examples 'a ProvRelation' do
   describe 'validations' do
+    let(:deleted_copy) {
+      described_class.new(
+          is_deleted: true,
+          creator_id: subject.creator.id,
+          relatable_from: subject.relatable_from,
+          relatable_to: subject.relatable_to
+      )
+    }
+    let(:invalid_copy) {
+      described_class.new(
+          creator_id: subject.creator.id,
+          relatable_from: subject.relatable_from,
+          relatable_to: subject.relatable_to
+      )
+    }
+
     it { is_expected.to validate_presence_of :creator_id }
     it { is_expected.to validate_presence_of :relatable_from }
     it { is_expected.to validate_presence_of :relatable_to }
+    it 'should be unique to all but deleted ProvRelations' do
+      expect(deleted_copy).to be_valid
+      expect(deleted_copy.save).to be true
+      is_expected.to be_persisted
+      expect(invalid_copy).not_to be_valid
+    end
   end
 
   it 'should implement set_relationship_type' do
