@@ -13,13 +13,18 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}" if headers
+        log_user_agent
+        populate_audit_store_with_request
       end
-
+      
       helpers Pundit
       helpers do
         def logger
           Rails.logger
+        end
+
+        def log_user_agent
+          logger.info "User-Agent: #{headers['User-Agent']}" if headers
         end
 
         def authenticate!
@@ -125,8 +130,8 @@ module DDS
           end
         end
 
-        def audit_attributes(additional_annotation = {})
-          audit_attrs = {
+        def populate_audit_store_with_request
+          audit_attributes = {
             request_uuid: SecureRandom.uuid,
             remote_address: request.ip,
             comment: {
@@ -135,26 +140,11 @@ module DDS
             }
           }
           if current_software_agent
-            audit_attrs[:comment][:software_agent_id] = current_software_agent.id
+            audit_attributes[:comment][:software_agent_id] = current_software_agent.id
           end
-          additional_annotation.merge(audit_attrs)
-        end
-
-        def audit_store(audit_attrs = {})
-          audit_store_clear
-          Audited.store.merge!(audit_attrs)
-        end
-        def audit_store_clear
           Audited.store.clear
-        end
-
-        def audit_as_current_user(additional_annotation = nil)
-          Audited.audit_class.as_user(current_user) do
-            audit_store({audit_attributes: audit_attributes})
-            yeild_result = yield
-            audit_store_clear
-            yeild_result
-          end
+          Audited.store.merge!({audit_attributes: audit_attributes})
+          Audited.store[:current_user] = current_user
         end
 
         def hide_logically_deleted(object)

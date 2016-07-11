@@ -105,24 +105,22 @@ module DDS
         file.upload = Upload.find(file_params[:upload][:id]) if file_params[:upload]
         file.label = file_params[:label] if file_params[:label]
         authorize file, :update?
-        audit_as_current_user do
-          if file.save
-            if file.current_file_version != initial_file_version
-              aupr = AttributedToUserProvRelation.create(
+        if file.save
+          if file.current_file_version != initial_file_version
+            aupr = AttributedToUserProvRelation.create(
+              creator: current_user,
+              relatable_from: file.current_file_version,
+              relatable_to: current_user)
+            if current_user.current_software_agent
+              ausr = AttributedToSoftwareAgentProvRelation.create(
                 creator: current_user,
                 relatable_from: file.current_file_version,
-                relatable_to: current_user)
-              if current_user.current_software_agent
-                ausr = AttributedToSoftwareAgentProvRelation.create(
-                  creator: current_user,
-                  relatable_from: file.current_file_version,
-                  relatable_to: current_user.current_software_agent)
-              end
+                relatable_to: current_user.current_software_agent)
             end
-            file
-          else
-            validation_error! file
           end
+          file
+        else
+          validation_error! file
         end
       end
 
