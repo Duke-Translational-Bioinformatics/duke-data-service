@@ -1,6 +1,7 @@
 class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed
+  include RequestAudited
   after_create :create_graph_node
   after_save :logically_delete_graph_node
   after_destroy :delete_graph_node
@@ -19,19 +20,6 @@ class FileVersion < ActiveRecord::Base
       if record.upload_id == record.data_file.current_file_version.upload_id
         record.errors.add(attr, 'match current file version.')
       end
-    end
-  end
-
-  def around_audit
-    if Audited.store[:current_user]
-      Audited.audit_class.as_user(Audited.store[:current_user]) do
-        yield
-      end
-    else
-      yield
-    end
-    if Audited.store[:audit_attributes]
-      audits.last.update(Audited.store[:audit_attributes])
     end
   end
 
