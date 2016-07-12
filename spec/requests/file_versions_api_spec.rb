@@ -158,4 +158,53 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'a logically deleted resource'
     end
   end
+
+  describe 'Promote file version' do
+    let(:url) { "/api/v1/file_versions/#{resource_id}/current" }
+
+    describe 'POST' do
+      subject { post(url, nil, headers) }
+      let(:called_action) { 'POST' }
+      before { expect(current_file_version).to be_persisted }
+
+      it_behaves_like 'a creatable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
+      end
+      it 'promotes the file_version to the current_file_version' do
+        expect(data_file.reload).to be_truthy
+        expect(data_file.current_file_version).to eq(current_file_version)
+        is_expected.to eq(201)
+        expect(data_file.reload).to be_truthy
+        expect(data_file.current_file_version).not_to eq(current_file_version)
+        expect(data_file.current_file_version.upload).to eq(resource.upload)
+        expect(data_file.current_file_version.label).to eq(resource.label)
+        expect(data_file.current_file_version.version_number).to be > resource.version_number
+      end
+
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 201 }
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 201 }
+        end
+      end
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+
+      context 'resource is current_file_version' do
+        let(:resource) { current_file_version }
+        it 'should not be duplicated' do
+          expect {
+            is_expected.to eq(400)
+          }.not_to change{resource_class.count}
+        end
+        it_behaves_like 'a validated resource'
+      end
+    end
+  end
 end
