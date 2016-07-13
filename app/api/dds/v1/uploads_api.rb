@@ -26,23 +26,20 @@ module DDS
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
             storage_provider = StorageProvider.first
-            Audited.audit_class.as_user(current_user) do
-              upload = project.uploads.build({
-                name: upload_params[:name],
-                size: upload_params[:size],
-                etag: SecureRandom.hex,
-                content_type: upload_params[:content_type],
-                storage_provider_id: storage_provider.id,
-                creator: current_user
-              })
-              authorize upload, :create?
-              if upload.save
-                upload.initialize_storage_provider
-                annotate_audits [upload.audits.last]
-                upload
-              else
-                validation_error!(upload)
-              end
+            upload = project.uploads.build({
+              name: upload_params[:name],
+              size: upload_params[:size],
+              etag: SecureRandom.hex,
+              content_type: upload_params[:content_type],
+              storage_provider_id: storage_provider.id,
+              creator: current_user
+            })
+            authorize upload, :create?
+            if upload.save
+              upload.initialize_storage_provider
+              upload
+            else
+              validation_error!(upload)
             end
           end
 
@@ -113,21 +110,18 @@ module DDS
             authenticate!
             chunk_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
-            Audited.audit_class.as_user(current_user) do
-              chunk = Chunk.new({
-                upload_id: upload.id,
-                number: chunk_params[:number],
-                size: chunk_params[:size],
-                fingerprint_value: chunk_params[:hash][:value],
-                fingerprint_algorithm: chunk_params[:hash][:algorithm],
-              })
-              authorize chunk, :create?
-              if chunk.save
-                annotate_audits [chunk.audits.last, upload.audits.last]
-                chunk
-              else
-                validation_error!(chunk)
-              end
+            chunk = Chunk.new({
+              upload_id: upload.id,
+              number: chunk_params[:number],
+              size: chunk_params[:size],
+              fingerprint_value: chunk_params[:hash][:value],
+              fingerprint_algorithm: chunk_params[:hash][:algorithm],
+            })
+            authorize chunk, :create?
+            if chunk.save
+              chunk
+            else
+              validation_error!(chunk)
             end
           end
 
@@ -154,11 +148,8 @@ module DDS
             authenticate!
             upload = Upload.find(params[:id])
             authorize upload, :complete?
-            Audited.audit_class.as_user(current_user) do
-              upload.etag = SecureRandom.hex
-              upload.complete
-              annotate_audits [upload.audits.last]
-            end
+            upload.etag = SecureRandom.hex
+            upload.complete
             upload
           end
 
@@ -178,17 +169,15 @@ module DDS
             requires :algorithm, type: String, desc: "The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.)."
           end
           put '/hashes', root: false do
+            authenticate!
             fingerprint_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
             authorize upload, :update?
             fingerprint = upload.fingerprints.build(fingerprint_params)
-            Audited.audit_class.as_user(current_user) do
-              if upload.save
-                annotate_audits [fingerprint.audits.last]
-                upload
-              else
-                validation_error!(fingerprint)
-              end
+            if upload.save
+              upload
+            else
+              validation_error!(fingerprint)
             end
           end
         end
