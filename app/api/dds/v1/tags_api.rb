@@ -29,13 +29,10 @@ module DDS
           taggable: taggable_object
         )
         authorize tag, :create?
-        Audited.audit_class.as_user(current_user) do
-          if tag.save
-            annotate_audits [tag.audits.last]
-            tag
-          else
-            validation_error!(tag)
-          end
+        if tag.save
+          tag
+        else
+          validation_error!(tag)
         end
       end
 
@@ -111,10 +108,7 @@ module DDS
         authenticate!
         tag = Tag.find(params[:id])
         authorize tag, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          tag.destroy
-          annotate_audits [tag.audits.last]
-        end
+        tag.destroy
         body false
       end
     end
