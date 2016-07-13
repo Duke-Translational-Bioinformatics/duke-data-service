@@ -4,6 +4,7 @@ module DDS
   module V1
     class Base < Grape::API
       include Grape::Kaminari
+      use AuditStoreCleanUp
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
@@ -14,17 +15,12 @@ module DDS
 
       before do
         log_user_agent
-        clear_audit_store
       end
 
       after_validation do
         populate_audit_store_with_request
       end
 
-      after do
-        clear_audit_store
-      end
-      
       helpers Pundit
       helpers do
         def logger
@@ -156,10 +152,6 @@ module DDS
           Audited.store.merge!({audit_attributes: audit_attributes})
         end
 
-        def clear_audit_store
-          Audited.store.clear
-        end
-
         def hide_logically_deleted(object)
           if object.is_deleted
             raise ActiveRecord::RecordNotFound.new("find #{object.class.name} with #{object.id} not found")
@@ -169,7 +161,6 @@ module DDS
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
-        clear_audit_store
         missing_object = ''
         m = e.message.match(/find\s(\w+)/)
         if m
@@ -184,7 +175,6 @@ module DDS
       end
 
       rescue_from NameError do |e|
-        clear_audit_store
         error_json = {
           "error" => "404",
           "reason" => e.message,
@@ -194,7 +184,6 @@ module DDS
       end
 
       rescue_from Pundit::NotAuthorizedError do |e|
-        clear_audit_store
         error_json = {
           "error" => "403",
           "reason" => "Unauthorized",
@@ -204,7 +193,6 @@ module DDS
       end
 
       rescue_from StorageProviderException do |e|
-        clear_audit_store
         error_json = {
           "error" => "500",
           "reason" => 'The storage provider is unavailable',
