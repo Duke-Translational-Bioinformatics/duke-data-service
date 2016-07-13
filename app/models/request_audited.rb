@@ -13,6 +13,8 @@ module RequestAudited
       yield
     end
     if audit_attributes
+      audit = audits.last
+      audit_attributes[:comment] = (audit.comment || {}).merge(audit_attributes[:comment])
       audits.last.update(audit_attributes)
     end
   end
