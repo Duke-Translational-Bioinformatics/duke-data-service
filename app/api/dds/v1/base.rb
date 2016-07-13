@@ -14,7 +14,15 @@ module DDS
 
       before do
         log_user_agent
+        clear_audit_store
+      end
+
+      after_validation do
         populate_audit_store_with_request
+      end
+
+      after do
+        clear_audit_store
       end
       
       helpers Pundit
@@ -28,7 +36,9 @@ module DDS
         end
 
         def authenticate!
-          unless current_user
+          if current_user
+            populate_audit_store_with_current_user
+          else
             @auth_error[:error] = 401
             error!(@auth_error, 401)
           end
@@ -130,6 +140,10 @@ module DDS
           end
         end
 
+        def populate_audit_store_with_current_user
+          Audited.store[:current_user] = current_user
+        end
+
         def populate_audit_store_with_request
           audit_attributes = {
             request_uuid: SecureRandom.uuid,
@@ -139,12 +153,11 @@ module DDS
               action: request.env["REQUEST_METHOD"]
             }
           }
-          if current_software_agent
-            audit_attributes[:comment][:software_agent_id] = current_software_agent.id
-          end
-          Audited.store.clear
           Audited.store.merge!({audit_attributes: audit_attributes})
-          Audited.store[:current_user] = current_user
+        end
+
+        def clear_audit_store
+          Audited.store.clear
         end
 
         def hide_logically_deleted(object)
@@ -156,6 +169,7 @@ module DDS
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
+        clear_audit_store
         missing_object = ''
         m = e.message.match(/find\s(\w+)/)
         if m
@@ -170,6 +184,7 @@ module DDS
       end
 
       rescue_from NameError do |e|
+        clear_audit_store
         error_json = {
           "error" => "404",
           "reason" => e.message,
@@ -179,6 +194,7 @@ module DDS
       end
 
       rescue_from Pundit::NotAuthorizedError do |e|
+        clear_audit_store
         error_json = {
           "error" => "403",
           "reason" => "Unauthorized",
@@ -188,6 +204,7 @@ module DDS
       end
 
       rescue_from StorageProviderException do |e|
+        clear_audit_store
         error_json = {
           "error" => "500",
           "reason" => 'The storage provider is unavailable',
