@@ -33,7 +33,7 @@ module DDS
 
         def authenticate!
           if current_user
-            populate_audit_store_with_current_user
+            populate_audit_store_with_user(current_user)
           else
             @auth_error[:error] = 401
             error!(@auth_error, 401)
@@ -111,33 +111,16 @@ module DDS
           error!(error_payload, 400)
         end
 
-        def annotate_audits(audits = [], additional_annotation = nil)
-          request_annotation = {
-            request_uuid: SecureRandom.hex,
-            remote_address: request.ip
-          }
-          comment_annotation = {
-            endpoint: request.env["REQUEST_URI"],
-            action: request.env["REQUEST_METHOD"]
-          }
-          if current_software_agent
-            comment_annotation['software_agent_id'] = current_software_agent.id
-          end
-          audit_annotation = additional_annotation ?
-            additional_annotation.merge(request_annotation) :
-            request_annotation
-
+        def annotate_audits(audits = [], additional_annotation = {})
           audits.each do |audit|
-            audit_update = audit_annotation
-            audit_update[:comment] = audit.comment ?
-              audit.comment.merge(comment_annotation) :
-              comment_annotation
+            audit_update = additional_annotation
+            audit_update[:comment] = (audit.comment || {}).merge(comment_annotation)
             audit.update(audit_update)
           end
         end
 
-        def populate_audit_store_with_current_user
-          Audited.store[:current_user] = current_user
+        def populate_audit_store_with_user(user)
+          Audited.store[:current_user] = user
         end
 
         def populate_audit_store_with_request
