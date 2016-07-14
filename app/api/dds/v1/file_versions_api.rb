@@ -55,11 +55,8 @@ module DDS
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :update?
         file_version.label = file_version_params[:label] if file_version_params[:label]
-        Audited.audit_class.as_user(current_user) do
-          file_version.save
-          annotate_audits [file_version.audits.last]
-          file_version
-        end
+        file_version.save
+        file_version
       end
 
       desc 'Delete a file version metadata object' do
@@ -76,14 +73,11 @@ module DDS
         authenticate!
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          if file_version.update(is_deleted: true)
-            annotate_audits [file_version.audits.last]
-          else
-            validation_error!(file_version)
-          end
+        if file_version.update(is_deleted: true)
+          body false
+        else
+          validation_error!(file_version)
         end
-        body false
       end
 
       desc 'Download a file_version' do
@@ -118,13 +112,10 @@ module DDS
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :create?
         dup_file_version = file_version.dup
-        Audited.audit_class.as_user(current_user) do
-          if dup_file_version.save
-            annotate_audits [dup_file_version.audits.last]
-            dup_file_version
-          else
-            validation_error!(dup_file_version)
-          end
+        if dup_file_version.save
+          dup_file_version
+        else
+          validation_error!(dup_file_version)
         end
       end
     end
