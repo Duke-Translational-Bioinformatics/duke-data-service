@@ -1,4 +1,5 @@
 class Fingerprint < ActiveRecord::Base
+  include RequestAudited
   audited
   belongs_to :upload
 

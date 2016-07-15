@@ -20,19 +20,16 @@ module DDS
         declared_params = declared(params, include_missing: false)
         project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        Audited.audit_class.as_user(current_user) do
-          affiliation = project.affiliations.where(user: user).first ||
-            project.affiliations.build({
-              user: user
-            })
-          affiliation.project_role_id = declared_params[:project_role][:id]
-          authorize affiliation, :create?
-          if affiliation.save
-            annotate_audits [affiliation.audits.last, project.audits.last]
-            affiliation
-          else
-            validation_error!(affiliation)
-          end
+        affiliation = project.affiliations.where(user: user).first ||
+          project.affiliations.build({
+            user: user
+          })
+        affiliation.project_role_id = declared_params[:project_role][:id]
+        authorize affiliation, :create?
+        if affiliation.save
+          affiliation
+        else
+          validation_error!(affiliation)
         end
       end
 
@@ -82,11 +79,8 @@ module DDS
         user = User.find(params[:user_id])
         affiliations = Affiliation.where(project: project, user: user).all
         authorize affiliations.first, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          affiliations.each do |affiliation|
-            affiliation.destroy
-            annotate_audits [affiliation.audits.last, project.audits.last]
-          end
+        affiliations.each do |affiliation|
+          affiliation.destroy
         end
         body false
       end

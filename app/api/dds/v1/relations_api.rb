@@ -35,13 +35,10 @@ module DDS
           relatable_to: entity
         )
         authorize relation, :create?
-        Audited.audit_class.as_user(current_user) do
-          if relation.save
-            annotate_audits [relation.audits.last]
-            relation
-          else
-            validation_error!(relation)
-          end
+        if relation.save
+          relation
+        else
+          validation_error!(relation)
         end
       end
 
@@ -79,13 +76,10 @@ module DDS
           relatable_from: entity
         )
         authorize relation, :create?
-        Audited.audit_class.as_user(current_user) do
-          if relation.save
-            annotate_audits [relation.audits.last]
-            relation
-          else
-            validation_error!(relation)
-          end
+        if relation.save
+          relation
+        else
+          validation_error!(relation)
         end
       end
 
@@ -123,13 +117,10 @@ module DDS
           relatable_to: used_entity
         )
         authorize relation, :create?
-        Audited.audit_class.as_user(current_user) do
-          if relation.save
-            annotate_audits [relation.audits.last]
-            relation
-          else
-            validation_error!(relation)
-          end
+        if relation.save
+          relation
+        else
+          validation_error!(relation)
         end
       end
 
@@ -166,13 +157,10 @@ module DDS
           relatable_to: activity
         )
         authorize relation, :create?
-        Audited.audit_class.as_user(current_user) do
-          if relation.save
-            annotate_audits [relation.audits.last]
-            relation
-          else
-            validation_error!(relation)
-          end
+        if relation.save
+          relation
+        else
+          validation_error!(relation)
         end
       end
 
@@ -213,10 +201,7 @@ module DDS
         authenticate!
         prov_relation = hide_logically_deleted ProvRelation.find(params[:id])
         authorize prov_relation, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          prov_relation.update(is_deleted: true)
-          annotate_audits [prov_relation.audits.last]
-        end
+        prov_relation.update(is_deleted: true)
         body false
       end
 

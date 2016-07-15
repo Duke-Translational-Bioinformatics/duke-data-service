@@ -1,4 +1,5 @@
 class SoftwareAgent < ActiveRecord::Base
+  include RequestAudited
   audited
   include Kinded
   include Graphed

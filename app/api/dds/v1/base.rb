@@ -4,6 +4,7 @@ module DDS
   module V1
     class Base < Grape::API
       include Grape::Kaminari
+      use AuditStoreCleanUp
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
@@ -13,7 +14,11 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}" if headers
+        log_user_agent
+      end
+
+      after_validation do
+        populate_audit_store_with_request
       end
 
       helpers Pundit
@@ -22,8 +27,14 @@ module DDS
           Rails.logger
         end
 
+        def log_user_agent
+          logger.info "User-Agent: #{headers['User-Agent']}" if headers
+        end
+
         def authenticate!
-          unless current_user
+          if current_user
+            populate_audit_store_with_user(current_user)
+          else
             @auth_error[:error] = 401
             error!(@auth_error, 401)
           end
@@ -100,29 +111,28 @@ module DDS
           error!(error_payload, 400)
         end
 
-        def annotate_audits(audits = [], additional_annotation = nil)
-          request_annotation = {
-            request_uuid: SecureRandom.hex,
-            remote_address: request.ip
-          }
-          comment_annotation = {
-            endpoint: request.env["REQUEST_URI"],
-            action: request.env["REQUEST_METHOD"]
-          }
-          if current_software_agent
-            comment_annotation['software_agent_id'] = current_software_agent.id
-          end
-          audit_annotation = additional_annotation ?
-            additional_annotation.merge(request_annotation) :
-            request_annotation
-
+        def annotate_audits(audits = [], additional_annotation = {})
           audits.each do |audit|
-            audit_update = audit_annotation
-            audit_update[:comment] = audit.comment ?
-              audit.comment.merge(comment_annotation) :
-              comment_annotation
+            audit_update = additional_annotation
+            audit_update[:comment] = (audit.comment || {}).merge(comment_annotation)
             audit.update(audit_update)
           end
+        end
+
+        def populate_audit_store_with_user(user)
+          Audited.store[:current_user] = user
+        end
+
+        def populate_audit_store_with_request
+          audit_attributes = {
+            request_uuid: SecureRandom.uuid,
+            remote_address: request.ip,
+            comment: {
+              endpoint: request.env["REQUEST_URI"],
+              action: request.env["REQUEST_METHOD"]
+            }
+          }
+          Audited.store.merge!({audit_attributes: audit_attributes})
         end
 
         def hide_logically_deleted(object)

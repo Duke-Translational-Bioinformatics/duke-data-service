@@ -39,30 +39,21 @@ module DDS
           label: file_params[:label]
         })
         authorize file, :create?
-        Audited.audit_class.as_user(current_user) do
-          if file.save
-            aupr = AttributedToUserProvRelation.create(
+        if file.save
+          aupr = AttributedToUserProvRelation.create(
+            creator: current_user,
+            relatable_from: file.current_file_version,
+            relatable_to: current_user)
+          if current_user.current_software_agent
+            ausr = AttributedToSoftwareAgentProvRelation.create(
               creator: current_user,
               relatable_from: file.current_file_version,
-              relatable_to: current_user)
-            audits = [
-                file.audits.last,
-                file.current_file_version.audits.last,
-                aupr.audits.last
-            ]
-            if current_user.current_software_agent
-              ausr = AttributedToSoftwareAgentProvRelation.create(
-                creator: current_user,
-                relatable_from: file.current_file_version,
-                relatable_to: current_user.current_software_agent)
-                audits << ausr.audits.last
-            end
-            annotate_audits audits
-            file
-          else
-            file
-            validation_error!(file)
+              relatable_to: current_user.current_software_agent)
           end
+          file
+        else
+          file
+          validation_error!(file)
         end
       end
 
@@ -105,29 +96,22 @@ module DDS
         file.upload = Upload.find(file_params[:upload][:id]) if file_params[:upload]
         file.label = file_params[:label] if file_params[:label]
         authorize file, :update?
-        Audited.audit_class.as_user(current_user) do
-          if file.save
-            audits = [file.audits.last]
-            if file.current_file_version != initial_file_version
-              audits << file.current_file_version.audits.last
-              aupr = AttributedToUserProvRelation.create(
+        if file.save
+          if file.current_file_version != initial_file_version
+            aupr = AttributedToUserProvRelation.create(
+              creator: current_user,
+              relatable_from: file.current_file_version,
+              relatable_to: current_user)
+            if current_user.current_software_agent
+              ausr = AttributedToSoftwareAgentProvRelation.create(
                 creator: current_user,
                 relatable_from: file.current_file_version,
-                relatable_to: current_user)
-              audits << aupr.audits.last
-              if current_user.current_software_agent
-                ausr = AttributedToSoftwareAgentProvRelation.create(
-                  creator: current_user,
-                  relatable_from: file.current_file_version,
-                  relatable_to: current_user.current_software_agent)
-                  audits << ausr.audits.last
-              end
+                relatable_to: current_user.current_software_agent)
             end
-            annotate_audits audits
-            file
-          else
-            validation_error! file
           end
+          file
+        else
+          validation_error! file
         end
       end
 
@@ -145,10 +129,7 @@ module DDS
         authenticate!
         file = hide_logically_deleted(DataFile.find(params[:id]))
         authorize file, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          file.update_attribute(:is_deleted, true)
-          annotate_audits [file.audits.last]
-        end
+        file.update_attribute(:is_deleted, true)
         body false
       end
 
@@ -195,13 +176,10 @@ module DDS
           update_params[:parent] = hide_logically_deleted Folder.find(file_params[:parent][:id])
         end
         authorize file, :move?
-        Audited.audit_class.as_user(current_user) do
-          if file.update(update_params)
-            annotate_audits [file.audits.last]
-            file
-          else
-            validation_error! file
-          end
+        if file.update(update_params)
+          file
+        else
+          validation_error! file
         end
       end
 
@@ -222,13 +200,10 @@ module DDS
         file = hide_logically_deleted(DataFile.find(params[:id]))
         file_params = declared(params, include_missing: false)
         authorize file, :rename?
-        Audited.audit_class.as_user(current_user) do
-          if file.update(name: file_params[:name])
-            annotate_audits [file.audits.last]
-            file
-          else
-            validation_error! file
-          end
+        if file.update(name: file_params[:name])
+          file
+        else
+          validation_error! file
         end
       end
     end
