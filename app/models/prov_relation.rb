@@ -3,7 +3,7 @@ class ProvRelation < ActiveRecord::Base
   before_validation :set_relationship_type
 
   include Kinded
-  include Graphed
+  include Graphed::Relation
   include RequestAudited
   after_create :create_graph_relation
   after_destroy :delete_graph_relation
