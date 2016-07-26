@@ -36,7 +36,6 @@ module Graphed
 
   def graph_relation(rel_type, from_model, to_model)
     from_node = from_model.graph_node
-    to_node = to_model.graph_node
     from_node.query_as(:from)
       .match("from-[r:#{rel_type}]->to")
       .where('to.model_id = {m_id}')
