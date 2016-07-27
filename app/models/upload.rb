@@ -1,4 +1,5 @@
 class Upload < ActiveRecord::Base
+  include RequestAudited
   default_scope { order('created_at DESC') }
   audited
   belongs_to :project

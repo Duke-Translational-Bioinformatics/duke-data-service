@@ -44,25 +44,20 @@ module DDS
           creator: current_user
         })
         authorize activity, :create?
-        Audited.audit_class.as_user(current_user) do
-          if activity.save
-            uaa = AssociatedWithUserProvRelation.create(
+        if activity.save
+          uaa = AssociatedWithUserProvRelation.create(
+            creator: current_user,
+            relatable_from: current_user,
+            relatable_to: activity)
+          if current_user.current_software_agent
+            saa = AssociatedWithSoftwareAgentProvRelation.create(
               creator: current_user,
-              relatable_from: current_user,
+              relatable_from: current_user.current_software_agent,
               relatable_to: activity)
-            audits = [activity.audits.last, uaa.audits.last]
-            if current_user.current_software_agent
-              saa = AssociatedWithSoftwareAgentProvRelation.create(
-                creator: current_user,
-                relatable_from: current_user.current_software_agent,
-                relatable_to: activity)
-                audits << saa.audits.last
-            end
-            annotate_audits audits
-            activity
-          else
-            validation_error!(activity)
           end
+          activity
+        else
+          validation_error!(activity)
         end
       end
 
@@ -110,13 +105,10 @@ module DDS
         activity_params.delete(:id)
         activity = hide_logically_deleted Activity.find(params[:id])
         authorize activity, :update?
-        Audited.audit_class.as_user(current_user) do
-          if activity.update(activity_params)
-            annotate_audits [activity.audits.last]
-            activity
-          else
-            validation_error!(activity)
-          end
+        if activity.update(activity_params)
+          activity
+        else
+          validation_error!(activity)
         end
       end
 
@@ -137,10 +129,7 @@ module DDS
         authenticate!
         activity = hide_logically_deleted Activity.find(params[:id])
         authorize activity, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          activity.update(is_deleted: true)
-          annotate_audits [activity.audits.last]
-        end
+        activity.update(is_deleted: true)
         body false
       end
     end

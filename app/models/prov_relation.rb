@@ -1,11 +1,12 @@
 class ProvRelation < ActiveRecord::Base
- default_scope { order('created_at DESC') }
- before_validation :set_relationship_type
+  default_scope { order('created_at DESC') }
+  before_validation :set_relationship_type
 
- include Kinded
- include Graphed
- after_create :create_graph_relation
- after_destroy :delete_graph_relation
+  include Kinded
+  include Graphed
+  include RequestAudited
+  after_create :create_graph_relation
+  after_destroy :delete_graph_relation
 
   audited
 
@@ -13,8 +14,9 @@ class ProvRelation < ActiveRecord::Base
   validates :relatable_from, presence: true
   validates :relationship_type, uniqueness: {
     scope: [:relatable_from_id, :relatable_to_id],
-    case_sensitive: false
-  }
+    case_sensitive: false,
+    conditions: -> { where(is_deleted: false) }
+  }, unless: :is_deleted
   validates :relatable_to, presence: true
 
   belongs_to :creator, class_name: "User"
