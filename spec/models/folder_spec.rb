@@ -16,17 +16,11 @@ RSpec.describe Folder, type: :model do
   it_behaves_like 'a logically deleted model'
   
   describe 'associations' do
-    it 'should be part of a project' do
-      should belong_to(:project)
-    end
-
-    it 'should have a parent' do
-      should belong_to(:parent)
-    end
-
-    it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:project)
-    end
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:parent) }
+    it { is_expected.to have_many(:project_permissions).through(:project) }
+    it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
+    it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
   end
 
   describe 'validations' do
