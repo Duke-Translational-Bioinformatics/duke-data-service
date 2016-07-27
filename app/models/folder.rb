@@ -2,6 +2,7 @@
 
 class Folder < Container
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
+  has_many :folders, -> { readonly }, foreign_key: "parent_id"
 
   after_set_parent_attribute :set_project_to_parent_project
 
@@ -13,10 +14,12 @@ class Folder < Container
       record.parent.reload.ancestors.include?(record)
   end
 
+  def folder_ids
+    (folders.collect {|x| [x.id, x.folder_ids]}).flatten
+  end
+
   def descendants
-    descendants = project.containers.select { |c| c.ancestors.include?(self) }
-    descendants_ids = descendants.collect { |d| d.id }
-    project.containers.where(id: descendants_ids)
+    project.containers.where(parent_id: [id, folder_ids].flatten)
   end
 
   def is_deleted=(val)
