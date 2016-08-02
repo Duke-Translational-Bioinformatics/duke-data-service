@@ -150,13 +150,13 @@ RSpec.describe ProvenanceGraph do
 
     it {
       expect{
-        described_class.new(focus)
+        described_class.new(focus: focus)
       }.to raise_error(ArgumentError)
     }
 
     it {
       expect {
-        described_class.new(focus, 1, policy_scope)
+        described_class.new(focus: focus, policy_scope: policy_scope)
       }.not_to raise_error
     }
   end
@@ -165,9 +165,62 @@ RSpec.describe ProvenanceGraph do
     context 'default' do
       let(:provenance_graph) {
         ProvenanceGraph.new(
-          focus,
-          1,
-          policy_scope
+          focus: focus,
+          policy_scope: policy_scope
+        )
+      }
+
+      context 'nodes' do
+        subject{ provenance_graph.nodes }
+
+        it_behaves_like 'ProvenanceGraph includes node', :focus
+
+        # 1 hop
+        it_behaves_like 'ProvenanceGraph includes node', :activity
+        it_behaves_like 'ProvenanceGraph includes node', :activity_creator
+        it_behaves_like 'ProvenanceGraph includes node', :software_agent
+        it_behaves_like 'ProvenanceGraph includes node', :generated_file
+        it_behaves_like 'ProvenanceGraph includes node', :deleted_file
+
+        # 2 hops
+        it_behaves_like 'ProvenanceGraph includes node', :invalidating_activity
+
+        # 3 hops
+        it_behaves_like 'ProvenanceGraph includes node', :invalidating_file
+        it_behaves_like 'ProvenanceGraph includes node', :other_software_agent
+      end
+
+      context 'relationships' do
+        subject{ provenance_graph.relationships }
+
+        # 1 hop
+        it_behaves_like 'ProvenanceGraph includes relationship', :activity_used_focus
+        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_activity_creator
+        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_software_agent
+        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_derived_from_focus
+        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_derived_from_focus
+
+        # 2 hops
+        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_activity_creator
+        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_software_agent
+        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_generated_by_activity
+        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_attributed_to_activity_creator
+        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_invalidated_by_invalidating_activity
+        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_attributed_to_activity_creator
+
+        # 3 hops
+        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_associated_with_activity_creator
+        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_associated_with_other_software_agent
+        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_used_invalidating_file
+      end
+    end
+
+    context 'max_hops 1' do
+      let(:provenance_graph) {
+        ProvenanceGraph.new(
+          focus: focus,
+          max_hops: 1,
+          policy_scope: policy_scope,
         )
       }
 
@@ -208,9 +261,9 @@ RSpec.describe ProvenanceGraph do
         it_behaves_like 'ProvenanceGraph excludes relationship', :generated_file_attributed_to_activity_creator
         it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_invalidated_by_invalidating_activity
         it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_attributed_to_activity_creator
+        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_activity_creator
 
         # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_activity_creator
         it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_other_software_agent
         it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_used_invalidating_file
       end
@@ -219,9 +272,9 @@ RSpec.describe ProvenanceGraph do
     context 'max_hops 2' do
       let(:provenance_graph) {
         ProvenanceGraph.new(
-          focus,
-          2,
-          policy_scope,
+          focus: focus,
+          max_hops: 2,
+          policy_scope: policy_scope,
         )
       }
 
@@ -273,9 +326,9 @@ RSpec.describe ProvenanceGraph do
     context 'restrictive policy_scope' do
       let(:provenance_graph) {
         ProvenanceGraph.new(
-          focus,
-          1,
-          Proc.new { |scope| scope.none }
+          focus: focus,
+          max_hops: 1,
+          policy_scope: Proc.new { |scope| scope.none }
         )
       }
 

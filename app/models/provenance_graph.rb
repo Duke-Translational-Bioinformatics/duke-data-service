@@ -3,7 +3,7 @@ class ProvenanceGraph
   attr_reader :nodes, :relationships
 
   #pass a method with ProvenanceGraph.new(focus, 2, method(:method_name))
-  def initialize(focus, max_hops, policy_scope)
+  def initialize(focus:, max_hops: nil, policy_scope:)
     @nodes = []
     @relationships = []
     @policy_scope = policy_scope
@@ -16,14 +16,18 @@ class ProvenanceGraph
     focus_node = focus.graph_node
     find_node(focus_node)
 
-    graph_query = nil
-    if max_hops > 1
-      graph_query = focus_node.query_as(:focus).match("(focus)-[relationships*1..#{max_hops}]-(related)")
+    if max_hops
+      if max_hops > 1
+        match_clause = "(focus)-[relationships*1..#{max_hops}]-(related)"
+      else
+        match_clause = "(focus)-[relationships]-(related)"
+      end
     else
-      graph_query = focus_node.query_as(:focus).match("(focus)-[relationships]-(related)")
+      # infinite hops
+      match_clause = "(focus)-[relationships*]-(related)"
     end
 
-    graph_query.pluck("relationships").each do |r|
+    focus_node.query_as(:focus).match(match_clause).pluck("relationships").each do |r|
       if r.is_a? Array
         r.each do |subr|
           add_relationship(subr)
