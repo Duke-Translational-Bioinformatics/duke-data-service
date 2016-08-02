@@ -1,5 +1,7 @@
 require 'rails_helper'
+require 'active_support/testing/stream'
 
+include ActiveSupport::Testing::Stream
 describe "db:data:migrate" do
   include_context "rake"
   let(:task_path) { "lib/tasks/db_data_migrate" }
