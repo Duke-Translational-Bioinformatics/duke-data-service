@@ -8,7 +8,7 @@ end
 shared_examples 'an annotate_audits endpoint' do
   let(:expected_response_status) { 200 }
   let(:expected_audits) { 1 }
-  let(:expected_auditable_type) { resource_class.base_class.to_s }
+  let(:expected_auditable_type) { resource_class.base_class }
   let(:audit_should_include) { {user: current_user} }
 
   it 'should create expected audit types' do
@@ -16,14 +16,14 @@ shared_examples 'an annotate_audits endpoint' do
       is_expected.to eq(expected_response_status)
     }.to change{
       Audited.audit_class.where(
-        auditable_type: expected_auditable_type
+        auditable_type: expected_auditable_type.to_s
       ).count }.by(expected_audits)
   end
 
   it 'audit should record the remote address, uuid, endpoint action' do
     is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
-      auditable_type: expected_auditable_type
+      auditable_type: expected_auditable_type.to_s
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last
@@ -40,7 +40,7 @@ shared_examples 'an annotate_audits endpoint' do
   it 'audit should include other expected attributes' do
     is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
-      auditable_type: expected_auditable_type
+      auditable_type: expected_auditable_type.to_s
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last
