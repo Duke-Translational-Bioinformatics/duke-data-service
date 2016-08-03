@@ -44,14 +44,14 @@ class ProvenanceGraph
   def create_graph()
     @to_be_graphed[:nodes].keys.each do |node_kind|
       @policy_scope.call(KindnessFactory.by_kind(node_kind)).where(id: @to_be_graphed[:nodes][node_kind].keys).each do |property|
-        @to_be_graphed[:nodes][node_kind][property.id][:properties] = property
+        @to_be_graphed[:nodes][node_kind][property.id].properties = property
       end
       @nodes |= @to_be_graphed[:nodes][node_kind].values
     end
 
     @to_be_graphed[:relationships].keys.each do |rel_kind|
       @policy_scope.call(KindnessFactory.by_kind(rel_kind)).where(id: @to_be_graphed[:relationships][rel_kind].keys).each do |property|
-        @to_be_graphed[:relationships][rel_kind][property.id][:properties] = property
+        @to_be_graphed[:relationships][rel_kind][property.id].properties = property
       end
       @relationships |= @to_be_graphed[:relationships][rel_kind].values
     end
@@ -61,11 +61,7 @@ class ProvenanceGraph
     @to_be_graphed[:nodes][node.model_kind] ||= {}
     return if @to_be_graphed[:nodes][node.model_kind][node.model_id]
 
-    @to_be_graphed[:nodes][node.model_kind][node.model_id] = {
-      id: node.model_id,
-      labels: [ "#{ node.class.mapped_label_name }" ],
-      properties: nil
-    }
+    @to_be_graphed[:nodes][node.model_kind][node.model_id] = ProvenanceGraphNode.new(node)
     true
   end
 
@@ -73,13 +69,7 @@ class ProvenanceGraph
     @to_be_graphed[:relationships][relationship.model_kind] ||= {}
     return if @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id]
 
-    @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id] = {
-      id: relationship.model_id,
-      type: relationship.type,
-      start_node: relationship.from_node.model_id,
-      end_node: relationship.to_node.model_id,
-      properties: nil
-    }
+    @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id] = ProvenanceGraphRelationship.new(relationship)
     true
   end
 end

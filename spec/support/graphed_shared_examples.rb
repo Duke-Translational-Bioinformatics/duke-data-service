@@ -211,43 +211,27 @@ shared_examples 'A ProvenanceGraph' do |
 
   it {
     includes_nodes.each do |included_node|
-      expect(subject.nodes).to include(
-        {
-          id: included_node.id,
-          labels: [ "#{ included_node.graph_node.class.mapped_label_name }" ],
-          properties: properties_included ? included_node : nil
-        }
-      )
+      graphed_node = ProvenanceGraphNode.new(included_node.graph_node)
+      graphed_node.properties = included_node if properties_included
+      expect(subject.nodes).to include(graphed_node)
     end
 
     excludes_nodes.each do |excluded_node|
-      expect(subject.nodes).not_to include(
-        {
-          id: excluded_node.id,
-          labels: [ "#{ excluded_node.graph_node.class.mapped_label_name }" ],
-          properties: properties_included ? excluded_node : nil
-        }
-      )
+      graphed_node = ProvenanceGraphNode.new(excluded_node.graph_node)
+      graphed_node.properties = excluded_node if properties_included
+      expect(subject.nodes).not_to include(graphed_node)
     end
 
     includes_relationships.each do |included_relationship|
-      expect(subject.relationships).to include({
-        id: included_relationship.id,
-        type: included_relationship.graph_relation.type,
-        start_node: included_relationship.relatable_from.id,
-        end_node: included_relationship.relatable_to.id,
-        properties: properties_included ? included_relationship : nil
-      })
+      graphed_relationship = ProvenanceGraphRelationship.new(included_relationship.graph_relation)
+      graphed_relationship.properties = included_relationship if properties_included
+      expect(subject.relationships).to include(graphed_relationship)
     end
 
     excludes_relationships.each do |excluded_relationship|
-      expect(subject.relationships).not_to include({
-        id: excluded_relationship.id,
-        type: excluded_relationship.graph_relation.type,
-        start_node: excluded_relationship.relatable_from.id,
-        end_node: excluded_relationship.relatable_to.id,
-        properties: properties_included ? excluded_relationship : nil
-      })
+      graphed_relationship = ProvenanceGraphRelationship.new(excluded_relationship.graph_relation)
+      graphed_relationship.properties = excluded_relationship if properties_included
+      expect(subject.relationships).not_to include(graphed_relationship)
     end
   }
 end
