@@ -7,8 +7,6 @@ class ProvenanceGraph
     @nodes = []
     @relationships = []
     @policy_scope = policy_scope
-    @nodes_to_find = {}
-    @relationships_to_find = {}
     @to_be_graphed = {
       nodes: {},
       relationships: {}
@@ -44,15 +42,15 @@ class ProvenanceGraph
   private
 
   def create_graph()
-    @nodes_to_find.keys.each do |node_kind|
-      @policy_scope.call(KindnessFactory.by_kind(node_kind)).where(id: @nodes_to_find[node_kind]).each do |property|
+    @to_be_graphed[:nodes].keys.each do |node_kind|
+      @policy_scope.call(KindnessFactory.by_kind(node_kind)).where(id: @to_be_graphed[:nodes][node_kind].keys).each do |property|
         @to_be_graphed[:nodes][node_kind][property.id][:properties] = property
       end
       @nodes |= @to_be_graphed[:nodes][node_kind].values
     end
 
-    @relationships_to_find.keys.each do |rel_kind|
-      @policy_scope.call(KindnessFactory.by_kind(rel_kind)).where(id: @relationships_to_find[rel_kind]).each do |property|
+    @to_be_graphed[:relationships].keys.each do |rel_kind|
+      @policy_scope.call(KindnessFactory.by_kind(rel_kind)).where(id: @to_be_graphed[:relationships][rel_kind].keys).each do |property|
         @to_be_graphed[:relationships][rel_kind][property.id][:properties] = property
       end
       @relationships |= @to_be_graphed[:relationships][rel_kind].values
@@ -60,11 +58,9 @@ class ProvenanceGraph
   end
 
   def find_node(node)
-    @nodes_to_find[node.model_kind] = [] unless @nodes_to_find[node.model_kind]
-    return if @nodes_to_find[node.model_kind].include?(node.model_id)
-
-    @nodes_to_find[node.model_kind] << node.model_id
     @to_be_graphed[:nodes][node.model_kind] ||= {}
+    return if @to_be_graphed[:nodes][node.model_kind][node.model_id]
+
     @to_be_graphed[:nodes][node.model_kind][node.model_id] = {
       id: node.model_id,
       labels: [ "#{ node.class.mapped_label_name }" ],
@@ -74,11 +70,9 @@ class ProvenanceGraph
   end
 
   def find_relationship(relationship)
-    @relationships_to_find[relationship.model_kind] = [] unless @relationships_to_find[relationship.model_kind]
-    return if @relationships_to_find[relationship.model_kind].include?(relationship.model_id)
-
-    @relationships_to_find[relationship.model_kind] << relationship.model_id
     @to_be_graphed[:relationships][relationship.model_kind] ||= {}
+    return if @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id]
+
     @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id] = {
       id: relationship.model_id,
       type: relationship.type,
@@ -86,5 +80,6 @@ class ProvenanceGraph
       end_node: relationship.to_node.model_id,
       properties: nil
     }
+    true
   end
 end
