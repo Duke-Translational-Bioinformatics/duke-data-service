@@ -27,27 +27,21 @@ class ProvenanceGraph
       match_clause = "(focus)-[relationships*]-(related)"
     end
 
-    focus_node.query_as(:focus).match(match_clause).pluck("relationships").each do |r|
-      if r.is_a? Array
-        r.each do |subr|
-          add_relationship(subr)
+    focus_node.query_as(:focus).match(match_clause).pluck("relationships","related").each do |r|
+      relationships, related = r
+      find_node(related)
+      if relationships.is_a? Array
+        relationships.each do |subr|
+          find_relationship(subr)
         end
       else
-        add_relationship(r)
+        find_relationship(relationships)
       end
     end
     create_graph
   end
 
   private
-
-  def add_relationship(relationship)
-    from_node = relationship.from_node
-    to_node = relationship.to_node
-    find_node(from_node)
-    find_node(to_node)
-    find_relationship(relationship, from_node, to_node)
-  end
 
   def create_graph()
     @nodes_to_find.keys.each do |node_kind|
@@ -87,7 +81,7 @@ class ProvenanceGraph
     true
   end
 
-  def find_relationship(relationship, from_node, to_node)
+  def find_relationship(relationship)
     @relationships_to_find[relationship.model_kind] = [] unless @relationships_to_find[relationship.model_kind]
     return if @relationships_to_find[relationship.model_kind].include?(relationship.model_id)
 
@@ -96,8 +90,8 @@ class ProvenanceGraph
     @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id] = {
       id: relationship.model_id,
       type: relationship.type,
-      start_node: from_node.model_id,
-      end_node: to_node.model_id,
+      start_node: relationship.from_node.model_id,
+      end_node: relationship.to_node.model_id,
       properties: nil
     }
   end

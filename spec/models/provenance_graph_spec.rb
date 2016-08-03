@@ -163,114 +163,98 @@ RSpec.describe ProvenanceGraph do
 
   context 'instantiations' do
     context 'default' do
-      let(:provenance_graph) {
+      subject{
         ProvenanceGraph.new(
           focus: focus,
           policy_scope: policy_scope
         )
       }
 
-      context 'nodes' do
-        subject{ provenance_graph.nodes }
-
-        it_behaves_like 'ProvenanceGraph includes node', :focus
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes node', :activity
-        it_behaves_like 'ProvenanceGraph includes node', :activity_creator
-        it_behaves_like 'ProvenanceGraph includes node', :software_agent
-        it_behaves_like 'ProvenanceGraph includes node', :generated_file
-        it_behaves_like 'ProvenanceGraph includes node', :deleted_file
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph includes node', :invalidating_activity
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph includes node', :invalidating_file
-        it_behaves_like 'ProvenanceGraph includes node', :other_software_agent
-      end
-
-      context 'relationships' do
-        subject{ provenance_graph.relationships }
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_used_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_derived_from_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_derived_from_focus
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_generated_by_activity
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_invalidated_by_invalidating_activity
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_attributed_to_activity_creator
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_associated_with_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_associated_with_other_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_used_invalidating_file
-      end
+      it_behaves_like 'A ProvenanceGraph', includes_node_syms: [
+          :focus,
+          # 1 hop
+          :activity,
+          :activity_creator,
+          :software_agent,
+          :generated_file,
+          :deleted_file,
+          # 2 hops
+          :invalidating_activity,
+          # 3 hops
+          :invalidating_file,
+          :other_software_agent
+        ], includes_relationship_syms: [
+          # 1 hop
+          :activity_used_focus,
+          :focus_attributed_to_activity_creator,
+          :focus_attributed_to_software_agent,
+          :generated_file_derived_from_focus,
+          :deleted_file_derived_from_focus,
+          # 2 hops
+          :activity_associated_with_activity_creator,
+          :activity_associated_with_software_agent,
+          :generated_file_generated_by_activity,
+          :generated_file_attributed_to_activity_creator,
+          :deleted_file_invalidated_by_invalidating_activity,
+          :deleted_file_attributed_to_activity_creator,
+          # 3 hops
+          :invalidating_activity_associated_with_activity_creator,
+          :invalidating_activity_associated_with_other_software_agent,
+          :invalidating_activity_used_invalidating_file
+        ]
     end
 
     context 'max_hops 1' do
-      let(:provenance_graph) {
+      subject{
         ProvenanceGraph.new(
           focus: focus,
           max_hops: 1,
-          policy_scope: policy_scope,
+          policy_scope: policy_scope
         )
       }
 
-      context 'nodes' do
-        subject{ provenance_graph.nodes }
-
-        it_behaves_like 'ProvenanceGraph includes node', :focus
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes node', :activity
-        it_behaves_like 'ProvenanceGraph includes node', :activity_creator
-        it_behaves_like 'ProvenanceGraph includes node', :software_agent
-        it_behaves_like 'ProvenanceGraph includes node', :generated_file
-        it_behaves_like 'ProvenanceGraph includes node', :deleted_file
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph excludes node', :invalidating_activity
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes node', :invalidating_file
-        it_behaves_like 'ProvenanceGraph excludes node', :other_software_agent
-      end
-
-      context 'relationships' do
-        subject{ provenance_graph.relationships }
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_used_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_derived_from_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_derived_from_focus
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :activity_associated_with_activity_creator
-        it_behaves_like 'ProvenanceGraph excludes relationship', :activity_associated_with_software_agent
-        it_behaves_like 'ProvenanceGraph excludes relationship', :generated_file_generated_by_activity
-        it_behaves_like 'ProvenanceGraph excludes relationship', :generated_file_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_invalidated_by_invalidating_activity
-        it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_activity_creator
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_other_software_agent
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_used_invalidating_file
-      end
+      it_behaves_like 'A ProvenanceGraph',
+        includes_node_syms: [
+          :focus,
+          # 1 hop
+          :activity,
+          :activity_creator,
+          :software_agent,
+          :generated_file,
+          :deleted_file
+        ],
+        excludes_node_syms: [
+          # 2 hops
+          :invalidating_activity,
+          # 3 hops
+          :invalidating_file,
+          :other_software_agent
+        ],
+        includes_relationship_syms: [
+          # 1 hop
+          :activity_used_focus,
+          :focus_attributed_to_activity_creator,
+          :focus_attributed_to_software_agent,
+          :generated_file_derived_from_focus,
+          :deleted_file_derived_from_focus
+        ],
+        excludes_relationship_syms: [
+          # 2 hops
+          :activity_associated_with_activity_creator,
+          :activity_associated_with_software_agent,
+          :generated_file_generated_by_activity,
+          :generated_file_attributed_to_activity_creator,
+          :deleted_file_invalidated_by_invalidating_activity,
+          :deleted_file_attributed_to_activity_creator,
+          :invalidating_activity_associated_with_activity_creator,
+          # 3 hops
+          :invalidating_activity_associated_with_other_software_agent,
+          :invalidating_activity_used_invalidating_file
+        ]
     end
 
     context 'max_hops 2' do
-      let(:provenance_graph) {
+      subject{
         ProvenanceGraph.new(
           focus: focus,
           max_hops: 2,
@@ -278,53 +262,48 @@ RSpec.describe ProvenanceGraph do
         )
       }
 
-      context 'nodes' do
-        subject{ provenance_graph.nodes }
-
-        it_behaves_like 'ProvenanceGraph includes node', :focus
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes node', :activity
-        it_behaves_like 'ProvenanceGraph includes node', :activity_creator
-        it_behaves_like 'ProvenanceGraph includes node', :software_agent
-        it_behaves_like 'ProvenanceGraph includes node', :generated_file
-        it_behaves_like 'ProvenanceGraph includes node', :deleted_file
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph includes node', :invalidating_activity
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes node', :invalidating_file
-        it_behaves_like 'ProvenanceGraph excludes node', :other_software_agent
-      end
-
-      context 'relationships' do
-        subject{ provenance_graph.relationships }
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_used_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_derived_from_focus
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_derived_from_focus
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_associated_with_software_agent
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_generated_by_activity
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_invalidated_by_invalidating_activity
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_attributed_to_activity_creator
-        it_behaves_like 'ProvenanceGraph includes relationship', :invalidating_activity_associated_with_activity_creator
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_other_software_agent
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_used_invalidating_file
-      end
+      it_behaves_like 'A ProvenanceGraph',
+        includes_node_syms: [
+          :focus,
+          # 1 hop
+          :activity,
+          :activity_creator,
+          :software_agent,
+          :generated_file,
+          :deleted_file,
+          # 2 hops
+          :invalidating_activity
+        ],
+        excludes_node_syms: [
+          # 3 hops
+          :invalidating_file,
+          :other_software_agent
+        ],
+        includes_relationship_syms:[
+          # 1 hop
+          :activity_used_focus,
+          :focus_attributed_to_activity_creator,
+          :focus_attributed_to_software_agent,
+          :generated_file_derived_from_focus,
+          :deleted_file_derived_from_focus,
+          # 2 hops
+          :activity_associated_with_activity_creator,
+          :activity_associated_with_software_agent,
+          :generated_file_generated_by_activity,
+          :generated_file_attributed_to_activity_creator,
+          :deleted_file_invalidated_by_invalidating_activity,
+          :deleted_file_attributed_to_activity_creator,
+          :invalidating_activity_associated_with_activity_creator
+        ],
+        excludes_relationship_syms: [
+          # 3 hops
+          :invalidating_activity_associated_with_other_software_agent,
+          :invalidating_activity_used_invalidating_file
+        ]
     end
 
     context 'restrictive policy_scope' do
-      let(:provenance_graph) {
+      subject{
         ProvenanceGraph.new(
           focus: focus,
           max_hops: 1,
@@ -332,49 +311,44 @@ RSpec.describe ProvenanceGraph do
         )
       }
 
-      context 'nodes' do
-        subject{ provenance_graph.nodes }
-
-        it_behaves_like 'ProvenanceGraph includes node', :focus, with_included_properties: false
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes node', :activity, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes node', :activity_creator, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes node', :software_agent, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes node', :generated_file, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes node', :deleted_file, with_included_properties: false
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph excludes node', :invalidating_activity, with_included_properties: false
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes node', :invalidating_file, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes node', :other_software_agent, with_included_properties: false
-      end
-
-      context 'relationships' do
-        subject{ provenance_graph.relationships }
-
-        # 1 hop
-        it_behaves_like 'ProvenanceGraph includes relationship', :activity_used_focus, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_activity_creator, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes relationship', :focus_attributed_to_software_agent, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes relationship', :generated_file_derived_from_focus, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph includes relationship', :deleted_file_derived_from_focus, with_included_properties: false
-
-        # 2 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :activity_associated_with_activity_creator, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :activity_associated_with_software_agent, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :generated_file_generated_by_activity, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :generated_file_attributed_to_activity_creator, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_invalidated_by_invalidating_activity, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :deleted_file_attributed_to_activity_creator, with_included_properties: false
-
-        # 3 hops
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_activity_creator, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_associated_with_other_software_agent, with_included_properties: false
-        it_behaves_like 'ProvenanceGraph excludes relationship', :invalidating_activity_used_invalidating_file, with_included_properties: false
-      end
+      it_behaves_like 'A ProvenanceGraph', with_included_properties: false,
+        includes_node_syms: [
+          :focus,
+          # 1 hop
+          :activity,
+          :activity_creator,
+          :software_agent,
+          :generated_file,
+          :deleted_file,
+        ],
+        excludes_node_syms: [
+          # 2 hops
+          :invalidating_activity,
+          # 3 hops
+          :invalidating_file,
+          :other_software_agent
+        ],
+        includes_relationship_syms: [
+          # 1 hop
+          :activity_used_focus,
+          :focus_attributed_to_activity_creator,
+          :focus_attributed_to_software_agent,
+          :generated_file_derived_from_focus,
+          :deleted_file_derived_from_focus,
+        ],
+        excludes_relationship_syms: [
+          # 2 hops
+          :activity_associated_with_activity_creator,
+          :activity_associated_with_software_agent,
+          :generated_file_generated_by_activity,
+          :generated_file_attributed_to_activity_creator,
+          :deleted_file_invalidated_by_invalidating_activity,
+          :deleted_file_attributed_to_activity_creator,
+          # 3 hops
+          :invalidating_activity_associated_with_activity_creator,
+          :invalidating_activity_associated_with_other_software_agent,
+          :invalidating_activity_used_invalidating_file
+        ]
     end
   end
 end

@@ -184,78 +184,70 @@ shared_examples 'a graphed model' do
   end
 end
 
-shared_examples 'ProvenanceGraph includes node' do |node_sym, with_included_properties: true|
-  let(:included_node) { send(node_sym) }
-  if with_included_properties
-    let(:expected_properties) { included_node }
-  else
-    let(:expected_properties) { nil }
-  end
+shared_examples 'A ProvenanceGraph' do |
+  includes_node_syms: [],
+  includes_relationship_syms: [],
+  excludes_node_syms: [],
+  excludes_relationship_syms: [],
+  with_included_properties: true|
 
-  it {
-    is_expected.to include(
-      {
-        id: included_node.id,
-        labels: [ "#{ included_node.graph_node.class.mapped_label_name }" ],
-        properties: expected_properties
-      }
-    )
+  let(:includes_nodes) {
+    includes_node_syms.map{|enode| send(enode) }
   }
-end
-
-shared_examples 'ProvenanceGraph includes relationship' do |relationship_sym, with_included_properties: true|
-  let(:included_relationship) { send(relationship_sym) }
-  if with_included_properties
-    let(:expected_properties) { included_relationship }
-  else
-    let(:expected_properties) { nil }
-  end
-
-  it {
-    is_expected.to include({
-      id: included_relationship.id,
-      type: included_relationship.graph_relation.type,
-      start_node: included_relationship.relatable_from.id,
-      end_node: included_relationship.relatable_to.id,
-      properties: expected_properties
-    })
+  let(:excludes_nodes) {
+    excludes_node_syms.map{|enode| send(enode) }
   }
-end
-
-shared_examples 'ProvenanceGraph excludes node' do |node_sym, with_included_properties: true|
-  let(:excluded_node) { send(node_sym) }
-  if with_included_properties
-    let(:expected_properties) { excluded_node }
-  else
-    let(:expected_properties) { nil }
-  end
-
-  it {
-    is_expected.not_to include(
-      {
-        id: excluded_node.id,
-        labels: [ "#{ excluded_node.graph_node.class.mapped_label_name }" ],
-        properties: expected_properties
-      }
-    )
+  let(:includes_relationships) {
+    includes_relationship_syms.map{|enode| send(enode) }
   }
-end
-
-shared_examples 'ProvenanceGraph excludes relationship' do |relationship_sym, with_included_properties: true|
-  let(:excluded_relationship) { send(relationship_sym) }
+  let(:excludes_relationships) {
+    excludes_relationship_syms.map{|enode| send(enode) }
+  }
   if with_included_properties
-    let(:expected_properties) { excluded_relationship }
+    let(:properties_included) { true }
   else
-    let(:expected_properties) { nil }
+    let(:properties_included) { false }
   end
 
   it {
-    is_expected.not_to include({
-      id: excluded_relationship.id,
-      type: excluded_relationship.graph_relation.type,
-      start_node: excluded_relationship.relatable_from.id,
-      end_node: excluded_relationship.relatable_to.id,
-      properties: expected_properties
-    })
+    includes_nodes.each do |included_node|
+      expect(subject.nodes).to include(
+        {
+          id: included_node.id,
+          labels: [ "#{ included_node.graph_node.class.mapped_label_name }" ],
+          properties: properties_included ? included_node : nil
+        }
+      )
+    end
+
+    excludes_nodes.each do |excluded_node|
+      expect(subject.nodes).not_to include(
+        {
+          id: excluded_node.id,
+          labels: [ "#{ excluded_node.graph_node.class.mapped_label_name }" ],
+          properties: properties_included ? excluded_node : nil
+        }
+      )
+    end
+
+    includes_relationships.each do |included_relationship|
+      expect(subject.relationships).to include({
+        id: included_relationship.id,
+        type: included_relationship.graph_relation.type,
+        start_node: included_relationship.relatable_from.id,
+        end_node: included_relationship.relatable_to.id,
+        properties: properties_included ? included_relationship : nil
+      })
+    end
+
+    excludes_relationships.each do |excluded_relationship|
+      expect(subject.relationships).not_to include({
+        id: excluded_relationship.id,
+        type: excluded_relationship.graph_relation.type,
+        start_node: excluded_relationship.relatable_from.id,
+        end_node: excluded_relationship.relatable_to.id,
+        properties: properties_included ? excluded_relationship : nil
+      })
+    end
   }
 end
