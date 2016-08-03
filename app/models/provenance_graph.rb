@@ -48,22 +48,14 @@ class ProvenanceGraph
       @policy_scope.call(KindnessFactory.by_kind(node_kind)).where(id: @nodes_to_find[node_kind]).each do |property|
         @to_be_graphed[:nodes][node_kind][property.id][:properties] = property
       end
-    end
-    @to_be_graphed[:nodes].keys.each do |node_kind|
-      @to_be_graphed[:nodes][node_kind].keys.each do |node_id|
-        @nodes << @to_be_graphed[:nodes][node_kind][node_id]
-      end
+      @nodes |= @to_be_graphed[:nodes][node_kind].values
     end
 
     @relationships_to_find.keys.each do |rel_kind|
       @policy_scope.call(KindnessFactory.by_kind(rel_kind)).where(id: @relationships_to_find[rel_kind]).each do |property|
         @to_be_graphed[:relationships][rel_kind][property.id][:properties] = property
       end
-    end
-    @to_be_graphed[:relationships].keys.each do |node_kind|
-      @to_be_graphed[:relationships][node_kind].keys.each do |node_id|
-        @relationships << @to_be_graphed[:relationships][node_kind][node_id]
-      end
+      @relationships |= @to_be_graphed[:relationships][rel_kind].values
     end
   end
 
