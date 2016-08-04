@@ -9,7 +9,7 @@ RSpec.describe SoftwareAgent, type: :model do
   it_behaves_like 'a kind' do
     let(:serialized_kind) { false }
   end
-  it_behaves_like 'a graphed model', auto_create: true do
+  it_behaves_like 'a graphed node', auto_create: true do
     let(:kind_name) { 'Agent' }
   end
 
