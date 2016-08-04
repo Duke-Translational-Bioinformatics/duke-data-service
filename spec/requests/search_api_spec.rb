@@ -11,7 +11,6 @@ describe DDS::V1::SearchAPI do
     let!(:start_node) { data_file.file_versions.first }
     let(:start_node_id) { start_node.id }
     let!(:activity) { FactoryGirl.create(:activity, creator: current_user) }
-    subject { post(url, payload.to_json, headers) }
     let(:resource_class) { FileVersion }
     let(:resource_kind) { start_node.kind }
 
@@ -34,6 +33,7 @@ describe DDS::V1::SearchAPI do
 
     describe 'POST /api/v1/search/provenance' do
       let(:url) { "/api/v1/search/provenance" }
+      subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
 
       let!(:other_file) { FactoryGirl.create(:data_file, project: project) }
@@ -88,7 +88,11 @@ describe DDS::V1::SearchAPI do
             id: deleted_file_version.id
           }
         }}
-        it_behaves_like 'an identified resource'
+        it 'should return graph with deleted focus' do
+          is_expected.to eq(201)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+        end
       end
 
       context 'when all nodes and relationships accessible by user' do

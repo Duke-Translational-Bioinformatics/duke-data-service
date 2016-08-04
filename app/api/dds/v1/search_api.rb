@@ -24,9 +24,11 @@ module DDS
         max_hops = prov_tags[:max_hops]
         start_node_kind = KindnessFactory.by_kind(prov_tags[:start_node][:kind])
         start_node = start_node_kind.find(prov_tags[:start_node][:id])
-        hide_logically_deleted start_node
         authorize start_node, :show?
-        ProvenanceGraph.new(focus: start_node, max_hops: max_hops, policy_scope: method(:policy_scope))
+        ProvenanceGraph.new(
+          focus: start_node,
+          max_hops: max_hops,
+          policy_scope: method(:policy_scope))
       end
     end
   end
