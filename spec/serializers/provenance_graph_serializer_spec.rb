@@ -19,6 +19,9 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
     ProvenanceGraph.new(focus: focus, policy_scope: policy_scope)
   }
 
+  it_behaves_like 'a has_many association with', :nodes, ProvenanceGraphNodeSerializer
+  it_behaves_like 'a has_many association with', :relationships, ProvenanceGraphRelationshipSerializer
+
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
       is_expected.to have_key('nodes')
