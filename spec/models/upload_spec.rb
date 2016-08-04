@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :completed) }
+  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
@@ -27,6 +29,18 @@ RSpec.describe Upload, type: :model do
 
     it { is_expected.not_to validate_presence_of :fingerprint_value }
     it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
+
+    it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+
+    context 'completed upload' do
+      subject { completed_upload }
+      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    end
+
+    context 'upload with error' do
+      subject { upload_with_error }
+      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    end
   end
 
   describe 'instance methods' do
@@ -132,7 +146,7 @@ RSpec.describe Upload, type: :model do
               expect(is_complete).to be_truthy
             }.not_to raise_error
             subject.reload
-            expect(subject.completed_at).to be
+            expect(subject.completed_at).not_to be_nil
             expect(subject.error_at).to be_nil
             expect(subject.error_message).to be_nil
           end
@@ -143,9 +157,9 @@ RSpec.describe Upload, type: :model do
             subject.update_attribute(:size, subject.size - 1)
             expect { subject.complete }.to raise_error(IntegrityException)
             subject.reload
-            expect(subject.completed_at).to be
-            expect(subject.error_at).to be
-            expect(subject.error_message).to be
+            expect(subject.completed_at).to be_nil
+            expect(subject.error_at).not_to be_nil
+            expect(subject.error_message).not_to be_nil
           end
         end #with reported size
 
@@ -157,9 +171,9 @@ RSpec.describe Upload, type: :model do
               subject.complete
             }.to raise_error(IntegrityException)
             subject.reload
-            expect(subject.completed_at).to be
-            expect(subject.error_at).to be
-            expect(subject.error_message).to be
+            expect(subject.completed_at).to be_nil
+            expect(subject.error_at).not_to be_nil
+            expect(subject.error_message).not_to be_nil
           end
         end #with reported chunk
 
