@@ -13,4 +13,14 @@ Rails.application.configure do
   config.log_formatter = ::Logger::Formatter.new
   config.active_record.dump_schema_after_migration = false
   config.force_ssl = true
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+  config.lograge.custom_options = lambda do |event|
+      {
+        request_id: event.payload[:request_id],
+        user_agent: event.payload[:user_agent],
+        #remote_ip: event.payload[:remote_ip],
+        grape_controller: event.payload[:params]["controller"]
+      }
+  end
 end
