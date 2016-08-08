@@ -32,13 +32,10 @@ module DDS
           name: folder_params[:name]
         })
         authorize folder, :create?
-        Audited.audit_class.as_user(current_user) do
-          if folder.save
-            annotate_audits [folder.audits.last]
-            folder
-          else
-            validation_error!(folder)
-          end
+        if folder.save
+          folder
+        else
+          validation_error!(folder)
         end
       end
 
@@ -72,11 +69,8 @@ module DDS
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          folder.update(is_deleted: true)
-          annotate_audits [folder.audits.last]
-          body false
-        end
+        folder.update(is_deleted: true)
+        body false
       end
 
       desc 'Move folder' do
@@ -105,13 +99,10 @@ module DDS
           update_params[:parent] = hide_logically_deleted Folder.find(folder_params[:parent][:id])
         end
         authorize folder, :move?
-        Audited.audit_class.as_user(current_user) do
-          if folder.update(update_params)
-            annotate_audits [folder.audits.last]
-            folder
-          else
-            validation_error!(folder)
-          end
+        if folder.update(update_params)
+          folder
+        else
+          validation_error!(folder)
         end
       end
 
@@ -133,13 +124,10 @@ module DDS
         new_name = folder_params[:name]
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :rename?
-        Audited.audit_class.as_user(current_user) do
-          if folder.update(name: new_name)
-            annotate_audits [folder.audits.last]
-            folder
-          else
-            validation_error!(folder)
-          end
+        if folder.update(name: new_name)
+          folder
+        else
+          validation_error!(folder)
         end
       end
     end

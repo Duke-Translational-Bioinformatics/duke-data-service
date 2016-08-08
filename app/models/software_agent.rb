@@ -1,7 +1,8 @@
 class SoftwareAgent < ActiveRecord::Base
+  include RequestAudited
   audited
   include Kinded
-  include Graphed
+  include Graphed::Node
   after_create :create_graph_node
   after_destroy :delete_graph_node
 

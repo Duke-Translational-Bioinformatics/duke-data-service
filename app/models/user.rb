@@ -2,7 +2,8 @@ require 'jwt'
 
 class User < ActiveRecord::Base
   include Kinded
-  include Graphed
+  include Graphed::Node
+  include RequestAudited
   after_create :create_graph_node
   after_destroy :delete_graph_node
 

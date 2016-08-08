@@ -1,11 +1,12 @@
 class ProvRelation < ActiveRecord::Base
- default_scope { order('created_at DESC') }
- before_validation :set_relationship_type
+  default_scope { order('created_at DESC') }
+  before_validation :set_relationship_type
 
- include Kinded
- include Graphed
- after_create :create_graph_relation
- after_destroy :delete_graph_relation
+  include Kinded
+  include Graphed::Relation
+  include RequestAudited
+  after_create :create_graph_relation
+  after_destroy :delete_graph_relation
 
   audited
 
