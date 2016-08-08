@@ -85,7 +85,14 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 
 07-Jul-2016
 --------------
-+ Added *Metadata Properties* actions - collection of endpoints for associating `key:value` pairs to DDS objects.
++ Added *Properties* actions - collection of endpoints for associating `key:value` metadata pairs to DDS objects.
+
+20-Jul-2016
+--------------
++ Modified the `/uploads/{id}/complete` action - this now requires the client to report the complete file hash.
++ Added rule for the `/uploads/{id}/hashes` action - this action now requires upload to be in completed state.  This would be called by official DDS hashing agent or client agents that wish to record additional hashes for their uploads.
++ Changed URI format of `POST /tags` to `POST /tags/{object_kind}/{object_id}` - tags are always created for a specific object.
+
 
 ## Group API Usage
 
@@ -1478,21 +1485,36 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-## Complete chunked file upload [PUT /uploads/{id}/complete]
+## NOT_IMPLEMENTED_CHANGE Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 
 >**Permission:** create_file
 - - - - -
 
+>**Request Properties**
+- - - - -
++ **hash.value (string, required)** - The entire file hash (computed by client).
++ **hash.algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
+
 >**Rules**
 - - - - -
 + If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider actions to assemble the parts into a single file object.
++ The reported `hash.value` must be a valid algorithm - supported/valid algorithms are: `md5`, `sha256`, and `sha1`.
 + The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.
 + The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
 + If there are no errors, the `upload_status.completed_on` is set to the current timestamp.
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+
++ Request
+
+        {
+            "hash": {
+                "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                "algorithm": "md5"
+            }
+        }
 
 + Response 200 (application/json)
 
@@ -1502,7 +1524,13 @@ This operation is called by the client after all file chunks have been successfu
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
             "size": 30024000,
-            "hashes": [ ],
+            "hashes": [
+                {
+                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                    "algorithm": "md5",
+                    "audit": { }
+                }
+            ],
             "chunks": [
                 {
                     "number": 1,
@@ -1536,7 +1564,7 @@ This operation is called by the client after all file chunks have been successfu
         }
 
 ## Report upload hash [PUT /uploads/{id}/hashes]
-Report hash (fingerprint) for the uploaded (or to be uploaded) file.
+Report a hash (fingerprint) for the uploaded file.
 
 >**Permission:** update_file
 - - - - -
@@ -1549,6 +1577,7 @@ Report hash (fingerprint) for the uploaded (or to be uploaded) file.
 >**Rules**
 - - - - -
 + The reported `value` must be a valid algorithm - supported/valid algorithms are: `md5`, `sha256`, and `sha1`.
++ The upload must be in a completed state (i.e. `upload_status.completed_on`).
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -2151,7 +2180,6 @@ This action can be used to list all prior versions of a file, including the curr
 >**Rules**
 - - - - -
 + The current file version cannot be deleted.
-+ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
@@ -2173,8 +2201,8 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-## NOT_IMPLEMENTED_NEW Promote file version [POST /file_versions/{id}/current]
-This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the versions stack.
+## Promote file version [POST /file_versions/{id}/current]
+This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the version stack.
 
 >**Permission:** update_file
 - - - - -
@@ -2533,10 +2561,6 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 ### Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
-
->**Rules**
-- - - - -
-+ The delete operation cascades to any direct (i.e. single hop away) provenance relations.
 
 + Response 204
 
@@ -3144,7 +3168,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
 
 >**Rules:**
 - - - - -
-+ If the user does not have visibilty to a `node` in the resulting graph, the `properties` attribute for that `node` will not be populated. (i.e. `"properties": null`)
++ If the user does not have visibilty to a `node` in the resulting graph, the `properties` attribute for that `node` will be a partial resource containing: `kind`, `id`, and `is_deleted`.
 
 >**Search Properties**
 - - - - -
@@ -3242,25 +3266,25 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
 
 *Note: Tags are composite metadata that become part of the tagged resource - they do not live in a global namespace. Only tagging of files* (i.e. `dds-file`) *is currently supported.*
 
-## Tags collection [/tags]
+## Tags collection [/tags/{object_kind}/{object_id}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
 
-### Create object tag [POST]
+### NOT_IMPLEMENTED_CHANGE Create object tag [POST]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
-
 >**Properties**
 - - - - -
-+ **object.kind (string, required)** - The kind of object to tag.
-+ **object.id (string, required)** - The unique id of the object to tag.
 + **label (string, required)** - The textual tag content.
+
+>**Rules:**
+- - - - -
++ The specified `label` must not already exist for the `(object.kind, object.id)`, the `label` comparison is *case-insensitive*.
 
 + Request (application/json)
 
         {
-            "object": {
-                "kind": "dds-file",
-                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
-            },
             "label": "SMRT sequencing"
         }
 
@@ -3276,15 +3300,54 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             "audit": { }
         }
 
-## List object tags [GET /tags/{object_kind}/{object_id}]
+
+## List object tags [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+                    "object": {
+                        "kind": "dds-file", "id":
+                        "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "label": "SMRT sequencing",
+                    "audit": { }
+                }
+            ]
+        }
+
+### NOT_IMPLEMENTED_CHANGE Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
+Append a list of tags to an object.
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **array (object[], required)** - An array of tags to apply to the object; object structure is as follows:
++ **label (string, required)** - The textual tag content.
+
+>**Rules:**
+- - - - -
++ If the object has an exisiting tag with the specified `label`, the `label` is ignored and a tag is not appended (i.e. created); the `label` comparison is *case-insensitive*.
++ At least one `label` must be specified.
 
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
 
-+ Response 200 (application/json)
++ Request (application/json)
+
+        [
+            {"label": "SMRT sequencing"}
+        ]
+
+
++ Response 201 (application/json)
 
         {
             "results": [
@@ -3308,6 +3371,10 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 >**Permission:** authenticated [scope: view_project when tagged object is file (`dds-file`)]
 - - - - -
 
+>**Rules:**
+- - - - -
++ The returned tags are sorted in most recently used (i.e. `last_used_on`) order.
+
 + Parameters
     + object_kind (string, optional, `dds-file`) ... Restricts search scope to tags for this kind of object.
     + label_contains (string, optional, `sequen`) ... If provided, searches for tags that contain this text fragment.
@@ -3318,15 +3385,18 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             "results": [
                 {
                     "label": "SMRT sequencing",
-                    "count": 47
+                    "count": 47,
+                    "last_used_on": "2015-01-01T12:10:00Z"
                 },
                 {
                     "label": "Polony sequencing",
-                    "count": 21
+                    "count": 21,
+                    "last_used_on": "2015-01-01T12:05:00Z"
                 },
                 {
                     "label": "DNA nanoball sequencing",
-                    "count": 13
+                    "count": 13,
+                    "last_used_on": "2015-01-01T12:00:00Z"
                 }
             ]
         }
@@ -3356,8 +3426,8 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 
 + Response 204
 
-## Group Metadata Properties
-The metadata actions allow researchers to define, store, and associate custom metadata with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, properties are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
+## Group Properties
+The metadata properties actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, properties are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
 
 Metadata properties must be defined and captured in the context of a metadata template. Templates allow related keys (i.e. fields) to be grouped together.  For example, a template named *seq_platform_info* may contain properties that describe the characteristics of the sequencing platform.  In addition, templates enforce data type (i.e. string, integer, etc.) integrity for the contained keys, so that clients are type aware when referencing key values from a search or data processing perspective. Metatdata templates are global in scope and visible to all users.
 
@@ -3383,18 +3453,18 @@ Metadata properties must be defined and captured in the context of a metadata te
 + Request (application/json)
 
         {
-            "name": "seq_run_processed_file_info",
-            "label": "Seq Processed File Info",
-            "description": "Extended attributes for sequencing - processed files only."
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files."
         }
 
 + Response 201 (application/json)
 
         {
             "id": "168f3f51-6800-403a-973d-78b23c08049b",
-            "name": "seq_run_processed_info",
-            "label": "Seq Processed File Info",
-            "description": "Extended attributes for sequencing run - processed files only.",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files.",
             "is_deprecated": false,
             "audit": { }
         }
@@ -3409,9 +3479,9 @@ Metadata properties must be defined and captured in the context of a metadata te
             "results": [
                 {
                     "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                    "name": "seq_run_processed_info",
-                    "label": "Seq Processed File Info",
-                    "description": "Extended attributes for sequencing run - processed files only.",
+                    "name": "sequencing_file_info",
+                    "label": "Sequencing File Info",
+                    "description": "Extended attributes for sequencing output files.",
                     "is_deprecated": false,
                     "audit": { }
                 }
@@ -3428,9 +3498,9 @@ Metadata properties must be defined and captured in the context of a metadata te
 
             {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "seq_run_processed_info",
-                "label": "Seq Processed File Info",
-                "description": "Extended attributes for sequencing run - processed files only.",
+                "name": "sequencing_file_info",
+                "label": "Sequencing File Info",
+                "description": "Extended attributes for sequencing output files (raw and processed).",
                 "is_deprecated": false,
                 "audit": { }
             }
@@ -3455,7 +3525,7 @@ Metadata properties must be defined and captured in the context of a metadata te
 + Request (application/json)
 
         {
-            "label": "Seq Processed File Info"
+            "description": "Extended attributes for sequencing output files (raw and processed)."
         }
 
 + Response 200
@@ -3488,7 +3558,7 @@ Metadata properties must be defined and captured in the context of a metadata te
     - maximum of 60 characters
 + **label (string, required)** - A short display label for the property.
 + **description (string, required)** - A verbose description of the property.
-+ **type (string, required)** - The data type of the key's value; currently supported are the Elasticserach core types: [Elasticsearch Core Datatypes](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html).
++ **type (string, required)** - The datatype of the key's value; currenty only the Elasticsearch core datatypes are supported: [Elasticsearch Core Datatypes](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html).
 
 >**Rules:**
 - - - - -
@@ -3499,7 +3569,7 @@ Metadata properties must be defined and captured in the context of a metadata te
         {
             "key": "output_type",
             "label": "Output Type",
-            "description": "The type of data in the processed file.",
+            "description": "The type of data in the sequencing output file.",
             "type": "string"
         }
 
@@ -3509,12 +3579,12 @@ Metadata properties must be defined and captured in the context of a metadata te
             "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "seq_run_processed_info",
-                "label": "Seq Processed File Info"
+                "name": "sequencing_file_info",
+                "label": "Sequencing File Info"
             },
             "key": "output_type",
             "label": "Output Type",
-            "description": "The type of data in the processed file.",
+            "description": "The type of data in the sequencing output file.",
             "type": "string",
             "is_deprecated": false,
             "audit": { }
@@ -3531,12 +3601,12 @@ Metadata properties must be defined and captured in the context of a metadata te
                     "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
                     "template": {
                         "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                        "name": "seq_run_processed_info",
-                        "label": "Seq Processed File Info"
+                        "name": "sequencing_file_info",
+                        "label": "Sequencing File Info"
                     },
                     "key": "output_type",
                     "label": "Output Type",
-                    "description": "The type of data in the processed file.",
+                    "description": "The type of data in the sequencing output file.",
                     "type": "string",
                     "is_deprecated": false,
                     "audit": { }
@@ -3556,12 +3626,12 @@ Metadata properties must be defined and captured in the context of a metadata te
                 "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
                 "template": {
                     "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                    "name": "seq_run_processed_info",
-                    "label": "Seq Processed File Info"
+                    "name": "sequencing_file_info",
+                    "label": "Sequencing File Info"
                 },
                 "key": "output_type",
                 "label": "Output Type",
-                "description": "The type of data in the processed file.",
+                "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
                 "type": "string",
                 "is_deprecated": false,
                 "audit": { }
@@ -3586,7 +3656,7 @@ Metadata properties must be defined and captured in the context of a metadata te
 + Request (application/json)
 
         {
-            "label": "Output Type"
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)"
         }
 
 + Response 200
@@ -3653,8 +3723,8 @@ Metadata properties must be defined and captured in the context of a metadata te
             },
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "seq_run_processed_info",
-                "label": "Seq Processed File Info",
+                "name": "sequencing_file_info",
+                "label": "Sequencing File Info",
                 "properties": [
                     {
                         "key": "output_type",
@@ -3684,8 +3754,8 @@ Metadata properties must be defined and captured in the context of a metadata te
             },
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "seq_run_processed_info",
-                "label": "Seq Processed File Info",
+                "name": "sequencing_file_info",
+                "label": "Sequencing File Info",
                 "properties": [
                     {
                         "key": "output_type",
@@ -3786,7 +3856,7 @@ Search for DDS objects (i.e. Elasticsearch documents).
                     ],
                     "meta": [
                         {
-                            "seq_run_processed_info": {
+                            "sequencing_file_info": {
                                 "output_type": "alignments",
                                 "mapping_assembly": "hg19"
                             }

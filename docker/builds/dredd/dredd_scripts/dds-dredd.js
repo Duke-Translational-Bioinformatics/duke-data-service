@@ -100,7 +100,7 @@ configuration = {
             // "File Versions > File Version instance > Update file version",
             // "File Versions > File Version instance > Delete file version",
             // "File Versions > File Version instance > Get file version download URL",
-            // "File Versions > File Version instance > NOT_IMPLEMENTED_NEW Promote file version",
+            // "File Versions > File Version instance > Promote file version",
             //13_search_project_folder_hooks.js
             // "Search Children > Search project children > Search project children",
             // "Search Children > Search folder children > Search folder children",
@@ -119,7 +119,7 @@ configuration = {
             // "Provenance Relations > Relation instance > View relation",
             // "Provenance Relations > Relation instance > Delete relation",
             // "Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance",
-            // "Tags > Tags collection > Create object tag",
+            // "Tags > Tags collection > NOT_IMPLEMENTED_CHANGE Create object tag",
             // "Tags > Tags collection > List object tags",
             // "Tags > Tags collection > List tag labels",
             // "Tags > Tag instance > View tag",
@@ -162,7 +162,7 @@ configuration = {
                   '18_metadata.py',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
+    'reporter': [], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 

@@ -2,6 +2,7 @@ import dredd_hooks as hooks
 import imp
 import os
 import json
+import requests
 import uuid
 import pprint
 #if you want to import another module for use in this workflow
@@ -27,11 +28,13 @@ def all_but_filecreat12_1(transaction):
     requestBody['parent']['id'] = proj_id
     requestBody['upload']['id'] = upload_id
     transaction[u'request'][u'body'] = json.dumps(requestBody)
+    print('This is my project id: ' + proj_id)
 @hooks.after("Files > Files collection > Create file")
 def grab_that_file_id12_1(transaction):
     global file_id
     json_trans = json.loads(transaction[u'real'][u'body'])
     file_id = json_trans['id']
+    print('This is my file id: ' + file_id)
 @hooks.before("Files > File instance > View file")
 def change_default_id12_1(transaction):
     url = transaction['fullPath']
@@ -93,6 +96,15 @@ def view_this_version12_1(transaction):
 def view_this_version212_1(transaction):
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('89ef1e77-1a0b-40a8-aaca-260d13987f2b',cur_version_id)
-@hooks.before("File Versions > File Version instance > NOT_IMPLEMENTED_NEW Promote file version")
-def skip_this_y12_1(transaction):
-    utils.skip_this_endpoint(transaction)
+@hooks.before("File Versions > File Version instance > Promote file version")
+def view_this_version212_12(transaction):
+    up_id = utils.upload_a_file(proj_id,unique=True)
+    url = os.getenv('HOST_NAME') + "/files/" + file_id
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    body = {"upload":{"id":up_id}}
+    rr = requests.put(url, headers=headers, data=json.dumps(body))
+    url = os.getenv('HOST_NAME') + "/files/" + file_id + "/versions"
+    r = requests.get(url,headers=headers)
+    promote_this = str(json.loads(r.text)[u'results'][2]['id'])
+    url = transaction['fullPath']
+    transaction['fullPath'] = str(url).replace('89ef1e77-1a0b-40a8-aaca-260d13987f2b',promote_this)

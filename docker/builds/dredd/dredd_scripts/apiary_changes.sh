@@ -1,3 +1,3 @@
 #!/bin/bash
 
-diff apib_names.txt <(dredd apiary.apib http://go.com --names)
+diff <(dredd apiary_old.apib http://go.com --names) <(dredd apiary.apib http://go.com --names)

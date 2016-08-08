@@ -140,7 +140,7 @@ def get_current_file_version(file_id):
     r = requests.get(url,headers=headers)
     return(str(json.loads(r.text)[u'results'][0]['id']))
 def delete_a_file_version(file_version_id):
-    url = os.getenv('HOST_NAME') + "/files_versions/" + file_version_id
+    url = os.getenv('HOST_NAME') + "/file_versions/" + file_version_id
     headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
     r = requests.delete(url,headers=headers)
     if r.status_code != 204:
