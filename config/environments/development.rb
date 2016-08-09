@@ -19,11 +19,10 @@ Rails.application.configure do
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Json.new
   config.lograge.custom_options = lambda do |event|
-      {
-        request_id: event.payload[:request_id],
-        user_agent: event.payload[:user_agent],
-        #remote_ip: event.payload[:remote_ip],
-        grape_controller: event.payload[:params]["controller"]
-      }
+    {
+      transaction_id: event.transaction_id,
+      request_time: event.time,
+      request_end: event.end
+    }.merge(event.payload)
   end
 end
