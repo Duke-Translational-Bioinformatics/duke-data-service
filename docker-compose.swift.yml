@@ -1,0 +1,26 @@
+version: '2'
+services:
+  swift:
+    build: ./docker/builds/swift
+    ports:
+      - 12345:12345
+    volumes:
+      - swiftvol:/srv
+  server:
+    links:
+      - swift:swift.local
+  rspec:
+    links:
+      - swift:swift.local
+  rails:
+    links:
+      - swift:swift.local
+  rake:
+    links:
+      - swift:swift.local
+  dredd:
+    links:
+      - swift:swift.circle.host
+volumes:
+  swiftvol:
+    driver: local

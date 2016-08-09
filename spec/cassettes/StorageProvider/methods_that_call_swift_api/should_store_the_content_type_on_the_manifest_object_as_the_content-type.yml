@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,33 +17,33 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx5b7e64d689ae43dc94cb4-0056e9d648
+      - tx2d867e5b4b71483d84ac1-0057aa0ef3
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Tue, 09 Aug 2016 17:12:19 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
+    uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
     body:
       encoding: UTF-8
       string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
       Content-Type:
       - text/plain
   response:
@@ -52,7 +52,7 @@ http_interactions:
       message: Created
     headers:
       Last-Modified:
-      - Wed, 16 Mar 2016 21:55:21 GMT
+      - Tue, 09 Aug 2016 17:12:20 GMT
       Content-Length:
       - '0'
       Etag:
@@ -60,23 +60,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx04b1124366644671a32f6-0056e9d648
+      - tx740e8a0addfe49318b4a1-0057aa0ef3
       Date:
-      - Wed, 16 Mar 2016 21:55:21 GMT
+      - Tue, 09 Aug 2016 17:12:19 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
+  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
 - request:
     method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/the_container/the_slo
+    uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
   response:
     status:
       code: 200
@@ -87,22 +87,22 @@ http_interactions:
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Wed, 16 Mar 2016 21:55:21 GMT
+      - Tue, 09 Aug 2016 17:12:20 GMT
       Etag:
       - '"70f457e8bdf12b30ed18c5b110740c2e"'
       X-Timestamp:
-      - '1458165320.99583'
+      - '1470762739.28558'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx394eb089acbc4d56ba508-0056e9d649
+      - tx7479650aee2240baac11b-0057aa0ef3
       Date:
-      - Wed, 16 Mar 2016 21:55:21 GMT
+      - Tue, 09 Aug 2016 17:12:19 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:21 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+recorded_with: VCR 3.0.3

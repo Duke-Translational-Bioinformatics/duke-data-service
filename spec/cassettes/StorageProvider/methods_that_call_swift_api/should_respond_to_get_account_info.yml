@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,33 +17,33 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx888e8c20e7f44cc2963fa-0056ec1268
+      - txee3bcd9b97864b6bb0032-0057aa0ef2
       Date:
-      - Fri, 18 Mar 2016 14:36:24 GMT
+      - Tue, 09 Aug 2016 17:12:18 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 18 Mar 2016 14:36:24 GMT
+  recorded_at: Tue, 09 Aug 2016 17:12:18 GMT
 - request:
     method: get
-    uri: http://192.168.99.100:12345/v1/AUTH_test
+    uri: http://swift.local:12345/v1/AUTH_test
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkdde542944fa445b9a791d5f42c40e371
+      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
   response:
     status:
       code: 200
@@ -54,7 +54,7 @@ http_interactions:
       Accept-Ranges:
       - bytes
       X-Timestamp:
-      - '1458311121.01918'
+      - '1470762738.48884'
       X-Account-Bytes-Used:
       - '0'
       X-Account-Container-Count:
@@ -64,13 +64,13 @@ http_interactions:
       X-Account-Object-Count:
       - '0'
       X-Trans-Id:
-      - tx181e34eddc874bfa807fd-0056ec1268
+      - tx9096ad0c3af84b45965d2-0057aa0ef2
       Date:
-      - Fri, 18 Mar 2016 14:36:24 GMT
+      - Tue, 09 Aug 2016 17:12:18 GMT
     body:
       encoding: UTF-8
       string: |
         the_container
     http_version: 
-  recorded_at: Fri, 18 Mar 2016 14:36:24 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Tue, 09 Aug 2016 17:12:18 GMT
+recorded_with: VCR 3.0.3

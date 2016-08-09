@@ -1,0 +1,70 @@
+version: '2'
+services:
+  rails:
+    image: dukedataservice_server
+    volumes_from:
+      - server
+    entrypoint: ['rails']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+    env_file:
+      - webapp.env
+      - swift.env
+      - neo4j.client.env
+  bundle:
+    image: dukedataservice_server
+    volumes_from:
+      - server
+    entrypoint: ['bundle']
+  rake:
+    image: dukedataservice_server
+    volumes_from:
+      - server
+    entrypoint: ['rake']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+    env_file:
+      - webapp.env
+      - swift.env
+      - neo4j.client.env
+  authservice:
+    image: dukedataservice_server
+    env_file:
+      - auth_service.env
+      - neo4j.client.env
+    volumes_from:
+      - server
+    entrypoint: ['rake']
+    command: authentication_service:create
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+  rspec:
+    image: dukedataservice_server
+    environment:
+      - RAILS_ENV=test
+    volumes_from:
+      - server
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+    env_file:
+      - webapp.env
+      - swift.env
+      - neo4j.client.env
+    entrypoint: ['rspec']
+    command: spec
+  dredd:
+    build: ./docker/builds/dredd
+    links:
+     - server:dds.host
+     - db:postgres.db.host
+     - neo4j:neo4j.db.host
+    env_file:
+      - dredd.env
+      - neo4j.client.env
+    volumes:
+      - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
+      - ./apiary.apib:/home/dredd_scripts/apiary.apib
