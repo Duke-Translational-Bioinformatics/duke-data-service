@@ -149,8 +149,11 @@ module DDS
             upload = Upload.find(params[:id])
             authorize upload, :complete?
             upload.etag = SecureRandom.hex
-            upload.complete
-            upload
+            if upload.complete
+              upload
+            else
+              validation_error!(upload)
+            end
           end
 
           desc 'Report upload hash' do

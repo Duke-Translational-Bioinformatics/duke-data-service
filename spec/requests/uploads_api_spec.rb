@@ -5,6 +5,7 @@ describe DDS::V1::UploadsAPI do
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
   let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :completed, storage_provider_id: storage_provider.id) }
 
   let(:project) { upload.project }
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
@@ -243,6 +244,11 @@ describe DDS::V1::UploadsAPI do
 
     it_behaves_like 'an identified resource' do
       let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
+    end
+
+    context 'with completed upload' do
+      let(:upload) { completed_upload }
+      it_behaves_like 'a validated resource'
     end
 
     it_behaves_like 'an annotate_audits endpoint'
