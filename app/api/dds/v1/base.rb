@@ -5,7 +5,7 @@ module DDS
     class Base < Grape::API
       include Grape::Kaminari
       use AuditStoreCleanUp
-      use Grape::Middleware::Lograge
+      # use Grape::Middleware::Lograge
 
       version 'v1', using: :path
       content_type :json, 'application/json'
