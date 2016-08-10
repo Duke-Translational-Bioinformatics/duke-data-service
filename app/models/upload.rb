@@ -16,6 +16,8 @@ class Upload < ActiveRecord::Base
   validates :creator_id, presence: true
   validates :completed_at, immutable: true, if: :completed_at_was
   validates :completed_at, immutable: true, if: :error_at_was
+  validates :fingerprints, presence: true, if: :completed_at
+  validates :fingerprints, presence: true, if: :error_at
 
   delegate :url_root, to: :storage_provider
 
@@ -78,6 +80,7 @@ class Upload < ActiveRecord::Base
   private
   def integrity_exception(message)
     exactly_now = DateTime.now
+    fingerprints.reload
     update_attributes({
       error_at: exactly_now,
       error_message: message

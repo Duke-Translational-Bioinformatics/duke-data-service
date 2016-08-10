@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :completed) }
-  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
+  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
@@ -29,6 +29,17 @@ RSpec.describe Upload, type: :model do
     it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
 
     it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    it { is_expected.not_to validate_presence_of :fingerprints }
+
+    context 'when completed_at is set' do
+      before { subject.completed_at = Faker::Time.forward(1) }
+      it { is_expected.to validate_presence_of :fingerprints }
+    end
+
+    context 'when error_at is set' do
+      before { subject.error_at = Faker::Time.forward(1) }
+      it { is_expected.to validate_presence_of :fingerprints }
+    end
 
     context 'completed upload' do
       subject { completed_upload }
@@ -92,7 +103,7 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'swift methods', :vcr do
-    subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
+    subject { FactoryGirl.create(:upload, :swift, :with_chunks, :with_fingerprint) }
 
     describe '.initialize_storage_provider' do
       it { is_expected.to respond_to 'initialize_storage_provider' }

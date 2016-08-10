@@ -12,6 +12,10 @@ FactoryGirl.define do
       chunks { [ build(:chunk, number: 1) ] }
     end
 
+    trait :with_fingerprint do
+      fingerprints { [ build(:fingerprint) ] }
+    end
+
     trait :swift do
       storage_provider { create(:storage_provider, :swift) }
     end
