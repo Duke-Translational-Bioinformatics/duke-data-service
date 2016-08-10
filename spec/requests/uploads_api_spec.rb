@@ -205,16 +205,17 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Complete the chunked file upload', :vcr do
+  describe 'Complete the chunked file upload', vcr: {record: :new_episodes} do #:vcr do
     let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
     let(:called_action) { "PUT" }
     subject { put(url, payload.to_json, headers) }
     let!(:payload) {{
       hash: {
         value: fingerprint_stub.value,
-        algorithm: fingerprint_stub.algorithm
+        algorithm: fingerprint_algorithm
       }
     }}
+    let(:fingerprint_algorithm) { fingerprint_stub.algorithm }
 
     before do
       expect(chunk).to be_persisted
@@ -254,6 +255,11 @@ describe DDS::V1::UploadsAPI do
 
     context 'with completed upload' do
       let(:upload) { completed_upload }
+      it_behaves_like 'a validated resource'
+    end
+
+    context 'with invalid fingerprint algorithm' do
+      let(:fingerprint_algorithm) { 'BadAlgorithm' }
       it_behaves_like 'a validated resource'
     end
 

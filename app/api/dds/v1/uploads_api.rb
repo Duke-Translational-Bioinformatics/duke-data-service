@@ -155,7 +155,7 @@ module DDS
             upload = Upload.find(params[:id])
             authorize upload, :complete?
             fingerprint_params = declared(params, include_missing: false)
-            upload.fingerprints.build(fingerprint_params[:hash])
+            upload.fingerprints_attributes = [fingerprint_params[:hash]]
             upload.etag = SecureRandom.hex
             if upload.complete
               upload

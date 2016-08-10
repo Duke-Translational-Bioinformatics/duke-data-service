@@ -9,6 +9,8 @@ class Upload < ActiveRecord::Base
   belongs_to :creator, class_name: 'User'
   has_many :fingerprints
 
+  accepts_nested_attributes_for :fingerprints
+
   validates :project_id, presence: true
   validates :name, presence: true
   validates :size, presence: true
