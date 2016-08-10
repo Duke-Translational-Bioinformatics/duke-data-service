@@ -19,13 +19,11 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'validations' do
-    it 'should require attributes' do
-      should validate_presence_of :project_id
-      should validate_presence_of :name
-      should validate_presence_of :size
-      should validate_presence_of :storage_provider_id
-      should validate_presence_of :creator_id
-    end
+    it { is_expected.to validate_presence_of :project_id }
+    it { is_expected.to validate_presence_of :name }
+    it { is_expected.to validate_presence_of :size }
+    it { is_expected.to validate_presence_of :storage_provider_id }
+    it { is_expected.to validate_presence_of :creator_id }
 
     it { is_expected.not_to validate_presence_of :fingerprint_value }
     it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
