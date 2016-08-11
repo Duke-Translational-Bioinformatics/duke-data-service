@@ -7,7 +7,7 @@ RSpec.describe FileVersion, type: :model do
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
   let(:upload) { file_version.upload }
-  let(:other_upload) { FactoryGirl.create(:upload, :completed) }
+  let(:other_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do

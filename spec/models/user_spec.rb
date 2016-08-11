@@ -89,7 +89,7 @@ RSpec.describe User, type: :model do
     let(:uploads) {
       uploads = []
       projects.each do |project|
-        uploads << FactoryGirl.create(:upload, :completed, creator: subject, project: project)
+        uploads << FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject, project: project)
       end
       uploads
     }
@@ -101,10 +101,10 @@ RSpec.describe User, type: :model do
       files
     }
     let!(:other_project) { FactoryGirl.create(:project, creator: subject) }
-    let!(:other_upload) { FactoryGirl.create(:upload, :completed, creator: subject) }
+    let!(:other_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject) }
     let!(:other_file) { FactoryGirl.create(:data_file, upload: other_upload) }
     let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted_project, user: subject).project }
-    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, creator: subject, project: projects.first)}
+    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject, project: projects.first)}
     let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
 
     describe 'project_count' do

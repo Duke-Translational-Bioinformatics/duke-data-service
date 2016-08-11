@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UploadSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
+  let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error, :with_fingerprint) }
   let(:is_logically_deleted) { false }
   let(:expected_keys) {
     %w(
