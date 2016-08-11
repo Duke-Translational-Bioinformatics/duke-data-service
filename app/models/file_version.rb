@@ -1,6 +1,6 @@
 class FileVersion < ActiveRecord::Base
   include Kinded
-  include Graphed
+  include Graphed::Node
   include RequestAudited
   after_create :create_graph_node
   after_save :logically_delete_graph_node
@@ -12,7 +12,7 @@ class FileVersion < ActiveRecord::Base
   has_many :project_permissions, through: :data_file
 
   validates :upload_id, presence: true, immutable: true, unless: :is_deleted
-  validates :is_deleted, 
+  validates :is_deleted,
     absence: { message: 'The current file version cannot be deleted.' },
     unless: :deletion_allowed?
   validates_each :upload_id, on: :create do |record, attr, value|

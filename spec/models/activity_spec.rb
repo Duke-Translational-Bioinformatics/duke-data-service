@@ -8,7 +8,7 @@ RSpec.describe Activity, type: :model do
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed model', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
 
   context 'started_on' do
     context 'default' do

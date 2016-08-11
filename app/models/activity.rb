@@ -1,6 +1,6 @@
 class Activity < ActiveRecord::Base
   include Kinded
-  include Graphed
+  include Graphed::Node
   include RequestAudited
   before_create :set_default_started_on
   after_create :create_graph_node

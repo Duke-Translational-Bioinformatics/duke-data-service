@@ -5,6 +5,8 @@ module DDS
     class Base < Grape::API
       include Grape::Kaminari
       use AuditStoreCleanUp
+      # use Grape::Middleware::Lograge
+
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
@@ -12,10 +14,6 @@ module DDS
       formatter :json, Grape::Formatter::ActiveModelSerializers
       prefix :api
       paginate offset: false
-
-      before do
-        log_user_agent
-      end
 
       after_validation do
         populate_audit_store_with_request
@@ -25,10 +23,6 @@ module DDS
       helpers do
         def logger
           Rails.logger
-        end
-
-        def log_user_agent
-          logger.info "User-Agent: #{headers['User-Agent']}" if headers
         end
 
         def authenticate!
@@ -203,6 +197,7 @@ module DDS
       mount DDS::V1::TagsAPI
       mount DDS::V1::ActivitiesAPI
       mount DDS::V1::RelationsAPI
+      mount DDS::V1::SearchAPI
       add_swagger_documentation \
         doc_version: '0.0.2',
         hide_documentation_path: true,
