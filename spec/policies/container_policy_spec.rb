@@ -5,7 +5,7 @@ describe ContainerPolicy do
 
   let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, creator: user, project: project_permission.project) }
+  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project, upload: upload) }
   let(:data_file_without_upload) { FactoryGirl.create(:data_file, project: project_permission.project) }
   let(:other_data_file) { FactoryGirl.create(:data_file) }

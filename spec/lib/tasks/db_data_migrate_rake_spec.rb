@@ -17,7 +17,7 @@ describe "db:data:migrate" do
         Audited.audit_class.as_user(current_user) do
           FactoryGirl.create(:data_file)
           f = FactoryGirl.create(:data_file)
-          f.upload = FactoryGirl.create(:upload, :completed)
+          f.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint)
           f.save
         end
       end
@@ -49,7 +49,7 @@ describe "db:data:migrate" do
       before do
         Audited.audit_class.as_user(current_user) do
           FactoryGirl.create(:data_file)
-          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
+          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed, :with_fingerprint))
         end
       end
 
