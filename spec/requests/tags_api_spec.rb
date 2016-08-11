@@ -32,8 +32,9 @@ describe DDS::V1::TagsAPI do
       let(:taggable_object) {{ kind: resource_kind, id: data_file.id }}
       let!(:payload) {{
         object: taggable_object,
-        label: resource_stub.label
+        label: payload_label
       }}
+      let(:payload_label) { resource_stub.label }
 
       it_behaves_like 'a creatable resource' do
         it 'should set label' do
@@ -55,6 +56,16 @@ describe DDS::V1::TagsAPI do
       context 'when object_kind unknown' do
         let(:resource_kind) { 'invalid-kind' }
         it_behaves_like 'a kinded resource'
+      end
+
+      context 'with blank label' do
+        let(:payload_label) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with existing label' do
+        let(:payload_label) { resource.label }
+        it_behaves_like 'a validated resource'
       end
     end
   end

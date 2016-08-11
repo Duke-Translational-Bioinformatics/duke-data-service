@@ -5,7 +5,8 @@ class Tag < ActiveRecord::Base
 
   belongs_to :taggable, polymorphic: true
 
-  validates :label, presence: true
+  validates :label, presence: true, 
+    uniqueness: {scope: [:taggable_id, :taggable_type], case_sensitive: false}
   validates :taggable, presence: true
 
   validates_each :taggable do |record, attr, value|
