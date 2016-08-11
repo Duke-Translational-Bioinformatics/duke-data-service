@@ -15,6 +15,10 @@ module DDS
       prefix :api
       paginate offset: false
 
+      before do
+        log_user_agent
+      end
+
       after_validation do
         populate_audit_store_with_request
       end
@@ -23,6 +27,10 @@ module DDS
       helpers do
         def logger
           Rails.logger
+        end
+
+        def log_user_agent
+          logger.info "User-Agent: #{headers['User-Agent']}" if headers
         end
 
         def authenticate!
