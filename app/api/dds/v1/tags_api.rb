@@ -52,6 +52,41 @@ module DDS
         policy_scope(Tag).where(taggable: taggable_object)
       end
 
+      desc 'Append a list of object tags' do
+        detail 'Append a list of tags to an object.'
+        named 'append object tags'
+        failure [
+          [200, 'This will never happen'],
+          [201, 'Successfully Created'],
+          [400, 'Tag requires a label'],
+          [401, 'Unauthorized'],
+          [404, 'Tag does not exist']
+        ]
+      end
+      params do
+        requires :tags, type: Array do
+          requires :label, type: String, desc: "The textual tag content"
+        end
+      end
+      post '/tags/:object_kind/:object_id/append', root: 'results' do
+        authenticate!
+        append_params = declared(params, include_missing: false)
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        taggable_object = object_kind.find(params[:object_id])
+        new_tags = []
+        append_params[:tags].each do |tag_params|
+          tag = Tag.new(
+            label: tag_params[:label],
+            taggable: taggable_object
+          )
+          authorize tag, :create?
+          if taggable_object.tags << tag
+            new_tags << tag 
+          end
+        end
+        new_tags
+      end
+
       desc 'List tag labels' do
         detail 'Get a list of the distinct tag label values visible to the current user.'
         named 'list tag labels'
