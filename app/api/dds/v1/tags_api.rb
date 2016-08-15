@@ -7,7 +7,7 @@ module DDS
         failure [
           [200, 'This will never happen'],
           [201, 'Successfully Created'],
-          [400, 'Tag requires a lable'],
+          [400, 'Tag requires a label'],
           [401, 'Unauthorized'],
           [404, 'Tag does not exist']
         ]
