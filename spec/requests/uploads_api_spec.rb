@@ -2,12 +2,13 @@ require 'rails_helper'
 
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
-  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider_id: storage_provider.id) }
 
-  let(:project) { upload.project }
+  let(:project) { FactoryGirl.create(:project) }
+  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id, project: project) }
+  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
 
   let(:user) { FactoryGirl.create(:user) }
@@ -18,7 +19,7 @@ describe DDS::V1::UploadsAPI do
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: upload.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project.id}/uploads" }
@@ -301,7 +302,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Report upload hash' do
     subject { put(url, payload.to_json, headers) }
     let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
-    let(:parent_id) { upload.id }
+    let!(:parent_id) { completed_upload.id }
     let(:called_action) { "PUT" }
     let!(:payload) {{
       value: fingerprint_stub.value,
@@ -311,7 +312,7 @@ describe DDS::V1::UploadsAPI do
 
     it_behaves_like 'a creatable resource' do
       let(:expected_response_status) {200}
-      let(:new_object) { upload.reload }
+      let(:new_object) { completed_upload.reload }
     end
     it_behaves_like 'an authenticated resource'
     it_behaves_like 'an authorized resource'
@@ -327,11 +328,22 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an annotate_audits endpoint'
     end
     
-    it_behaves_like 'a validated resource' do
+    context 'with nil payload values' do
       let(:payload) {{
         value: nil,
         algorithm: nil
       }}
+      it_behaves_like 'a validated resource'
+      it 'should not persist changes' do
+        expect {
+          is_expected.to eq(400)
+        }.not_to change{resource_class.count}
+      end
+    end
+    
+    context 'with incomplete upload' do
+      let(:parent_id) { upload.id }
+      it_behaves_like 'a validated resource'
       it 'should not persist changes' do
         expect {
           is_expected.to eq(400)
