@@ -107,6 +107,9 @@ GEM
     grape-kaminari (0.1.9)
       grape
       kaminari
+    grape-middleware-lograge (1.2.3)
+      grape (>= 0.14, < 1)
+      lograge (~> 0.3)
     grape-swagger (0.21.0)
       grape (>= 0.12.0)
     hashdiff (0.3.0)
@@ -130,6 +133,10 @@ GEM
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
+    lograge (0.4.1)
+      actionpack (>= 4, < 5.1)
+      activesupport (>= 4, < 5.1)
+      railties (>= 4, < 5.1)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.4)
@@ -304,6 +311,7 @@ DEPENDENCIES
   grape
   grape-active_model_serializers
   grape-kaminari
+  grape-middleware-lograge
   grape-swagger
   hashie-forbidden_attributes
   httparty

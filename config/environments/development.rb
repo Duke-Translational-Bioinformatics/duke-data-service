@@ -15,4 +15,14 @@ Rails.application.configure do
   unless ENV['NOFORCESSL'].present?
     config.force_ssl = true
   end
+
+  # config.lograge.enabled = true
+  # config.lograge.formatter = Lograge::Formatters::Json.new
+  # config.lograge.custom_options = lambda do |event|
+  #   {
+  #     transaction_id: event.transaction_id,
+  #     request_time: event.time,
+  #     request_end: event.end
+  #   }.merge(event.payload)
+  # end
 end

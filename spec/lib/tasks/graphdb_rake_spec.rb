@@ -40,7 +40,7 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
       Audited.audit_class.as_user(user) do
         sa = FactoryGirl.create(:software_agent, creator: user)
         annotate_audit(sa.audits.last)
-        user_upload = FactoryGirl.create(:upload, :completed, creator: user)
+        user_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
         annotate_audit(user_upload.audits.last)
 
         user_df = FactoryGirl.create(:data_file, upload: user_upload)
@@ -63,7 +63,7 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
           relatable_to: user_activity)
         annotate_audit(aWu.audits.last)
 
-        sa_upload = FactoryGirl.create(:upload, :completed, creator: user)
+        sa_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
         annotate_audit(sa_upload.audits.last, sa)
 
         sa_df = FactoryGirl.create(:data_file, upload: sa_upload)
@@ -105,7 +105,7 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
       Audited.audit_class.as_user(user) do
         sa = FactoryGirl.create(:software_agent, creator: user)
         annotate_audit(sa.audits.last)
-        user_upload = FactoryGirl.create(:upload, :completed, creator: user)
+        user_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
         annotate_audit(user_upload.audits.last)
 
         user_df = FactoryGirl.create(:data_file, upload: user_upload)
@@ -117,7 +117,7 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
         user_activity = FactoryGirl.create(:activity, creator: user)
         annotate_audit(user_activity.audits.last)
 
-        sa_upload = FactoryGirl.create(:upload, :completed, creator: user)
+        sa_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
         annotate_audit(sa_upload.audits.last, sa)
 
         sa_df = FactoryGirl.create(:data_file, upload: sa_upload)

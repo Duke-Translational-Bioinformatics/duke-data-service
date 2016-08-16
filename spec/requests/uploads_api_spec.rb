@@ -5,6 +5,7 @@ describe DDS::V1::UploadsAPI do
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
   let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider_id: storage_provider.id) }
 
   let(:project) { upload.project }
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
@@ -204,10 +205,17 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Complete the chunked file upload', :vcr do
+  describe 'Complete the chunked file upload', vcr: {record: :new_episodes} do #:vcr do
     let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
     let(:called_action) { "PUT" }
-    subject { put(url, nil, headers) }
+    subject { put(url, payload.to_json, headers) }
+    let!(:payload) {{
+      hash: {
+        value: fingerprint_stub.value,
+        algorithm: fingerprint_algorithm
+      }
+    }}
+    let(:fingerprint_algorithm) { fingerprint_stub.algorithm }
 
     before do
       expect(chunk).to be_persisted
@@ -243,6 +251,16 @@ describe DDS::V1::UploadsAPI do
 
     it_behaves_like 'an identified resource' do
       let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
+    end
+
+    context 'with completed upload' do
+      let(:upload) { completed_upload }
+      it_behaves_like 'a validated resource'
+    end
+
+    context 'with invalid fingerprint algorithm' do
+      let(:fingerprint_algorithm) { 'BadAlgorithm' }
+      it_behaves_like 'a validated resource'
     end
 
     it_behaves_like 'an annotate_audits endpoint'
