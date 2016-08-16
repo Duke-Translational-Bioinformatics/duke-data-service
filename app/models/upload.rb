@@ -19,7 +19,6 @@ class Upload < ActiveRecord::Base
   validates :completed_at, immutable: true, if: :completed_at_was
   validates :completed_at, immutable: true, if: :error_at_was
   validates :fingerprints, presence: true, if: :completed_at
-  validates :fingerprints, presence: true, if: :error_at
 
   delegate :url_root, to: :storage_provider
 

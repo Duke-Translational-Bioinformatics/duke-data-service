@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
   let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
-  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :with_error) }
+  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
@@ -35,11 +35,6 @@ RSpec.describe Upload, type: :model do
 
     context 'when completed_at is set' do
       before { subject.completed_at = Faker::Time.forward(1) }
-      it { is_expected.to validate_presence_of :fingerprints }
-    end
-
-    context 'when error_at is set' do
-      before { subject.error_at = Faker::Time.forward(1) }
       it { is_expected.to validate_presence_of :fingerprints }
     end
 
