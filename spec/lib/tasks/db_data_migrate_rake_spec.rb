@@ -17,7 +17,7 @@ describe "db:data:migrate" do
         Audited.audit_class.as_user(current_user) do
           FactoryGirl.create(:data_file)
           f = FactoryGirl.create(:data_file)
-          f.upload = FactoryGirl.create(:upload, :completed)
+          f.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint)
           f.save
         end
       end
@@ -49,7 +49,7 @@ describe "db:data:migrate" do
       before do
         Audited.audit_class.as_user(current_user) do
           FactoryGirl.create(:data_file)
-          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed))
+          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed, :with_fingerprint))
         end
       end
 
@@ -66,13 +66,19 @@ describe "db:data:migrate" do
 
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
-      let(:upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_capitalized_algorithm) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
-      let(:upload_with_invalid_fingerprint_algorithm) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
+      let(:incomplete_upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_fingerprint_value) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_capitalized_algorithm) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
+      let(:upload_with_invalid_fingerprint_algorithm) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
       context 'for upload without fingerprint_value' do
         before { FactoryGirl.create(:upload) }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
+      end
+      context 'for incomplete upload with fingerprint_value' do
+        before { expect(incomplete_upload_with_fingerprint_value).to be_persisted }
+        it { expect {invoke_task}.to change{Fingerprint.count}.by(0) }
+        it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
       end
       context 'for upload with fingerprint_value' do
         before { expect(upload_with_fingerprint_value).to be_persisted }

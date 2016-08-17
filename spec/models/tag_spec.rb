@@ -21,6 +21,7 @@ RSpec.describe Tag, type: :model do
       is_expected.to allow_value(file).for(:taggable)
       is_expected.not_to allow_value(tag).for(:taggable)
     end
+    it { is_expected.to validate_uniqueness_of(:label).scoped_to(:taggable_id, :taggable_type).case_insensitive }
   end
 
   describe '#project_permissions' do

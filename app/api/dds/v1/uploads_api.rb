@@ -144,13 +144,24 @@ module DDS
             }
             error!(error_json, 400)
           end
+          params do
+            requires :hash, type: Hash do
+              requires :value, type: String, desc: "The entire file hash (computed by client)."
+              requires :algorithm, type: String, desc: "The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.)."
+            end
+          end
           put '/complete', root: false do
             authenticate!
             upload = Upload.find(params[:id])
             authorize upload, :complete?
+            fingerprint_params = declared(params, include_missing: false)
+            upload.fingerprints_attributes = [fingerprint_params[:hash]]
             upload.etag = SecureRandom.hex
-            upload.complete
-            upload
+            if upload.complete
+              upload
+            else
+              validation_error!(upload)
+            end
           end
 
           desc 'Report upload hash' do
@@ -177,7 +188,7 @@ module DDS
             if upload.save
               upload
             else
-              validation_error!(fingerprint)
+              validation_error!(upload)
             end
           end
         end

@@ -32,8 +32,9 @@ describe DDS::V1::TagsAPI do
       let(:taggable_object) {{ kind: resource_kind, id: data_file.id }}
       let!(:payload) {{
         object: taggable_object,
-        label: resource_stub.label
+        label: payload_label
       }}
+      let(:payload_label) { resource_stub.label }
 
       it_behaves_like 'a creatable resource' do
         it 'should set label' do
@@ -55,6 +56,16 @@ describe DDS::V1::TagsAPI do
       context 'when object_kind unknown' do
         let(:resource_kind) { 'invalid-kind' }
         it_behaves_like 'a kinded resource'
+      end
+
+      context 'with blank label' do
+        let(:payload_label) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with existing label' do
+        let(:payload_label) { resource.label }
+        it_behaves_like 'a validated resource'
       end
     end
   end
@@ -79,6 +90,80 @@ describe DDS::V1::TagsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+
+      context 'with invalid file_id' do
+        let(:file_id) { 'notfoundid' }
+        let(:resource_class) { DataFile }
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
+      end
+    end
+  end
+
+  describe 'Append a list of object tags'  do
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}/append" }
+    let(:file_id) { data_file.id }
+    let(:resource_kind) { data_file.kind }
+    describe 'POST' do
+      subject { post(url, payload.to_json, headers) }
+      let(:called_action) { 'POST' }
+      let!(:payload) {{
+        tags: [
+          { label: payload_label },
+          { label: payload_label },
+          { label: payload_label },
+          { label: payload_label }
+        ]
+      }}
+      let(:payload_label) { resource_stub.label }
+
+      it_behaves_like 'a creatable resource' do
+        let(:new_object) {
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('results')
+          expect(response_json['results']).to be_a(Array)
+          expect(response_json['results']).not_to be_empty
+          expect(response_json['results'].last).to have_key('id')
+          resource_class.find(response_json['results'].last['id'])
+        }
+        it 'should set label' do
+          is_expected.to eq(expected_response_status)
+          expect(new_object.label).to eq(payload_label)
+        end
+        it_behaves_like 'a listable resource' do
+          let(:expected_response_status) { 201 }
+          let(:expected_resources) { [new_object] }
+          let(:serializable_resource) { new_object }
+        end
+      end
+
+      context 'with blank label' do
+        let(:payload_label) { '' }
+        it 'should not be persisted' do
+          expect {
+            is_expected.to eq(201)
+          }.not_to change{resource_class.count}
+        end
+      end
+
+      context 'with existing label' do
+        let(:payload_label) { resource.label }
+        it 'should not be persisted' do
+          expect {
+            is_expected.to eq(201)
+          }.not_to change{resource_class.count}
+        end
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 201 }
+      end
 
       context 'with invalid file_id' do
         let(:file_id) { 'notfoundid' }

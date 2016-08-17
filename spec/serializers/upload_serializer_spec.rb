@@ -1,18 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe UploadSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
+  let(:resource) { FactoryGirl.create(:upload, :with_chunks) }
   let(:is_logically_deleted) { false }
-  let(:expected_keys) {
-    %w(
-      id
-      name
-      content_type
-      size
-      etag
-      status
-    )
-  }
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'name' => resource.name,
+    'content_type' => resource.content_type,
+    'size' => resource.size,
+    'etag' => resource.etag,
+    'status' => {
+      'initiated_on' => resource.created_at.as_json,
+      'completed_on' => resource.completed_at.as_json,
+      'error_on' => resource.error_at.as_json,
+      'error_message' => resource.error_message
+    }
+  }}
 
   it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
   it_behaves_like 'a has_one association with', :storage_provider, StorageProviderPreviewSerializer
@@ -21,23 +24,21 @@ RSpec.describe UploadSerializer, type: :serializer do
 
   it_behaves_like 'a json serializer' do
     it { is_expected.not_to have_key('hash') }
-    it 'should have expected keys and values' do
-      expected_keys.each do |ekey|
-        is_expected.to have_key ekey
-      end
-      expect(subject["id"]).to eq(resource.id)
-      expect(subject["name"]).to eq(resource.name)
-      expect(subject["content_type"]).to eq(resource.content_type)
-      expect(subject["size"]).to eq(resource.size)
-      expect(subject["status"]).to be_a Hash
-      %w(initiated_on completed_on error_on error_message).each do |ekey|
-        expect(subject["status"]).to have_key ekey
-      end
-      expect(DateTime.parse(subject["status"]["initiated_on"]).to_i).to eq(resource.created_at.to_i)
-      expect(DateTime.parse(subject["status"]["completed_on"]).to_i).to eq(resource.completed_at.to_i)
-      expect(DateTime.parse(subject["status"]["error_on"]).to_i).to eq(resource.error_at.to_i)
-      expect(subject["status"]["error_message"]).to eq(resource.error_message)
-    end
+    it { is_expected.to include(expected_attributes) }
     it_behaves_like 'a serializer with a serialized audit'
+  end
+
+  context 'with completed upload' do
+    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_fingerprint) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
+  end
+
+  context 'when upload has error' do
+    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
   end
 end

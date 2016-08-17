@@ -16,8 +16,8 @@ Rails.application.configure do
     config.force_ssl = true
   end
 
-  config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Json.new
+  # config.lograge.enabled = true
+  # config.lograge.formatter = Lograge::Formatters::Json.new
   # config.lograge.custom_options = lambda do |event|
   #   {
   #     transaction_id: event.transaction_id,

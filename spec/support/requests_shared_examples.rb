@@ -42,19 +42,20 @@ shared_examples 'a listable resource' do
   let(:serializable_resource) { resource }
   let(:expected_list_length) { expected_resources.count }
   let(:unexpected_resources) { [] }
+  let(:expected_response_status) { 200 }
   before do
     expect(resource).to be_persisted
   end
   it 'should return a list that includes a serialized resource' do
-    is_expected.to eq(200)
-    expect(response.status).to eq(200)
+    is_expected.to eq(expected_response_status)
+    expect(response.status).to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
     expect(response.body).to include(resource_serializer.new(serializable_resource).to_json)
   end
 
   it 'should include the expected number of results' do
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     response_json = JSON.parse(response.body)
     expect(response_json).to have_key('results')
     returned_results = response_json['results']
@@ -64,7 +65,7 @@ shared_examples 'a listable resource' do
 
   it 'should not include unexpected resources' do
     expect(unexpected_resources).to be_a(Array)
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     unexpected_resources.each do |unexpected_resource|
       expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
     end

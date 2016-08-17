@@ -27,7 +27,7 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'validations' do
-    let(:completed_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
+    let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
     let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
     let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
 
@@ -196,7 +196,7 @@ RSpec.describe DataFile, type: :model do
 
       context 'when upload changed' do
         let!(:original_upload) { subject.upload }
-        let(:new_upload) { FactoryGirl.create(:upload, :completed) }
+        let(:new_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
         before { subject.upload = new_upload }
         it { expect(subject.current_file_version).to be_persisted }
         it { expect(subject.upload_id_changed?).to be_truthy }
@@ -211,7 +211,7 @@ RSpec.describe DataFile, type: :model do
       end
 
       context 'when current_file_version.upload differs' do
-        let(:different_upload) { FactoryGirl.create(:upload, :completed) }
+        let(:different_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
         before do
           subject.current_file_version.update_attribute(:upload, different_upload)
           subject.reload
