@@ -23,7 +23,7 @@ RSpec.describe UploadPreviewSerializer, type: :serializer do
   end
 
   context 'when upload has error' do
-    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :with_error, :with_fingerprint) }
+    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
