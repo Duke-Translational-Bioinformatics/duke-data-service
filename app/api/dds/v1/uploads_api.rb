@@ -188,7 +188,7 @@ module DDS
             if upload.save
               upload
             else
-              validation_error!(fingerprint)
+              validation_error!(upload)
             end
           end
         end

@@ -17,7 +17,7 @@ describe DDS::V1::FilesAPI do
 
   let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
   let(:incomplete_upload) { FactoryGirl.create(:upload, project: project, creator: current_user) }
-  let(:error_upload) { FactoryGirl.create(:upload, :with_error, :with_fingerprint, project: project, creator: current_user) }
+  let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project, creator: current_user) }
 
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }

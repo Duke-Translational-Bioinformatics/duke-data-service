@@ -29,7 +29,7 @@ RSpec.describe DataFile, type: :model do
   describe 'validations' do
     let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
     let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
-    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, :with_fingerprint, project: subject.project) }
+    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:project_id) }
