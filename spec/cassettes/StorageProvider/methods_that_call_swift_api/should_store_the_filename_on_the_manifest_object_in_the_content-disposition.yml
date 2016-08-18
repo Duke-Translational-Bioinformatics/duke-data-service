@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx59f69d74b65f45888b9de-0057aa0ef3
+      - txcff65f171a3546888ccbc-0057b5e651
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:09 GMT
 - request:
     method: put
     uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
@@ -43,7 +43,7 @@ http_interactions:
       string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Disposition:
       - attachment; filename=text_file.txt
   response:
@@ -52,7 +52,7 @@ http_interactions:
       message: Created
     headers:
       Last-Modified:
-      - Tue, 09 Aug 2016 17:12:20 GMT
+      - Thu, 18 Aug 2016 16:46:10 GMT
       Content-Length:
       - '0'
       Etag:
@@ -60,14 +60,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx5e88b98cfbfa4ed9861db-0057aa0ef3
+      - tx548c6c092fb54e5ebad13-0057b5e651
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:09 GMT
 - request:
     method: head
     uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo
@@ -76,7 +76,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 200
@@ -89,22 +89,22 @@ http_interactions:
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Tue, 09 Aug 2016 17:12:20 GMT
+      - Thu, 18 Aug 2016 16:46:10 GMT
       Etag:
       - '"70f457e8bdf12b30ed18c5b110740c2e"'
       X-Timestamp:
-      - '1470762739.34879'
+      - '1471538769.07245'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - application/x-www-form-urlencoded
       X-Trans-Id:
-      - txf56600afae7b46d9aa044-0057aa0ef3
+      - tx54b62589e1af46e89109e-0057b5e651
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:09 GMT
 recorded_with: VCR 3.0.3
