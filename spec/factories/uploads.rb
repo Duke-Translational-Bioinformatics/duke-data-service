@@ -28,5 +28,9 @@ FactoryGirl.define do
       error_at { DateTime.now }
       error_message { Faker::Lorem.sentence }
     end
+
+    trait :skip_validation do
+      to_create {|instance| instance.save(validate: false) }
+    end
   end
 end
