@@ -22,7 +22,11 @@ Rails.application.configure do
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  if Rails.version > '5.0.0'
+    config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  else
+    config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  end
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -95,4 +99,5 @@ Rails.application.configure do
   #     grape_controller: event.payload[:params]["controller"]
   #   }
   # end
+
 end
