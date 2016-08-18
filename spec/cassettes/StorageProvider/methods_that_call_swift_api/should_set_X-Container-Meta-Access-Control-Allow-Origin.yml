@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txcee2b61832824af5a61cb-0057aa0ef3
+      - txe80a37f9866540cbad731-0057b5e650
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:08 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
 - request:
     method: put
     uri: http://swift.local:12345/v1/AUTH_test/the_container
@@ -43,7 +43,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,14 +56,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx6b7c6ec8623449da9e22d-0057aa0ef3
+      - txef7ba94537094ee68b5bf-0057b5e650
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:08 GMT
     body:
       encoding: UTF-8
       string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
 - request:
     method: get
     uri: http://swift.local:12345/v1/AUTH_test/the_container
@@ -72,7 +72,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 200
@@ -85,7 +85,7 @@ http_interactions:
       Accept-Ranges:
       - bytes
       X-Timestamp:
-      - '1470762738.52529'
+      - '1471538767.89556'
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
       X-Container-Bytes-Used:
@@ -93,14 +93,14 @@ http_interactions:
       Content-Type:
       - text/plain; charset=utf-8
       X-Trans-Id:
-      - tx2efbe2617d0c48b8849db-0057aa0ef3
+      - tx0c0862e9bf3547d1bced1-0057b5e650
       Date:
-      - Tue, 09 Aug 2016 17:12:19 GMT
+      - Thu, 18 Aug 2016 16:46:08 GMT
     body:
       encoding: UTF-8
       string: |
         the_object/1
         the_slo
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:12:19 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
 recorded_with: VCR 3.0.3

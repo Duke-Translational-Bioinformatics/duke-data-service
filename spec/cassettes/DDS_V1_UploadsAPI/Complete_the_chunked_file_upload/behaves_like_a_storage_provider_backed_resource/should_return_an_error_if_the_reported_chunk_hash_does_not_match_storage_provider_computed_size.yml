@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx9e6418fb46c943f8b5886-0057aa178f
+      - tx9fe63d2a750c41f0aa019-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/a6df1eb7-3da7-4dcc-92b8-a251008031cf
+    uri: http://swift.local:12345/v1/AUTH_test/aaa4f838-0e15-4288-9b87-023b793e9fc4
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx3758cbd52b5942c6a34f8-0057aa178f
+      - tx886ea0a5db53407cb5116-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/a6df1eb7-3da7-4dcc-92b8-a251008031cf/3ad8d094-d99c-406e-9142-9d2439e0c55e/1
+    uri: http://swift.local:12345/v1/AUTH_test/aaa4f838-0e15-4288-9b87-023b793e9fc4/26bc4a97-5045-41ab-9abd-06a5f3f71c6f/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Tue, 09 Aug 2016 17:49:04 GMT
+      - Thu, 18 Aug 2016 17:03:11 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,14 +87,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx82189cc861ab4c2dae23a-0057aa178f
+      - tx651da257816e48f5806f7-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 - request:
     method: get
     uri: http://swift.local:12345/auth/v1.0
@@ -114,35 +114,35 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc01aca02fbb041ed80eaa-0057aa178f
+      - tx7123be717c75404380ee7-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/a6df1eb7-3da7-4dcc-92b8-a251008031cf/3ad8d094-d99c-406e-9142-9d2439e0c55e?multipart-manifest=put
+    uri: http://swift.local:12345/v1/AUTH_test/aaa4f838-0e15-4288-9b87-023b793e9fc4/26bc4a97-5045-41ab-9abd-06a5f3f71c6f?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: '[{"path":"a6df1eb7-3da7-4dcc-92b8-a251008031cf/3ad8d094-d99c-406e-9142-9d2439e0c55e/1","etag":"NOTTHECOMPUTEDHASH","size_bytes":15}]'
+      string: '[{"path":"aaa4f838-0e15-4288-9b87-023b793e9fc4/26bc4a97-5045-41ab-9abd-06a5f3f71c6f/1","etag":"NOTTHECOMPUTEDHASH","size_bytes":15}]'
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/plain
       Content-Disposition:
-      - attachment; filename=ducimus.sit
+      - attachment; filename=ducimus_eveniet
   response:
     status:
       code: 400
@@ -153,25 +153,25 @@ http_interactions:
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx1233ab2881c04b8d86d6c-0057aa178f
+      - tx3b1b88929f3c41349df4b-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: |-
         Errors:
-        a6df1eb7-3da7-4dcc-92b8-a251008031cf/3ad8d094-d99c-406e-9142-9d2439e0c55e/1, Etag Mismatch
+        aaa4f838-0e15-4288-9b87-023b793e9fc4/26bc4a97-5045-41ab-9abd-06a5f3f71c6f/1, Etag Mismatch
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 - request:
     method: delete
-    uri: http://swift.local:12345/v1/AUTH_test/a6df1eb7-3da7-4dcc-92b8-a251008031cf/3ad8d094-d99c-406e-9142-9d2439e0c55e/1
+    uri: http://swift.local:12345/v1/AUTH_test/aaa4f838-0e15-4288-9b87-023b793e9fc4/26bc4a97-5045-41ab-9abd-06a5f3f71c6f/1
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 204
@@ -182,12 +182,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx76210dd724a741eb8a0d4-0057aa178f
+      - tx0041d8f02fa04c729a87f-0057b5ea4e
       Date:
-      - Tue, 09 Aug 2016 17:49:03 GMT
+      - Thu, 18 Aug 2016 17:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:49:03 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:10 GMT
 recorded_with: VCR 3.0.3

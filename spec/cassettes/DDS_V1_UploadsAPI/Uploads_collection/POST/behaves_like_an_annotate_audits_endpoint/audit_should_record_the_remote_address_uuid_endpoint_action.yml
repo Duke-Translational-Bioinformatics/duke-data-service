@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx41c2a1a7f4534f6091c9a-0057aa177b
+      - txc6de684505494c628fe0d-0057b5ea33
       Date:
-      - Tue, 09 Aug 2016 17:48:43 GMT
+      - Thu, 18 Aug 2016 17:02:43 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:48:43 GMT
+  recorded_at: Thu, 18 Aug 2016 17:02:43 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/b7ae5879-bca2-4120-9ea0-796a79415060
+    uri: http://swift.local:12345/v1/AUTH_test/15bb5ee7-725e-49e1-8e27-caf41a254c58
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc67f93f2e04e49ea9d62478bb3672ea3
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,12 +56,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx9ebf0a7c58e24dcfad381-0057aa177b
+      - txc7f2a68beb6d4c76bb92e-0057b5ea33
       Date:
-      - Tue, 09 Aug 2016 17:48:43 GMT
+      - Thu, 18 Aug 2016 17:02:43 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 09 Aug 2016 17:48:43 GMT
+  recorded_at: Thu, 18 Aug 2016 17:02:43 GMT
 recorded_with: VCR 3.0.3
