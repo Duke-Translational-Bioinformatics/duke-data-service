@@ -21,7 +21,7 @@ class TagPolicy < ApplicationPolicy
       Tag.taggable_classes.each do |taggable_class|
         tag_scope = tag_scope.union(
           Tag.where(
-            taggable_type: taggable_class.base_class, 
+            taggable_type: taggable_class.base_class.to_s, 
             taggable_id: policy_scope(taggable_class).select(:id).unscope(:order)
           )
         )
