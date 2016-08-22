@@ -29,5 +29,5 @@ Rails.application.configure do
   #     #remote_ip: event.payload[:remote_ip],
   #     grape_controller: event.payload[:params]["controller"]
   #   }
-  end
+  # end
 end
