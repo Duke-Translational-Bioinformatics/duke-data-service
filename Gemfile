@@ -13,6 +13,7 @@ gem 'neo4j'
 gem 'puma'
 gem 'rack', '1.6.4' # Remove in rails 5
 gem 'rack-cors', :require => 'rack/cors'
+gem 'grape-middleware-lograge'
 
 gem 'grape-swagger'
 gem 'kaminari'
