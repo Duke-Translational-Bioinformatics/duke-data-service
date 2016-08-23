@@ -101,8 +101,7 @@ module DDS
       end
       put '/activities/:id', root: false do
         authenticate!
-        activity_params = declared(params, include_missing: false)
-        activity_params.delete(:id)
+        activity_params = declared(params, {include_missing: false}, [:name, :description, :started_on, :ended_on])
         activity = hide_logically_deleted Activity.find(params[:id])
         authorize activity, :update?
         if activity.update(activity_params)
