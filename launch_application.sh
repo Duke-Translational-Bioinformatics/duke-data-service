@@ -2,15 +2,13 @@
 
 if [ -s swift.env ]
 then
-  docker_compose_flags='-f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml'
-  docker-compose ${docker_compose_flags} up -d swift
-else
-  docker_compose_flags='-f docker-compose.yml -f docker-compose.dev.yml'
+  export COMPOSE_FILE='docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml'
+  docker-compose up -d swift
 fi
 docker-compose up -d neo4j
 sleep 5
-docker-compose ${docker_compose_flags} up -d server
-docker-compose ${docker_compose_flags} run rake db:migrate
-docker-compose ${docker_compose_flags} run rake db:seed
-docker-compose ${docker_compose_flags} run authservice
-docker-compose ${docker_compose_flags} run rake storage_provider:create
+docker-compose up -d server
+docker-compose run rake db:migrate
+docker-compose run rake db:seed
+docker-compose run authservice
+docker-compose run rake storage_provider:create
