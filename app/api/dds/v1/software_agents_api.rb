@@ -89,7 +89,7 @@ module DDS
       end
       put '/software_agents/:id', root: false do
         authenticate!
-        software_agent_params = declared(params, include_missing: false)
+        software_agent_params = declared(params, {include_missing: false}, [:name, :description, :repo_url])
         software_agent = hide_logically_deleted SoftwareAgent.find(params[:id])
         authorize software_agent, :update?
         if software_agent.update(software_agent_params)

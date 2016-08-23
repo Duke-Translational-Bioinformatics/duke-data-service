@@ -11,7 +11,7 @@
 docker-compose up -d server
 sleep 10
 docker-compose ps
-curl http://swift.circle.host:12345/info
+curl http://swift.local:12345/info
 docker-compose run rake db:migrate
 docker-compose run rake db:seed
 docker-compose run authservice

@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
+  let(:project) { FactoryGirl.create(:project) }
+  let!(:existing_tag_for_uniqueness_validation) { FactoryGirl.create(:tag, :skip_validation, taggable: project) }
   subject { FactoryGirl.create(:tag) }
   let(:taggable_classes) {[
     DataFile
