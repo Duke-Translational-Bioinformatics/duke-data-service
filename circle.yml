@@ -2,11 +2,13 @@ machine:
   pre:
     - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   environment:
+    LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
-    COMPOSE_FILE: 'docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml'
-    GRAPHSTORY_URL: http://neo4j.circle.host:7474
+    COMPOSE_FILE: 'docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml:docker-compose.circle.yml'
+    GRAPHSTORY_URL: http://neo4j.db.host:7474
   hosts:
     swift.local: 0.0.0.0
+    neo4j.db.host: 0.0.0.0
   services:
     - docker
 
