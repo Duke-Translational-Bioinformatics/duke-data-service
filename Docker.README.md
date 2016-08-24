@@ -129,6 +129,17 @@ to all of your docker-compose commands, e.g.
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rails c
 ```
 
+Alternatively, you can use the fact that docker-compose looks for both docker-compose.yml
+and docker-compose.override.yml by default, and create a symlink from docker-compose.dev.yml
+to docker-compose.override.yml that will make docker-compose use both by default, without
+any of the extra -f flags.
+```
+ln -s docker-compose.dev.yml docker-compose.override.yml
+```
+Note, docker-compose.override.yml is in the .gitignore, so it will never be committed
+to the repo. This ensures that the default behavior for those not wishing to use the
+extra functionality in docker-compose.dev.yml is preserved.
+
 You should always specify the exact service (e.g. top level key
 in the docker-compose.dev.yml file) when running docker-compose commands using this
 docker-compose.dev.yml file. Otherwise, docker-compose will try to run all services,
@@ -144,15 +155,35 @@ set up by default to run the swift service. We use the vcr gem to record calls t
 swift for future tests to use, which makes it possible for most of our development
 work to be done without a running swift instance.
 
-Here is a list of docker-compose commands available using these docker-compose files:
+If you wish to make running the swift services part of the default behavior of docker-compose,
+without needing the -f flags, set your COMPOSE_FILE environment variable to a colon
+separated list of these three files:
+```
+export COMPOSE_FILE='docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml'
+```
+Again, if you do this, be sure never to run docker-compose up -d without specifying individual
+services, or unexpected services will be run and errors will result.
+
+default docker-compose commands
+---
+Using just the docker-compose.yml, e.g. no COMPOSE_FILE environment variable, and
+docker-compose.override.yml file/symlink is not present:
 
 Launch the server, postgresdb, and neo4j to interact with the application:
 ```
 docker-compose up -d server
 ```
 Docker-compose is smart enough to realize all of the linked services required,
-and spin them up in order.
+and spin them up in order. This will not launch a swift service.
 
+Bring down and delete running containers:
+```
+docker-compose down
+```
+
+docker-compose.dev.yml docker-compose commands
+---
+Either use -f docker-compose.yml -f docker-compose.dev.yml, like so:
 Run rspec
 ```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rspec
@@ -160,23 +191,46 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rspec spec/re
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rspec spec/models/user_spec.rb
 ```
 
+Or create a symlink from docker-compose.dev.yml to docker-compose.override.yml.
+This is the recommended way to use docker-compose.dev.yml, as it will be more
+permenant between invocations of the shell terminal, unless you add the COMPOSE_FILE
+environment setting to your ~/.bash_profile.
+```
+ln -s docker-compose.dev.yml docker-compose.override.yml
+```
+
+Then you can run services like rspec without the extra -f flags:
+```
+docker-compose run rspec
+docker-compose run rspec spec/requests
+```
+
+Alternatively, you can create a COMPOSE_FILE environment variable and get the same
+default behavior.
+```
+export COMPOSE_FILE='docker-compose.yml:docker-compose.dev.yml'
+```
+This will last only as long as your current shell terminal session, unless you add
+the above command to your ~/.bash_profile.
+
+The following commands assume the symlink, or COMPOSE_FILE environment variable exists.
 Run bundle (see
 [below](#dockerfile) for **important information about modifying the Gemfile**)):
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run bundle
+docker-compose run bundle
 ```
 
 Run rake commands (default RAILS_ENV=development):
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake db:migrate
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake db:seed
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake db:migrate RAILS_ENV=test
+docker-compose run rake db:migrate
+docker-compose run rake db:seed
+docker-compose run rake db:migrate RAILS_ENV=test
 ```
 
-Run rails commands (default RAILS_ENV=development):
+Run rails commands (default RAILS_ENV=docker):
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rails c
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rails c RAILS_ENV=test
+docker-compose run rails c
+docker-compose run rails c RAILS_ENV=test
 ```
 
 Create an AuthenticationService object that links to the
@@ -184,42 +238,71 @@ Create an AuthenticationService object that links to the
 ([see below](#connecting-a-duke-authentication-service-microservice)) **Note this must be run against
 an existing, migrated database**:
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run authservice
+docker-compose run authservice
 ```
 
 Remove the authservice
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake authservice:destroy
-```
-
-Create a StorageProvider linked to a swift service (defined in [swift.env](#running-a-local-swift-service-using-docker)]) **Note this must be run against
-an existing, migrated database**:
-```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml run rake storageprovider:create
-```
-
-Start a locally running swift storage service ([see below](#running-a-local-swift-service-using-docker)):
-```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml up -d swift
+docker-compose run rake authservice:destroy
 ```
 
 Create an api test user ([see below](#creating-an-api_test_user-and-token)) **Note this must be run against an existing, migrated database**
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create
+docker-compose run rake api_test_user:create
 ```
 
 Destroy the api_test_user (and all objects created by the user):
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:destroy
+docker-compose run rake api_test_user:destroy
 ```
 
 Clean up any objects created by the api_test_user, such as by [running the workflow](#running-the-workflow):
 ```
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:clean
+docker-compose run rake api_test_user:clean
+```
+
+docker-compose.swift.yml docker-compose commands
+---
+Either use -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml, like so:
+Run rspec
+```
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.env run swift
+```
+
+Or create the COMPOSE_FILE environment variable.
+```
+export COMPOSE_FILE='docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml'
+```
+
+Again, if you want this to last between shell terminal sessions, add the above to
+your ~/.bash_profile.
+
+This repo does not provide a yml file that combines the services in docker-compose.dev.yml
+and docker-compose.swift.yml together into a single file that could be used as a
+docker-compose.override.yml, but this is certainly possible.
+
+The following assume the COMPOSE_FILE environment is set.
+
+Start a locally running swift storage service ([see below](#running-a-local-swift-service-using-docker)):
+```
+docker-compose up -d swift
+```
+
+Create a StorageProvider linked to a swift service (defined in [swift.env](#running-a-local-swift-service-using-docker)]) **Note this must be run against an existing, migrated database, and the swift service should be running**:
+```
+docker-compose run rake storageprovider:create
 ```
 
 Run the [dredd](#run-dredd) API specification tests (see below for how to
-run this).
+run this). **Note** the dredd service is actually defined in docker-compose.dev.yml,
+but it should be run with the docker-compose.swift.yml against a running swift.
+
+**Note about docker-compose down**
+You should run docker-compose down using the same docker-compose yml file context,
+e.g. with COMPOSE_FILE set, or the docker-compose.override.yml file in existence,
+or using the -f flags for all docker-compose yml files. Otherwise, services defined
+in the missing docker-compose.yml file will not be shut down and removed, and a warning
+may come up in your output that says containers were 'orphaned'.
 
 docker-compose.circle.yml
 ---
@@ -325,13 +408,13 @@ ln -s swift.local.env swift.env
 ```
 
 **Note** In order to run the server, or any rails, rake, rspec commands against
-the running swift service, you must run these withcthe docker-compose.swift.yml
-file included in the chain of docker-compose files, e.g add
-`-f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml` to
-all docker-compose commands. Otherwise, the application containers are not linked
-to the swift service. This will cause any attempts to communicate with the swift
-service, such as when starting or completing an upload, to timeout. You will also
-need to use this chain to run docker-compose down, docker-compose stop, etc:
+the running swift service, you must run these with the docker-compose.swift.yml
+file included in the chain of docker-compose files, e.g with the -f flags,
+the COMPOSE_FILE set, or a specially crafted docker-compose.override.yml.
+Otherwise, the application containers are not linked to the swift service. This
+will cause any attempts to communicate with the swift service, such as when starting
+or completing an upload, to timeout. You will also need to use this chain to run
+docker-compose down, docker-compose stop, etc:
 ```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml stop swift
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
@@ -346,6 +429,8 @@ files. To run this:
 - create a freshly launched application (e.g. the postgres database and swift service
 are completely clean). You can run the following to ensure this:
 ```
+rm swift.env
+ln -s swift.local.env swift.env
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
 ./launch_application.sh
 ```
@@ -374,9 +459,9 @@ branches where dredd should run).
 
 The dredd application has been wrapped into its own docker image, which can be built
 and run using the docker-compose.dev.yml docker-compose file. Dredd must be run
-against a running DDS service, which is configured to work with a running swift
-storage service. It does not need a running Authentication Service to work, but
-it does need the [Api Test User Token](#creating-an-api_test_user-and-token).
+against a running DDS service, and swift service, and the DDS service must be configured
+to work with a running swift storage service. It does not need a running Authentication
+Service to work, but it does need the [Api Test User Token](#creating-an-api_test_user-and-token).
 
 The dredd service in docker-compose.dev.yml uses an environment file in the Application Root,
 dredd.env.  It must specify the host to which dredd will connect to test assigned
@@ -412,7 +497,7 @@ docker-compose run dredd
 To clean up after a dredd run (you should do this between runs, and also before committing
 any code changes to git):
 ```
-docker-compose down
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
 git checkout -- dredd.env swift.env webapp.env
 ```
 
@@ -429,7 +514,7 @@ for details on how to work with this client on the locally running server instan
 In production, the API Explorer uses the APIEXPLORER_ID environment variable to
 store the UUID used to identify the client to the Duke Authentication Service
 microservice configured for the DDS server. This must be set on the host server
-for the applicaton. It must also be registered along with the apiexplorer URL, and
+for the application. It must also be registered along with the apiexplorer URL, and
 DDS SECRET_KEY_BASE as a Consumer in the Duke Authentication Service server.
 
 * See the configuration section of [Connecting a Duke Authentication Service microservice](#connecting-a-duke-authentication-service-microservice)
@@ -595,22 +680,7 @@ is configured to use ENVIRONMENT variables for these secrets:
 * SWIFT_PRIMARY_KEY: see [Configuration](#connecting-to-an-openstack-swift-object-store)
 * SWIFT_SECONDARY_KEY: see [Configuration](#connecting-to-an-openstack-swift-object-store)
 
-Rake Heroku Secret Deployment
----
-Duke School of Medicine Employees connected to the Duke School of Medicine VPN
-can use a rake task to deploy their secrets, using our internal [vault](https://vaultproject.io/)
-service. The employee must also install, authenticate, and be authorized to use the
-[heroku commandline tool](https://devcenter.heroku.com/articles/heroku-command) to deploy configuration to the duke data service heroku
-applications. Users must also set the RAILS_ENV environment variable on their host
-machine before running the rake task.
-
-To deploy secrets to heroku:
-```
-export RAILS_ENV=development
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml run deploysecrets
-```
-
-Useful Docker Commands
+Docker basics
 ===
 
 To stop all running docker containers (you must stop a container before you can
@@ -703,14 +773,12 @@ alias docker_cleanup='docker rm -v $(docker ps -aq)'
 alias docker_images_cleanup='docker rmi $(docker images -f dangling=true -q)'
 alias docker_volume_cleanup='docker volume rm $(docker volume ls -q)'
 
-# you can change this environment variable to hook in the running swift to
-# the aliases below
-export COMPOSE_FILE_CHAIN='-f docker-compose.yml -f docker-compose.dev.yml'
-
 # fake rake/rails/rspec using docker under the hood
-alias rails="docker-compose ${COMPOSE_FILE_CHAIN} run rails"
-alias rake="docker-compose ${COMPOSE_FILE_CHAIN} run rake"
-alias rspec="docker-compose ${COMPOSE_FILE_CHAIN} run rspec"
-alias bundle="docker-compose ${COMPOSE_FILE_CHAIN} run bundle"
-alias dcdown="docker-compose ${COMPOSE_FILE_CHAIN} down"
+# this depends on either a docker-compose.override.yml, or COMPOSE_FILE
+# environment variable
+alias rails="docker-compose run rails"
+alias rake="docker-compose run rake"
+alias rspec="docker-compose run rspec"
+alias bundle="docker-compose run bundle"
+alias dcdown="docker-compose down"
 ```

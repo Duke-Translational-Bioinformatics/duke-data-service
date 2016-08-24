@@ -181,7 +181,7 @@ module DDS
           end
           put '/hashes', root: false do
             authenticate!
-            fingerprint_params = declared(params, include_missing: false)
+            fingerprint_params = declared(params, {include_missing: false}, [:value, :algorithm])
             upload = Upload.find(params[:id])
             authorize upload, :update?
             fingerprint = upload.fingerprints.build(fingerprint_params)
