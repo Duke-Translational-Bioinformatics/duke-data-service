@@ -13,6 +13,8 @@ RSpec.describe Template, type: :model do
     "#{Faker::Name.first_name}\n#{Faker::Name.first_name}"
   ]}
 
+  it_behaves_like 'an audited model'
+
   describe 'associations' do
     it { is_expected.to belong_to(:creator).class_name('User') }
   end
