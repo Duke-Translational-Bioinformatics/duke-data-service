@@ -37,6 +37,19 @@ services:
       - circle/webapp.circle.env
       - auth_service.local.env
       - neo4j.client.env
+  rspec:
+    image: dukedataservice_server
+    environment:
+      - RAILS_ENV=test
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+    env_file:
+      - circle/webapp.circle.env
+      - swift.env
+      - neo4j.client.local.env
+    entrypoint: ['rspec']
+    command: spec
   dredd:
     build: ./docker/builds/dredd
     links:
