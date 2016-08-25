@@ -486,12 +486,13 @@ To run dredd against the default, locally running DDS server service, do the fol
 rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
-ln -s circle/webapp.circle.env webapp.env
+ln -s webapp.local.env webapp.env
 rm dredd.env
 ln -s dredd.local.env dredd.env
 ./launch_application.sh
-echo "MY_GENERATED_JWT="$(docker-compose run rake api_test_user:create | tail -1) >> dredd.env
-docker-compose run dredd
+echo "MY_GENERATED_JWT="$(docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create) >> dredd.env
+#Now I have to manually go into dredd.env and remove ^M, can you help with this?
+`docker-compose -f docker-compose.yml -f docker-compose.dev.yml run dredd` docker-compose run dredd
 ```
 
 To clean up after a dredd run (you should do this between runs, and also before committing
