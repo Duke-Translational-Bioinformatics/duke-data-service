@@ -20,7 +20,7 @@ services:
       - swift:swift.local
   dredd:
     links:
-      - swift:swift.circle.host
+      - swift:swift.local
 volumes:
   swiftvol:
     driver: local
