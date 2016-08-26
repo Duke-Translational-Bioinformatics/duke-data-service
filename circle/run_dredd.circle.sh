@@ -18,7 +18,7 @@ docker-compose run authservice
 docker-compose run rake storage_provider:create
 docker-compose run rake api_test_user:create
 docker-compose run rake api_test_user_pool:create
-echo "MY_GENERATED_JWT="`docker-compose run rake api_test_user:create | tail -1` >> dredd.env
+MY_GENERATED_JWT=$(docker-compose run rake api_test_user:create | tail -1)
 
 # run dredd
-docker-compose run dredd
+docker-compose run -e MY_GENERATED_JWT -e "HOST_NAME=http://dds.host:3000/api/v1" dredd

@@ -54,11 +54,6 @@ services:
     build: ./docker/builds/dredd
     links:
      - server:dds.host
-     - db:postgres.db.host
-     - neo4j:neo4j.db.host
-    env_file:
-      - dredd.local.env
-      - neo4j.client.local.env
     volumes:
       - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
       - ./apiary.apib:/home/dredd_scripts/apiary.apib
