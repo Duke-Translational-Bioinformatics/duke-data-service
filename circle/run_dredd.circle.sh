@@ -8,7 +8,7 @@
 ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 
 # launch_application
-docker-compose run -e MY_GENERATED_JWT -e "HOST_NAME=http://dds.host:3000/api/v1" dredd cat /etc/hosts
+docker-compose run -e MY_GENERATED_JWT -e "HOST_NAME=http://dds.host:3000/api/v1" dredd curl http://dds.host:3000/api/v1/app/status
 exit
 
 echo "COMPOSE_FILE ${COMPOSE_FILE}"
