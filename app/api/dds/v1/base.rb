@@ -206,6 +206,7 @@ module DDS
       mount DDS::V1::ActivitiesAPI
       mount DDS::V1::RelationsAPI
       mount DDS::V1::SearchAPI
+      mount DDS::V1::TemplatesAPI
       add_swagger_documentation \
         doc_version: '0.0.2',
         hide_documentation_path: true,
