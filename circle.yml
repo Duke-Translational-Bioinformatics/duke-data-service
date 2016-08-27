@@ -28,8 +28,8 @@ dependencies:
 
 test:
   override:
-    - ./circle/run_dredd.circle.sh:
-        parallel: false
+    - ./circle/parallelize_test_suite.sh:
+        parallel: true
 
 deployment:
  development:

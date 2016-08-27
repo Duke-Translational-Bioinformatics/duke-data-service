@@ -8,10 +8,6 @@
 ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 
 # launch_application
-docker-compose run -e MY_GENERATED_JWT -e "HOST_NAME=http://dds.host:3000/api/v1" dredd curl http://dds.host:3000/api/v1/app/status
-exit
-
-echo "COMPOSE_FILE ${COMPOSE_FILE}"
 docker-compose up -d server
 sleep 10
 docker-compose ps
@@ -23,7 +19,6 @@ docker-compose run rake storage_provider:create > /dev/null 2>&1
 docker-compose run rake api_test_user:create > /dev/null 2>&1
 docker-compose run rake api_test_user_pool:create > /dev/null 2>&1
 MY_GENERATED_JWT=$(docker-compose run rake api_test_user:create | tail -1)
-echo "GOT ${MY_GENERATED_JWT}"
 
 # run dredd
 docker-compose run -e MY_GENERATED_JWT -e "HOST_NAME=http://dds.host:3000/api/v1" dredd
