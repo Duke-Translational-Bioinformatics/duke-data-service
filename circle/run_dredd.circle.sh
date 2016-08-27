@@ -8,6 +8,8 @@
 ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 
 # launch_application
+docker-compose up -d neo4j db
+sleep 10
 docker-compose up -d server
 sleep 10
 docker-compose ps
