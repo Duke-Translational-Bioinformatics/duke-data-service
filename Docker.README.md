@@ -463,35 +463,15 @@ against a running DDS service, and swift service, and the DDS service must be co
 to work with a running swift storage service. It does not need a running Authentication
 Service to work, but it does need the [Api Test User Token](#creating-an-api_test_user-and-token).
 
-The dredd service in docker-compose.dev.yml uses an environment file in the Application Root,
-dredd.env.  It must specify the host to which dredd will connect to test assigned
-to HOST_NAME, and it must contain an api_token assigned to MY_GENERATED_JWT.
-**NOTE** the default dredd.env file in the repository only contains the HOST_NAME.
-It does not contain a MY_GENERATED_JWT. This should be generated and appended to
-the dredd.env file before running the application, and any changes to dredd.env
-should be discarded, and never committed to git.
-
-The default dredd.env file is configured with a HOST_NAME to work with a locally
-running dds server docker container linked to the dredd container using the
-dredd.host hostname, running **without SSL**. This can be modified by
-changing the dredd.env file to use a different HOST_NAME. The URL set for this
-variable must be valid, such that accessing ${URL}/api/v1/app/status, such as in
-a browser, or using curl, would return {'status': 'ok'}. In addition, the
-DDS service must be configured to work with a running swift service. The default,
-locally running dds server service should be run with a valid swift.env file
-specifying a live swift service.
-
 To run dredd against the default, locally running DDS server service, do the following:
 ```
 rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
 ln -s webapp.local.env webapp.env
-rm dredd.env
-ln -s dredd.local.env dredd.env
 ./launch_application.sh
-echo "MY_GENERATED_JWT="$(docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create) >> dredd.env
-`docker-compose -f docker-compose.yml -f docker-compose.dev.yml run dredd` docker-compose run dredd
+MY_GENERATED_JWT=$(docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create | tail -1)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml run -e "MY_GENERATED_JWT=${MY_GENERATED_JWT}" -e "HOST_NAME=http://dds.host:3000/api/v1" dredd
 ```
 
 To clean up after a dredd run (you should do this between runs, and also before committing
