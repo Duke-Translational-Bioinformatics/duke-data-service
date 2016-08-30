@@ -27,5 +27,6 @@ RSpec.describe Template, type: :model do
     it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
     it { is_expected.to allow_values(*good_names).for(:name) }
     it { is_expected.not_to allow_values(*bad_names).for(:name) }
+    it { is_expected.to validate_length_of(:name).is_at_most(60) }
   end
 end
