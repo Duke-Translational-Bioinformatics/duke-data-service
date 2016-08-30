@@ -465,13 +465,18 @@ Service to work, but it does need the [Api Test User Token](#creating-an-api_tes
 
 To run dredd against the default, locally running DDS server service, do the following:
 ```
+export COMPOSE_FILE=dc-dev.utils.yml
 rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
 ln -s webapp.local.env webapp.env
+rm dredd.env
+cp dredd.local.env dredd.env
 ./launch_application.sh
-MY_GENERATED_JWT=$(docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create | tail -1)
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml run -e "MY_GENERATED_JWT=${MY_GENERATED_JWT}" -e "HOST_NAME=http://dds.host:3000/api/v1" dredd
+echo "MY_GENERATED_JWT="$(docker-compose run rake api_test_user:create | tail -1) >> dredd.env
+docker-compose run rake api_test_user_pool:create
+docker-compose run dredd
+>>>>>>> develop
 ```
 
 To clean up after a dredd run (you should do this between runs, and also before committing
