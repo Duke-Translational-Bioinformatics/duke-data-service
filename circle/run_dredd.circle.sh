@@ -8,17 +8,20 @@
 ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 
 # launch_application
+docker-compose up -d neo4j db
+sleep 10
 docker-compose up -d server
 sleep 10
 docker-compose ps
-curl http://swift.circle.host:12345/info
-docker-compose run rake db:migrate
-docker-compose run rake db:seed
-docker-compose run authservice
-docker-compose run rake storage_provider:create
-docker-compose run rake api_test_user:create
-docker-compose run rake api_test_user_pool:create
-echo "MY_GENERATED_JWT="`docker-compose run rake api_test_user:create | tail -1` >> dredd.env
+curl http://swift.local:12345/info
+docker-compose run rake db:migrate > /dev/null 2>&1
+docker-compose run rake db:seed > /dev/null 2>&1
+docker-compose run authservice > /dev/null 2>&1
+docker-compose run rake storage_provider:create > /dev/null 2>&1
+docker-compose run rake api_test_user:create > /dev/null 2>&1
+docker-compose run rake api_test_user_pool:create > /dev/null 2>&1
+MY_GENERATED_JWT=$(docker-compose run rake api_test_user:create | tail -1)
+HOST_NAME="http://dds.host:3000/api/v1"
 
 # run dredd
-docker-compose run dredd
+docker-compose run -e "MY_GENERATED_JWT=${MY_GENERATED_JWT}" -e "HOST_NAME=${HOST_NAME}" dredd

@@ -1,12 +1,14 @@
 machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   environment:
     LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
-    COMPOSE_FILE: docker-compose.circle.yml
-    GRAPHSTORY_URL: http://neo4j.circle.host:7474
+    COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
+    GRAPHSTORY_URL: http://neo4j.db.host:7474
   hosts:
-    swift.circle.host: 0.0.0.0
-    neo4j.circle.host: 0.0.0.0
+    swift.local: 0.0.0.0
+    neo4j.db.host: 0.0.0.0
   services:
     - docker
 
@@ -21,7 +23,7 @@ dependencies:
   pre:
     - ./docker/circle/cache_docker_image.sh neo4j 2.3.2
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
-    - sudo pip install --upgrade docker-compose==1.5.0
+    - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j
 
 test:
