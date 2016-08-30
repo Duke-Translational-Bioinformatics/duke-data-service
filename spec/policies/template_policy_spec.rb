@@ -14,7 +14,7 @@ describe TemplatePolicy do
 
     describe '.scope' do
       it { expect(resolved_scope).to include(template) }
-      it { expect(resolved_scope).not_to include(other_template) }
+      it { expect(resolved_scope).to include(other_template) }
     end
     permissions :create?, :update?, :destroy? do
       it { is_expected.to permit(user, template) }
