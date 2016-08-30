@@ -530,15 +530,16 @@ specifying a live swift service.
 
 To run dredd against the default, locally running DDS server service, do the following:
 ```
+export COMPOSE_FILE=dc-dev.utils.yml
 rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
-ln -s circle/webapp.circle.env webapp.env
+ln -s webapp.local.env webapp.env
 rm dredd.env
-ln -s dredd.local.env dredd.env
-export COMPOSE_FILE=docker-compose.circle.yml
+cp dredd.local.env dredd.env
 ./launch_application.sh
 echo "MY_GENERATED_JWT="$(docker-compose run rake api_test_user:create | tail -1) >> dredd.env
+docker-compose run rake api_test_user_pool:create
 docker-compose run dredd
 ```
 
