@@ -19,7 +19,7 @@ def all_but_filecreat12_1(transaction):
     #create a project
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     #upload a file
     upload_id = utils.upload_a_file(proj_id)
@@ -33,8 +33,9 @@ def all_but_filecreat12_1(transaction):
 def grab_that_file_id12_1(transaction):
     global file_id
     json_trans = json.loads(transaction[u'real'][u'body'])
+    print(json_trans)
     file_id = json_trans['id']
-    print('This is my file id: ' + file_id)
+    #print('This is my file id: ' + file_id)
 @hooks.before("Files > File instance > View file")
 def change_default_id12_1(transaction):
     url = transaction['fullPath']
@@ -62,7 +63,7 @@ def move_id12_1(transaction):
     #create a project
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     folder_id = utils.create_a_folder(proj_id,'justaname')
     proj2_id = neww['id']
     url = transaction['fullPath']

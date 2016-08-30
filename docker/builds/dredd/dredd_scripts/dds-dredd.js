@@ -25,8 +25,8 @@ configuration = {
     'language': 'python',
 
     'only': [//01_auth_hooks.js
-            //  "Authorization Roles > Authorization Roles collection > List roles",
-            //  "Authorization Roles > Authorization Role instance > View role",
+             "Authorization Roles > Authorization Roles collection > List roles",
+             "Authorization Roles > Authorization Role instance > View role",
              //14_software_agents.js
             //  "Software Agents > Software Agents collection > Create software agent",
             //  "Software Agents > Software Agents collection > List software agents",
@@ -84,7 +84,7 @@ configuration = {
             // "Uploads > Uploads collection > List chunked uploads",
             // "Uploads > Upload instance > View chunked upload",
             // "Uploads > Upload instance > Get pre-signed chunk URL",
-            // "Uploads > Upload instance > Complete chunked file upload",
+            // "Uploads > Upload instance > NOT_IMPLEMENTED_CHANGE Complete chunked file upload",
             // "Uploads > Upload instance > Report server computed hash",
             // "Uploads > Upload instance > Report upload hash",
             //12_files_hooks.js
@@ -144,22 +144,22 @@ configuration = {
 
     'hookfiles': [//'hook_endpoints.py'
                   '01_auth_hooks.py',
-                  '02_software_agents.py',
-                  '03_current_users.py',
-                  '04_system_permission.py',
-                  '05_projects.py',
-                  '06_project_permissions.py',
-                  '07_project_roles.py',
-                  '08_affiliates.py',
-                  '09_storage_providers.py',
-                  '10_folders.py',
-                  '11_uploads.py',
-                  '12_files.py',
-                  '14_children_search.py',
-                  '15_provenance_activities.py',
-                  '16_provenance_relations.py',
-                  '17_tags.py',
-                  '18_metadata.py',
+                  // '02_software_agents.py',
+                  // '03_current_users.py',
+                  // '04_system_permission.py',
+                  // '05_projects.py',
+                  // '06_project_permissions.py',
+                  // '07_project_roles.py',
+                  // '08_affiliates.py',
+                  // '09_storage_providers.py',
+                  // '10_folders.py',
+                  // '11_uploads.py',
+                  // '12_files.py',
+                  // '14_children_search.py',
+                  // '15_provenance_activities.py',
+                  // '16_provenance_relations.py',
+                  // '17_tags.py',
+                  // '18_metadata.py',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
     'reporter': [], // Array of possible reporters, see folder src/reporters

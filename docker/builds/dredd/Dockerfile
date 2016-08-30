@@ -22,18 +22,7 @@ RUN ln -s /usr/bin/nodejs /usr/bin/node
 RUN npm install -g dredd@1.0.8
 
 #install node modules
-#RUN npm install hooks
-#RUN npm install shortid32
-#RUN npm install underscore
-#RUN npm install node-rest-client
-#RUN npm install node-promise
-#RUN npm install fs
-#RUN npm install md5
 RUN npm install dredd@1.0.8
-
-#COPY Files
-#These files are now mounted via docker-compose.circle.yml
-#COPY ./dredd_scripts /home/dredd_scripts/
 
 #Execute the node app
 WORKDIR /home/dredd_scripts

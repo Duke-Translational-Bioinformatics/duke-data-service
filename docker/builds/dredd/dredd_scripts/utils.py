@@ -19,7 +19,7 @@ def skip_this_endpoint(transaction):
 def pass_this_endpoint(transaction):
     pass
 
-def create_a_project(transaction,name,description):
+def create_a_project(name,description):
     url = os.getenv('HOST_NAME') + "/projects"
     headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
     body = { "name": name, "description": description}
@@ -91,8 +91,8 @@ def upload_a_file(proj_id,unique=None):
     url = os.getenv('HOST_NAME') + "/projects/" + proj_id + "/uploads"
     headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
     r = requests.post(url, headers=headers, data=json.dumps(body))
-    #if r.status_code != 201:
-    #    print("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
+    if r.status_code != 201:
+        print("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
     upload_id = str(json.loads(r.text)['id'])
     ## Now we need to get a pre-signed url to the swift storage facility
     body = {"number": 1,
@@ -108,6 +108,12 @@ def upload_a_file(proj_id,unique=None):
     ##Let data service know the upload is complete
     #if r3.status_code != 201:
     #    print('Could not upload to swift, error ' + str(r3.status_code))
+    #now we need to report the hash of this file
+    url = os.getenv('HOST_NAME') + "/uploads/" + upload_id + "/hashes"
+    body = {"value": chunk['hash']['value'],
+            "algorithm":'md5'
+            }
+    r3_5 = requests.put(url,headers=headers,data=json.dumps(body))
     url = os.getenv('HOST_NAME') + "/uploads/" + upload_id + "/complete"
     r4 = requests.put(url, headers=headers)
     ##Complete the process by creating a file
