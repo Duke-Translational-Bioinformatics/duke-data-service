@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160825150213) do
+ActiveRecord::Schema.define(version: 20160826200027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -155,6 +155,17 @@ ActiveRecord::Schema.define(version: 20160825150213) do
     t.boolean  "is_deleted",  default: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+  end
+
+  create_table "properties", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "template_id"
+    t.string   "key"
+    t.string   "label"
+    t.text     "description"
+    t.string   "data_type"
+    t.boolean  "is_deprecated"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "prov_relations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

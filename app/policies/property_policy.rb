@@ -1,4 +1,4 @@
-class TemplatePolicy < ApplicationPolicy
+class PropertyPolicy < ApplicationPolicy
   def show?
     true
   end
@@ -24,6 +24,6 @@ class TemplatePolicy < ApplicationPolicy
   private
 
   def creator?
-    record.creator == user
+    record.template && record.template.creator == user
   end
 end
