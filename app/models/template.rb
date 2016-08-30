@@ -2,6 +2,7 @@ class Template < ActiveRecord::Base
   include RequestAudited
   audited
   belongs_to :creator, class_name: 'User'
+  has_many :properties
 
   validates :name, presence: true,
     uniqueness: {case_sensitive: false},
