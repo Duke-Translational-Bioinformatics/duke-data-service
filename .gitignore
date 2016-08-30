@@ -7,6 +7,12 @@
 # Ignore bundler config.
 /.bundle
 
+#Ignore mac
+*.DS_Store
+
+#python hooks
+*.pyc
+
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
