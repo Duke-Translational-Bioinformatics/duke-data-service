@@ -17,11 +17,7 @@ class TemplatePolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      if user.system_permission
-        scope
-      else
-        scope.where(creator: user)
-      end
+      scope
     end
   end
 
