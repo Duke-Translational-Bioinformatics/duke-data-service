@@ -15,7 +15,7 @@ fi
 dds_url=$DDSURL
 if [ -z $dds_url ]
 then
-  dds_url=https://192.168.99.100:3001
+  dds_url=http://localhost:3001
 fi
 
 echo "creating project ${dds_url}"
