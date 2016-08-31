@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,33 +17,33 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk44c4cfa46ef24765804c5c5db6585701
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk44c4cfa46ef24765804c5c5db6585701
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txf32b2740b0b348d8aadcf-0056e71792
+      - tx54e709567278455ab670b-0057b5ea36
       Date:
-      - Mon, 14 Mar 2016 19:57:06 GMT
+      - Thu, 18 Aug 2016 17:02:46 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Mon, 14 Mar 2016 19:57:06 GMT
+  recorded_at: Thu, 18 Aug 2016 17:02:46 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/a6d5b6dd-e432-453a-a007-9399362df5e3
+    uri: http://swift.local:12345/v1/AUTH_test/f10348cd-435c-4c24-984f-11b2f9d169ef
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk44c4cfa46ef24765804c5c5db6585701
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,12 +56,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txb75585c75bfe4fa49ee3e-0056e71792
+      - tx44d7ac71ebf84063a786f-0057b5ea36
       Date:
-      - Mon, 14 Mar 2016 19:57:06 GMT
+      - Thu, 18 Aug 2016 17:02:46 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Mon, 14 Mar 2016 19:57:06 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Thu, 18 Aug 2016 17:02:46 GMT
+recorded_with: VCR 3.0.3

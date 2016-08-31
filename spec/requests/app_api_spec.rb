@@ -46,7 +46,7 @@ describe DDS::V1::AppAPI do
       context 'is not created' do
         before do
           ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://192.168.99.100:3000'
+          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
           ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
         end
 
@@ -100,7 +100,7 @@ describe DDS::V1::AppAPI do
           ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
           ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
           ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://192.168.99.100:12345'
+          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
           ENV['SWIFT_VERSION'] = 'v1'
           ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
           ENV['SWIFT_USER'] = 'test:tester'
@@ -129,7 +129,7 @@ describe DDS::V1::AppAPI do
           ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
           ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
           ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://192.168.99.100:12345'
+          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
           ENV['SWIFT_VERSION'] = 'v1'
           ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
           ENV['SWIFT_USER'] = 'test:tester'
@@ -167,12 +167,12 @@ describe DDS::V1::AppAPI do
         let(:authentication_service) { FactoryGirl.create(:authentication_service)}
         before do
           ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://192.168.99.100:3000'
+          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
           ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
           ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
           ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
           ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://192.168.99.100:12345'
+          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
           ENV['SWIFT_VERSION'] = 'v1'
           ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
           ENV['SWIFT_USER'] = 'test:tester'
@@ -228,12 +228,12 @@ describe DDS::V1::AppAPI do
       before do
         WebMock.reset!
         ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-        ENV['AUTH_SERVICE_BASE_URI'] = 'https://192.168.99.100:3000'
+        ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
         ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
         ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
         ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
         ENV['SWIFT_ACCT'] = 'AUTH_test'
-        ENV['SWIFT_URL_ROOT'] = 'http://192.168.99.100:12345'
+        ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
         ENV['SWIFT_VERSION'] = 'v1'
         ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
         ENV['SWIFT_USER'] = 'test:tester'

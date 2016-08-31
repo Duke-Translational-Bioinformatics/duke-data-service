@@ -3,7 +3,11 @@ Rails.application.configure do
   config.eager_load = ENV['RAILS_EAGER_LOAD'].present?
   config.consider_all_requests_local       = ENV['RAILS_CONSIDER_REQUESTS_LOCAL'].present?
   config.action_controller.perform_caching = ENV['RAILS_PERFORM_CACHING'].present?
-  config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  if Rails.version > '5.0.0'
+    config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  else
+    config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  end
   config.assets.js_compressor = :uglifier
   config.assets.compile = ENV['RAILS_COMPILE_ASSETS'].present?
   config.assets.digest = ENV['RAILS_DIGEST_ASSETS'].present?

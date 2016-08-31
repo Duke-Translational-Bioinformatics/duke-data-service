@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,22 +17,22 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx966713ba9ebf4db18cabd-0056e9d648
+      - txc00a668c6b7b4da49c1c4-0057b5e64f
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Thu, 18 Aug 2016 16:46:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Thu, 18 Aug 2016 16:46:07 GMT
+recorded_with: VCR 3.0.3
