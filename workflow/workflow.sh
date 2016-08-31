@@ -37,7 +37,7 @@ project_kind=`echo ${resp} | jq -r '.kind'`
 upload_size=`wc -c test_file.txt | awk '{print $1}'`
 upload_md5=`md5 test_file.txt | awk '{print $NF}'`
 echo "creating upload"
-resp=`curl --insecure -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"test_file.txt","content_type":"text%2Fplain","size":"'${upload_size}'","hash":{"value":"'${upload_md5}'","algorithm":"md5"}}' "${dds_url}/api/v1/projects/${project_id}/uploads"`
+resp=`curl --insecure -# -X POST --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"name":"test_file.txt","content_type":"text%2Fplain","size":"'${upload_size}'"}' "${dds_url}/api/v1/projects/${project_id}/uploads"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
@@ -95,7 +95,7 @@ do
    fi
 done
 echo "completing upload"
-resp=`curl --insecure -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" "${dds_url}/api/v1/uploads/${upload_id}/complete"`
+resp=`curl --insecure -# -X PUT --header "Content-Type: application/json" --header "Accept: application/json" --header "Authorization: ${auth_token}" -d '{"hash":{"value":"'${upload_md5}'","algorithm":"md5"}}' "${dds_url}/api/v1/uploads/${upload_id}/complete"`
 if [ $? -gt 0 ]
 then
   echo "Problem!"
