@@ -3,9 +3,9 @@ class Tag < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   audited
 
-  belongs_to :taggable, polymorphic: true
+  belongs_to :taggable, polymorphic: true, touch: true
 
-  validates :label, presence: true, 
+  validates :label, presence: true,
     uniqueness: {scope: [:taggable_id, :taggable_type], case_sensitive: false}
   validates :taggable, presence: true
 
@@ -13,7 +13,7 @@ class Tag < ActiveRecord::Base
     record.errors.add(attr, 'is not a taggable class') if value &&
       !taggable_classes.include?(value.class)
   end
-  
+
   def project_permissions
     taggable.project_permissions
   end
@@ -24,7 +24,7 @@ class Tag < ActiveRecord::Base
     ]
   end
 
-  def self.label_like(label_contains) 
+  def self.label_like(label_contains)
     where("label LIKE ?", "%#{label_contains}%")
   end
 
