@@ -40,6 +40,26 @@ module DDS
         authenticate!
         Template.all
       end
+
+      desc 'View metadata template details' do
+        detail 'Returns the metadata template details for a given UUID.'
+        named 'view metadata template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [404, 'Metadata Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata template UUID'
+      end
+      get '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        template
+      end
+
     end
   end
 end
