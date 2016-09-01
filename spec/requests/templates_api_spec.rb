@@ -76,7 +76,32 @@ describe DDS::V1::TemplatesAPI do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
+        name: payload_name,
+        label: resource_stub.label,
+        description: resource_stub.description
       }}
+      let(:payload_name) { resource_stub.name }
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an annotate_audits endpoint'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
+      it_behaves_like 'an authorized resource' do
+        let!(:resource_id) { other_template.id }
+      end
+
+      context 'with blank name' do
+        let(:payload_name) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with existing name' do
+        let(:payload_name) { other_template.name }
+        it_behaves_like 'a validated resource'
+      end
+
     end
 
     describe 'DELETE' do
