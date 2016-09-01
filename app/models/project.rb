@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
+  include RequestAudited
   audited
 
   belongs_to :creator, class_name: "User"

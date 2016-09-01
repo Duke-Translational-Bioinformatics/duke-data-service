@@ -5,6 +5,7 @@ require 'rails/all'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+require 'neo4j/railtie'
 
 module DukeDataService
   class Application < Rails::Application
@@ -21,7 +22,9 @@ module DukeDataService
     # config.i18n.default_locale = :de
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    if Rails.version < '5.0.0'
+      config.active_record.raise_in_transactional_callbacks = true
+    end
     config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
     config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
 
@@ -29,7 +32,7 @@ module DukeDataService
     cors_origins = '*'
     cors_origins = ENV['CORS_ORIGINS'].split(',') if ENV['CORS_ORIGINS']
 
-    config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
+    config.middleware.insert_before 0, Rack::Cors, :debug => true, :logger => (-> { Rails.logger }) do
       allow do
         origins cors_origins
 
@@ -39,5 +42,8 @@ module DukeDataService
           :max_age => 0
       end
     end
+    # Neo4j using Graph Story
+    config.neo4j.session_type = :server_db
+    config.neo4j.session_path = ENV["GRAPHSTORY_URL"]
   end
 end

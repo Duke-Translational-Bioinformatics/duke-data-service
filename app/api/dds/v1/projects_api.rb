@@ -25,17 +25,11 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id,
         })
-        Audited.audit_class.as_user(current_user) do
-          if project.save
-            pre_permission_audit = project.audits.last
-            last_permission = project.set_project_admin
-            post_permission_audit = project.audits.last
-            last_permission_audit = last_permission.audits.last
-            annotate_audits [pre_permission_audit, post_permission_audit, last_permission_audit]
-            project
-          else
-            validation_error!(project)
-          end
+        if project.save
+          project.set_project_admin
+          project
+        else
+          validation_error!(project)
         end
       end
 
@@ -91,16 +85,13 @@ module DDS
       end
       put '/projects/:id', root: false do
         authenticate!
-        project_params = declared(params, include_missing: false)
+        project_params = declared(params, {include_missing: false}, [:name, :description])
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :update?
-        Audited.audit_class.as_user(current_user) do
-          if project.update(project_params.merge(etag: SecureRandom.hex))
-            annotate_audits [project.audits.last]
-            project
-          else
-            validation_error!(project)
-          end
+        if project.update(project_params.merge(etag: SecureRandom.hex))
+          project
+        else
+          validation_error!(project)
         end
       end
 
@@ -121,10 +112,7 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          project.update(is_deleted: true)
-          annotate_audits [project.audits.last]
-        end
+        project.update(is_deleted: true)
         body false
       end
     end

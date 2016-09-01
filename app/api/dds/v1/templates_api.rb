@@ -1,0 +1,94 @@
+module DDS
+  module V1
+    class TemplatesAPI < Grape::API
+      desc 'Create template' do
+        detail 'Creates a template.'
+        named 'create template'
+        failure [
+          [200, 'This will never happen'],
+          [201, 'Successfully Created'],
+          [400, 'Validation error'],
+          [401, 'Unauthorized']
+        ]
+      end
+      params do
+        requires :name, type: String, desc: "The unique name of the template"
+        requires :label, type: String, desc: "A short display label for the template"
+        optional :description, type: String, desc: "A verbose description of the template"
+      end
+      post '/templates', root: false do
+        authenticate!
+        template_params = declared(params, {include_missing: false}, [:name, :label, :description])
+        template = Template.new(template_params)
+        template.creator = current_user
+        if template.save
+          template
+        else
+          validation_error!(template)
+        end
+      end
+
+      desc 'List templates' do
+        detail 'List templates.'
+        named 'list templates'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      get '/templates', root: 'results' do
+        authenticate!
+        Template.all
+      end
+
+      desc 'View metadata template details' do
+        detail 'Returns the metadata template details for a given UUID.'
+        named 'view metadata template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [404, 'Metadata Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata template UUID'
+      end
+      get '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        template
+      end
+
+      desc 'Update metadata template' do
+        detail 'Updates metadata template UUID.'
+        named 'update metadata template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [400, 'Validation Error'],
+          [404, 'Metadata template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata template UUID'
+        optional :name, type: String, desc: 'The Name of the Metadata template'
+        optional :label, type: String, desc: 'The Label of the Metadata template'
+        optional :description, type: String, desc: 'The Description of the Metadata template'
+      end
+      put '/templates/:id', root: false do
+        authenticate!
+        template_params = declared(params, {include_missing: false}, [:name, :label, :description])
+        template =  Template.find(params[:id])
+        authorize template, :update?
+        if template.update(template_params)
+          template
+        else
+          validation_error!(template)
+        end
+      end
+
+    end
+  end
+end

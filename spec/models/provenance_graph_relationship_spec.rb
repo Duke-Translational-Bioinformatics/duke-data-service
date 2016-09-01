@@ -1,0 +1,53 @@
+require 'rails_helper'
+
+RSpec.describe ProvenanceGraphRelationship do
+  # (activity)-(used)->(focus)
+  let!(:focus) {
+    FactoryGirl.create(:file_version, label: "FOCUS")
+  }
+
+  let!(:activity) { FactoryGirl.create(:activity, name: "ACTIVITY") }
+  let!(:activity_used_focus) {
+    FactoryGirl.create(:used_prov_relation,
+      relatable_from: activity,
+      relatable_to: focus
+    )
+  }
+  let!(:relationship) { activity_used_focus.graph_relation }
+  subject{ ProvenanceGraphRelationship.new(relationship) }
+
+  it { expect(described_class).to include(ActiveModel::Serialization) }
+  it { expect(described_class).to include(Comparable) }
+
+  it { is_expected.to respond_to( "id" ) }
+  it { is_expected.to respond_to("type") }
+  it { is_expected.to respond_to("start_node") }
+  it { is_expected.to respond_to("end_node") }
+  it { is_expected.to respond_to( "properties" ) }
+  it { is_expected.to respond_to( "properties=" ) }
+
+  it { expect(subject.id).to eq(activity_used_focus.id) }
+  it { expect(subject.type).to eq(relationship.type) }
+  it { expect(subject.start_node).to eq(relationship.from_node.model_id) }
+  it { expect(subject.end_node).to eq(relationship.to_node.model_id) }
+  it {
+    expect(subject.properties).to be_nil
+    subject.properties = activity_used_focus
+    expect(subject.properties).not_to be_nil
+    expect(subject.properties).to eq(activity_used_focus)
+  }
+
+  context 'initialization' do
+    it {
+      expect{
+        described_class.new
+      }.to raise_error(ArgumentError)
+    }
+
+    it {
+      expect{
+        described_class.new(relationship)
+      }.not_to raise_error
+    }
+  end
+end

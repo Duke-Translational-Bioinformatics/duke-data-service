@@ -1,8 +1,8 @@
 class DataFileSerializer < ActiveModel::Serializer
   include AuditSummarySerializer
-  attributes :kind, :id, :parent, :name, :label, :audit, :is_deleted
+  attributes :kind, :id, :parent, :name, :audit, :is_deleted
 
-  has_one :upload, serializer: UploadPreviewSerializer
+  has_one :current_file_version, serializer: FileVersionPreviewSerializer, root: :current_version
   has_one :project, serializer: ProjectPreviewSerializer
   has_many :ancestors, serializer: AncestorSerializer
 

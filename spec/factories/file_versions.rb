@@ -3,7 +3,7 @@ FactoryGirl.define do
     data_file
     label { Faker::Hacker.say_something_smart }
     is_deleted false
-    association :upload, :completed
+    association :upload, :completed, :with_fingerprint
 
     trait :deleted do
       is_deleted true

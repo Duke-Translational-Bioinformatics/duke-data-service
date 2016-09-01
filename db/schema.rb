@@ -11,11 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160329164550) do
+ActiveRecord::Schema.define(version: 20160826200027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
+
+  create_table "activities", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.uuid     "creator_id"
+    t.datetime "started_on"
+    t.datetime "ended_on"
+    t.boolean  "is_deleted",  default: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
 
   create_table "affiliations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "project_id"
@@ -94,7 +105,6 @@ ActiveRecord::Schema.define(version: 20160329164550) do
     t.string   "type"
     t.uuid     "parent_id"
     t.uuid     "project_id"
-    t.uuid     "creator_id"
     t.uuid     "upload_id"
     t.boolean  "is_deleted", default: false
     t.datetime "created_at",                 null: false
@@ -110,6 +120,14 @@ ActiveRecord::Schema.define(version: 20160329164550) do
     t.boolean  "is_deleted",     default: false
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+  end
+
+  create_table "fingerprints", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "upload_id"
+    t.string   "algorithm"
+    t.string   "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "project_permissions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
@@ -138,6 +156,33 @@ ActiveRecord::Schema.define(version: 20160329164550) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
   end
+
+  create_table "properties", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "template_id"
+    t.string   "key"
+    t.string   "label"
+    t.text     "description"
+    t.string   "data_type"
+    t.boolean  "is_deprecated"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  create_table "prov_relations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "type"
+    t.uuid     "creator_id"
+    t.uuid     "relatable_from_id"
+    t.string   "relatable_from_type"
+    t.string   "relationship_type"
+    t.uuid     "relatable_to_id"
+    t.string   "relatable_to_type"
+    t.boolean  "is_deleted",          default: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "prov_relations", ["relatable_from_id"], name: "index_prov_relations_on_relatable_from_id", using: :btree
+  add_index "prov_relations", ["relatable_to_id"], name: "index_prov_relations_on_relatable_to_id", using: :btree
 
   create_table "software_agents", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.string   "name"
@@ -171,6 +216,24 @@ ActiveRecord::Schema.define(version: 20160329164550) do
     t.string   "auth_role_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+  end
+
+  create_table "tags", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "label"
+    t.string   "taggable_type"
+    t.uuid     "taggable_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  create_table "templates", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.string   "label"
+    t.text     "description"
+    t.boolean  "is_deprecated", default: false
+    t.uuid     "creator_id"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

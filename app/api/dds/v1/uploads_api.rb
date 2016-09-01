@@ -20,37 +20,26 @@ module DDS
             requires :name, type: String, desc: "The name of the client file to upload."
             requires :content_type, type: String, desc: "Valid Media Type"
             requires :size, type: Integer, desc: "The size in bytes"
-            optional :hash, type: Hash do
-              requires :value, type: String, desc: "The files hash computed by the client."
-              requires :algorithm, type: String, desc: "The hash algorithm used (i.e. md5, sha256, sha1, etc.)"
-            end
           end
           post '/uploads', root: false do
             authenticate!
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
             storage_provider = StorageProvider.first
-            Audited.audit_class.as_user(current_user) do
-              upload = project.uploads.build({
-                name: upload_params[:name],
-                size: upload_params[:size],
-                etag: SecureRandom.hex,
-                content_type: upload_params[:content_type],
-                storage_provider_id: storage_provider.id,
-                creator: current_user
-              })
-              if upload_params[:hash]
-                upload.fingerprint_value = upload_params[:hash][:value]
-                upload.fingerprint_algorithm = upload_params[:hash][:algorithm]
-              end
-              authorize upload, :create?
-              if upload.save
-                upload.initialize_storage_provider
-                annotate_audits [upload.audits.last]
-                upload
-              else
-                validation_error!(upload)
-              end
+            upload = project.uploads.build({
+              name: upload_params[:name],
+              size: upload_params[:size],
+              etag: SecureRandom.hex,
+              content_type: upload_params[:content_type],
+              storage_provider_id: storage_provider.id,
+              creator: current_user
+            })
+            authorize upload, :create?
+            if upload.save
+              upload.initialize_storage_provider
+              upload
+            else
+              validation_error!(upload)
             end
           end
 
@@ -121,21 +110,18 @@ module DDS
             authenticate!
             chunk_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
-            Audited.audit_class.as_user(current_user) do
-              chunk = Chunk.new({
-                upload_id: upload.id,
-                number: chunk_params[:number],
-                size: chunk_params[:size],
-                fingerprint_value: chunk_params[:hash][:value],
-                fingerprint_algorithm: chunk_params[:hash][:algorithm],
-              })
-              authorize chunk, :create?
-              if chunk.save
-                annotate_audits [chunk.audits.last, upload.audits.last]
-                chunk
-              else
-                validation_error!(chunk)
-              end
+            chunk = Chunk.new({
+              upload_id: upload.id,
+              number: chunk_params[:number],
+              size: chunk_params[:size],
+              fingerprint_value: chunk_params[:hash][:value],
+              fingerprint_algorithm: chunk_params[:hash][:algorithm],
+            })
+            authorize chunk, :create?
+            if chunk.save
+              chunk
+            else
+              validation_error!(chunk)
             end
           end
 
@@ -158,16 +144,52 @@ module DDS
             }
             error!(error_json, 400)
           end
+          params do
+            requires :hash, type: Hash do
+              requires :value, type: String, desc: "The entire file hash (computed by client)."
+              requires :algorithm, type: String, desc: "The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.)."
+            end
+          end
           put '/complete', root: false do
             authenticate!
             upload = Upload.find(params[:id])
             authorize upload, :complete?
-            Audited.audit_class.as_user(current_user) do
-              upload.etag = SecureRandom.hex
-              upload.complete
-              annotate_audits [upload.audits.last]
+            fingerprint_params = declared(params, include_missing: false)
+            upload.fingerprints_attributes = [fingerprint_params[:hash]]
+            upload.etag = SecureRandom.hex
+            if upload.complete
+              upload
+            else
+              validation_error!(upload)
             end
-            upload
+          end
+
+          desc 'Report upload hash' do
+            detail 'Report hash (fingerprint) for the uploaded (or to be uploaded) file.'
+            named 'report upload hash'
+            failure [
+              [200, 'Success'],
+              [401, 'Unauthorized'],
+              [404, 'Upload Does not Exist'],
+              [400, 'Validation Error'],
+              [500, 'Unexpected StorageProviderException experienced']
+            ]
+          end
+          params do
+            requires :value, type: String, desc: "The entire file hash (computed by client)."
+            requires :algorithm, type: String, desc: "The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.)."
+          end
+          put '/hashes', root: false do
+            authenticate!
+            fingerprint_params = declared(params, {include_missing: false}, [:value, :algorithm])
+            upload = Upload.find(params[:id])
+            authorize upload, :update?
+            fingerprint = upload.fingerprints.build(fingerprint_params)
+            if upload.save
+              upload
+            else
+              validation_error!(upload)
+            end
           end
         end
       end

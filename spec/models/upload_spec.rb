@@ -2,44 +2,57 @@ require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
   subject { FactoryGirl.create(:upload, :with_chunks) }
+  let(:fingerprint) { FactoryGirl.create(:fingerprint, upload: subject) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
+  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
 
   describe 'associations' do
-    it 'should belong_to a project' do
-      should belong_to :project
-    end
-
-    it 'should belong_to a storage_provider' do
-      should belong_to :storage_provider
-    end
-
-    it 'should have_many chunks' do
-      should have_many :chunks
-    end
-
-    it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:project)
-    end
-
-    it 'should belong to creator' do
-      should belong_to(:creator).class_name('User')
-    end
+    it { is_expected.to belong_to(:project) }
+    it { is_expected.to belong_to(:storage_provider) }
+    it { is_expected.to have_many(:chunks) }
+    it { is_expected.to have_many(:project_permissions).through(:project) }
+    it { is_expected.to belong_to(:creator).class_name('User') }
+    it { is_expected.to have_many(:fingerprints) }
   end
 
+  it { is_expected.to accept_nested_attributes_for(:fingerprints) }
+
   describe 'validations' do
-    it 'should require attributes' do
-      should validate_presence_of :project_id
-      should validate_presence_of :name
-      should validate_presence_of :size
-      should validate_presence_of :storage_provider_id
-      should validate_presence_of :creator_id
-    end
+    it { is_expected.to validate_presence_of :project_id }
+    it { is_expected.to validate_presence_of :name }
+    it { is_expected.to validate_presence_of :size }
+    it { is_expected.to validate_presence_of :storage_provider_id }
+    it { is_expected.to validate_presence_of :creator_id }
 
     it { is_expected.not_to validate_presence_of :fingerprint_value }
     it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
+
+    it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    it { is_expected.not_to validate_presence_of :fingerprints }
+
+    context 'when completed_at is set' do
+      before { subject.completed_at = Faker::Time.forward(1) }
+      it { is_expected.to validate_presence_of :fingerprints }
+    end
+
+    context 'when completed_at is nil' do
+      it { is_expected.not_to be_completed_at }
+      it { is_expected.not_to allow_value([fingerprint]).for(:fingerprints) }
+    end
+
+    context 'completed upload' do
+      subject { completed_upload }
+      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    end
+
+    context 'upload with error' do
+      subject { upload_with_error }
+      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    end
   end
 
   describe 'instance methods' do
@@ -106,6 +119,9 @@ RSpec.describe Upload, type: :model do
     end
 
     describe 'complete' do
+      let(:fingerprint_attributes) { FactoryGirl.attributes_for(:fingerprint) }
+      before { subject.fingerprints_attributes = [fingerprint_attributes] }
+
       it 'should be implemented' do
         is_expected.to respond_to 'complete'
       end
@@ -145,7 +161,7 @@ RSpec.describe Upload, type: :model do
               expect(is_complete).to be_truthy
             }.not_to raise_error
             subject.reload
-            expect(subject.completed_at).to be
+            expect(subject.completed_at).not_to be_nil
             expect(subject.error_at).to be_nil
             expect(subject.error_message).to be_nil
           end
@@ -156,9 +172,9 @@ RSpec.describe Upload, type: :model do
             subject.update_attribute(:size, subject.size - 1)
             expect { subject.complete }.to raise_error(IntegrityException)
             subject.reload
-            expect(subject.completed_at).to be
-            expect(subject.error_at).to be
-            expect(subject.error_message).to be
+            expect(subject.completed_at).to be_nil
+            expect(subject.error_at).not_to be_nil
+            expect(subject.error_message).not_to be_nil
           end
         end #with reported size
 
@@ -170,9 +186,9 @@ RSpec.describe Upload, type: :model do
               subject.complete
             }.to raise_error(IntegrityException)
             subject.reload
-            expect(subject.completed_at).to be
-            expect(subject.error_at).to be
-            expect(subject.error_message).to be
+            expect(subject.completed_at).to be_nil
+            expect(subject.error_at).not_to be_nil
+            expect(subject.error_message).not_to be_nil
           end
         end #with reported chunk
 

@@ -38,21 +38,24 @@ shared_context 'with software_agent authentication' do
 end
 
 shared_examples 'a listable resource' do
-  let(:expected_list_length) { resource_class.all.count }
+  let(:expected_resources) { resource_class.all }
+  let(:serializable_resource) { resource }
+  let(:expected_list_length) { expected_resources.count }
   let(:unexpected_resources) { [] }
+  let(:expected_response_status) { 200 }
   before do
     expect(resource).to be_persisted
   end
   it 'should return a list that includes a serialized resource' do
-    is_expected.to eq(200)
-    expect(response.status).to eq(200)
+    is_expected.to eq(expected_response_status)
+    expect(response.status).to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
-    expect(response.body).to include(resource_serializer.new(resource).to_json)
+    expect(response.body).to include(resource_serializer.new(serializable_resource).to_json)
   end
 
   it 'should include the expected number of results' do
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     response_json = JSON.parse(response.body)
     expect(response_json).to have_key('results')
     returned_results = response_json['results']
@@ -62,7 +65,7 @@ shared_examples 'a listable resource' do
 
   it 'should not include unexpected resources' do
     expect(unexpected_resources).to be_a(Array)
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     unexpected_resources.each do |unexpected_resource|
       expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
     end
@@ -80,14 +83,16 @@ shared_examples 'a searchable resource' do
   it 'should include expected resources' do
     is_expected.to eq(200)
     expected_resources.each do |expected_resource|
-      expect(response.body).to include(resource_serializer.new(expected_resource).to_json)
+      expect(response.body).to include(ActiveModel::Serializer.serializer_for(
+        expected_resource).new(expected_resource).to_json)
     end
   end
 
   it 'should not include unexpected resources' do
     is_expected.to eq(200)
     unexpected_resources.each do |unexpected_resource|
-      expect(response.body).not_to include(resource_serializer.new(unexpected_resource).to_json)
+      expect(response.body).not_to include(ActiveModel::Serializer.serializer_for(
+        unexpected_resource).new(unexpected_resource).to_json)
     end
   end
 end
@@ -147,6 +152,7 @@ shared_examples 'a storage_provider backed resource' do
 
   it 'should return a 500 error and JSON error when a StorageProviderException is experienced' do
     storage_provider.update_attribute(:url_root, "http://257.1.1.1")
+    stub_request(:any, "#{storage_provider.url_root}#{storage_provider.auth_uri}").to_timeout
     is_expected.to eq(500)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -337,6 +343,21 @@ shared_examples 'an identified resource' do
     expect(response_json['reason']).to eq("#{resource_class} Not Found")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq(expected_suggestion)
+  end
+end
+
+shared_examples 'a kinded resource' do
+  it 'should return 404 with error when resource not found with id' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("object_kind #{resource_kind} Not Supported")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
   end
 end
 

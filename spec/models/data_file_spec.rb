@@ -15,28 +15,24 @@ RSpec.describe DataFile, type: :model do
   it_behaves_like 'a kind' do
     let!(:kind_name) { 'file' }
   end
-
+  it_behaves_like 'a logically deleted model'
+  
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
-    it { is_expected.to belong_to(:creator).class_name('User') }
-    it { is_expected.to have_many(:file_versions) }
+    it { is_expected.to have_many(:file_versions).order('version_number ASC').autosave(true) }
+    it { is_expected.to have_many(:tags) }
   end
 
   describe 'validations' do
-    let(:completed_upload) { FactoryGirl.create(:upload, :completed, creator: subject.creator, project: subject.project) }
-    let(:incomplete_upload) { FactoryGirl.create(:upload, creator: subject.creator, project: subject.project) }
-    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, creator: subject.creator, project: subject.project) }
-    let(:not_creator_of_upload) { FactoryGirl.create(:upload, :completed, project: subject.project) }
-    it 'should have a name' do
-      should validate_presence_of(:name)
-    end
+    let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+    let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
+    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
 
-    it 'should have a project_id' do
-      should validate_presence_of(:project_id)
-    end
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:project_id) }
 
     it 'should not allow project_id to be changed' do
       should allow_value(project).for(:project)
@@ -74,10 +70,6 @@ RSpec.describe DataFile, type: :model do
       expect(subject.errors[:upload]).to include('must be completed successfully')
     end
 
-    it 'should require a creator_id' do
-      should validate_presence_of :creator_id
-    end
-
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
       should allow_value(false).for(:is_deleted)
@@ -88,7 +80,7 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
       it { is_expected.not_to validate_presence_of(:upload_id) }
-      it { is_expected.not_to validate_presence_of(:creator_id) }
+      it { expect(deleted_file.file_versions).to all( be_is_deleted ) }
     end
   end
 
@@ -149,35 +141,106 @@ RSpec.describe DataFile, type: :model do
       end
     end
 
+    describe '#current_file_version' do
+      it { is_expected.to respond_to(:current_file_version) }
+      it { expect(subject.current_file_version).to be_persisted }
+      it { expect(subject.current_file_version).to eq subject.current_file_version }
+
+      context 'with unsaved file_version' do
+        before { subject.build_file_version }
+        it { expect(subject.current_file_version).not_to be_persisted }
+        it { expect(subject.current_file_version).to eq subject.current_file_version }
+      end
+
+      context 'with multiple file_versions' do
+        let(:last_file_version) { FactoryGirl.create(:file_version, data_file: subject) }
+        before do
+          expect(last_file_version).to be_persisted
+          subject.reload
+        end
+        it { expect(subject.current_file_version).to eq last_file_version }
+      end
+    end
+
     describe '#build_file_version' do
       it { is_expected.to respond_to(:build_file_version) }
       it { expect(subject.build_file_version).to be_a FileVersion }
       it 'builds a file_version' do
-        expect { 
+        expect {
           subject.build_file_version
         }.to change{subject.file_versions.length}.by(1)
       end
-      it { expect(subject.build_file_version.label).to eq subject.label }
-      it { expect(subject.build_file_version.upload).to eq subject.upload }
+    end
 
-      context 'after subject attributes changed' do
+    describe '#set_current_file_version_attributes' do
+      let(:latest_version) { subject.current_file_version }
+      it { is_expected.to respond_to(:set_current_file_version_attributes) }
+      it { expect(subject.set_current_file_version_attributes).to be_a FileVersion }
+      it { expect(subject.set_current_file_version_attributes).to eq latest_version }
+      context 'with persisted file_version' do
+        it { expect(latest_version).to be_persisted }
+        it { expect(subject.set_current_file_version_attributes.changed?).to be_falsey }
+      end
+      context 'with new file_version' do
+        before { subject.build_file_version }
+        it { expect(subject.set_current_file_version_attributes.changed?).to be_truthy }
+        it { expect(subject.set_current_file_version_attributes.upload).to eq subject.upload }
+        it { expect(subject.set_current_file_version_attributes.label).to eq subject.label }
+      end
+    end
+
+    describe '#new_file_version_needed?' do
+      it { is_expected.to respond_to(:new_file_version_needed?) }
+      it { expect(subject.upload_id_changed?).to be_falsey }
+      it { expect(subject.new_file_version_needed?).to be_falsey }
+
+      context 'when upload changed' do
         let!(:original_upload) { subject.upload }
-        let!(:original_label) { subject.label }
-        let(:new_upload) { FactoryGirl.create(:upload, :completed) }
-        let(:new_label) { Faker::Hacker.say_something_smart }
-        before do
-          subject.upload = new_upload
-          subject.label = new_label
+        let(:new_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
+        before { subject.upload = new_upload }
+        it { expect(subject.current_file_version).to be_persisted }
+        it { expect(subject.upload_id_changed?).to be_truthy }
+        it { expect(subject.new_file_version_needed?).to be_truthy }
+
+        context 'after call to build_file_version' do
+          before { subject.build_file_version }
+          it { expect(subject.current_file_version).not_to be_persisted }
+          it { expect(subject.upload_id_changed?).to be_truthy }
+          it { expect(subject.new_file_version_needed?).to be_falsey }
         end
-        it { expect(subject.build_file_version.upload).not_to eq new_upload }
-        it { expect(subject.build_file_version.label).not_to eq new_label }
-        it { expect(subject.build_file_version.upload).to eq original_upload }
-        it { expect(subject.build_file_version.label).to eq original_label }
+      end
+
+      context 'when current_file_version.upload differs' do
+        let(:different_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
+        before do
+          subject.current_file_version.update_attribute(:upload, different_upload)
+          subject.reload
+        end
+        it { expect(subject.current_file_version).to be_persisted }
+        it { expect(subject.current_file_version.upload).not_to eq subject.upload }
+        it { expect(subject.new_file_version_needed?).to be_truthy }
+      end
+
+      context 'before subject is created' do
+        subject { FactoryGirl.build(:data_file) }
+
+        it { is_expected.not_to be_persisted }
+        context 'without file_versions' do
+          it { expect(subject.file_versions).to be_empty }
+          it { expect(subject.new_file_version_needed?).to be_truthy }
+        end
+        context 'with a file_version' do
+          before { subject.build_file_version }
+          it { expect(subject.file_versions).not_to be_empty }
+          it { expect(subject.new_file_version_needed?).to be_falsey }
+        end
       end
     end
   end
 
   describe 'callbacks' do
-    it { is_expected.to callback(:build_file_version).before(:update).if(:upload_id_changed?) }
+    it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
+    it { is_expected.to callback(:build_file_version).before(:save).if(:new_file_version_needed?) }
+    it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 end
