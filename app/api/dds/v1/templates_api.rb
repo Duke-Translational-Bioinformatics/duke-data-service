@@ -60,6 +60,27 @@ module DDS
         template
       end
 
+      desc 'Delete a metadata template' do
+        detail 'Deletes a metadata template.'
+        named 'delete metadata template'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [404, 'Metadata Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata Template UUID'
+      end
+      delete '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        authorize template, :destroy?
+        template.destroy
+        body false
+      end
+
     end
   end
 end
