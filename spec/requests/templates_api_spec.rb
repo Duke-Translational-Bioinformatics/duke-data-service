@@ -3,8 +3,7 @@ require 'rails_helper'
 describe DDS::V1::TemplatesAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:template) { FactoryGirl.create(:template) }
+  let(:template) { FactoryGirl.create(:template, creator: current_user) }
   let(:template_stub) { FactoryGirl.build(:template) }
   let(:other_template) { FactoryGirl.create(:template) }
   let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
@@ -53,6 +52,10 @@ describe DDS::V1::TemplatesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'a software_agent accessible resource'
     end
   end
 
