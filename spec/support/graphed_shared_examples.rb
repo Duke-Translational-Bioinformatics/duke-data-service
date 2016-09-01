@@ -91,7 +91,7 @@ shared_examples 'a graphed relation' do |auto_create: false|
   #let(:to_model) { activerecordmodel }
   let(:from_node) { from_model.graph_node }
   let(:to_node) { to_model.graph_node }
-  let(:graphed_relation) { from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
+  let(:graphed_relation) { from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
 
   context 'create_graph_relation' do
     it 'should support create_graph_relation method' do
@@ -112,9 +112,9 @@ shared_examples 'a graphed relation' do |auto_create: false|
     end
     it 'should return the graphed relation of rel_type between from_model.graph_node and to_model.graph_node' do
       expect(subject).to be
-      expect(from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
       expect(subject.graph_relation).to be
-      expect(from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
       graphed_relation = subject.graph_relation
       expect(graphed_relation.model_id).to eq(subject.id)
       expect(graphed_relation.model_kind).to eq(subject.kind)
@@ -131,9 +131,9 @@ shared_examples 'a graphed relation' do |auto_create: false|
       expect(subject).to be
       expect(from_model.graph_node).to be
       expect(to_model.graph_node).to be
-      expect(from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(0)
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(0)
       expect(subject.create_graph_relation).to be
-      expect(from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
       expect(subject.graph_relation.from_node.model_id).to eq(from_model.id)
       graphed_relation = subject.graph_relation
       expect(graphed_relation.model_id).to eq(subject.id)
@@ -159,7 +159,7 @@ shared_examples 'a graphed relation' do |auto_create: false|
       expect(subject).to be
       expect(graphed_relation).to be
       subject.destroy
-      expect(from_node.query_as(:from).match("from-[r:#{rel_type}]->to").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first).not_to be
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first).not_to be
     end
   end
 end #a graphed relation
