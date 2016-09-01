@@ -27,6 +27,19 @@ module DDS
           validation_error!(template)
         end
       end
+
+      desc 'List templates' do
+        detail 'List templates.'
+        named 'list templates'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      get '/templates', root: 'results' do
+        authenticate!
+        Template.all
+      end
     end
   end
 end
