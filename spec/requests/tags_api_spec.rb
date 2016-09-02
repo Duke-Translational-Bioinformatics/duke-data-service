@@ -23,15 +23,14 @@ describe DDS::V1::TagsAPI do
   let(:resource_stub) { tag_stub }
 
   describe 'Tags collection' do
-    let(:url) { "/api/v1/tags" }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}" }
+    let(:file_id) { data_file.id }
+    let(:resource_kind) { data_file.kind }
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
-      let(:resource_kind) { data_file.kind }
-      let(:taggable_object) {{ kind: resource_kind, id: data_file.id }}
       let!(:payload) {{
-        object: taggable_object,
         label: payload_label
       }}
       let(:payload_label) { resource_stub.label }
@@ -49,7 +48,7 @@ describe DDS::V1::TagsAPI do
       end
 
       it_behaves_like 'an identified resource' do
-        let(:taggable_object) {{ kind: resource_kind, id: 'notfoundid' }}
+        let(:file_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
       end
 
@@ -68,12 +67,7 @@ describe DDS::V1::TagsAPI do
         it_behaves_like 'a validated resource'
       end
     end
-  end
 
-  describe 'Tag collection for object'  do
-    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}" }
-    let(:file_id) { data_file.id }
-    let(:resource_kind) { data_file.kind }
     describe 'GET' do
       subject { get(url, nil, headers) }
 
