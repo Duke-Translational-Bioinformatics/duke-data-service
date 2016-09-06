@@ -3,8 +3,9 @@ require 'rails_helper'
 describe DDS::V1::PropertiesAPI do
   include_context 'with authentication'
 
-  let(:template) { FactoryGirl.create(:template) }
+  let(:template) { property.template }
   let(:property) { FactoryGirl.create(:property) }
+  let(:other_property) { FactoryGirl.create(:property) }
   let(:property_stub) { FactoryGirl.build(:property) }
   let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
 
@@ -55,6 +56,19 @@ describe DDS::V1::PropertiesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_property
+        ] }
+      end
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:template_id) { "notexist" }
+        let(:resource_class) { Template }
+      end
     end
   end
 
