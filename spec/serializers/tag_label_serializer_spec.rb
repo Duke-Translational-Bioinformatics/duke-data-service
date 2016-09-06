@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TagLabelSerializer, type: :serializer do
   let!(:tag) { FactoryGirl.create(:tag) }
-  let(:resource) { Tag.label_count.first }
+  let(:resource) { Tag.tag_labels.first }
 
   it_behaves_like 'a json serializer' do
     it 'should have expected keys and values' do
