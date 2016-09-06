@@ -48,6 +48,25 @@ module DDS
         template = Template.find(params[:template_id])
         template.properties
       end
+
+      desc 'View property details' do
+        detail 'Returns the property details for a given UUID.'
+        named 'view property'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (property restricted)'],
+          [404, 'Property Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Property UUID'
+      end
+      get '/template_properties/:id', root: false do
+        authenticate!
+        property = Property.find(params[:id])
+        property
+      end
     end
   end
 end
