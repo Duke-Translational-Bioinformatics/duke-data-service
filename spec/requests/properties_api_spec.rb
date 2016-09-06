@@ -77,6 +77,12 @@ describe DDS::V1::PropertiesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
+      it_behaves_like 'a software_agent accessible resource'
     end
 
     describe 'PUT' do
