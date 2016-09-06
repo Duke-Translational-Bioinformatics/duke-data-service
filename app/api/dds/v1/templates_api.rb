@@ -40,6 +40,75 @@ module DDS
         authenticate!
         Template.all
       end
+
+      desc 'View metadata template details' do
+        detail 'Returns the metadata template details for a given UUID.'
+        named 'view metadata template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [404, 'Metadata Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata template UUID'
+      end
+      get '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        template
+      end
+
+      desc 'Update metadata template' do
+        detail 'Updates metadata template UUID.'
+        named 'update metadata template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [400, 'Validation Error'],
+          [404, 'Metadata template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata template UUID'
+        optional :name, type: String, desc: 'The Name of the Metadata template'
+        optional :label, type: String, desc: 'The Label of the Metadata template'
+        optional :description, type: String, desc: 'The Description of the Metadata template'
+      end
+      put '/templates/:id', root: false do
+        authenticate!
+        template_params = declared(params, {include_missing: false}, [:name, :label, :description])
+        template =  Template.find(params[:id])
+        authorize template, :update?
+        if template.update(template_params)
+          template
+        else
+          validation_error!(template)
+        end
+      end
+
+      desc 'Delete a metadata template' do
+        detail 'Deletes a metadata template.'
+        named 'delete metadata template'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (metadata_template restricted)'],
+          [404, 'Metadata Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Metadata Template UUID'
+      end
+      delete '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        authorize template, :destroy?
+        template.destroy
+        body false
+      end
     end
   end
 end
