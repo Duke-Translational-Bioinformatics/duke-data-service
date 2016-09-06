@@ -106,7 +106,7 @@ module DDS
           object_kind = KindnessFactory.by_kind(tag_params[:object_kind])
           scoped_tags = scoped_tags.where(taggable: object_kind.all)
         end
-        scoped_tags.label_count
+        scoped_tags.tag_labels
       end
 
       desc 'View tag' do
