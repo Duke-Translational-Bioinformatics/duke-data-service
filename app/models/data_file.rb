@@ -64,4 +64,20 @@ class DataFile < Container
       current_file_version.upload != upload &&
       current_file_version.persisted?
   end
+
+  settings index: { number_of_shards: 1 } do
+    mappings dynamic: 'false' do
+      indexes :id
+      indexes :name
+      indexes :is_deleted, type: "boolean"
+      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :label
+      indexes :tags do
+        indexes :label, type: "string", fields: {
+          raw: {type: "string", index: "not_analyzed"}
+        }
+      end
+    end
+  end
 end

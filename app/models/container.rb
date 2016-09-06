@@ -6,6 +6,10 @@ class Container < ActiveRecord::Base
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
+  def as_indexed_json(options={})
+    self.as_json(include: {tags: {only: :label}})
+  end
+
   audited
   belongs_to :project
 	belongs_to :parent, class_name: "Folder"
@@ -37,9 +41,5 @@ class Container < ActiveRecord::Base
 
   def set_project_to_parent_project
     self.project = self.parent.project if self.parent
-  end
-
-  def as_indexed_json(options={})
-    self.as_json(include: {tags: {only: :label}})
   end
 end
