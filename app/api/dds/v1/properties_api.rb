@@ -34,6 +34,20 @@ module DDS
           validation_error!(property)
         end
       end
+
+      desc 'List properties' do
+        detail 'List properties.'
+        named 'list properties'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized']
+        ]
+      end
+      get '/templates/:template_id/properties', root: 'results' do
+        authenticate!
+        template = Template.find(params[:template_id])
+        template.properties
+      end
     end
   end
 end
