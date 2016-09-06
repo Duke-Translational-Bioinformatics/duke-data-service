@@ -13,17 +13,13 @@ module DDS
         ]
       end
       params do
-        requires :object, type: Hash do
-          requires :kind, type: String, desc: "The kind of object to tag"
-          requires :id, type: String, desc: "The unique id of object to tag"
-        end
         requires :label
       end
-      post '/tags', root: false do
+      post '/tags/:object_kind/:object_id', root: false do
         authenticate!
         tag_params = declared(params, include_missing: false)
-        object_kind = KindnessFactory.by_kind(tag_params[:object][:kind])
-        taggable_object = object_kind.find(tag_params[:object][:id])
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        taggable_object = object_kind.find(params[:object_id])
         tag = Tag.new(
           label: tag_params[:label],
           taggable: taggable_object
@@ -110,7 +106,7 @@ module DDS
           object_kind = KindnessFactory.by_kind(tag_params[:object_kind])
           scoped_tags = scoped_tags.where(taggable: object_kind.all)
         end
-        scoped_tags.label_count
+        scoped_tags.tag_labels
       end
 
       desc 'View tag' do
