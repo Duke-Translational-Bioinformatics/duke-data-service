@@ -41,18 +41,18 @@ module DDS
         Template.all
       end
 
-      desc 'View metadata template details' do
-        detail 'Returns the metadata template details for a given UUID.'
-        named 'view metadata template'
+      desc 'View template details' do
+        detail 'Returns the template details for a given UUID.'
+        named 'view template'
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (metadata_template restricted)'],
-          [404, 'Metadata Template Does not Exist']
+          [403, 'Forbidden (template restricted)'],
+          [404, 'Template Does not Exist']
         ]
       end
       params do
-        requires :id, type: String, desc: 'Metadata template UUID'
+        requires :id, type: String, desc: 'Template UUID'
       end
       get '/templates/:id', root: false do
         authenticate!
@@ -60,22 +60,22 @@ module DDS
         template
       end
 
-      desc 'Update metadata template' do
-        detail 'Updates metadata template UUID.'
-        named 'update metadata template'
+      desc 'Update template' do
+        detail 'Updates template UUID.'
+        named 'update template'
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (metadata_template restricted)'],
+          [403, 'Forbidden (template restricted)'],
           [400, 'Validation Error'],
-          [404, 'Metadata template Does not Exist']
+          [404, 'Template Does not Exist']
         ]
       end
       params do
-        requires :id, type: String, desc: 'Metadata template UUID'
-        optional :name, type: String, desc: 'The Name of the Metadata template'
-        optional :label, type: String, desc: 'The Label of the Metadata template'
-        optional :description, type: String, desc: 'The Description of the Metadata template'
+        requires :id, type: String, desc: 'Template UUID'
+        optional :name, type: String, desc: 'The Name of the template'
+        optional :label, type: String, desc: 'The Label of the template'
+        optional :description, type: String, desc: 'The Description of the template'
       end
       put '/templates/:id', root: false do
         authenticate!
@@ -89,18 +89,18 @@ module DDS
         end
       end
 
-      desc 'Delete a metadata template' do
-        detail 'Deletes a metadata template.'
-        named 'delete metadata template'
+      desc 'Delete a template' do
+        detail 'Deletes a template.'
+        named 'delete template'
         failure [
           [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (metadata_template restricted)'],
-          [404, 'Metadata Template Does not Exist']
+          [403, 'Forbidden (template restricted)'],
+          [404, 'Template Does not Exist']
         ]
       end
       params do
-        requires :id, type: String, desc: 'Metadata Template UUID'
+        requires :id, type: String, desc: 'Template UUID'
       end
       delete '/templates/:id', root: false do
         authenticate!
