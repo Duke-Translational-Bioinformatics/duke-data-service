@@ -68,21 +68,21 @@ module DDS
         property
       end
 
-      desc 'Update property' do
-        detail 'Updates property for given UUID.'
-        named 'update property'
+      desc 'Update template property' do
+        detail 'Updates template property for given UUID.'
+        named 'update template property'
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [403, 'Forbidden (property restricted)'],
+          [403, 'Forbidden (template property restricted)'],
           [400, 'Validation Error'],
           [404, 'Property Does not Exist']
         ]
       end
       params do
-        optional :key, type: String, desc: "The unique key of the property"
-        optional :label, type: String, desc: "A short display label for the property"
-        optional :description, type: String, desc: "A verbose description of the property"
+        optional :key, type: String, desc: "The unique key of the template property"
+        optional :label, type: String, desc: "A short display label for the template property"
+        optional :description, type: String, desc: "A verbose description of the template property"
         optional :type, type: String, desc: "The datatype of the key’s value; currenty only the Elasticsearch core datatypes are supported"
       end
       put '/template_properties/:id', root: false do
