@@ -28,9 +28,15 @@ class Tag < ActiveRecord::Base
     where("label LIKE ?", "%#{label_contains}%")
   end
 
-  def self.label_count
-    unscope(:order).select(:label).group(:label).count.collect do |l|
-      TagLabel.new(label: l.first, count: l.second)
+  def self.label_group
+    unscope(:order).select(:label).group(:label)
+  end
+
+  def self.tag_labels
+    maxes = label_group.maximum(:created_at)
+    counts = label_group.count
+    counts.keys.collect do |l|
+      TagLabel.new(label: l, count: counts[l], last_used_on: maxes[l])
     end
   end
 end

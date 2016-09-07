@@ -177,8 +177,8 @@ describe DDS::V1::TagsAPI do
     let(:query_params) { '' }
     let(:resource_class) { TagLabel }
     let(:resource_serializer) { TagLabelSerializer }
-    let!(:resource_tag_label) { TagLabel.new(label: resource.label, count: 1) }
-    let!(:not_allowed_tag_label) { TagLabel.new(label: not_allowed_tag.label, count: 1) }
+    let!(:resource_tag_label) { Tag.where(label: resource.label).tag_labels.first }
+    let!(:not_allowed_tag_label) { Tag.where(label: not_allowed_tag.label).tag_labels.first }
     describe 'GET' do
       subject { get(url, nil, headers) }
 
@@ -220,9 +220,8 @@ describe DDS::V1::TagsAPI do
       context 'with label_contains parameter' do
         let(:label_query) { SecureRandom.hex }
         let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: data_file) }
-        let(:resource_tag_label) { TagLabel.new(label: resource.label, count: 1) }
         let!(:diff_tag) { FactoryGirl.create(:tag, taggable: data_file) }
-        let!(:diff_tag_label) { TagLabel.new(label: diff_tag.label, count: 1) }
+        let!(:diff_tag_label) { Tag.where(label: diff_tag.label).tag_labels.first }
         let(:query_params) { "?label_contains=#{label_query}" }
 
         it_behaves_like 'a listable resource' do
