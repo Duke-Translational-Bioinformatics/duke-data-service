@@ -6,10 +6,6 @@ class Container < ActiveRecord::Base
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
-  def as_indexed_json(options={})
-    self.as_json(include: {tags: {only: :label}})
-  end
-
   audited
   belongs_to :project
 	belongs_to :parent, class_name: "Folder"

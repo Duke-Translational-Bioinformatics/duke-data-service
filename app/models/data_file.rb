@@ -65,6 +65,10 @@ class DataFile < Container
       current_file_version.persisted?
   end
 
+  def as_indexed_json(options={})
+    self.as_json(include: {tags: {only: :label}})
+  end
+
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
       indexes :id
