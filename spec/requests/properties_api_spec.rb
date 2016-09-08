@@ -89,7 +89,32 @@ describe DDS::V1::PropertiesAPI do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
+        key: payload_key,
+        label: resource_stub.label,
+        description: resource_stub.description,
+        type: resource_stub.data_type
       }}
+      let(:payload_key) { resource_stub.key }
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an updatable resource'
+      it_behaves_like 'an authorized resource' do
+        let(:resource) { other_property }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'with blank key' do
+        let(:payload_key) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with existing key' do
+        let(:payload_key) { other_property.key }
+        it_behaves_like 'a validated resource'
+      end
     end
 
     describe 'DELETE' do
