@@ -97,6 +97,27 @@ module DDS
           validation_error!(property)
         end
       end
+
+      desc 'Delete a template property' do
+        detail 'Deletes a template property.'
+        named 'delete template property'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (template property restricted)'],
+          [404, 'Template Property Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Template property UUID'
+      end
+      delete '/template_properties/:id', root: false do
+        authenticate!
+        property = Property.find(params[:id])
+        authorize property, :destroy?
+        property.destroy
+        body false
+      end
     end
   end
 end
