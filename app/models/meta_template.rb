@@ -3,6 +3,7 @@ class MetaTemplate < ActiveRecord::Base
   audited
   belongs_to :templatable, polymorphic: true
   belongs_to :template
+  has_many :meta_properties
 
   validates :template, presence: true,
     uniqueness: {scope: [:templatable_id, :templatable_type], case_sensitive: false}
