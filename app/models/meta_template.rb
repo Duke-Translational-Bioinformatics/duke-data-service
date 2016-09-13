@@ -1,5 +1,6 @@
 class MetaTemplate < ActiveRecord::Base
-
+  include RequestAudited
+  audited
   belongs_to :templatable, polymorphic: true
   belongs_to :template
 

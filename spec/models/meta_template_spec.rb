@@ -8,6 +8,8 @@ RSpec.describe MetaTemplate, type: :model do
   let(:file) { FactoryGirl.create(:data_file) }
   let(:meta_template) { FactoryGirl.create(:meta_template) }
 
+  it_behaves_like 'an audited model'
+
   describe 'associations' do
     it { is_expected.to belong_to(:templatable) }
     it { is_expected.to belong_to(:template) }
