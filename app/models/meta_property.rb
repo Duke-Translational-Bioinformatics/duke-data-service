@@ -12,10 +12,11 @@ class MetaProperty < ActiveRecord::Base
   validates :value, presence: true
 
   def set_property_from_key
-    if meta_template && meta_template.template
-      self.property = meta_template.template.properties.where(key: key).first
-    else
+    if key
       self.property = nil
+      if meta_template && meta_template.template
+        self.property = meta_template.template.properties.where(key: key).first
+      end
     end
   end
 end

@@ -32,10 +32,10 @@ RSpec.describe MetaProperty, type: :model do
       before { expect{subject.set_property_from_key}.not_to raise_error }
 
       context 'when key is nil' do
-        subject { FactoryGirl.build(:meta_property, meta_template: meta_template, key: nil) }
+        subject { FactoryGirl.build(:meta_property, meta_template: meta_template, property: property, key: nil) }
 
         it { expect(subject.key).to be_nil }
-        it { expect(subject.property).to be_nil }
+        it { expect(subject.property).to eq(property) }
       end
 
       context 'when meta_template is nil' do
