@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe TemplatePreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:template) }
+RSpec.describe TemplatableSerializer, type: :serializer do
+  let(:resource) { FactoryGirl.create(:data_file) }
   let(:expected_attributes) {{
     'id' => resource.id,
-    'name' => resource.name
+    'kind' => resource.kind,
   }}
 
   it_behaves_like 'a json serializer' do
