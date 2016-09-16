@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :property do
     template
-    key { "#{Faker::Name.first_name}_#{rand(10**3)}" }
+    sequence(:key) { |n| "#{Faker::Name.first_name}_#{n}" }
     label { Faker::App.name }
     description { Faker::Hacker.say_something_smart }
     data_type { 'string' }
