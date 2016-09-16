@@ -10,7 +10,7 @@ class ElasticsearchResponse
   def initialize(query:, indices:, policy_scope:)
     raise ArgumentError.new("indices must have at least one entry") unless indices && !indices.empty?
     indices.map {|focus_model|
-      raise NameError.new("focus_model #{focus_model} Not Supported") unless [DataFile, Folder].include?(focus_model)
+      raise NameError.new("object_kind #{focus_model} Not Indexed") unless [DataFile, Folder].include?(focus_model)
     }
     @results = []
     @indices = indices
