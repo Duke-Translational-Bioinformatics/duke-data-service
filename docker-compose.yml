@@ -7,6 +7,7 @@ services:
       - webapp.env
       - portal.env
       - neo4j.client.env
+      - elastic.client.env
     ports:
       - 3001:3000
     volumes:
@@ -14,6 +15,7 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
   db:
     build: ./docker/builds/db
     env_file:
@@ -24,3 +26,7 @@ services:
       - '7474:7474'
     env_file:
       - neo4j.server.env
+  elasticsearch:
+    image: elasticsearch:2.2.2
+    ports:
+      - '9200:9200'

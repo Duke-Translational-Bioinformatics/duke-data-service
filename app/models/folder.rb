@@ -30,4 +30,18 @@ class Folder < Container
     end
     super(val)
   end
+
+  def as_indexed_json(options={})
+    self.as_json
+  end
+
+  settings index: { number_of_shards: 1 } do
+    mappings dynamic: 'false' do
+      indexes :id
+      indexes :name
+      indexes :is_deleted, type: "boolean"
+      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+    end
+  end
 end

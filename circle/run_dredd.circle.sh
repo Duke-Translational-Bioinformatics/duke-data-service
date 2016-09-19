@@ -8,8 +8,6 @@
 ./docker/circle/cache_docker_image.sh morrisjobke/docker-swift-onlyone latest
 
 # launch_application
-docker-compose up -d neo4j db
-sleep 10
 docker-compose up -d server
 sleep 10
 docker-compose ps
@@ -20,6 +18,7 @@ docker-compose run authservice > /dev/null 2>&1
 docker-compose run rake storage_provider:create > /dev/null 2>&1
 docker-compose run rake api_test_user:create > /dev/null 2>&1
 docker-compose run rake api_test_user_pool:create > /dev/null 2>&1
+docker-compose run rake elasticsearch:index:create
 MY_GENERATED_JWT=$(docker-compose run rake api_test_user:create | tail -1)
 HOST_NAME="http://dds.host:3000/api/v1"
 

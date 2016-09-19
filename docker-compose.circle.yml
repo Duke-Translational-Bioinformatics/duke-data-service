@@ -7,11 +7,13 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - swift.local.env
       - circle/webapp.circle.env
       - neo4j.client.local.env
       - auth_service.local.env
+      - elastic.client.local.env
   db:
     build: ./docker/builds/db
     env_file:
@@ -22,26 +24,34 @@ services:
       - '7474:7474'
     env_file:
       - neo4j.server.env
+  elasticsearch:
+    image: elasticsearch:2.2.2
+    ports:
+      - '9200:9200'
   rails:
     image: dukedataservice_server
     entrypoint: ['rails']
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - circle/webapp.circle.env
       - swift.local.env
       - neo4j.client.local.env
+      - elastic.client.local.env
   rake:
     image: dukedataservice_server
     entrypoint: ['rake']
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - circle/webapp.circle.env
       - swift.local.env
       - neo4j.client.local.env
+      - elastic.client.local.env
   authservice:
     image: dukedataservice_server
     entrypoint: ['rake']
@@ -49,10 +59,12 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - circle/webapp.circle.env
       - auth_service.local.env
       - neo4j.client.local.env
+      - elastic.client.local.env
   rspec:
     image: dukedataservice_server
     environment:
@@ -60,10 +72,12 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - circle/webapp.circle.env
       - swift.local.env
       - neo4j.client.local.env
+      - elastic.client.local.env
     entrypoint: ['rspec']
     command: spec
   dredd:
