@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :property do
     template
-    sequence(:key) { |n| "#{Faker::Name.first_name}_#{n}" }
+    sequence(:key) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
     label { Faker::App.name }
     description { Faker::Hacker.say_something_smart }
     data_type { 'string' }
