@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160915195034) do
+ActiveRecord::Schema.define(version: 20160913155812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,7 +130,7 @@ ActiveRecord::Schema.define(version: 20160915195034) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "meta_properties", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+  create_table "meta_properties", force: :cascade do |t|
     t.uuid     "meta_template_id"
     t.uuid     "property_id"
     t.string   "value"
@@ -138,7 +138,7 @@ ActiveRecord::Schema.define(version: 20160915195034) do
     t.datetime "updated_at",       null: false
   end
 
-  create_table "meta_templates", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+  create_table "meta_templates", force: :cascade do |t|
     t.uuid     "templatable_id"
     t.string   "templatable_type"
     t.uuid     "template_id"

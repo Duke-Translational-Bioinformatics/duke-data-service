@@ -3,7 +3,7 @@ class Tag < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   audited
 
-  belongs_to :taggable, polymorphic: true
+  belongs_to :taggable, polymorphic: true, touch: true
 
   validates :label, presence: true,
     uniqueness: {scope: [:taggable_id, :taggable_type], case_sensitive: false}
