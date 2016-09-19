@@ -196,4 +196,158 @@ describe DDS::V1::SearchAPI do
       end
     end
   end
+
+  describe 'Search Objects' do
+    around :each do |example|
+      current_indices = DataFile.__elasticsearch__.client.cat.indices
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        if current_indices.include? indexed_model.index_name
+          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+        end
+        indexed_model.__elasticsearch__.client.indices.create(
+          index: indexed_model.index_name,
+          body: {
+            settings: indexed_model.settings.to_hash,
+            mappings: indexed_model.mappings.to_hash
+          }
+        )
+      end
+
+      expect(indexed_folder).to be_persisted
+      indexed_folder.__elasticsearch__.index_document
+      expect(indexed_data_file).to be_persisted
+      indexed_data_file.__elasticsearch__.index_document
+
+      Folder.__elasticsearch__.refresh_index!
+      DataFile.__elasticsearch__.refresh_index!
+
+      example.run
+
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+      end
+    end
+
+    describe 'POST /api/v1/search' do
+      let(:url) { "/api/v1/search" }
+      subject { post(url, payload.to_json, headers) }
+      let(:called_action) { 'POST' }
+      let(:included_kinds) { ['dds-file'] }
+      let(:elastic_query) {
+        {
+          query: {
+            query_string: {
+              query: "foo"
+            }
+          }
+        }
+      }
+      let!(:project) { FactoryGirl.create(:project) }
+      let!(:other_project) { FactoryGirl.create(:project) }
+      let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+      let!(:resource_permission) { project_permission }
+
+      let(:indexed_data_file) {
+        FactoryGirl.create(:data_file, name: "foo", project: project)
+      }
+      let(:indexed_folder) {
+        FactoryGirl.create(:folder, :root, name: "foo", project: project)
+      }
+
+      let(:payload) {
+        {
+          included_kinds: included_kinds,
+          search_query: elastic_query
+        }
+      }
+
+      context 'basic api' do
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent accessible resource' do
+          let(:expected_response_status) { 201 }
+        end
+        it_behaves_like 'a listable resource' do
+          let(:resource) { indexed_data_file }
+          let(:resource_class) { DataFile }
+          let(:resource_serializer) { DataFileSerializer }
+          let(:unexpected_resources) {
+            []
+          }
+          let(:expected_resources) { [resource] }
+          let(:expected_response_status) { 201 }
+        end
+      end
+
+      context 'single included kind' do
+        context 'invalid kind' do
+          let(:included_kinds) { ['dds-not-a-kind'] }
+          let(:resource_kind) { 'dds-not-a-kind' }
+          it_behaves_like 'a kinded resource'
+        end
+
+        context 'unindexed kind' do
+          let(:included_kinds) { ['dds-project'] }
+          let(:resource_class) { Project }
+          it_behaves_like 'an indexed resource'
+        end
+
+        context 'when user does not have rights to view a result' do
+          let(:indexed_data_file) {
+            FactoryGirl.create(:data_file, name: "foo", project: other_project)
+          }
+          let(:expected_response_status) { 201 }
+
+          it 'should return a list that does not include unauthorized resources' do
+            is_expected.to eq(expected_response_status)
+            expect(response.status).to eq(expected_response_status)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            expect(response.body).not_to include(DataFileSerializer.new(indexed_data_file).to_json)
+          end
+        end
+      end
+
+      context 'multiple included kinds' do
+        let(:included_kinds) { ['dds-folder','dds-file'] }
+        let(:expected_response_status) { 201 }
+
+        it 'should return a list of resources' do
+          is_expected.to eq(expected_response_status)
+          expect(response.status).to eq(expected_response_status)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+          expect(response.body).to include(DataFileSerializer.new(indexed_data_file).to_json)
+          expect(response.body).to include(FolderSerializer.new(indexed_folder).to_json)
+        end
+
+        context 'invalid kind' do
+          let(:included_kinds) { ['dds-not-a-kind', 'dds-folder'] }
+          let(:resource_kind) { 'dds-not-a-kind' }
+          it_behaves_like 'a kinded resource'
+        end
+
+        context 'unindexed kind' do
+          let(:included_kinds) { ['dds-project', 'dds-folder'] }
+          let(:resource_class) { Project }
+          it_behaves_like 'an indexed resource'
+        end
+
+        context 'when user does not have rights to view a result' do
+          let(:indexed_folder) {
+            FactoryGirl.create(:folder, :root, name: "foo", project: other_project)
+          }
+          let(:expected_response_status) { 201 }
+
+          it 'should return a list of resources excluding unauthorized resources' do
+            is_expected.to eq(expected_response_status)
+            expect(response.status).to eq(expected_response_status)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            expect(response.body).to include(DataFileSerializer.new(indexed_data_file).to_json)
+            expect(response.body).not_to include(FolderSerializer.new(indexed_folder).to_json)
+          end
+        end
+      end
+    end
+  end
 end
