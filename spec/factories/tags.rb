@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :tag do
-    label { Faker::Hacker.say_something_smart }
+    sequence(:label) { |n| "#{Faker::Hacker.say_something_smart}#{n}" }
     association :taggable, factory: :data_file
 
     trait :skip_validation do
