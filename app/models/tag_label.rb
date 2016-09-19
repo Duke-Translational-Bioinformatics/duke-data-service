@@ -3,7 +3,7 @@ class TagLabel
   include ActiveModel::Serialization
   include Comparable
 
-  attr_accessor :label, :count
+  attr_accessor :label, :count, :last_used_on
 
   def attributes
     {'label' => label, 'count' => count}

@@ -3,10 +3,14 @@ class Container < ActiveRecord::Base
   include Kinded
   include RequestAudited
 
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
   audited
   belongs_to :project
 	belongs_to :parent, class_name: "Folder"
   has_many :project_permissions, through: :project
+  has_many :tags, as: :taggable
 
   define_model_callbacks :set_parent_attribute
   validates :name, presence: true, unless: :is_deleted

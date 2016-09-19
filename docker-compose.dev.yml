@@ -8,10 +8,12 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
+      - elastic.client.env
   bundle:
     image: dukedataservice_server
     volumes_from:
@@ -25,15 +27,18 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
+      - elastic.client.env
   authservice:
     image: dukedataservice_server
     env_file:
       - auth_service.env
       - neo4j.client.env
+      - elastic.client.env
     volumes_from:
       - server
     entrypoint: ['rake']
@@ -41,6 +46,7 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
   rspec:
     image: dukedataservice_server
     environment:
@@ -50,10 +56,12 @@ services:
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
+      - elastic.client.env
     entrypoint: ['rspec']
     command: spec
   dredd:

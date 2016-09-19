@@ -9,6 +9,10 @@ gem 'pg'
 # Use neo4j for PROV graph relationships
 gem 'neo4j'
 
+# Use elasticsearch for search
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4' # Remove in rails 5

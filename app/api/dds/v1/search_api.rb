@@ -30,6 +30,36 @@ module DDS
           max_hops: max_hops,
           policy_scope: method(:policy_scope))
       end
+
+      desc 'Search Objects' do
+        detail 'Search for DDS objects using the elasticsearch query_dsl on supported kinds of objects'
+        named 'Search Objects'
+        failure [
+          [200, 'Will never happen'],
+          [201, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'one or more included kinds is not supported, or not indexed']
+        ]
+      end
+      params do
+        requires :included_kinds, type: Array, desc: 'The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. dds-folder, dds-file)'
+        requires :search_query, type: Hash, desc: 'The Elasticsearch query criteria (i.e. Query DSL)'
+      end
+      post '/search', root: false do
+        authenticate!
+        search_params = declared(params, include_missing: false)
+        indices = []
+        search_params[:included_kinds].each do |included_kind|
+          kinded_model = KindnessFactory.kind_map[included_kind]
+          raise NameError.new("object_kind #{included_kind} Not Supported") unless kinded_model
+          indices << kinded_model
+        end
+        ElasticsearchResponse.new(
+          query: search_params[:search_query],
+          indices: indices,
+          policy_scope: method(:policy_scope)
+        )
+      end
     end
   end
 end

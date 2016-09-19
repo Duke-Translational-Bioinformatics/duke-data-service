@@ -65,7 +65,8 @@ VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
   c.hook_into :webmock
   c.configure_rspec_metadata!
-  c.ignore_hosts URI(Rails.application.config.neo4j.session_path).host
+  c.ignore_hosts URI(Rails.application.config.neo4j.session_path).host,
+                 ENV['BONSAI_URL'].split(':').first
   c.register_request_matcher :header_keys do |request_1, request_2|
     request_1.headers.keys == request_2.headers.keys
   end

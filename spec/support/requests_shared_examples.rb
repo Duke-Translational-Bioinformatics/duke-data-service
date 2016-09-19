@@ -347,7 +347,7 @@ shared_examples 'an identified resource' do
 end
 
 shared_examples 'a kinded resource' do
-  it 'should return 404 with error when resource not found with id' do
+  it 'should return 404 with error when kind is not supported' do
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -356,6 +356,21 @@ shared_examples 'a kinded resource' do
     expect(response_json['error']).to eq('404')
     expect(response_json).to have_key('reason')
     expect(response_json['reason']).to eq("object_kind #{resource_kind} Not Supported")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
+  end
+end
+
+shared_examples 'an indexed resource' do
+  it 'should return 404 with error when kind is not indexed' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("object_kind #{resource_class} Not Indexed")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
   end

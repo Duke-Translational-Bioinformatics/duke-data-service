@@ -40,6 +40,75 @@ module DDS
         authenticate!
         Template.all
       end
+
+      desc 'View template details' do
+        detail 'Returns the template details for a given UUID.'
+        named 'view template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (template restricted)'],
+          [404, 'Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Template UUID'
+      end
+      get '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        template
+      end
+
+      desc 'Update template' do
+        detail 'Updates template UUID.'
+        named 'update template'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (template restricted)'],
+          [400, 'Validation Error'],
+          [404, 'Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Template UUID'
+        optional :name, type: String, desc: 'The Name of the template'
+        optional :label, type: String, desc: 'The Label of the template'
+        optional :description, type: String, desc: 'The Description of the template'
+      end
+      put '/templates/:id', root: false do
+        authenticate!
+        template_params = declared(params, {include_missing: false}, [:name, :label, :description])
+        template =  Template.find(params[:id])
+        authorize template, :update?
+        if template.update(template_params)
+          template
+        else
+          validation_error!(template)
+        end
+      end
+
+      desc 'Delete a template' do
+        detail 'Deletes a template.'
+        named 'delete template'
+        failure [
+          [204, 'Successfully Deleted'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden (template restricted)'],
+          [404, 'Template Does not Exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'Template UUID'
+      end
+      delete '/templates/:id', root: false do
+        authenticate!
+        template = Template.find(params[:id])
+        authorize template, :destroy?
+        template.destroy
+        body false
+      end
     end
   end
 end
