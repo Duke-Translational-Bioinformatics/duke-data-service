@@ -9,7 +9,7 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
   let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: data_file) }
 
-  let(:template) { FactoryGirl.create(:template) }
+  let(:template) { meta_template.template }
   let(:property) { FactoryGirl.create(:property, template: template) }
   let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
 
@@ -43,6 +43,7 @@ describe DDS::V1::MetaTemplatesAPI do
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
+      let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         properties: [
@@ -104,6 +105,27 @@ describe DDS::V1::MetaTemplatesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'with a nonexistent file id' do
+        let(:file_id) { 'notfoundid' }
+        let(:resource_class) {'DataFile'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'with a nonexistent template id' do
+        let(:template_id) { 'notfoundid' }
+        let(:resource_class) {'Template'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
+      end
     end
 
     describe 'PUT' do

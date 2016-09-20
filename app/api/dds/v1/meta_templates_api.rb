@@ -1,7 +1,6 @@
 module DDS
   module V1
     class MetaTemplatesAPI < Grape::API
-
       desc 'Create object metadata' do
         detail 'Creates object metadata.'
         named 'create object metadata'
@@ -45,6 +44,25 @@ module DDS
         end
       end
 
+      desc 'View object metadata' do
+        detail 'Used to retrieve the metadata template instance for a corresponding DDS object.'
+        named 'view object metadata'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Object or Template does not exist']
+        ]
+      end
+      get '/meta/:object_kind/:object_id/:template_id', root: false do
+        authenticate!
+
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        templatable_object = object_kind.find(params[:object_id])
+        template = Template.find(params[:template_id])
+        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).first
+        meta_template
+      end
     end
   end
 end
