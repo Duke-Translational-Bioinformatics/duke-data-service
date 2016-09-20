@@ -60,7 +60,7 @@ module DDS
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         templatable_object = object_kind.find(params[:object_id])
         template = Template.find(params[:template_id])
-        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).first
+        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).take!
         meta_template
       end
     end

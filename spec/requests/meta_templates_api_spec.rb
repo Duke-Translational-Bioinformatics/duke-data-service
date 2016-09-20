@@ -126,6 +126,12 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:resource_kind) { 'invalid-kind' }
         it_behaves_like 'a kinded resource'
       end
+
+      context 'with a nonexistent meta template' do
+        let(:template) { FactoryGirl.create(:template) }
+        let(:resource_class) {'MetaTemplate'}
+        it_behaves_like 'an identified resource'
+      end
     end
 
     describe 'PUT' do
