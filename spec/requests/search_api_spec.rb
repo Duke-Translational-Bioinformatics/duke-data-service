@@ -170,7 +170,7 @@ describe DDS::V1::SearchAPI do
           )
         }
 
-        it 'should not return properties for the inaccessible node' do
+        it 'should return kind, id, and is_deleted for the inaccessible node' do
           is_expected.to eq(201)
           expect(response.body).to be
           expect(response.body).not_to eq('null')
@@ -182,7 +182,14 @@ describe DDS::V1::SearchAPI do
           provenance_graph['nodes'].each do |node|
             expect(expected_nodes).to include(node['id'])
             if node['id'] == other_file_version.id
-              expect(node['properties']).to be_nil
+              expect(node['properties']).not_to be_nil
+              expect(node['properties']['id']).to eq(other_file_version.id)
+              expect(node['properties']['kind']).to eq(other_file_version.kind)
+              if other_file_version.is_deleted
+                expect(node['properties']['is_deleted']).to eq("true")
+              else
+                expect(node['properties']['is_deleted']).to eq("false")
+              end
             end
           end
           expect(provenance_graph).to have_key('relationships')

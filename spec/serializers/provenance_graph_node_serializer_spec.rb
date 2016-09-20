@@ -44,7 +44,20 @@ RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
         is_expected.to have_key('properties')
         expect(subject["id"]).to eq(resource.id)
         expect(subject["labels"]).to eq(resource.labels)
-        expect(subject["properties"]).to be_nil
+        expect(subject["properties"]).not_to be_nil
+        expect(subject["properties"]).to have_key('id')
+        expect(subject["properties"]["id"]).to eq(node.model_id)
+        expect(subject["properties"]).to have_key('kind')
+        expect(subject["properties"]["kind"]).to eq(node.model_kind)
+        expect(subject["properties"]).to have_key('is_deleted')
+        if node.is_deleted
+          expect(subject["properties"]["is_deleted"]).to eq("true")
+        else
+          expect(subject["properties"]["is_deleted"]).to eq("false")
+        end
+        ["name","label","created_at","updated_at","upload","audit"].each do |unexpected_key|
+          expect(subject["properties"]).not_to have_key(unexpected_key)
+        end
       end
     end
   end
