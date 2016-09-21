@@ -206,6 +206,36 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
+
+      it_behaves_like 'a removable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) {204}
+      end
+
+      context 'with a nonexistent file id' do
+        let(:file_id) { 'notfoundid' }
+        let(:resource_class) {'DataFile'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'with a nonexistent template id' do
+        let(:template_id) { 'notfoundid' }
+        let(:resource_class) {'Template'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'with a nonexistent meta template' do
+        let(:template) { FactoryGirl.create(:template) }
+        let(:resource_class) {'MetaTemplate'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
+      end
     end
   end
 end
