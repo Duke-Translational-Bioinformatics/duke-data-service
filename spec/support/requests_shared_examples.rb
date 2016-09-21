@@ -237,12 +237,12 @@ shared_examples 'a viewable resource' do
 end
 
 shared_examples 'an updatable resource' do
+  let(:expected_response_status) { 200 }
   before do
     expect(resource).to be_persisted
   end
   it 'should return success' do
-    is_expected.to eq(200)
-    expect(response.status).to eq(200)
+    is_expected.to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
   end
@@ -250,7 +250,7 @@ shared_examples 'an updatable resource' do
     resource.reload
     original_attributes = resource.attributes
     expect {
-      is_expected.to eq(200)
+      is_expected.to eq(expected_response_status)
     }.not_to change{resource_class.count}
     resource.reload
     expect(resource.attributes).not_to eq(original_attributes)
@@ -259,7 +259,7 @@ shared_examples 'an updatable resource' do
     end
   end
   it 'should return a serialized resource' do
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     resource.reload
     expect(response.body).to include(resource_serializer.new(resource).to_json)
   end

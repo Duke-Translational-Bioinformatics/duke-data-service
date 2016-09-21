@@ -60,8 +60,50 @@ module DDS
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         templatable_object = object_kind.find(params[:object_id])
         template = Template.find(params[:template_id])
-        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).first
+        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).take!
         meta_template
+      end
+
+      desc 'Update object metadata' do
+        detail 'Updates object metadata'
+        named 'update object metadata'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [400, 'Validation Error'],
+          [404, 'Object or Template does not exist']
+        ]
+      end
+      params do
+        requires :properties, type: Array, desc: "A list of the key:value pairs to set for the template instance." do
+          requires :key, type: String, desc: "The property key to set"
+          requires :value, type: String, desc: "The key value"
+        end
+      end
+      put '/meta/:object_kind/:object_id/:template_id', root: false do
+        authenticate!
+        meta_params = declared(params, {include_missing: false})
+
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        templatable_object = object_kind.find(params[:object_id])
+        template = Template.find(params[:template_id])
+        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).take!
+
+        existing_keys = meta_template.meta_properties.collect {|mp| mp.property.key}
+        meta_params[:properties].each do |property_params|
+          if meta_property_index = existing_keys.index(property_params[:key])
+            meta_template.meta_properties[meta_property_index].value = property_params[:value]
+          else
+            meta_template.meta_properties.build(property_params)
+          end
+        end
+
+        if meta_template.save
+          meta_template
+        else
+          validation_error!(meta_template)
+        end
       end
     end
   end
