@@ -14,7 +14,7 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:meta_property) { FactoryGirl.create(:meta_property, property: property, meta_template: meta_template) }
   let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin) }
   let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
   let(:other_meta_template) { FactoryGirl.create(:meta_template, templatable: other_data_file) }
 
@@ -35,6 +35,30 @@ describe DDS::V1::MetaTemplatesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+
+      it_behaves_like 'a listable resource' do
+        let(:expected_list_length) { expected_resources.length }
+        let!(:expected_resources) { [
+          resource
+        ]}
+        let!(:unexpected_resources) { [
+          other_meta_template
+        ] }
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'with a nonexistent file id' do
+        let(:file_id) { 'notfoundid' }
+        let(:resource_class) {'DataFile'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
+      end
     end
   end
 
