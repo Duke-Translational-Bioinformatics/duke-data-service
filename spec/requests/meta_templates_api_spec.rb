@@ -11,6 +11,7 @@ describe DDS::V1::MetaTemplatesAPI do
 
   let(:template) { meta_template.template }
   let(:property) { FactoryGirl.create(:property, template: template) }
+  let(:meta_property) { FactoryGirl.create(:meta_property, property: property, meta_template: meta_template) }
   let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
@@ -126,6 +127,12 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:resource_kind) { 'invalid-kind' }
         it_behaves_like 'a kinded resource'
       end
+
+      context 'with a nonexistent meta template' do
+        let(:template) { FactoryGirl.create(:template) }
+        let(:resource_class) {'MetaTemplate'}
+        it_behaves_like 'an identified resource'
+      end
     end
 
     describe 'PUT' do
@@ -141,6 +148,59 @@ describe DDS::V1::MetaTemplatesAPI do
       }}
       let(:payload_property_key) { property.key }
       let(:payload_property_value) { meta_property_stub.value }
+
+      it_behaves_like 'an updatable resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'with existing meta property key' do
+        let(:payload_property_key) { meta_property.property.key }
+        it_behaves_like 'an updatable resource' do
+          it 'should not create a new meta property' do
+            expect {
+              is_expected.to eq(expected_response_status)
+            }.not_to change{MetaProperty.count}
+          end
+        end
+      end
+
+      context 'with a nonexistent file id' do
+        let(:file_id) { 'notfoundid' }
+        let(:resource_class) {'DataFile'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'with a nonexistent template id' do
+        let(:template_id) { 'notfoundid' }
+        let(:resource_class) {'Template'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'with a nonexistent meta template' do
+        let(:template) { FactoryGirl.create(:template) }
+        let(:resource_class) {'MetaTemplate'}
+        it_behaves_like 'an identified resource'
+      end
+
+      context 'when object_kind unknown' do
+        let(:resource_kind) { 'invalid-kind' }
+        it_behaves_like 'a kinded resource'
+      end
+
+      context 'with blank property key' do
+        let(:payload_property_key) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with property key from another template' do
+        let(:payload_property_key) { FactoryGirl.create(:property).key }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with blank property value' do
+        let(:payload_property_value) { '' }
+        it_behaves_like 'a validated resource'
+      end
     end
 
     describe 'DELETE' do
