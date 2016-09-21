@@ -105,6 +105,29 @@ module DDS
           validation_error!(meta_template)
         end
       end
+
+      desc 'Delete objet metadata' do
+        detail 'Deletes objet metadata'
+        named 'delete objet metadata'
+        failure [
+          [200, "This will never happen"],
+          [204, 'Successfully Deleted'],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Object or template does not exist']
+        ]
+      end
+      delete '/meta/:object_kind/:object_id/:template_id', root: false do
+        authenticate!
+        meta_params = declared(params, {include_missing: false})
+
+        object_kind = KindnessFactory.by_kind(params[:object_kind])
+        templatable_object = object_kind.find(params[:object_id])
+        template = Template.find(params[:template_id])
+        meta_template = MetaTemplate.where(templatable: templatable_object, template: template).take!
+        authorize meta_template, :destroy?
+        meta_template.destroy
+        body false
+      end
     end
   end
 end
