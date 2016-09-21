@@ -16,7 +16,8 @@ describe DDS::V1::TemplatesAPI do
   let(:resource_stub) { template_stub }
 
   describe 'Templates collection' do
-    let(:url) { "/api/v1/templates" }
+    let(:query_params) { '' }
+    let(:url) { "/api/v1/templates#{query_params}" }
 
     describe 'POST' do
       subject { post(url, payload.to_json, headers) }
@@ -52,6 +53,57 @@ describe DDS::V1::TemplatesAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+
+      context 'with name query parameter' do
+        let(:query_params) { "?name=#{name}" }
+
+        context 'when empty string' do
+          let(:name) { '' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              template,
+              other_template
+            ] }
+          end
+        end
+        context 'when string without matches' do
+          let(:name) { 'name_without_matches' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              template,
+              other_template
+            ] }
+          end
+        end
+
+        context 'when string with a match' do
+          let(:name) { template.name }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              template
+            ] }
+            let(:unexpected_resources) { [
+              other_template
+            ] }
+          end
+        end
+
+        context 'when upcase string' do
+          let(:name) { template.name.upcase }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              template,
+              other_template
+            ] }
+          end
+        end
+      end
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a listable resource'
