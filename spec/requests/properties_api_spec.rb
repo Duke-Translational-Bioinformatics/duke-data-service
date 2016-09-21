@@ -17,7 +17,8 @@ describe DDS::V1::PropertiesAPI do
   let(:resource_stub) { property_stub }
 
   describe 'Properties collection' do
-    let(:url) { "/api/v1/templates/#{template_id}/properties" }
+    let(:url) { "/api/v1/templates/#{template_id}/properties#{query_params}" }
+    let(:query_params) { '' }
     let(:template_id) { template.id }
 
     describe 'POST' do
@@ -68,6 +69,57 @@ describe DDS::V1::PropertiesAPI do
       it_behaves_like 'an identified resource' do
         let(:template_id) { "notexist" }
         let(:resource_class) { Template }
+      end
+
+      context 'with key query parameter' do
+        let(:query_params) { "?key=#{key}" }
+
+        context 'when empty string' do
+          let(:key) { '' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              property,
+              other_property
+            ] }
+          end
+        end
+        context 'when string without matches' do
+          let(:key) { 'key' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              property,
+              other_property
+            ] }
+          end
+        end
+
+        context 'when string with a match' do
+          let(:key) { property.key }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              property
+            ] }
+            let(:unexpected_resources) { [
+              other_property
+            ] }
+          end
+        end
+
+        context 'when upcase string' do
+          let(:key) { property.key.upcase }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+            ] }
+            let(:unexpected_resources) { [
+              property,
+              other_property
+            ] }
+          end
+        end
       end
     end
   end
