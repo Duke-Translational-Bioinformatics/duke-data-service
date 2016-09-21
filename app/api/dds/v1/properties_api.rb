@@ -43,10 +43,16 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
+      params do
+        optional :key, type: String, desc: "The unique key of the template property"
+      end
       get '/templates/:template_id/properties', root: 'results' do
         authenticate!
+        property_params = declared(params, {include_missing: false})
         template = Template.find(params[:template_id])
-        template.properties
+        properties = template.properties
+        properties = properties.where(key: params[:key]) if params[:key]
+        properties
       end
 
       desc 'View property details' do
