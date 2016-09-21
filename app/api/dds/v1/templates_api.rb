@@ -33,12 +33,22 @@ module DDS
         named 'list templates'
         failure [
           [200, 'Success'],
-          [401, 'Unauthorized']
+          [401, 'Unauthorized'],
+          [404, 'Template does not exist']
         ]
+      end
+      params do
+        optional :name, type: String, desc: 'list templates whose name contains this string'
       end
       get '/templates', root: 'results' do
         authenticate!
-        Template.all
+        template_params = declared(params, include_missing: false)
+        if template_params[:name]
+          template = Template.where("name = ?", template_params[:name])
+        else
+          Template.all
+        end
+          
       end
 
       desc 'View template details' do
