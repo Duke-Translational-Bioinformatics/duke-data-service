@@ -33,8 +33,7 @@ module DDS
         named 'list templates'
         failure [
           [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Template does not exist']
+          [401, 'Unauthorized']
         ]
       end
       params do
@@ -48,7 +47,7 @@ module DDS
         else
           Template.all
         end
-          
+
       end
 
       desc 'View template details' do
