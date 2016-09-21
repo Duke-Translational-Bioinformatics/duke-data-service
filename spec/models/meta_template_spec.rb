@@ -13,7 +13,7 @@ RSpec.describe MetaTemplate, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:templatable) }
     it { is_expected.to belong_to(:template) }
-    it { is_expected.to have_many(:meta_properties) }
+    it { is_expected.to have_many(:meta_properties).autosave(true) }
   end
 
   describe 'validations' do

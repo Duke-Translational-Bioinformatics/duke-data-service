@@ -5,7 +5,11 @@ class ProvenanceGraphNodeSerializer < ActiveModel::Serializer
     if object.properties
       ActiveModel::Serializer.serializer_for(object.properties).new(object.properties)
     else
-      nil
+      {
+        id: object.node.model_id,
+        kind: object.node.model_kind,
+        is_deleted: object.node.is_deleted ? "true" : "false"
+      }
     end
   end
 end
