@@ -126,6 +126,11 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:payload_property_value) { '' }
         it_behaves_like 'a validated resource'
       end
+
+      context 'when template exists' do
+        let(:template) { resource.template }
+        it_behaves_like 'a validated resource'
+      end
     end
 
     describe 'GET' do
