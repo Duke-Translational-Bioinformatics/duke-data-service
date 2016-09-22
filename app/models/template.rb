@@ -3,6 +3,7 @@ class Template < ActiveRecord::Base
   audited
   belongs_to :creator, class_name: 'User'
   has_many :properties
+  has_many :meta_templates
 
   validates :name, presence: true,
     uniqueness: {case_sensitive: false},

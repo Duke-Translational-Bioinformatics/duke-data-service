@@ -18,6 +18,7 @@ RSpec.describe Template, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:creator).class_name('User') }
     it { is_expected.to have_many(:properties) }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
