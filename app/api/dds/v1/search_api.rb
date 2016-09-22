@@ -42,7 +42,7 @@ module DDS
         ]
       end
       params do
-        requires :included_kinds, type: Array, desc: 'The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. dds-folder, dds-file)'
+        requires :included_kinds, type: Array[String], desc: 'The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. dds-folder, dds-file)'
         requires :search_query, type: Hash, desc: 'The Elasticsearch query criteria (i.e. Query DSL)'
       end
       post '/search', root: false do
