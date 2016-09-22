@@ -30,6 +30,7 @@ RSpec.describe Property, type: :model do
 
   describe 'associations' do
     it { is_expected.to belong_to(:template) }
+    it { is_expected.to have_many(:meta_properties) }
   end
 
   describe 'validations' do
@@ -43,5 +44,22 @@ RSpec.describe Property, type: :model do
     it { is_expected.to allow_values(*good_keys).for(:key) }
     it { is_expected.not_to allow_values(*bad_keys).for(:key) }
     it { is_expected.to validate_inclusion_of(:data_type).in_array(elastic_core_data_types) }
+
+    context 'after creation' do
+      subject { FactoryGirl.create(:property) }
+
+      context 'without meta_properties' do
+        it { expect(subject.meta_properties).to be_empty }
+        it { is_expected.to allow_values(*good_keys).for(:key) }
+        it { is_expected.to allow_value(elastic_core_data_types.last).for(:data_type) }
+      end
+
+      context 'with meta_properties' do
+        before { FactoryGirl.create(:meta_property, property: subject) }
+        it { expect(subject.meta_properties).not_to be_empty }
+        it { is_expected.not_to allow_values(*good_keys).for(:key) }
+        it { is_expected.not_to allow_value(elastic_core_data_types.last).for(:data_type) }
+      end
+    end
   end
 end
