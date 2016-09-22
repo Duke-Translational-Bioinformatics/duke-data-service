@@ -29,5 +29,20 @@ RSpec.describe Template, type: :model do
     it { is_expected.to allow_values(*good_names).for(:name) }
     it { is_expected.not_to allow_values(*bad_names).for(:name) }
     it { is_expected.to validate_length_of(:name).is_at_most(60) }
+
+    context 'after creation' do
+      subject { FactoryGirl.create(:template) }
+
+      context 'without meta_templates' do
+        it { expect(subject.meta_templates).to be_empty }
+        it { is_expected.to allow_values(*good_names).for(:name) }
+      end
+
+      context 'with meta_templates' do
+        before { FactoryGirl.create(:meta_template, template: subject) }
+        it { expect(subject.meta_templates).not_to be_empty }
+        it { is_expected.not_to allow_values(*good_names).for(:name) }
+      end
+    end
   end
 end
