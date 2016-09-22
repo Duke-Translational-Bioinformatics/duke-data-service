@@ -9,10 +9,12 @@ class Property < ActiveRecord::Base
     uniqueness: {case_sensitive: false},
     format: {with: /\A[a-z0-9_]*\z/i},
     length: {maximum: 60}
+  validates :key, immutable: true, if: :has_meta_properties?
   validates :label, presence: true
   validates :description, presence: true
   validates :data_type, presence: true, 
     inclusion: {in: :available_data_types}
+  validates :data_type, immutable: true, if: :has_meta_properties?
 
   private
 
@@ -27,5 +29,9 @@ class Property < ActiveRecord::Base
       'date',
       'boolean',
       'binary' ]
+  end
+
+  def has_meta_properties?
+    meta_properties.exists?
   end
 end
