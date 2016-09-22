@@ -3,6 +3,7 @@ class Property < ActiveRecord::Base
   audited
 
   belongs_to :template
+  has_many :meta_properties
 
   validates :key, presence: true,
     uniqueness: {case_sensitive: false},

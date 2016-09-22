@@ -30,6 +30,7 @@ RSpec.describe Property, type: :model do
 
   describe 'associations' do
     it { is_expected.to belong_to(:template) }
+    it { is_expected.to have_many(:meta_properties) }
   end
 
   describe 'validations' do
