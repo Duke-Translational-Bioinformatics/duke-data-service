@@ -67,7 +67,7 @@ class DataFile < Container
   end
 
   def as_indexed_json(options={})
-    DataFileSearchDocumentSerializer.new(self).to_json
+    DataFileSearchDocumentSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do

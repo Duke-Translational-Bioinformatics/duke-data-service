@@ -32,7 +32,7 @@ class Folder < Container
   end
 
   def as_indexed_json(options={})
-    FolderSearchDocumentSerializer.new(self).to_json
+    FolderSearchDocumentSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do

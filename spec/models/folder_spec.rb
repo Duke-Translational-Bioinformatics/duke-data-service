@@ -150,7 +150,7 @@ RSpec.describe Folder, type: :model do
     describe 'as_indexed_json' do
       # let!(:tag) { FactoryGirl.create(:tag, taggable: child_folder) }
       it { is_expected.to respond_to 'as_indexed_json' }
-      it { expect(subject.as_indexed_json).to eq(FolderSearchDocumentSerializer.new(subject).to_json) }
+      it { expect(subject.as_indexed_json).to eq(FolderSearchDocumentSerializer.new(subject).as_json) }
     end
 
     describe 'mappings' do
