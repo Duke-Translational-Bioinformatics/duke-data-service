@@ -17,7 +17,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
   end
 
   shared_examples 'a metadata annotated document' do
-    it 'should have expected metadata section' do
+    it 'should have expected meta section' do
       expect(meta_template).to be_persisted
       expect(property).to be_persisted
       expect(meta_property).to be_persisted
@@ -26,9 +26,9 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
       meta_property.reload
 
       expect(resource.meta_templates).not_to be_empty
-      is_expected.to have_key 'metadata'
-      expect(subject['metadata']).not_to be_empty
-      metadata = subject['metadata']
+      is_expected.to have_key 'meta'
+      expect(subject['meta']).not_to be_empty
+      metadata = subject['meta']
       resource.meta_templates.each do |meta_template|
         expect(meta_template.meta_properties).not_to be_empty
         expect(metadata).to have_key meta_template.template.name
@@ -58,6 +58,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
   end
 
   context 'with tags' do
+    include_context 'elasticsearch prep', [:tag], [:resource]
     let(:tag) { FactoryGirl.create(:tag, taggable: resource) }
 
     it_behaves_like 'a json serializer' do
@@ -70,6 +71,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     let(:meta_template) { FactoryGirl.create(:meta_template, templatable: resource) }
     let(:property) { FactoryGirl.create(:property, template: meta_template.template) }
     let(:meta_property){ FactoryGirl.create(:meta_property, meta_template: meta_template, property: property) }
+    include_context 'elasticsearch prep', [:meta_template, :property, :meta_property], [:resource]
 
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_file_attributes) }
@@ -84,6 +86,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     let(:meta_property){ FactoryGirl.create(:meta_property,
       meta_template: meta_template, property: property, key: property.key
     ) }
+    include_context 'elasticsearch prep', [:tag, :meta_template, :property, :meta_property], [:resource]
 
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_file_attributes) }
