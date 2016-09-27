@@ -144,7 +144,7 @@ RSpec.describe MetaProperty, type: :model do
       it {
         expect(meta_template.templatable.class.__elasticsearch__.search(query).count).to eq 0
         subject.save
-        sleep 1
+        meta_template.templatable.class.__elasticsearch__.client.indices.flush
         search = meta_template.templatable.class.__elasticsearch__.search(query)
         expect(search.count).to eq 1
         expect(search.results.first.id).to eq(meta_template.templatable.id)
@@ -154,12 +154,12 @@ RSpec.describe MetaProperty, type: :model do
     context 'after destroy' do
       it {
         subject.save
-        sleep 1
+        meta_template.templatable.class.__elasticsearch__.client.indices.flush
         search = meta_template.templatable.class.__elasticsearch__.search(query)
         expect(search.count).to eq 1
         expect(search.results.first.id).to eq(meta_template.templatable.id)
         subject.destroy
-        sleep 1
+        meta_template.templatable.class.__elasticsearch__.client.indices.flush
         search = meta_template.templatable.class.__elasticsearch__.search(query)
         expect(search.count).to eq 0
       }
