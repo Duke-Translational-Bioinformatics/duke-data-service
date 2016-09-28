@@ -67,6 +67,8 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:template_id) { template.id }
 
     describe 'POST' do
+      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+
       subject { post(url, payload.to_json, headers) }
       let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
@@ -165,6 +167,8 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'PUT' do
+      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
