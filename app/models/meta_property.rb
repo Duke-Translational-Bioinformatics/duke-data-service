@@ -3,7 +3,7 @@ class MetaProperty < ActiveRecord::Base
   attr_accessor :key
 
   audited
-  belongs_to :meta_template
+  belongs_to :meta_template, touch: true
   belongs_to :property
 
   # callbacks

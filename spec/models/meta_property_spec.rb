@@ -9,7 +9,7 @@ RSpec.describe MetaProperty, type: :model do
   it_behaves_like 'an audited model'
 
   describe 'associations' do
-    it { is_expected.to belong_to(:meta_template) }
+    it { is_expected.to belong_to(:meta_template).touch(true) }
     it { is_expected.to belong_to(:property) }
   end
 
