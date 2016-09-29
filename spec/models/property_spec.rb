@@ -55,7 +55,11 @@ RSpec.describe Property, type: :model do
       end
 
       context 'with meta_properties' do
-        before { FactoryGirl.create(:meta_property, property: subject) }
+        include_context 'elasticsearch prep', [:meta_property, :subject, :meta_template], [:templatable]
+        let(:templatable) { FactoryGirl.create(:data_file) }
+        let(:meta_template) { FactoryGirl.create(:meta_template, templatable: templatable)}
+        let(:meta_property) { FactoryGirl.create(:meta_property, meta_template: meta_template, property: subject) }
+
         it { expect(subject.meta_properties).not_to be_empty }
         it { is_expected.not_to allow_values(*good_keys).for(:key) }
         it { is_expected.not_to allow_value(elastic_core_data_types.last).for(:data_type) }

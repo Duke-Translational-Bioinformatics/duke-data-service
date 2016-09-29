@@ -67,6 +67,8 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:template_id) { template.id }
 
     describe 'POST' do
+      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+
       subject { post(url, payload.to_json, headers) }
       let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
@@ -126,6 +128,11 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:payload_property_value) { '' }
         it_behaves_like 'a validated resource'
       end
+
+      context 'when template exists' do
+        let(:template) { resource.template }
+        it_behaves_like 'a validated resource'
+      end
     end
 
     describe 'GET' do
@@ -160,6 +167,8 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'PUT' do
+      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{

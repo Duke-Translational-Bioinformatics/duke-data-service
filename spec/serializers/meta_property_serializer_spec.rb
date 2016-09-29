@@ -2,6 +2,16 @@ require 'rails_helper'
 
 RSpec.describe MetaPropertySerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:meta_property) }
+  let(:meta_template) { resource.meta_template }
+  let(:templatable) { meta_template.templatable }
+  let(:property) { resource.property }
+
+  include_context 'elasticsearch prep', [
+      :meta_template,
+      :property
+    ],
+    [:templatable]
+
   let(:expected_attributes) {{
     'value' => resource.value
   }}
