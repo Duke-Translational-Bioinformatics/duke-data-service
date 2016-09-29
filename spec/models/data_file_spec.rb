@@ -24,6 +24,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:file_versions).order('version_number ASC').autosave(true) }
     it { is_expected.to have_many(:tags) }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
@@ -251,18 +252,8 @@ RSpec.describe DataFile, type: :model do
     # a test to ensure that jobs are created on create, update, delete
     it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
 
-    describe 'as_indexed_json' do
-      let!(:tag) { FactoryGirl.create(:tag, taggable: child_file) }
-      it { is_expected.to respond_to 'as_indexed_json' }
-      it {
-        indexed_json = subject.as_indexed_json
-        ['id', 'name', 'is_deleted', 'created_at', 'updated_at', 'label', 'tags'].each do |expected_key|
-          expect(indexed_json).to have_key expected_key
-        end
-        expect(indexed_json['tags']).not_to be_empty
-        expect(indexed_json['tags'].first).to have_key 'label'
-      }
-    end
+    it { is_expected.to respond_to 'as_indexed_json' }
+    it { expect(subject.as_indexed_json).to eq(DataFileSearchDocumentSerializer.new(subject).as_json) }
 
     describe 'mappings' do
       subject { root_file.class.mapping.to_hash }
