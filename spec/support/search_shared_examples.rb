@@ -19,8 +19,8 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
           mappings: indexed_model.mappings.to_hash
         }
       )
-      indexed_model.__elasticsearch__.client.indices.flush
     end
+    Elasticsearch::Model.client.indices.flush
 
     refresh_record_documents.each do |refresh_record_document|
       expect(refresh_record_document).to be_persisted
