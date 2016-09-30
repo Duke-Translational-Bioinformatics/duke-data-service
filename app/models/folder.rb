@@ -3,7 +3,8 @@
 class Folder < Container
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
   has_many :folders, -> { readonly }, foreign_key: "parent_id"
-
+  has_many :meta_templates, as: :templatable
+  
   after_set_parent_attribute :set_project_to_parent_project
 
   validates :project_id, presence: true, immutable: true
