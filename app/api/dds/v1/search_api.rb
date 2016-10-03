@@ -18,14 +18,14 @@ module DDS
         end
         optional :max_hops, type: Integer, desc: "Maximum number of degrees of seperation from start node (default infinite)"
       end
-      post '/search/provenance', root: 'graph' do
+      post '/search/provenance', root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_tags = declared(params, include_missing: false)
         max_hops = prov_tags[:max_hops]
         start_node_kind = KindnessFactory.by_kind(prov_tags[:start_node][:kind])
         start_node = start_node_kind.find(prov_tags[:start_node][:id])
         authorize start_node, :show?
-        ProvenanceGraph.new(
+        SearchProvenanceGraph.new(
           focus: start_node,
           max_hops: max_hops,
           policy_scope: method(:policy_scope))
