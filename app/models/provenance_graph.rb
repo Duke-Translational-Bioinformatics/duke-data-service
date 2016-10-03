@@ -2,13 +2,14 @@ class ProvenanceGraph
   include ActiveModel::Serialization
   attr_reader :nodes, :relationships
 
-  def initialize()
+  def initialize(policy_scope)
     @nodes = []
     @relationships = []
     @to_be_graphed = {
       nodes: {},
       relationships: {}
     }
+    @policy_scope = policy_scope
   end
 
   private
