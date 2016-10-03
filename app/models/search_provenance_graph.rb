@@ -1,13 +1,8 @@
 class SearchProvenanceGraph < ProvenanceGraph
   #pass a method with ProvenanceGraph.new(focus, 2, method(:method_name))
   def initialize(focus:, max_hops: nil, policy_scope:)
-    @nodes = []
-    @relationships = []
+    super()
     @policy_scope = policy_scope
-    @to_be_graphed = {
-      nodes: {},
-      relationships: {}
-    }
     focus_node = focus.graph_node
     find_node(focus_node)
 

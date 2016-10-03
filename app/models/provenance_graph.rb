@@ -2,6 +2,15 @@ class ProvenanceGraph
   include ActiveModel::Serialization
   attr_reader :nodes, :relationships
 
+  def initialize()
+    @nodes = []
+    @relationships = []
+    @to_be_graphed = {
+      nodes: {},
+      relationships: {}
+    }
+  end
+
   private
 
   def create_graph()
