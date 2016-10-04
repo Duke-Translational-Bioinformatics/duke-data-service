@@ -1,0 +1,20 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+script:
+  - make test
+before_install:
+  - git submodule update --init --recursive
+notifications:
+  email:
+    recipients:
+      - z@apiary.io
+    on_success: change
+    on_failure: always
+  hipchat:
+    rooms:
+      secure: "ntgT6mBRusOkCNFnuwmYL1y+BfBA4d/bY2QgiGK/J2PEaiSDplLZDvv42PG7wjX2RkZTKBc5U0eNIu/lCmoiwY8goPkxSYdKysdVHQZfzVKcJjKYi9UAHlghW0JAprBCsXwwCJ6cj7CmmXxm9ibyGFtcmpS11/tU/6GaRBtbNro="
+    template:
+      - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
+    format: html

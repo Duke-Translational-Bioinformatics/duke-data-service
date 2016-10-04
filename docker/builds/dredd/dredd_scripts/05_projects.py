@@ -43,7 +43,7 @@ def change_proj_name2(transaction):
 def create_a_del_project(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1',neww['id'])
 @hooks.before("Projects > Project instance > NOT_IMPLEMENTED_NEW Project usage")

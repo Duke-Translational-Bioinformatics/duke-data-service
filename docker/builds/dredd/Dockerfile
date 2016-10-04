@@ -19,10 +19,13 @@ RUN pip install dredd_hooks
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # install dredd version older
-RUN npm install -g dredd@1.0.8
+#RUN npm install -g dredd@1.0.8
+RUN npm install -g dredd@stable
+RUN npm install -g try_thread_sleep
 
 #install node modules
-RUN npm install dredd@1.0.8
+#RUN npm install dredd@1.0.8
+RUN npm install dredd@stable
 
 #Execute the node app
 WORKDIR /home/dredd_scripts

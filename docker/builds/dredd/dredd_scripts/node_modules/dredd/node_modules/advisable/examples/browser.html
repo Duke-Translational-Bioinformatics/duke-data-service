@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="../lib/advisable.js"></script>
+  </head>
+  <body>
+    <h1>simple browser example</h1>
+    <p id="advisable-sync-target"></p>
+    <p id="advisable-async-target"></p>
+    <script>
+      var syncTarget = document.getElementById('advisable-sync-target')
+        , asyncTarget = document.getElementById('advisable-async-target')
+        , target
+        , equation = '((10 * 3) + (100*3) + 1) + 123 = ';
+
+      function Target(val) {
+        this.val = val;
+      }
+
+      Target.prototype.syncFunc = function (a, b) {
+        return a + b + this.val;
+      };
+
+      Target.prototype.asyncFunc = function (a, b, callback) {
+        setTimeout(function () {
+          callback(null, a + b + this.val);
+        }.bind(this), 1500);
+      };
+
+      advisable.sync.call(Target.prototype);
+      advisable.async.call(Target.prototype);
+
+      Target.prototype.aroundSync(
+        'syncFunc'
+      , function (a, b) {
+          return [ a * 3, b * 3 ];
+        }
+      , function (v) {
+          return v + 123;
+        }
+      , { mutate: true }
+      );
+
+      Target.prototype.around(
+        'asyncFunc'
+      , function (a, b, callback) {
+          callback(null, a * 3, b * 3);
+        }
+      , function (v, callback) {
+          callback(null, v + 123);
+        }
+      , { mutate: true }
+      );
+
+      target = new Target(1);
+      syncTarget.textContent = 'sync: ' + equation + target.syncFunc(10, 100);
+
+      asyncTarget.textContent = 'waiting for async...';
+
+      target = new Target(1);
+      target.asyncFunc(10, 100, function (err, result) {
+        asyncTarget.textContent = 'async: ' + equation + result;
+      });
+    </script>
+  <body>
+</html>

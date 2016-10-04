@@ -1,0 +1,3 @@
+[submodule "drafter"]
+	path = drafter
+	url = https://github.com/apiaryio/drafter.git

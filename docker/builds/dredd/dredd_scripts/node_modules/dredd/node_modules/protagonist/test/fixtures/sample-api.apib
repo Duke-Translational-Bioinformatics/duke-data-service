@@ -1,0 +1,23 @@
+FORMAT: 1A
+
+# Group Messages
+
+# Message [/messages/{id}]
+
++ Parameters
+    + id ... Id of a message
+        + Values
+            + `1`
+            + `2`
+            + `3`
+
++ Attributes
+    + id (number)
+    + message: Hello World! (string) - The Message
+
+## Retrieve Message [GET]
++ Response 200 (application/json)
+    + Attributes (Message)
+
+## Delete Message [DELETE]
++ Response 204

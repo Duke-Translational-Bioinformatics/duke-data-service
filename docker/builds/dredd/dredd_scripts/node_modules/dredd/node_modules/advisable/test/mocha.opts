@@ -1,0 +1,4 @@
+--require chai
+--ui bdd
+--reporter spec
+--require ./test/setup

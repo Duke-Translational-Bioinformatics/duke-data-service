@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://apiuatest.dataservice.duke.edu/api/v1/
+HOST: https://apidev.dataservice.duke.edu/api/v1
 
 # Duke Data Service
 
@@ -11,92 +11,30 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 
 ## API Change Log
 
-24-Feb-2016
---------------
-+ Updated API usage details - included convenience links to *Web Portal* and *API Explorer*.
-+ Added `agent` property to standard *Audit Object* - this will be populated when resources are created or modified by a *Software Agent*.
-+ Added *Software Agents* resource/actions - includes actions for maintaining agent, maintaining agent secret API key, and getting access token.
-+ Extended *Current User* resource actions - added actions for maintaining user secret API key.
-+ For *Projects* resource - removed unique contraint rule on `project.name`.
-+ For *Storage Providers* resource - added `chunk_hash_algorithm` - this can be used by clients to determine type of hash to report for uploaded chunks.  This is only relevant for chunks, entire file hashes must be reported as `sha1`.
-+ Added `GET /uploads` action - allows hashing agent to to search across projects for uploads that are pending hash computation.
-+ Modified `hash` property for *Uploads* resource - this property now contains `client_reported` and `server_reported` properties to support server side hash computation and verification of optionally reported client hash.
-+ For *Files* resource - added `PUT /files/{id}` action that allows select file properties to be updated. The significant extension here is when `file.upload` property is updated, the previous file upload is transtioned to version history stack.
-+ Added `label` property to *Files* resource to help users differentiate file versions.
-+ Added *File Versions* resource/actions - includes actions for retrieving, updating and removing prior versions of a file.
-
-26-Feb-2016
---------------
-+ Added provenance *Activities* resource/actions - includes actions for creating, retrieving, updating and removing provenance activties.
-
-08-Mar-2016
---------------
-+ Added *Provenance Relations* resource/actions - includes actions for creating, retrieving and removing `used` and `wasGeneratedBy` provenance relations.
-
-09-Mar-2016
---------------
-+ Added *Search Provenance* resource/actions - supports graph query of provenance chains; returns graph results that are structured for visualization.
-
-15-Mar-2016
---------------
-+ For resource actions not yet implemented - added *NOT_IMPLEMENTED* prefix to inform API consumers and dredd testing workflow.
-+ Reverted design changes to support server hashing agent back to current production implementation.  This will be addressed in later sprint.
-
-16-Mar-2016
---------------
-+ Added *Tags* resource/actions - current iteration assumes only file tagging is supported, but design supports extension to tag other objects.
-+ For *Software Agents* resource - added `time_to_live` property to the `POST /software_agents/api_token` action response payload.
-+ For actions `PUT /folders/{id}/move` and `PUT /files/{id}/move`, removed restriction for cross-project moves.
-+ Added `GET /projects/{id}/usage` - returns summary usage details for the project.
-
-18-Mar-2016
---------------
-+ For *Software Agents* resource - added action `DELETE /software_agents/{id}/api_key` - this allows agent key to be removed liken to user key actions.
-+ For *Uploads* resource - reverted `hash` back to a required property - this aligns with Web portal now being able to hash "larger" files via streaming.
-
-07-Apr-2016
---------------
-+ Refactored file versioning - the biggest change here is file resource now has a `current_version` property that contains version details - including the referenced `upload` (see *Files* and *File Versions* actions).
-+ For *File Versions* resource - added new action `POST /file_versions/{id}/current` that promotes a prior file version to top of version stack.
-+ For *Current User* resource - added property `agent` that is populated when user is authenticated via a software agent.
-+ For *Uploads* resource - removed hash properties (`hash.value` and `hash.algorithm`) from initiate chunked upload request - there is a new action `PUT /uploads/{id}/hashes` for reporting client hashes.  The upload resource now contains a `hashes` property - this is a collection of client reported hashes.
-
-21-Apr-2016
---------------
-+ Added `update_file` permission to the Project Uploader role.
-+ Added *Provenance Relations* actions for `wasDerivedFrom` and `wasInvalidatedBy`.
-
-25-Apr-2016
---------------
-+ For *File Versions* resource - added `project` property to facilitate portal acccess to project permissions for the current user.
-+ Added *Search Objects* action - this allows robust search of DDS objects using Elasticsearch Query DSL.
-
-02-May-2016
---------------
-+ For *Provenance Relations* resource - added `to` and `from` properties to resource - this provides clients with insight to the W3C relationship direction.
-+ Added *Provenance Inferred* section - provides overview of inferred relations for initial provenance release.
-
-10-Jun-2016
---------------
-+ For *Provenace Relations* resource - modified `to` and `from` properties to render complete JSON representation for the node vs. partial.
-+ Added new rule - requires 'invalidated' entity to be deleted prior to recording 'wasInvalidatedBy' relation.
-+ Added new rule - cascades logical delete of provenance node to any direct (i.e. single hop away) provenance relations.
-+ Change permission model for `wasGeneratedBy` and `wasDerivedFrom` relations - for both create operations, `update_file` permission is required for the `generated` entity.
-
-07-Jul-2016
---------------
-+ Added *Properties* actions - collection of endpoints for associating `key:value` metadata pairs to DDS objects.
-
-20-Jul-2016
---------------
-+ Modified the `/uploads/{id}/complete` action - this now requires the client to report the complete file hash.
-+ Added rule for the `/uploads/{id}/hashes` action - this action now requires upload to be in completed state.  This would be called by official DDS hashing agent or client agents that wish to record additional hashes for their uploads.
-
 02-Aug-2016
 --------------
 + Changed URI format of `POST /tags` to `POST /tags/{object_kind}/{object_id}` - tags are always created for a specific object.
 + Changed `GET /tags/labels` to include a `last_used_on` property in the response; the response is sorted in descending order by this new property.
 + Added endpoint `POST /tags/{object_kind}/{object_id}/append` - allows clients to append a collection of tags to an object.
+
+02-Sep-2016
+--------------
++ Removed *Provenance Inferred* section - implementation will no longer auto-generate inferred provenance relation based on audit trail.
++ Refactored Metadata *Properties* actions to follow URI pattern liken to `Tags`.
+
+07-Sep-2016
+--------------
++ Added endpoint `/search/provenance/was_generated_by` - allows targeted search "up" the provenance chain for a set of file versions.
++ Added rules/constraints for *Provenance Relations* actions.
+
+12-Sep-2016
+--------------
++ Refactored *Metadata* actions - objects can now be annotated with metadata via bulk `POST` and `PUT` actions.
++ Added `name` query param to `GET /templates` and `key` query param to `GET /templates/{id}/properties`; these query params allow clients to lookup templates and template properties by their alternate unique key.
+
+23-Sep-2016
+--------------
++ Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
 
 ## Group API Usage
 
@@ -110,7 +48,7 @@ In an effort to promote provenance, all programmatic access to the API must util
 
 Exploring the API
 --------------
-In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://apiuatest.dataservice.duke.edu/apiexplorer).
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the [API Explorer](https://apidev.dataservice.duke.edu/apiexplorer).
 
 Collection Pagination
 --------------
@@ -142,8 +80,8 @@ Resource payloads may include a composite audit object. An example structure of 
             "id": "ce245d81-bae1-452b-8589-24f736ca7735",
             "username": "mrgardner01",
             "full_name": "Matthew Gardner",
-            "agent": {
-                "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "software_agent": {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
                 "name": "Hashing computation agent"
             }
         },
@@ -152,7 +90,7 @@ Resource payloads may include a composite audit object. An example structure of 
             "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
             "username": "jturner01",
             "full_name": "Jon Turner",
-            "agent": null
+            "software_agent": null
         },
         "deleted_on": null,
         "deleted_by": null
@@ -282,11 +220,10 @@ Represents a software agent and associated secret that can be used to access the
 
 ## Create software agent [POST]
 Creates software agent and an associated secret API key; the secret key is visible and managed through the `software_agents/{id}/api_key` action.
-
 >**Permission:** authenticated
 - - - - -
 
->**Request Properties**
+>**Properties**
 - - - - -
 + **name (string)** - A short name for the software agent.
 + **description (string, optional)** - A verbose description for the software agent.
@@ -406,7 +343,7 @@ Shows the secret key for the software agent.
 >**Permission:** creator or system_admin
 - - - - -
 
->**Response Properties**
+>**Properties**
 - - - - -
 + **key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
 + **created_on (datetime)** - The date the software agent key was generated.
@@ -469,7 +406,6 @@ Represents the currently authenticated user.
 
 ### View current user [GET]
 Get profile for the currently authenticated user.
-
 >**Permission:** authenticated
 - - - - -
 
@@ -500,11 +436,10 @@ Get profile for the currently authenticated user.
 
 ## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
-
 >**Permission:** authenticated [scope: view_project]
 - - - - -
 
->**Response Properties**
+>**Properties**
 - - - - -
 + **project_count (number)** - Total number of projects where the user has been granted a project level authorization role.
 + **file_count (integer)** - Total number of files the user has created (i.e. uploaded) across all projects.
@@ -527,11 +462,10 @@ View summary usage for current user across all projects.
 
 ## Generate current user API key [PUT]
 Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents** actions).
-
 >**Permission:** authenticated
 - - - - -
 
->**Response Properties**
+>**Properties**
 - - - - -
 + **key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
 + **created_on (datetime)** - The date the user key was generated.
@@ -821,7 +755,7 @@ View summary usage for the project.
 >**Permission:** view_project
 - - - - -
 
->**Response Properties**
+>**Properties**
 - - - - -
 + **member_count (number)** - Total number of users granted a project level permission.
 + **file_count (integer)** - Total number of files contained in the project.
@@ -1323,7 +1257,6 @@ All files must be uploaded using a multi-part/chunked upload process.  Although 
 
 ### Initiate chunked upload [POST]
 This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.
-
 >**Permission:** create_file
 - - - - -
 
@@ -1446,7 +1379,6 @@ This is the first step in uploading a large file. An upload objects is created a
 
 ## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
 Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
-
 >**Permission:** create_file
 - - - - -
 
@@ -1489,13 +1421,12 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-## NOT_IMPLEMENTED_CHANGE Complete chunked file upload [PUT /uploads/{id}/complete]
+## Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
-
 >**Permission:** create_file
 - - - - -
 
->**Request Properties**
+>**Properties**
 - - - - -
 + **hash.value (string, required)** - The entire file hash (computed by client).
 + **hash.algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
@@ -1569,11 +1500,10 @@ This operation is called by the client after all file chunks have been successfu
 
 ## Report upload hash [PUT /uploads/{id}/hashes]
 Report a hash (fingerprint) for the uploaded file.
-
 >**Permission:** update_file
 - - - - -
 
->**Request Properties**
+>**Properties**
 - - - - -
 + **value (string, required)** - The entire file hash (computed by client).
 + **algorithm (string, required)** - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).
@@ -2092,7 +2022,7 @@ This action can be used to list all prior versions of a file, including the curr
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
 
 ### View file version [GET]
-**Permissions** view_project
+>**Permission** view_project
 - - - - -
 
 + Response 200 (application/json)
@@ -2130,7 +2060,7 @@ This action can be used to list all prior versions of a file, including the curr
         }
 
 ### Update file version [PUT]
-**Permission:** update_file
+>**Permission:** update_file
 - - - - -
 
 >**Rules**
@@ -2189,7 +2119,6 @@ This action can be used to list all prior versions of a file, including the curr
 
 ## Get file version download URL [GET /file_versions/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
-
 >**Permission:** download_file
 - - - - -
 
@@ -2207,7 +2136,6 @@ Generates and returns a storage provider specific pre-signed URL that client can
 
 ## Promote file version [POST /file_versions/{id}/current]
 This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the version stack.
-
 >**Permission:** update_file
 - - - - -
 
@@ -2256,7 +2184,6 @@ This action can be used to promote a prior file version to the current version. 
 Search for the children (i.e. folders and files) of a project or folder.
 
 ## Search project children [GET /projects/{id}/children{?name_contains,kind}]
-
 >**Permission:** view_project
 - - - - -
 
@@ -2351,7 +2278,6 @@ Search for the children (i.e. folders and files) of a project or folder.
         }
 
 ## Search folder children [GET /folders/{id}/children{?name_contains,kind}]
-
 >**Permission:** view_project
 - - - - -
 
@@ -2583,6 +2509,10 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 + **entity.kind (string, required)** - The kind of entity that was used; this must be a file version (i.e. `dds-file-version`).
 + **entity.id (string, required)** - The unique id of the used entity.
 
+>**Rules**
+- - - - -
++ An entity (i.e. `file_version`) cannot be used and generated by the same activity (i.e. `dds-activity`).
+
 + Request (application/json)
 
         {
@@ -2653,6 +2583,11 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 + **entity.kind (string, required)** - The kind of entity that was generated; this must be a file version (i.e. `dds-file-version`).
 + **entity.id (string, required)** - The unique id of the generated entity.
 + **activity.id (string, required)** - The activity that generated the entity.
+
+>**Rules**
+- - - - -
++ An entity (i.e. `file_version`) can be generated by one and only one activity (i.e. `dds-activity`).
++ An entity (i.e. `file_version`) cannot be used and generated by the same activity (i.e. `dds-activity`).
 
 + Request (application/json)
 
@@ -2822,6 +2757,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 >**Rules**
 - - - - -
 + The `invalidated` entity must be in a deleted state (i.e. `"is_deleted": true`).
++ An entity (i.e. `file_version`) can be invalidated by one and only one activity (i.e. `dds-activity`).
 
 + Request (application/json)
 
@@ -2887,7 +2823,6 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 
 ### List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
-
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
 - - - - -
 
@@ -3148,25 +3083,13 @@ List the relations for a provenance node; this only lists direct relations for t
 
 + Response 204
 
-## Group Provenance Inferred
-The **Provenace Relations** actions for recording: *used, wasGeneratedBy, wasDerivedFrom, and wasInvalidatedBy* relations need to be called explicitly by client agents - nothing is inferred from the audit trail for these relations.  The provenance relations for: *wasAssociatedWith and wasAttributedTo* will be inferred from the audit trail.  So for example, when **Erich Huang -> Python Agent** creates **Experiment A** and uploads **Data File A - Version 1**, the following provenance relations would be inferred (i.e. generated):
-
-+ *Experiment A* -> **wasAssociatedWith** -> *Erich Huang*
-+ *Data File A - Version 1* -> **wasAttributedTo** -> *Erich Huang*
-+ *Data File A - Version 1* -> **wasAttributedTo** -> *Python Agent*
-
-To complete the provenance picture, client agents will need to explicitly call *used, wasGenerated, and wasDerivedFrom* actions where relevant in their pipelines, these are not inferred from audit trail.
-
-*Note: To view sample JSON payload for the generated* `wasAssociatedWith` *and* `wasAttributedTo` *relations, see* `/relations/{id}` *action responses.*
-
 ## Group Search Provenance
 The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation.
 
 *Note: The provenance graph structure is stored in a* [Neo4J](http://neo4j.com) *database and ubiquitous JavaScript libraries can be used for* [graph rendering](http://neo4j.com/developer/guide-data-visualization).
 
-## NOT_IMPLEMENTED_NEW Search Provenance [POST /search/provenance]
+## Search Provenance [POST /search/provenance]
 Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.
-
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `start_node.kind`, `start_node.id`) - which may be an activity *or* an entity
 - - - - -
 
@@ -3174,7 +3097,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
 - - - - -
 + If the user does not have visibilty to a `node` in the resulting graph, the `properties` attribute for that `node` will be a partial resource containing: `kind`, `id`, and `is_deleted`.
 
->**Search Properties**
+>**Properties**
 - - - - -
 + **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity` or `dds-file-version`.
 + **start_node.id (string, required)** - The unique id of the node.
@@ -3265,6 +3188,111 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
+## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/was_generated_by]
+This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each file version:
+
+1. Gets the generating activity.
+2. For the generating activity, gets the list of *wasGeneratedBy* and *used* file versions.
+
+A graph structure of the unique nodes and relationships is returned.
+
+>**Rules:**
+- - - - -
++ All of the provided file versions must exist or a validation error is returned.
++ If a file version does not have a generating activity, then only the file version node is returned.
++ If the user does not have visibilty to a `node` in the resulting graph, the `properties` attribute for that `node` will be a partial resource containing: `kind`, `id`, and `is_deleted`.
+
+>**Properties**
+- - - - -
++ **file_versions (object[ ], required)** - The list of file versions (i.e. `dds-file-version`)
++ **file_versions[ ].id (string, required)** - The unique file version id.
+
++ Request (application/json)
+
+        {
+            "file_versions": [
+                {
+                    "id": "1b80a313-97cf-482d-8d17-9b911bf815b3"
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "graph": {
+                "nodes": [
+                    {
+                        "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                        "labels": ["Activity"],
+                        "properties": {
+                            "kind": "dds-activity",
+                            "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                            "name": "RF PI3-Kinase",
+                            "is_deleted": false,
+                            "audit": { }
+                        }
+                    },
+                    {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "labels": ["File Version"],
+                        "properties": {
+                            "kind": "dds-file-version",
+                            "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                            "file": {
+                                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                            },
+                            "version": 1,
+                            "label": "Initial raw data from device",
+                            "is_deleted": false,
+                            "audit": { }
+                        }
+                    },
+                    {
+                        "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                        "labels": ["File Version"],
+                        "properties": {
+                            "kind": "dds-file-version",
+                            "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                            "file": {
+                                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"
+                            },
+                            "version": 2,
+                            "label": "Alignment performed on raw data",
+                            "is_deleted": false,
+                            "audit": { }
+                        }
+                    }
+                ],
+                "relationships": [
+                    {
+                        "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+                        "type": "used",
+                        "start_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                        "end_node": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "properties": {
+                            "kind": "dds-relation-used",
+                            "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
+                            "audit": { }
+                        }
+                    },
+                    {
+                        "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+                        "type": "wasGeneratedBy",
+                        "start_node": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                        "end_node": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                        "properties": {
+                            "kind": "dds-relation-was-generated-by",
+                            "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
+                            "audit": { }
+                        }
+                    }
+                ]
+            }
+        }
+
 ## Group Tags
 A tag is a label (i.e. word or phrase) that can be associated to an object to facilitate classification and searching.
 
@@ -3275,9 +3303,10 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
 
-### NOT_IMPLEMENTED_CHANGE Create object tag [POST]
+### Create object tag [POST]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
+
 >**Properties**
 - - - - -
 + **label (string, required)** - The textual tag content.
@@ -3305,7 +3334,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
         }
 
 
-## List object tags [GET]
+### List object tags [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
 
@@ -3325,7 +3354,7 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-### NOT_IMPLEMENTED_NEW Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
+## Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
 Append a list of tags to an object.
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
@@ -3369,7 +3398,7 @@ Append a list of tags to an object.
             ]
         }
 
-### NOT_IMPLEMENTED_CHANGE List tag labels [GET /tags/labels{?object_kind,label_contains}]
+## List tag labels [GET /tags/labels{?object_kind,label_contains}]
 Get a list of the **distinct** tag `label` values visible to the current user.
 
 *Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
@@ -3432,14 +3461,14 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 
 + Response 204
 
-## Group Properties
-The metadata properties actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, properties are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
+## Group Metadata
+The metadata actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, metadata are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
 
-Metadata properties must be defined and captured in the context of a metadata template. Templates allow related keys (i.e. fields) to be grouped together.  For example, a template named *seq_platform_info* may contain properties that describe the characteristics of the sequencing platform.  In addition, templates enforce data type (i.e. string, integer, etc.) integrity for the contained keys, so that clients are type aware when referencing key values from a search or data processing perspective. Metatdata templates are global in scope and visible to all users.
+Metadata must be defined and captured in the context of a metadata template. Templates allow related keys (i.e. properties) to be grouped together.  For example, a template named *seq_platform_info* may contain properties that describe the characteristics of the sequencing platform.  In addition, templates enforce data type (i.e. string, integer, etc.) integrity for the contained keys, so that clients are type aware when referencing key values from a search or data processing perspective. Metatdata templates are global in scope and visible to all users.
 
 ## Metadata Templates collection [/templates]
 
-### NOT_IMPLEMENTED_NEW Create metadata template [POST]
+### Create metadata template [POST]
 >**Permission:** authenticated
 - - - - -
 
@@ -3454,7 +3483,7 @@ Metadata properties must be defined and captured in the context of a metadata te
 
 >**Rules:**
 - - - - -
-+ The template `name` must be unique - this unique check must include deprecated (i.e. `is_deprecated: true`) templates.
++ The template `name` must be unique in the global context.
 
 + Request (application/json)
 
@@ -3471,13 +3500,17 @@ Metadata properties must be defined and captured in the context of a metadata te
             "name": "sequencing_file_info",
             "label": "Sequencing File Info",
             "description": "Extended attributes for sequencing output files.",
-            "is_deprecated": false,
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_NEW List metadata templates [GET]
+## List metadata templates [GET /templates{?name}]
+List all of the global metadata templates, optionally get a template by name.
 >**Permission:** authenticated
 - - - - -
+
++ Parameters
+    + name (string, optional, `sequencing_file_info`) ... The unique `name` of the template; performs an exact match.
+
 
 + Response 200 (application/json)
 
@@ -3488,7 +3521,6 @@ Metadata properties must be defined and captured in the context of a metadata te
                     "name": "sequencing_file_info",
                     "label": "Sequencing File Info",
                     "description": "Extended attributes for sequencing output files.",
-                    "is_deprecated": false,
                     "audit": { }
                 }
             ]
@@ -3498,35 +3530,28 @@ Metadata properties must be defined and captured in the context of a metadata te
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
 
-+ Model (application/json)
 
-    + Body
-
-            {
-                "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "sequencing_file_info",
-                "label": "Sequencing File Info",
-                "description": "Extended attributes for sequencing output files (raw and processed).",
-                "is_deprecated": false,
-                "audit": { }
-            }
-
-
-### NOT_IMPLEMENTED_NEW View metadata template [GET]
+### View metadata template [GET]
 >**Permission:** authenticated
 - - - - -
 
-+ Response 200
++ Response 200 (application/json)
 
-    [Metadata Template instance][]
+        {
+            "id": "168f3f51-6800-403a-973d-78b23c08049b",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files (raw and processed).",
+            "audit": { }
+        }
 
-### NOT_IMPLEMENTED_NEW Update metadata template [PUT]
+### Update metadata template [PUT]
 >**Permission:** creator or system_admin
 - - - - -
 
 >**Rules**
 - - - - -
-+ The `name` cannot be updated if the metadata template has been associated to one or more DDS objects (i.e. activity, file, etc.)
++ The `name` cannot be updated if the template has been associated to one or more DDS objects.
 
 + Request (application/json)
 
@@ -3534,31 +3559,38 @@ Metadata properties must be defined and captured in the context of a metadata te
             "description": "Extended attributes for sequencing output files (raw and processed)."
         }
 
-+ Response 200
++ Response 200 (application/json)
 
-    [Metadata Template instance][]
+        {
+            "id": "168f3f51-6800-403a-973d-78b23c08049b",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files (raw and processed).",
+            "audit": { }
+        }
 
-### NOT_IMPLEMENTED_NEW Delete metadata template [DELETE]
+
+### Delete metadata template [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
 
 >**Rules**
 - - - - -
-+ The metadata template cannot be deleted if it has been associated to one or more DDS objects (i.e. activity, file, etc.)
++ The template cannot be deleted if it has been associated to one or more DDS objects.
 
 + Response 204
 
-## Metadata Template Properties collection [/templates/{id}/properties]
+## Metadata Properties collection [/templates/{id}/properties]
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
 
-### NOT_IMPLEMENTED_NEW Create metadata template property [POST]
->**Permission:** creator or system_admin
+### Create metadata property [POST]
+>**Permission:** template creator or system_admin
 - - - - -
 
 >**Properties**
 - - - - -
-+ **key (string, required)** - The unique key (i.e. field name) for the property; the key must meet the following criteria:
++ **key (string, required)** - The unique key for the property; the key must meet the following criteria:
     - contain only alphanumerics and underscores
     - no whitespace
     - maximum of 60 characters
@@ -3568,7 +3600,7 @@ Metadata properties must be defined and captured in the context of a metadata te
 
 >**Rules:**
 - - - - -
-+ The property `key` must be unique within the context of the template - this unique check must include deprecated (i.e. `is_deprecated: true`) keys.
++ The property `key` must be unique within the context of the template.
 
 + Request (application/json)
 
@@ -3585,19 +3617,24 @@ Metadata properties must be defined and captured in the context of a metadata te
             "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "sequencing_file_info",
-                "label": "Sequencing File Info"
+                "name": "sequencing_file_info"
             },
             "key": "output_type",
             "label": "Output Type",
             "description": "The type of data in the sequencing output file.",
             "type": "string",
-            "is_deprecated": false,
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW List metadata template properties [GET]
+## List metadata properties [GET /templates/{id}/properties{?key}]
+List metadata template properties, optionally get a property by key.
 >**Permission:** authenticated
+- - - - -
+
++ Parameters
+    + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
+    + key (string, optional, `output_type`) ... The unique `key` of the property; performs an exact match.
+
 
 + Response 200 (application/json)
 
@@ -3607,57 +3644,48 @@ Metadata properties must be defined and captured in the context of a metadata te
                     "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
                     "template": {
                         "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                        "name": "sequencing_file_info",
-                        "label": "Sequencing File Info"
+                        "name": "sequencing_file_info"
                     },
                     "key": "output_type",
                     "label": "Output Type",
                     "description": "The type of data in the sequencing output file.",
                     "type": "string",
-                    "is_deprecated": false,
                     "audit": { }
                 }
             ]
         }
 
-## Metadata Template Property instance [/template_properties/{id}]
+## Metadata Property instance [/template_properties/{id}]
 + Parameters
-    + id (string, required, `48d34c8f-4284-4327-9ca6-7a9145a1c957`) ... The unique `id` of the metadata template property.
+    + id (string, required, `48d34c8f-4284-4327-9ca6-7a9145a1c957`) ... The unique `id` of the template property.
 
-+ Model (application/json)
 
-    + Body
-
-            {
-                "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
-                "template": {
-                    "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                    "name": "sequencing_file_info",
-                    "label": "Sequencing File Info"
-                },
-                "key": "output_type",
-                "label": "Output Type",
-                "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
-                "type": "string",
-                "is_deprecated": false,
-                "audit": { }
-            }
-
-### NOT_IMPLEMENTED_NEW View metadata template property [GET]
+### View metadata property [GET]
 >**Permission:** authenticated
 - - - - -
 
-+ Response 200
++ Response 200 (application/json)
 
-    [Metadata Template Property instance][]
+        {
+            "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
+            "type": "string",
+            "audit": { }
+        }
 
-### NOT_IMPLEMENTED_NEW Update metadata template property [PUT]
+### Update metadata property [PUT]
 >**Permission:** creator or system_admin
 - - - - -
 
 >**Rules**
 - - - - -
-+ The `key` cannot be updated if the metadata template property has been associated to one or more DDS objects (i.e. activity, file, etc.)
++ The `key` or `type` cannot be updated if the template property has been associated to one or more DDS objects.
 
 + Request (application/json)
 
@@ -3665,62 +3693,66 @@ Metadata properties must be defined and captured in the context of a metadata te
             "description": "The type of data in the sequencing output file. (alignments, peaks, signal)"
         }
 
-+ Response 200
 
-    [Metadata Template Property instance][]
++ Response 200 (application/json)
 
-### NOT_IMPLEMENTED_NEW Delete metadata template property [DELETE]
+        {
+            "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
+            "type": "string",
+            "audit": { }
+        }
+
+### Delete metadata property [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
 
 >**Rules**
 - - - - -
-+ The template property cannot be deleted if it has been associated to one or more DDS objects (i.e. activity, file, etc.)
++ The template property cannot be deleted if it is assigned to one or more DDS objects.
 
 + Response 204
 
-## Object Metadata Template instance [/meta/{object_kind}/{object_id}/{template_id}]
+## Object Metadata instance [/meta/{object_kind}/{object_id}/{template_id}]
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `b80a2679-f6bf-46da-acaa-b7a4582b1eda`) ... The unique id of the object.
-    + template_id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique id of the metadata template.
+    + template_id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique id of the template.
 
-### NOT_IMPLEMENTED_NEW Create/Update object metatdata template [PUT ]
+### Create object metadata [POST]
+Used to create a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When creating metadata, only values that adhere to the metadata template schema will be accepted.
 >**Permission:** update_file when annotated object is file (`dds-file`)
 - - - - -
 
-*Note: Only metadata templates for files* (i.e. `dds-file`) *are currently supported.*
-
 >**Properties**
 - - - - -
-+ **properties (object[ ], required)** - An array of `key:value` pairs and the operation to perform for each key; object structure is as follows:
-+ **properties[ ].op (string, required)** - The operation to perform for the key; must be `add` or `remove`.  For `add`, if value already exists, then previous value will be overwritten by the new value.
-+ **properties[ ].key (string, required)** - The key to perform operation on.
-+ **properties[ ].value (string, optional)** - The value to be set for the key when `op` is `add`; this is not required when `op` is `remove`.
++ **properties (object[ ], required)** - A list of the `key:value` pairs to set for the template instance.
++ **properties[ ].key (string, required)** - The property key to set.
++ **properties[ ].value (any, required)** - The key value.
 
->**Rules**
+>**Rules:**
 - - - - -
-+ All `keys` must be declared in the specified metadata template; if the `op` specified is `add`, the `key` cannot be in a deprecated state (i.e. `is_deprecated: true`).
-+ All `key` values must conform to their `type` specified in metadata template.
++ All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
++ If the template instance already exists for the DDS object, a validation (unique conflict) error will be returned and the update method should be used.
 
 + Request (application/json)
 
         {
             "properties": [
                 {
-                    "op": "add",
                     "key": "output_type",
                     "value": "alignments"
-                },
-                {
-                    "op": "add",
-                    "key": "mapping_assembly",
-                    "value": "hg19"
                 }
             ]
         }
 
-+ Response 200
++ Response 201 (application/json)
 
         {
             "object": {
@@ -3729,29 +3761,25 @@ Metadata properties must be defined and captured in the context of a metadata te
             },
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "sequencing_file_info",
-                "label": "Sequencing File Info",
-                "properties": [
-                    {
-                        "key": "output_type",
-                        "value": "alignments",
-                        "label": "Output Type"
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
                     },
-                    {
-                        "key": "mapping_assembly",
-                        "value": "hg19",
-                        "label": "Mapping Assembly"
-                    }
-                ],
-            "audit": { }
+                    "value": "alignments"
+                }
+            ]
         }
 
-
-### NOT_IMPLEMENTED_NEW View object metadata template [GET]
->**Permission:** view_project when annotated object is file (`dds-file`)
+### View object metadata [GET]
+Used to retrieve the metadata template instance for a corresponding DDS object.
+>**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
 - - - - -
 
-+ Response 200
++ Response 200 (application/json)
 
         {
             "object": {
@@ -3760,21 +3788,111 @@ Metadata properties must be defined and captured in the context of a metadata te
             },
             "template": {
                 "id": "168f3f51-6800-403a-973d-78b23c08049b",
-                "name": "sequencing_file_info",
-                "label": "Sequencing File Info",
-                "properties": [
-                    {
-                        "key": "output_type",
-                        "value": "alignments",
-                        "label": "Output Type"
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
                     },
-                    {
-                        "key": "mapping_assembly",
-                        "value": "hg19",
-                        "label": "Mapping Assembly"
-                    }
-                ],
-            "audit": { }
+                    "value": "alignments"
+                }
+            ]
+        }
+
+### Update object metadata [PUT]
+Used to update a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When updating metadata, only values that adhere to the metadata template schema will be accepted.
+>**Permission:** update_file when annotated object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **properties (object[ ], required)** - A list of the `key:value` pairs to set for the template instance.
++ **properties[ ].key (string, required)** - The property key to set.
++ **properties[ ].value (any, required)** - The key value.
+
+>**Rules:**
+- - - - -
++ All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
++ If the specified `key` already exists, the value is updated, otherwise it is appended to the template instance.
++ If the template instance specified does not exist, a validation error will be returned and the create method should be used.
+
++ Request (application/json)
+
+        {
+            "properties": [
+                {
+                    "key": "output_type",
+                    "value": "peaks"
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "object": {
+                "kind": "dds-file",
+                "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+            },
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
+                    },
+                    "value": "peaks"
+                }
+            ]
+        }
+
+### Delete object metadata [DELETE]
+Used to delete the metadata template instance.
+>**Permission:** update_file when annotated object is file (`dds-file`)
+- - - - -
+
++ Response 204
+
+## View All Object Metadata [/meta/{object_kind}/{object_id}{?meta_template_name}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `b80a2679-f6bf-46da-acaa-b7a4582b1eda`) ... The unique id of the object.
+    + meta_template_name (string, optional, `sequencing_file_info`) ... The unique `meta_template_name` of the template; performs an exact match.
+
+### View All Object Metadata [GET]
+Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.
+>**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "object": {
+                        "kind": "dds-file",
+                        "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+                    },
+                    "template": {
+                        "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                        "name": "sequencing_file_info"
+                    },
+                    "properties": [
+                        {
+                            "template_property": {
+                                "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                                "key": "output_type"
+                            },
+                            "value": "alignments"
+                        }
+                    ]
+                }
+            ]
         }
 
 ## Group Search Objects
@@ -3784,13 +3902,12 @@ The search action can be used to find specific DDS objects (e.g. folders, files,
 
 *Deprecation: The* **Search Children** *actions will be deprecated once this action has been implemented.*
 
-## NOT_IMPLEMENTED_NEW Search Objects [POST /search]
+## Search Objects [POST /search]
 Search for DDS objects (i.e. Elasticsearch documents).
-
 >**Permission:** authenticated [scope: view_project for objects of kind (`dds-folder`, `dds-file`)]
 - - - - -
 
->**Search Properties**
+>**Properties**
 - - - - -
 + **include_kinds (string[ ], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
 + **search_query (object, required)** - The Elasticsearch query criteria (i.e. Query DSL).
@@ -3870,4 +3987,423 @@ Search for DDS objects (i.e. Elasticsearch documents).
                     ]
                 }
             ]
+        }
+
+## Group Project Transfer
+**Proposed endpoints to meet the needs of the GCB project transfer workflow**
+The *Project Transfer* actions can be used by research core facilities to formally transfer ownership of a project to a researcher (customer).  These endpoints support the transfer workflow and retain a record of the transfer history.
+
+## Project Transfer collection [/projects/{id}/transfers]
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
+### NOT_IMPLEMENTED_NEW Initiate a project transfer [POST]
+Initiates a project transfer from the current owner (i.e. `project_admin`) to a new owner or list of owners.
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **to_users (object[ ], required)** - The list of users to transfer project ownership to.
++ **to_users[ ].id (string, required)** - The unique `id` of a user.
+
+>**Response Properties**
+- - - - -
++ **from_user (object)** - The user who initiated the project transfer.
++ **status (string)** - The current status of the project transfer; defaults to `pending`.
++ **status_comment (string)** - An optional comment that can be provided when status transfers to a terminal state.
+
+>**Rules:**
+- - - - -
++ There must be no existing transfers for the `project` in a `pending` state.
+
++ Request (application/json)
+
+        {
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712"
+                }
+            ]
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "email": "mrgardner01@duke.edu",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "email": "cbrandn01@duke.edu",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "pending",
+            "status_comment": null,
+            "audit": { }
+        }
+
+### NOT_IMPLEMENTED_NEW List project transfers [GET]
+>**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                        "name": "Knockout Mouse Project (KOMP)"
+                    },
+                    "from_user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "email": "mrgardner01@duke.edu",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "to_users": [
+                        {
+                            "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                            "username": "cbrandon01",
+                            "email": "cbrandn01@duke.edu",
+                            "full_name": "Chad Brandon"
+                        }
+                    ],
+                    "status": "pending",
+                    "status_comment": null,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Project Transfer instance [/project_transfers/{id}]
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
+### NOT_IMPLEMENTED_NEW View a project transfer [GET]
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "email": "mrgardner01@duke.edu",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "email": "cbrandn01@duke.edu",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "pending",
+            "status_comment": null,
+            "audit": { }
+        }
+
+## NOT_IMPLEMENTED_NEW Accept a project transfer [PUT /project_transfers/{id}/accept]
+Accept a *pending* project transfer.
+>**Permission:** transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
++ All exisiting permissions for the project are removed, `project_viewer` is granted to the transfer initiater (i.e. `from_user`), and `project_admin` is granted to the list of recipients (i.e. `to_users`)
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "This data looks great..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "email": "mrgardner01@duke.edu",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "email": "cbrandn01@duke.edu",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "accepted",
+            "status_comment": "This data looks great...",
+            "audit": { }
+        }
+
+## NOT_IMPLEMENTED_NEW Reject a project transfer [PUT /project_transfers/{id}/reject]
+Reject a *pending* project transfer.
+>**Permission:** transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "Missing alignment files..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "email": "mrgardner01@duke.edu",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "email": "cbrandn01@duke.edu",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "rejected",
+            "status_comment": "Missing alignment files...",
+            "audit": { }
+        }
+
+## NOT_IMPLEMENTED_NEW Cancel a project transfer [PUT /project_transfers/{id}/cancel]
+Cancel a *pending* project transfer.
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "Sent to the wrong PI..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "email": "mrgardner01@duke.edu",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "email": "cbrandn01@duke.edu",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "canceled",
+            "status_comment": "Sent to the wrong PI...",
+            "audit": { }
+        }
+
+## View All Project Transfers [/project_transfers{?status}]
++ Parameters
+    + status (string, optional, `pending`) ... The `status` of the project transfer; can be one of `pending`,`accepted`, or `canceled`.
+
+### NOT_IMPLEMENTED_NEW View All Project Transfers [GET]
+Used to retrieve all project transfers visible to the current user, optionally filtered by status.
+>**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                        "name": "Knockout Mouse Project (KOMP)"
+                    },
+                    "from_user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "email": "mrgardner01@duke.edu",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "to_users": [
+                        {
+                            "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                            "username": "cbrandon01",
+                            "email": "cbrandn01@duke.edu",
+                            "full_name": "Chad Brandon"
+                        }
+                    ],
+                    "status": "pending",
+                    "status_comment": null,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Group Authentication Providers
+Represents the authentication providers (services) that are supported by DDS.
+
+## Authentication Providers collection [/auth_providers]
+
+### NOT_IMPLEMENTED_NEW List authentication providers [GET]
+>**Permission:** public
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                    "name": "duke",
+                    "description": "Duke Authentication Service"
+                }
+            ]
+        }
+
+## Authentication Provider instance [/auth_providers/{id}]
++ Parameters
+    + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
+
+### NOT_IMPLEMENTED_NEW View authentication provider [GET]
+>**Permission:** public
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+            "name": "duke",
+            "description": "Duke Authentication Service"
+        }
+
+## NOT_IMPLEMENTED_NEW Get All Authentication Provider Affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
+Get a list of affiliates (potential users), for a supported authentication provider.
+>**Permission:** public
+- - - - -
+
++ Parameters
+    + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
+    + full_name_contains (string, optional, `gardner`) ... Returns affiliates where their full name contains the specified string.
+
++ Response 200 (application/json)
+
+        {
+            "results":
+                [
+                    {
+                        "uid": "mrgardner01",
+                        "first_name": "Matthew",
+                        "last_name": "Gardner",
+                        "full_name": "Matthew Gardner",
+                        "email": "mrgardner01@duke.edu",
+                        "auth_provider": {
+                            "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                            "name": "duke"
+                        }
+                    }
+                ]
+        }
+
+### NOT_IMPLEMENTED_NEW View User by Auth Provider ID [GET /auth_providers/{id}/affiliates/{uid}/dds_user]
+Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.
+>**Permission:** authenticated
+- - - - -
+
+>**Rules:**
+- - - - -
++ If the `id` and `uid` are valid and a corresponding DDS user does not exist, the affiliate is registered as DDS user and returned.
+
++ Parameters
+    + id (string, required, `duke`) ... The `id` of an authentication provider (service) supported by the DDS application.
+    + uid (string, required, `gardner001`) ... The unique `uid` (user id) in the context of the specified auth provider.
+
++ Response 200 (application/json)
+
+        {
+            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+            "username": "mrgardner01",
+            "first_name": "Matthew",
+            "last_name": "Gardner",
+            "full_name": "Matthew Gardner",
+            "email": "mrgardner01@duke.edu",
+            "auth_provider": {
+                "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                "name": "duke",
+                "affiliate": {
+                    "uid": "mrgardner01"
+                }
+            },
+            "last_login_on": "2015-01-01T12:00:00Z",
+            "audit": { }
         }
