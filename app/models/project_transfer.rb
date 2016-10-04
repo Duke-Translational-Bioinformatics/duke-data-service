@@ -9,5 +9,17 @@ class ProjectTransfer < ActiveRecord::Base
   has_many :to_users, through: :project_transfer_users
 
   validates :project_id, presence: true
+  validates :status, uniqueness: {
+      scope: [:project_id],
+      case_sensitive: false,
+      message: 'Pending transfer already exists'
+    }, if: :pending?
   validates :from_user_id, presence: true
+
+  private
+
+  def pending?
+    status && status.downcase == 'pending'
+  end
+
 end
