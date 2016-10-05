@@ -1,6 +1,58 @@
 require 'rails_helper'
 
 describe DDS::V1::SearchAPI do
+
+  shared_examples 'a ProvenanceGraphSerializer Serialized endpoint' do |visible_node_syms:,
+    non_visible_node_syms: [],
+    visible_relationship_syms:,
+    non_visible_relationship_syms: []|
+    let(:visible_nodes) { visible_node_syms.map{|r| send(r) }.flatten }
+    let(:non_visible_nodes) { non_visible_node_syms.map{|r| send(r) }.flatten }
+    let(:visible_relationships) { visible_relationship_syms.map{|r| send(r) }.flatten }
+    let(:non_visible_relationships) { non_visible_relationship_syms.map{|r| send(r) }.flatten }
+
+    it 'should return properties for all nodes and relationships returned' do
+      is_expected.to eq(201)
+      expect(response.body).to be
+      expect(response.body).not_to eq('null')
+      response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('graph')
+      provenance_graph = response_json['graph']
+      expect(provenance_graph).to have_key('nodes')
+      expect(provenance_graph['nodes']).not_to be_empty
+      visible_nodes.each do |visible_node|
+        expected_node = ProvenanceGraphNode.new(visible_node.graph_node)
+        expected_node.properties = visible_node
+        expect(provenance_graph['nodes']).to include(
+          JSON.parse(ProvenanceGraphNodeSerializer.new(expected_node).to_json)
+        )
+      end
+      non_visible_nodes.each do |non_visible_node|
+        expected_node = ProvenanceGraphNode.new(non_visible_node.graph_node)
+        expect(provenance_graph['nodes']).to include(
+          JSON.parse(ProvenanceGraphNodeSerializer.new(expected_node).to_json)
+        )
+      end
+      expect(provenance_graph).to have_key('relationships')
+      expect(provenance_graph['relationships']).not_to be_empty
+
+      visible_relationships.each do |visible_relationship|
+        expected_relationship = ProvenanceGraphRelationship.new(visible_relationship.graph_relation)
+        expected_relationship.properties = visible_relationship
+        expect(provenance_graph['relationships']).to include(
+         JSON.parse(ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json)
+        )
+      end
+
+      non_visible_relationships.each do |non_visible_relationship|
+        expected_relationship = ProvenanceGraphRelationship.new(non_visible_relationship.graph_relation)
+        expect(provenance_graph['relationships']).to include(
+         JSON.parse(ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json)
+        )
+      end
+    end
+  end
+
   include_context 'with authentication'
 
   describe 'Search Provenance' do
@@ -53,17 +105,6 @@ describe DDS::V1::SearchAPI do
           id: start_node_id
         }
       }}
-      let(:expected_nodes) { [
-        start_node.id,
-        activity.id,
-        current_user.id,
-        other_file_version.id
-      ] }
-      let(:expected_relationships) { [
-        activity_used_start_node.id,
-        activity_associated_with_current_user.id,
-        start_node_derived_from_other_file_version.id
-      ] }
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
@@ -96,28 +137,9 @@ describe DDS::V1::SearchAPI do
       end
 
       context 'when all nodes and relationships accessible by user' do
-        it 'should return properties for all nodes and relationships returned' do
-          is_expected.to eq(201)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('graph')
-          provenance_graph = response_json['graph']
-          expect(provenance_graph).to have_key('nodes')
-          expect(provenance_graph['nodes']).not_to be_empty
-          provenance_graph['nodes'].each do |node|
-            expect(expected_nodes).to include(node['id'])
-            expect(node['properties']).not_to eq('nil')
-            expect(node['properties']['id']).to eq(node['id'])
-          end
-          expect(provenance_graph).to have_key('relationships')
-          expect(provenance_graph['relationships']).not_to be_empty
-          provenance_graph['relationships'].each do |relationship|
-            expect(expected_relationships).to include(relationship['id'])
-            expect(relationship['properties']).not_to eq('nil')
-            expect(relationship['properties']['id']).to eq(relationship['id'])
-          end
-        end
+        it_behaves_like 'a ProvenanceGraphSerializer Serialized endpoint',
+          visible_node_syms: [:start_node, :activity, :current_user, :other_file_version],
+          visible_relationship_syms: [:activity_used_start_node, :activity_associated_with_current_user, :start_node_derived_from_other_file_version]
       end
 
       context 'max_hops 1' do
@@ -128,33 +150,10 @@ describe DDS::V1::SearchAPI do
           },
           max_hops: 1
         }}
-        let(:expected_relationships) { [
-          activity_used_start_node.id,
-          start_node_derived_from_other_file_version.id
-        ] }
 
-        it 'should return properties for nodes and relationships directly related to the start_node' do
-          is_expected.to eq(201)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('graph')
-          provenance_graph = response_json['graph']
-          expect(provenance_graph).to have_key('nodes')
-          expect(provenance_graph['nodes']).not_to be_empty
-          provenance_graph['nodes'].each do |node|
-            expect(expected_nodes).to include(node['id'])
-            expect(node['properties']).not_to eq('nil')
-            expect(node['properties']['id']).to eq(node['id'])
-          end
-          expect(provenance_graph).to have_key('relationships')
-          expect(provenance_graph['relationships']).not_to be_empty
-          provenance_graph['relationships'].each do |relationship|
-            expect(expected_relationships).to include(relationship['id'])
-            expect(relationship['properties']).not_to eq('nil')
-            expect(relationship['properties']['id']).to eq(relationship['id'])
-          end
-        end
+        it_behaves_like 'a ProvenanceGraphSerializer Serialized endpoint',
+          visible_node_syms: [:start_node, :activity, :other_file_version],
+          visible_relationship_syms: [:activity_used_start_node, :start_node_derived_from_other_file_version]
       end
 
       context 'when a node is not accessible by user' do
@@ -170,36 +169,74 @@ describe DDS::V1::SearchAPI do
           )
         }
 
-        it 'should return kind, id, and is_deleted for the inaccessible node' do
-          is_expected.to eq(201)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('graph')
-          provenance_graph = response_json['graph']
-          expect(provenance_graph).to have_key('nodes')
-          expect(provenance_graph['nodes']).not_to be_empty
-          provenance_graph['nodes'].each do |node|
-            expect(expected_nodes).to include(node['id'])
-            if node['id'] == other_file_version.id
-              expect(node['properties']).not_to be_nil
-              expect(node['properties']['id']).to eq(other_file_version.id)
-              expect(node['properties']['kind']).to eq(other_file_version.kind)
-              if other_file_version.is_deleted
-                expect(node['properties']['is_deleted']).to eq("true")
-              else
-                expect(node['properties']['is_deleted']).to eq("false")
-              end
-            end
-          end
-          expect(provenance_graph).to have_key('relationships')
-          expect(provenance_graph['relationships']).not_to be_empty
-          provenance_graph['relationships'].each do |relationship|
-            expect(expected_relationships).to include(relationship['id'])
-            expect(relationship['properties']).not_to eq('nil')
-            expect(relationship['properties']['id']).to eq(relationship['id'])
-          end
-        end
+        it_behaves_like 'a ProvenanceGraphSerializer Serialized endpoint',
+          visible_node_syms: [:start_node, :activity, :current_user],
+          non_visible_node_syms: [:other_file_version],
+          visible_relationship_syms: [:activity_used_start_node, :start_node_derived_from_other_file_version]
+      end
+    end
+  end
+
+  describe 'Search Provenance wasGeneratedBy' do
+    let!(:project) { FactoryGirl.create(:project) }
+    let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+    let!(:resource_permission) { project_permission }
+    let!(:data_file) { FactoryGirl.create(:data_file, project: project) }
+    let!(:file_version) { data_file.file_versions.first }
+    let(:file_version_id) { file_version.id }
+    let!(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+    let(:resource_class) { FileVersion }
+    let(:resource_kind) { file_version.kind }
+
+    #(file_version)-[was_generated_by]->(activity)
+    let!(:activity_generated_file_version) {
+      FactoryGirl.create(:generated_by_activity_prov_relation,
+        relatable_from: file_version,
+        relatable_to: activity
+      )
+    }
+
+    describe 'POST /api/v1/search/provenance/was_generated_by' do
+      let(:url) { "/api/v1/search/provenance/was_generated_by" }
+      subject { post(url, payload.to_json, headers) }
+      let(:called_action) { 'POST' }
+
+      let(:payload) {{
+        file_versions: [
+            {
+              id: file_version.id
+            }
+          ]
+      }}
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:expected_response_status) { 201 }
+      end
+
+      context 'when all nodes and relationships accessible by user' do
+        it_behaves_like 'a ProvenanceGraphSerializer Serialized endpoint',
+          visible_node_syms: [:file_version, :activity],
+          visible_relationship_syms: [:activity_generated_file_version]
+      end
+
+      context 'when a node is not accessible by user' do
+        let!(:other_project) { FactoryGirl.create(:project) }
+        let!(:other_file) { FactoryGirl.create(:data_file, project: other_project) }
+        let!(:other_file_version) { other_file.file_versions.first }
+
+        # (activity)-[used]->(other_file_version)
+        let!(:activity_used_other_file_version) {
+          FactoryGirl.create(:used_prov_relation,
+            relatable_from: activity,
+            relatable_to: other_file_version
+          )
+        }
+
+        it_behaves_like 'a ProvenanceGraphSerializer Serialized endpoint',
+          visible_node_syms: [:file_version, :activity],
+          non_visible_node_syms: [:other_file_version],
+          visible_relationship_syms: [:activity_generated_file_version, :activity_used_other_file_version]
       end
     end
   end
