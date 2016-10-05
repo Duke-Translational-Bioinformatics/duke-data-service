@@ -16,7 +16,8 @@ describe DDS::V1::ProjectAffiliatesAPI do
   let!(:resource_permission) { project_permission }
 
   describe 'Project Affiliate collection' do
-    let(:url) { "/api/v1/projects/#{project.id}/affiliates" }
+    let(:url) { "/api/v1/projects/#{project_id}/affiliates" }
+    let(:project_id) { project.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -32,11 +33,17 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
     end
   end
 
   describe 'Project Affiliate instance' do
-    let(:url) { "/api/v1/projects/#{project.id}/affiliates/#{user.id}" }
+    let(:url) { "/api/v1/projects/#{project_id}/affiliates/#{user_id}" }
+    let(:project_id) { project.id }
+    let(:user_id) { user.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -46,6 +53,14 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
       end
     end
 
@@ -90,6 +105,14 @@ describe DDS::V1::ProjectAffiliatesAPI do
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
+      end
     end
 
     describe 'DELETE' do
@@ -112,6 +135,14 @@ describe DDS::V1::ProjectAffiliatesAPI do
 
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
       end
     end
   end

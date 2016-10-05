@@ -70,13 +70,17 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
   end
   describe 'SoftwareAgent instance' do
-    let(:url) { "/api/v1/software_agents/#{resource.id}" }
+    let(:url) { "/api/v1/software_agents/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent restricted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
 
     describe 'PUT' do
@@ -99,6 +103,9 @@ describe DDS::V1::SoftwareAgentsAPI do
       it_behaves_like 'an annotate_audits endpoint'
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a software_agent restricted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
 
     describe 'DELETE' do
@@ -122,10 +129,14 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a software_agent restricted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
 
     describe 'api_key' do
-      let(:url) { "/api/v1/software_agents/#{software_agent.id}/api_key" }
+      let(:url) { "/api/v1/software_agents/#{software_agent_id}/api_key" }
+      let(:software_agent_id) { software_agent.id }
       let(:resource) { ApiKey.find(software_agent.api_key.id) }
       let(:resource_class) { ApiKey }
       let(:resource_serializer) { ApiKeySerializer }
@@ -142,6 +153,10 @@ describe DDS::V1::SoftwareAgentsAPI do
           let(:expected_audits) { 2 }
         end
         it_behaves_like 'a software_agent restricted resource'
+        it_behaves_like 'an identified resource' do
+          let(:software_agent_id) { "doesNotExist" }
+          let(:resource_class) { SoftwareAgent }
+        end
       end
 
       describe 'GET' do
@@ -149,6 +164,10 @@ describe DDS::V1::SoftwareAgentsAPI do
         it_behaves_like 'a viewable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent restricted resource'
+        it_behaves_like 'an identified resource' do
+          let(:software_agent_id) { "doesNotExist" }
+          let(:resource_class) { SoftwareAgent }
+        end
       end
 
       describe 'DELETE' do
@@ -156,6 +175,10 @@ describe DDS::V1::SoftwareAgentsAPI do
         it_behaves_like 'a removable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent restricted resource'
+        it_behaves_like 'an identified resource' do
+          let(:software_agent_id) { "doesNotExist" }
+          let(:resource_class) { SoftwareAgent }
+        end
       end
     end
   end
