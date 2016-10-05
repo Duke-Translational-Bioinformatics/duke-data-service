@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ProvenanceGraph do
+RSpec.describe SearchProvenanceGraph do
   let(:policy_scope) { Proc.new {|scope| scope } }
 
   # (activity)-(used)->(focus)
@@ -164,7 +164,7 @@ RSpec.describe ProvenanceGraph do
   context 'instantiations' do
     context 'default' do
       subject{
-        ProvenanceGraph.new(
+        SearchProvenanceGraph.new(
           focus: focus,
           policy_scope: policy_scope
         )
@@ -206,7 +206,7 @@ RSpec.describe ProvenanceGraph do
 
     context 'max_hops 1' do
       subject{
-        ProvenanceGraph.new(
+        SearchProvenanceGraph.new(
           focus: focus,
           max_hops: 1,
           policy_scope: policy_scope
@@ -255,7 +255,7 @@ RSpec.describe ProvenanceGraph do
 
     context 'max_hops 2' do
       subject{
-        ProvenanceGraph.new(
+        SearchProvenanceGraph.new(
           focus: focus,
           max_hops: 2,
           policy_scope: policy_scope,
@@ -304,7 +304,7 @@ RSpec.describe ProvenanceGraph do
 
     context 'restrictive policy_scope' do
       subject{
-        ProvenanceGraph.new(
+        SearchProvenanceGraph.new(
           focus: focus,
           max_hops: 1,
           policy_scope: Proc.new { |scope| scope.none }
