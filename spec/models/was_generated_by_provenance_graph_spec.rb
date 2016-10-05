@@ -29,7 +29,7 @@ RSpec.describe WasGeneratedByProvenanceGraph do
       relatable_from: fv2ga
     )
   }
-  let!(:file_versions) { [ fv1.id, fv2.id ] }
+  let!(:file_versions) { [ {id: fv1.id}, {id: fv2.id} ] }
 
   it { expect(described_class).to include(ActiveModel::Serialization) }
 

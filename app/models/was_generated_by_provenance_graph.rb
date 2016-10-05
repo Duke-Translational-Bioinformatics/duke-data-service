@@ -8,7 +8,7 @@ class WasGeneratedByProvenanceGraph < ProvenanceGraph
     OPTIONAL MATCH (generating_activity)-[contributing:WasGeneratedBy|:Used]-(contributed:FileVersion)'
 
     Neo4j::Session.query.match(match_clause).params(
-      file_versions: file_versions
+      file_versions: file_versions.map{|fv| fv[:id] }.flatten
     ).pluck(
       "file_version",
       "generated_by",

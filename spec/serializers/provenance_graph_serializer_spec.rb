@@ -64,7 +64,7 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
         relatable_to: fv1ga
       )
     }
-    let!(:file_versions) { [ fv1.id ] }
+    let!(:file_versions) { [ {id: fv1.id} ] }
     let(:resource) {
       WasGeneratedByProvenanceGraph.new(
         file_versions: file_versions,
