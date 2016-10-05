@@ -205,35 +205,11 @@ describe DDS::V1::SearchAPI do
   end
 
   describe 'Search Objects' do
-    around :each do |example|
-      current_indices = DataFile.__elasticsearch__.client.cat.indices
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
-        if current_indices.include? indexed_model.index_name
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-        indexed_model.__elasticsearch__.client.indices.create(
-          index: indexed_model.index_name,
-          body: {
-            settings: indexed_model.settings.to_hash,
-            mappings: indexed_model.mappings.to_hash
-          }
-        )
-      end
-
-      expect(indexed_folder).to be_persisted
-      indexed_folder.__elasticsearch__.index_document
-      expect(indexed_data_file).to be_persisted
-      indexed_data_file.__elasticsearch__.index_document
-
-      Folder.__elasticsearch__.refresh_index!
-      DataFile.__elasticsearch__.refresh_index!
-
-      example.run
-
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
-        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-      end
-    end
+    include_context 'elasticsearch prep', [],
+    [
+      :indexed_folder,
+      :indexed_data_file
+    ]
 
     describe 'POST /api/v1/search' do
       let(:url) { "/api/v1/search" }

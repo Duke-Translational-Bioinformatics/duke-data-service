@@ -4,6 +4,7 @@ class DataFile < Container
   belongs_to :upload
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
+  has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :build_file_version, if: :new_file_version_needed?
@@ -66,7 +67,7 @@ class DataFile < Container
   end
 
   def as_indexed_json(options={})
-    self.as_json(include: {tags: {only: :label}})
+    DataFileSearchDocumentSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do

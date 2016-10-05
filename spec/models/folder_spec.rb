@@ -21,6 +21,7 @@ RSpec.describe Folder, type: :model do
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
     it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
@@ -150,12 +151,7 @@ RSpec.describe Folder, type: :model do
     describe 'as_indexed_json' do
       # let!(:tag) { FactoryGirl.create(:tag, taggable: child_folder) }
       it { is_expected.to respond_to 'as_indexed_json' }
-      it {
-        indexed_json = subject.as_indexed_json
-        ['id', 'name', 'is_deleted', 'created_at', 'updated_at', 'label'].each do |expected_key|
-          expect(indexed_json).to have_key expected_key
-        end
-      }
+      it { expect(subject.as_indexed_json).to eq(FolderSearchDocumentSerializer.new(subject).as_json) }
     end
 
     describe 'mappings' do

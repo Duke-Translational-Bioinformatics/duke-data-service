@@ -16,7 +16,21 @@ namespace :elasticsearch do
           }
         )
       end
+      # property mappings
+      MetaProperty.all.each do |mp|
+        mp.create_mapping
+      end
     end #create
+
+    desc "indexes all documents"
+    task index_documents: :environment do
+      Rails.logger.level = 3
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        indexed_model.all.each do |im|
+          im.__elasticsearch__.index_document
+        end
+      end
+    end
 
     desc "drops indices for all indexed models"
     task drop: :environment do
