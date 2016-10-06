@@ -51,6 +51,34 @@ def create_a_sa(transaction,name):
         return(json.loads(r.text))
     else:
         print('POST /software_agents returned: ' + str(r.status_code))
+key = re.sub('\-','',str(uuid.uuid4()))
+
+def create_metadata_property(template_id):
+    url = os.getenv('HOST_NAME') + "/templates/" + template_id + "/properties"
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    body = {
+            "key": key,
+            "label": re.sub('\-','',str(uuid.uuid4())),
+            "description": "The type of data in the sequencing output file.",
+            "type": "string"
+            }
+    r = requests.post(url, headers=headers, data=json.dumps(body))
+    if r.status_code ==201:
+        return(str(json.loads(r.text)['id']))
+    else:
+        print('POST /software_agents returned: ' + str(r.status_code))
+
+def create_meta_object(file_id,template_id):
+    url = os.getenv('HOST_NAME') + "/meta/dds-file/" + file_id + "/" + template_id
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    body = {
+            "properties": [{"key": key,"value": "alignments"}]
+            }
+    r = requests.post(url, headers=headers, data=json.dumps(body))
+    if r.status_code ==201:
+        return(json.loads(r.text))
+    else:
+        print('POST /software_agents returned: ' + str(r.status_code))
 
 def create_metadata_templatess():
     url = os.getenv('HOST_NAME') + "/templates"
@@ -108,7 +136,6 @@ def upload_a_file(proj_id,unique=None):
     chunk['hash'] = {};
     chunk['hash']['value'] = hashlib.md5(chunk['content']).hexdigest();
     chunk['hash']['algorithm'] = 'md5';
-    #first we'll initiate the upload process
     body = {"name": "made_up_data.Rdata",
             "content_type": chunk['content_type'],
             "size": chunk['size'],
@@ -120,17 +147,16 @@ def upload_a_file(proj_id,unique=None):
     if r.status_code != 201:
         print("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
     upload_id = str(json.loads(r.text)['id'])
-    ## Now we need to get a pre-signed url to the swift storage facility
     body = {"number": 1,
             "size": chunk['size'],
             "hash": {"value":chunk['hash']['value'],"algorithm":'md5'}
             }
     url = os.getenv('HOST_NAME') + "/uploads/" + upload_id + "/chunks"
     r2 = requests.put(url, headers=headers, data=json.dumps(body))
-    ## Now we need to upload the document
+        ## Now we need to upload the document
     body = chunk['content']
     url = str(json.loads(r2.text)['host']) + str(json.loads(r2.text)['url'])
-    r3 = requests.put(url, data=body)
+    r3 = requests.put(url, data=body,verify=False)
     if r3.status_code != 201:
         print("couldn't upload the content to the swift server")
     ##Let data service know the upload is complete

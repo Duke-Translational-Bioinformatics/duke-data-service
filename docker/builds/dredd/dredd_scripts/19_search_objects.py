@@ -13,4 +13,4 @@ utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
 ###############################################################################
 @hooks.before("Search Objects > Search Objects > Search Objects")
 def skippy19_1(transaction):
-    utils.skip_this_endpoint(transaction)
+    utils.pass_this_endpoint(transaction)

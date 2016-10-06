@@ -73,11 +73,11 @@ def changeid216_2(transaction):
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('ac242faf-fba0-4293-a949-0b82ae7ba810',prov_rel_id)
 @hooks.before("Search Provenance > Search Provenance > Search Provenance")
-# def skippy16_3(transaction):
-#     activity_id = utils.create_provenance_activity()
-#     requestBody = json.loads(transaction[u'request'][u'body'])
-#     requestBody['start_node']['id'] = activity_id
-#     transaction[u'request'][u'body'] = json.dumps(requestBody)
+def skippy16_3(transaction):
+    activity_id = utils.create_provenance_activity()
+    requestBody = json.loads(transaction[u'request'][u'body'])
+    requestBody['start_node']['id'] = activity_id
+    transaction[u'request'][u'body'] = json.dumps(requestBody)
 @hooks.before("Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy > NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy")
 def skipy16_32(transaction):
     utils.skip_this_endpoint(transaction)

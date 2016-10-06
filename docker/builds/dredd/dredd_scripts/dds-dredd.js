@@ -140,7 +140,7 @@ configuration = {
             // "Metadata > Object Metadata instance > Update object metadata",
             // "Metadata > Object Metadata instance > Delete object metadata",
             // "Metadata > View All Object Metadata > View All Object Metadata",
-            // "Search Objects > Search Objects > NOT_IMPLEMENTED_NEW Search Objects",
+            // "Search Objects > Search Objects > Search Objects",
             ], // Array of Strings, run only transaction that match these names
 
     'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
@@ -169,7 +169,7 @@ configuration = {
                   '21_auth_provider.py',
                 ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'reporter': [], // Array of possible reporters, see folder src/reporters
+    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
 
     'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
