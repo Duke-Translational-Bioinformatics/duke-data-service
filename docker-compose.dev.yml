@@ -75,6 +75,12 @@ services:
     build: ./docker/builds/apiary
     volumes:
       - .:/var/www/app
+  validateapiary:
+    image: dukedataservice_apiary
+    volumes_from:
+      - apiary
+    entrypoint: ['api-blueprint-validator']
+    command: apiary.apib
   genapiary:
     image: dukedataservice_apiary
     volumes_from:
