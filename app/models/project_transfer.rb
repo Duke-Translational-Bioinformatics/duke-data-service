@@ -5,6 +5,7 @@ class ProjectTransfer < ActiveRecord::Base
   belongs_to :project
   belongs_to :from_user, class_name: 'User'
 
+  has_many :project_permissions, through: :project
   has_many :project_transfer_users
   has_many :to_users, through: :project_transfer_users
 

@@ -6,6 +6,7 @@ RSpec.describe ProjectTransfer, type: :model do
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
+    it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to belong_to(:from_user).class_name('User') }
     it { is_expected.to have_many(:project_transfer_users) }
     it { is_expected.to have_many(:to_users).through(:project_transfer_users) }
@@ -18,14 +19,6 @@ RSpec.describe ProjectTransfer, type: :model do
     it { is_expected.to validate_presence_of :project_id }
     it { is_expected.to validate_presence_of :from_user_id }
 
-    # context 'when status pending' do
-    #   subject { FactoryGirl.build(:project_transfer, :pending, project: existing_project_transfer.project) }
-    #   it { is_expected.to validate_uniqueness_of(:project_id).scoped_to(:status).case_insensitive }
-    # end
-    # context 'when status not pending' do
-    #   subject { FactoryGirl.build(:project_transfer, project: existing_project_transfer.project) }
-    #   it { is_expected.not_to validate_uniqueness_of(:project_id).scoped_to(:status).case_insensitive }
-    # end
     it { is_expected.to allow_value('pending').for(:status) }
     it { is_expected.to allow_values(*non_pending_statuses).for(:status) }
 
