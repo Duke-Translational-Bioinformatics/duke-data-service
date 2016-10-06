@@ -7,7 +7,7 @@ describe DDS::V1::UploadsAPI do
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id, project: project) }
   let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
 
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
 
