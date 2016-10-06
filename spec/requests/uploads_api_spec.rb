@@ -146,13 +146,14 @@ describe DDS::V1::UploadsAPI do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { "PUT" }
       let!(:payload) {{
-        number: chunk_stub.number,
+        number: payload_chunk_number,
         size: chunk_stub.size,
         hash: {
           value: chunk_stub.fingerprint_value,
           algorithm: chunk_stub.fingerprint_algorithm
         }
       }}
+      let(:payload_chunk_number) { chunk_stub.number }
       it_behaves_like 'a creatable resource' do
         let(:expected_response_status) {200}
         let(:new_object) {
@@ -164,6 +165,11 @@ describe DDS::V1::UploadsAPI do
             fingerprint_algorithm: payload[:hash][:algorithm]
           ).last
         }
+      end
+
+      context 'when chunk.number exists' do
+        let(:payload_chunk_number) { chunk.number }
+        it_behaves_like 'an updatable resource'
       end
 
       it_behaves_like 'a validated resource' do
