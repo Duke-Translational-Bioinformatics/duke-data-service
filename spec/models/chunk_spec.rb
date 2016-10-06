@@ -12,28 +12,18 @@ RSpec.describe Chunk, type: :model do
   it_behaves_like 'an audited model'
 
   describe 'associations' do
-    it 'should belong_to an upload' do
-      should belong_to :upload
-    end
-    it 'should have_one storage_provider via upload' do
-      should have_one(:storage_provider).through(:upload)
-    end
-    it 'should have one project via upload' do
-      should have_one(:project).through(:upload)
-    end
-    it 'should have many project permissions' do
-      should have_many(:project_permissions).through(:upload)
-    end
+    it { is_expected.to belong_to(:upload) }
+    it { is_expected.to have_one(:storage_provider).through(:upload) }
+    it { is_expected.to have_one(:project).through(:upload) }
+    it { is_expected.to have_many(:project_permissions).through(:upload) }
   end
 
   describe 'validations' do
-    it 'should require attributes' do
-      should validate_presence_of :upload_id
-      should validate_presence_of :number
-      should validate_presence_of :size
-      should validate_presence_of :fingerprint_value
-      should validate_presence_of :fingerprint_algorithm
-    end
+    it { is_expected.to validate_presence_of(:upload_id) }
+    it { is_expected.to validate_presence_of(:number) }
+    it { is_expected.to validate_presence_of(:size) }
+    it { is_expected.to validate_presence_of(:fingerprint_value) }
+    it { is_expected.to validate_presence_of(:fingerprint_algorithm) }
   end
 
   describe 'instance methods' do
