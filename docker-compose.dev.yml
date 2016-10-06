@@ -71,3 +71,19 @@ services:
     volumes:
       - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
       - ./apiary.apib:/home/dredd_scripts/apiary.apib
+  apiary:
+    build: ./docker/builds/apiary
+    volumes:
+      - .:/var/www/app
+  validateapiary:
+    image: dukedataservice_apiary
+    volumes_from:
+      - apiary
+    entrypoint: ['api-blueprint-validator']
+    command: apiary.apib
+  genapiary:
+    image: dukedataservice_apiary
+    volumes_from:
+      - apiary
+    entrypoint: ['aglio']
+    command: ['-i','apiary.apib', '-o', 'app/views/apidocs/index.html']
