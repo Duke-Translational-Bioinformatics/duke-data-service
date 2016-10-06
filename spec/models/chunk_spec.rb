@@ -24,6 +24,7 @@ RSpec.describe Chunk, type: :model do
     it { is_expected.to validate_presence_of(:size) }
     it { is_expected.to validate_presence_of(:fingerprint_value) }
     it { is_expected.to validate_presence_of(:fingerprint_algorithm) }
+    it { is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive }
   end
 
   describe 'instance methods' do
