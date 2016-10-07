@@ -17,7 +17,8 @@ describe DDS::V1::ProjectPermissionsAPI do
   let(:resource_user) { resource.user }
 
   describe 'Project Permissions collection' do
-    let(:url) { "/api/v1/projects/#{resource_project.id}/permissions" }
+    let(:url) { "/api/v1/projects/#{project_id}/permissions" }
+    let(:project_id) { resource_project.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -39,8 +40,8 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/permissions" }
-        let(:resource_class) {'Project'}
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { resource_project }
@@ -49,7 +50,9 @@ describe DDS::V1::ProjectPermissionsAPI do
   end
 
   describe 'Project Permission instance' do
-    let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/#{resource_user.id}" }
+    let(:url) { "/api/v1/projects/#{project_id}/permissions/#{user_id}" }
+    let(:project_id) { resource_project.id }
+    let(:user_id) { resource_user.id }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -70,18 +73,18 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/permissions/#{resource_user.id}" }
-        let(:resource_class) {'Project'}
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
-        let(:resource_class) {'User'}
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
       end
       it_behaves_like 'an identified resource' do
         let!(:payload) {{
           auth_role: {id: 'invalid_role'}
         }}
-        let(:resource_class) {'AuthRole'}
+        let(:resource_class) { AuthRole }
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
@@ -122,11 +125,15 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
-        let(:resource_class) {'User'}
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{other_permission.project.id}/permissions/#{resource_user.id}" }
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { other_permission.project.id }
         let(:resource_class) {'ProjectPermission'}
       end
       it_behaves_like 'a logically deleted resource' do
@@ -142,8 +149,16 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/#{resource_project.id}/permissions/notexists_userid" }
-        let(:resource_class) {'User'}
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:user_id) { "doesNotExist" }
+        let(:resource_class) { User }
+      end
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { other_permission.project.id }
+        let(:resource_class) {'ProjectPermission'}
       end
 
       it_behaves_like 'an annotate_audits endpoint' do

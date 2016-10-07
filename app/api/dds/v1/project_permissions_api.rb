@@ -90,7 +90,7 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        permission = ProjectPermission.find_by(project: project, user: user)
+        permission = ProjectPermission.find_by!(project: project, user: user)
         authorize permission, :destroy?
         permission.destroy
         body false

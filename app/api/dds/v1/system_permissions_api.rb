@@ -74,7 +74,7 @@ module DDS
       delete '/system/permissions/:user_id', root: false do
         authenticate!
         user = User.find(params[:user_id])
-        permission = user.system_permission
+        permission = SystemPermission.find_by!(user: user)
         authorize permission, :destroy?
         permission.destroy
         body false
