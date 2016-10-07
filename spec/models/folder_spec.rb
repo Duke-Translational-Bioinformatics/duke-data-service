@@ -14,13 +14,14 @@ RSpec.describe Folder, type: :model do
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind'
   it_behaves_like 'a logically deleted model'
-  
+
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
     it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
@@ -137,6 +138,43 @@ RSpec.describe Folder, type: :model do
         expect(invalid_file.reload).to be_truthy
         expect(invalid_file.is_deleted?).to be_truthy
       end
+    end
+  end
+
+  describe 'elasticsearch' do
+    it { expect(described_class).to include(Elasticsearch::Model) }
+
+    # TODO, when we move to asynchronous indexing, remove this and replace with
+    # a test to ensure that jobs are created on create, update, delete
+    it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
+
+    describe 'as_indexed_json' do
+      # let!(:tag) { FactoryGirl.create(:tag, taggable: child_folder) }
+      it { is_expected.to respond_to 'as_indexed_json' }
+      it { expect(subject.as_indexed_json).to eq(FolderSearchDocumentSerializer.new(subject).as_json) }
+    end
+
+    describe 'mappings' do
+      subject { root_folder.class.mapping.to_hash }
+      it {
+        is_expected.to have_key :folder
+
+        expect(subject[:folder]).to have_key :dynamic
+        expect(subject[:folder][:dynamic]).to eq "false"
+
+        expect(subject[:folder]).to have_key :properties
+        [:id, :name, :is_deleted, :created_at, :updated_at].each do |expected_property|
+          expect(subject[:folder][:properties]).to have_key expected_property
+        end
+
+        expect(subject[:folder][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:name][:type]).to eq "string"
+
+        expect(subject[:folder][:properties][:is_deleted][:type]).to eq "boolean"
+
+        expect(subject[:folder][:properties][:created_at][:type]).to eq "date"
+        expect(subject[:folder][:properties][:updated_at][:type]).to eq "date"
+      }
     end
   end
 end

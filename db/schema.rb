@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160624181343) do
+ActiveRecord::Schema.define(version: 20160915195034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,22 @@ ActiveRecord::Schema.define(version: 20160624181343) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "meta_properties", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "meta_template_id"
+    t.uuid     "property_id"
+    t.string   "value"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "meta_templates", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "templatable_id"
+    t.string   "templatable_type"
+    t.uuid     "template_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
   create_table "project_permissions", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
     t.uuid     "project_id"
     t.uuid     "user_id"
@@ -155,6 +171,17 @@ ActiveRecord::Schema.define(version: 20160624181343) do
     t.boolean  "is_deleted",  default: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+  end
+
+  create_table "properties", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.uuid     "template_id"
+    t.string   "key"
+    t.string   "label"
+    t.text     "description"
+    t.string   "data_type"
+    t.boolean  "is_deprecated"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "prov_relations", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
@@ -213,6 +240,16 @@ ActiveRecord::Schema.define(version: 20160624181343) do
     t.uuid     "taggable_id"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+  end
+
+  create_table "templates", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
+    t.string   "name"
+    t.string   "label"
+    t.text     "description"
+    t.boolean  "is_deprecated", default: false
+    t.uuid     "creator_id"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "uploads", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

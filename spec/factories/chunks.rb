@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :chunk do
     upload
-    number { Faker::Number.digit }
+    sequence(:number, 1000)
     size { Faker::Number.digit }
     fingerprint_value { SecureRandom.hex(32) }
     fingerprint_algorithm "md5"

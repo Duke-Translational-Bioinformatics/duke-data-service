@@ -110,14 +110,17 @@ module DDS
             authenticate!
             chunk_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
-            chunk = Chunk.new({
-              upload_id: upload.id,
-              number: chunk_params[:number],
+            if chunk = Chunk.find_by(upload: upload, number: chunk_params[:number])
+              authorize chunk, :update?
+            else
+              chunk = Chunk.new({upload: upload, number: chunk_params[:number]})
+              authorize chunk, :create?
+            end
+            chunk.attributes = {
               size: chunk_params[:size],
               fingerprint_value: chunk_params[:hash][:value],
               fingerprint_algorithm: chunk_params[:hash][:algorithm],
-            })
-            authorize chunk, :create?
+            }
             if chunk.save
               chunk
             else

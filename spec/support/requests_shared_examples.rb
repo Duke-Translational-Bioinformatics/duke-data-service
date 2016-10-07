@@ -237,12 +237,12 @@ shared_examples 'a viewable resource' do
 end
 
 shared_examples 'an updatable resource' do
+  let(:expected_response_status) { 200 }
   before do
     expect(resource).to be_persisted
   end
   it 'should return success' do
-    is_expected.to eq(200)
-    expect(response.status).to eq(200)
+    is_expected.to eq(expected_response_status)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
   end
@@ -250,7 +250,7 @@ shared_examples 'an updatable resource' do
     resource.reload
     original_attributes = resource.attributes
     expect {
-      is_expected.to eq(200)
+      is_expected.to eq(expected_response_status)
     }.not_to change{resource_class.count}
     resource.reload
     expect(resource.attributes).not_to eq(original_attributes)
@@ -259,7 +259,7 @@ shared_examples 'an updatable resource' do
     end
   end
   it 'should return a serialized resource' do
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     resource.reload
     expect(response.body).to include(resource_serializer.new(resource).to_json)
   end
@@ -347,7 +347,7 @@ shared_examples 'an identified resource' do
 end
 
 shared_examples 'a kinded resource' do
-  it 'should return 404 with error when resource not found with id' do
+  it 'should return 404 with error when kind is not supported' do
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -356,6 +356,21 @@ shared_examples 'a kinded resource' do
     expect(response_json['error']).to eq('404')
     expect(response_json).to have_key('reason')
     expect(response_json['reason']).to eq("object_kind #{resource_kind} Not Supported")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
+  end
+end
+
+shared_examples 'an indexed resource' do
+  it 'should return 404 with error when kind is not indexed' do
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("object_kind #{resource_class} Not Indexed")
     expect(response_json).to have_key('suggestion')
     expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
   end

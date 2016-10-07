@@ -29,7 +29,8 @@ describe DDS::V1::SystemPermissionsAPI do
   end
 
   describe 'System Permission instance' do
-    let(:url) { "/api/v1/system/permissions/#{resource_user.id}" }
+    let(:url) { "/api/v1/system/permissions/#{resource_user_id}" }
+    let(:resource_user_id) { resource_user.id }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
@@ -56,7 +57,7 @@ describe DDS::V1::SystemPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/system/permissions/notexists_userid" }
+        let(:resource_user_id) { "doesNotExist" }
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
@@ -75,7 +76,7 @@ describe DDS::V1::SystemPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/system/permissions/notexists_userid" }
+        let(:resource_user_id) { "doesNotExist" }
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
@@ -99,8 +100,11 @@ describe DDS::V1::SystemPermissionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/system/permissions/notexists_userid" }
+        let(:resource_user_id) { "doesNotExist" }
         let(:resource_class) {'User'}
+      end
+      it_behaves_like 'an identified resource' do
+        let(:resource_user) {FactoryGirl.create(:user)}
       end
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }

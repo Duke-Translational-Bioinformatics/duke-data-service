@@ -2,11 +2,12 @@ class ProvenanceGraphNode
   include ActiveModel::Serialization
   include Comparable
 
-  attr_reader :id, :labels
+  attr_reader :id, :labels, :node
   attr_accessor :properties
 
   def initialize(node)
     @id = node.model_id
+    @node = node
     @labels = [ "#{ node.class.mapped_label_name }" ]
     @properties = nil
   end

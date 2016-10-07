@@ -41,13 +41,19 @@ RSpec.describe Tag, type: :model do
     it { expect(described_class.label_like('label_to_find')).to be_a ActiveRecord::Relation }
   end
 
-  describe '::label_count' do
-    it { expect(described_class).to respond_to(:label_count) }
-    it { expect(described_class.label_count).to be_a Array }
+  describe '::tag_labels' do
+    it { expect(described_class).to respond_to(:tag_labels) }
+    it { expect(described_class.tag_labels).to be_a Array }
     context 'with tags' do
-      let(:tag_label) { TagLabel.new(label: 'Foo', count: 2) }
-      before { FactoryGirl.create_list(:tag, 2, label: 'Foo') }
-      it { expect(described_class.label_count).to include(tag_label) }
+      let(:tag_label) { TagLabel.new(label: 'Foo', count: 2, last_used_on: DateTime.now) }
+      let!(:tags) { FactoryGirl.create_list(:tag, 2, label: 'Foo') }
+      let(:foo_tag_label) { described_class.where(label: 'Foo').tag_labels.first }
+      before { tags.each {|x| x.reload} }
+
+      it { expect(described_class.tag_labels).to include(tag_label) }
+      it { expect(foo_tag_label).to eq(tag_label) }
+      it { expect(foo_tag_label.last_used_on).to eq(tags.last.created_at) }
+      it { expect(foo_tag_label.last_used_on).not_to eq(tags.first.created_at) }
     end
   end
 end

@@ -110,7 +110,8 @@ describe DDS::V1::ProjectsAPI do
   end
 
   describe 'Project instance' do
-    let(:url) { "/api/v1/projects/#{resource.id}" }
+    let(:url) { "/api/v1/projects/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -119,6 +120,9 @@ describe DDS::V1::ProjectsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
 
     describe 'PUT' do
@@ -144,6 +148,9 @@ describe DDS::V1::ProjectsAPI do
         it_behaves_like 'an annotate_audits endpoint'
       end
       it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
 
     describe 'DELETE' do
@@ -191,6 +198,9 @@ describe DDS::V1::ProjectsAPI do
         end
       end
       it_behaves_like 'a logically deleted resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
   end
 end

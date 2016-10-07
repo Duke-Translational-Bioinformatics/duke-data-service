@@ -16,7 +16,7 @@ RSpec.describe DataFile, type: :model do
     let!(:kind_name) { 'file' }
   end
   it_behaves_like 'a logically deleted model'
-  
+
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
@@ -24,6 +24,7 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:file_versions).order('version_number ASC').autosave(true) }
     it { is_expected.to have_many(:tags) }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
@@ -242,5 +243,51 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
     it { is_expected.to callback(:build_file_version).before(:save).if(:new_file_version_needed?) }
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
+  end
+
+  describe 'elasticsearch' do
+    it { expect(described_class).to include(Elasticsearch::Model) }
+
+    # TODO, when we move to asynchronous indexing, remove this and replace with
+    # a test to ensure that jobs are created on create, update, delete
+    it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
+
+    it { is_expected.to respond_to 'as_indexed_json' }
+    it { expect(subject.as_indexed_json).to eq(DataFileSearchDocumentSerializer.new(subject).as_json) }
+
+    describe 'mappings' do
+      subject { root_file.class.mapping.to_hash }
+      it {
+        is_expected.to have_key :data_file
+
+        expect(subject[:data_file]).to have_key :dynamic
+        expect(subject[:data_file][:dynamic]).to eq "false"
+
+        expect(subject[:data_file]).to have_key :properties
+        [:id, :name, :is_deleted, :created_at, :updated_at, :label, :tags].each do |expected_property|
+          expect(subject[:data_file][:properties]).to have_key expected_property
+        end
+
+        expect(subject[:data_file][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:label][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:is_deleted][:type]).to eq "boolean"
+
+        expect(subject[:data_file][:properties][:created_at][:type]).to eq "date"
+        expect(subject[:data_file][:properties][:updated_at][:type]).to eq "date"
+
+        expect(subject[:data_file][:properties][:tags][:type]).to eq "object"
+
+        expect(subject[:data_file][:properties][:tags]).to have_key :properties
+        expect(subject[:data_file][:properties][:tags][:properties]).to have_key :label
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:tags][:properties][:label]).to have_key :fields
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields]).to have_key :raw
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:index]).to eq "not_analyzed"
+      }
+    end
   end
 end

@@ -375,7 +375,8 @@ describe DDS::V1::UsersAPI do
 
   describe 'User instance' do
     include_context 'with authentication'
-    let(:url) { "/api/v1/users/#{resource.id}" }
+    let(:url) { "/api/v1/users/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -383,6 +384,9 @@ describe DDS::V1::UsersAPI do
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
     end
   end
 end

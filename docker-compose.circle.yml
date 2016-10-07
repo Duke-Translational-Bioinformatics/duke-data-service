@@ -1,78 +1,89 @@
-server:
-  build: .
-  env_file:
-    - circle/swift.circle.env
-    - circle/webapp.circle.env
-    - neo4j.client.local.env
-    - auth_service.local.env
-  links:
-    - db:postgres.db.host
-    - swift:swift.circle.host
-    - neo4j:neo4j.db.host
-  ports:
-    - 3001:3000
-db:
-  build: ./docker/builds/db
-  env_file:
-    - db.env
-swiftvol:
-  image: busybox
-  volumes:
-    - /srv
-swift:
-  build: ./docker/builds/swift
-  ports:
-    - 8080:8080
-neo4j:
-  image: neo4j:2.3.2
-  ports:
-    - '7474:7474'
-  env_file:
-    - neo4j.server.local.env
-rake:
-  image: dukedataservice_server
-  entrypoint: ['rake']
-  links:
-    - db:postgres.db.host
-    - swift:swift.circle.host
-    - neo4j:neo4j.db.host
-  env_file:
-    - circle/webapp.circle.env
-    - circle/swift.circle.env
-    - neo4j.client.local.env
-authservice:
-  image: dukedataservice_server
-  env_file:
-    - auth_service.env
-    - neo4j.client.env
-  entrypoint: ['rake']
-  command: authentication_service:create
-  links:
-    - db:postgres.db.host
-    - neo4j:neo4j.db.host
-rspec:
-  image: dukedataservice_server
-  environment:
-    - RAILS_ENV=test
-  links:
-    - db:postgres.db.host
-    - swift:swift.circle.host
-    - neo4j:neo4j.db.host
-  env_file:
-    - circle/swift.circle.env
-    - neo4j.client.env
-  entrypoint: ['rspec']
-  command: spec
-dredd:
-  build: ./docker/builds/dredd
-  links:
-   - server:dds.host
-   - swift:swift.circle.host
-   - db:postgres.db.host
-   - neo4j:neo4j.db.host
-  env_file:
-    - dredd.env
-    - neo4j.client.env
-  volumes:
-    - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
-    - ./apiary.apib:/home/dredd_scripts/apiary.apib
+version: '2'
+services:
+  server:
+    build: .
+    ports:
+      - 3001:3000
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - swift.local.env
+      - circle/webapp.circle.env
+      - neo4j.client.local.env
+      - auth_service.local.env
+      - elastic.client.local.env
+  db:
+    build: ./docker/builds/db
+    env_file:
+      - db.env
+  neo4j:
+    image: neo4j:3.0.2
+    ports:
+      - '7474:7474'
+    env_file:
+      - neo4j.server.env
+  elasticsearch:
+    image: elasticsearch:2.2.2
+    ports:
+      - '9200:9200'
+  rails:
+    image: dukedataservice_server
+    entrypoint: ['rails']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - circle/webapp.circle.env
+      - swift.local.env
+      - neo4j.client.local.env
+      - elastic.client.local.env
+  rake:
+    image: dukedataservice_server
+    entrypoint: ['rake']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - circle/webapp.circle.env
+      - swift.local.env
+      - neo4j.client.local.env
+      - elastic.client.local.env
+  authservice:
+    image: dukedataservice_server
+    entrypoint: ['rake']
+    command: authentication_service:create
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - circle/webapp.circle.env
+      - auth_service.local.env
+      - neo4j.client.local.env
+      - elastic.client.local.env
+  rspec:
+    image: dukedataservice_server
+    environment:
+      - RAILS_ENV=test
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - circle/webapp.circle.env
+      - swift.local.env
+      - neo4j.client.local.env
+      - elastic.client.local.env
+    entrypoint: ['rspec']
+    command: spec
+  dredd:
+    build: ./docker/builds/dredd
+    links:
+     - server:dds.host
+    volumes:
+      - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
+      - ./apiary.apib:/home/dredd_scripts/apiary.apib

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,33 +17,33 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx1be56a631b6f464e81817-0056e9d916
+      - tx156f3aceffcc43e5819b8-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/b2c3239b-5791-45c3-aaba-fdbcd255d12c
+    uri: http://swift.local:12345/v1/AUTH_test/3e935d91-68ac-4522-902b-837439a26fff
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txc0e42b2a288f4abdb2878-0056e9d916
+      - tx2acebf292015469f8724a-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/b2c3239b-5791-45c3-aaba-fdbcd255d12c/9bf1d085-596f-46fb-a889-734d043d96f9/1
+    uri: http://swift.local:12345/v1/AUTH_test/3e935d91-68ac-4522-902b-837439a26fff/75ff284c-a79f-440b-befc-f4cc6234f607/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Wed, 16 Mar 2016 22:07:19 GMT
+      - Thu, 18 Aug 2016 17:03:08 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,17 +87,17 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx640177c9826f475495ff9-0056e9d916
+      - tx1204f2f3d7c545c5a38b0-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -112,44 +112,44 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx25a5425cca624cd9ba4f8-0056e9d916
+      - txc2c086ad65034ee883c7d-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: put
-    uri: http://192.168.99.100:12345/v1/AUTH_test/b2c3239b-5791-45c3-aaba-fdbcd255d12c/9bf1d085-596f-46fb-a889-734d043d96f9?multipart-manifest=put
+    uri: http://swift.local:12345/v1/AUTH_test/3e935d91-68ac-4522-902b-837439a26fff/75ff284c-a79f-440b-befc-f4cc6234f607?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: '[{"path":"b2c3239b-5791-45c3-aaba-fdbcd255d12c/9bf1d085-596f-46fb-a889-734d043d96f9/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+      string: '[{"path":"3e935d91-68ac-4522-902b-837439a26fff/75ff284c-a79f-440b-befc-f4cc6234f607/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/plain
       Content-Disposition:
-      - attachment; filename=placeat_velit
+      - attachment; filename=est_quis
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Wed, 16 Mar 2016 22:07:19 GMT
+      - Thu, 18 Aug 2016 17:03:08 GMT
       Content-Length:
       - '0'
       Etag:
@@ -157,23 +157,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx9d01e0fe3f8e48d4bb919-0056e9d916
+      - tx4cddf9324a434e069c2e7-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: head
-    uri: http://192.168.99.100:12345/v1/AUTH_test/b2c3239b-5791-45c3-aaba-fdbcd255d12c/9bf1d085-596f-46fb-a889-734d043d96f9
+    uri: http://swift.local:12345/v1/AUTH_test/3e935d91-68ac-4522-902b-837439a26fff/75ff284c-a79f-440b-befc-f4cc6234f607
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 200
@@ -182,37 +182,37 @@ http_interactions:
       Content-Length:
       - '15'
       Content-Disposition:
-      - attachment; filename=placeat_velit
+      - attachment; filename=est_quis
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Wed, 16 Mar 2016 22:07:19 GMT
+      - Thu, 18 Aug 2016 17:03:08 GMT
       Etag:
       - '"b77622f6f760a1bed182840a7c02a53c"'
       X-Timestamp:
-      - '1458166038.19174'
+      - '1471539787.48992'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx3326e17647544cbaba220-0056e9d916
+      - tx04b05e9a419e4850972fb-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
 - request:
     method: delete
-    uri: http://192.168.99.100:12345/v1/AUTH_test/b2c3239b-5791-45c3-aaba-fdbcd255d12c/9bf1d085-596f-46fb-a889-734d043d96f9/1
+    uri: http://swift.local:12345/v1/AUTH_test/3e935d91-68ac-4522-902b-837439a26fff/75ff284c-a79f-440b-befc-f4cc6234f607/1
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk68382fa8a2a9452c8fce6efb6a54fd1e
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
   response:
     status:
       code: 204
@@ -223,12 +223,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx9059a0bfea5f441892d1e-0056e9d916
+      - txe796422f84a9443684b73-0057b5ea4b
       Date:
-      - Wed, 16 Mar 2016 22:07:18 GMT
+      - Thu, 18 Aug 2016 17:03:07 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 22:07:18 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Thu, 18 Aug 2016 17:03:07 GMT
+recorded_with: VCR 3.0.3

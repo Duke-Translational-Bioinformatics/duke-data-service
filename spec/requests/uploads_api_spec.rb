@@ -7,7 +7,7 @@ describe DDS::V1::UploadsAPI do
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id, project: project) }
   let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
 
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
 
@@ -22,7 +22,8 @@ describe DDS::V1::UploadsAPI do
   let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   describe 'Uploads collection' do
-    let(:url) { "/api/v1/projects/#{project.id}/uploads" }
+    let(:url) { "/api/v1/projects/#{project_id}/uploads" }
+    let(:project_id) { project.id }
 
     #List file uploads for a project
     describe 'GET' do
@@ -38,8 +39,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
-        let(:resource_class) { 'Project' }
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
 
       it_behaves_like 'a paginated resource' do
@@ -96,8 +97,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
-        let(:resource_class) { 'Project' }
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
@@ -116,7 +117,8 @@ describe DDS::V1::UploadsAPI do
   end
 
   describe 'Upload instance' do
-    let(:url) { "/api/v1/uploads/#{resource.id}" }
+    let(:url) { "/api/v1/uploads/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     #View upload details/status
     describe 'GET' do
@@ -127,9 +129,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an authorized resource'
-
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/uploads/notexists_resourceid" }
+        let(:resource_id) { "doesNotExist" }
       end
     end
   end
@@ -138,19 +139,21 @@ describe DDS::V1::UploadsAPI do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
-    let!(:url) { "/api/v1/uploads/#{upload.id}/chunks" }
+    let!(:url) { "/api/v1/uploads/#{upload_id}/chunks" }
+    let(:upload_id) { upload.id }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { "PUT" }
       let!(:payload) {{
-        number: chunk_stub.number,
+        number: payload_chunk_number,
         size: chunk_stub.size,
         hash: {
           value: chunk_stub.fingerprint_value,
           algorithm: chunk_stub.fingerprint_algorithm
         }
       }}
+      let(:payload_chunk_number) { chunk_stub.number }
       it_behaves_like 'a creatable resource' do
         let(:expected_response_status) {200}
         let(:new_object) {
@@ -162,6 +165,11 @@ describe DDS::V1::UploadsAPI do
             fingerprint_algorithm: payload[:hash][:algorithm]
           ).last
         }
+      end
+
+      context 'when chunk.number exists' do
+        let(:payload_chunk_number) { chunk.number }
+        it_behaves_like 'an updatable resource'
       end
 
       it_behaves_like 'a validated resource' do
@@ -185,7 +193,7 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/uploads/notexists_resourceid/chunks" }
+        let(:upload_id) { "doesNotExist" }
         let(:resource_class) {"Upload"}
       end
 
@@ -207,7 +215,8 @@ describe DDS::V1::UploadsAPI do
   end
 
   describe 'Complete the chunked file upload', vcr: {record: :new_episodes} do #:vcr do
-    let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
+    let(:url) { "/api/v1/uploads/#{resource_id}/complete" }
+    let(:resource_id) { resource.id }
     let(:called_action) { "PUT" }
     subject { put(url, payload.to_json, headers) }
     let!(:payload) {{
@@ -251,7 +260,7 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'an authorized resource'
 
     it_behaves_like 'an identified resource' do
-      let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
+      let(:resource_id) { "doesNotExist" }
     end
 
     context 'with completed upload' do
