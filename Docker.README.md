@@ -465,7 +465,7 @@ Service to work, but it does need the [Api Test User Token](#creating-an-api_tes
 
 To run dredd against the default, locally running DDS server service, do the following:
 ```
-rrm swift.env
+rm swift.env
 ln -s swift.local.env swift.env
 rm webapp.env
 ln -s webapp.local.env webapp.env
