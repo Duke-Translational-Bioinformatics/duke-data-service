@@ -31,7 +31,8 @@ describe DDS::V1::StorageProvidersAPI do
   end
 
   describe 'Storage Provider instance' do
-    let(:url) { "/api/v1/storage_providers/#{resource.id}" }
+    let(:url) { "/api/v1/storage_providers/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     describe 'GET' do
       subject { get(url, nil, headers) }
@@ -40,7 +41,7 @@ describe DDS::V1::StorageProvidersAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/storage_providers/notexists_id" }
+        let(:resource_id) { "doesNotExist" }
       end
     end
   end

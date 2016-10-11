@@ -3,7 +3,8 @@
 class Folder < Container
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
   has_many :folders, -> { readonly }, foreign_key: "parent_id"
-
+  has_many :meta_templates, as: :templatable
+  
   after_set_parent_attribute :set_project_to_parent_project
 
   validates :project_id, presence: true, immutable: true
@@ -32,7 +33,7 @@ class Folder < Container
   end
 
   def as_indexed_json(options={})
-    self.as_json
+    FolderSearchDocumentSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do
