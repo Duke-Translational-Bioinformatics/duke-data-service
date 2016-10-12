@@ -7,7 +7,7 @@ RSpec.describe ProjectTransferUser, type: :model do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of :project_transfer_id }
-    it { is_expected.to validate_presence_of :to_user_id }
+    it { is_expected.to validate_presence_of :project_transfer }
+    it { is_expected.to validate_presence_of :to_user }
   end
 end
