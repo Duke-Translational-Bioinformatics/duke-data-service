@@ -8,6 +8,8 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
   let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
   let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: data_file) }
+  let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
+  let(:different_meta_template) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
 
   let(:template) { meta_template.template }
   let(:property) { FactoryGirl.create(:property, template: template) }
@@ -42,7 +44,8 @@ describe DDS::V1::MetaTemplatesAPI do
           resource
         ]}
         let!(:unexpected_resources) { [
-          other_meta_template
+          other_meta_template,
+          different_meta_template
         ] }
       end
 

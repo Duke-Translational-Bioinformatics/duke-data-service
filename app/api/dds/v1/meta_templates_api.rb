@@ -14,7 +14,7 @@ module DDS
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         templatable_object = object_kind.find(params[:object_id])
-        policy_scope(MetaTemplate)
+        policy_scope(MetaTemplate).where(templatable: templatable_object)
       end
 
       desc 'Create object metadata' do
