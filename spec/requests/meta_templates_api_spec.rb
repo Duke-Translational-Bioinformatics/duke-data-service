@@ -8,8 +8,6 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
   let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
   let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: data_file) }
-  let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:different_meta_template) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
 
   let(:template) { meta_template.template }
   let(:property) { FactoryGirl.create(:property, template: template) }
@@ -36,17 +34,36 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:url) { "/api/v1/meta/#{resource_kind}/#{file_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, query_params, headers) }
+      let(:query_params) {{}}
+      let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
+      let(:meta_template_diff_file) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
+      let(:meta_template_diff_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { [
-          resource
+          resource,
+          meta_template_diff_template
         ]}
         let!(:unexpected_resources) { [
           other_meta_template,
-          different_meta_template
+          meta_template_diff_file
         ] }
+      end
+      context 'with meta_template_name parameter' do
+        let(:query_params) {{meta_template_name: resource.template.name}}
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            resource
+          ]}
+          let!(:unexpected_resources) { [
+            other_meta_template,
+            meta_template_diff_file,
+            meta_template_diff_template
+          ] }
+        end
       end
 
       it_behaves_like 'an authenticated resource'
