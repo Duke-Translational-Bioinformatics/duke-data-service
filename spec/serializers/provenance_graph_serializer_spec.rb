@@ -14,14 +14,12 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
         is_expected.to have_key('relationships')
         expected_nodes = expected_object_nodes.map{|enode|
           g = ProvenanceGraphNode.new(enode.graph_node)
-          g.properties = enode
           JSON.parse(ProvenanceGraphNodeSerializer.new(g).to_json)
         }.flatten
         expect(subject["nodes"]).to match_array(expected_nodes)
 
         expected_relationships = expected_object_relationships.map{|expected_object_relationship|
           expected_relationship = ProvenanceGraphRelationship.new(expected_object_relationship.graph_relation)
-          expected_relationship.properties = expected_object_relationship
           JSON.parse(
             ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json
           )
