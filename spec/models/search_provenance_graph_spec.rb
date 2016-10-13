@@ -311,7 +311,7 @@ RSpec.describe SearchProvenanceGraph do
         )
       }
 
-      it_behaves_like 'A ProvenanceGraph', with_included_properties: false,
+      it_behaves_like 'A ProvenanceGraph', with_restricted_properties: true,
         includes_node_syms: [
           :focus,
           # 1 hop
