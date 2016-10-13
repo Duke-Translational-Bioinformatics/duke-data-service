@@ -261,6 +261,15 @@ describe DDS::V1::MetaTemplatesAPI do
       let(:called_action) { 'DELETE' }
 
       it_behaves_like 'a removable resource'
+      context 'with associated meta_property' do
+        include_context 'elasticsearch prep', [:template, :property], [:data_file]
+        before { expect(meta_property).to be_persisted }
+        it 'should destroy meta_property' do
+          expect {
+            is_expected.to eq 204
+          }.to change{MetaProperty.count}.by(-1)
+        end
+      end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource' do
