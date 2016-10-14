@@ -189,7 +189,7 @@ shared_examples 'A ProvenanceGraph' do |
   includes_relationship_syms: [],
   excludes_node_syms: [],
   excludes_relationship_syms: [],
-  with_included_properties: true|
+  with_restricted_properties: false|
 
   let(:includes_nodes) {
     includes_node_syms.map{|enode| send(enode) }
@@ -203,34 +203,34 @@ shared_examples 'A ProvenanceGraph' do |
   let(:excludes_relationships) {
     excludes_relationship_syms.map{|enode| send(enode) }
   }
-  if with_included_properties
-    let(:properties_included) { true }
+  if with_restricted_properties
+    let (:properties_restricted) { true }
   else
-    let(:properties_included) { false }
+    let(:properties_restricted) { false }
   end
 
   it {
     includes_nodes.each do |included_node|
       graphed_node = ProvenanceGraphNode.new(included_node.graph_node)
-      graphed_node.properties = included_node if properties_included
+      graphed_node.restricted = properties_restricted
       expect(subject.nodes).to include(graphed_node)
     end
 
     excludes_nodes.each do |excluded_node|
       graphed_node = ProvenanceGraphNode.new(excluded_node.graph_node)
-      graphed_node.properties = excluded_node if properties_included
+      graphed_node.restricted = properties_restricted
       expect(subject.nodes).not_to include(graphed_node)
     end
 
     includes_relationships.each do |included_relationship|
       graphed_relationship = ProvenanceGraphRelationship.new(included_relationship.graph_relation)
-      graphed_relationship.properties = included_relationship if properties_included
+      graphed_relationship.restricted = properties_restricted
       expect(subject.relationships).to include(graphed_relationship)
     end
 
     excludes_relationships.each do |excluded_relationship|
       graphed_relationship = ProvenanceGraphRelationship.new(excluded_relationship.graph_relation)
-      graphed_relationship.properties = excluded_relationship if properties_included
+      graphed_relationship.restricted = properties_restricted
       expect(subject.relationships).not_to include(graphed_relationship)
     end
   }
