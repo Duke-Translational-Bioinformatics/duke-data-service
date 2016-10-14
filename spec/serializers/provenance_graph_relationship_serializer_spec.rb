@@ -15,12 +15,8 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
   }
   let!(:relationship) { activity_used_focus.graph_relation }
 
-  context 'with properties' do
-    let(:resource) {
-      res = ProvenanceGraphRelationship.new(relationship)
-      res.properties = activity_used_focus
-      res
-    }
+  context 'not restricted' do
+    let(:resource) { ProvenanceGraphRelationship.new(relationship) }
 
     it_behaves_like 'a json serializer' do
       let(:expected_properties_object) { resource.properties }
@@ -46,9 +42,11 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
     end
   end
 
-  context 'without properties' do
+  context 'restricted' do
     let(:resource) {
-      ProvenanceGraphRelationship.new(relationship)
+      res = ProvenanceGraphRelationship.new(relationship)
+      res.restricted = true
+      res
     }
 
     it_behaves_like 'a json serializer' do
