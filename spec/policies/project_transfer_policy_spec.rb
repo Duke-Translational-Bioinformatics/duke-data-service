@@ -5,8 +5,8 @@ describe ProjectTransferPolicy do
 
   let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:project_transfer) { FactoryGirl.create(:project_transfer, project: project_permission.project) }
-  let(:other_project_transfer) { FactoryGirl.create(:project_transfer) }
+  let(:project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, project: project_permission.project) }
+  let(:other_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users) }
   let(:to_user) { FactoryGirl.create(:project_transfer_user, project_transfer: project_transfer).to_user }
 
   it_behaves_like 'system_permission can access', :project_transfer
