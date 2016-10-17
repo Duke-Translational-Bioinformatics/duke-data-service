@@ -16,8 +16,8 @@ RSpec.describe ProjectTransfer, type: :model do
     let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :accepted) }
     subject { FactoryGirl.build(:project_transfer, project: existing_project_transfer.project) }
 
-    it { is_expected.to validate_presence_of :project_id }
     it { is_expected.to validate_presence_of :from_user_id }
+    it { is_expected.to validate_presence_of :project }
 
     it { is_expected.to allow_value('pending').for(:status) }
     it { is_expected.to allow_values(*non_pending_statuses).for(:status) }
