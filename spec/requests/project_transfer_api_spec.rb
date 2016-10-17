@@ -69,6 +69,10 @@ describe DDS::V1::ProjectTransfersAPI do
       it_behaves_like 'a validated resource' do
         let(:payload_to_user_id) { "doesNotExist" }
       end
+      context 'empty to_users array' do
+        let(:payload) {{ to_users: [] }}
+        it_behaves_like 'a validated resource'
+      end
     end
   end
 end
