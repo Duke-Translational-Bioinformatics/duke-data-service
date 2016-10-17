@@ -24,17 +24,22 @@ RSpec.describe ProvenanceGraphRelationship do
   it { is_expected.to respond_to("start_node") }
   it { is_expected.to respond_to("end_node") }
   it { is_expected.to respond_to( "properties" ) }
-  it { is_expected.to respond_to( "properties=" ) }
+  it { is_expected.to respond_to( "restricted" ) }
+  it { is_expected.to respond_to("restricted=") }
+  it { is_expected.to respond_to("is_restricted?") }
 
   it { expect(subject.id).to eq(activity_used_focus.id) }
   it { expect(subject.type).to eq(relationship.type) }
   it { expect(subject.start_node).to eq(relationship.from_node.model_id) }
   it { expect(subject.end_node).to eq(relationship.to_node.model_id) }
   it {
-    expect(subject.properties).to be_nil
-    subject.properties = activity_used_focus
     expect(subject.properties).not_to be_nil
     expect(subject.properties).to eq(activity_used_focus)
+  }
+  it {
+    expect(subject.is_restricted?).to be false
+    subject.restricted = true
+    expect(subject.is_restricted?).to be true
   }
 
   context 'initialization' do
