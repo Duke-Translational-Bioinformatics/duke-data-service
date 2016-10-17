@@ -38,7 +38,7 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 
 17-Oct-2016
 --------------
-+ For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/source`; this search action now includes `wasDerivedFrom` file versions in the results.
++ For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/origin`; this search action now includes `wasDerivedFrom` file versions in the results.
 + For *Metadata* - changed `/templates{?name}` to `/templates{?name_contains}` - facilitates contains search vs. exact match.
 + Changed `/templates/{id}/properties{?key}` to `/templates/{id}/properties` - if we need `key` based lookup we will extend API to return the instance by `key`, not an array of 1.
 + Changed `/meta/{object_kind}/{object_id}{?meta_template_name}` to `/meta/{object_kind}/{object_id}` - if we need `template_name` based lookup we will extend API to return the instance by `template_name`, not an array of 1.
@@ -3196,7 +3196,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
-## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/source]
+## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/origin]
 This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each *File Version*:   
 
 1. Gets all related *wasDerivedFrom* file versions (if they exist).
