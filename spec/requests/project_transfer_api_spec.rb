@@ -4,12 +4,12 @@ describe DDS::V1::ProjectTransfersAPI do
   include_context 'with authentication'
   let(:project) { FactoryGirl.create(:project) }
   let(:other_project) { FactoryGirl.create(:project) }
-  let(:project_transfer) { FactoryGirl.create(:project_transfer) }
+  let(:project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users) }
   let(:to_user) { FactoryGirl.create(:user) }
-  let(:other_project_transfer) { FactoryGirl.create(:project_transfer) }
-  let(:project_transfer_stub) { FactoryGirl.create(:project_transfer) }
+  let(:other_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users) }
+  let(:project_transfer_stub) { FactoryGirl.build(:project_transfer, :with_to_users) }
   let(:project_transfer_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
-  let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :pending) }
+  let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
 
   let(:resource_class) { ProjectTransfer }
   let(:resource_serializer) { ProjectTransferSerializer }

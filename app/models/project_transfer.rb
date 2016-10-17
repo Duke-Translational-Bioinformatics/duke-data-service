@@ -16,6 +16,7 @@ class ProjectTransfer < ActiveRecord::Base
       message: 'Pending transfer already exists'
     }, if: :pending?
   validates :from_user, presence: true
+  validates :project_transfer_users, presence: true
 
   private
 

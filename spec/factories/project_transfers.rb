@@ -4,6 +4,10 @@ FactoryGirl.define do
     project
     association :from_user, factory: :user
 
+    trait :with_to_users do
+      project_transfer_users { [ build(:project_transfer_user) ] }
+    end
+
     trait :pending do
       status 'pending'
     end
@@ -18,6 +22,10 @@ FactoryGirl.define do
 
     trait :canceled do
       status 'canceled'
+    end
+
+    trait :skip_validation do
+      to_create {|instance| instance.save(validate: false) }
     end
   end
 end
