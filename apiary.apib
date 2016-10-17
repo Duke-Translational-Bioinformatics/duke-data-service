@@ -36,6 +36,14 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 --------------
 + Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
 
+17-Oct-2016
+--------------
++ For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/source`; this search action now includes `wasDerivedFrom` file versions in the results.
++ For *Metadata* - changed `/templates{?name}` to `/templates{?name_contains}` - facilitates contains search vs. exact match.
++ Changed `/templates/{id}/properties{?key}` to `/templates/{id}/properties` - if we need `key` based lookup we will extend API to return the instance by `key`, not an array of 1.
++ Changed `/meta/{object_kind}/{object_id}{?meta_template_name}` to `/meta/{object_kind}/{object_id}` - if we need `template_name` based lookup we will extend API to return the instance by `template_name`, not an array of 1.
+
+
 ## Group API Usage
 
 Web Portal
@@ -3188,11 +3196,12 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
-## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/was_generated_by]
-This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each file version:   
+## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/source]
+This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each *File Version*:   
 
-1. Gets the generating activity.  
-2. For the generating activity, gets the list of *wasGeneratedBy* and *used* file versions.  
+1. Gets all related *wasDerivedFrom* file versions (if they exist).
+2. Gets the generating activity (if it exists).
+3. For the generating activity, gets the list of *wasGeneratedBy* and *used* file versions.  
 
 A graph structure of the unique nodes and relationships is returned.
 
@@ -3503,14 +3512,13 @@ Metadata must be defined and captured in the context of a metadata template. Tem
             "audit": { }
         }
 
-## List metadata templates [GET /templates{?name}]
-List all of the global metadata templates, optionally get a template by name.
+## List metadata templates [GET /templates{?name_contains}]
+List all of the global metadata templates.
 >**Permission:** authenticated
 - - - - -
 
 + Parameters
-    + name (string, optional, `sequencing_file_info`) ... The unique `name` of the template; performs an exact match.
-
+    + name_contains (string, optional, `Sequencing`) ... Returns templates in which `name` contains the specified string.
 
 + Response 200 (application/json)
 
@@ -3626,15 +3634,13 @@ List all of the global metadata templates, optionally get a template by name.
             "audit": { }
         }
 
-## List metadata properties [GET /templates/{id}/properties{?key}]
-List metadata template properties, optionally get a property by key. 
+## List metadata properties [GET /templates/{id}/properties]
+List metadata template properties. 
 >**Permission:** authenticated
 - - - - -
 
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
-    + key (string, optional, `output_type`) ... The unique `key` of the property; performs an exact match.
-
 
 + Response 200 (application/json)
 
@@ -3858,11 +3864,10 @@ Used to delete the metadata template instance.
 
 + Response 204
 
-## View All Object Metadata [/meta/{object_kind}/{object_id}{?meta_template_name}]
+## View All Object Metadata [/meta/{object_kind}/{object_id}]
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `b80a2679-f6bf-46da-acaa-b7a4582b1eda`) ... The unique id of the object.
-    + meta_template_name (string, optional, `sequencing_file_info`) ... The unique `meta_template_name` of the template; performs an exact match.
     
 ### View All Object Metadata [GET]
 Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.
@@ -4032,20 +4037,17 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
         {     
             "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
             "project": {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)"
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
             },
             "from_user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
-                "email": "mrgardner01@duke.edu",
                 "full_name": "Matthew Gardner"
             },
             "to_users": [
                 {
                     "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                     "username": "cbrandon01",
-                    "email": "cbrandn01@duke.edu",
                     "full_name": "Chad Brandon"
                 }
             ],
@@ -4065,20 +4067,17 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
                 {     
                     "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
                     "project": {
-                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                        "name": "Knockout Mouse Project (KOMP)"
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
                     },
                     "from_user": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "username": "mrgardner01",
-                        "email": "mrgardner01@duke.edu",
                         "full_name": "Matthew Gardner"
                     },
                     "to_users": [
                         {
                             "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                             "username": "cbrandon01",
-                            "email": "cbrandn01@duke.edu",
                             "full_name": "Chad Brandon"
                         }
                     ],
@@ -4102,20 +4101,17 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
         {     
             "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
             "project": {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)"
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
             },
             "from_user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
-                "email": "mrgardner01@duke.edu",
                 "full_name": "Matthew Gardner"
             },
             "to_users": [
                 {
                     "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                     "username": "cbrandon01",
-                    "email": "cbrandn01@duke.edu",
                     "full_name": "Chad Brandon"
                 }
             ],
@@ -4152,20 +4148,17 @@ Accept a *pending* project transfer.
         {     
             "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
             "project": {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)"
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
             },
             "from_user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
-                "email": "mrgardner01@duke.edu",
                 "full_name": "Matthew Gardner"
             },
             "to_users": [
                 {
                     "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                     "username": "cbrandon01",
-                    "email": "cbrandn01@duke.edu",
                     "full_name": "Chad Brandon"
                 }
             ],
@@ -4201,20 +4194,17 @@ Reject a *pending* project transfer.
         {     
             "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
             "project": {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)"
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
             },
             "from_user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
-                "email": "mrgardner01@duke.edu",
                 "full_name": "Matthew Gardner"
             },
             "to_users": [
                 {
                     "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                     "username": "cbrandon01",
-                    "email": "cbrandn01@duke.edu",
                     "full_name": "Chad Brandon"
                 }
             ],
@@ -4250,20 +4240,17 @@ Cancel a *pending* project transfer.
         {     
             "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
             "project": {
-                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                "name": "Knockout Mouse Project (KOMP)"
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
             },
             "from_user": {
                 "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                 "username": "mrgardner01",
-                "email": "mrgardner01@duke.edu",
                 "full_name": "Matthew Gardner"
             },
             "to_users": [
                 {
                     "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                     "username": "cbrandon01",
-                    "email": "cbrandn01@duke.edu",
                     "full_name": "Chad Brandon"
                 }
             ],
@@ -4288,20 +4275,17 @@ Used to retrieve all project transfers visible to the current user, optionally f
                 {     
                     "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
                     "project": {
-                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
-                        "name": "Knockout Mouse Project (KOMP)"
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
                     },
                     "from_user": {
                         "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
                         "username": "mrgardner01",
-                        "email": "mrgardner01@duke.edu",
                         "full_name": "Matthew Gardner"
                     },
                     "to_users": [
                         {
                             "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
                             "username": "cbrandon01",
-                            "email": "cbrandn01@duke.edu",
                             "full_name": "Chad Brandon"
                         }
                     ],
