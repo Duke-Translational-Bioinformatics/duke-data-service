@@ -82,8 +82,8 @@ describe DDS::V1::ProjectTransfersAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'a listable resource' do
-        let!(:project_transfer_from) { FactoryGirl.create(:project_transfer, from_user: current_user)}
-        let!(:project_transfer_user) { FactoryGirl.create(:project_transfer_user, to_user: current_user)}
+        let!(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
+        let!(:project_transfer_user) { FactoryGirl.create(:project_transfer, :with_to_users)}
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { [
           project_transfer
@@ -91,7 +91,7 @@ describe DDS::V1::ProjectTransfersAPI do
         let!(:unexpected_resources) { [
           other_project_transfer,
           project_transfer_from,
-          project_transfer_user.project_transfer
+          project_transfer_user
         ] }
       end
       it_behaves_like 'an identified resource' do
