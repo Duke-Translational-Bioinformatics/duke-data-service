@@ -3,7 +3,7 @@ FactoryGirl.define do
     association :to_user, factory: :user
 
     trait :with_project_transfer do
-      project_transfer
+      project_transfer { build(:project_transfer) }
     end
   end
 end
