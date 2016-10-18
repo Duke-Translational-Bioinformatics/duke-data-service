@@ -29,6 +29,15 @@ RSpec.describe WasGeneratedByProvenanceGraph do
       relatable_from: fv2ga
     )
   }
+
+  # (fv2)-(derivedFrom)->(fv2_derived_from)
+  let!(:fv2_derived_from) { FactoryGirl.create(:file_version, label: "FV2_DERIVED_FROM") }
+  let!(:fv2_derived_from_fv2_derived_from) {
+    FactoryGirl.create(:derived_from_file_version_prov_relation,
+      relatable_to: fv2_derived_from,
+      relatable_from: fv2
+    )
+  }
   let!(:file_versions) { [ {id: fv1.id}, {id: fv2.id} ] }
 
   it { expect(described_class).to include(ActiveModel::Serialization) }
@@ -67,11 +76,13 @@ RSpec.describe WasGeneratedByProvenanceGraph do
           :fv1ga,
           :fv2,
           :fv2ga,
-          :used_by_fv2ga
+          :used_by_fv2ga,
+          :fv2_derived_from
         ], includes_relationship_syms: [
           :fv1ga_generated_fv1,
           :fv2ga_generated_fv2,
-          :fv2ga_used_used_by_fv2ga
+          :fv2ga_used_used_by_fv2ga,
+          :fv2_derived_from_fv2_derived_from
         ]
     end
 
@@ -89,11 +100,13 @@ RSpec.describe WasGeneratedByProvenanceGraph do
           :fv1ga,
           :fv2,
           :fv2ga,
-          :used_by_fv2ga
+          :used_by_fv2ga,
+          :fv2_derived_from
         ], includes_relationship_syms: [
           :fv1ga_generated_fv1,
           :fv2ga_generated_fv2,
-          :fv2ga_used_used_by_fv2ga
+          :fv2ga_used_used_by_fv2ga,
+          :fv2_derived_from_fv2_derived_from
         ]
     end
   end
