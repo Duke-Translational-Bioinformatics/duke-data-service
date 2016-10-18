@@ -17,14 +17,14 @@ class ProvenanceGraph
   def create_graph()
     @to_be_graphed[:nodes].keys.each do |node_kind|
       @policy_scope.call(KindnessFactory.by_kind(node_kind)).where(id: @to_be_graphed[:nodes][node_kind].keys).each do |property|
-        @to_be_graphed[:nodes][node_kind][property.id].properties = property
+        @to_be_graphed[:nodes][node_kind][property.id].restricted = false
       end
       @nodes |= @to_be_graphed[:nodes][node_kind].values
     end
 
     @to_be_graphed[:relationships].keys.each do |rel_kind|
       @policy_scope.call(KindnessFactory.by_kind(rel_kind)).where(id: @to_be_graphed[:relationships][rel_kind].keys).each do |property|
-        @to_be_graphed[:relationships][rel_kind][property.id].properties = property
+        @to_be_graphed[:relationships][rel_kind][property.id].restricted = false
       end
       @relationships |= @to_be_graphed[:relationships][rel_kind].values
     end
@@ -35,6 +35,7 @@ class ProvenanceGraph
     return if @to_be_graphed[:nodes][node.model_kind][node.model_id]
 
     @to_be_graphed[:nodes][node.model_kind][node.model_id] = ProvenanceGraphNode.new(node)
+    @to_be_graphed[:nodes][node.model_kind][node.model_id].restricted = true
     true
   end
 
@@ -43,6 +44,7 @@ class ProvenanceGraph
     return if @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id]
 
     @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id] = ProvenanceGraphRelationship.new(relationship)
+    @to_be_graphed[:relationships][relationship.model_kind][relationship.model_id].restricted = true
     true
   end
 end
