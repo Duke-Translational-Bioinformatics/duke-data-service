@@ -13,17 +13,18 @@ RSpec.describe ProjectTransfer, type: :model do
   end
 
   describe 'validations' do
-    let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :accepted) }
+    let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :accepted, :skip_validation) }
     subject { FactoryGirl.build(:project_transfer, project: existing_project_transfer.project) }
 
-    it { is_expected.to validate_presence_of :project_id }
-    it { is_expected.to validate_presence_of :from_user_id }
+    it { is_expected.to validate_presence_of :project }
+    it { is_expected.to validate_presence_of :from_user }
+    it { is_expected.to validate_presence_of :project_transfer_users }
 
     it { is_expected.to allow_value('pending').for(:status) }
     it { is_expected.to allow_values(*non_pending_statuses).for(:status) }
 
     context 'when pending transfer exists' do
-      let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :pending) }
+      let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :pending, :skip_validation) }
       it { is_expected.to validate_uniqueness_of(:status).
         scoped_to(:project_id).case_insensitive.
         with_message('Pending transfer already exists') }
