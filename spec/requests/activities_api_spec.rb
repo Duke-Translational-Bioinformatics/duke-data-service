@@ -38,15 +38,12 @@ describe DDS::V1::ActivitiesAPI do
       }}
       it_behaves_like 'a creatable resource' do
         let(:resource) { resource_stub }
-        it 'should set creator to current_user and create an agent_activity_association' do
-          expect {
+        it 'should set creator to current_user' do
             is_expected.to eq(201)
-          }.to change{ AssociatedWithUserProvRelation.count }.by(1)
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('id')
           new_object = resource_class.find(response_json['id'])
           expect(new_object.creator_id).to eq(current_user.id)
-          expect(AssociatedWithUserProvRelation.where(relatable_from: current_user, relatable_to: new_object).first).to be
         end
       end
 
@@ -65,21 +62,10 @@ describe DDS::V1::ActivitiesAPI do
 
         context 'ProvRelations' do
           it 'should be created' do
-            expect {
-              is_expected.to eq(201)
-            }.to change{ AssociatedWithUserProvRelation.count }.by(1)
+            is_expected.to eq(201)
             response_json = JSON.parse(response.body)
             expect(response_json).to have_key('id')
             new_object = resource_class.find(response_json['id'])
-            expect(AssociatedWithUserProvRelation.where(relatable_from: current_user, relatable_to: new_object).first).to be
-            expect(AssociatedWithSoftwareAgentProvRelation.where(relatable_from: software_agent, relatable_to: new_object).first).to be
-          end
-
-          it_behaves_like 'an annotate_audits endpoint' do
-            let(:resource) { activity_stub }
-            let(:expected_auditable_type) { ProvRelation }
-            let(:expected_response_status) { 201 }
-            let(:expected_audits) { 2 }
           end
         end
       end
@@ -100,19 +86,13 @@ describe DDS::V1::ActivitiesAPI do
         let(:resource) { activity_stub }
         let(:expected_response_status) { 201 }
       end
-
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:resource) { activity_stub }
-        let(:expected_auditable_type) { ProvRelation }
-        let(:expected_response_status) { 201 }
-      end
     end #POST
   end #Activities collection
 
   describe 'Activities instance' do
     let(:url) { "/api/v1/activities/#{resource_id}" }
     let(:resource_id) { resource.id }
-    
+
     describe 'GET' do
       subject { get(url, nil, headers) }
       it_behaves_like 'a viewable resource'
