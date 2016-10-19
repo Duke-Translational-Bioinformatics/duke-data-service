@@ -6,12 +6,8 @@ RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
   }
   let(:node) { focus.graph_node }
 
-  context 'with properties' do
-    let(:resource) {
-      res = ProvenanceGraphNode.new(node)
-      res.properties = focus
-      res
-    }
+  context 'not restricted' do
+    let(:resource) { ProvenanceGraphNode.new(node)    }
 
     it_behaves_like 'a json serializer' do
       let(:expected_properties_object) { resource.properties }
@@ -32,9 +28,11 @@ RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
     end
   end
 
-  context 'without properties' do
+  context 'restricted' do
     let(:resource) {
-      ProvenanceGraphNode.new(node)
+      res = ProvenanceGraphNode.new(node)
+      res.restricted = true
+      res
     }
 
     it_behaves_like 'a json serializer' do
@@ -50,10 +48,10 @@ RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
         expect(subject["properties"]).to have_key('kind')
         expect(subject["properties"]["kind"]).to eq(node.model_kind)
         expect(subject["properties"]).to have_key('is_deleted')
-        if node.is_deleted
-          expect(subject["properties"]["is_deleted"]).to eq("true")
+        if focus.is_deleted
+          expect(subject["properties"]["is_deleted"]).to be true
         else
-          expect(subject["properties"]["is_deleted"]).to eq("false")
+          expect(subject["properties"]["is_deleted"]).to be false
         end
         ["name","label","created_at","updated_at","upload","audit"].each do |unexpected_key|
           expect(subject["properties"]).not_to have_key(unexpected_key)

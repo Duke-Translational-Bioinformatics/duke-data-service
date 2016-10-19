@@ -188,6 +188,12 @@ describe DDS::V1::PropertiesAPI do
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }
       end
+
+      context 'with associated meta_property' do
+        include_context 'elasticsearch prep', [:resource], []
+        before { FactoryGirl.create(:meta_property, property: resource) }
+        it_behaves_like 'a validated resource'
+      end
     end
   end
 end

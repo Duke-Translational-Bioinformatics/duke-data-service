@@ -45,16 +45,6 @@ module DDS
         })
         authorize activity, :create?
         if activity.save
-          uaa = AssociatedWithUserProvRelation.create(
-            creator: current_user,
-            relatable_from: current_user,
-            relatable_to: activity)
-          if current_user.current_software_agent
-            saa = AssociatedWithSoftwareAgentProvRelation.create(
-              creator: current_user,
-              relatable_from: current_user.current_software_agent,
-              relatable_to: activity)
-          end
           activity
         else
           validation_error!(activity)

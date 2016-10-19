@@ -121,8 +121,11 @@ module DDS
         authenticate!
         property = Property.find(params[:id])
         authorize property, :destroy?
-        property.destroy
-        body false
+        if property.destroy
+          body false
+        else
+          validation_error!(property)
+        end
       end
     end
   end
