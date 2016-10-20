@@ -37,6 +37,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
 
       it_behaves_like 'a creatable resource' do
         it 'should set status to pending' do
