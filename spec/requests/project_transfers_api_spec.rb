@@ -37,6 +37,9 @@ describe DDS::V1::ProjectTransfersAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 201 }
+      end
 
       it_behaves_like 'a creatable resource' do
         it 'should set status to pending' do
@@ -56,20 +59,20 @@ describe DDS::V1::ProjectTransfersAPI do
           expect(new_object.to_users).to contain_exactly(to_user)
         end
       end
-      it_behaves_like 'an identified resource' do
+      context 'with invalid project_id' do
         let(:project_id) { "doesNotExist" }
         let(:resource_class) { Project }
+        it_behaves_like 'an identified resource'
       end
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_response_status) { 201 }
-      end
-      it_behaves_like 'a validated resource' do
+      context 'where project_transfer is pending' do
         let(:project) { pending_project_transfer.project }
+        it_behaves_like 'a validated resource'
       end
-      it_behaves_like 'a validated resource' do
+      context 'where to_user_id does not exist' do
         let(:payload_to_user_id) { "doesNotExist" }
+        it_behaves_like 'a validated resource'
       end
-      context 'empty to_users array' do
+      context 'where to_users array is empty' do
         let(:payload) {{ to_users: [] }}
         it_behaves_like 'a validated resource'
       end
@@ -127,9 +130,10 @@ describe DDS::V1::ProjectTransfersAPI do
         end
       end
 
-      it_behaves_like 'an identified resource' do
+      context 'with invalid project_id' do
         let(:project_id) { "doesNotExist" }
         let(:resource_class) { Project }
+        it_behaves_like 'an identified resource'
       end
     end
   end
