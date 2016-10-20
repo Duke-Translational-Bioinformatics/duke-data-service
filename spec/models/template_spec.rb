@@ -36,12 +36,14 @@ RSpec.describe Template, type: :model do
       context 'without meta_templates' do
         it { expect(subject.meta_templates).to be_empty }
         it { is_expected.to allow_values(*good_names).for(:name) }
+        it { expect(subject.destroy).to be_truthy }
       end
 
       context 'with meta_templates' do
         before { FactoryGirl.create(:meta_template, template: subject) }
         it { expect(subject.meta_templates).not_to be_empty }
         it { is_expected.not_to allow_values(*good_names).for(:name) }
+        it { expect(subject.destroy).to be_falsey }
       end
     end
   end

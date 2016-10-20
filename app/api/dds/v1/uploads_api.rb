@@ -36,7 +36,6 @@ module DDS
             })
             authorize upload, :create?
             if upload.save
-              upload.initialize_storage_provider
               upload
             else
               validation_error!(upload)

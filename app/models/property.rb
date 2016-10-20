@@ -15,8 +15,16 @@ class Property < ActiveRecord::Base
   validates :data_type, presence: true, 
     inclusion: {in: :available_data_types}
   validates :data_type, immutable: true, if: :has_meta_properties?
+  before_destroy :validate_removability
 
   private
+
+  def validate_removability
+    if has_meta_properties?
+      self.errors[:base] << "The property cannot be deleted if it has been associated to one or more DDS objects."
+      return false   
+    end
+  end
 
   def available_data_types
     [ 'string',
