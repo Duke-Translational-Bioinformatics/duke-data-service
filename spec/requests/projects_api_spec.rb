@@ -42,53 +42,60 @@ describe DDS::V1::ProjectsAPI do
         name: resource.name,
         description: resource.description
       }}
-      it_behaves_like 'a creatable resource' do
-        let(:resource) { project_stub }
-        it 'should set creator to current_user and make them a project_admin' do
 
-          expect {
-            is_expected.to eq(201)
-          }.to change{ ProjectPermission.count }.by(1)
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('id')
-          new_object = resource_class.find(response_json['id'])
-          expect(new_object.creator_id).to eq(current_user.id)
-          project_admin_role = AuthRole.where(id: 'project_admin').first
-          project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
-          expect(project_admin_permission).to be
+      context 'with queued ActiveJob' do
+        before do
+          ActiveJob::Base.queue_adapter = :test
         end
-      end
 
-      it_behaves_like 'an authenticated resource'
-
-      it_behaves_like 'a validated resource' do
-        let!(:payload) {{
-          name: resource.name,
-          description: nil
-        }}
-        it 'should not persist changes' do
-          expect(resource).to be_persisted
-          expect {
-            is_expected.to eq(400)
-          }.not_to change{resource_class.count}
+        it_behaves_like 'a creatable resource' do
+          let(:resource) { project_stub }
+          it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
+            expect {
+              expect {
+                is_expected.to eq(201)
+              }.to have_enqueued_job(ProjectStorageProviderInitializationJob)
+            }.to change{ ProjectPermission.count }.by(1)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('id')
+            new_object = resource_class.find(response_json['id'])
+            expect(new_object.creator_id).to eq(current_user.id)
+            project_admin_role = AuthRole.where(id: 'project_admin').first
+            project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
+            expect(project_admin_permission).to be
+          end
         end
-      end
 
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:resource) { project_stub }
-        let(:expected_response_status) { 201 }
-        let(:expected_audits) { 2 }
-      end
+        it_behaves_like 'an authenticated resource'
 
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:resource) { project_stub }
-        let(:expected_auditable_type) { ProjectPermission }
-        let(:expected_response_status) { 201 }
-        let(:audit_should_include) {
-          {user: current_user, audited_parent: 'Project'}
-        }
-      end
-      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'a validated resource' do
+          let!(:payload) {{
+            name: resource.name,
+            description: nil
+          }}
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
+          end
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 201 }
+          let(:expected_audits) { 2 }
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_auditable_type) { ProjectPermission }
+          let(:expected_response_status) { 201 }
+          let(:audit_should_include) {
+            {user: current_user, audited_parent: 'Project'}
+          }
+        end
+        it_behaves_like 'a software_agent accessible resource' do
           let(:resource) { project_stub }
           let(:expected_response_status) { 201 }
           it_behaves_like 'an annotate_audits endpoint' do
@@ -105,6 +112,19 @@ describe DDS::V1::ProjectsAPI do
               {user: current_user, audited_parent: 'Project', software_agent: software_agent}
             }
           end
+        end
+      end
+
+      context 'with inline ActiveJob', :vcr do
+        before do
+          ActiveJob::Base.queue_adapter = :inline
+        end
+
+        let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+        it_behaves_like 'a creatable resource' do
+          let(:resource) { project_stub }
+          it_behaves_like 'a storage_provider backed resource'
+        end
       end
     end
   end
