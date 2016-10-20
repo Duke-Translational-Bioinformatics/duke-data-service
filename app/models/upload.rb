@@ -26,7 +26,7 @@ class Upload < ActiveRecord::Base
   def object_path
     id
   end
-  
+
   def sub_path
     [project_id, id].join('/')
   end
@@ -73,10 +73,6 @@ class Upload < ActiveRecord::Base
     rescue IntegrityException => e
       integrity_exception(e.message)
     end
-  end
-
-  def initialize_storage_provider
-    storage_provider.put_container(project_id)
   end
 
   private

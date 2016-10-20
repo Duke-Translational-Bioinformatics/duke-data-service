@@ -108,16 +108,6 @@ RSpec.describe Upload, type: :model do
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
-    describe '.initialize_storage_provider' do
-      it { is_expected.to respond_to 'initialize_storage_provider' }
-
-      it 'should create the upload container in the storage provider' do
-        expect(subject.storage_provider.get_container_meta(subject.project_id)).to be_nil
-        subject.initialize_storage_provider
-        expect(subject.storage_provider.get_container_meta(subject.project_id)).to be
-      end
-    end
-
     describe 'complete' do
       let(:fingerprint_attributes) { FactoryGirl.attributes_for(:fingerprint) }
       before { subject.fingerprints_attributes = [fingerprint_attributes] }

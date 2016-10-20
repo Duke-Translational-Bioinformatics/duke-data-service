@@ -22,13 +22,13 @@ describe DDS::V1::SearchAPI do
       expect(provenance_graph['nodes']).not_to be_empty
       visible_nodes.each do |visible_node|
         expected_node = ProvenanceGraphNode.new(visible_node.graph_node)
-        expected_node.properties = visible_node
         expect(provenance_graph['nodes']).to include(
           JSON.parse(ProvenanceGraphNodeSerializer.new(expected_node).to_json)
         )
       end
       non_visible_nodes.each do |non_visible_node|
         expected_node = ProvenanceGraphNode.new(non_visible_node.graph_node)
+        expected_node.restricted = true
         expect(provenance_graph['nodes']).to include(
           JSON.parse(ProvenanceGraphNodeSerializer.new(expected_node).to_json)
         )
@@ -38,7 +38,6 @@ describe DDS::V1::SearchAPI do
 
       visible_relationships.each do |visible_relationship|
         expected_relationship = ProvenanceGraphRelationship.new(visible_relationship.graph_relation)
-        expected_relationship.properties = visible_relationship
         expect(provenance_graph['relationships']).to include(
          JSON.parse(ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json)
         )
@@ -46,6 +45,7 @@ describe DDS::V1::SearchAPI do
 
       non_visible_relationships.each do |non_visible_relationship|
         expected_relationship = ProvenanceGraphRelationship.new(non_visible_relationship.graph_relation)
+        expected_relationship.restricted = true
         expect(provenance_graph['relationships']).to include(
          JSON.parse(ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json)
         )

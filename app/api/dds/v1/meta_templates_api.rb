@@ -10,11 +10,19 @@ module DDS
           [404, 'Object or template does not exist']
         ]
       end
+      params do
+        optional :meta_template_name, type: String, desc: "The unique meta_template_name of the template; performs an exact match."
+      end
       get '/meta/:object_kind/:object_id', root: 'results' do
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         templatable_object = object_kind.find(params[:object_id])
-        policy_scope(MetaTemplate)
+        meta_params = declared(params, {include_missing: false})
+        meta_templates = policy_scope(MetaTemplate).where(templatable: templatable_object)
+        if name = meta_params[:meta_template_name]
+          meta_templates = meta_templates.joins(:template).where(templates: {name: name})
+        end
+        meta_templates
       end
 
       desc 'Create object metadata' do
