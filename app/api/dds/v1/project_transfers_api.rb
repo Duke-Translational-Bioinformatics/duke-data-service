@@ -1,6 +1,9 @@
 module DDS
   module V1
     class ProjectTransfersAPI < Grape::API
+      before do
+        not_implemented_error! if ENV['SKIP_PROJECT_TRANSFERS']
+      end
       desc 'Initiate a project transfer' do
         detail 'Initiates a project transfer from the current owner to a new owner or list of owners.'
         named 'initiate project transfer'

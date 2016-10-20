@@ -143,6 +143,15 @@ module DDS
           end
           object
         end
+
+        def not_implemented_error!
+          error_body = {
+            error: 405,
+            reason: 'not implemented',
+            suggestion: 'this is not the endpoint you are looking for'
+          }
+          error!(error_body, 405)
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
