@@ -19,7 +19,6 @@ describe DDS::V1::ProjectTransfersAPI do
   let!(:resource_permission) { project_transfer_permission }
   let(:resource_stub) { project_transfer_stub }
 
-
   describe 'Project Transfer Collection' do
     let(:url) { "/api/v1/projects/#{project_id}/transfers" }
     let(:project_id) { project.id }
@@ -78,22 +77,56 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'GET' do
       subject { get(url, nil, headers) }
+      let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
+      let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
-      it_behaves_like 'a listable resource' do
-        let!(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
-        let!(:project_transfer_user) { FactoryGirl.create(:project_transfer, :with_to_users)}
-        let(:expected_list_length) { expected_resources.length }
-        let!(:expected_resources) { [
-          project_transfer
-        ]}
-        let!(:unexpected_resources) { [
-          other_project_transfer,
-          project_transfer_from,
-          project_transfer_user
-        ] }
+
+      context 'where user has project_permission for project' do
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            project_transfer
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer,
+            project_transfer_from,
+            project_transfer_to
+          ] }
+        end
       end
+      context 'where user is from_user' do
+        let(:project_id) { project_transfer_from.project.id }
+        it_behaves_like 'a listable resource' do
+          let(:serializable_resource) { project_transfer_from }
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            project_transfer_from
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer,
+            project_transfer,
+            project_transfer_to
+          ] }
+        end
+      end
+      context 'where user is to_user' do
+        let(:project_id) { project_transfer_to.project.id }
+        it_behaves_like 'a listable resource' do
+          let(:serializable_resource) { project_transfer_to }
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            project_transfer_to
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer,
+            project_transfer,
+            project_transfer_from
+          ] }
+        end
+      end
+
       it_behaves_like 'an identified resource' do
         let(:project_id) { "doesNotExist" }
         let(:resource_class) { Project }
