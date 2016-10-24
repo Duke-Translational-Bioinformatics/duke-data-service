@@ -43,13 +43,10 @@ module DDS
         })
         authorize software_agent, :create?
         software_agent.build_api_key(key: SecureRandom.hex)
-        Audited.audit_class.as_user(current_user) do
-          if software_agent.save
-            annotate_audits [software_agent.audits.last, software_agent.api_key.audits.last]
-            software_agent
-          else
-            validation_error!(software_agent)
-          end
+        if software_agent.save
+          software_agent
+        else
+          validation_error!(software_agent)
         end
       end
 
@@ -92,16 +89,13 @@ module DDS
       end
       put '/software_agents/:id', root: false do
         authenticate!
-        software_agent_params = declared(params, include_missing: false)
+        software_agent_params = declared(params, {include_missing: false}, [:name, :description, :repo_url])
         software_agent = hide_logically_deleted SoftwareAgent.find(params[:id])
         authorize software_agent, :update?
-        Audited.audit_class.as_user(current_user) do
-          if software_agent.update(software_agent_params)
-            annotate_audits [software_agent.audits.last]
-            software_agent
-          else
-            validation_error!(software_agent)
-          end
+        if software_agent.update(software_agent_params)
+          software_agent
+        else
+          validation_error!(software_agent)
         end
       end
 
@@ -122,10 +116,7 @@ module DDS
         authenticate!
         software_agent = hide_logically_deleted SoftwareAgent.find(params[:id])
         authorize software_agent, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          software_agent.update(is_deleted: true)
-          annotate_audits [software_agent.audits.last]
-        end
+        software_agent.update(is_deleted: true)
         body false
       end
 
@@ -146,15 +137,10 @@ module DDS
         authenticate!
         software_agent = SoftwareAgent.find(params[:id])
         authorize software_agent.api_key, :update?
-        Audited.audit_class.as_user(current_user) do
-          ApiKey.transaction do
-            original_api_key_id = software_agent.api_key.id
-            software_agent.api_key.destroy!
-            delete_audit = Audited.audit_class.where(auditable_id: original_api_key_id).last
-            software_agent.build_api_key(key: SecureRandom.hex)
-            software_agent.save
-            annotate_audits [software_agent.api_key.audits.last, delete_audit]
-          end
+        ApiKey.transaction do
+          software_agent.api_key.destroy!
+          software_agent.build_api_key(key: SecureRandom.hex)
+          software_agent.save
         end
         software_agent.api_key
       end
@@ -194,10 +180,7 @@ module DDS
         authenticate!
         ak = SoftwareAgent.find(params[:id]).api_key
         authorize ak, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          ak.destroy
-          annotate_audits [ak.audits.last]
-        end
+        ak.destroy
         body false
       end
 

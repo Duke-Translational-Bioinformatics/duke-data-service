@@ -2,24 +2,28 @@ require 'rails_helper'
 
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
-  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
 
-  let(:project) { upload.project }
+  let(:project) { FactoryGirl.create(:project) }
+  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id, project: project) }
+  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:completed_upload) { FactoryGirl.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+
   let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
 
   let(:user) { FactoryGirl.create(:user) }
   let(:upload_stub) { FactoryGirl.build(:upload, storage_provider_id: storage_provider.id) }
   let(:chunk_stub) { FactoryGirl.build(:chunk, upload_id: upload.id) }
+  let(:fingerprint_stub) { FactoryGirl.build(:fingerprint) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: upload.project) }
+  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   describe 'Uploads collection' do
-    let(:url) { "/api/v1/projects/#{project.id}/uploads" }
+    let(:url) { "/api/v1/projects/#{project_id}/uploads" }
+    let(:project_id) { project.id }
 
     #List file uploads for a project
     describe 'GET' do
@@ -35,8 +39,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
-        let(:resource_class) { 'Project' }
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
 
       it_behaves_like 'a paginated resource' do
@@ -51,17 +55,13 @@ describe DDS::V1::UploadsAPI do
     end
 
     #Initiate a chunked file upload for a project
-    describe 'POST', :vcr do
+    describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { "POST" }
       let!(:payload) {{
         name: upload_stub.name,
         content_type: upload_stub.content_type,
-        size: upload_stub.size,
-        hash: {
-          value: upload_stub.fingerprint_value,
-          algorithm: upload_stub.fingerprint_algorithm
-        }
+        size: upload_stub.size
       }}
 
       it_behaves_like 'a creatable resource' do
@@ -69,44 +69,13 @@ describe DDS::V1::UploadsAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
         end
-
-        it 'should set fingerprint_value' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.fingerprint_value).to eq(payload[:hash][:value])
-        end
-
-        it 'should set fingerprint_algorithm' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.fingerprint_algorithm).to eq(payload[:hash][:algorithm])
-        end
-
-        it 'should create the project container in the storage_provider' do
-          expect(storage_provider.get_container_meta(project.id)).to be_nil
-          is_expected.to eq(expected_response_status)
-          expect(storage_provider.get_container_meta(project.id)).to be
-        end
-      end
-
-      it_behaves_like 'a storage_provider backed resource'
-
-      context 'without hash parameter in payload' do
-        let!(:payload) {{
-          name: upload_stub.name,
-          content_type: upload_stub.content_type,
-          size: upload_stub.size
-        }}
-        it_behaves_like 'a creatable resource'
       end
 
       it_behaves_like 'a validated resource' do
         let(:payload) {{
           name: nil,
           content_type: nil,
-          size: nil,
-          hash: {
-            value: nil,
-            algorithm: nil
-          }
+          size: nil
         }}
         it 'should not persist changes' do
           expect(resource).to be_persisted
@@ -120,8 +89,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/projects/notexists_projectid/uploads" }
-        let(:resource_class) { 'Project' }
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
@@ -140,7 +109,8 @@ describe DDS::V1::UploadsAPI do
   end
 
   describe 'Upload instance' do
-    let(:url) { "/api/v1/uploads/#{resource.id}" }
+    let(:url) { "/api/v1/uploads/#{resource_id}" }
+    let(:resource_id) { resource.id }
 
     #View upload details/status
     describe 'GET' do
@@ -151,9 +121,8 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'an authorized resource'
-
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/uploads/notexists_resourceid" }
+        let(:resource_id) { "doesNotExist" }
       end
     end
   end
@@ -162,19 +131,21 @@ describe DDS::V1::UploadsAPI do
     let(:resource_class) { Chunk }
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
-    let!(:url) { "/api/v1/uploads/#{upload.id}/chunks" }
+    let!(:url) { "/api/v1/uploads/#{upload_id}/chunks" }
+    let(:upload_id) { upload.id }
 
     describe 'PUT' do
       subject { put(url, payload.to_json, headers) }
       let(:called_action) { "PUT" }
       let!(:payload) {{
-        number: chunk_stub.number,
+        number: payload_chunk_number,
         size: chunk_stub.size,
         hash: {
           value: chunk_stub.fingerprint_value,
           algorithm: chunk_stub.fingerprint_algorithm
         }
       }}
+      let(:payload_chunk_number) { chunk_stub.number }
       it_behaves_like 'a creatable resource' do
         let(:expected_response_status) {200}
         let(:new_object) {
@@ -186,6 +157,11 @@ describe DDS::V1::UploadsAPI do
             fingerprint_algorithm: payload[:hash][:algorithm]
           ).last
         }
+      end
+
+      context 'when chunk.number exists' do
+        let(:payload_chunk_number) { chunk.number }
+        it_behaves_like 'an updatable resource'
       end
 
       it_behaves_like 'a validated resource' do
@@ -209,7 +185,7 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'an authorized resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) { "/api/v1/uploads/notexists_resourceid/chunks" }
+        let(:upload_id) { "doesNotExist" }
         let(:resource_class) {"Upload"}
       end
 
@@ -230,10 +206,18 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Complete the chunked file upload', :vcr do
-    let(:url) { "/api/v1/uploads/#{resource.id}/complete" }
+  describe 'Complete the chunked file upload', vcr: {record: :new_episodes} do #:vcr do
+    let(:url) { "/api/v1/uploads/#{resource_id}/complete" }
+    let(:resource_id) { resource.id }
     let(:called_action) { "PUT" }
-    subject { put(url, nil, headers) }
+    subject { put(url, payload.to_json, headers) }
+    let!(:payload) {{
+      hash: {
+        value: fingerprint_stub.value,
+        algorithm: fingerprint_algorithm
+      }
+    }}
+    let(:fingerprint_algorithm) { fingerprint_stub.algorithm }
 
     before do
       expect(chunk).to be_persisted
@@ -268,7 +252,17 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'an authorized resource'
 
     it_behaves_like 'an identified resource' do
-      let(:url) { "/api/v1/uploads/notexists_resourceid/complete" }
+      let(:resource_id) { "doesNotExist" }
+    end
+
+    context 'with completed upload' do
+      let(:upload) { completed_upload }
+      it_behaves_like 'a validated resource'
+    end
+
+    context 'with invalid fingerprint algorithm' do
+      let(:fingerprint_algorithm) { 'BadAlgorithm' }
+      it_behaves_like 'a validated resource'
     end
 
     it_behaves_like 'an annotate_audits endpoint'
@@ -302,6 +296,59 @@ describe DDS::V1::UploadsAPI do
         expect(response_json['reason']).to eq('IntegrityException')
         expect(response_json).to have_key('suggestion')
         expect(response_json['suggestion']).to eq('reported chunk hash does not match that computed by StorageProvider')
+      end
+    end
+  end
+
+  describe 'Report upload hash' do
+    subject { put(url, payload.to_json, headers) }
+    let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
+    let!(:parent_id) { completed_upload.id }
+    let(:called_action) { "PUT" }
+    let!(:payload) {{
+      value: fingerprint_stub.value,
+      algorithm: fingerprint_stub.algorithm
+    }}
+    let(:resource_class) { Fingerprint }
+
+    it_behaves_like 'a creatable resource' do
+      let(:expected_response_status) {200}
+      let(:new_object) { completed_upload.reload }
+    end
+    it_behaves_like 'an authenticated resource'
+    it_behaves_like 'an authorized resource'
+
+    it_behaves_like 'an identified resource' do
+      let(:parent_id) { "notexist" }
+      let(:resource_class) { Upload }
+    end
+
+    it_behaves_like 'an annotate_audits endpoint'
+
+    it_behaves_like 'a software_agent accessible resource' do
+      it_behaves_like 'an annotate_audits endpoint'
+    end
+
+    context 'with nil payload values' do
+      let(:payload) {{
+        value: nil,
+        algorithm: nil
+      }}
+      it_behaves_like 'a validated resource'
+      it 'should not persist changes' do
+        expect {
+          is_expected.to eq(400)
+        }.not_to change{resource_class.count}
+      end
+    end
+
+    context 'with incomplete upload' do
+      let(:parent_id) { upload.id }
+      it_behaves_like 'a validated resource'
+      it 'should not persist changes' do
+        expect {
+          is_expected.to eq(400)
+        }.not_to change{resource_class.count}
       end
     end
   end

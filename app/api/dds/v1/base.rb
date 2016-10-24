@@ -4,6 +4,9 @@ module DDS
   module V1
     class Base < Grape::API
       include Grape::Kaminari
+      use AuditStoreCleanUp
+      # use Grape::Middleware::Lograge
+
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
@@ -13,7 +16,11 @@ module DDS
       paginate offset: false
 
       before do
-        logger.info "User-Agent: #{headers['User-Agent']}"
+        log_user_agent
+      end
+
+      after_validation do
+        populate_audit_store_with_request
       end
 
       helpers Pundit
@@ -22,8 +29,14 @@ module DDS
           Rails.logger
         end
 
+        def log_user_agent
+          logger.info "User-Agent: #{headers['User-Agent']}" if headers
+        end
+
         def authenticate!
-          unless current_user
+          if current_user
+            populate_audit_store_with_user(current_user)
+          else
             @auth_error[:error] = 401
             error!(@auth_error, 401)
           end
@@ -100,29 +113,28 @@ module DDS
           error!(error_payload, 400)
         end
 
-        def annotate_audits(audits = [], additional_annotation = nil)
-          request_annotation = {
-            request_uuid: SecureRandom.hex,
-            remote_address: request.ip
-          }
-          comment_annotation = {
-            endpoint: request.env["REQUEST_URI"],
-            action: request.env["REQUEST_METHOD"]
-          }
-          if current_software_agent
-            comment_annotation['software_agent_id'] = current_software_agent.id
-          end
-          audit_annotation = additional_annotation ?
-            additional_annotation.merge(request_annotation) :
-            request_annotation
-
+        def annotate_audits(audits = [], additional_annotation = {})
           audits.each do |audit|
-            audit_update = audit_annotation
-            audit_update[:comment] = audit.comment ?
-              audit.comment.merge(comment_annotation) :
-              comment_annotation
+            audit_update = additional_annotation
+            audit_update[:comment] = (audit.comment || {}).merge(comment_annotation)
             audit.update(audit_update)
           end
+        end
+
+        def populate_audit_store_with_user(user)
+          Audited.store[:current_user] = user
+        end
+
+        def populate_audit_store_with_request
+          audit_attributes = {
+            request_uuid: SecureRandom.uuid,
+            remote_address: request.ip,
+            comment: {
+              endpoint: request.env["REQUEST_URI"],
+              action: request.env["REQUEST_METHOD"]
+            }
+          }
+          Audited.store.merge!({audit_attributes: audit_attributes})
         end
 
         def hide_logically_deleted(object)
@@ -130,6 +142,15 @@ module DDS
             raise ActiveRecord::RecordNotFound.new("find #{object.class.name} with #{object.id} not found")
           end
           object
+        end
+
+        def not_implemented_error!
+          error_body = {
+            error: 405,
+            reason: 'not implemented',
+            suggestion: 'this is not the endpoint you are looking for'
+          }
+          error!(error_body, 405)
         end
       end
 
@@ -143,6 +164,15 @@ module DDS
           "error" => "404",
           "reason" => "#{missing_object} Not Found",
           "suggestion" => "you may have mistyped the #{missing_object} id"
+        }
+        error!(error_json, 404)
+      end
+
+      rescue_from NameError do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => e.message,
+          "suggestion" => "Please supply a supported object_kind"
         }
         error!(error_json, 404)
       end
@@ -181,10 +211,21 @@ module DDS
       mount DDS::V1::ChildrenAPI
       mount DDS::V1::SoftwareAgentsAPI
       mount DDS::V1::FileVersionsAPI
-      add_swagger_documentation(
-        api_version: 'v1',
-        hide_format: true
-      )
+      mount DDS::V1::TagsAPI
+      mount DDS::V1::ActivitiesAPI
+      mount DDS::V1::RelationsAPI
+      mount DDS::V1::SearchAPI
+      mount DDS::V1::TemplatesAPI
+      mount DDS::V1::PropertiesAPI
+      mount DDS::V1::MetaTemplatesAPI
+      mount DDS::V1::ProjectTransfersAPI
+      add_swagger_documentation \
+        doc_version: '0.0.2',
+        hide_documentation_path: true,
+        info: {
+          title: "Duke Data Service API.",
+          description: "REST API to the Duke Data Service. Some requests require Authentication.",
+        }
     end
   end
 end

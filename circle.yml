@@ -1,10 +1,16 @@
 machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   environment:
     LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
-    COMPOSE_FILE: docker-compose.circle.yml
+    COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
+    GRAPHSTORY_URL: http://neo4j.db.host:7474
+    BONSAI_URL: elastic.local:9200
   hosts:
-    swift.circle.host: 0.0.0.0
+    swift.local: 0.0.0.0
+    neo4j.db.host: 0.0.0.0
+    elastic.local: 0.0.0.0
   services:
     - docker
 
@@ -17,16 +23,16 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-    - ./docker/circle/cache_ruby.sh
-    - ./docker/circle/cache_dredd.sh
-    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
-    - sudo pip install --upgrade docker-compose==1.3.0
-    - ./circle/launch_application.circle.sh
+    - ./docker/circle/cache_docker_image.sh neo4j 3.0.2
+    - ./docker/circle/cache_docker_image.sh elasticsearch 2.2.2
+#    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
+    - sudo pip install --upgrade docker-compose==1.8.0
+    - docker-compose up -d neo4j elasticsearch
 
 test:
- post:
-  #- './workflow/workflow.circle.sh'
-  - 'docker-compose run dredd'
+  override:
+    - ./circle/parallelize_test_suite.sh:
+        parallel: true
 
 deployment:
  development:
@@ -39,6 +45,7 @@ deployment:
         timeout: 54000
     - heroku run rake --exit-code db:migrate --app 'dukeds-dev'
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -50,6 +57,7 @@ deployment:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -60,3 +68,4 @@ deployment:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds'
     - heroku run --exit-code rake db:seed --app 'dukeds'
+    - heroku run --exit-code rake db:data:migrate --app 'dukeds'

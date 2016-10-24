@@ -54,9 +54,8 @@ module DDS
                   uid: access_token['uid'],
                   authentication_service: auth_service
                 )
+                populate_audit_store_with_user(new_user)
                 new_user.save!
-                last_audit = new_user.audits.last
-                annotate_audits([last_audit], {user: new_user})
               end
             end
             ApiToken.new(user: authorized_user.user, user_authentication_service: authorized_user)

@@ -27,7 +27,8 @@ describe DDS::V1::ProjectRolesAPI do
   end
 
   describe 'View authorization role details' do
-    let(:url) {"/api/v1/project_roles/#{resource.id}"}
+    let(:url) {"/api/v1/project_roles/#{resource_id}"}
+    let(:resource_id) { resource.id }
     describe 'GET' do
       subject { get(url, nil, headers) }
 
@@ -37,7 +38,7 @@ describe DDS::V1::ProjectRolesAPI do
       it_behaves_like 'a software_agent accessible resource'
 
       it_behaves_like 'an identified resource' do
-        let(:url) {"/api/v1/project_roles/notexists_projectrole_id"}
+        let(:resource_id) { "doesNotExist" }
       end
     end
   end

@@ -2,10 +2,9 @@ FactoryGirl.define do
   factory :data_file do
     name { Faker::Team.name }
     label { Faker::Hacker.say_something_smart }
-    association :upload, :completed
+    association :upload, :completed, :with_fingerprint
     parent_id { SecureRandom.uuid }
     project
-    creator { upload.creator }
     is_deleted false
 
     trait :with_parent do
@@ -23,7 +22,7 @@ FactoryGirl.define do
 
     trait :invalid do
       to_create {|instance| instance.save(validate: false) }
-      creator { nil }
+      name { nil }
     end
   end
 end

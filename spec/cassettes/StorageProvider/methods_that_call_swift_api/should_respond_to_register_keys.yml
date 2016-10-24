@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: http://192.168.99.100:12345/auth/v1.0
+    uri: http://swift.local:12345/auth/v1.0
     body:
       encoding: US-ASCII
       string: ''
@@ -17,37 +17,37 @@ http_interactions:
       message: OK
     headers:
       X-Storage-Url:
-      - http://192.168.99.100:12345/v1/AUTH_test
+      - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc977c02f568d42fea189e-0056e9d648
+      - txf27fc1c4337c4956b097f-0057b5e650
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Thu, 18 Aug 2016 16:46:08 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
+  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
 - request:
     method: post
-    uri: http://192.168.99.100:12345/v1/AUTH_test
+    uri: http://swift.local:12345/v1/AUTH_test
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk258aa7605cba4fdcb51526b2b71485af
+      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
       X-Account-Meta-Temp-Url-Key:
-      - e84c1ba30c7ab996fb91d0594b75d97a
+      - 1ee00aa5e26e0bcd75443eed0800b2c8
       X-Account-Meta-Temp-Url-Key-2:
-      - 15d7bd05d69fef12fb1074345bdbbc4e
+      - 9572b6704bf1cf8996273b34474ea41e
   response:
     status:
       code: 204
@@ -58,12 +58,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txc57bd8ff8ddd44e1bf3ce-0056e9d648
+      - tx3bca721ecdb4410bb06cf-0057b5e650
       Date:
-      - Wed, 16 Mar 2016 21:55:20 GMT
+      - Thu, 18 Aug 2016 16:46:08 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 16 Mar 2016 21:55:20 GMT
-recorded_with: VCR 3.0.0
+  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
+recorded_with: VCR 3.0.3

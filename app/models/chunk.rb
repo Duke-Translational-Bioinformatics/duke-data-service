@@ -1,4 +1,5 @@
 class Chunk < ActiveRecord::Base
+  include RequestAudited
   default_scope { order('created_at DESC') }
   audited
   after_save :update_upload_etag
@@ -10,7 +11,8 @@ class Chunk < ActiveRecord::Base
   has_many :project_permissions, through: :upload
 
   validates :upload_id, presence: true
-  validates :number, presence: true
+  validates :number, presence: true, 
+    uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true

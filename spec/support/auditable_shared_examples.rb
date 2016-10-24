@@ -1,4 +1,13 @@
-shared_examples 'an audited model' do
+shared_examples 'an audited model' do |request_audited: true|
+  let(:primary_key_column) { described_class.column_for_attribute(:id) }
+  let(:audited_foriegn_key_column) { Audited.audit_class.column_for_attribute(:auditable_id) }
+
+  if request_audited
+    it { is_expected.to be_a(RequestAudited) }
+  end
+  it 'should have audit compatible primary key' do
+    expect(primary_key_column.sql_type).to eq(audited_foriegn_key_column.sql_type)
+  end
   it 'should have an audit record' do
     should have_many(:audits)
     expect(subject.audits).to be
@@ -8,7 +17,7 @@ end
 shared_examples 'an annotate_audits endpoint' do
   let(:expected_response_status) { 200 }
   let(:expected_audits) { 1 }
-  let(:expected_auditable_type) { resource_class.base_class.to_s }
+  let(:expected_auditable_type) { resource_class.base_class }
   let(:audit_should_include) { {user: current_user} }
 
   it 'should create expected audit types' do
@@ -16,14 +25,14 @@ shared_examples 'an annotate_audits endpoint' do
       is_expected.to eq(expected_response_status)
     }.to change{
       Audited.audit_class.where(
-        auditable_type: expected_auditable_type
+        auditable_type: expected_auditable_type.to_s
       ).count }.by(expected_audits)
   end
 
   it 'audit should record the remote address, uuid, endpoint action' do
     is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
-      auditable_type: expected_auditable_type
+      auditable_type: expected_auditable_type.to_s
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last
@@ -40,7 +49,7 @@ shared_examples 'an annotate_audits endpoint' do
   it 'audit should include other expected attributes' do
     is_expected.to eq(expected_response_status)
     last_audit = Audited.audit_class.where(
-      auditable_type: expected_auditable_type
+      auditable_type: expected_auditable_type.to_s
     ).where(
       'comment @> ?', {action: called_action, endpoint: url}.to_json
     ).order(:created_at).last

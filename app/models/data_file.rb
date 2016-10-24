@@ -2,15 +2,17 @@
 
 class DataFile < Container
   belongs_to :upload
-  belongs_to :creator, class_name: 'User'
-  has_many :file_versions
+  has_many :file_versions, -> { order('version_number ASC') }, autosave: true
+  has_many :tags, as: :taggable
+  has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
-  before_update :build_file_version, if: :upload_id_changed?
+  before_save :build_file_version, if: :new_file_version_needed?
+  before_save :set_current_file_version_attributes
+  before_save :set_file_versions_is_deleted, if: :is_deleted?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload_id, presence: true, unless: :is_deleted
-  validates :creator_id, presence: true, unless: :is_deleted
 
   validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
     if record.upload
@@ -32,14 +34,55 @@ class DataFile < Container
     upload.temporary_url(name)
   end
 
+  def set_file_versions_is_deleted
+    file_versions.each do |fv|
+      fv.is_deleted = true
+    end
+  end
+
   def kind
     super('file')
   end
 
+  def current_file_version
+    file_versions[-1]
+  end
+
   def build_file_version
-    file_versions.build(
-      upload_id: upload_id_was,
-      label: label_was
-    )
+    file_versions.build
+  end
+
+  def set_current_file_version_attributes
+    current_file_version.attributes = {
+      upload: upload,
+      label: label
+    }
+    current_file_version
+  end
+
+  def new_file_version_needed?
+    file_versions.empty? ||
+      current_file_version.upload != upload &&
+      current_file_version.persisted?
+  end
+
+  def as_indexed_json(options={})
+    DataFileSearchDocumentSerializer.new(self).as_json
+  end
+
+  settings index: { number_of_shards: 1 } do
+    mappings dynamic: 'false' do
+      indexes :id
+      indexes :name
+      indexes :is_deleted, type: "boolean"
+      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :label
+      indexes :tags do
+        indexes :label, type: "string", fields: {
+          raw: {type: "string", index: "not_analyzed"}
+        }
+      end
+    end
   end
 end

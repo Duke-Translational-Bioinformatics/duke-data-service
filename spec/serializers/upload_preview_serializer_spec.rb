@@ -1,30 +1,31 @@
 require 'rails_helper'
 
 RSpec.describe UploadPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_error) }
+  let(:resource) { FactoryGirl.create(:upload, :with_chunks) }
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'size' => resource.size
+  }}
 
   it_behaves_like 'a has_one association with', :storage_provider, StorageProviderPreviewSerializer
+  it_behaves_like 'a has_many association with', :fingerprints, FingerprintSerializer, root: :hashes
 
   it_behaves_like 'a json serializer' do
-    it 'should have expected keys and values' do
-      is_expected.to have_key('id')
-      is_expected.to have_key('size')
-      is_expected.to have_key('hash')
-      expect(subject["id"]).to eq(resource.id)
-      expect(subject["size"]).to eq(resource.size)
-      expect(subject["hash"]).to eq({
-        "value" => resource.fingerprint_value,
-        "algorithm" => resource.fingerprint_algorithm
-      })
+    it { is_expected.not_to have_key('hash') }
+    it { is_expected.to include(expected_attributes) }
+  end
+
+  context 'with completed upload' do
+    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_fingerprint) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
     end
   end
 
-  context 'upload without fingerprint' do
-    let(:resource) { FactoryGirl.create(:upload, :without_fingerprint, :with_chunks, :completed, :with_error) }
-
+  context 'when upload has error' do
+    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
     it_behaves_like 'a json serializer' do
-      it { is_expected.to have_key "hash" }
-      it { expect(subject["hash"]).to eq(nil) }
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end

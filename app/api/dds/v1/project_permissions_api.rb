@@ -48,13 +48,10 @@ module DDS
           raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
         end
         
-        Audited.audit_class.as_user(current_user) do
-          if permission.save
-            annotate_audits [permission.audits.last, project.audits.last]
-            permission
-          else
-            validation_error! permission
-          end
+        if permission.save
+          permission
+        else
+          validation_error! permission
         end
       end
 
@@ -93,12 +90,9 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        permission = ProjectPermission.find_by(project: project, user: user)
+        permission = ProjectPermission.find_by!(project: project, user: user)
         authorize permission, :destroy?
-        Audited.audit_class.as_user(current_user) do
-          permission.destroy
-          annotate_audits [permission.audits.last, project.audits.last]
-        end
+        permission.destroy
         body false
       end
     end

@@ -29,7 +29,7 @@ RSpec.describe ProjectPermission, type: :model do
     end
 
     it 'should have a user_id unique to the project' do
-      should validate_uniqueness_of(:user_id).scoped_to(:project_id)
+      should validate_uniqueness_of(:user_id).scoped_to(:project_id).case_insensitive
     end
 
     it 'should have a project_id' do

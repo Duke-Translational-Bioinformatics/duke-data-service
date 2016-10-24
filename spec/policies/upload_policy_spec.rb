@@ -11,14 +11,16 @@ describe UploadPolicy do
   it_behaves_like 'system_permission can access', :upload
   it_behaves_like 'system_permission can access', :other_upload
 
-  it_behaves_like 'a user with project_permission', :create_file, allows: [:create?, :update?, :complete?], on: :upload
+  it_behaves_like 'a user with project_permission', :create_file, allows: [:create?, :complete?], on: :upload
+  it_behaves_like 'a user with project_permission', :update_file, allows: [:update?], on: :upload
   it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:complete?], on: :upload
 
   it_behaves_like 'a user with project_permission', :create_file, allows: [], denies: [:complete?], on: :other_upload
+  it_behaves_like 'a user with project_permission', :update_file, allows: [], denies: [:complete?], on: :other_upload
   it_behaves_like 'a user with project_permission', :view_project, allows: [], denies: [:complete?], on: :other_upload
 
-  it_behaves_like 'a user without project_permission', [:create_file, :view_project], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :complete?], on: :upload
-  it_behaves_like 'a user without project_permission', [:create_file, :view_project], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :complete?], on: :other_upload
+  it_behaves_like 'a user without project_permission', [:create_file, :update_file, :view_project], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :complete?], on: :upload
+  it_behaves_like 'a user without project_permission', [:create_file, :update_file, :view_project], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :complete?], on: :other_upload
 
 
   context 'when user does not have project_permission' do
