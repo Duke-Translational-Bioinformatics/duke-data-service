@@ -5,37 +5,27 @@ RSpec.describe FolderSerializer, type: :serializer do
   let(:is_logically_deleted) { true }
   let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:root_folder) { FactoryGirl.create(:folder, :root) }
-
+  let(:expected_attributes_with_parent) {{
+    'id' => resource.id,
+    'parent' => { 'kind' => resource.parent.kind, 'id' => resource.parent.id },
+    'name' => resource.name,
+    'is_deleted' => resource.is_deleted
+  }}
+  let(:expected_attributes_without_parent) {{
+    'parent' => { 'kind' => resource.project.kind, 'id' => resource.project.id }
+  }}
+  
   it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
   it_behaves_like 'a has_many association with', :ancestors, AncestorSerializer
 
   it_behaves_like 'a json serializer' do
-    it 'should have expected keys and values' do
-      is_expected.to have_key('id')
-      is_expected.to have_key('parent')
-      expect(subject['parent']).to have_key('kind')
-      expect(subject['parent']).to have_key('id')
-      is_expected.to have_key('name')
-      is_expected.to have_key('is_deleted')
-
-      expect(subject['id']).to eq(resource.id)
-      expect(subject['parent']['kind']).to eq(resource.parent.kind)
-      expect(subject['parent']['id']).to eq(resource.parent.id)
-      expect(subject['name']).to eq(resource.name)
-      expect(subject['is_deleted']).to eq(resource.is_deleted)
+    context 'with a parent' do
+      it { is_expected.to include(expected_attributes_with_parent) }
     end
 
     context 'without a parent' do
       let(:resource) { root_folder }
-
-      it 'should have expected keys and values' do
-        is_expected.to have_key('parent')
-        expect(subject['parent']).to have_key('kind')
-        expect(subject['parent']).to have_key('id')
-
-        expect(subject['parent']['kind']).to eq(resource.project.kind)
-        expect(subject['parent']['id']).to eq(resource.project.id)
-      end
+      it { is_expected.to include(expected_attributes_without_parent) }
     end
   end
 end
