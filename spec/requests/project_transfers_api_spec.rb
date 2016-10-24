@@ -35,12 +35,12 @@ describe DDS::V1::ProjectTransfersAPI do
       }}
       let(:payload_to_user_id) { to_user.id }
 
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_response_status) { 201 }
       end
-
       it_behaves_like 'a creatable resource' do
         it 'should set status to pending' do
           is_expected.to eq(expected_response_status)
