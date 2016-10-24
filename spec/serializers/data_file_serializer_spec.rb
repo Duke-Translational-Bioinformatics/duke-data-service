@@ -7,7 +7,9 @@ RSpec.describe DataFileSerializer, type: :serializer do
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
   let(:expected_attributes) {{
     'id' => resource.id,
-    'parent' => { 'kind' => resource.parent.kind, 'id' => resource.parent_id },
+    'parent' => { 'kind' => resource.parent.kind,
+                  'id' => resource.parent_id
+                },
     'name' => resource.name,
     'is_deleted' => resource.is_deleted
   }}
