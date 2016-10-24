@@ -18,7 +18,18 @@ class GeneratedByActivityProvRelation < ProvRelation
   validates :relatable_to_type, inclusion: { in: %w(Activity),
     message: "GeneratedByActivityProvRelation must be to a Activity" }
 
+  validate :generating_activity, unless: :is_deleted
+
   def set_relationship_type
     self.relationship_type = 'was-generated-by'
+  end
+
+  def generating_activity
+    if UsedProvRelation.where(
+      relatable_from_id: relatable_to_id,
+      relatable_to_id: relatable_from_id
+      ).exists?
+      errors.add(:relatable_to_id, "GeneratedByActivityProvRelation cannot be made to an Activity that has a UsedProvRelation to the generated FileVersion")
+    end
   end
 end
