@@ -4,10 +4,23 @@ RSpec.describe UserSerializer, type: :serializer do
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:resource) { user_authentication_service.user }
   let(:is_logically_deleted) { false }
-
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'username' => resource.username,
+    'full_name' => resource.display_name,
+    'first_name' => resource.first_name,
+    'last_name' => resource.last_name,
+    'email' => resource.email,
+    'auth_provider' => { 'uid' => user_authentication_service.uid,
+                         'source' => user_authentication_service.authentication_service.name
+                       },
+    'last_login_on' => resource.last_login_at.as_json,
+    'agent' => nil
+  }}
   it_behaves_like 'a has_one association with', :current_software_agent, SoftwareAgentPreviewSerializer, root: :agent
 
   it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
     it 'should have expected keys and values' do
       is_expected.to have_key('id')
       is_expected.to have_key('username')
