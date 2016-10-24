@@ -14,14 +14,12 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
         is_expected.to have_key('relationships')
         expected_nodes = expected_object_nodes.map{|enode|
           g = ProvenanceGraphNode.new(enode.graph_node)
-          g.properties = enode
           JSON.parse(ProvenanceGraphNodeSerializer.new(g).to_json)
         }.flatten
         expect(subject["nodes"]).to match_array(expected_nodes)
 
         expected_relationships = expected_object_relationships.map{|expected_object_relationship|
           expected_relationship = ProvenanceGraphRelationship.new(expected_object_relationship.graph_relation)
-          expected_relationship.properties = expected_object_relationship
           JSON.parse(
             ProvenanceGraphRelationshipSerializer.new(expected_relationship).to_json
           )
@@ -64,6 +62,14 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
         relatable_to: fv1ga
       )
     }
+    let!(:fv1_derived_from) { FactoryGirl.create(:file_version, label: "FV1_DERIVED_FROM") }
+    let!(:fv1_derived_from_fv1_derived_from) {
+      FactoryGirl.create(:derived_from_file_version_prov_relation,
+        relatable_to: fv1_derived_from,
+        relatable_from: fv1
+      )
+    }
+
     let!(:file_versions) { [ {id: fv1.id} ] }
     let(:resource) {
       WasGeneratedByProvenanceGraph.new(
@@ -71,7 +77,7 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
         policy_scope: policy_scope
       )
     }
-    it_behaves_like 'a ProvenanceGraphSerializer', expected_object_node_syms: [:fv1, :fv1ga],
-      expected_object_relationship_syms: [:fv1ga_generated_fv1]
+    it_behaves_like 'a ProvenanceGraphSerializer', expected_object_node_syms: [:fv1, :fv1ga, :fv1_derived_from],
+      expected_object_relationship_syms: [:fv1ga_generated_fv1, :fv1_derived_from_fv1_derived_from]
   end
 end

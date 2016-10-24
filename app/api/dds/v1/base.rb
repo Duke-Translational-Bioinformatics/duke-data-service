@@ -143,6 +143,15 @@ module DDS
           end
           object
         end
+
+        def not_implemented_error!
+          error_body = {
+            error: 405,
+            reason: 'not implemented',
+            suggestion: 'this is not the endpoint you are looking for'
+          }
+          error!(error_body, 405)
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
@@ -209,6 +218,7 @@ module DDS
       mount DDS::V1::TemplatesAPI
       mount DDS::V1::PropertiesAPI
       mount DDS::V1::MetaTemplatesAPI
+      mount DDS::V1::ProjectTransfersAPI
       add_swagger_documentation \
         doc_version: '0.0.2',
         hide_documentation_path: true,

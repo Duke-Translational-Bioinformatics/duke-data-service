@@ -34,16 +34,36 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:url) { "/api/v1/meta/#{resource_kind}/#{file_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, query_params, headers) }
+      let(:query_params) {{}}
+      let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
+      let(:meta_template_diff_file) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
+      let(:meta_template_diff_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
         let!(:expected_resources) { [
-          resource
+          resource,
+          meta_template_diff_template
         ]}
         let!(:unexpected_resources) { [
-          other_meta_template
+          other_meta_template,
+          meta_template_diff_file
         ] }
+      end
+      context 'with meta_template_name parameter' do
+        let(:query_params) {{meta_template_name: resource.template.name}}
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            resource
+          ]}
+          let!(:unexpected_resources) { [
+            other_meta_template,
+            meta_template_diff_file,
+            meta_template_diff_template
+          ] }
+        end
       end
 
       it_behaves_like 'an authenticated resource'
@@ -241,6 +261,15 @@ describe DDS::V1::MetaTemplatesAPI do
       let(:called_action) { 'DELETE' }
 
       it_behaves_like 'a removable resource'
+      context 'with associated meta_property' do
+        include_context 'elasticsearch prep', [:template, :property], [:data_file]
+        before { expect(meta_property).to be_persisted }
+        it 'should destroy meta_property' do
+          expect {
+            is_expected.to eq 204
+          }.to change{MetaProperty.count}.by(-1)
+        end
+      end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource' do

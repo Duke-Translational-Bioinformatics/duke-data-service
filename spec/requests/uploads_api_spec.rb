@@ -55,7 +55,7 @@ describe DDS::V1::UploadsAPI do
     end
 
     #Initiate a chunked file upload for a project
-    describe 'POST', :vcr do
+    describe 'POST' do
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { "POST" }
       let!(:payload) {{
@@ -69,15 +69,7 @@ describe DDS::V1::UploadsAPI do
           is_expected.to eq(expected_response_status)
           expect(new_object.creator_id).to eq(current_user.id)
         end
-
-        it 'should create the project container in the storage_provider' do
-          expect(storage_provider.get_container_meta(project.id)).to be_nil
-          is_expected.to eq(expected_response_status)
-          expect(storage_provider.get_container_meta(project.id)).to be
-        end
       end
-
-      it_behaves_like 'a storage_provider backed resource'
 
       it_behaves_like 'a validated resource' do
         let(:payload) {{
@@ -336,7 +328,7 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'a software_agent accessible resource' do
       it_behaves_like 'an annotate_audits endpoint'
     end
-    
+
     context 'with nil payload values' do
       let(:payload) {{
         value: nil,
@@ -349,7 +341,7 @@ describe DDS::V1::UploadsAPI do
         }.not_to change{resource_class.count}
       end
     end
-    
+
     context 'with incomplete upload' do
       let(:parent_id) { upload.id }
       it_behaves_like 'a validated resource'

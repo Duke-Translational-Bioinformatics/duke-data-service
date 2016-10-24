@@ -52,6 +52,7 @@ RSpec.describe Property, type: :model do
         it { expect(subject.meta_properties).to be_empty }
         it { is_expected.to allow_values(*good_keys).for(:key) }
         it { is_expected.to allow_value(elastic_core_data_types.last).for(:data_type) }
+        it { expect(subject.destroy).to be_truthy }
       end
 
       context 'with meta_properties' do
@@ -63,6 +64,7 @@ RSpec.describe Property, type: :model do
         it { expect(subject.meta_properties).not_to be_empty }
         it { is_expected.not_to allow_values(*good_keys).for(:key) }
         it { is_expected.not_to allow_value(elastic_core_data_types.last).for(:data_type) }
+        it { expect(subject.destroy).to be_falsey }
       end
     end
   end

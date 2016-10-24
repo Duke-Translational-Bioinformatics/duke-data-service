@@ -115,8 +115,11 @@ module DDS
         authenticate!
         template = Template.find(params[:id])
         authorize template, :destroy?
-        template.destroy
-        body false
+        if template.destroy
+          body false
+        else
+          validation_error!(template)
+        end
       end
     end
   end

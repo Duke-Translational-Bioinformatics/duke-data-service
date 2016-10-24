@@ -40,19 +40,8 @@ module DDS
         })
         authorize file, :create?
         if file.save
-          aupr = AttributedToUserProvRelation.create(
-            creator: current_user,
-            relatable_from: file.current_file_version,
-            relatable_to: current_user)
-          if current_user.current_software_agent
-            ausr = AttributedToSoftwareAgentProvRelation.create(
-              creator: current_user,
-              relatable_from: file.current_file_version,
-              relatable_to: current_user.current_software_agent)
-          end
           file
         else
-          file
           validation_error!(file)
         end
       end
@@ -97,18 +86,6 @@ module DDS
         file.label = file_params[:label] if file_params[:label]
         authorize file, :update?
         if file.save
-          if file.current_file_version != initial_file_version
-            aupr = AttributedToUserProvRelation.create(
-              creator: current_user,
-              relatable_from: file.current_file_version,
-              relatable_to: current_user)
-            if current_user.current_software_agent
-              ausr = AttributedToSoftwareAgentProvRelation.create(
-                creator: current_user,
-                relatable_from: file.current_file_version,
-                relatable_to: current_user.current_software_agent)
-            end
-          end
           file
         else
           validation_error! file

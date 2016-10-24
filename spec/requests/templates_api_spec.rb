@@ -165,6 +165,10 @@ describe DDS::V1::TemplatesAPI do
       it_behaves_like 'an authorized resource'do
         let!(:resource_id) { other_template.id }
       end
+      context 'with associated meta_template' do
+        before { FactoryGirl.create(:meta_template, template: resource) }
+        it_behaves_like 'a validated resource'
+      end
       it_behaves_like 'an identified resource' do
         let(:resource_id) { "doesNotExist" }
       end

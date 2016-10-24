@@ -19,49 +19,47 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkbabb9608d6d1439780699cb4d420115d
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkbabb9608d6d1439780699cb4d420115d
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc6de684505494c628fe0d-0057b5ea33
+      - txeefcbced480a4f9eac202-005807a642
       Date:
-      - Thu, 18 Aug 2016 17:02:43 GMT
+      - Wed, 19 Oct 2016 16:58:42 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 17:02:43 GMT
+  recorded_at: Wed, 19 Oct 2016 16:58:42 GMT
 - request:
-    method: put
-    uri: http://swift.local:12345/v1/AUTH_test/15bb5ee7-725e-49e1-8e27-caf41a254c58
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/791be6bc-2faa-4ae1-a016-7e4190c07423
     body:
-      encoding: UTF-8
+      encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
-      X-Container-Meta-Access-Control-Allow-Origin:
-      - "*"
+      - AUTH_tkbabb9608d6d1439780699cb4d420115d
   response:
     status:
-      code: 201
-      message: Created
+      code: 404
+      message: Not Found
     headers:
       Content-Length:
       - '0'
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txc7f2a68beb6d4c76bb92e-0057b5ea33
+      - txdad33d713ed548b69cb7e-005807a642
       Date:
-      - Thu, 18 Aug 2016 17:02:43 GMT
+      - Wed, 19 Oct 2016 16:58:42 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 17:02:43 GMT
+  recorded_at: Wed, 19 Oct 2016 16:58:42 GMT
 recorded_with: VCR 3.0.3

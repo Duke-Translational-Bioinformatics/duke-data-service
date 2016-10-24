@@ -411,3 +411,20 @@ shared_examples 'a software_agent restricted resource' do
     expect(response.status).to eq(403)
   end
 end
+
+shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
+  let(:response_json) { JSON.parse(response.body) }
+  let(:expected_response) {{
+    'error' => 405,
+    'reason' => 'not implemented',
+    'suggestion' => 'this is not the endpoint you are looking for'
+  }}
+  before do
+    ENV[env_key] = env_value
+    is_expected.to eq(405)
+  end
+  after do
+    ENV.delete(env_key)
+  end
+  it { expect(response_json).to eq(expected_response) }
+end
