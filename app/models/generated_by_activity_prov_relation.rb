@@ -5,6 +5,13 @@ class GeneratedByActivityProvRelation < ProvRelation
   # which maps to a Graph::WasGeneratedBy graphed relationship
   validates :relatable_from_type, inclusion: { in: %w(FileVersion),
     message: "GeneratedByActivityProvRelation must be from a FileVersion" }
+
+  validates :relatable_from_id, uniqueness: {
+    scope: :relatable_to_id,
+    case_sensitive: false,
+    conditions: -> { where(is_deleted: false) }
+  }, unless: :is_deleted
+
   validates :relationship_type, inclusion: { in: %w(was-generated-by),
     message: "GeneratedByActivityProvRelation relationship_type must be 'was-generated-by'" },
     allow_nil: true

@@ -20,5 +20,6 @@ RSpec.describe GeneratedByActivityProvRelation, type: :model do
     it { is_expected.not_to allow_value('Project').for(:relatable_to_type) }
     it { is_expected.not_to allow_value('FileVersion').for(:relatable_to_type) }
     it { is_expected.not_to allow_value('SoftwareAgent').for(:relatable_to_type) }
+    it { is_expected.to validate_uniqueness_of(:relatable_from_id).scoped_to(:relatable_to_id).case_insensitive }
   end
 end
