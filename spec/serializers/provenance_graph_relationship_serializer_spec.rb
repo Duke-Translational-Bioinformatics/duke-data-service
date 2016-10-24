@@ -14,23 +14,16 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
     )
   }
   let!(:relationship) { activity_used_focus.graph_relation }
-  let(:expected_attributes_not_restricted) {{
-    'id' => resource.id,
-    'type' => resource.type,
-    'start_node' => resource.start_node,
-    'end_node' => resource.end_node,
-    'properties' => expected_properties
-  }}
-  let(:expected_attributes_restricted) {{
-    'id' => resource.id,
-    'type' => resource.type,
-    'start_node' => resource.start_node,
-    'end_node' => resource.end_node,
-    'properties' => nil
-  }}
 
   context 'not restricted' do
     let(:resource) { ProvenanceGraphRelationship.new(relationship) }
+    let(:expected_attributes) {{
+      'id' => resource.id,
+      'type' => resource.type,
+      'start_node' => resource.start_node,
+      'end_node' => resource.end_node,
+      'properties' => expected_properties
+    }}
 
     it_behaves_like 'a json serializer' do
       let(:expected_properties_object) { resource.properties }
@@ -40,7 +33,7 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
         ).to_json
       }
       let(:expected_properties) { JSON.parse(expected_properties_json) }
-      it { is_expected.to include(expected_attributes_not_restricted) }
+      it { is_expected.to include(expected_attributes) }
     end
   end
 
@@ -50,9 +43,16 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
       res.restricted = true
       res
     }
+    let(:expected_attributes) {{
+      'id' => resource.id,
+      'type' => resource.type,
+      'start_node' => resource.start_node,
+      'end_node' => resource.end_node,
+      'properties' => nil
+    }}
 
     it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_attributes_restricted) }
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end
