@@ -10,7 +10,18 @@ class UsedProvRelation < ProvRelation
   validates :relatable_to_type, inclusion: { in: %w(FileVersion),
     message: "UsedProvRelation must be to a FileVersion" }
 
+  validate :using_activity, unless: :is_deleted
+
   def set_relationship_type
     self.relationship_type = 'used'
+  end
+
+  def using_activity
+    if GeneratedByActivityProvRelation.where(
+      relatable_from_id: relatable_to_id,
+      relatable_to_id: relatable_from_id
+      ).exists?
+      errors.add(:relatable_from_id, "UsedProvRelation cannot be made from an Activity that has a GeneratedByActivityProvRelation to the used FileVersion")
+    end
   end
 end
