@@ -28,6 +28,7 @@ namespace :elasticsearch do
       ElasticsearchResponse.indexed_models.each do |indexed_model|
         indexed_model.all.each do |im|
           im.__elasticsearch__.index_document
+          $stderr.puts "+"
         end
       end
     end
