@@ -48,7 +48,8 @@ module DDS
         named 'list project transfers'
         failure [
           [200, 'Success'],
-          [401, 'Unauthorized']
+          [401, 'Unauthorized'],
+          [404, 'Project does not exist']
         ]
       end
       get '/projects/:project_id/transfers', root: 'results' do

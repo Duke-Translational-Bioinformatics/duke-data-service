@@ -13,15 +13,14 @@ RSpec.describe ApiTokenSerializer, type: :serializer do
     let(:resource) {
       ApiToken.new(user: user, user_authentication_service: user_authentication_service)
     }
+    let(:expected_attributes) {{
+      'api_token' => resource.api_token,
+      'expires_on' => resource.expires_on,
+      'time_to_live' => resource.time_to_live
+    }}
+    
     it_behaves_like 'a json serializer' do
-      it 'should have expected keys and values' do
-        is_expected.to have_key('api_token')
-        is_expected.to have_key('expires_on')
-        is_expected.to have_key('time_to_live')
-        expect(subject['api_token']).to be
-        expect(subject['expires_on']).to be
-        expect(subject['time_to_live']).to be
-      end
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end
