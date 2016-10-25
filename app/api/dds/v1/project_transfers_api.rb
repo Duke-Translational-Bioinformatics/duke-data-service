@@ -64,7 +64,8 @@ module DDS
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
-          [404, 'Project does not exist']
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
         ]
       end
       get '/project_transfers/:id', root: false do
