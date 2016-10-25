@@ -56,7 +56,23 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         policy_scope(ProjectTransfer).where(project: project)
-     end
+      end
+
+      desc 'View project transfer' do
+        detail 'Used to retrieve the metadata template instance for a corresponding DDS object.'
+        named 'view object metadata'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project does not exist']
+        ]
+      end
+      get '/project_transfers/:id', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        authorize project_transfer, :show?
+        project_transfer
+      end
     end
   end
 end

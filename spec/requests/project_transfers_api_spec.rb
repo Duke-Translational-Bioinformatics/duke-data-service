@@ -137,4 +137,22 @@ describe DDS::V1::ProjectTransfersAPI do
       end
     end
   end
+
+  describe 'Project Transfer instance' do
+    let(:url) { "/api/v1/project_transfers/#{resource_id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a viewable resource'
+      
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
+  end
 end
