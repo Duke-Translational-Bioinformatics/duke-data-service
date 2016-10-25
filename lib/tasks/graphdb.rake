@@ -45,45 +45,6 @@ namespace :graphdb do
         end
         $stderr.print "+"
       end
-      creation_audit = file_version.audits.where(action: 'create').take
-      attributed_to_user = AttributedToUserProvRelation.where(
-        relatable_to: creation_audit.user, relatable_from: file_version
-      ).take
-      unless attributed_to_user
-        Audited.audit_class.as_user(creation_audit.user) do
-          a2u = AttributedToUserProvRelation.create(
-            creator: creation_audit.user, relatable_to: creation_audit.user, relatable_from: file_version
-          )
-          annotate_audit creation_audit, a2u.audits.last
-          if artifacts[:attributed_to_user_prov_relations]
-            artifacts[:attributed_to_user_prov_relations] += 1
-          else
-            artifacts[:attributed_to_user_prov_relations] =  1
-          end
-          $stderr.print "+"
-        end
-      end
-
-      if creation_audit.comment && creation_audit.comment.has_key?("software_agent_id")
-        sa = SoftwareAgent.find(creation_audit.comment["software_agent_id"])
-        attributed_to_software_agent = AttributedToSoftwareAgentProvRelation.where(
-          relatable_to: sa, relatable_from: file_version
-        ).take
-        unless attributed_to_software_agent
-          Audited.audit_class.as_user(creation_audit.user) do
-            a2sa = AttributedToSoftwareAgentProvRelation.create(
-              creator: creation_audit.user, relatable_to: sa, relatable_from: file_version
-            )
-            annotate_audit creation_audit, a2sa.audits.last
-            if artifacts[:attributed_to_software_agents_prov_relations]
-              artifacts[:attributed_to_software_agents_prov_relations] += 1
-            else
-              artifacts[:attributed_to_software_agents_prov_relations] =  1
-            end
-            $stderr.print "+"
-          end
-        end
-      end
     end
 
     Activity.all.each do |activity|
@@ -95,45 +56,6 @@ namespace :graphdb do
           artifacts[:activities] =  1
         end
         $stderr.print "+"
-      end
-      creation_audit = activity.audits.where(action: 'create').take
-      associated_with_user = AssociatedWithUserProvRelation.where(
-        creator: creation_audit.user, relatable_from: creation_audit.user, relatable_to: activity
-      ).take
-      unless associated_with_user
-        Audited.audit_class.as_user(creation_audit.user) do
-          a2u = AssociatedWithUserProvRelation.create(
-            creator: creation_audit.user, relatable_from: creation_audit.user, relatable_to: activity
-          )
-          annotate_audit creation_audit, a2u.audits.last
-          if artifacts[:associated_with_user_prov_relations]
-            artifacts[:associated_with_user_prov_relations] += 1
-          else
-            artifacts[:associated_with_user_prov_relations] =  1
-          end
-          $stderr.print "+"
-        end
-      end
-
-      if creation_audit.comment && creation_audit.comment.has_key?("software_agent_id")
-        sa = SoftwareAgent.find(creation_audit.comment["software_agent_id"])
-        associated_with_software_agent = AssociatedWithSoftwareAgentProvRelation.where(
-          creator: creation_audit.user, relatable_from: sa, relatable_to: activity
-        ).take
-        unless associated_with_software_agent
-          Audited.audit_class.as_user(creation_audit.user) do
-            a2sa = AssociatedWithSoftwareAgentProvRelation.create(
-              creator: creation_audit.user, relatable_from: sa, relatable_to: activity
-            )
-            annotate_audit creation_audit, a2sa.audits.last
-            if artifacts[:associated_with_user_prov_relations]
-              artifacts[:associated_with_user_prov_relations] += 1
-            else
-              artifacts[:associated_with_user_prov_relations] =  1
-            end
-            $stderr.print "+"
-          end
-        end
       end
     end
 
