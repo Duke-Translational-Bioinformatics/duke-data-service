@@ -3,15 +3,12 @@ require 'rails_helper'
 RSpec.describe UserPreviewSerializer, type: :serializer do
   let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
   let(:resource) { user_authentication_service.user }
-
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'username' => resource.username,
+    'full_name' => resource.display_name
+  }}
   it_behaves_like 'a json serializer' do
-    it 'should have expected keys and values' do
-      is_expected.to have_key('id')
-      is_expected.to have_key('username')
-      is_expected.to have_key('full_name')
-      expect(subject['id']).to eq(resource.id)
-      expect(subject['username']).to eq(resource.username)
-      expect(subject['full_name']).to eq(resource.display_name)
-    end
+    it { is_expected.to include(expected_attributes) }
   end
 end
