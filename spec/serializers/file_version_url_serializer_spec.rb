@@ -2,17 +2,14 @@ require 'rails_helper'
 
 RSpec.describe FileVersionUrlSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:file_version) }
+  let(:expected_attributes) {{
+    'http_verb' => resource.http_verb,
+    'host' => resource.host,
+    'url' => resource.url,
+    'http_headers' => []
+  }}
 
   it_behaves_like 'a json serializer' do
-    it 'should have expected keys and values' do
-      is_expected.to have_key('http_verb')
-      is_expected.to have_key('host')
-      is_expected.to have_key('url')
-      is_expected.to have_key('http_headers')
-      expect(subject['http_verb']).to eq(resource.http_verb)
-      expect(subject['host']).to eq(resource.host)
-      expect(subject['url']).to eq(resource.url)
-      expect(subject['http_headers']).to eq([])
-    end
+    it { is_expected.to include(expected_attributes) }
   end
 end

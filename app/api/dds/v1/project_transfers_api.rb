@@ -36,14 +36,27 @@ module DDS
             })
         end
         authorize project_transfer, :create?
-
         if project_transfer.save
           project_transfer
         else
           validation_error!(project_transfer)
         end
-
       end
+
+      desc 'List project transfers' do
+        detail 'list project transfers'
+        named 'list project transfers'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project does not exist']
+        ]
+      end
+      get '/projects/:project_id/transfers', root: 'results' do
+        authenticate!
+        project = Project.find(params[:project_id])
+        policy_scope(ProjectTransfer).where(project: project)
+     end
     end
   end
 end
