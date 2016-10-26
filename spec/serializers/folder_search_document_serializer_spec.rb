@@ -1,6 +1,8 @@
+require 'rails_helper'
+
 RSpec.describe FolderSearchDocumentSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:data_file) }
-  let(:expected_folder_attributes) {{
+  let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name,
     'is_deleted' => resource.is_deleted?,
@@ -10,7 +12,7 @@ RSpec.describe FolderSearchDocumentSerializer, type: :serializer do
   }}
 
   it_behaves_like 'a json serializer' do
-    it { is_expected.to include(expected_folder_attributes) }
+    it { is_expected.to include(expected_attributes) }
   end
 
   context 'with meta_templates' do
@@ -20,7 +22,7 @@ RSpec.describe FolderSearchDocumentSerializer, type: :serializer do
     include_context 'elasticsearch prep', [:meta_template, :property, :meta_property], [:resource]
 
     it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_folder_attributes) }
+      it { is_expected.to include(expected_attributes) }
       it_behaves_like 'a metadata annotated document'
     end
   end
