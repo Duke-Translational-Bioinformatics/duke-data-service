@@ -18,7 +18,7 @@ This is an open source project for building a "data service" for researchers tha
 * https://github.com/Duke-Translational-Bioinformatics/repository-dashboard-shiny
 
 ## api blueprint
-http://docs.dukedataservice.apiary.io
+https://api.dataservice.duke.edu/apidocs
 
 ### circleci development
 [![Circle CI](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop.svg?style=svg)](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/develop)
