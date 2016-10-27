@@ -58,9 +58,9 @@ module DDS
         policy_scope(ProjectTransfer).where(project: project)
       end
 
-      desc 'View project transfer' do
-        detail 'Used to retrieve the metadata template instance for a corresponding DDS object.'
-        named 'view object metadata'
+      desc 'View a project transfer' do
+        detail 'Used to view an instance of a project transfer.'
+        named 'view a project transfer'
         failure [
           [200, 'Success'],
           [401, 'Unauthorized'],
