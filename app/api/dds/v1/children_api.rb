@@ -1,6 +1,8 @@
 module DDS
   module V1
     class ChildrenAPI < Grape::API
+      helpers PaginationParams
+
       desc 'List folder children' do
         detail 'Returns the immediate children of the folder.'
         named 'list folder children'
@@ -12,6 +14,7 @@ module DDS
       end
       params do
         optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        use :pagination
       end
       get '/folders/:id/children', root: 'results' do
         authenticate!
@@ -23,7 +26,7 @@ module DDS
         else
           descendants = policy_scope(folder.descendants).where(Container.arel_table[:name].matches("%#{name_contains}%"))
         end
-        descendants.where(is_deleted: false)
+        paginate(descendants.where(is_deleted: false))
       end
 
       desc 'List project children' do
@@ -37,6 +40,7 @@ module DDS
       end
       params do
         optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        use :pagination
       end
       get '/projects/:id/children', root: 'results' do
         authenticate!
@@ -48,7 +52,7 @@ module DDS
         else
           descendants = project.containers.where(Container.arel_table[:name].matches("%#{name_contains}%"))
         end
-        policy_scope(descendants).where(is_deleted: false)
+        paginate(policy_scope(descendants).where(is_deleted: false))
       end
     end
   end
