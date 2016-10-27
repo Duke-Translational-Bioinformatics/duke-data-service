@@ -37,6 +37,20 @@ shared_context 'with software_agent authentication' do
   }}
 end
 
+shared_context 'request parameters' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers|
+  let(:payload) {{}}
+  let(:request_url) { send(url_sym) }
+  let(:request_payload) { send(payload_sym) }
+  let(:request_headers) { send(headers_sym) }
+end
+
+shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers, response_status: 200|
+  include_context 'request parameters', url_sym, payload_sym, headers_sym
+  let(:expected_response_status) { response_status }
+  let(:called_action) { "GET" }
+  subject { get(request_url, request_payload, request_headers) }
+end
+
 shared_examples 'a listable resource' do
   let(:expected_resources) { resource_class.all }
   let(:serializable_resource) { resource }
@@ -97,7 +111,7 @@ shared_examples 'a searchable resource' do
   end
 end
 
-shared_examples 'a paginated resource' do
+shared_examples 'a paginated resource' do |payload_sym: :payload|
   let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }
   let(:per_page) { 1 }
@@ -112,34 +126,28 @@ shared_examples 'a paginated resource' do
 
   #paginated_payload must include pagination_parameters
   #if you override it to pass other parameters
-  let(:paginated_payload) {
-    pagination_parameters
+  let(:request_payload) {
+    send(payload_sym).merge(pagination_parameters)
   }
 
-  subject { get(url, paginated_payload, headers) }
+  let(:expected_response_headers) {{
+     'X-Total' => expected_total_length.to_s,
+     'X-Total-Pages' => (expected_total_length/per_page).to_s,
+     'X-Page' => page.to_s,
+     'X-Per-Page' => per_page.to_s,
+     'X-Next-Page' => (page+1).to_s,
+     'X-Prev-Page' => (page-1).to_s
+  }}
 
   it 'should return pagination response headers' do
      expect(extras.count).to be > per_page
-     is_expected.to eq(200)
-     response_headers = response.headers
-     expect(response_headers).to have_key('X-Total')
-     expect(response_headers['X-Total'].to_i).to eq(expected_total_length)
-     expect(response_headers).to have_key('X-Total-Pages')
-     expect(response_headers['X-Total-Pages'].to_i).to eq(expected_total_length/per_page)
-     expect(response_headers).to have_key('X-Page')
-     expect(response_headers['X-Page'].to_i).to eq(page)
-     expect(response_headers).to have_key('X-Per-Page')
-     expect(response_headers['X-Per-Page'].to_i).to eq(per_page)
-     expect(response_headers).to have_key('X-Next-Page')
-     expect(response_headers['X-Next-Page'].to_i).to eq(page+1)
-     expect(response_headers).to have_key('X-Prev-Page')
-     expect(response_headers['X-Prev-Page'].to_i).to eq(page-1)
+     is_expected.to eq(expected_response_status)
+     expect(response.headers).to include(expected_response_headers)
   end
 
   it 'should return only per_page results' do
     expect(extras.count).to be > per_page
-    paginated_payload.merge({per_page: per_page})
-    is_expected.to eq(200)
+    is_expected.to eq(expected_response_status)
     response_json = JSON.parse(response.body)
     expect(response_json).to have_key('results')
     returned_results = response_json['results']
