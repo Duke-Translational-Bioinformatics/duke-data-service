@@ -56,7 +56,24 @@ module DDS
         authenticate!
         project = Project.find(params[:project_id])
         policy_scope(ProjectTransfer).where(project: project)
-     end
+      end
+
+      desc 'View a project transfer' do
+        detail 'Used to view an instance of a project transfer.'
+        named 'view a project transfer'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      get '/project_transfers/:id', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        authorize project_transfer, :show?
+        project_transfer
+      end
     end
   end
 end
