@@ -45,7 +45,7 @@ shared_context 'request parameters' do |url_sym: :url, payload_sym: :payload, he
 end
 
 shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers, response_status: 200|
-  include_context 'request parameters', url_sym, payload_sym, headers_sym
+  include_context 'request parameters', url_sym: url_sym, payload_sym: payload_sym, headers_sym: headers_sym
   let(:expected_response_status) { response_status }
   let(:called_action) { "GET" }
   subject { get(request_url, request_payload, request_headers) }
