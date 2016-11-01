@@ -29,11 +29,6 @@ dependencies:
     - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j elasticsearch
 
-test:
-  override:
-    - ./circle/parallelize_test_suite.sh:
-        parallel: true
-
 deployment:
  development:
    branch: develop
