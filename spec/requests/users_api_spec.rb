@@ -9,7 +9,7 @@ describe DDS::V1::UsersAPI do
     let(:url) { '/api/v1/user/api_token' }
 
     describe 'for first time users' do
-      include_context 'common headers'
+      include_context 'without authentication'
       let(:new_user) { FactoryGirl.attributes_for(:user) }
       let(:auth_service) { FactoryGirl.create(:authentication_service)}
       let(:new_user_token) {
@@ -29,7 +29,7 @@ describe DDS::V1::UsersAPI do
         )
       }
 
-      subject { get(url, {access_token: access_token}, common_headers) }
+      subject { get(url, {access_token: access_token}, headers) }
       let(:called_action) { "GET" }
 
       it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
@@ -112,7 +112,7 @@ describe DDS::V1::UsersAPI do
       let (:wrong_secret_access_token) {
         JWT.encode(user_token, 'WrongSecret')
       }
-      subject { get(url, {access_token: access_token}, common_headers) }
+      subject { get(url, {access_token: access_token}, headers) }
 
       it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
         original_last_login_at = current_user.last_login_at.to_i
@@ -143,7 +143,7 @@ describe DDS::V1::UsersAPI do
       end
 
       it 'should respond with an error when not provided an access_token' do
-        get url, nil, common_headers
+        get url, nil, headers
         expect(response.status).to eq(400)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
@@ -157,7 +157,7 @@ describe DDS::V1::UsersAPI do
 
       it 'should respond with an error when the service_id in the access_token is not registered' do
         original_last_login_at = current_user.last_login_at.to_i
-        get url, {access_token: unknown_service_access_token}, common_headers
+        get url, {access_token: unknown_service_access_token}, headers
         expect(response.status).to eq(401)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
@@ -173,7 +173,7 @@ describe DDS::V1::UsersAPI do
 
       it 'should respond with an error when the token has not been signed by the secret_key_base' do
         original_last_login_at = current_user.last_login_at.to_i
-        get url, {access_token: wrong_secret_access_token}, common_headers
+        get url, {access_token: wrong_secret_access_token}, headers
         expect(response.status).to eq(401)
         expect(response.body).to be
         error_response = JSON.parse(response.body)
