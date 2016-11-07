@@ -83,6 +83,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
       let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
 
@@ -144,6 +145,7 @@ describe DDS::V1::ProjectTransfersAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
@@ -168,6 +170,7 @@ describe DDS::V1::ProjectTransfersAPI do
         subject { put(url, payload.to_json, headers) }
         let(:called_action) { 'PUT' }
 
+        it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
@@ -198,7 +201,7 @@ describe DDS::V1::ProjectTransfersAPI do
             end
           end
         end
-        context 'where project_transfer status is rejected' do
+        context 'where project_transfer status is not processing' do
           # TODO Need to look at DDS-694
           let(:status) { :accepted }
           it_behaves_like 'a validated resource'
