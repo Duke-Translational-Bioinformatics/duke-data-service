@@ -1,0 +1,2 @@
+class OitAuthenticationService < AuthenticationService
+end
