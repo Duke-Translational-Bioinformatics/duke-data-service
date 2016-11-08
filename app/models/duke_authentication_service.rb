@@ -17,7 +17,6 @@ class DukeAuthenticationService < AuthenticationService
             email: access_token['email'],
             display_name: access_token['display_name'],
             first_name: access_token['first_name'],
-            last_login_at: DateTime.now,
             last_name: access_token['last_name']
           )
         end

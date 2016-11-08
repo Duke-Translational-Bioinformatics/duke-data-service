@@ -49,6 +49,8 @@ RSpec.describe DukeAuthenticationService, type: :model do
       'email' => existing_user.email
     }
   }
+  let(:existing_first_authenticating_user) { existing_user }
+
   let (:existing_first_authenticating_access_token) {
     JWT.encode(existing_first_authenticating_user_token, Rails.application.secrets.secret_key_base)
   }
