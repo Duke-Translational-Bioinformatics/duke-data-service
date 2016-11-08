@@ -117,7 +117,7 @@ RSpec.describe DukeAuthenticationService, type: :model do
         expect(current_user).to be_persisted
         expect {
           subject.get_user_for_access_token(wrong_secret_access_token)
-        }.to raise_error(JWT::VerificationError)
+        }.to raise_error(InvalidAccessTokenException)
       }
     end
   end
