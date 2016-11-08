@@ -14,7 +14,6 @@ services:
       - swift.env
       - neo4j.client.env
       - elastic.client.env
-      - oauth.env
   bundle:
     image: dukedataservice_server
     volumes_from:
@@ -34,7 +33,6 @@ services:
       - swift.env
       - neo4j.client.env
       - elastic.client.env
-      - oauth.env
   authservice:
     image: dukedataservice_server
     env_file:
