@@ -12,31 +12,17 @@ class ProjectTransfer < ActiveRecord::Base
   validates :project, presence: true
   validates :status, uniqueness: {
       scope: [:project_id],
-      case_sensitive: false,
       message: 'Pending transfer already exists'
     }, if: :pending?
   validates :status, immutable: true, unless: :status_was_pending?
+  validates :status_comment, immutable: true, unless: :status_was_pending?
   validates :from_user, presence: true
   validates :project_transfer_users, presence: true
 
-  def pending?
-    status && status.downcase == 'pending'
-  end
-
-  def rejected?
-    status && status.downcase == 'rejected'
-  end
-
-  def accepted?
-    status && status.downcase == 'accepted'
-  end
-
-  def canceled?
-    status && status.downcase == 'canceled'
-  end
+  enum status: [:pending, :rejected, :accepted, :canceled]
 
   def status_was_pending?
-    status_was && status_was.downcase == 'pending'
+    status_was == 'pending'
   end
 
 end
