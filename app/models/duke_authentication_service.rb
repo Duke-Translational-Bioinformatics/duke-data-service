@@ -7,22 +7,25 @@ class DukeAuthenticationService < AuthenticationService
       user.current_user_authenticaiton_service = user_authentication_service
       user
     else
-      new_user = User.new(
-        id: SecureRandom.uuid,
-        username: access_token['uid'],
-        etag: SecureRandom.hex,
-        email: access_token['email'],
-        display_name: access_token['display_name'],
-        first_name: access_token['first_name'],
-        last_login_at: DateTime.now,
-        last_name: access_token['last_name']
-      )
-      user_authentication_service = new_user.user_authentication_services.build(
+      user = User.where(username: access_token['uid']).take
+      unless user
+        user = User.new(
+          id: SecureRandom.uuid,
+          username: access_token['uid'],
+          etag: SecureRandom.hex,
+          email: access_token['email'],
+          display_name: access_token['display_name'],
+          first_name: access_token['first_name'],
+          last_login_at: DateTime.now,
+          last_name: access_token['last_name']
+        )
+      end
+      user_authentication_service = user.user_authentication_services.build(
         uid: access_token['uid'],
         authentication_service: self
       )
-      new_user.current_user_authenticaiton_service = user_authentication_service
-      new_user
+      user.current_user_authenticaiton_service = user_authentication_service
+      user
     end
   end
 end
