@@ -70,7 +70,7 @@ services:
      - server:dds.host
     volumes:
       - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
-      - ./apiary.apib:/home/dredd_scripts/apiary.apib
+      - ./apiary.apib:/apiary/apiary.apib
   apiary:
     build: ./docker/builds/apiary
     volumes:

@@ -15,7 +15,7 @@ configuration = {
   //export MY_GENERATED_JWT=
   options: {
 
-    'path': ['./apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
+    'path': ['/apiary/apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
 
     'dry-run': false, // Boolean, do not run any real HTTP transaction
     'names': false,   // Boolean, Print Transaction names and finish, similar to dry-run
