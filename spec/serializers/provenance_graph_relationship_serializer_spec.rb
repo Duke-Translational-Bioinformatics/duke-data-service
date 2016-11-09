@@ -17,6 +17,13 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
 
   context 'not restricted' do
     let(:resource) { ProvenanceGraphRelationship.new(relationship) }
+    let(:expected_attributes) {{
+      'id' => resource.id,
+      'type' => resource.type,
+      'start_node' => resource.start_node,
+      'end_node' => resource.end_node,
+      'properties' => expected_properties
+    }}
 
     it_behaves_like 'a json serializer' do
       let(:expected_properties_object) { resource.properties }
@@ -26,19 +33,7 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
         ).to_json
       }
       let(:expected_properties) { JSON.parse(expected_properties_json) }
-
-      it 'should have expected keys and values' do
-        is_expected.to have_key('id')
-        is_expected.to have_key('type')
-        is_expected.to have_key('start_node')
-        is_expected.to have_key('end_node')
-        is_expected.to have_key('properties')
-        expect(subject["id"]).to eq(resource.id)
-        expect(subject["type"]).to eq(resource.type)
-        expect(subject["start_node"]).to eq(resource.start_node)
-        expect(subject["end_node"]).to eq(resource.end_node)
-        expect(subject["properties"]).to eq(expected_properties)
-      end
+      it { is_expected.to include(expected_attributes) }
     end
   end
 
@@ -48,20 +43,16 @@ RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
       res.restricted = true
       res
     }
+    let(:expected_attributes) {{
+      'id' => resource.id,
+      'type' => resource.type,
+      'start_node' => resource.start_node,
+      'end_node' => resource.end_node,
+      'properties' => nil
+    }}
 
     it_behaves_like 'a json serializer' do
-      it 'should have expected keys and values' do
-        is_expected.to have_key('id')
-        is_expected.to have_key('type')
-        is_expected.to have_key('start_node')
-        is_expected.to have_key('end_node')
-        is_expected.to have_key('properties')
-        expect(subject["id"]).to eq(resource.id)
-        expect(subject["type"]).to eq(resource.type)
-        expect(subject["start_node"]).to eq(resource.start_node)
-        expect(subject["end_node"]).to eq(resource.end_node)
-        expect(subject["properties"]).to be_nil
-      end
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end

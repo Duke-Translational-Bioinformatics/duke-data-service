@@ -15,13 +15,28 @@ class ProjectTransfer < ActiveRecord::Base
       case_sensitive: false,
       message: 'Pending transfer already exists'
     }, if: :pending?
+  validates :status, immutable: true, unless: :status_was_pending?
   validates :from_user, presence: true
   validates :project_transfer_users, presence: true
 
-  private
-
   def pending?
     status && status.downcase == 'pending'
+  end
+
+  def rejected?
+    status && status.downcase == 'rejected'
+  end
+
+  def accepted?
+    status && status.downcase == 'accepted'
+  end
+
+  def canceled?
+    status && status.downcase == 'canceled'
+  end
+
+  def status_was_pending?
+    status_was && status_was.downcase == 'pending'
   end
 
 end
