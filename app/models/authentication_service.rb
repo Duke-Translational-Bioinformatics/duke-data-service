@@ -4,4 +4,5 @@ class AuthenticationService < ActiveRecord::Base
   validates :service_id, presence: true
   validates :name, presence: true
   validates :base_uri, presence: true
+  validates :is_default, uniqueness: true, if: :is_default
 end

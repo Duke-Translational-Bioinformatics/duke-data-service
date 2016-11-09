@@ -86,11 +86,12 @@ ActiveRecord::Schema.define(version: 20161107180243) do
     t.uuid     "service_id"
     t.string   "base_uri"
     t.string   "name"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.string   "type"
     t.string   "client_id"
     t.string   "client_secret"
+    t.boolean  "is_default",    default: false, null: false
   end
 
   create_table "chunks", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|

@@ -11,6 +11,28 @@ shared_examples 'an authentication service' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :service_id }
     it { is_expected.to validate_presence_of :base_uri }
+
+    context 'is_default' do
+      it 'should allow only one default authentication_service of any type' do
+        subject.update(is_default: true) unless subject.is_default?
+
+        [:duke_authentication_service, :openid_authentication_service].each do |service_sym|
+            new_default_service = FactoryGirl.build(service_sym, :default)
+            expect(new_default_service).not_to be_valid
+            non_default_service = FactoryGirl.build(service_sym)
+            expect(non_default_service).to be_valid
+        end
+
+        subject.update(is_default: false)
+
+        [:duke_authentication_service, :openid_authentication_service].each do |service_sym|
+          new_default_service = FactoryGirl.build(service_sym, :default)
+          expect(new_default_service).to be_valid
+          non_default_service = FactoryGirl.build(service_sym)
+          expect(non_default_service).to be_valid
+        end
+      end
+    end
   end
 
   context 'get_user_for_access_token' do
