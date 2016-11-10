@@ -83,6 +83,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
       let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
 
@@ -134,6 +135,77 @@ describe DDS::V1::ProjectTransfersAPI do
         let(:project_id) { "doesNotExist" }
         let(:resource_class) { Project }
         it_behaves_like 'an identified resource'
+      end
+    end
+  end
+
+  describe 'Project Transfer instance' do
+    let(:url) { "/api/v1/project_transfers/#{resource_id}" }
+
+    describe 'GET' do
+      subject { get(url, nil, headers) }
+
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
+      it_behaves_like 'a viewable resource'
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) {'notfoundid'}
+      end
+    end
+
+    describe 'Reject project transfer' do
+      let(:url) { "/api/v1/project_transfers/#{resource_id}/reject" }
+      let(:resource) { FactoryGirl.create(:project_transfer,
+                                          :with_to_users,
+                                          status: status,
+                                          to_user: current_user) }
+      let(:status) { :pending }
+      let(:payload) {{}}
+
+      describe 'PUT' do
+        subject { put(url, payload.to_json, headers) }
+        let(:called_action) { 'PUT' }
+
+        it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+        it_behaves_like 'a software_agent accessible resource'
+        it_behaves_like 'an updatable resource' do
+          it 'sets project transfer status comment' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource).to be_rejected
+          end
+        end
+        context 'when current user is not to_user' do
+          let(:resource) { FactoryGirl.create(:project_transfer,
+                                              :with_to_users,
+                                              status: status) }
+          it_behaves_like 'an authorized resource'
+        end
+        context 'with status_comment' do
+          let(:payload) {{
+            status_comment: Faker::Hacker.say_something_smart
+          }}
+          it_behaves_like 'an updatable resource' do
+            it 'sets project transfer status comment' do
+              is_expected.to eq(200)
+              expect(resource.reload).to be_truthy
+              expect(resource.status_comment).to eq(payload[:status_comment])
+            end
+          end
+        end
+        context 'where project_transfer status is not processing' do
+          # TODO Need to look at DDS-694
+          let(:status) { :accepted }
+          it_behaves_like 'a validated resource'
+        end
       end
     end
   end
