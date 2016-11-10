@@ -23,20 +23,6 @@ module DDS
         }
         error!(error_json, 400)
       end
-      rescue_from InvalidAccessTokenException do
-        error!({
-          error: 401,
-          reason: 'invalid access_token',
-          suggestion: 'token not properly signed'
-        },401)
-      end
-    rescue_from InvalidAuthenticationServiceIDException do
-      error!({
-        error: 401,
-        reason: 'invalid access_token',
-        suggestion: 'authentication service not registered'
-      },401)
-    end
       get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
         raise InvalidAccessTokenException.new unless token_info_params[:access_token]

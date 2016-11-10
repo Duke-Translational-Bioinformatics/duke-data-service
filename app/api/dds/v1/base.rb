@@ -203,20 +203,20 @@ module DDS
         error!(error_json, 500)
       end
 
-      rescue_from InvalidAuthenticationServiceIDException do |e|
+      rescue_from InvalidAccessTokenException do
         error!({
           error: 401,
           reason: 'invalid access_token',
-          suggestion: 'authenticaton service not recognized'
-        }, 401)
+          suggestion: 'token not properly signed'
+        },401)
       end
 
-      rescue_from InvalidAccessTokenException do |e|
+      rescue_from InvalidAuthenticationServiceIDException do
         error!({
           error: 401,
           reason: 'invalid access_token',
-          suggestion: 'authenticaton service not recognized'
-        }, 401)
+          suggestion: 'authentication service not registered'
+        },401)
       end
 
       mount DDS::V1::UsersAPI
