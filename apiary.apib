@@ -9,7 +9,7 @@ This the documentation for the Data Service API. Key focuses are on API endpoint
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://geemus.gitbooks.io/http-api-design/content/en/index.html) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
-## API Change Log
+## Group API Change Log
 
 02-Aug-2016
 --------------
@@ -385,7 +385,7 @@ Using a software agent secret key and a user secret key, get an access token.
 >**Response Properties**
 - - - - -
 + **api_token (string)** - The access token.
-+ **expire_on (number)** - Token expiration as posix/epoch time.
++ **expires_on (number)** - Token expiration as posix/epoch time.
 + **time_to_live (number)** - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.
 
 >**Rules**
@@ -403,7 +403,7 @@ Using a software agent secret key and a user secret key, get an access token.
 
         {
             "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
-            "expire_on": 1455571739,
+            "expires_on": 1455571739,
             "time_to_live": 14400 
         }
 
@@ -434,10 +434,7 @@ Get profile for the currently authenticated user.
                 "source": "duke_shibboleth",
                 "uid": "gardner100"
             },
-            "agent": {
-                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
-                "name": "Hashing computation agent"
-            },
+            "agent": null,
             "last_login_on": "2015-01-01T12:00:00Z",
             "audit": { }
         }
@@ -2910,10 +2907,6 @@ List the relations for a provenance node; this only lists direct relations for t
             "from": {
                 "kind": "dds-activity",
                 "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
-                "name": "RF PI3-Kinase",
-                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
-                "started_on": "2015-01-01T12:00:00Z",
-                "ended_on": "2015-01-01T14:30:00Z",
                 "is_deleted": false,
                 "audit": { }
             },
@@ -3120,7 +3113,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         { 
             "graph": {
@@ -3929,7 +3922,7 @@ Search for DDS objects (i.e. Elasticsearch documents).
             }
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
             "results": [
