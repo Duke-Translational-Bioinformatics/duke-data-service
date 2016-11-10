@@ -152,6 +152,14 @@ module DDS
           }
           error!(error_body, 405)
         end
+
+        def get_auth_service(service_id = nil)
+          if service_id
+            AuthenticationService.where(service_id: service_id).take or raise InvalidAuthenticationServiceIDException.new()
+          else
+            AuthenticationService.where(is_default: true).take!
+          end
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
@@ -193,6 +201,22 @@ module DDS
           "suggestion" => 'try again in a few minutes, or contact the systems administrators'
         }
         error!(error_json, 500)
+      end
+
+      rescue_from InvalidAuthenticationServiceIDException do |e|
+        error!({
+          error: 401,
+          reason: 'invalid access_token',
+          suggestion: 'authenticaton service not recognized'
+        }, 401)
+      end
+
+      rescue_from InvalidAccessTokenException do |e|
+        error!({
+          error: 401,
+          reason: 'invalid access_token',
+          suggestion: 'authenticaton service not recognized'
+        }, 401)
       end
 
       mount DDS::V1::UsersAPI

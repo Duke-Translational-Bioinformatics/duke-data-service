@@ -13,59 +13,44 @@ module DDS
       end
       params do
         requires :access_token
+        optional :authentication_service_id, type: String, desc: 'authentication service uuid'
       end
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error_json = {
           "error" => 400,
           "reason" => "no access_token",
-          "suggestion" => "you might need to login through an authenticaton service"#,
+          "suggestion" => "you might need to login through an authentication service"#,
         }
         error!(error_json, 400)
       end
-      rescue_from JWT::VerificationError do
+      rescue_from InvalidAccessTokenException do
         error!({
           error: 401,
           reason: 'invalid access_token',
           suggestion: 'token not properly signed'
         },401)
       end
+    rescue_from InvalidAuthenticationServiceIDException do
+      error!({
+        error: 401,
+        reason: 'invalid access_token',
+        suggestion: 'authentication service not registered'
+      },401)
+    end
       get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
-        encoded_access_token = token_info_params[:access_token]
-        if access_token = JWT.decode(encoded_access_token, Rails.application.secrets.secret_key_base)[0]
-          auth_service = AuthenticationService.where(service_id: access_token['service_id']).take
-          if auth_service
-            authorized_user = auth_service.user_authentication_services.where(uid: access_token['uid']).first
-            if authorized_user
-              authorized_user.user.update_attribute(:last_login_at, DateTime.now)
-            else
-              auth_service.with_lock do
-                new_user = User.new(
-                  id: SecureRandom.uuid,
-                  username: access_token['uid'],
-                  etag: SecureRandom.hex,
-                  email: access_token['email'],
-                  display_name: access_token['display_name'],
-                  first_name: access_token['first_name'],
-                  last_login_at: DateTime.now,
-                  last_name: access_token['last_name']
-                )
-                authorized_user = new_user.user_authentication_services.build(
-                  uid: access_token['uid'],
-                  authentication_service: auth_service
-                )
-                populate_audit_store_with_user(new_user)
-                new_user.save!
-              end
-            end
-            ApiToken.new(user: authorized_user.user, user_authentication_service: authorized_user)
-          else
-            error!({
-              error: 401,
-              reason: 'invalid access_token',
-              suggestion: 'authenticaton service not recognized'
-            }, 401)
-          end
+        raise InvalidAccessTokenException.new unless token_info_params[:access_token]
+
+        auth_service = get_auth_service(
+          token_info_params[:authentication_service_id])
+        authorized_user = auth_service.get_user_for_access_token(token_info_params[:access_token])
+        authorized_user.last_login_at = DateTime.now
+        populate_audit_store_with_user(authorized_user)
+        if authorized_user.save
+          api_token = ApiToken.new(user: authorized_user, user_authentication_service:authorized_user.current_user_authenticaiton_service)
+          api_token
+        else
+          validation_error!(authorized_user)
         end
       end
 
