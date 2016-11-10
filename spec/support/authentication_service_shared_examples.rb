@@ -1,5 +1,13 @@
 shared_context 'mocked openid request to' do |build_openid_authentication_service|
   let(:openid_authentication_service) { send(build_openid_authentication_service) }
+  # requires the following to be let:
+  #   first_time_user_access_token
+  #   first_time_user_userinfo
+  #   existing_user_access_token
+  #   existing_user_userinfo
+  #   existing_first_authenticating_access_token
+  #   existing_first_authenticating_user_userinfo
+  #   invalid_access_token
   before do
     WebMock.reset!
     stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
