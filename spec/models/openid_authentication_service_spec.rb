@@ -61,6 +61,6 @@ RSpec.describe OpenidAuthenticationService, type: :model do
     SecureRandom.hex
   }
 
-  include_context 'mocked openid request'
+  include_context 'mocked openid request to', :subject
   it_behaves_like 'an authentication service'
 end

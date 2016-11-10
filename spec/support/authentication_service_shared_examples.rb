@@ -1,19 +1,20 @@
-shared_context 'mocked openid request' do
+shared_context 'mocked openid request to' do |build_openid_authentication_service|
+  let(:openid_authentication_service) { send(build_openid_authentication_service) }
   before do
     WebMock.reset!
-    stub_request(:post, "#{subject.base_uri}/userinfo").
+    stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{first_time_user_access_token}").
       to_return(:status => 200, :body => first_time_user_userinfo.to_json)
 
-    stub_request(:post, "#{subject.base_uri}/userinfo").
+    stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{existing_user_access_token}").
       to_return(:status => 200, :body => existing_user_userinfo.to_json)
 
-    stub_request(:post, "#{subject.base_uri}/userinfo").
+    stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{existing_first_authenticating_access_token}").
       to_return(:status => 200, :body => existing_first_authenticating_user_userinfo.to_json)
 
-    stub_request(:post, "#{subject.base_uri}/userinfo").
+    stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{invalid_access_token}").
       to_return(:status => 401, :body => {error: "invalid_token", error_description: "Invalid access token: #{invalid_access_token}"}.to_json)
   end
