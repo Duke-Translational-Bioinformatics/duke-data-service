@@ -1,3 +1,24 @@
+shared_context 'mocked openid request' do
+  before do
+    WebMock.reset!
+    stub_request(:post, "#{subject.base_uri}/userinfo").
+      with(:body => "access_token=#{first_time_user_access_token}").
+      to_return(:status => 200, :body => first_time_user_userinfo.to_json)
+
+    stub_request(:post, "#{subject.base_uri}/userinfo").
+      with(:body => "access_token=#{existing_user_access_token}").
+      to_return(:status => 200, :body => existing_user_userinfo.to_json)
+
+    stub_request(:post, "#{subject.base_uri}/userinfo").
+      with(:body => "access_token=#{existing_first_authenticating_access_token}").
+      to_return(:status => 200, :body => existing_first_authenticating_user_userinfo.to_json)
+
+    stub_request(:post, "#{subject.base_uri}/userinfo").
+      with(:body => "access_token=#{invalid_access_token}").
+      to_return(:status => 401, :body => {error: "invalid_token", error_description: "Invalid access token: #{invalid_access_token}"}.to_json)
+  end
+end
+
 shared_examples 'an authentication service' do
   it { is_expected.to respond_to('get_user_for_access_token') }
 
