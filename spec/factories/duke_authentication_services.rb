@@ -7,5 +7,11 @@ FactoryGirl.define do
     trait :default do
       is_default { true }
     end
+
+    trait :from_auth_service_env do
+      service_id { ENV['AUTH_SERVICE_SERVICE_ID'] }
+      base_uri { ENV['AUTH_SERVICE_BASE_URI'] }
+      name { ENV['AUTH_SERVICE_NAME'] }
+    end
   end
 end
