@@ -323,3 +323,130 @@ shared_examples 'an authentication request endpoint' do
     end
   end
 end
+
+shared_examples 'an authentication_service:create task' do |
+  rake_task_name_sym: :rake_task_name,
+  authentication_service_class_sym: :resource_class,
+  expected_env_keys_sym: :required_env|
+
+  let(:task_name) { send(rake_task_name_sym) }
+  let(:authentication_service_class) { send(authentication_service_class_sym) }
+  let(:expected_env_keys) { send(expected_env_keys_sym) }
+  let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
+
+  it { expect(subject.prerequisites).to  include("environment") }
+
+  context 'ENV[AUTH_SERVICE_IS_DEFAULT] false' do
+    before do
+      ENV['AUTH_SERVICE_IS_DEFAULT'] = 'false'
+    end
+    context 'with existing default authentication service' do
+      it {
+        FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :default)
+        expected_env_keys.each do |expected_env_key|
+          expect(ENV[expected_env_key]).to be_truthy
+        end
+        expect {
+          invoke_task
+        }.to change{authentication_service_class.count}.by(1)
+        created_authentication_service = authentication_service_class.where(service_id: ENV['AUTH_SERVICE_SERVICE_ID']).take
+        expect(created_authentication_service).to be
+        expected_env_keys.each do |expected_env_key|
+          obj_attribute = expected_env_key.gsub(/AUTH\_SERVICE\_/,'').downcase
+          expect(created_authentication_service.send(obj_attribute)).to eq(ENV[expected_env_key])
+        end
+        expect(created_authentication_service.is_default?).not_to be
+      }
+    end
+    context 'with no existing default authentication service' do
+      it {
+        expected_env_keys.each do |expected_env_key|
+          expect(ENV[expected_env_key]).to be_truthy
+        end
+        expect {
+          invoke_task
+        }.to change{authentication_service_class.count}.by(1)
+        created_authentication_service = authentication_service_class.where(service_id: ENV['AUTH_SERVICE_SERVICE_ID']).take
+        expect(created_authentication_service).to be
+        expected_env_keys.each do |expected_env_key|
+          obj_attribute = expected_env_key.gsub(/AUTH\_SERVICE\_/,'').downcase
+          expect(created_authentication_service.send(obj_attribute)).to eq(ENV[expected_env_key])
+        end
+        expect(created_authentication_service.is_default?).not_to be
+      }
+    end
+  end
+
+  context 'ENV[AUTH_SERVICE_IS_DEFAULT] true' do
+    before do
+      ENV['AUTH_SERVICE_IS_DEFAULT'] = 'true'
+    end
+    context 'with existing default authentication service' do
+      it {
+        FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :default)
+        expected_env_keys.each do |expected_env_key|
+          expect(ENV[expected_env_key]).to be_truthy
+        end
+        expect {
+          expect {
+            invoke_task
+          }.to raise_error(StandardError)
+        }.not_to change{authentication_service_class.count}
+      }
+    end
+    context 'with no existing default authentication service' do
+      it {
+        expected_env_keys.each do |expected_env_key|
+          expect(ENV[expected_env_key]).to be_truthy
+        end
+        expect {
+          invoke_task
+        }.to change{authentication_service_class.count}.by(1)
+        created_authentication_service = authentication_service_class.where(service_id: ENV['AUTH_SERVICE_SERVICE_ID']).take
+        expect(created_authentication_service).to be
+        expected_env_keys.each do |expected_env_key|
+          obj_attribute = expected_env_key.gsub(/AUTH\_SERVICE\_/,'').downcase
+          expect(created_authentication_service.send(obj_attribute)).to eq(ENV[expected_env_key])
+        end
+        expect(created_authentication_service.is_default?).to be
+      }
+    end
+  end
+end
+
+shared_examples 'an authentication_service:destroy task' do |
+  rake_task_name_sym: :rake_task_name,
+  authentication_service_class_sym: :resource_class|
+
+  let(:task_name) { send(rake_task_name_sym) }
+  let(:authentication_service_class) { send(authentication_service_class_sym) }
+
+  let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
+  it { expect(subject.prerequisites).to  include("environment") }
+
+  context 'default authentication_service' do
+    before do
+      FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
+    end
+
+    it {
+      expect {
+        expect {
+          invoke_task
+        }.to output("WARNING: destroying default authentication_service\n").to_stderr
+      }.to change{authentication_service_class.count}.by(-1)
+    }
+  end
+
+  context 'non default authentication_service' do
+    before do
+      FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
+    end
+
+    it {
+      expect {
+        invoke_task
+      }.to change{authentication_service_class.count}.by(-1)
+    }
+  end
+end
