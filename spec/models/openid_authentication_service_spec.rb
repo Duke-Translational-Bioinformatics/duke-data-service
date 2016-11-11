@@ -61,6 +61,9 @@ RSpec.describe OpenidAuthenticationService, type: :model do
     SecureRandom.hex
   }
 
+  it { is_expected.to validate_presence_of :client_id }
+  it { is_expected.to validate_presence_of :client_secret }
+
   include_context 'mocked openid request to', :subject
   it_behaves_like 'an authentication service'
 end

@@ -31,7 +31,7 @@ namespace :auth_service do
     task create: :environment do
       service_id = ENV['AUTH_SERVICE_SERVICE_ID'] || SecureRandom.uuid
       unless DukeAuthenticationService.where(service_id: service_id).exists?
-        DukeAuthenticationService.create(
+        DukeAuthenticationService.create!(
           service_id: service_id,
           base_uri: ENV['AUTH_SERVICE_BASE_URI'],
           name: ENV['AUTH_SERVICE_NAME'],
@@ -62,7 +62,7 @@ namespace :auth_service do
     task create: :environment do
       service_id = ENV['AUTH_SERVICE_SERVICE_ID'] || SecureRandom.uuid
       unless OpenidAuthenticationService.where(service_id: service_id).exists?
-        OpenidAuthenticationService.create(
+        OpenidAuthenticationService.create!(
           service_id: service_id,
           base_uri: ENV['AUTH_SERVICE_BASE_URI'],
           name: ENV['AUTH_SERVICE_NAME'],
