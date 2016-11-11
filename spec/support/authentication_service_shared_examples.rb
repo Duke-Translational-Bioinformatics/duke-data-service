@@ -119,204 +119,206 @@ shared_examples 'an authentication request endpoint' do
   #   existing_user_access_token
   #   invalid_access_token
 
-  describe 'for first time users' do
-    let(:payload) {
-      payload = { access_token: first_time_user_access_token }
-      payload[:authentication_service_id] = authentication_service.service_id unless authentication_service.is_default?
-      payload
-    }
+  it_behaves_like 'a GET request' do
+    describe 'for first time users' do
+      let(:payload) {
+        payload = { access_token: first_time_user_access_token }
+        payload[:authentication_service_id] = authentication_service.service_id unless authentication_service.is_default?
+        payload
+      }
 
-    it 'should create a new User and return an api JWT when provided a valid access_token by a registered AuthenticationService' do
-      expect(authentication_service).to be_persisted
-      pre_time = DateTime.now.to_i
-      expect{
-        expect {
-          is_expected.to eq(200)
-        }.to change{UserAuthenticationService.count}.by(1)
-      }.to change{User.count}.by(1)
-      post_time = DateTime.now.to_i
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      token_wrapper = JSON.parse(response.body)
-      expect(token_wrapper).to have_key('api_token')
-      decoded_token = JWT.decode(token_wrapper['api_token'],
-        Rails.application.secrets.secret_key_base
-      )[0]
-      expect(decoded_token).to be
-      %w(id service_id exp).each do |expected_key|
-        expect(decoded_token).to have_key(expected_key)
-      end
-      expect(decoded_token['service_id']).to eq(authentication_service.service_id)
-      created_user = User.find(decoded_token['id'])
-      expect(created_user).to be
-      expect(created_user.display_name).to eq(first_time_user[:display_name])
-      expect(created_user.username).to eq(first_time_user[:username])
-      expect(created_user.first_name).to eq(first_time_user[:first_name])
-      expect(created_user.last_name).to eq(first_time_user[:last_name])
-      expect(created_user.email).to eq(first_time_user[:email])
-      expect(created_user.last_login_at.to_i).to be >= pre_time
-      expect(created_user.last_login_at.to_i).to be <= post_time
-      created_user_authentication_service = created_user.user_authentication_services.where(uid: first_time_user[:username]).first
-      expect(created_user_authentication_service).to be
-      expect(created_user_authentication_service.authentication_service_id).to eq(authentication_service.id)
-    end
-
-    it_behaves_like 'an annotate_audits endpoint' do
-      let(:audit_should_include) {{}}
-
-      it 'should set the newly created user as the user' do
-        is_expected.to eq(expected_response_status)
-        last_audit = Audited.audit_class.where(
-          auditable_type: expected_auditable_type.to_s
-        ).where(
-          'comment @> ?', {action: called_action, endpoint: url}.to_json
-        ).order(:created_at).last
-        expect(last_audit.user).to be
-        expect(last_audit.user.username).to eq(first_time_user[:username])
-      end
-    end
-  end
-
-  describe 'for existing users' do
-    let(:payload) {
-      if authentication_service.is_default?
-        {
-          access_token: existing_user_access_token
-        }
-      else
-        {
-          access_token: existing_user_access_token,
-          authentication_service_id: authentication_service.service_id
-        }
-      end
-    }
-
-    it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-      original_last_login_at = existing_user.last_login_at.to_i
-      pre_time = DateTime.now.to_i
-      is_expected.to eq(200)
-      post_time = DateTime.now.to_i
-      expect(response.status).to eq(200)
-      expect(response.body).to be
-      expect(response.body).not_to eq('null')
-      token_wrapper = JSON.parse(response.body)
-      expect(token_wrapper).to have_key('expires_on')
-      expect(token_wrapper).to have_key('api_token')
-      decoded_token = JWT.decode(token_wrapper['api_token'],
-        Rails.application.secrets.secret_key_base
-      )[0]
-      expect(decoded_token).to be
-      %w(id service_id exp).each do |expected_key|
-        expect(decoded_token).to have_key(expected_key)
-      end
-      expect(decoded_token['id']).to eq(existing_user.id)
-      expect(decoded_token['service_id']).to eq(authentication_service.service_id)
-      existing_user = User.find(decoded_token['id'])
-      expect(existing_user).to be
-      expect(existing_user.id).to eq(existing_user.id)
-      expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
-      expect(existing_user.last_login_at.to_i).to be >= pre_time
-      expect(existing_user.last_login_at.to_i).to be <= post_time
-    end
-
-    context 'nil payload' do
-      let(:payload) { nil }
-      it 'should respond with an error when not provided an access_token' do
-        is_expected.to eq(400)
-        expect(response.status).to eq(400)
+      it 'should create a new User and return an api JWT when provided a valid access_token by a registered AuthenticationService' do
+        expect(authentication_service).to be_persisted
+        pre_time = DateTime.now.to_i
+        expect{
+          expect {
+            is_expected.to eq(200)
+          }.to change{UserAuthenticationService.count}.by(1)
+        }.to change{User.count}.by(1)
+        post_time = DateTime.now.to_i
+        expect(response.status).to eq(200)
         expect(response.body).to be
-        error_response = JSON.parse(response.body)
-        %w(error reason suggestion).each do |expected_key|
-          expect(error_response).to have_key expected_key
+        expect(response.body).not_to eq('null')
+        token_wrapper = JSON.parse(response.body)
+        expect(token_wrapper).to have_key('api_token')
+        decoded_token = JWT.decode(token_wrapper['api_token'],
+          Rails.application.secrets.secret_key_base
+        )[0]
+        expect(decoded_token).to be
+        %w(id service_id exp).each do |expected_key|
+          expect(decoded_token).to have_key(expected_key)
         end
-        expect(error_response['error']).to eq(400)
-        expect(error_response['reason']).to eq('no access_token')
-        expect(error_response['suggestion']).to eq('you might need to login through an authentication service')
+        expect(decoded_token['service_id']).to eq(authentication_service.service_id)
+        created_user = User.find(decoded_token['id'])
+        expect(created_user).to be
+        expect(created_user.display_name).to eq(first_time_user[:display_name])
+        expect(created_user.username).to eq(first_time_user[:username])
+        expect(created_user.first_name).to eq(first_time_user[:first_name])
+        expect(created_user.last_name).to eq(first_time_user[:last_name])
+        expect(created_user.email).to eq(first_time_user[:email])
+        expect(created_user.last_login_at.to_i).to be >= pre_time
+        expect(created_user.last_login_at.to_i).to be <= post_time
+        created_user_authentication_service = created_user.user_authentication_services.where(uid: first_time_user[:username]).first
+        expect(created_user_authentication_service).to be
+        expect(created_user_authentication_service.authentication_service_id).to eq(authentication_service.id)
+      end
+
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:audit_should_include) {{}}
+
+        it 'should set the newly created user as the user' do
+          is_expected.to eq(expected_response_status)
+          last_audit = Audited.audit_class.where(
+            auditable_type: expected_auditable_type.to_s
+          ).where(
+            'comment @> ?', {action: called_action, endpoint: url}.to_json
+          ).order(:created_at).last
+          expect(last_audit.user).to be
+          expect(last_audit.user.username).to eq(first_time_user[:username])
+        end
       end
     end
 
-    context 'nil access_token' do
+    describe 'for existing users' do
       let(:payload) {
         if authentication_service.is_default?
           {
-            access_token: nil
+            access_token: existing_user_access_token
           }
         else
           {
-            access_token: nil,
-            authentication_service_id: authentication_service.service_id
-          }
-        end
-      }
-      it 'should respond with an error when not provided an access_token' do
-        is_expected.to eq(401)
-        expect(response.status).to eq(401)
-        expect(response.body).to be
-        error_response = JSON.parse(response.body)
-        %w(error reason suggestion).each do |expected_key|
-          expect(error_response).to have_key expected_key
-        end
-        expect(error_response['error']).to eq(401)
-        expect(error_response['reason']).to eq('invalid access_token')
-        expect(error_response['suggestion']).to eq('token not properly signed')
-      end
-    end
-
-    context 'unknown authentication_service' do
-      let(:payload) {
-        if authentication_service.is_default?
-          authentication_service.update(is_default: false)
-        end
-        {
-          access_token: existing_user_access_token,
-          authentication_service_id: SecureRandom.uuid
-        }
-      }
-
-      it 'should respond with an error when the authentication_service_id is not registered' do
-        original_last_login_at = existing_user.last_login_at.to_i
-        is_expected.to eq(401)
-        expect(response.status).to eq(401)
-        expect(response.body).to be
-        error_response = JSON.parse(response.body)
-        %w(error reason suggestion).each do |expected_key|
-          expect(error_response).to have_key expected_key
-        end
-        expect(error_response['error']).to eq(401)
-        expect(error_response['reason']).to eq('invalid access_token')
-        expect(error_response['suggestion']).to eq('authentication service not registered')
-        existing_user.reload
-        expect(existing_user.last_login_at.to_i).to eq(original_last_login_at)
-      end
-    end
-
-    context 'invalid token' do
-      let(:payload) {
-        if authentication_service.is_default?
-          {access_token: invalid_access_token }
-        else
-          {
-            access_token: invalid_access_token,
+            access_token: existing_user_access_token,
             authentication_service_id: authentication_service.service_id
           }
         end
       }
 
-      it 'should respond with an error' do
+      it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
         original_last_login_at = existing_user.last_login_at.to_i
-        is_expected.to eq(401)
-        expect(response.status).to eq(401)
+        pre_time = DateTime.now.to_i
+        is_expected.to eq(200)
+        post_time = DateTime.now.to_i
+        expect(response.status).to eq(200)
         expect(response.body).to be
-        error_response = JSON.parse(response.body)
-        %w(error reason suggestion).each do |expected_key|
-          expect(error_response).to have_key expected_key
+        expect(response.body).not_to eq('null')
+        token_wrapper = JSON.parse(response.body)
+        expect(token_wrapper).to have_key('expires_on')
+        expect(token_wrapper).to have_key('api_token')
+        decoded_token = JWT.decode(token_wrapper['api_token'],
+          Rails.application.secrets.secret_key_base
+        )[0]
+        expect(decoded_token).to be
+        %w(id service_id exp).each do |expected_key|
+          expect(decoded_token).to have_key(expected_key)
         end
-        expect(error_response['error']).to eq(401)
-        expect(error_response['reason']).to eq('invalid access_token')
-        expect(error_response['suggestion']).to eq('token not properly signed')
-        existing_user.reload
-        expect(existing_user.last_login_at.to_i).to eq(original_last_login_at)
+        expect(decoded_token['id']).to eq(existing_user.id)
+        expect(decoded_token['service_id']).to eq(authentication_service.service_id)
+        existing_user = User.find(decoded_token['id'])
+        expect(existing_user).to be
+        expect(existing_user.id).to eq(existing_user.id)
+        expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
+        expect(existing_user.last_login_at.to_i).to be >= pre_time
+        expect(existing_user.last_login_at.to_i).to be <= post_time
+      end
+
+      context 'nil payload' do
+        let(:payload) { nil }
+        it 'should respond with an error when not provided an access_token' do
+          is_expected.to eq(400)
+          expect(response.status).to eq(400)
+          expect(response.body).to be
+          error_response = JSON.parse(response.body)
+          %w(error reason suggestion).each do |expected_key|
+            expect(error_response).to have_key expected_key
+          end
+          expect(error_response['error']).to eq(400)
+          expect(error_response['reason']).to eq('no access_token')
+          expect(error_response['suggestion']).to eq('you might need to login through an authentication service')
+        end
+      end
+
+      context 'nil access_token' do
+        let(:payload) {
+          if authentication_service.is_default?
+            {
+              access_token: nil
+            }
+          else
+            {
+              access_token: nil,
+              authentication_service_id: authentication_service.service_id
+            }
+          end
+        }
+        it 'should respond with an error when not provided an access_token' do
+          is_expected.to eq(401)
+          expect(response.status).to eq(401)
+          expect(response.body).to be
+          error_response = JSON.parse(response.body)
+          %w(error reason suggestion).each do |expected_key|
+            expect(error_response).to have_key expected_key
+          end
+          expect(error_response['error']).to eq(401)
+          expect(error_response['reason']).to eq('invalid access_token')
+          expect(error_response['suggestion']).to eq('token not properly signed')
+        end
+      end
+
+      context 'unknown authentication_service' do
+        let(:payload) {
+          if authentication_service.is_default?
+            authentication_service.update(is_default: false)
+          end
+          {
+            access_token: existing_user_access_token,
+            authentication_service_id: SecureRandom.uuid
+          }
+        }
+
+        it 'should respond with an error when the authentication_service_id is not registered' do
+          original_last_login_at = existing_user.last_login_at.to_i
+          is_expected.to eq(401)
+          expect(response.status).to eq(401)
+          expect(response.body).to be
+          error_response = JSON.parse(response.body)
+          %w(error reason suggestion).each do |expected_key|
+            expect(error_response).to have_key expected_key
+          end
+          expect(error_response['error']).to eq(401)
+          expect(error_response['reason']).to eq('invalid access_token')
+          expect(error_response['suggestion']).to eq('authentication service not registered')
+          existing_user.reload
+          expect(existing_user.last_login_at.to_i).to eq(original_last_login_at)
+        end
+      end
+
+      context 'invalid token' do
+        let(:payload) {
+          if authentication_service.is_default?
+            {access_token: invalid_access_token }
+          else
+            {
+              access_token: invalid_access_token,
+              authentication_service_id: authentication_service.service_id
+            }
+          end
+        }
+
+        it 'should respond with an error' do
+          original_last_login_at = existing_user.last_login_at.to_i
+          is_expected.to eq(401)
+          expect(response.status).to eq(401)
+          expect(response.body).to be
+          error_response = JSON.parse(response.body)
+          %w(error reason suggestion).each do |expected_key|
+            expect(error_response).to have_key expected_key
+          end
+          expect(error_response['error']).to eq(401)
+          expect(error_response['reason']).to eq('invalid access_token')
+          expect(error_response['suggestion']).to eq('token not properly signed')
+          existing_user.reload
+          expect(existing_user.last_login_at.to_i).to eq(original_last_login_at)
+        end
       end
     end
   end

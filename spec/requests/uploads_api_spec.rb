@@ -26,9 +26,7 @@ describe DDS::V1::UploadsAPI do
     let(:project_id) { project.id }
 
     #List file uploads for a project
-    describe 'GET' do
-      subject { get(url, nil, headers) }
-
+    it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           other_upload
