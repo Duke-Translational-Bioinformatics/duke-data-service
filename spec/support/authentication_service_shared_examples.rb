@@ -1,14 +1,15 @@
 shared_context 'mocked openid request to' do |build_openid_authentication_service|
   let(:openid_authentication_service) { send(build_openid_authentication_service) }
-  # requires the following to be let:
-  #   first_time_user_access_token
-  #   first_time_user_userinfo
-  #   existing_user_access_token
-  #   existing_user_userinfo
-  #   existing_first_authenticating_access_token
-  #   existing_first_authenticating_user_userinfo
-  #   invalid_access_token
+
   before do
+    expect(first_time_user_access_token).to be
+    expect(first_time_user_userinfo).to be
+    expect(existing_user_access_token).to be
+    expect(existing_user_userinfo).to be
+    expect(existing_first_authenticating_access_token).to be
+    expect(existing_first_authenticating_user_userinfo).to be
+    expect(invalid_access_token).to be
+
     WebMock.reset!
     stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{first_time_user_access_token}").
@@ -120,12 +121,13 @@ shared_examples 'an authentication service' do
 end
 
 shared_examples 'an authentication request endpoint' do
-  # requires the following be let
-  #   first_time_user
-  #   first_time_user_access_token
-  #   existing_user
-  #   existing_user_access_token
-  #   invalid_access_token
+  before do
+    expect(first_time_user).to be
+    expect(first_time_user_access_token).to be
+    expect(existing_user).to be
+    expect(existing_user_access_token).to be
+    expect(invalid_access_token).to be
+  end
 
   it_behaves_like 'a GET request' do
     describe 'for first time users' do
@@ -189,16 +191,10 @@ shared_examples 'an authentication request endpoint' do
 
     describe 'for existing users' do
       let(:payload) {
-        if authentication_service.is_default?
-          {
-            access_token: existing_user_access_token
-          }
-        else
-          {
-            access_token: existing_user_access_token,
-            authentication_service_id: authentication_service.service_id
-          }
-        end
+        {
+          access_token: existing_user_access_token,
+          authentication_service_id: authentication_service.service_id
+        }
       }
 
       it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
@@ -268,9 +264,6 @@ shared_examples 'an authentication request endpoint' do
 
       context 'unknown authentication_service' do
         let(:payload) {
-          if authentication_service.is_default?
-            authentication_service.update(is_default: false)
-          end
           {
             access_token: existing_user_access_token,
             authentication_service_id: SecureRandom.uuid
@@ -296,14 +289,10 @@ shared_examples 'an authentication request endpoint' do
 
       context 'invalid token' do
         let(:payload) {
-          if authentication_service.is_default?
-            {access_token: invalid_access_token }
-          else
-            {
-              access_token: invalid_access_token,
-              authentication_service_id: authentication_service.service_id
-            }
-          end
+          {
+            access_token: invalid_access_token,
+            authentication_service_id: authentication_service.service_id
+          }
         }
 
         it 'should respond with an error' do
