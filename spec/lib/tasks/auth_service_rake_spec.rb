@@ -1,4 +1,8 @@
 require 'rails_helper'
+if Rails.version > '5.0.0'
+  require 'active_support/testing/stream'
+  include ActiveSupport::Testing::Stream
+end
 
 describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
 

@@ -13,12 +13,15 @@ namespace :auth_service do
   desc "transfer default authentication_service from ENV[FROM_AUTH_SERVICE_ID] to ENV[TO_AUTH_SERVICE_ID]"
   task transfer_default: :environment do
     raise 'please set ENV[FROM_AUTH_SERVICE_ID] and ENV[TO_AUTH_SERVICE_ID]' unless ENV['FROM_AUTH_SERVICE_ID'] && ENV['TO_AUTH_SERVICE_ID']
-    from_auth_service = AuthenticationService.where(service_id: ENV['FROM_AUTH_SERVICE_ID']).take!
+    from_auth_service = AuthenticationService.find_by!(service_id: ENV['FROM_AUTH_SERVICE_ID'])
     raise '#{from_auth_service.service_id} is not default' unless from_auth_service.is_default?
 
-    to_auth_service = AuthenticationService.where(service_id: ENV['TO_AUTH_SERVICE_ID']).take!
-    from_auth_service.update(is_default: false)
-    to_auth_service.update(is_default: true)
+    to_auth_service = AuthenticationService.find_by!(service_id: ENV['TO_AUTH_SERVICE_ID'])
+
+    from_auth_service.transaction do
+      from_auth_service.update!(is_default: false)
+      to_auth_service.update!(is_default: true)
+    end
   end
 
   namespace :duke do
