@@ -40,10 +40,7 @@ namespace :auth_service do
       if existing_default_auth_service
         raise "Service #{existing_default_auth_service.service_id} is already default. Use auth_service_transfer_default instead"
       end
-
-      auth_service.transaction do
-        auth_service.update!(is_default: true)
-      end
+      auth_service.update!(is_default: true)
     end
   end
 
