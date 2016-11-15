@@ -63,7 +63,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     let(:resource_class) { OpenidAuthenticationService }
 
     before do
-      FactoryGirl.attributes_for(:duke_authentication_service).each do |key,value|
+      FactoryGirl.attributes_for(:openid_authentication_service).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
     end
@@ -153,6 +153,77 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         expect(default_authentication_service.is_default).not_to be
         expect(non_default_authentication_service.is_default).to be
       }
+    end
+  end
+
+  describe 'auth_service:set_default' do
+    include_context "rake"
+    let(:task_name) { "auth_service:set_default" }
+    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
+
+    context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
+      it {
+        expect {
+          expect {
+            invoke_task
+          }.to output(/AUTH_SERVICE_SERVICE_ID environment variable is required/).to_stderr
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'specified service does not exist' do
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = SecureRandom.uuid
+      end
+      it {
+        expect {
+          expect {
+            invoke_task
+          }.to output(/AUTH_SERVICE_SERVICE_ID is not a registered service/).to_stderr
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'specified service is already default' do
+      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
+      end
+
+      it {
+        expect {
+          expect {
+            invoke_task
+          }.to output(/AUTH_SERVICE_SERVICE_ID service is already default/).to_stderr
+        }.not_to raise_error
+      }
+    end
+
+    context 'specified service is not already default' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
+      end
+
+      context 'another default service already exists' do
+        let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+        it {
+          expect {
+            expect {
+              invoke_task
+            }.to output(Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")).to_stderr
+          }.to raise_error(StandardError)
+        }
+      end
+
+      context 'no default service exists' do
+        it {
+          expect {
+            invoke_task
+          }.not_to raise_error
+        }
+      end
     end
   end
 end

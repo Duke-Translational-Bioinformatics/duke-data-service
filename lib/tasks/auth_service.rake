@@ -24,6 +24,29 @@ namespace :auth_service do
     end
   end
 
+  desc "set default authentication_service using ENV[AUTH_SERVICE_SERVICE_ID]"
+  task set_default: :environment do
+    raise 'AUTH_SERVICE_SERVICE_ID environment variable is required' unless ENV['AUTH_SERVICE_SERVICE_ID']
+    begin
+      auth_service = AuthenticationService.find_by!(service_id: ENV['AUTH_SERVICE_SERVICE_ID'])
+    rescue
+      raise "AUTH_SERVICE_SERVICE_ID is not a registered service"
+    end
+
+    if auth_service.is_default?
+      $stderr.puts "AUTH_SERVICE_SERVICE_ID service is already default"
+    else
+      existing_default_auth_service = AuthenticationService.find_by(is_default: true)
+      if existing_default_auth_service
+        raise "Service #{existing_default_auth_service.service_id} is already default. Use auth_service_transfer_default instead"
+      end
+
+      auth_service.transaction do
+        auth_service.update!(is_default: true)
+      end
+    end
+  end
+
   namespace :duke do
     desc "creates a duke_authentication_service using
       ENV[AUTH_SERVICE_SERVICE_ID]
