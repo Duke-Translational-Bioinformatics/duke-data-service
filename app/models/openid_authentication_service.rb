@@ -3,6 +3,7 @@ class OpenidAuthenticationService < AuthenticationService
   validates :client_secret, presence: true
 
   def get_user_for_access_token(token)
+    raise InvalidAccessTokenException.new if token.nil?
     user_info = get_userinfo(token)
     uid = user_info['dukeNetID']
     user_authentication_service = user_authentication_services.where(uid: uid).first

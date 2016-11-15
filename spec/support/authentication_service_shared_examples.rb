@@ -108,6 +108,14 @@ shared_examples 'an authentication service' do
         }.to raise_error(InvalidAccessTokenException)
       }
     end
+
+    context 'with nil token' do
+      it {
+        expect {
+          subject.get_user_for_access_token(nil)
+        }.to raise_error(InvalidAccessTokenException)
+      }
+    end
   end
 end
 

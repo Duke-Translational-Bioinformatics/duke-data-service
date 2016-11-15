@@ -27,7 +27,7 @@ class DukeAuthenticationService < AuthenticationService
         user.current_user_authenticaiton_service = user_authentication_service
         user
       end
-    rescue JWT::VerificationError
+    rescue JWT::VerificationError, JWT::DecodeError
       raise InvalidAccessTokenException
     end
   end
