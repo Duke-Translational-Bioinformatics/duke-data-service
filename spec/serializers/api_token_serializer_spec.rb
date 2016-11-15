@@ -4,7 +4,7 @@ RSpec.describe ApiTokenSerializer, type: :serializer do
   let(:user) { FactoryGirl.create(:user) }
 
   context 'with UserAuthenticationService Authenticated User' do
-    let(:auth_service) { FactoryGirl.create(:authentication_service) }
+    let(:auth_service) { FactoryGirl.create(:duke_authentication_service) }
     let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service,
       user: user,
       authentication_service: auth_service
@@ -18,7 +18,7 @@ RSpec.describe ApiTokenSerializer, type: :serializer do
       'expires_on' => resource.expires_on,
       'time_to_live' => resource.time_to_live
     }}
-    
+
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end

@@ -7,6 +7,10 @@ machine:
     COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
     GRAPHSTORY_URL: http://neo4j.db.host:7474
     BONSAI_URL: elastic.local:9200
+    OPENID_CLIENT_ID: test
+    OPENID_CLIENT_SECRET: testpass
+    OPENID_URL: http://oit.oauth.edu
+
   hosts:
     swift.local: 0.0.0.0
     neo4j.db.host: 0.0.0.0
