@@ -6,7 +6,7 @@ class OpenidAuthenticationService < AuthenticationService
     raise InvalidAccessTokenException.new if token.nil?
     user_info = get_userinfo(token)
     uid = user_info['dukeNetID']
-    user_authentication_service = user_authentication_services.where(uid: uid).first
+    user_authentication_service = user_authentication_services.find_by(uid: uid)
     if user_authentication_service
       user = user_authentication_service.user
       user.current_user_authenticaiton_service = user_authentication_service
