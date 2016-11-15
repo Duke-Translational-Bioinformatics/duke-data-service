@@ -37,6 +37,14 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context 'current_user_authenticaiton_service attribute' do
+    it 'should be an accessor' do
+      should respond_to('current_user_authenticaiton_service')
+      subject.current_user_authenticaiton_service = user_authentication_service
+      expect(subject.current_user_authenticaiton_service.id).to eq(user_authentication_service.id)
+    end
+  end
+
   describe 'associations' do
     subject {FactoryGirl.create(:user)}
 
