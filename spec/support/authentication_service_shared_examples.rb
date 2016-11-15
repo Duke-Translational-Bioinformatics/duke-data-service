@@ -247,16 +247,10 @@ shared_examples 'an authentication request endpoint' do
 
       context 'nil access_token' do
         let(:payload) {
-          if authentication_service.is_default?
-            {
-              access_token: nil
-            }
-          else
-            {
-              access_token: nil,
-              authentication_service_id: authentication_service.service_id
-            }
-          end
+          {
+            access_token: nil,
+            authentication_service_id: authentication_service.service_id
+          }
         }
         it 'should respond with an error when not provided an access_token' do
           is_expected.to eq(401)
