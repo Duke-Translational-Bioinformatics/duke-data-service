@@ -1,15 +1,15 @@
 shared_context 'mocked openid request to' do |build_openid_authentication_service|
+  include_context 'requires let variables', [:first_time_user_access_token,
+  :first_time_user_userinfo,
+  :existing_user_access_token,
+  :existing_user_userinfo,
+  :existing_first_authenticating_access_token,
+  :existing_first_authenticating_user_userinfo,
+  :invalid_access_token]
+
   let(:openid_authentication_service) { send(build_openid_authentication_service) }
 
   before do
-    expect(first_time_user_access_token).to be
-    expect(first_time_user_userinfo).to be
-    expect(existing_user_access_token).to be
-    expect(existing_user_userinfo).to be
-    expect(existing_first_authenticating_access_token).to be
-    expect(existing_first_authenticating_user_userinfo).to be
-    expect(invalid_access_token).to be
-
     WebMock.reset!
     stub_request(:post, "#{openid_authentication_service.base_uri}/userinfo").
       with(:body => "access_token=#{first_time_user_access_token}").
@@ -121,13 +121,12 @@ shared_examples 'an authentication service' do
 end
 
 shared_examples 'an authentication request endpoint' do
-  before do
-    expect(first_time_user).to be
-    expect(first_time_user_access_token).to be
-    expect(existing_user).to be
-    expect(existing_user_access_token).to be
-    expect(invalid_access_token).to be
-  end
+  include_context 'requires let variables', [
+    :first_time_user,
+    :first_time_user_access_token,
+    :existing_user,
+    :existing_user_access_token,
+    :invalid_access_token]
 
   it_behaves_like 'a GET request' do
     describe 'for first time users' do
