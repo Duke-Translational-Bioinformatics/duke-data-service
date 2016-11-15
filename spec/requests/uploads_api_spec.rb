@@ -157,6 +157,27 @@ describe DDS::V1::UploadsAPI do
         }
       end
 
+      context 'retry' do
+        let(:resource) {
+          chunk_stub.save
+          chunk_stub
+        }
+        it_behaves_like 'an updatable resource' do
+          it 'updates the expiration on the signed url' do
+            expect(resource.updated_at).to eq(resource.created_at)
+            sleep 1
+            orig_obj = resource_serializer.new(resource).as_json
+            orig_temp_url_expires = URI.decode_www_form(URI.parse(orig_obj[:url]).query).assoc('temp_url_expires')[1]
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.updated_at).not_to eq(resource.created_at)
+            new_obj = resource_serializer.new(resource).as_json
+            new_temp_url_expires = URI.decode_www_form(URI.parse(new_obj[:url]).query).assoc('temp_url_expires')[1]
+            expect(new_temp_url_expires).not_to eq(orig_temp_url_expires)
+          end
+        end
+      end
+
       context 'when chunk.number exists' do
         let(:payload_chunk_number) { chunk.number }
         it_behaves_like 'an updatable resource'
