@@ -45,6 +45,7 @@ deployment:
     - heroku run rake --exit-code db:migrate --app 'dukeds-dev'
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds-dev'
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -57,6 +58,7 @@ deployment:
     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds-uatest'
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -68,3 +70,4 @@ deployment:
     - heroku run --exit-code rake db:migrate --app 'dukeds'
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
