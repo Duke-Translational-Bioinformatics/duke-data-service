@@ -25,7 +25,6 @@ module DDS
       end
       get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
-        raise InvalidAccessTokenException.new unless token_info_params[:access_token]
 
         auth_service = get_auth_service(
           token_info_params[:authentication_service_id])
