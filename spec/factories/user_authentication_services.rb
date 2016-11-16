@@ -4,7 +4,7 @@ FactoryGirl.define do
 
     trait :populated do
       user
-      authentication_service
+      association :authentication_service, factory: :duke_authentication_service
     end
   end
 end

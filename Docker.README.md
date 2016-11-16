@@ -510,7 +510,7 @@ Configuration
 ---
 In production, the DDS server must be configured with the information for a live
 Duke Authentication Service microservice. This requires three Environment variables:
-* AUTH_SERVICE_ID: The SERVICE_ID configured in the live Duke Authentication Service
+* AUTH_SERVICE_SERVICE_ID: The SERVICE_ID configured in the live Duke Authentication Service
 * AUTH_SERVICE_BASE_URI: The Base URI to the live Duke Authentication Service, e.g. URI/api/v1/app/status should return {'status': 'ok'}
 * AUTH_SERVICE_NAME: A Description of the Service used in the apiexplorer and portal frontends
 

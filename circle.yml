@@ -7,6 +7,10 @@ machine:
     COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
     GRAPHSTORY_URL: http://neo4j.db.host:7474
     BONSAI_URL: elastic.local:9200
+    OPENID_CLIENT_ID: test
+    OPENID_CLIENT_SECRET: testpass
+    OPENID_URL: http://oit.oauth.edu
+
   hosts:
     swift.local: 0.0.0.0
     neo4j.db.host: 0.0.0.0
@@ -41,6 +45,7 @@ deployment:
     - heroku run rake --exit-code db:migrate --app 'dukeds-dev'
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds-dev'
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -53,6 +58,7 @@ deployment:
     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds-uatest'
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -64,3 +70,4 @@ deployment:
     - heroku run --exit-code rake db:migrate --app 'dukeds'
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
+    - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
