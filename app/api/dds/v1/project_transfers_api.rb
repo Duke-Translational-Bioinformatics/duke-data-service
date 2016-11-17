@@ -132,6 +132,35 @@ module DDS
           validation_error!(project_transfer)
         end
       end
+
+      desc 'Accept a project transfer' do
+        detail 'Accept a pending project transfer.'
+        named 'accept a project transfer'
+        failure [
+          [200, 'Success'],
+          [400, 'Validation Error'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'The unique id of the project transfer.'
+        optional :status_comment, type: String, desc: 'An optional comment that can be provided.'
+      end
+      put '/project_transfers/:id/accept', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
+        project_transfer.status = 'accepted'
+        project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
+        authorize project_transfer, :update?
+        if project_transfer.save
+          project_transfer
+        else
+          validation_error!(project_transfer)
+        end
+      end
     end
   end
 end
