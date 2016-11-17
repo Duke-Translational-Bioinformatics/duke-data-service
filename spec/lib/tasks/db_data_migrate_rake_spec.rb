@@ -1,9 +1,5 @@
 require 'rails_helper'
 
-if Rails.version > '5.0.0'
-  require 'active_support/testing/stream'
-  include ActiveSupport::Testing::Stream
-end
 describe "db:data:migrate" do
   include_context "rake"
   let(:task_path) { "lib/tasks/db_data_migrate" }
@@ -14,8 +10,6 @@ describe "db:data:migrate" do
   it { expect(subject.prerequisites).to  include("environment") }
 
   describe "#invoke" do
-    let(:invoke_task) { silence_stream(STDOUT) { silence_stream(STDERR) { subject.invoke } } }
-
     context 'with correct current_versions' do
       before do
         Audited.audit_class.as_user(current_user) do
@@ -118,9 +112,7 @@ describe "db:data:migrate" do
 
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/0 untyped authentication_services changed/).to_stderr
+          invoke_task expected_stderr: /0 untyped authentication_services changed/
         }.not_to change{
           AuthenticationService.where(type: nil).count
         }
@@ -137,9 +129,7 @@ describe "db:data:migrate" do
       it {
         expect(untyped_authentication_service).not_to be_a default_type
         expect {
-          expect {
-            invoke_task
-          }.to output(Regexp.new("1 untyped authentication_services changed to #{default_type}")).to_stderr
+          invoke_task expected_stderr: Regexp.new("1 untyped authentication_services changed to #{default_type}")
         }.to change{
           AuthenticationService.where(type: nil).count
         }.by(-1)
