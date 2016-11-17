@@ -1,3 +1,16 @@
+def type_untyped_authentication_services
+  default_type = "DukeAuthenticationService"
+  untyped = AuthenticationService.where(type: nil)
+  pre_count = untyped.count
+  if pre_count > 0
+    untyped.update_all(type: default_type)
+    $stderr.puts "#{untyped.count - pre_count} untyped authentication_services changed to #{default_type}"
+  else
+    $stderr.puts "0 untyped authentication_services changed"
+  end
+  puts "Fin!"
+end
+
 def create_current_file_versions
   files = DataFile.eager_load(:file_versions).unscope(:order).joins('LEFT OUTER JOIN file_versions B ON B.data_file_id = containers.id AND B.version_number > file_versions.version_number').where('B.data_file_id IS NULL').where('file_versions.data_file_id IS NULL OR containers.upload_id != file_versions.upload_id')
   version_count = FileVersion.count
@@ -55,6 +68,7 @@ namespace :db do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_current_file_versions
       create_missing_fingerprints
+      type_untyped_authentication_services
     end
   end
 end
