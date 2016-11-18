@@ -3,8 +3,8 @@ def type_untyped_authentication_services
   untyped = AuthenticationService.where(type: nil)
   pre_count = untyped.count
   if pre_count > 0
-    untyped.update_all(type: default_type)
-    $stderr.puts "#{pre_count} untyped authentication_services changed to #{default_type}"
+    changed = untyped.update_all(type: default_type)
+    $stderr.puts "#{changed} untyped authentication_services changed to #{default_type}"
   else
     $stderr.puts "0 untyped authentication_services changed"
   end
