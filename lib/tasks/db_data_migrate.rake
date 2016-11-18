@@ -4,7 +4,7 @@ def type_untyped_authentication_services
   pre_count = untyped.count
   if pre_count > 0
     untyped.update_all(type: default_type)
-    $stderr.puts "#{untyped.count - pre_count} untyped authentication_services changed to #{default_type}"
+    $stderr.puts "#{pre_count} untyped authentication_services changed to #{default_type}"
   else
     $stderr.puts "0 untyped authentication_services changed"
   end
