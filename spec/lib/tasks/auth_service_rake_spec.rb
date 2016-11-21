@@ -1,8 +1,4 @@
 require 'rails_helper'
-if Rails.version > '5.0.0'
-  require 'active_support/testing/stream'
-  include ActiveSupport::Testing::Stream
-end
 
 describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
 
@@ -73,7 +69,6 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
   describe 'auth_service:transfer_default' do
     include_context "rake"
     let(:task_name) { "auth_service:transfer_default" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
     let(:non_default_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
 
@@ -159,14 +154,11 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
   describe 'auth_service:set_default' do
     include_context "rake"
     let(:task_name) { "auth_service:set_default" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
 
     context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID environment variable is required/).to_stderr
+          invoke_task epected_stderr: /AUTH_SERVICE_SERVICE_ID environment variable is required/
         }.to raise_error(StandardError)
       }
     end
@@ -177,9 +169,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
       end
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID is not a registered service/).to_stderr
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
         }.to raise_error(StandardError)
       }
     end
@@ -192,9 +182,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
 
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID service is already default/).to_stderr
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID service is already default/
         }.not_to raise_error
       }
     end
@@ -210,9 +198,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
         it {
           expect {
-            expect {
-              invoke_task
-            }.to output(Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")).to_stderr
+            invoke_task expected_stderr: Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")
           }.to raise_error(StandardError)
         }
       end
