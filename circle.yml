@@ -25,7 +25,7 @@ machine:
 
 dependencies:
   cache_directories:
-    - "docker/circle"
+    # - "docker/circle"
   pre:
     # - ./docker/circle/cache_docker_image.sh neo4j 3.0.2
     # - ./docker/circle/cache_docker_image.sh elasticsearch 2.2.2
