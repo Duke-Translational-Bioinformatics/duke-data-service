@@ -265,6 +265,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:url) { "/api/v1/project_transfers/#{resource_id}/accept" }
       let(:resource) { FactoryGirl.create(:project_transfer,
                                           :with_to_users,
+                                          project: project,
                                           status: status,
                                           to_user: current_user) }
       let(:status) { :pending }
@@ -310,8 +311,33 @@ describe DDS::V1::ProjectTransfersAPI do
           let(:status) { :rejected }
           it_behaves_like 'a validated resource'
         end
+
+        context 'when project has project_permissions' do
+          let(:from_user_permission) { FactoryGirl.create(:project_permission, :project_admin, user: resource.from_user, project: project) }
+          let(:another_permission) { FactoryGirl.create(:project_permission, project: project) }
+          let(:different_permission) { FactoryGirl.create(:project_permission) }
+          it 'should remove the from_user project_permission' do
+            expect(resource).to be_persisted
+            expect(from_user_permission).to be_persisted
+            expect(ProjectPermission.where(project: project).all).to include(from_user_permission)
+            is_expected.to eq(200)
+            expect(ProjectPermission.where(project: project).all).not_to include(from_user_permission)
+          end
+          it 'should remove another_permission' do
+            expect(resource).to be_persisted
+            expect(another_permission).to be_persisted
+            expect(ProjectPermission.where(project: project).all).to include(another_permission)
+            is_expected.to eq(200)
+            expect(ProjectPermission.where(project: project).all).not_to include(another_permission)
+          end
+          it 'should not remove a different projects permissions' do
+            expect(resource).to be_persisted
+            expect(different_permission).to be_persisted
+            is_expected.to eq(200)
+            expect{different_permission.reload}.not_to raise_error
+          end
+        end
       end
     end
-
   end
 end

@@ -154,6 +154,7 @@ module DDS
         project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
         project_transfer.status = 'accepted'
         project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
+        project_transfer.project.project_permissions.destroy_all
         authorize project_transfer, :update?
         if project_transfer.save
           project_transfer
