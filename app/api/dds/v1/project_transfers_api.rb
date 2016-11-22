@@ -154,12 +154,15 @@ module DDS
         project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
         project_transfer.status = 'accepted'
         project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
-        project_transfer.project.project_permissions.destroy_all
-        from_user_permission = ProjectPermission.new(project: project_transfer.project, user: project_transfer.from_user)
-        from_user_permission.auth_role = AuthRole.find("project_viewer")
-        from_user_permission.save
-
         authorize project_transfer, :update?
+        project_transfer.project.project_permissions.destroy_all
+        project_viewer = AuthRole.find("project_viewer")
+        project_admin = AuthRole.find("project_admin")
+        project_transfer.project.project_permissions.build(user: project_transfer.from_user, auth_role: project_viewer)
+        project_transfer.to_users.each do |to_user|
+          project_transfer.project.project_permissions.build(user: to_user, auth_role: project_admin)
+        end
+        project_transfer.project.save
         if project_transfer.save
           project_transfer
         else

@@ -271,6 +271,8 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:status) { :pending }
       let(:payload) {{}}
       let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
+      let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
+
       describe 'PUT' do
         subject { put(url, payload.to_json, headers) }
         let(:called_action) { 'PUT' }
@@ -341,6 +343,11 @@ describe DDS::V1::ProjectTransfersAPI do
             expect {
               is_expected.to eq(200)
             }.to change{ProjectPermission.where(project: project, user: resource.from_user, auth_role: project_viewer).count}.by(1)
+          end
+          it 'should grant project_admin permission to to_users' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{ProjectPermission.where(project: project, user: resource.to_users.unscope(:order), auth_role: project_admin).count}.by(1)
           end
         end
       end
