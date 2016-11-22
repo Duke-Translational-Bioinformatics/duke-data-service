@@ -1,202 +1,216 @@
 var Dredd = require('dredd');
+var auth = require("./auth");
 
-// allow self-signed certs
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+//first create a folder
+url = JSON.parse(process.env.DATA_SERVICE_CREDENTIALS).url
+var myJSONObject = {
+  "agent_key": JSON.parse(process.env.DATA_SERVICE_CREDENTIALS).agent_key,
+  "user_key": JSON.parse(process.env.DATA_SERVICE_CREDENTIALS).user_key
+};
+var request = auth.createResource('POST', "/software_agents/api_token", JSON.stringify(myJSONObject), url);
+request.then(function(data) {
 
-// suppress warning message if more than 10 listeners are added to an event - this is needed here to suppress
-// warning messages from the node-rest-client package...
-require('events').EventEmitter.defaultMaxListeners = Infinity;
+  // allow self-signed certs
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-configuration = {
-  server: process.env.HOST_NAME, // your URL to API endpoint the tests will run against
-  //For debug: export HOST_NAME=https://dukeds-dev.herokuapp.com/api/v1
-  //For debug: export HOST_NAME=https://uatest.dataservice.duke.edu/api/v1
-  //Get JWT: https://dukeds-dev.herokuapp.com/apiexplorer
-  //export MY_GENERATED_JWT=
-  options: {
+  // suppress warning message if more than 10 listeners are added to an event - this is needed here to suppress
+  // warning messages from the node-rest-client package...
+  require('events').EventEmitter.defaultMaxListeners = Infinity;
 
-    'path': ['/apiary/apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
+  configuration = {
+    server: JSON.parse(process.env.DATA_SERVICE_CREDENTIALS).url, // your URL to API endpoint the tests will run against
+    //For debug: export HOST_NAME=https://dukeds-dev.herokuapp.com/api/v1
+    //For debug: export HOST_NAME=https://uatest.dataservice.duke.edu/api/v1
+    //Get JWT: https://dukeds-dev.herokuapp.com/apiexplorer
+    //export MY_GENERATED_JWT=
+    options: {
 
-    'dry-run': false, // Boolean, do not run any real HTTP transaction
-    'names': false,   // Boolean, Print Transaction names and finish, similar to dry-run
+      'path': ['apiary.apib'],  // Required Array if Strings; filepaths to API Blueprint files, can use glob wildcards
 
-    'level': 'info', // String, log-level (info, silly, debug, verbose, ...)
-    'silent': false, // Boolean, Silences all logging output
-    'language': 'python',
+      'dry-run': false, // Boolean, do not run any real HTTP transaction
+      'names': false,   // Boolean, Print Transaction names and finish, similar to dry-run
 
-    'only': [//01_auth_hooks.js
-            //  "Authorization Roles > Authorization Roles collection > List roles",
-            //  "Authorization Roles > Authorization Role instance > View role",
-             //14_software_agents.js
-            //  "Software Agents > Software Agents collection > Create software agent",
-            //  "Software Agents > Software Agents collection > List software agents",
-            //  "Software Agents > Software Agent instance > View software agent",
-            //  "Software Agents > Software Agent instance > Update software agent",
-            //  "Software Agents > Software Agent instance > Delete software agent",
-            //  "Software Agents > Software Agent API Key > Generate software agent API key",
-            //  "Software Agents > Software Agent API Key > View software agent API key",
-            //  "Software Agents > Software Agent API Key > Delete software agent API key",
-            //  "Software Agents > Software Agent Access Token > Get software agent access token",
-            //15_current_user_api_hooks.js
-            // "Current User > Current User instance > View current user",
-            // "Current User > Current User instance > Current user usage",
-            // "Current User > Current User API Key > Generate current user API key",
-            // "Current User > Current User API Key > View current user API key",
-            // "Current User > Current User API Key > Delete current user API key",
-            // "Users > Users collection > List users",
-            // "Users > User instance > View user",
-            //04_system_permissions_hooks.js
-            // "System Permissions > System Permissions collection > List system permissions",
-            // "System Permissions > System Permission instance > Grant system permission",
-            // "System Permissions > System Permission instance > View system permission",
-            // "System Permissions > System Permission instance > Revoke system permission",
-            //05_projects_hooks.js
-            // "Projects > Projects collection > Create project",
-            // "Projects > Projects collection > List projects",
-            // "Projects > Project instance > View project",
-            // "Projects > Project instance > Update project",
-            // "Projects > Project instance > Delete project",
-            // "Projects > Project instance > NOT_IMPLEMENTED_NEW Project usage",
-            //06_project_permissions_hooks.js
-            // "Project Permissions > Project Permissions collection > List project permissions",
-            // "Project Permissions > Project Permission instance > Grant project permission",
-            // "Project Permissions > Project Permission instance > View project permission",
-            // "Project Permissions > Project Permission instance > Revoke project permission",
-            //07_project_roles_hooks.js
-            // "Project Roles > Project Roles collection > List project roles",
-            // "Project Roles > Project Role instance > View project role",
-            //08_affiliates_hooks.js
-            // "Affiliates > Affiliates collection > List affiliates",
-            // "Affiliates > Affiliate instance > Associate affiliate",
-            // "Affiliates > Affiliate instance > View affiliate",
-            // "Affiliates > Affiliate instance > Delete affiliate",
-            //09_storage_providers_hooks.js
-            // "Storage Providers > Storage Providers collection > List storage providers",
-            // "Storage Providers > Storage Provider instance > View storage provider",
-            //10_folders_hooks.js
-            // "Folders > Folders collection > Create folder",
-            // "Folders > Folder instance > View folder",
-            // "Folders > Folder instance > Delete folder",
-            // "Folders > Folder instance > Move folder",
-            // "Folders > Folder instance > Rename folder",
-            //11_uploads_hooks.js
-            // "Uploads > Uploads collection > Initiate chunked upload",
-            // "Uploads > Uploads collection > List chunked uploads",
-            // "Uploads > Upload instance > View chunked upload",
-            // "Uploads > Upload instance > Get pre-signed chunk URL",
-            // "Uploads > Upload instance > Complete chunked file upload",
-            // "Uploads > Upload instance > Report server computed hash",
-            // "Uploads > Upload instance > Report upload hash",
-            //12_files_hooks.js
-            // "Files > Files collection > Create file",
-            // "Files > File instance > View file",
-            // "Files > File instance > Update file",
-            // "Files > File instance > Delete file",
-            // "Files > File instance > Get file download URL",
-            // "Files > File instance > Move file",
-            // "Files > File instance > Rename file",
-            // "File Versions > File Versions collection > List file versions",
-            // "File Versions > File Version instance > View file version",
-            // "File Versions > File Version instance > Update file version",
-            // "File Versions > File Version instance > Delete file version",
-            // "File Versions > File Version instance > Get file version download URL",
-            // "File Versions > File Version instance > Promote file version",
-            //13_search_project_folder_hooks.js
-            // "Search Children > Search project children > Search project children",
-            // "Search Children > Search folder children > Search folder children",
-            //18_provenance_activities.js
-            // "Provenance Activities > Activities collection > Create activity",
-            // "Provenance Activities > Activities collection > List activities",
-            // "Provenance Activities > Activities instance > View activity",
-            // "Provenance Activities > Activities instance > Update activity",
-            // "Provenance Activities > Activities instance > Delete activity",
-            //19_provenance_relations.js
-            // "Provenance Relations > Relations collection > Create used relation",
-            // "Provenance Relations > Relations collection > Create was generated by relation",
-            // "Provenance Relations > Relations collection > Create was derived from relation",
-            // "Provenance Relations > Relations collection > Create was invalidated by relation",
-            // "Provenance Relations > Relations collection > List provenance relations",
-            // "Provenance Relations > Relation instance > View relation",
-            // "Provenance Relations > Relation instance > Delete relation",
-            // "Search Provenance > Search Provenance > Search Provenance",
-            // "Tags > Tags collection > Create object tag",
-            // "Tags > Tags collection > List object tags",
-            // "Tags > Tags collection > Append a list of object tags",
-            // "Tags > Tags collection > List tag labels",
-            // "Tags > Tag instance > View tag",
-            // "Tags > Tag instance > Delete tag",
-            // "Metadata > Metadata Templates collection > Create metadata template",
-            // "Metadata > Metadata Templates collection > List metadata templates",
-            // "Metadata > Metadata Template instance > View metadata template",
-            // "Metadata > Metadata Template instance > Update metadata template",
-            // "Metadata > Metadata Template instance > Delete metadata template",
-            // "Metadata > Metadata Properties collection > Create metadata property",
-            // "Metadata > Metadata Properties collection > List metadata properties",
-            // "Metadata > Metadata Property instance > View metadata property",
-            // "Metadata > Metadata Property instance > Update metadata property",
-            // "Metadata > Metadata Property instance > Delete metadata property",
-            // "Metadata > Object Metadata instance > Create object metadata",
-            // "Metadata > Object Metadata instance > View object metadata",
-            // "Metadata > Object Metadata instance > Update object metadata",
-            // "Metadata > Object Metadata instance > Delete object metadata",
-            // "Metadata > View All Object Metadata > View All Object Metadata",
-            // "Search Objects > Search Objects > Search Objects",
-            ], // Array of Strings, run only transaction that match these names
+      'level': 'info', // String, log-level (info, silly, debug, verbose, ...)
+      'silent': false, // Boolean, Silences all logging output
+      'language': 'python',
 
-    'header': ['Accept: application/json', 'Authorization: '.concat(process.env.MY_GENERATED_JWT)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
-    'user': null,    // String, Basic Auth credentials in the form username:password
+      'only': [//01_auth_hooks.js
+               "Authorization Roles > Authorization Roles collection > List roles",
+               "Authorization Roles > Authorization Role instance > View role",
+               //14_software_agents.js
+               "Software Agents > Software Agents collection > Create software agent",
+               "Software Agents > Software Agents collection > List software agents",
+               "Software Agents > Software Agent instance > View software agent",
+               "Software Agents > Software Agent instance > Update software agent",
+               "Software Agents > Software Agent instance > Delete software agent",
+               "Software Agents > Software Agent API Key > Generate software agent API key",
+               "Software Agents > Software Agent API Key > View software agent API key",
+               "Software Agents > Software Agent API Key > Delete software agent API key",
+               "Software Agents > Software Agent Access Token > Get software agent access token",
+              //15_current_user_api_hooks.js
+              "Current User > Current User instance > View current user",
+              "Current User > Current User instance > Current user usage",
+              "Current User > Current User API Key > Generate current user API key",
+              "Current User > Current User API Key > View current user API key",
+              "Current User > Current User API Key > Delete current user API key",
+              "Users > Users collection > List users",
+              "Users > User instance > View user",
+              //04_system_permissions_hooks.js
+              "System Permissions > System Permissions collection > List system permissions",
+              "System Permissions > System Permission instance > Grant system permission",
+              "System Permissions > System Permission instance > View system permission",
+              "System Permissions > System Permission instance > Revoke system permission",
+              //05_projects_hooks.js
+              "Projects > Projects collection > Create project",
+              "Projects > Projects collection > List projects",
+              "Projects > Project instance > View project",
+              "Projects > Project instance > Update project",
+              "Projects > Project instance > Delete project",
+              "Projects > Project instance > NOT_IMPLEMENTED_NEW Project usage",
+              //06_project_permissions_hooks.js
+              "Project Permissions > Project Permissions collection > List project permissions",
+              "Project Permissions > Project Permission instance > Grant project permission",
+              "Project Permissions > Project Permission instance > View project permission",
+              "Project Permissions > Project Permission instance > Revoke project permission",
+              //07_project_roles_hooks.js
+              "Project Roles > Project Roles collection > List project roles",
+              "Project Roles > Project Role instance > View project role",
+              //08_affiliates_hooks.js
+              "Affiliates > Affiliates collection > List affiliates",
+              "Affiliates > Affiliate instance > Associate affiliate",
+              "Affiliates > Affiliate instance > View affiliate",
+              "Affiliates > Affiliate instance > Delete affiliate",
+              //09_storage_providers_hooks.js
+              "Storage Providers > Storage Providers collection > List storage providers",
+              "Storage Providers > Storage Provider instance > View storage provider",
+              //10_folders_hooks.js
+              "Folders > Folders collection > Create folder",
+              "Folders > Folder instance > View folder",
+              "Folders > Folder instance > Delete folder",
+              "Folders > Folder instance > Move folder",
+              "Folders > Folder instance > Rename folder",
+              //11_uploads_hooks.js
+              "Uploads > Uploads collection > Initiate chunked upload",
+              "Uploads > Uploads collection > List chunked uploads",
+              "Uploads > Upload instance > View chunked upload",
+              "Uploads > Upload instance > Get pre-signed chunk URL",
+              "Uploads > Upload instance > Complete chunked file upload",
+              "Uploads > Upload instance > Report server computed hash",
+              "Uploads > Upload instance > Report upload hash",
+              //12_files_hooks.js
+              // "Files > Files collection > Create file",
+              // "Files > File instance > View file",
+              // "Files > File instance > Update file",
+              // "Files > File instance > Delete file",
+              // "Files > File instance > Get file download URL",
+              // "Files > File instance > Move file",
+              // "Files > File instance > Rename file",
+              // "File Versions > File Versions collection > List file versions",
+              // "File Versions > File Version instance > View file version",
+              // "File Versions > File Version instance > Update file version",
+              // "File Versions > File Version instance > Delete file version",
+              // "File Versions > File Version instance > Get file version download URL",
+              // "File Versions > File Version instance > Promote file version",
+              //13_search_project_folder_hooks.js
+              // "Search Children > Search project children > Search project children",
+              // "Search Children > Search folder children > Search folder children",
+              //18_provenance_activities.js
+              // "Provenance Activities > Activities collection > Create activity",
+              // "Provenance Activities > Activities collection > List activities",
+              // "Provenance Activities > Activities instance > View activity",
+              // "Provenance Activities > Activities instance > Update activity",
+              // "Provenance Activities > Activities instance > Delete activity",
+              //19_provenance_relations.js
+              // "Provenance Relations > Relations collection > Create used relation",
+              // "Provenance Relations > Relations collection > Create was generated by relation",
+              // "Provenance Relations > Relations collection > Create was derived from relation",
+              // "Provenance Relations > Relations collection > Create was invalidated by relation",
+              // "Provenance Relations > Relations collection > List provenance relations",
+              // "Provenance Relations > Relation instance > View relation",
+              // "Provenance Relations > Relation instance > Delete relation",
+              // "Search Provenance > Search Provenance > Search Provenance",
+              // "Tags > Tags collection > Create object tag",
+              // "Tags > Tags collection > List object tags",
+              // "Tags > Tags collection > Append a list of object tags",
+              // "Tags > Tags collection > List tag labels",
+              // "Tags > Tag instance > View tag",
+              // "Tags > Tag instance > Delete tag",
+              // "Metadata > Metadata Templates collection > Create metadata template",
+              // "Metadata > Metadata Templates collection > List metadata templates",
+              // "Metadata > Metadata Template instance > View metadata template",
+              // "Metadata > Metadata Template instance > Update metadata template",
+              // "Metadata > Metadata Template instance > Delete metadata template",
+              // "Metadata > Metadata Properties collection > Create metadata property",
+              // "Metadata > Metadata Properties collection > List metadata properties",
+              // "Metadata > Metadata Property instance > View metadata property",
+              // "Metadata > Metadata Property instance > Update metadata property",
+              // "Metadata > Metadata Property instance > Delete metadata property",
+              // "Metadata > Object Metadata instance > Create object metadata",
+              // "Metadata > Object Metadata instance > View object metadata",
+              // "Metadata > Object Metadata instance > Update object metadata",
+              // "Metadata > Object Metadata instance > Delete object metadata",
+              // "Metadata > View All Object Metadata > View All Object Metadata",
+              // "Search Objects > Search Objects > Search Objects",
+              ], // Array of Strings, run only transaction that match these names
 
-    'hookfiles': [//'hook_endpoints.py'
-                  '01_auth_hooks.py',
-                  '02_software_agents.py',
-                  '03_current_users.py',
-                  '04_system_permission.py',
-                  '05_projects.py',
-                  '06_project_permissions.py',
-                  '07_project_roles.py',
-                  '08_affiliates.py',
-                  '09_storage_providers.py',
-                  '10_folders.py',
-                  '11_uploads.py',
-                  '12_files.py',
-                  '14_children_search.py',
-                  '15_provenance_activities.py',
-                  '16_provenance_relations.py',
-                  '17_tags.py',
-                  '18_metadata.py',
-                  '19_search_objects.py',
-                  '20_project_transfer.py',
-                  '21_auth_provider.py',
-                ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
+      'header': ['Accept: application/json', 'Authorization: '.concat(data.api_token)], // Array of Strings, these strings are then added as headers (key:value) to every transaction
+      'user': null,    // String, Basic Auth credentials in the form username:password
 
-    'reporter': ['apiary'], // Array of possible reporters, see folder src/reporters
+      'hookfiles': [//'hook_endpoints.py'
+                    '01_auth_hooks.py',
+                    '02_software_agents_skip.py',
+                    '03_current_users.py',
+                    '04_system_permission.py',
+                    '05_projects.py',
+                    '06_project_permissions.py',
+                    '07_project_roles.py',
+                    '08_affiliates.py',
+                    '09_storage_providers.py',
+                    '10_folders.py',
+                    '11_uploads.py',
+                    // '12_files.py',
+                    // '14_children_search.py',
+                    // '15_provenance_activities.py',
+                    // '16_provenance_relations.py',
+                    // '17_tags.py',
+                    // '18_metadata.py',
+                    // '19_search_objects.py',
+                    // '20_project_transfer.py',
+                    // '21_auth_provider.py',
+                  ], // Array of Strings, filepaths to files containing hooks (can use glob wildcards)
 
-    'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
+      'reporter': [], // Array of possible reporters, see folder src/reporters
 
-    'inline-errors': false, // Boolean, If failures/errors are display immediately in Dredd run
+      'output': [],    // Array of Strings, filepaths to files used for output of file-based reporters
 
-    'color': true,
-    'hook-worker-timeout': 40000,
-    'hook-worker-connect-timeout':40000,
-    'hook-worker-term-timeout': 40000,
-    'timestamp': false
+      'inline-errors': false, // Boolean, If failures/errors are display immediately in Dredd run
+
+      'color': true,
+      'hook-worker-timeout': 40000,
+      'hook-worker-connect-timeout':40000,
+      'hook-worker-term-timeout': 40000,
+      'timestamp': false
+    }
+    // 'emitter': EventEmitterInstance // optional - listen to test progress, your own instance of EventEmitter
+
+    // 'hooksData': {
+    //   'pathToHook' : '...'
+    // }
+
+    // 'data': {
+    //   'path/to/file': '...'
+    //}
   }
-  // 'emitter': EventEmitterInstance // optional - listen to test progress, your own instance of EventEmitter
 
-  // 'hooksData': {
-  //   'pathToHook' : '...'
-  // }
+  var dredd = new Dredd(configuration);
 
-  // 'data': {
-  //   'path/to/file': '...'
-  //}
-}
+  dredd.run(function (err, stats) {
+    // uncomment for production stop
+    // if (stats.failures>0 | stats.error>0) process.exit(1);
+    // uncomment for production uninterrupted
+    if (stats.failures>0 | stats.error>0) process.exit(0);
+  });
 
-var dredd = new Dredd(configuration);
 
-dredd.run(function (err, stats) {
-  // uncomment for production stop
-  // if (stats.failures>0 | stats.error>0) process.exit(1);
-  // uncomment for production uninterrupted
-  if (stats.failures>0 | stats.error>0) process.exit(0);
+
 });

@@ -9,6 +9,8 @@
 
 #Ignore mac
 *.DS_Store
+node_modules
+dredd.env
 
 #python hooks
 *.pyc

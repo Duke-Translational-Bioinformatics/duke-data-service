@@ -1,0 +1,8 @@
+version: '2'
+services:
+  dredd:
+    build: ./docker/builds/dredd
+    env_file: dredd.env
+    volumes:
+      - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
+      - ./apiary.apib:/apiary/apiary.apib:ro
