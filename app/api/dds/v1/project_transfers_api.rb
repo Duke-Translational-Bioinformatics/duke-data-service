@@ -155,6 +155,10 @@ module DDS
         project_transfer.status = 'accepted'
         project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
         project_transfer.project.project_permissions.destroy_all
+        from_user_permission = ProjectPermission.new(project: project_transfer.project, user: project_transfer.from_user)
+        from_user_permission.auth_role = AuthRole.find("project_viewer")
+        from_user_permission.save
+
         authorize project_transfer, :update?
         if project_transfer.save
           project_transfer

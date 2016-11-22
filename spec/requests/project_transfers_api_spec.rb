@@ -270,7 +270,7 @@ describe DDS::V1::ProjectTransfersAPI do
                                           to_user: current_user) }
       let(:status) { :pending }
       let(:payload) {{}}
-
+      let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
       describe 'PUT' do
         subject { put(url, payload.to_json, headers) }
         let(:called_action) { 'PUT' }
@@ -316,25 +316,31 @@ describe DDS::V1::ProjectTransfersAPI do
           let(:from_user_permission) { FactoryGirl.create(:project_permission, :project_admin, user: resource.from_user, project: project) }
           let(:another_permission) { FactoryGirl.create(:project_permission, project: project) }
           let(:different_permission) { FactoryGirl.create(:project_permission) }
-          it 'should remove the from_user project_permission' do
+          before do
             expect(resource).to be_persisted
+          end
+
+          it 'should remove the from_user project_permission' do
             expect(from_user_permission).to be_persisted
             expect(ProjectPermission.where(project: project).all).to include(from_user_permission)
             is_expected.to eq(200)
             expect(ProjectPermission.where(project: project).all).not_to include(from_user_permission)
           end
           it 'should remove another_permission' do
-            expect(resource).to be_persisted
             expect(another_permission).to be_persisted
             expect(ProjectPermission.where(project: project).all).to include(another_permission)
             is_expected.to eq(200)
             expect(ProjectPermission.where(project: project).all).not_to include(another_permission)
           end
           it 'should not remove a different projects permissions' do
-            expect(resource).to be_persisted
             expect(different_permission).to be_persisted
             is_expected.to eq(200)
             expect{different_permission.reload}.not_to raise_error
+          end
+          it 'should grant project_viewer permission to from_user' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{ProjectPermission.where(project: project, user: resource.from_user, auth_role: project_viewer).count}.by(1)
           end
         end
       end
