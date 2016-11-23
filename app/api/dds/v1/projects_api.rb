@@ -1,6 +1,8 @@
 module DDS
   module V1
     class ProjectsAPI < Grape::API
+      helpers PaginationParams
+
       desc 'Create a project' do
         detail 'Creates a project for the given payload.'
         named 'create project'
@@ -46,10 +48,13 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
+      params do
+        use :pagination
+      end
       get '/projects', root: 'results' do
         authenticate!
         authorize Project.new, :index?
-        policy_scope(Project).where(is_deleted: false)
+        paginate(policy_scope(Project).where(is_deleted: false))
       end
 
       desc 'View project details' do
