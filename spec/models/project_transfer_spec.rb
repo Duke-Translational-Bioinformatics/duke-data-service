@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe ProjectTransfer, type: :model do
   it_behaves_like 'an audited model'
   let(:non_pending_statuses) { %w{accepted canceled rejected} }
+  let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
+  let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -10,6 +12,10 @@ RSpec.describe ProjectTransfer, type: :model do
     it { is_expected.to belong_to(:from_user).class_name('User') }
     it { is_expected.to have_many(:project_transfer_users) }
     it { is_expected.to have_many(:to_users).through(:project_transfer_users) }
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:reassign_permissions).before(:validation) }
   end
 
   describe 'validations' do

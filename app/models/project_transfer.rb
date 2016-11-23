@@ -21,8 +21,24 @@ class ProjectTransfer < ActiveRecord::Base
 
   enum status: [:pending, :rejected, :accepted, :canceled]
 
+  #callbacks
+  before_validation :reassign_permissions
+
   def status_was_pending?
     status_was == 'pending'
+  end
+
+  def reassign_permissions
+    if accepted?
+      project.project_permissions.destroy_all
+      project_viewer = AuthRole.find("project_viewer")
+      project_admin = AuthRole.find("project_admin")
+      project.project_permissions.build(user: from_user, auth_role: project_viewer)
+      to_users.each do |to_user|
+        project.project_permissions.build(user: to_user, auth_role: project_admin)
+      end
+      project.save
+    end
   end
 
 end
