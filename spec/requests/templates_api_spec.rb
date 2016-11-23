@@ -61,10 +61,10 @@ describe DDS::V1::TemplatesAPI do
           let(:name_contains) { '' }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
-            ] }
-            let(:unexpected_resources) { [
               template,
               other_template
+            ] }
+            let(:unexpected_resources) { [
             ] }
           end
         end
@@ -96,9 +96,22 @@ describe DDS::V1::TemplatesAPI do
           let(:name_contains) { template.name.upcase }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
+              template
             ] }
             let(:unexpected_resources) { [
-              template,
+              other_template
+            ] }
+          end
+        end
+
+        context 'when partial match' do
+          let(:template) { FactoryGirl.create(:template, name: 'only_a_partial_match', creator: current_user) }
+          let(:name_contains) { 'a_partial' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              template
+            ] }
+            let(:unexpected_resources) { [
               other_template
             ] }
           end

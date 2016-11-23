@@ -42,8 +42,8 @@ module DDS
       get '/templates', root: 'results' do
         authenticate!
         template_params = declared(params, include_missing: false)
-        if template_params[:name_contains]
-          template = Template.where("name = ?", template_params[:name_contains])
+        if name_contains = template_params[:name_contains]
+          template = Template.where(Template.arel_table[:name].matches("%#{name_contains}%"))
         else
           Template.all
         end
