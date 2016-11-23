@@ -37,13 +37,13 @@ module DDS
         ]
       end
       params do
-        optional :name, type: String, desc: 'list templates whose name contains this string'
+        optional :name_contains, type: String, desc: 'list templates whose name contains the specified string'
       end
       get '/templates', root: 'results' do
         authenticate!
         template_params = declared(params, include_missing: false)
-        if template_params[:name]
-          template = Template.where("name = ?", template_params[:name])
+        if template_params[:name_contains]
+          template = Template.where("name = ?", template_params[:name_contains])
         else
           Template.all
         end
