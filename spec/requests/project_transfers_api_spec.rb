@@ -11,7 +11,9 @@ describe DDS::V1::ProjectTransfersAPI do
   let(:project_transfer_stub) { FactoryGirl.build(:project_transfer, :with_to_users) }
   let(:project_transfer_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
-
+  let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
+  let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
+  
   let(:resource_class) { ProjectTransfer }
   let(:resource_serializer) { ProjectTransferSerializer }
   let!(:resource) { project_transfer }
@@ -270,8 +272,6 @@ describe DDS::V1::ProjectTransfersAPI do
                                           to_user: current_user) }
       let(:status) { :pending }
       let(:payload) {{}}
-      let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
-      let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
 
       describe 'PUT' do
         subject { put(url, payload.to_json, headers) }
