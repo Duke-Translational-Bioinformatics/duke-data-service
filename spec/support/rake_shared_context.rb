@@ -4,8 +4,15 @@ shared_context "rake" do
   let(:rake) { Rake::Application.new }
   let(:task_name) { self.class.top_level_description }
   let(:task_path) { "lib/tasks/#{task_name.split(":").first}" }
-  let(:invoke_task) { subject.invoke }
   subject { rake[task_name] }
+
+  def invoke_task(expected_stdout: //, expected_stderr: //)
+    expect {
+      expect {
+        subject.invoke
+      }.to output(expected_stderr).to_stderr
+    }.to output(expected_stdout).to_stdout
+  end
 
   def loaded_files_excluding_current_rake_file
     $".reject {|file| file == Rails.root.join("#{task_path}.rake").to_s }
@@ -18,4 +25,3 @@ shared_context "rake" do
     Rake::Task.define_task(:environment)
   end
 end
-

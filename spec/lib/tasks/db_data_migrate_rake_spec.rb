@@ -1,9 +1,5 @@
 require 'rails_helper'
 
-if Rails.version > '5.0.0'
-  require 'active_support/testing/stream'
-  include ActiveSupport::Testing::Stream
-end
 describe "db:data:migrate" do
   include_context "rake"
   let(:task_path) { "lib/tasks/db_data_migrate" }
@@ -14,8 +10,6 @@ describe "db:data:migrate" do
   it { expect(subject.prerequisites).to  include("environment") }
 
   describe "#invoke" do
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
-
     context 'with correct current_versions' do
       before do
         Audited.audit_class.as_user(current_user) do
@@ -110,6 +104,40 @@ describe "db:data:migrate" do
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
       end
+    end
+
+    context 'without any untyped authentication services' do
+      let(:duke_authentication_service) { FactoryGirl.create(:duke_authentication_service) }
+      let(:openid_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+
+      it {
+        expect {
+          invoke_task expected_stderr: /0 untyped authentication_services changed/
+        }.not_to change{
+          AuthenticationService.where(type: nil).count
+        }
+      }
+    end
+
+    context 'with untyped authentication services' do
+      let(:default_type) { DukeAuthenticationService }
+      let(:untyped_authentication_service) {
+        AuthenticationService.create(FactoryGirl.attributes_for(:duke_authentication_service))
+      }
+      let(:openid_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+
+      it {
+        expect(untyped_authentication_service).not_to be_a default_type
+        expect {
+          invoke_task expected_stderr: Regexp.new("1 untyped authentication_services changed to #{default_type}")
+        }.to change{
+          AuthenticationService.where(type: nil).count
+        }.by(-1)
+        expected_to_be_typed_auth_service = AuthenticationService.find(untyped_authentication_service.id)
+        expect(expected_to_be_typed_auth_service).to be_a default_type
+        openid_authentication_service.reload
+        expect(openid_authentication_service).to be_a OpenidAuthenticationService
+      }
     end
   end
 end

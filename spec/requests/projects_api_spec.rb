@@ -22,8 +22,7 @@ describe DDS::V1::ProjectsAPI do
   describe 'Project collection' do
     let(:url) { "/api/v1/projects" }
 
-    describe 'GET' do
-      subject { get(url, nil, headers) }
+    it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           deleted_project,
@@ -33,6 +32,10 @@ describe DDS::V1::ProjectsAPI do
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { Project.all.count }
+        let(:extras) { FactoryGirl.create_list(:project_permission, 5, :project_admin, user: current_user) }
+      end
     end
 
     describe 'POST' do
