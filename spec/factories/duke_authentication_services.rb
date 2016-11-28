@@ -3,7 +3,7 @@ FactoryGirl.define do
     service_id { SecureRandom.uuid }
     base_uri { Faker::Internet.url }
     login_initiation_uri { Faker::Internet.slug }
-    login_response_type { 'Bearer' }
+    login_response_type { 'token' }
     name { Faker::Company.name }
     client_id { SecureRandom.hex }
 
