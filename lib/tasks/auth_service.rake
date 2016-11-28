@@ -44,12 +44,31 @@ namespace :auth_service do
     end
   end
 
+  desc "deprecate authentication_service using ENV[AUTH_SERVICE_SERVICE_ID]"
+  task deprecate: :environment do
+    raise 'AUTH_SERVICE_SERVICE_ID environment variable is required' unless ENV['AUTH_SERVICE_SERVICE_ID']
+    begin
+      auth_service = AuthenticationService.find_by!(service_id: ENV['AUTH_SERVICE_SERVICE_ID'])
+    rescue
+      raise "AUTH_SERVICE_SERVICE_ID is not a registered service"
+    end
+
+    if auth_service.is_deprecated?
+      $stderr.puts "AUTH_SERVICE_SERVICE_ID service is already deprecated"
+    else
+      auth_service.update!(is_deprecated: true)
+    end
+  end
+
   namespace :duke do
     desc "creates a duke_authentication_service using
       ENV[AUTH_SERVICE_SERVICE_ID]
       ENV[AUTH_SERVICE_BASE_URI]
       ENV[AUTH_SERVICE_NAME]
       ENV[AUTH_SERVICE_IS_DEFAULT]
+      ENV[AUTH_SERVICE_LOGIN_INITIATION_URI]
+      ENV[AUTH_SERVICE_LOGIN_RESPONSE_TYPE]
+      ENV[AUTH_SERVICE_CLIENT_ID]
     this will fail if AUTH_SERVICE_IS_DEFAULT is true and there is already a default authentication_service\n"
     task create: :environment do
       service_id = ENV['AUTH_SERVICE_SERVICE_ID'] || SecureRandom.uuid
@@ -58,7 +77,10 @@ namespace :auth_service do
           service_id: service_id,
           base_uri: ENV['AUTH_SERVICE_BASE_URI'],
           name: ENV['AUTH_SERVICE_NAME'],
-          is_default: is_default
+          is_default: is_default,
+          client_id: ENV['AUTH_SERVICE_CLIENT_ID'],
+          login_initiation_uri: ENV['AUTH_SERVICE_LOGIN_INITIATION_URI'],
+          login_response_type: ENV['AUTH_SERVICE_LOGIN_RESPONSE_TYPE']
         )
       end
     end
@@ -81,6 +103,8 @@ namespace :auth_service do
       ENV[AUTH_SERVICE_IS_DEFAULT]
       ENV[AUTH_SERVICE_CLIENT_ID]
       ENV[AUTH_SERVICE_CLIENT_SECRET]
+      ENV[AUTH_SERVICE_LOGIN_INITIATION_URI]
+      ENV[AUTH_SERVICE_LOGIN_RESPONSE_TYPE]
     this will fail if AUTH_SERVICE_IS_DEFAULT is true and there is already a default authentication_service\n"
     task create: :environment do
       service_id = ENV['AUTH_SERVICE_SERVICE_ID'] || SecureRandom.uuid
@@ -91,7 +115,9 @@ namespace :auth_service do
           name: ENV['AUTH_SERVICE_NAME'],
           client_id: ENV['AUTH_SERVICE_CLIENT_ID'],
           client_secret: ENV['AUTH_SERVICE_CLIENT_SECRET'],
-          is_default: is_default
+          is_default: is_default,
+          login_initiation_uri: ENV['AUTH_SERVICE_LOGIN_INITIATION_URI'],
+          login_response_type: ENV['AUTH_SERVICE_LOGIN_RESPONSE_TYPE']
         )
       end
     end

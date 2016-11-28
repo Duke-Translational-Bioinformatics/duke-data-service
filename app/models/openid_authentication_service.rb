@@ -1,5 +1,4 @@
 class OpenidAuthenticationService < AuthenticationService
-  validates :client_id, presence: true
   validates :client_secret, presence: true
 
   def get_user_for_access_token(token)
