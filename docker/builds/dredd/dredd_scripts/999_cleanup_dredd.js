@@ -2,7 +2,6 @@ from dataservice.config import create_config
 from dataservice.core.remotestore import RemoteStore
 from dataservice.core.ddsapi import DataServiceApi
 config = create_config()
-auth = DataServiceAuth(config)
 
 remote_store = RemoteStore(config)
 all_projs = remote_store.get_project_names()
