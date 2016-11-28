@@ -151,7 +151,14 @@ describe DDS::V1::MetaTemplatesAPI do
 
       context 'when template exists' do
         let(:template) { resource.template }
-        it_behaves_like 'a validated resource'
+        let(:response_json) { JSON.parse(response.body) }
+        it 'returns a unique conflict' do
+          is_expected.to eq(409)
+          expect(response_json).to include({
+            'error' => '409',
+            'reason' => 'unique conflict'
+          })
+        end
       end
     end
 

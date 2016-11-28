@@ -33,7 +33,8 @@ module DDS
           [201, 'Successfully Created'],
           [400, 'Validation error'],
           [401, 'Unauthorized'],
-          [404, 'Object or template does not exist']
+          [404, 'Object or template does not exist'],
+          [409, 'Template instance already exists for the DDS object']
         ]
       end
       params do
@@ -64,7 +65,14 @@ module DDS
         if meta_template.save
           meta_template
         else
-          validation_error!(meta_template)
+          if meta_template.errors.added? :template, :taken
+            error!({
+              error: '409',
+              reason: 'unique conflict'
+            }, 409)
+          else
+            validation_error!(meta_template)
+          end
         end
       end
 
