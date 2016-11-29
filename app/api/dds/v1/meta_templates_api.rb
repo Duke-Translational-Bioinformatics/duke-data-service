@@ -68,7 +68,8 @@ module DDS
           if meta_template.errors.added? :template, :taken
             error!({
               error: '409',
-              reason: 'unique conflict'
+              reason: 'unique conflict',
+              suggestion: 'Resubmit as an update request'
             }, 409)
           else
             validation_error!(meta_template)
