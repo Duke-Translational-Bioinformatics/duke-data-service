@@ -203,9 +203,11 @@ describe DDS::V1::ProjectTransfersAPI do
             end
           end
         end
-        context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694 #resolve more words
-          let(:status) { :accepted }
+        context 'where project_transfer status is rejected' do
+          let(:status) { :rejected }
+          before do
+            expect(resource).to be_persisted
+          end
           it_behaves_like 'a validated resource'
         end
       end
@@ -255,9 +257,11 @@ describe DDS::V1::ProjectTransfersAPI do
             end
           end
         end
-        context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694
-          let(:status) { :accepted }
+        context 'where project_transfer status is canceled' do
+          let(:status) { :canceled }
+          before do
+            expect(resource).to be_persisted
+          end
           it_behaves_like 'a validated resource'
         end
       end
@@ -309,7 +313,7 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'where project_transfer status is not processing' do
-          let(:status) { :accepted } # TODO Need to look at DDS-694
+          let(:status) { :accepted }
           before do
             expect(resource).to be_persisted
           end
