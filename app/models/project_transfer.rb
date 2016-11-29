@@ -14,7 +14,10 @@ class ProjectTransfer < ActiveRecord::Base
       scope: [:project_id],
       message: 'Pending transfer already exists'
     }, if: :pending?
-  validates :status, immutable: true, unless: :status_was_pending?
+  validates_each :status, on: :update, unless: :status_was_pending? do |record, attr, value|
+    record.errors.add(attr, 'cannot be changed when not pending')
+    record.errors.added?(:template, :taken)
+  end
   validates :status_comment, immutable: true, unless: :status_was_pending?
   validates :from_user, presence: true
   validates :project_transfer_users, presence: true

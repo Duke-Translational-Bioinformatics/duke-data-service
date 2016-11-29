@@ -20,7 +20,7 @@ RSpec.describe ProjectTransfer, type: :model do
 
   describe 'validations' do
     let!(:existing_project_transfer) { FactoryGirl.create(:project_transfer, :accepted, :skip_validation) }
-    subject { FactoryGirl.build(:project_transfer, project: existing_project_transfer.project) }
+    subject { FactoryGirl.build(:project_transfer, :with_to_users, project: existing_project_transfer.project) }
 
     it { is_expected.to validate_presence_of :project }
     it { is_expected.to validate_presence_of :from_user }
@@ -46,17 +46,17 @@ RSpec.describe ProjectTransfer, type: :model do
       end
       context 'status is rejected' do
         let(:status) { :rejected }
-        it { is_expected.not_to allow_values(*%w{accepted pending canceled}).for(:status) }
+        it { is_expected.not_to allow_values(*%w{accepted rejected pending canceled}).for(:status) }
         it { is_expected.not_to allow_value('This is a valid status comment').for(:status_comment) }
       end
       context 'status is accepted' do
         let(:status) { :accepted }
-        it { is_expected.not_to allow_values(*%w{canceled pending rejected}).for(:status) }
+        it { is_expected.not_to allow_values(*%w{accepted rejected pending canceled}).for(:status) }
         it { is_expected.not_to allow_value('This is a valid status comment').for(:status_comment) }
       end
       context 'status is canceled' do
         let(:status) { :canceled }
-        it { is_expected.not_to allow_values(*%w{accepted pending rejected}).for(:status) }
+        it { is_expected.not_to allow_values(*%w{accepted rejected pending canceled}).for(:status) }
         it { is_expected.not_to allow_value('This is a valid status comment').for(:status_comment) }
       end
     end

@@ -13,7 +13,7 @@ describe DDS::V1::ProjectTransfersAPI do
   let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
   let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
   let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
-  
+
   let(:resource_class) { ProjectTransfer }
   let(:resource_serializer) { ProjectTransferSerializer }
   let!(:resource) { project_transfer }
@@ -204,7 +204,7 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694
+          # TODO Need to look at DDS-694 #resolve more words
           let(:status) { :accepted }
           it_behaves_like 'a validated resource'
         end
@@ -309,9 +309,15 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694
-          let(:status) { :rejected }
+          let(:status) { :accepted } # TODO Need to look at DDS-694
+          before do
+            expect(resource).to be_persisted
+          end
           it_behaves_like 'a validated resource'
+          it 'should retain current permissions' do
+            expect(resource.project.project_permissions).not_to be_empty
+            expect {is_expected.to eq(400)}.not_to change{ProjectPermission.all}
+          end
         end
 
         context 'when project has project_permissions' do
