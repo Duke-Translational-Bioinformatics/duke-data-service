@@ -179,7 +179,7 @@ describe DDS::V1::ProjectTransfersAPI do
         end
         it_behaves_like 'a software_agent accessible resource'
         it_behaves_like 'an updatable resource' do
-          it 'sets project transfer status comment' do
+          it 'sets rejected status to true' do
             is_expected.to eq(200)
             expect(resource.reload).to be_truthy
             expect(resource).to be_rejected
@@ -196,7 +196,7 @@ describe DDS::V1::ProjectTransfersAPI do
             status_comment: Faker::Hacker.say_something_smart
           }}
           it_behaves_like 'an updatable resource' do
-            it 'sets project transfer status comment' do
+            it 'sets rejected status to true and saves status comment' do
               is_expected.to eq(200)
               expect(resource.reload).to be_truthy
               expect(resource.status_comment).to eq(payload[:status_comment])
@@ -233,7 +233,7 @@ describe DDS::V1::ProjectTransfersAPI do
         end
         it_behaves_like 'a software_agent accessible resource'
         it_behaves_like 'an updatable resource' do
-          it 'sets project transfer status comment' do
+          it 'sets canceled status to true' do
             is_expected.to eq(200)
             expect(resource.reload).to be_truthy
             expect(resource).to be_canceled
@@ -250,7 +250,7 @@ describe DDS::V1::ProjectTransfersAPI do
             status_comment: Faker::Hacker.say_something_smart
           }}
           it_behaves_like 'an updatable resource' do
-            it 'sets project transfer status comment' do
+            it 'sets canceled status to true and saves status comment' do
               is_expected.to eq(200)
               expect(resource.reload).to be_truthy
               expect(resource.status_comment).to eq(payload[:status_comment])
@@ -288,7 +288,7 @@ describe DDS::V1::ProjectTransfersAPI do
         end
         it_behaves_like 'a software_agent accessible resource'
         it_behaves_like 'an updatable resource' do
-          it 'sets project transfer status comment' do
+          it 'sets accepted status to true' do
             is_expected.to eq(200)
             expect(resource.reload).to be_truthy
             expect(resource).to be_accepted
@@ -305,7 +305,7 @@ describe DDS::V1::ProjectTransfersAPI do
             status_comment: Faker::Hacker.say_something_smart
           }}
           it_behaves_like 'an updatable resource' do
-            it 'sets project transfer status comment' do
+            it 'sets accepted status to true and saves status comment' do
               is_expected.to eq(200)
               expect(resource.reload).to be_truthy
               expect(resource.status_comment).to eq(payload[:status_comment])
