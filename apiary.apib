@@ -11,31 +11,6 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 
 ## Group API Change Log
 
-02-Aug-2016
---------------
-+ Changed URI format of `POST /tags` to `POST /tags/{object_kind}/{object_id}` - tags are always created for a specific object.
-+ Changed `GET /tags/labels` to include a `last_used_on` property in the response; the response is sorted in descending order by this new property.
-+ Added endpoint `POST /tags/{object_kind}/{object_id}/append` - allows clients to append a collection of tags to an object.
-
-02-Sep-2016
---------------
-+ Removed *Provenance Inferred* section - implementation will no longer auto-generate inferred provenance relation based on audit trail.
-+ Refactored Metadata *Properties* actions to follow URI pattern liken to `Tags`.
-
-07-Sep-2016
---------------
-+ Added endpoint `/search/provenance/was_generated_by` - allows targeted search "up" the provenance chain for a set of file versions.
-+ Added rules/constraints for *Provenance Relations* actions.
-
-12-Sep-2016
---------------
-+ Refactored *Metadata* actions - objects can now be annotated with metadata via bulk `POST` and `PUT` actions.
-+ Added `name` query param to `GET /templates` and `key` query param to `GET /templates/{id}/properties`; these query params allow clients to lookup templates and template properties by their alternate unique key.
-
-23-Sep-2016
---------------
-+ Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
-
 17-Oct-2016
 --------------
 + For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/origin`; this search action now includes `wasDerivedFrom` file versions in the results.
@@ -43,6 +18,30 @@ Adhere as well as possible to the [Heroku API Design Best Practices:](https://ge
 + Changed `/templates/{id}/properties{?key}` to `/templates/{id}/properties` - if we need `key` based lookup we will extend API to return the instance by `key`, not an array of 1.
 + Changed `/meta/{object_kind}/{object_id}{?meta_template_name}` to `/meta/{object_kind}/{object_id}` - if we need `template_name` based lookup we will extend API to return the instance by `template_name`, not an array of 1.
 
+23-Sep-2016
+--------------
++ Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
+
+12-Sep-2016
+--------------
++ Refactored *Metadata* actions - objects can now be annotated with metadata via bulk `POST` and `PUT` actions.
++ Added `name` query param to `GET /templates` and `key` query param to `GET /templates/{id}/properties`; these query params allow clients to lookup templates and template properties by their alternate unique key.
+
+07-Sep-2016
+--------------
++ Added endpoint `/search/provenance/was_generated_by` - allows targeted search "up" the provenance chain for a set of file versions.
++ Added rules/constraints for *Provenance Relations* actions.
+
+02-Sep-2016
+--------------
++ Removed *Provenance Inferred* section - implementation will no longer auto-generate inferred provenance relation based on audit trail.
++ Refactored Metadata *Properties* actions to follow URI pattern liken to `Tags`.
+
+02-Aug-2016
+--------------
++ Changed URI format of `POST /tags` to `POST /tags/{object_kind}/{object_id}` - tags are always created for a specific object.
++ Changed `GET /tags/labels` to include a `last_used_on` property in the response; the response is sorted in descending order by this new property.
++ Added endpoint `POST /tags/{object_kind}/{object_id}/append` - allows clients to append a collection of tags to an object.
 
 ## Group API Usage
 
