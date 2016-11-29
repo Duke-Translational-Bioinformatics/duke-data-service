@@ -6,6 +6,8 @@ class MetaProperty < ActiveRecord::Base
   belongs_to :meta_template, touch: true
   belongs_to :property
 
+  delegate :data_type, to: :property
+
   # callbacks
   before_validation :set_property_from_key
   before_create :create_mapping
