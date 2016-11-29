@@ -6,7 +6,7 @@ class Property < ActiveRecord::Base
   has_many :meta_properties
 
   validates :key, presence: true,
-    uniqueness: {case_sensitive: false},
+    uniqueness: {scope: :template_id, case_sensitive: false},
     format: {with: /\A[a-z0-9_]*\z/i},
     length: {maximum: 60}
   validates :key, immutable: true, if: :has_meta_properties?

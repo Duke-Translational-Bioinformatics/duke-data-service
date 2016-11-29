@@ -1,8 +1,4 @@
 require 'rails_helper'
-if Rails.version > '5.0.0'
-  require 'active_support/testing/stream'
-  include ActiveSupport::Testing::Stream
-end
 
 describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
 
@@ -14,6 +10,9 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         AUTH_SERVICE_SERVICE_ID
         AUTH_SERVICE_BASE_URI
         AUTH_SERVICE_NAME
+        AUTH_SERVICE_LOGIN_INITIATION_URI
+        AUTH_SERVICE_LOGIN_RESPONSE_TYPE
+        AUTH_SERVICE_CLIENT_ID
       )
     }
 
@@ -46,11 +45,14 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         AUTH_SERVICE_SERVICE_ID
         AUTH_SERVICE_BASE_URI
         AUTH_SERVICE_NAME
+        AUTH_SERVICE_LOGIN_INITIATION_URI
+        AUTH_SERVICE_LOGIN_RESPONSE_TYPE
+        AUTH_SERVICE_CLIENT_ID
       )
     }
 
     before do
-      FactoryGirl.attributes_for(:duke_authentication_service).each do |key,value|
+      FactoryGirl.attributes_for(:openid_authentication_service).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
     end
@@ -73,7 +75,6 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
   describe 'auth_service:transfer_default' do
     include_context "rake"
     let(:task_name) { "auth_service:transfer_default" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
     let(:non_default_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
 
@@ -159,14 +160,11 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
   describe 'auth_service:set_default' do
     include_context "rake"
     let(:task_name) { "auth_service:set_default" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
 
     context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID environment variable is required/).to_stderr
+          invoke_task epected_stderr: /AUTH_SERVICE_SERVICE_ID environment variable is required/
         }.to raise_error(StandardError)
       }
     end
@@ -177,9 +175,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
       end
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID is not a registered service/).to_stderr
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
         }.to raise_error(StandardError)
       }
     end
@@ -192,9 +188,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
 
       it {
         expect {
-          expect {
-            invoke_task
-          }.to output(/AUTH_SERVICE_SERVICE_ID service is already default/).to_stderr
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID service is already default/
         }.not_to raise_error
       }
     end
@@ -210,9 +204,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
         it {
           expect {
-            expect {
-              invoke_task
-            }.to output(Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")).to_stderr
+            invoke_task expected_stderr: Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")
           }.to raise_error(StandardError)
         }
       end
@@ -224,6 +216,59 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
           }.not_to raise_error
         }
       end
+    end
+  end
+
+  describe 'auth_service:deprecate' do
+    include_context "rake"
+    let(:task_name) { "auth_service:deprecate" }
+
+    context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
+      it {
+        expect {
+          invoke_task epected_stderr: /AUTH_SERVICE_SERVICE_ID environment variable is required/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'specified service does not exist' do
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = SecureRandom.uuid
+      end
+      it {
+        expect {
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'specified service is already deprecated' do
+      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :deprecated) }
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
+      end
+
+      it {
+        expect {
+          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID service is already deprecated/
+        }.not_to raise_error
+      }
+    end
+
+    context 'specified service is not already deprecated' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+
+      before do
+        ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
+      end
+
+      it {
+        expect {
+          invoke_task
+        }.not_to raise_error
+        authentication_service.reload
+        expect(authentication_service).to be_is_deprecated
+      }
     end
   end
 end
