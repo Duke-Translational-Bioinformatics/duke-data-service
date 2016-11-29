@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe MetaProperty, type: :model do
   let(:templatable) { FactoryGirl.create(:data_file) }
   let(:meta_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
-  let(:property) { FactoryGirl.create(:property, template: meta_template.template) }
+  let(:property) { FactoryGirl.create(:property, data_type: data_type, template: meta_template.template) }
+  let(:data_type) { 'string' }
   let(:other_property) { FactoryGirl.create(:property) }
 
   it_behaves_like 'an audited model'
@@ -54,10 +55,42 @@ RSpec.describe MetaProperty, type: :model do
       it { is_expected.not_to allow_value(property.key).for(:key) }
       it { is_expected.not_to allow_value(other_property.key).for(:key) }
     end
-  end
 
-  it { is_expected.to respond_to(:key) }
-  it { is_expected.to respond_to(:key=).with(1).argument }
+    context 'with property set' do
+      subject { FactoryGirl.build(:meta_property, meta_template: meta_template, property: property) }
+      context 'when data_type is string' do
+        let(:data_type) { 'string' }
+        it { is_expected.not_to validate_numericality_of(:value) }
+      end
+      context 'when data_type is long' do
+        let(:data_type) { 'long' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is integer' do
+        let(:data_type) { 'integer' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is short' do
+        let(:data_type) { 'short' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is byte' do
+        let(:data_type) { 'byte' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is double' do
+        let(:data_type) { 'double' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is float' do
+        let(:data_type) { 'float' }
+        it { is_expected.to validate_numericality_of(:value) }
+      end
+      context 'when data_type is date' do
+        let(:data_type) { 'date' }
+      end
+    end
+  end
 
   describe '#set_property_from_key' do
     it { is_expected.to respond_to(:set_property_from_key) }
