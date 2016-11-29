@@ -1,0 +1,2 @@
+class InvalidAccessTokenException < StandardError
+end

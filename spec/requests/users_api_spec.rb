@@ -6,192 +6,134 @@ describe DDS::V1::UsersAPI do
   let(:resource_serializer) { UserSerializer }
 
   describe '/api/v1/user/api_token' do
+    include_context 'common headers'
     let(:url) { '/api/v1/user/api_token' }
+    let(:payload) { {access_token: access_token} }
+    let(:headers) { common_headers }
 
-    it_behaves_like 'a GET request' do
-      context 'for first time users' do
-        include_context 'without authentication'
-        let(:new_user) { FactoryGirl.attributes_for(:user) }
-        let(:auth_service) { FactoryGirl.create(:authentication_service)}
-        let(:new_user_token) {
-          {
-            'service_id' => auth_service.service_id,
-            'uid' => FactoryGirl.attributes_for(:user_authentication_service)[:uid],
-            'display_name' => new_user[:display_name],
-            'first_name' => new_user[:first_name],
-            'last_name' => new_user[:last_name],
-            'email' => new_user[:email],
-          }
+    context 'duke_authentication_service' do
+      let(:first_time_user) { FactoryGirl.attributes_for(:user) }
+      let(:first_time_user_token) {
+        {
+          'service_id' => authentication_service.service_id,
+          'uid' => first_time_user[:username],
+          'display_name' => first_time_user[:display_name],
+          'first_name' => first_time_user[:first_name],
+          'last_name' => first_time_user[:last_name],
+          'email' => first_time_user[:email],
         }
-        let(:access_token) {
-          JWT.encode(
-            new_user_token,
-            Rails.application.secrets.secret_key_base
-          )
+      }
+      let(:first_time_user_access_token) {
+        JWT.encode(
+          first_time_user_token,
+          Rails.application.secrets.secret_key_base
+        )
+      }
+
+      let(:existing_user_auth) {
+        FactoryGirl.create(:user_authentication_service,
+        :populated,
+        authentication_service: authentication_service)
+      }
+      let(:existing_user) { existing_user_auth.user }
+      let (:existing_user_token) {
+        {
+          'service_id' => authentication_service.service_id,
+          'uid' => existing_user_auth.uid,
+          'display_name' => existing_user.display_name,
+          'first_name' => existing_user.first_name,
+          'last_name' => existing_user.last_name,
+          'email' => existing_user.email
         }
+      }
+      let (:existing_user_access_token) {
+        JWT.encode(existing_user_token, Rails.application.secrets.secret_key_base)
+      }
+      let (:invalid_access_token) {
+        JWT.encode(existing_user_token, 'WrongSecret')
+      }
 
-        let(:payload) {{access_token: access_token}}
-
-        it 'should create a new User and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-          expect(auth_service).to be_persisted
-          pre_time = DateTime.now.to_i
-          expect{
-            expect {
-              is_expected.to eq(200)
-            }.to change{UserAuthenticationService.count}.by(1)
-          }.to change{User.count}.by(1)
-          post_time = DateTime.now.to_i
-          expect(response.status).to eq(200)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          token_wrapper = JSON.parse(response.body)
-          expect(token_wrapper).to have_key('api_token')
-          decoded_token = JWT.decode(token_wrapper['api_token'],
-            Rails.application.secrets.secret_key_base
-          )[0]
-          expect(decoded_token).to be
-          %w(id service_id exp).each do |expected_key|
-            expect(decoded_token).to have_key(expected_key)
-          end
-          expect(decoded_token['service_id']).to eq(auth_service.service_id)
-          created_user = User.find(decoded_token['id'])
-          expect(created_user).to be
-          expect(created_user.display_name).to eq(new_user_token['display_name'])
-          expect(created_user.username).to eq(new_user_token['uid'])
-          expect(created_user.first_name).to eq(new_user_token['first_name'])
-          expect(created_user.last_name).to eq(new_user_token['last_name'])
-          expect(created_user.email).to eq(new_user_token['email'])
-          expect(created_user.last_login_at.to_i).to be >= pre_time
-          expect(created_user.last_login_at.to_i).to be <= post_time
-          created_user_authentication_service = created_user.user_authentication_services.where(uid: new_user_token['uid']).first
-          expect(created_user_authentication_service).to be
-          expect(created_user_authentication_service.authentication_service_id).to eq(auth_service.id)
-        end
-
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:audit_should_include) {{}}
-
-          it 'should set the newly created user as the user' do
-            is_expected.to eq(expected_response_status)
-            last_audit = Audited.audit_class.where(
-              auditable_type: expected_auditable_type.to_s
-            ).where(
-              'comment @> ?', {action: called_action, endpoint: url}.to_json
-            ).order(:created_at).last
-            expect(last_audit.user).to be
-            expect(last_audit.user.username).to eq(new_user_token['uid'])
-          end
-        end
+      context 'as default authentication_service' do
+        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+        it_behaves_like 'an authentication request endpoint'
       end
 
-      context 'for all users' do
-        include_context 'with authentication'
-        let (:user_token) {
-          {
-            'service_id' => user_auth.authentication_service.service_id,
-            'uid' => user_auth.uid,
-            'display_name' => current_user.display_name,
-            'first_name' => current_user.first_name,
-            'last_name' => current_user.last_name,
-            'email' => current_user.email
-          }
-        }
-        let (:access_token) {
-          JWT.encode(user_token, Rails.application.secrets.secret_key_base)
-        }
-        let (:unknown_service_access_token) {
-          JWT.encode({
-            'service_id' => SecureRandom.uuid,
-            'uid' => user_auth.uid,
-            'display_name' => current_user.display_name,
-            'first_name' => current_user.first_name,
-            'last_name' => current_user.last_name,
-            'email' => current_user.email,
-          }, Rails.application.secrets.secret_key_base)
-        }
-        let (:wrong_secret_access_token) {
-          JWT.encode(user_token, 'WrongSecret')
-        }
-        let(:payload) {{access_token: access_token}}
+      context 'as identified authentication_service' do
+        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service) }
+        it_behaves_like 'an authentication request endpoint'
+      end
+    end
 
-        it 'should update user.last_login_at and return an api JWT when provided a JWT access_token encoded with our secret by a registered AuthenticationService' do
-          original_last_login_at = current_user.last_login_at.to_i
-          pre_time = DateTime.now.to_i
-          is_expected.to eq(200)
-          post_time = DateTime.now.to_i
-          expect(response.status).to eq(200)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          token_wrapper = JSON.parse(response.body)
-          expect(token_wrapper).to have_key('expires_on')
-          expect(token_wrapper).to have_key('api_token')
-          decoded_token = JWT.decode(token_wrapper['api_token'],
-            Rails.application.secrets.secret_key_base
-          )[0]
-          expect(decoded_token).to be
-          %w(id service_id exp).each do |expected_key|
-            expect(decoded_token).to have_key(expected_key)
-          end
-          expect(decoded_token['id']).to eq(current_user.id)
-          expect(decoded_token['service_id']).to eq(user_auth.authentication_service.service_id)
-          existing_user = User.find(decoded_token['id'])
-          expect(existing_user).to be
-          expect(existing_user.id).to eq(current_user.id)
-          expect(existing_user.last_login_at.to_i).not_to eq(original_last_login_at)
-          expect(existing_user.last_login_at.to_i).to be >= pre_time
-          expect(existing_user.last_login_at.to_i).to be <= post_time
-        end
+    context 'openid_authentication_service' do
+      let(:first_time_user) { FactoryGirl.attributes_for(:user) }
+      let(:first_time_user_userinfo) {{
+        sub: "#{first_time_user[:username]}@duke.edu",
+        dukeNetID: first_time_user[:username],
+        dukeUniqueID: "4444444",
+        name: first_time_user[:display_name],
+        given_name: first_time_user[:first_name],
+        family_name: first_time_user[:last_name],
+        email: first_time_user[:email],
+        email_verified: false
+      }}
 
-        context 'without an access_token' do
-          let(:payload) {{}}
-          it 'should respond with an error' do
-            is_expected.to eq(400)
-            expect(response.body).to be
-            error_response = JSON.parse(response.body)
-            %w(error reason suggestion).each do |expected_key|
-              expect(error_response).to have_key expected_key
-            end
-            expect(error_response['error']).to eq(400)
-            expect(error_response['reason']).to eq('no access_token')
-            expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')
-          end
-        end
+      let(:first_time_user_access_token) {
+        SecureRandom.hex
+      }
 
-        context 'when the service_id in the access_token is not registered' do
-          let(:payload) {{access_token: unknown_service_access_token}}
-          it 'should respond with an error' do
-            original_last_login_at = current_user.last_login_at.to_i
-            is_expected.to eq(401)
-            expect(response.body).to be
-            error_response = JSON.parse(response.body)
-            %w(error reason suggestion).each do |expected_key|
-              expect(error_response).to have_key expected_key
-            end
-            expect(error_response['error']).to eq(401)
-            expect(error_response['reason']).to eq('invalid access_token')
-            expect(error_response['suggestion']).to eq('authenticaton service not recognized')
-            current_user.reload
-            expect(current_user.last_login_at.to_i).to eq(original_last_login_at)
-          end
-        end
+      let(:existing_user) { FactoryGirl.create(:user) }
+      let(:existing_user_auth) {
+        FactoryGirl.create(:user_authentication_service,
+        authentication_service: authentication_service,
+        uid: existing_user.username,
+        user: existing_user)
+      }
+      let(:existing_user_access_token) {
+        SecureRandom.hex
+      }
 
-        context 'when the token has not been signed by the secret_key_base' do
-          let(:payload) {{access_token: wrong_secret_access_token}}
-          it 'should respond with an error' do
-            original_last_login_at = current_user.last_login_at.to_i
-            is_expected.to eq(401)
-            expect(response.body).to be
-            error_response = JSON.parse(response.body)
-            %w(error reason suggestion).each do |expected_key|
-              expect(error_response).to have_key expected_key
-            end
-            expect(error_response['error']).to eq(401)
-            expect(error_response['reason']).to eq('invalid access_token')
-            expect(error_response['suggestion']).to eq('token not properly signed')
-            current_user.reload
-            expect(current_user.last_login_at.to_i).to eq(original_last_login_at)
-          end
-        end
+      let(:existing_user_userinfo) {{
+        sub: "#{existing_user.username}@duke.edu",
+        dukeNetID: existing_user_auth.uid,
+        dukeUniqueID: "4444444",
+        name: existing_user.display_name,
+        given_name: existing_user.first_name,
+        family_name: existing_user.last_name,
+        email: existing_user.email,
+        email_verified: false
+      }}
+
+      let(:existing_first_authenticating_user) {
+        FactoryGirl.create(:user)
+      }
+      let(:existing_first_authenticating_access_token) {
+        SecureRandom.hex
+      }
+      let(:existing_first_authenticating_user_userinfo) {{
+        sub: "#{existing_first_authenticating_user.username}@duke.edu",
+        dukeNetID: existing_first_authenticating_user.username,
+        dukeUniqueID: "4444444",
+        name: existing_first_authenticating_user.display_name,
+        given_name: existing_first_authenticating_user.first_name,
+        family_name: existing_first_authenticating_user.last_name,
+        email: existing_first_authenticating_user.email,
+        email_verified: false
+      }}
+
+      let(:invalid_access_token) {
+        SecureRandom.hex
+      }
+
+      include_context 'mocked openid request to', :authentication_service
+
+      context 'as default authentication_service' do
+        let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :default , :openid_env) }
+        it_behaves_like 'an authentication request endpoint'
+      end
+
+      context 'as identified authentication_service' do
+        let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :openid_env) }
+        it_behaves_like 'an authentication request endpoint'
       end
     end
   end

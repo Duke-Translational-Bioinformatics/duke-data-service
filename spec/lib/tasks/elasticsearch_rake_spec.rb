@@ -4,7 +4,6 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
   describe "elasticsearch:index:create" do
     include_context "rake"
     let(:task_name) { "elasticsearch:index:create" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     it { expect(subject.prerequisites).to  include("environment") }
 
     before do
@@ -57,7 +56,6 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
   describe "elasticsearch:index:index_documents" do
     include_context "rake"
     let(:task_name) { "elasticsearch:index:index_documents" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     it { expect(subject.prerequisites).to  include("environment") }
 
     context 'with existing documents not already indexed' do
@@ -142,7 +140,6 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
   describe "elasticsearch:index:drop" do
     include_context "rake"
     let(:task_name) { "elasticsearch:index:drop" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     it { expect(subject.prerequisites).to  include("environment") }
 
     around :each do |example|

@@ -51,6 +51,9 @@ services:
     image: dukedataservice_server
     environment:
       - RAILS_ENV=test
+      - OPENID_CLIENT_ID=test
+      - OPENID_CLIENT_SECRET=testpass
+      - OPENID_URL=http://oit.oauth.edu
     volumes_from:
       - server
     links:
