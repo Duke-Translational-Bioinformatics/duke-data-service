@@ -13,6 +13,12 @@ RSpec.describe MetaProperty, type: :model do
     it { is_expected.to belong_to(:property) }
   end
 
+  describe 'instance methods' do
+    it { is_expected.to delegate_method(:data_type).to(:property) }
+    it { is_expected.to respond_to(:key) }
+    it { is_expected.to respond_to(:key=).with(1).argument }
+  end
+
   describe 'callbacks' do
     it { is_expected.to callback(:set_property_from_key).before(:validation) }
     it { is_expected.to callback(:create_mapping).before(:create) }
