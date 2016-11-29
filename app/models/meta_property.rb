@@ -18,6 +18,7 @@ class MetaProperty < ActiveRecord::Base
     uniqueness: {scope: [:meta_template_id], case_sensitive: false}
   validates :meta_template, presence: true
   validates :value, presence: true
+  validates :value, numericality: true, if: :numeric_data_type?
 
   validates_each :key do |record, attr, value|
     record.errors.add(attr, 'key is not in the template') if value && !record.property
@@ -93,5 +94,22 @@ class MetaProperty < ActiveRecord::Base
   def index_templatable_document
     meta_template.templatable.reload
     meta_template.templatable.__elasticsearch__.index_document
+  end
+
+private
+
+  def numeric_data_type?
+    data_type && numeric_data_types.include?(data_type.to_s)
+  end
+
+  def numeric_data_types
+    [ 
+      'long',
+      'integer',
+      'short',
+      'byte',
+      'double',
+      'float'
+    ]
   end
 end
