@@ -10,7 +10,8 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: data_file) }
 
   let(:template) { meta_template.template }
-  let(:property) { FactoryGirl.create(:property, template: template) }
+  let(:property_data_type) { 'string' }
+  let(:property) { FactoryGirl.create(:property, data_type: property_data_type, template: template) }
   let(:meta_property) { FactoryGirl.create(:meta_property, property: property, meta_template: meta_template) }
   let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
 
@@ -139,6 +140,16 @@ describe DDS::V1::MetaTemplatesAPI do
         it_behaves_like 'a validated resource'
       end
 
+      context 'with invalid numeric value' do
+        let(:property_data_type) { 'integer' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with invalid date value' do
+        let(:property_data_type) { 'date' }
+        it_behaves_like 'a validated resource'
+      end
+
       context 'with property key from another template' do
         let(:payload_property_key) { FactoryGirl.create(:property).key }
         it_behaves_like 'a validated resource'
@@ -260,6 +271,16 @@ describe DDS::V1::MetaTemplatesAPI do
 
       context 'with blank property value' do
         let(:payload_property_value) { '' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with invalid numeric value' do
+        let(:property_data_type) { 'integer' }
+        it_behaves_like 'a validated resource'
+      end
+
+      context 'with invalid date value' do
+        let(:property_data_type) { 'date' }
         it_behaves_like 'a validated resource'
       end
     end
