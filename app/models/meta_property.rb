@@ -19,6 +19,15 @@ class MetaProperty < ActiveRecord::Base
   validates :meta_template, presence: true
   validates :value, presence: true
   validates :value, numericality: true, if: :numeric_data_type?
+  validates_each :value, if: :date_data_type? do |record, attr, value|
+    message = 'is not a valid date (format: yyyy-MM-dd[THH:mm[:ss]])'
+    begin
+      parsed_date = DateTime.parse(value)
+    rescue
+    end
+    record.errors.add(attr, message) unless parsed_date && 
+      parsed_date.to_s(:iso8601).start_with?(value)
+  end
 
   validates_each :key do |record, attr, value|
     record.errors.add(attr, 'key is not in the template') if value && !record.property
@@ -97,6 +106,9 @@ class MetaProperty < ActiveRecord::Base
   end
 
 private
+  def date_data_type?
+    data_type && data_type.to_s == 'date'
+  end
 
   def numeric_data_type?
     data_type && numeric_data_types.include?(data_type.to_s)
