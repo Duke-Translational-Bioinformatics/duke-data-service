@@ -88,6 +88,19 @@ RSpec.describe MetaProperty, type: :model do
       end
       context 'when data_type is date' do
         let(:data_type) { 'date' }
+        let(:good_times) {[
+          '2001-02-03',
+          '2001-02-03T04:05',
+          '2001-02-03T04:05:06'
+        ]}
+        let(:bad_times) {[
+          '2001-02-03T24:05:06',
+          '2001-02-03T04:05:06:07',
+          '2001-02-03T04',
+          'tomorrow'
+        ]}
+        it { is_expected.to allow_values(*good_times).for(:value) }
+        it { is_expected.not_to allow_values(*bad_times).for(:value) }
       end
     end
   end
