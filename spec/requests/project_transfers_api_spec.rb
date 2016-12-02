@@ -11,6 +11,7 @@ describe DDS::V1::ProjectTransfersAPI do
   let(:project_transfer_stub) { FactoryGirl.build(:project_transfer, :with_to_users) }
   let(:project_transfer_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
+  let(:rejected_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :rejected, project: project) }
   let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
   let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
 
@@ -359,6 +360,72 @@ describe DDS::V1::ProjectTransfersAPI do
               is_expected.to eq(200)
             }.to change{ProjectPermission.where(project: project, user: resource.to_users.unscope(:order), auth_role: project_admin).count}.by(1)
           end
+        end
+      end
+    end
+  end
+
+  describe 'View all project transfers' do
+    let(:url) { "/api/v1/project_transfers" }
+
+    describe 'GET' do
+      let(:payload) {nil}
+      subject { get(url, payload, headers) }
+      let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
+      let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
+
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'when status query is not set' do
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            project_transfer,
+            project_transfer_from,
+            project_transfer_to,
+            rejected_project_transfer
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer
+          ] }
+        end
+      end
+
+      context 'when status query is set' do
+        let!(:payload) {{status: rejected_project_transfer.status}}
+        it_behaves_like 'a listable resource' do
+          let(:serializable_resource) { rejected_project_transfer }
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            rejected_project_transfer
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer,
+            project_transfer,
+            project_transfer_from,
+            project_transfer_to
+          ] }
+        end
+      end
+
+      context 'when status type does not exist' do
+        let!(:payload) {{status: 'notexists'}}
+        it 'should return 404 with error' do
+          is_expected.to eq(404)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('error')
+          expect(response_json['error']).to eq('404')
+          expect(response_json).to have_key('reason')
+          expect(response_json['reason']).to eq("Unknown Status")
+          expect(response_json).to have_key('suggestion')
+          expect(response_json['suggestion']).to eq("Status should be one of the following: #{ProjectTransfer.statuses.keys}")
         end
       end
     end
