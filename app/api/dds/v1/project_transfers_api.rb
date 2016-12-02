@@ -161,6 +161,38 @@ module DDS
           validation_error!(project_transfer)
         end
       end
+
+      desc 'View all project transfers' do
+        detail 'View all project transfers.'
+        named 'view all project transfers'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Unsupported Status']
+        ]
+      end
+      params do
+        optional :status, values: ProjectTransfer.statuses.keys,
+                          type: String,
+                          desc: 'Status must be one of the allowed statuses'
+      end
+      rescue_from Grape::Exceptions::ValidationErrors do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => "Unknown Status",
+          "suggestion" => "Status should be one of the following: #{ProjectTransfer.statuses.keys}",
+        }
+        error!(error_json, 404)
+      end
+      get '/project_transfers', root: 'results' do
+        authenticate!
+        project_transfer_params = declared(params, include_missing: false)
+        project_transfers = policy_scope(ProjectTransfer)
+        if project_transfer_params[:status]
+          project_transfers = project_transfers.where(status: ProjectTransfer.statuses[project_transfer_params[:status]])
+        end
+        project_transfers
+      end
     end
   end
 end
