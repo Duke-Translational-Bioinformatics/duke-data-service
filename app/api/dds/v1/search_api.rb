@@ -64,14 +64,14 @@ module DDS
         ]
       end
       params do
-        requires :included_kinds, type: Array[String], desc: 'The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. dds-folder, dds-file)'
+        requires :include_kinds, type: Array[String], desc: 'The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. dds-folder, dds-file)'
         requires :search_query, type: Hash, desc: 'The Elasticsearch query criteria (i.e. Query DSL)'
       end
       post '/search', root: false do
         authenticate!
         search_params = declared(params, include_missing: false)
         indices = []
-        search_params[:included_kinds].each do |included_kind|
+        search_params[:include_kinds].each do |included_kind|
           kinded_model = KindnessFactory.kind_map[included_kind]
           raise NameError.new("object_kind #{included_kind} Not Supported") unless kinded_model
           indices << kinded_model

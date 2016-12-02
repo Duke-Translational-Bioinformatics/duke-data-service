@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe ApiKeySerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:api_key) }
+  let(:expected_attributes) {{
+    'key' => resource.key
+  }}
+
   it_behaves_like 'a json serializer' do
-    it 'should have expected keys and values' do
-      is_expected.to have_key('key')
-      is_expected.to have_key('created_on')
-      expect(subject['key']).to eq(resource.key)
-    end
+    it { is_expected.to include(expected_attributes) }
   end
 end
