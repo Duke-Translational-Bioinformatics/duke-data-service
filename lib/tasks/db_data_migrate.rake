@@ -59,7 +59,7 @@ end
 
 def create_missing_fingerprints
   #uploads = Upload.where.not(fingerprint_value: nil)
-  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil).unscope(:order)
+  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
   fingerprint_count = Fingerprint.count
   failures = []
   puts "Creating fingerprints for #{uploads.count} uploads"
