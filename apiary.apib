@@ -1856,6 +1856,22 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never actually happen
+
++ Response 201 (text/plain)
+
+        Created Successfully
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
+
 ### List chunked uploads [GET]
 >**Permission:** view_project
 - - - - -
@@ -1886,6 +1902,19 @@ This is the first step in uploading a large file. An upload objects is created a
                 }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
+
 
 ## Upload instance [/uploads/{id}]
 + Parameters
@@ -1928,6 +1957,18 @@ This is the first step in uploading a large file. An upload objects is created a
             },
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Upload Does not Exist
 
 ## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
 Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
@@ -1972,6 +2013,22 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
                 { "Content-Length": "5024000" }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Upload Does not Exist
+
++ Response 500 (text/plain)
+
+        Unexpected StorageProviderException experienced
 
 ## Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
@@ -2050,6 +2107,26 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Upload Does not Exist
+
++ Response 500 (text/plain)
+
+        Unexpected StorageProviderException experienced
+
 ## Report upload hash [PUT /uploads/{id}/hashes]
 Report a hash (fingerprint) for the uploaded file.
 >**Permission:** update_file
@@ -2122,6 +2199,25 @@ Report a hash (fingerprint) for the uploaded file.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+       Success
+
++ Response 400 (text/plain)
+
+       Validation Error
+
++ Response 401 (text/plain)
+
+       Unauthorized
+
++ Response 404 (text/plain)
+
+       Upload Does not Exist
+
++ Response 500 (text/plain)
+
+       Unexpected StorageProviderException experienced
 
 ## Group Files
 A file resource represents a virtual container for a physical data file (i.e. `upload`) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).
@@ -2211,6 +2307,26 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+       This will never happen
+
++ Response 201 (text/plain)
+
+      Successfully Created
+
++ Response 400 (text/plain)
+
+       Upload has an IntegrityException
+
++ Response 401 (text/plain)
+
+       Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+       Project Does not Exist, Parent Folder or Upload does not exist in Project
+
 ## File instance [/files/{id}]
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2268,6 +2384,18 @@ Creates a file metadata resource; the client is responsible for the creation of 
             },
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+       Success
+
++ Response 401 (text/plain)
+
+      Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+       File does not exist
 
 ### Update file [PUT]
 Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
@@ -2348,6 +2476,18 @@ Updates one or more file resource properties; if this action includes an `upload
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+       Success
+
++ Response 401 (text/plain)
+
+      Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+       File does not exist
+
 ### Delete file [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -2356,7 +2496,19 @@ Updates one or more file resource properties; if this action includes an `upload
 - - - - -
 + This operation recursively deletes all the related file versions.
 
++ Response 200 (text/plain)
+
+       This will never happen
+
 + Response 204
+
++ Response 401 (text/plain)
+
+      Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+       File does not exist
 
 ## Get file download URL [GET /files/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download file; the download URL is for the current version of the specified file.
@@ -2377,6 +2529,22 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
             "http_headers": [ ]
         }
+
++ Response 200 (text/plain)
+
+       Success
+
++ Response 301 (text/plain)
+
+        Redirect to file
+
++ Response 401 (text/plain)
+
+      Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+       File does not exist
 
 ## Move file [PUT /files/{id}/move]
 Move file to a different parent project or parent folder.
@@ -2446,6 +2614,18 @@ Move file to a different parent project or parent folder.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+       Success
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File does not exist, Parent does not exist in Project
+
 ## Rename file [PUT /files/{id}/rename]
 Change the name of a file.
 
@@ -2511,6 +2691,18 @@ Change the name of a file.
             },
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+       Success
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File does not exist, Parent does not exist in Project
 
 ## Group File Versions
 The actions herein are used to interact with prior versions of a file resource.
