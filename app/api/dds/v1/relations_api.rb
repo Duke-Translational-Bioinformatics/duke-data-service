@@ -26,7 +26,7 @@ module DDS
         authenticate!
         relation_params = declared(params, include_missing: false)
         activity = Activity.find(relation_params[:activity][:id])
-        #todo change this when we allow other entities to be used by activities
+        # TODO change this when we allow other entities to be used by activities
         entity = FileVersion.find(relation_params[:entity][:id])
 
         relation = UsedProvRelation.new(
@@ -164,6 +164,35 @@ module DDS
         end
       end
 
+      desc 'List provenance relations' do
+        detail 'List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.'
+        named 'List provenance relations'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Object kind or id Does not Exist']
+        ]
+      end
+      params do
+        requires :object_kind, type: String, desc: 'Object kind'
+        requires :object_id, type: String, desc: 'Object UUID'
+      end
+      get '/relations/:object_kind/:object_id', root: 'results' do
+        authenticate!
+        object_params = declared(params, include_missing: false)
+        root_node = KindnessFactory.by_kind(
+            object_params[:object_kind]
+          ).find(object_params[:object_id])
+        authorize root_node, :show?
+        prov_relationsq = ProvRelation.arel_table
+        ProvRelation.where(
+          prov_relationsq[:relatable_from_id].eq(root_node.id).or(
+            prov_relationsq[:relatable_to_id].eq(root_node.id)
+          )
+        ).where(is_deleted: false)
+      end
+
       desc 'View relation' do
         detail 'Show information about a Relation. Requires ownership of the relation, or visibility to a single node for the specified relation'
         named 'View relation'
@@ -203,35 +232,6 @@ module DDS
         authorize prov_relation, :destroy?
         prov_relation.update(is_deleted: true)
         body false
-      end
-
-      desc 'List provenance relations' do
-        detail 'List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.'
-        named 'List provenance relations'
-        failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Object kind or id Does not Exist']
-        ]
-      end
-      params do
-        requires :object_kind, type: String, desc: 'Object kind'
-        requires :object_id, type: String, desc: 'Object UUID'
-      end
-      get '/relations/:object_kind/:object_id', root: 'results' do
-        authenticate!
-        object_params = declared(params, include_missing: false)
-        root_node = KindnessFactory.by_kind(
-            object_params[:object_kind]
-          ).find(object_params[:object_id])
-        authorize root_node, :show?
-        prov_relationsq = ProvRelation.arel_table
-        ProvRelation.where(
-          prov_relationsq[:relatable_from_id].eq(root_node.id).or(
-            prov_relationsq[:relatable_to_id].eq(root_node.id)
-          )
-        ).where(is_deleted: false)
       end
     end
   end
