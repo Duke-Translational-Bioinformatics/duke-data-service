@@ -1370,6 +1370,18 @@ Represents an individual that plays some project level role of interest from a c
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
+
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
 + Parameters
     + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
@@ -1410,6 +1422,22 @@ Represents an individual that plays some project level role of interest from a c
 
     [Affiliate instance][]
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Project Name Already Exists
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
+
 ### View affiliate [GET]
 >**Permission:** view_project
 - - - - -
@@ -1418,11 +1446,31 @@ Represents an individual that plays some project level role of interest from a c
 
     [Affiliate instance][]
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
+
 ### Delete affiliate [DELETE]
 >**Permission:** update_project
 - - - - -
 
 + Response 204
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project Does not Exist
 
 ## Group Storage Providers
 Represents an external service that provides physical storage space for files.
@@ -1454,6 +1502,13 @@ Represents an external service that provides physical storage space for files.
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
 ## Storage Provider instance [/storage_providers/{id}]
 + Parameters
     + id (string, required, `g5579f73-0558-4f96-afc7-9d251e65bv33`) ... The unique `id` of the storage provider.
@@ -1472,6 +1527,19 @@ Represents an external service that provides physical storage space for files.
             "chunk_hash_algorithm": "md5",
             "is_deprecated": false
         }
+
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        StorageProvider Does not Exist
 
 ## Group Folders
 A folder is a container for files and sub-folders; folders are located in the top-level project root or a parent folder.
@@ -1531,6 +1599,22 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Project Does not Exist, Parent Folder does not exist in Project
+
 ## Folder instance [/folders/{id}]
 + Parameters
     + id (string, required, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... The unique `id` of the folder.
@@ -1568,6 +1652,18 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Folder does not exist
+
 ### Delete folder [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -1576,7 +1672,20 @@ A folder is a container for files and sub-folders; folders are located in the to
 - - - - -
 + This operation recursively deletes all of the folder children (i.e. folders, files and file versions).
 
++ Response 200 (text/plain)
+
+        This will never happen
+
 + Response 204
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Folder does not exist
+
 
 ## Move folder [PUT /folders/{id}/move]
 >**Permission:** create_file
@@ -1627,6 +1736,18 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Folder does not exist, Parent does not exist
+
 ## Rename folder [PUT /folders/{id}/rename]
 >**Permission:** create_file
 - - - - -
@@ -1666,6 +1787,18 @@ A folder is a container for files and sub-folders; folders are located in the to
             "is_deleted": false,
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Folder does not exist
 
 ## Group Uploads
 All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following actions must be used by the client to manage the chunked upload process.
