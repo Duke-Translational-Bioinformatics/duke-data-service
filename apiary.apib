@@ -2761,6 +2761,18 @@ This action can be used to list all prior versions of a file, including the curr
             ]
         }
 
++ Response 200 (text/plain)
+
+       Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File does not exist
+
 ## File Version instance [/file_versions/{id}]
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
@@ -2802,6 +2814,18 @@ This action can be used to list all prior versions of a file, including the curr
             },
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+       Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File does not exist
 
 ### Update file version [PUT]
 >**Permission:** update_file
@@ -2851,6 +2875,18 @@ This action can be used to list all prior versions of a file, including the curr
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+       Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File does not exist
+
 ### Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -2859,7 +2895,19 @@ This action can be used to list all prior versions of a file, including the curr
 - - - - -
 + The current file version cannot be deleted.
 
++ Response 200 (text/plain)
+
+       This will never happen
+
 + Response 204
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File version does not exist
 
 ## Get file version download URL [GET /file_versions/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
@@ -2877,6 +2925,22 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738",
             "http_headers": [ ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 301 (text/plain)
+
+        Redirect to file version
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File version does not exist
 
 ## Promote file version [POST /file_versions/{id}/current]
 This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the version stack.
@@ -2923,6 +2987,18 @@ This action can be used to promote a prior file version to the current version. 
             },
             "audit": { }
         }
+
++ Response 201 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+      File version does not exist
 
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
