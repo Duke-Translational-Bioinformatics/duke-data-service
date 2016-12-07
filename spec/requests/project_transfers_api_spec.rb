@@ -11,6 +11,9 @@ describe DDS::V1::ProjectTransfersAPI do
   let(:project_transfer_stub) { FactoryGirl.build(:project_transfer, :with_to_users) }
   let(:project_transfer_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
+  let(:rejected_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :rejected, project: project) }
+  let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
+  let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
 
   let(:resource_class) { ProjectTransfer }
   let(:resource_serializer) { ProjectTransferSerializer }
@@ -177,7 +180,7 @@ describe DDS::V1::ProjectTransfersAPI do
         end
         it_behaves_like 'a software_agent accessible resource'
         it_behaves_like 'an updatable resource' do
-          it 'sets project transfer status comment' do
+          it 'sets rejected status to true' do
             is_expected.to eq(200)
             expect(resource.reload).to be_truthy
             expect(resource).to be_rejected
@@ -194,16 +197,18 @@ describe DDS::V1::ProjectTransfersAPI do
             status_comment: Faker::Hacker.say_something_smart
           }}
           it_behaves_like 'an updatable resource' do
-            it 'sets project transfer status comment' do
+            it 'sets rejected status to true and saves status comment' do
               is_expected.to eq(200)
               expect(resource.reload).to be_truthy
               expect(resource.status_comment).to eq(payload[:status_comment])
             end
           end
         end
-        context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694
-          let(:status) { :accepted }
+        context 'where project_transfer status is rejected' do
+          let(:status) { :rejected }
+          before do
+            expect(resource).to be_persisted
+          end
           it_behaves_like 'a validated resource'
         end
       end
@@ -229,7 +234,7 @@ describe DDS::V1::ProjectTransfersAPI do
         end
         it_behaves_like 'a software_agent accessible resource'
         it_behaves_like 'an updatable resource' do
-          it 'sets project transfer status comment' do
+          it 'sets canceled status to true' do
             is_expected.to eq(200)
             expect(resource.reload).to be_truthy
             expect(resource).to be_canceled
@@ -246,7 +251,62 @@ describe DDS::V1::ProjectTransfersAPI do
             status_comment: Faker::Hacker.say_something_smart
           }}
           it_behaves_like 'an updatable resource' do
-            it 'sets project transfer status comment' do
+            it 'sets canceled status to true and saves status comment' do
+              is_expected.to eq(200)
+              expect(resource.reload).to be_truthy
+              expect(resource.status_comment).to eq(payload[:status_comment])
+            end
+          end
+        end
+        context 'where project_transfer status is canceled' do
+          let(:status) { :canceled }
+          before do
+            expect(resource).to be_persisted
+          end
+          it_behaves_like 'a validated resource'
+        end
+      end
+    end
+
+    describe 'Accept project transfer' do
+      let(:url) { "/api/v1/project_transfers/#{resource_id}/accept" }
+      let(:resource) { FactoryGirl.create(:project_transfer,
+                                          :with_to_users,
+                                          project: project,
+                                          status: status,
+                                          to_user: current_user) }
+      let(:status) { :pending }
+      let(:payload) {{}}
+
+      describe 'PUT' do
+        subject { put(url, payload.to_json, headers) }
+        let(:called_action) { 'PUT' }
+
+        it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) {'notfoundid'}
+        end
+        it_behaves_like 'a software_agent accessible resource'
+        it_behaves_like 'an updatable resource' do
+          it 'sets accepted status to true' do
+            is_expected.to eq(200)
+            expect(resource.reload).to be_truthy
+            expect(resource).to be_accepted
+          end
+        end
+        context 'when current user is not to_user' do
+          let(:resource) { FactoryGirl.create(:project_transfer,
+                                              :with_to_users,
+                                              status: status) }
+          it_behaves_like 'an authorized resource'
+        end
+        context 'with status_comment' do
+          let(:payload) {{
+            status_comment: Faker::Hacker.say_something_smart
+          }}
+          it_behaves_like 'an updatable resource' do
+            it 'sets accepted status to true and saves status comment' do
               is_expected.to eq(200)
               expect(resource.reload).to be_truthy
               expect(resource.status_comment).to eq(payload[:status_comment])
@@ -254,9 +314,118 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'where project_transfer status is not processing' do
-          # TODO Need to look at DDS-694
           let(:status) { :accepted }
+          before do
+            expect(resource).to be_persisted
+          end
           it_behaves_like 'a validated resource'
+          it 'should retain current permissions' do
+            expect(resource.project.project_permissions).not_to be_empty
+            expect {is_expected.to eq(400)}.not_to change{ProjectPermission.all}
+          end
+        end
+
+        context 'when project has project_permissions' do
+          let(:from_user_permission) { FactoryGirl.create(:project_permission, :project_admin, user: resource.from_user, project: project) }
+          let(:another_permission) { FactoryGirl.create(:project_permission, project: project) }
+          let(:different_permission) { FactoryGirl.create(:project_permission) }
+          before do
+            expect(resource).to be_persisted
+          end
+
+          it 'should remove the from_user project_permission' do
+            expect(from_user_permission).to be_persisted
+            expect(ProjectPermission.where(project: project).all).to include(from_user_permission)
+            is_expected.to eq(200)
+            expect(ProjectPermission.where(project: project).all).not_to include(from_user_permission)
+          end
+          it 'should remove another_permission' do
+            expect(another_permission).to be_persisted
+            expect(ProjectPermission.where(project: project).all).to include(another_permission)
+            is_expected.to eq(200)
+            expect(ProjectPermission.where(project: project).all).not_to include(another_permission)
+          end
+          it 'should not remove a different projects permissions' do
+            expect(different_permission).to be_persisted
+            is_expected.to eq(200)
+            expect{different_permission.reload}.not_to raise_error
+          end
+          it 'should grant project_viewer permission to from_user' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{ProjectPermission.where(project: project, user: resource.from_user, auth_role: project_viewer).count}.by(1)
+          end
+          it 'should grant project_admin permission to to_users' do
+            expect {
+              is_expected.to eq(200)
+            }.to change{ProjectPermission.where(project: project, user: resource.to_users.unscope(:order), auth_role: project_admin).count}.by(1)
+          end
+        end
+      end
+    end
+  end
+
+  describe 'View all project transfers' do
+    let(:url) { "/api/v1/project_transfers" }
+
+    describe 'GET' do
+      let(:payload) {nil}
+      subject { get(url, payload, headers) }
+      let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
+      let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
+
+      it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a listable resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'when status query is not set' do
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            project_transfer,
+            project_transfer_from,
+            project_transfer_to,
+            rejected_project_transfer
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer
+          ] }
+        end
+      end
+
+      context 'when status query is set' do
+        let!(:payload) {{status: rejected_project_transfer.status}}
+        it_behaves_like 'a listable resource' do
+          let(:serializable_resource) { rejected_project_transfer }
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            rejected_project_transfer
+          ]}
+          let!(:unexpected_resources) { [
+            other_project_transfer,
+            project_transfer,
+            project_transfer_from,
+            project_transfer_to
+          ] }
+        end
+      end
+
+      context 'when status type does not exist' do
+        let!(:payload) {{status: 'notexists'}}
+        it 'should return 404 with error' do
+          is_expected.to eq(404)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+          response_json = JSON.parse(response.body)
+          expect(response_json).to have_key('error')
+          expect(response_json['error']).to eq('404')
+          expect(response_json).to have_key('reason')
+          expect(response_json['reason']).to eq("Unknown Status")
+          expect(response_json).to have_key('suggestion')
+          expect(response_json['suggestion']).to eq("Status should be one of the following: #{ProjectTransfer.statuses.keys}")
         end
       end
     end

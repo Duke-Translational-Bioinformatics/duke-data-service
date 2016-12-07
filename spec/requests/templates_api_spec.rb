@@ -54,22 +54,22 @@ describe DDS::V1::TemplatesAPI do
     describe 'GET' do
       subject { get(url, nil, headers) }
 
-      context 'with name query parameter' do
-        let(:query_params) { "?name=#{name}" }
+      context 'with name_contains query parameter' do
+        let(:query_params) { "?name_contains=#{name_contains}" }
 
         context 'when empty string' do
-          let(:name) { '' }
+          let(:name_contains) { '' }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
-            ] }
-            let(:unexpected_resources) { [
               template,
               other_template
+            ] }
+            let(:unexpected_resources) { [
             ] }
           end
         end
         context 'when string without matches' do
-          let(:name) { 'name_without_matches' }
+          let(:name_contains) { 'name_without_matches' }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
             ] }
@@ -81,7 +81,7 @@ describe DDS::V1::TemplatesAPI do
         end
 
         context 'when string with a match' do
-          let(:name) { template.name }
+          let(:name_contains) { template.name }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
               template
@@ -93,12 +93,25 @@ describe DDS::V1::TemplatesAPI do
         end
 
         context 'when upcase string' do
-          let(:name) { template.name.upcase }
+          let(:name_contains) { template.name.upcase }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
+              template
             ] }
             let(:unexpected_resources) { [
-              template,
+              other_template
+            ] }
+          end
+        end
+
+        context 'when partial match' do
+          let(:template) { FactoryGirl.create(:template, name: 'only_a_partial_match', creator: current_user) }
+          let(:name_contains) { 'a_partial' }
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              template
+            ] }
+            let(:unexpected_resources) { [
               other_template
             ] }
           end

@@ -31,6 +31,7 @@ end
 
 shared_examples 'an authentication service' do
   it { is_expected.to respond_to('get_user_for_access_token') }
+  it { is_expected.to respond_to('login_initiation_url') }
 
   describe 'associations' do
     it {
@@ -42,6 +43,9 @@ shared_examples 'an authentication service' do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :service_id }
     it { is_expected.to validate_presence_of :base_uri }
+    it { is_expected.to validate_presence_of :client_id }
+    it { is_expected.to validate_presence_of :login_initiation_uri }
+    it { is_expected.to validate_presence_of :login_response_type }
 
     context 'is_default' do
       it 'should allow only one default authentication_service of any type' do
@@ -66,7 +70,19 @@ shared_examples 'an authentication service' do
     end
   end
 
-  context 'get_user_for_access_token' do
+  describe 'login_initiation_url' do
+    it {
+      expect(subject.login_initiation_url).to eq([
+        subject.base_uri,
+        subject.login_initiation_uri
+      ].join('/') + '?' + [
+        "response_type=#{subject.login_response_type}",
+        "client_id=#{subject.client_id}"
+      ].join('&'))
+    }
+  end
+
+  describe 'get_user_for_access_token' do
     context 'with valid token' do
       context 'for first time user' do
         it 'should return an unpersisted user with an unpersisted user_authentication_service assigned to user.current_user_authenticaiton_service' do
@@ -438,5 +454,19 @@ shared_examples 'an authentication_service:destroy task' do |
         invoke_task
       }.to change{authentication_service_class.count}.by(-1)
     }
+  end
+end
+
+shared_examples 'an authentication_service_serializer serializable resource' do
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'name' => resource.name,
+    'login_initiation_url' => resource.login_initiation_url,
+    'is_deprecated' => resource.is_deprecated,
+    'is_default' => resource.is_default
+  }}
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
   end
 end
