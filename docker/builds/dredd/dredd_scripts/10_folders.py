@@ -16,7 +16,7 @@ def create_folder10_1(transaction):
     global proj_id
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     requestBody = json.loads(transaction[u'request'][u'body'])
     requestBody['parent']['kind'] = 'dds-project'
@@ -35,7 +35,7 @@ def viewin_my_folder10_1(transaction):
 def create_and_tear_down10_1(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     folder_id2 = utils.create_a_folder(neww['id'],'test')
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('d5ae02a4-b9e6-473d-87c4-66f4c881ae7a',folder_id2)
