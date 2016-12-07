@@ -4216,6 +4216,22 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        start_node or start_node kind does not exist
+
 ## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/origin]
 This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each *File Version*:
 
@@ -4322,6 +4338,18 @@ A graph structure of the unique nodes and relationships is returned.
             }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## Group Tags
 A tag is a label (i.e. word or phrase) that can be associated to an object to facilitate classification and searching.
 
@@ -4362,6 +4390,25 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Tag requires a label
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Tag does not exist
 
 ### List object tags [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
@@ -4382,6 +4429,14 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
                 }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
 
 ## Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
 Append a list of tags to an object.
@@ -4427,6 +4482,26 @@ Append a list of tags to an object.
             ]
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Tag requires a label
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Tag does not exist
+
 ## List tag labels [GET /tags/labels{?object_kind,label_contains}]
 Get a list of the **distinct** tag `label` values visible to the current user.
 
@@ -4465,6 +4540,14 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## Tag instance [/tags/{id}]
 + Parameters
     + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
@@ -4484,11 +4567,35 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Valid API Token in 'Authorization' Header
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Tag does not exist
+
 ### Delete tag [DELETE]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
++ Response 200 (text/plain)
+
+        This will never happen
+
 + Response 204
+
++ Response 401 (text/plain)
+
+        Missing, Expired, Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Tag does not exist
 
 ## Group Metadata
 The metadata actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, metadata are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
