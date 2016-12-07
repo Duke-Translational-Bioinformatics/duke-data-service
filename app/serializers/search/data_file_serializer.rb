@@ -9,7 +9,8 @@ class Search::DataFileSerializer < ActiveModel::Serializer
 
   has_many :tags, serializer: Search::TagSummarySerializer
   has_one :project, serializer: Search::ProjectSummarySerializer
-
+  has_one :parent, serializer: Search::FolderSummarySerializer
+  
   def is_deleted
     object.is_deleted?
   end
