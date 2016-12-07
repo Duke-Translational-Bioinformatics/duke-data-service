@@ -10,7 +10,9 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     'updated_at' => resource.updated_at.as_json,
     'label' => resource.label
   }}
+
   it_behaves_like 'a has_many association with', :tags, TagSearchDocumentSerializer
+  it_behaves_like 'a has_one association with', :project, ProjectSearchDocumentSerializer
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }

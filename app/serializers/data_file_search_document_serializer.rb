@@ -1,7 +1,14 @@
 class DataFileSearchDocumentSerializer < ActiveModel::Serializer
-  attributes :id, :name, :is_deleted, :created_at, :updated_at, :label, :meta
+  attributes :id,
+             :name,
+             :is_deleted,
+             :created_at,
+             :updated_at,
+             :label,
+             :meta
 
   has_many :tags, serializer: TagSearchDocumentSerializer
+  has_one :project, serializer: ProjectSearchDocumentSerializer
 
   def is_deleted
     object.is_deleted?
