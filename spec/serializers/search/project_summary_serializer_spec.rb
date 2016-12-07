@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Search::ProjectSerializer, type: :serializer do
+RSpec.describe Search::ProjectSummarySerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:project) }
   let(:expected_attributes) {{
     'id' => resource.id,

@@ -11,8 +11,8 @@ RSpec.describe Search::DataFileSerializer, type: :serializer do
     'label' => resource.label
   }}
 
-  it_behaves_like 'a has_many association with', :tags, Search::TagSerializer
-  it_behaves_like 'a has_one association with', :project, Search::ProjectSerializer
+  it_behaves_like 'a has_many association with', :tags, Search::TagSummarySerializer
+  it_behaves_like 'a has_one association with', :project, Search::ProjectSummarySerializer
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }

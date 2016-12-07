@@ -7,8 +7,8 @@ class Search::DataFileSerializer < ActiveModel::Serializer
              :label,
              :meta
 
-  has_many :tags, serializer: Search::TagSerializer
-  has_one :project, serializer: Search::ProjectSerializer
+  has_many :tags, serializer: Search::TagSummarySerializer
+  has_one :project, serializer: Search::ProjectSummarySerializer
 
   def is_deleted
     object.is_deleted?
