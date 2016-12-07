@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FolderSearchDocumentSerializer, type: :serializer do
+RSpec.describe Search::FolderSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:data_file) }
   let(:expected_attributes) {{
     'id' => resource.id,

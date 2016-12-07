@@ -1,4 +1,4 @@
-class FolderSearchDocumentSerializer < ActiveModel::Serializer
+class Search::FolderSerializer < ActiveModel::Serializer
   attributes :id, :name, :is_deleted, :created_at, :updated_at, :label, :meta
 
   def is_deleted

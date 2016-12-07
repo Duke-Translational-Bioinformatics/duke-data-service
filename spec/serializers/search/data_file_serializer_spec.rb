@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
+RSpec.describe Search::DataFileSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:data_file) }
   let(:expected_attributes) {{
     'id' => resource.id,
@@ -11,8 +11,8 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     'label' => resource.label
   }}
 
-  it_behaves_like 'a has_many association with', :tags, TagSearchDocumentSerializer
-  it_behaves_like 'a has_one association with', :project, ProjectSearchDocumentSerializer
+  it_behaves_like 'a has_many association with', :tags, Search::TagSerializer
+  it_behaves_like 'a has_one association with', :project, Search::ProjectSerializer
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }

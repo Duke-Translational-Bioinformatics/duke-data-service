@@ -253,7 +253,7 @@ RSpec.describe DataFile, type: :model do
     it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
 
     it { is_expected.to respond_to 'as_indexed_json' }
-    it { expect(subject.as_indexed_json).to eq(DataFileSearchDocumentSerializer.new(subject).as_json) }
+    it { expect(subject.as_indexed_json).to eq(Search::DataFileSerializer.new(subject).as_json) }
 
     describe 'mappings' do
       subject { root_file.class.mapping.to_hash }

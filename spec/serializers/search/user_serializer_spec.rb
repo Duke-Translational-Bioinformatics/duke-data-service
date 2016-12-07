@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe UserSearchDocumentSerializer, type: :serializer do
+RSpec.describe Search::UserSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:user) }
   let(:expected_attributes) {{
     'id' => resource.id,
