@@ -14,6 +14,15 @@ RSpec.describe Search::DataFileSerializer, type: :serializer do
   it_behaves_like 'a has_many association with', :tags, Search::TagSummarySerializer
   it_behaves_like 'a has_one association with', :project, Search::ProjectSummarySerializer
   it_behaves_like 'a has_one association with', :parent, Search::FolderSummarySerializer
+  it_behaves_like 'a has_one association with', :creator, Search::UserSummarySerializer do
+    let(:expected_attributes) {{
+        'creator' => Search::UserSummarySerializer.new(resource.current_file_version.audits.find_by(action: 'create').user).as_json
+    }}
+
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
+  end
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }

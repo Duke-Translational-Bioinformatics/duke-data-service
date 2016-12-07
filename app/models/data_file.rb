@@ -85,4 +85,8 @@ class DataFile < Container
       end
     end
   end
+
+  def creator
+    current_file_version.audits.find_by(action: "create").user
+  end
 end
