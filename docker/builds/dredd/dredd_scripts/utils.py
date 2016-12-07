@@ -34,7 +34,7 @@ def pass_this_endpoint(transaction):
 
 def create_a_project(name,description):
     url = os.getenv('HOST_NAME') + "/projects"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     body = { "name": name, "description": description}
     r = requests.post(url, headers=headers, data=json.dumps(body))
     if r.status_code ==201:
@@ -44,7 +44,7 @@ def create_a_project(name,description):
 
 def create_a_sa(transaction,name):
     url = os.getenv('HOST_NAME') + "/software_agents"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     body = { "name": name}
     r = requests.post(url, headers=headers, data=json.dumps(body))
     if r.status_code ==201:
@@ -55,7 +55,7 @@ key = re.sub('\-','',str(uuid.uuid4()))
 
 def create_metadata_property(template_id):
     url = os.getenv('HOST_NAME') + "/templates/" + template_id + "/properties"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     body = {
             "key": key,
             "label": re.sub('\-','',str(uuid.uuid4())),
@@ -70,7 +70,7 @@ def create_metadata_property(template_id):
 
 def create_meta_object(file_id,template_id):
     url = os.getenv('HOST_NAME') + "/meta/dds-file/" + file_id + "/" + template_id
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     body = {
             "properties": [{"key": key,"value": "alignments"}]
             }
@@ -82,7 +82,7 @@ def create_meta_object(file_id,template_id):
 
 def create_metadata_templatess():
     url = os.getenv('HOST_NAME') + "/templates"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     body = {"name": re.sub('\-','',str(uuid.uuid4())),
             "label": "Sequencing File Info",
             "description": "Extended attributes for sequencing output files."
@@ -95,7 +95,7 @@ def create_metadata_templatess():
 
 def generate_sa_key(transaction,_id):
     url = os.getenv('HOST_NAME') + "/software_agents/" + _id + "/api_key"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.put(url, headers=headers)
     if r.status_code ==200:
         text = json.loads(r.text)
@@ -105,7 +105,7 @@ def generate_sa_key(transaction,_id):
 
 def generate_user_key(transaction):
     url = os.getenv('HOST_NAME') + "/current_user/api_key"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.put(url, headers=headers)
     if r.status_code ==200:
         text = json.loads(r.text)
@@ -115,7 +115,7 @@ def generate_user_key(transaction):
 
 def get_user_id_notme():
     url = os.getenv('HOST_NAME') + "/users"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.get(url, headers=headers)
     if r.status_code ==200:
         text = json.loads(r.text)
@@ -142,7 +142,7 @@ def upload_a_file(proj_id,unique=None):
             "hash": {"value":chunk['hash']['value'],"algorithm":'md5'}
             }
     url = os.getenv('HOST_NAME') + "/projects/" + proj_id + "/uploads"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.post(url, headers=headers, data=json.dumps(body))
     if r.status_code != 201:
         print("upload_a_file could not initiate the chunked upload error: " + str(r.status_code))
@@ -175,7 +175,7 @@ def upload_a_file(proj_id,unique=None):
 def create_a_file(proj_id,upload_id):
     body = {"parent":{"kind":"dds-project","id":proj_id},
             "upload":{"id":upload_id}}
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     url = os.getenv('HOST_NAME') + "/files"
     r5 = requests.post(url, headers=headers, data=json.dumps(body))
     return(str(json.loads(r5.text)['id']))
@@ -184,14 +184,14 @@ def update_a_file(upload_id,file_id):
     returns the new file_version_id of the file
     """
     body = {"upload":{"id":upload_id}}
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     url = os.getenv('HOST_NAME') + "/files/" + str(file_id)
     r5 = requests.put(url, headers=headers, data=json.dumps(body))
     return str(json.loads(r5.text).get('current_version').get('id'))
 def create_a_folder(proj_id,name):
     body = {"parent":{"kind":"dds-project","id":proj_id},
             "name":name}
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     url = os.getenv('HOST_NAME') + "/folders"
     r = requests.post(url, headers=headers, data=json.dumps(body))
     return(str(json.loads(r.text)['id']))
@@ -200,12 +200,12 @@ def create_provenance_activity():
     description = "a dredd provenance activity creation"
     body = {"name": name, "description":description}
     url = os.getenv('HOST_NAME') + "/activities"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.post(url, headers=headers, data=json.dumps(body))
     return(str(json.loads(r.text)['id']))
 def get_current_file_version(file_id):
     url = os.getenv('HOST_NAME') + "/files/" + file_id + "/versions"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.get(url,headers=headers)
     file_versions = []
     for x in json.loads(str(r.text)).get('results'):
@@ -213,24 +213,24 @@ def get_current_file_version(file_id):
     return(str(file_versions[-1]))
 def get_a_file(file_id):
     url = os.getenv('HOST_NAME') + "/files/" + file_id
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.get(url,headers=headers)
     return json.loads(r.text)
 
 def promote_a_file_version(file_version_id):
     url = os.getenv('HOST_NAME') + "/file_versions/" + file_version_id + "/current"
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.post(url,headers=headers)
     return(str(json.loads(r.text)[u'results'][0]['id']))
 def delete_a_file_version(file_version_id):
     url = os.getenv('HOST_NAME') + "/file_versions/" + file_version_id
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.delete(url,headers=headers)
     if r.status_code != 204:
         print("Could not delete the file version" + str(file_version_id))
 def delete_a_file(file_id):
     url = os.getenv('HOST_NAME') + "/files/" + file_id
-    headers = { "Content-Type": "application/json", "Authorization": os.getenv('MY_GENERATED_JWT')}
+    headers = { "Content-Type": "application/json", "Authorization": os.getenv('apiToken')}
     r = requests.delete(url,headers=headers)
     if r.status_code != 204:
         print("Could not delete the file" + str(file_id))

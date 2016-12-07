@@ -14,4 +14,4 @@ utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
 @hooks.before("Project Roles > Project Roles collection > List project roles")
 @hooks.before("Project Roles > Project Role instance > View project role")
 def skippy07_1(transaction):
-    pass
+    utils.pass_this_endpoint(transaction)

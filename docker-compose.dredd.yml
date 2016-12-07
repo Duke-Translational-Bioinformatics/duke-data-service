@@ -1,6 +1,7 @@
 version: '2'
 services:
   dredd:
+    env_file: ./dredd.env
     build: ./docker/builds/dredd
     volumes:
       - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
