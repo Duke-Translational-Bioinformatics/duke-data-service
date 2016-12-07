@@ -14,6 +14,8 @@ from dataservice.core.fileuploader import FileUploader, FileUploadOperations
 config = create_config()
 
 
+utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
+
 ###############################################################################
 ###############################################################################
 #           Files
