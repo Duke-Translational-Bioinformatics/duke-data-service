@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::FolderSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:data_file) }
+  let(:resource) { FactoryGirl.create(:folder) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name,
