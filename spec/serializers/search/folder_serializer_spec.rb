@@ -12,15 +12,7 @@ RSpec.describe Search::FolderSerializer, type: :serializer do
   }}
 
   it_behaves_like 'a has_one association with', :parent, Search::FolderSummarySerializer
-  it_behaves_like 'a has_one association with', :creator, Search::UserSummarySerializer do
-    let(:expected_attributes) {{
-        'creator' => Search::UserSummarySerializer.new(resource.audits.find_by(action: 'create').user).as_json
-    }}
-
-    it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_attributes) }
-    end
-  end
+  it_behaves_like 'a has_one association with', :creator, Search::UserSummarySerializer
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }

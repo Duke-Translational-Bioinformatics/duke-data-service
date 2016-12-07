@@ -154,6 +154,21 @@ RSpec.describe Folder, type: :model do
       it { expect(subject.as_indexed_json).to eq(Search::FolderSerializer.new(subject).as_json) }
     end
 
+    describe 'creator' do
+      let(:creator) { FactoryGirl.create(:user) }
+      subject {
+        Audited.audit_class.as_user(creator) do
+          FactoryGirl.create(:folder)
+        end
+      }
+
+      it { is_expected.to respond_to :creator }
+      it {
+        expect(subject.audits.find_by(action: 'create')).not_to be_nil
+        expect(subject.creator.id).to eq(subject.audits.find_by(action: 'create').user.id)
+      }
+    end
+
     describe 'mappings' do
       subject { root_folder.class.mapping.to_hash }
       it {

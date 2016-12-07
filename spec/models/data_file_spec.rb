@@ -245,6 +245,22 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 
+  describe 'creator' do
+    let(:creator) { FactoryGirl.create(:user) }
+    subject {
+      Audited.audit_class.as_user(creator) do
+        FactoryGirl.create(:data_file)
+      end
+    }
+    it { is_expected.to respond_to :creator }
+    it {
+      expect(subject.current_file_version).not_to be_nil
+      expect(subject.current_file_version.audits).not_to be_empty
+      expect(subject.current_file_version.audits.find_by(action: 'create')).not_to be_nil
+      expect(subject.creator.id).to eq(subject.current_file_version.audits.find_by(action: 'create').user.id)
+    }
+  end
+
   describe 'elasticsearch' do
     it { expect(described_class).to include(Elasticsearch::Model) }
 
