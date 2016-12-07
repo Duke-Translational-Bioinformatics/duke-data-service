@@ -4639,6 +4639,22 @@ Metadata must be defined and captured in the context of a metadata template. Tem
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## List metadata templates [GET /templates{?name_contains}]
 List all of the global metadata templates.
 >**Permission:** authenticated
@@ -4661,6 +4677,14 @@ List all of the global metadata templates.
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## Metadata Template instance [/templates/{id}]
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
@@ -4679,6 +4703,22 @@ List all of the global metadata templates.
             "description": "Extended attributes for sequencing output files (raw and processed).",
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (template restricted)
+
++ Response 404 (text/plain)
+
+        Template does not exist
 
 ### Update metadata template [PUT]
 >**Permission:** creator or system_admin
@@ -4704,6 +4744,25 @@ List all of the global metadata templates.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (template restricted)
+
++ Response 404 (text/plain)
+
+        Template does not exist
 
 ### Delete metadata template [DELETE]
 >**Permission:** creator or system_admin
@@ -4714,6 +4773,18 @@ List all of the global metadata templates.
 + The template cannot be deleted if it has been associated to one or more DDS objects.
 
 + Response 204
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (template restricted)
+
++ Response 404 (text/plain)
+
+        Template does not exist
 
 ## Metadata Properties collection [/templates/{id}/properties]
 + Parameters
@@ -4761,6 +4832,22 @@ List all of the global metadata templates.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## List metadata properties [GET /templates/{id}/properties]
 List metadata template properties.
 >**Permission:** authenticated
@@ -4788,6 +4875,14 @@ List metadata template properties.
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
 ## Metadata Property instance [/template_properties/{id}]
 + Parameters
     + id (string, required, `48d34c8f-4284-4327-9ca6-7a9145a1c957`) ... The unique `id` of the template property.
@@ -4811,6 +4906,22 @@ List metadata template properties.
             "type": "string",
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (property restricted)
+
++ Response 404 (text/plain)
+
+        Property does not exist
 
 ### Update metadata property [PUT]
 >**Permission:** creator or system_admin
@@ -4842,6 +4953,22 @@ List metadata template properties.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (template property restricted)
+
++ Response 404 (text/plain)
+
+        Property does not exist
+
 ### Delete metadata property [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
@@ -4851,6 +4978,18 @@ List metadata template properties.
 + The template property cannot be deleted if it is assigned to one or more DDS objects.
 
 + Response 204
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden (template property restricted)
+
++ Response 404 (text/plain)
+
+        Template does not exist
 
 ## Object Metadata instance [/meta/{object_kind}/{object_id}/{template_id}]
 + Parameters
@@ -4907,6 +5046,30 @@ Used to create a metadata template instance for a corresponding DDS object (i.e.
             ]
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Object or template does not exist
+
++ Response 409 (text/plain)
+
+        Template instance already exists for the DDS object
+
 ### View object metadata [GET]
 Used to retrieve the metadata template instance for a corresponding DDS object.
 >**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
@@ -4933,6 +5096,22 @@ Used to retrieve the metadata template instance for a corresponding DDS object.
                 }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Object or template does not exist
 
 ### Update object metadata [PUT]
 Used to update a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When updating metadata, only values that adhere to the metadata template schema will be accepted.
@@ -4984,12 +5163,44 @@ Used to update a metadata template instance for a corresponding DDS object (i.e.
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Object or Template does not exist
+
 ### Delete object metadata [DELETE]
 Used to delete the metadata template instance.
 >**Permission:** update_file when annotated object is file (`dds-file`)
 - - - - -
 
++ Response 200 (text/plain)
+
+        This will never happen
+
 + Response 204
+
++ Response 401 (text/plain)
+
+        Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 404 (text/plain)
+
+        Object or Template does not exist
 
 ## View All Object Metadata [/meta/{object_kind}/{object_id}]
 + Parameters
@@ -5026,6 +5237,18 @@ Used to retrieve all metadata associated with a DDS object, optionally find a te
                 }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Object or Template does not exist
 
 ## Group Search Objects
 The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages [Elasticsearch](https://www.elastic.co/) to perform document based searches.  All queries must be specified in [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html).
@@ -5121,6 +5344,22 @@ Search for DDS objects (i.e. Elasticsearch documents).
             ]
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        One or more included kinds is not supported, or not indexed
+
 ## Group Project Transfer
 **Proposed endpoints to meet the needs of the GCB project transfer workflow**
 The *Project Transfer* actions can be used by research core facilities to formally transfer ownership of a project to a researcher (customer).  These endpoints support the transfer workflow and retain a record of the transfer history.
@@ -5183,6 +5422,26 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        This will never happen
+
++ Response 201 (text/plain)
+
+        Successfully Created
+
++ Response 400 (text/plain)
+
+        Project Transfer Already Exists
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
 ### NOT_IMPLEMENTED_NEW List project transfers [GET]
 >**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
 - - - - -
@@ -5215,6 +5474,18 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             ]
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Project does not exist
+
 ## Project Transfer instance [/project_transfers/{id}]
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
@@ -5246,6 +5517,22 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "status_comment": null,
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Project Transfer does not exist
 
 ## NOT_IMPLEMENTED_NEW Accept a project transfer [PUT /project_transfers/{id}/accept]
 Accept a *pending* project transfer.
@@ -5294,6 +5581,26 @@ Accept a *pending* project transfer.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Project transfer does not exist
+
 ## NOT_IMPLEMENTED_NEW Reject a project transfer [PUT /project_transfers/{id}/reject]
 Reject a *pending* project transfer.
 >**Permission:** transfer recipient (i.e. in `to_users`)]
@@ -5339,6 +5646,26 @@ Reject a *pending* project transfer.
             "status_comment": "Missing alignment files...",
             "audit": { }
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Project transfer does not exist
 
 ## NOT_IMPLEMENTED_NEW Cancel a project transfer [PUT /project_transfers/{id}/cancel]
 Cancel a *pending* project transfer.
@@ -5386,6 +5713,26 @@ Cancel a *pending* project transfer.
             "audit": { }
         }
 
++ Response 200 (text/plain)
+
+        Success
+
++ Response 400 (text/plain)
+
+        Validation Error
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 403 (text/plain)
+
+        Forbidden
+
++ Response 404 (text/plain)
+
+        Project transfer does not exist
+
 ## View All Project Transfers [/project_transfers{?status}]
 + Parameters
     + status (string, optional, `pending`) ... The `status` of the project transfer; can be one of `pending`,`accepted`, or `canceled`.
@@ -5422,6 +5769,18 @@ Used to retrieve all project transfers visible to the current user, optionally f
                 }
             ]
         }
+
++ Response 200 (text/plain)
+
+        Success
+
++ Response 401 (text/plain)
+
+        Unauthorized
+
++ Response 404 (text/plain)
+
+        Unsupported Status
 
 ## Group Authentication Providers
 Represents the authentication providers (services) that are supported by DDS.
