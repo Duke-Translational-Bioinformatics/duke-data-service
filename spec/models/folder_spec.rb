@@ -163,10 +163,34 @@ RSpec.describe Folder, type: :model do
       name: "string",
       is_deleted: "boolean",
       created_at: "date",
-      updated_at: "date"
+      updated_at: "date",
+      parent: "object",
+      creator: "object"
     }}
 
     it_behaves_like 'an Elasticsearch::Model'
-    it_behaves_like 'an Elasticsearch index mapping model'
+    it_behaves_like 'an Elasticsearch index mapping model' do
+      it {
+        #parent
+        expect(subject[:folder][:properties][:parent]).to have_key :properties
+        expect(subject[:folder][:properties][:parent][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:parent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:parent][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:parent][:properties][:name][:type]).to eq "string"
+
+        #creator
+        expect(subject[:folder][:properties][:creator]).to have_key :properties
+        expect(subject[:folder][:properties][:creator][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:creator][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:creator][:properties]).to have_key :username
+        expect(subject[:folder][:properties][:creator][:properties][:username][:type]).to eq "string"
+        expect(subject[:folder][:properties][:creator][:properties]).to have_key :email
+        expect(subject[:folder][:properties][:creator][:properties][:email][:type]).to eq "string"
+        expect(subject[:folder][:properties][:creator][:properties]).to have_key :first_name
+        expect(subject[:folder][:properties][:creator][:properties][:first_name][:type]).to eq "string"
+        expect(subject[:folder][:properties][:creator][:properties]).to have_key :last_name
+        expect(subject[:folder][:properties][:creator][:properties][:last_name][:type]).to eq "string"
+      }
+    end
   end
 end

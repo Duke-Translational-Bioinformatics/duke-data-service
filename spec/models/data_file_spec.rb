@@ -270,18 +270,50 @@ RSpec.describe DataFile, type: :model do
       created_at: "date",
       updated_at: "date",
       label: "string",
-      tags: "object"
+      tags: "object",
+      project: "object",
+      parent: "object",
+      creator: "object"
     }}
 
     it_behaves_like 'an Elasticsearch::Model'
     it_behaves_like 'an Elasticsearch index mapping model' do
       it {
+        #tags
+        expect(subject[:data_file][:properties][:tags]).to have_key :properties
         expect(subject[:data_file][:properties][:tags][:properties]).to have_key :label
         expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "string"
         expect(subject[:data_file][:properties][:tags][:properties][:label]).to have_key :fields
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields]).to have_key :raw
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "string"
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:index]).to eq "not_analyzed"
+
+        #project
+        expect(subject[:data_file][:properties][:project]).to have_key :properties
+        expect(subject[:data_file][:properties][:project][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:project][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:project][:properties][:name][:type]).to eq "string"
+
+        #parent
+        expect(subject[:data_file][:properties][:parent]).to have_key :properties
+        expect(subject[:data_file][:properties][:parent][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:parent][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:parent][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:parent][:properties][:name][:type]).to eq "string"
+
+        #creator
+        expect(subject[:data_file][:properties][:creator]).to have_key :properties
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:creator][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :username
+        expect(subject[:data_file][:properties][:creator][:properties][:username][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :email
+        expect(subject[:data_file][:properties][:creator][:properties][:email][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :first_name
+        expect(subject[:data_file][:properties][:creator][:properties][:first_name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :last_name
+        expect(subject[:data_file][:properties][:creator][:properties][:last_name][:type]).to eq "string"
       }
     end
   end

@@ -83,6 +83,23 @@ class DataFile < Container
           raw: {type: "string", index: "not_analyzed"}
         }
       end
+      indexes :project do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :parent do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :creator do
+        indexes :id, type: "string"
+        indexes :username, type: "string"
+        indexes :first_name, type: "string"
+        indexes :last_name, type: "string"
+        indexes :email, type: "string"
+      end
     end
   end
 

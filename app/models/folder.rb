@@ -43,6 +43,20 @@ class Folder < Container
       indexes :is_deleted, type: "boolean"
       indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
       indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+
+      indexes :parent do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :creator do
+        indexes :id, type: "string"
+        indexes :username, type: "string"
+        indexes :first_name, type: "string"
+        indexes :last_name, type: "string"
+        indexes :email, type: "string"
+      end
+
     end
   end
 
