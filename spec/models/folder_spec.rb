@@ -141,6 +141,21 @@ RSpec.describe Folder, type: :model do
     end
   end
 
+  describe 'creator' do
+    let(:creator) { FactoryGirl.create(:user) }
+    subject {
+      Audited.audit_class.as_user(creator) do
+        FactoryGirl.create(:folder)
+      end
+    }
+
+    it { is_expected.to respond_to :creator }
+    it {
+      expect(subject.audits.find_by(action: 'create')).not_to be_nil
+      expect(subject.creator.id).to eq(subject.audits.find_by(action: 'create').user.id)
+    }
+  end
+
   describe 'elasticsearch' do
     it { expect(described_class).to include(Elasticsearch::Model) }
 
@@ -152,21 +167,6 @@ RSpec.describe Folder, type: :model do
       # let!(:tag) { FactoryGirl.create(:tag, taggable: child_folder) }
       it { is_expected.to respond_to 'as_indexed_json' }
       it { expect(subject.as_indexed_json).to eq(Search::FolderSerializer.new(subject).as_json) }
-    end
-
-    describe 'creator' do
-      let(:creator) { FactoryGirl.create(:user) }
-      subject {
-        Audited.audit_class.as_user(creator) do
-          FactoryGirl.create(:folder)
-        end
-      }
-
-      it { is_expected.to respond_to :creator }
-      it {
-        expect(subject.audits.find_by(action: 'create')).not_to be_nil
-        expect(subject.creator.id).to eq(subject.audits.find_by(action: 'create').user.id)
-      }
     end
 
     describe 'mappings' do
