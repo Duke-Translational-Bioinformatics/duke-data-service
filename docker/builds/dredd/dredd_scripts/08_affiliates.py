@@ -17,10 +17,10 @@ def affiliates_hooks08_1(transaction):
     global this_project_id, notme
     name = str(uuid.uuid4())
     description = "Created by dredd unders: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     url = transaction['fullPath']
     this_project_id = str(neww['id'])
-    notme = utils.get_user_id_notme(transaction)
+    notme = utils.get_user_id_notme()
     transaction['fullPath'] = str(url).replace('ca29f7df-33ca-46dd-a015-92c46fdb6fd1',this_project_id).replace('c1179f73-0558-4f96-afc7-9d251e65b7bb',notme)
 @hooks.before("Affiliates > Affiliate instance > View affiliate")
 @hooks.before("Affiliates > Affiliate instance > Delete affiliate")

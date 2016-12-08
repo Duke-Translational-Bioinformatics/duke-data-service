@@ -9,6 +9,7 @@
 
 #Ignore mac
 *.DS_Store
+node_modules
 
 #python hooks
 *.pyc
