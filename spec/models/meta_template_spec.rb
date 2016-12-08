@@ -37,4 +37,30 @@ RSpec.describe MetaTemplate, type: :model do
     it { expect(described_class.templatable_classes).to match_array(templatable_classes)}
   end
 
+  describe '#save' do
+    context 'with concurrent calls' do
+      self.use_transactional_fixtures = false
+      after do
+        ActiveRecord::Base.subclasses.each(&:delete_all)
+      end
+      let(:template) { FactoryGirl.create(:template) }
+      let(:templatable) { FactoryGirl.create(:data_file) }
+      let(:meta_templates) { FactoryGirl.build_list(:meta_template, 4, template: template, templatable: templatable) }
+      before do
+        expect(ActiveRecord::Base.connection.pool.size).to be > 4
+
+        threads = meta_templates.collect do |meta_template|
+          Thread.new do
+            expect{meta_template.save}.not_to raise_error
+          end
+        end
+
+        threads.each(&:join)
+      end
+
+      it 'should only create one' do
+        expect(MetaTemplate.count).to eq(1)
+      end
+    end
+  end
 end
