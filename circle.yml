@@ -46,9 +46,9 @@ deployment:
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds-dev'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds-dev'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds-dev'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds-dev'
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds-dev'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds-dev'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds-dev'"
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -62,9 +62,9 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds-uatest'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds-uatest'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds-uatest'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds-uatest'
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds-uatest'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds-uatest'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds-uatest'"
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -77,6 +77,6 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds'
-    - [[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds'
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds'"
+    - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds'"
