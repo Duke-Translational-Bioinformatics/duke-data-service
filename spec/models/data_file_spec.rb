@@ -262,43 +262,22 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'elasticsearch' do
-    it { expect(described_class).to include(Elasticsearch::Model) }
+    let(:search_serializer) { Search::DataFileSerializer }
+    let(:property_mappings) {{
+      id: "string",
+      name: "string",
+      is_deleted: "boolean",
+      created_at: "date",
+      updated_at: "date",
+      label: "string",
+      tags: "object"
+    }}
 
-    # TODO, when we move to asynchronous indexing, remove this and replace with
-    # a test to ensure that jobs are created on create, update, delete
-    it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
-
-    it { is_expected.to respond_to 'as_indexed_json' }
-    it { expect(subject.as_indexed_json).to eq(Search::DataFileSerializer.new(subject).as_json) }
-
-    describe 'mappings' do
-      subject { root_file.class.mapping.to_hash }
+    it_behaves_like 'an Elasticsearch::Model'
+    it_behaves_like 'an Elasticsearch index mapping model' do
       it {
-        is_expected.to have_key :data_file
-
-        expect(subject[:data_file]).to have_key :dynamic
-        expect(subject[:data_file][:dynamic]).to eq "false"
-
-        expect(subject[:data_file]).to have_key :properties
-        [:id, :name, :is_deleted, :created_at, :updated_at, :label, :tags].each do |expected_property|
-          expect(subject[:data_file][:properties]).to have_key expected_property
-        end
-
-        expect(subject[:data_file][:properties][:id][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:name][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:label][:type]).to eq "string"
-
-        expect(subject[:data_file][:properties][:is_deleted][:type]).to eq "boolean"
-
-        expect(subject[:data_file][:properties][:created_at][:type]).to eq "date"
-        expect(subject[:data_file][:properties][:updated_at][:type]).to eq "date"
-
-        expect(subject[:data_file][:properties][:tags][:type]).to eq "object"
-
-        expect(subject[:data_file][:properties][:tags]).to have_key :properties
         expect(subject[:data_file][:properties][:tags][:properties]).to have_key :label
         expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "string"
-
         expect(subject[:data_file][:properties][:tags][:properties][:label]).to have_key :fields
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields]).to have_key :raw
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "string"
