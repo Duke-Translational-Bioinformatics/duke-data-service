@@ -245,20 +245,52 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 
-  describe 'creator' do
+  describe '#creator' do
     let(:creator) { FactoryGirl.create(:user) }
-    subject {
-      Audited.audit_class.as_user(creator) do
-        FactoryGirl.create(:data_file)
-      end
-    }
     it { is_expected.to respond_to :creator }
-    it {
-      expect(subject.current_file_version).not_to be_nil
-      expect(subject.current_file_version.audits).not_to be_empty
-      expect(subject.current_file_version.audits.find_by(action: 'create')).not_to be_nil
-      expect(subject.creator.id).to eq(subject.current_file_version.audits.find_by(action: 'create').user.id)
-    }
+
+    context 'with nil current_file_version' do
+      subject {
+        df = FactoryGirl.create(:data_file)
+        df.file_versions.destroy_all
+        df
+      }
+      it {
+        expect(subject.current_file_version).to be_nil
+        expect(subject.creator).to be_nil
+      }
+    end
+
+    context 'with nil current_file_version create audit' do
+      subject {
+        FactoryGirl.create(:data_file)
+      }
+
+      around(:each) do |example|
+          FileVersion.auditing_enabled = false
+          example.run
+          FileVersion.auditing_enabled = true
+      end
+
+      it {
+        expect(subject.current_file_version).not_to be_nil
+        expect(subject.current_file_version.audits.find_by(action: 'create')).to be_nil
+        expect(subject.creator).to be_nil
+      }
+    end
+
+    context 'with current_file_version and create audit' do
+      subject {
+        Audited.audit_class.as_user(creator) do
+          FactoryGirl.create(:data_file)
+        end
+      }
+      it {
+        expect(subject.current_file_version).not_to be_nil
+        expect(subject.current_file_version.audits.find_by(action: 'create')).not_to be_nil
+        expect(subject.creator.id).to eq(subject.current_file_version.audits.find_by(action: 'create').user.id)
+      }
+    end
   end
 
   describe 'elasticsearch' do

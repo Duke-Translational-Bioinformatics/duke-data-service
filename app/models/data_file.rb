@@ -104,6 +104,9 @@ class DataFile < Container
   end
 
   def creator
-    current_file_version.audits.find_by(action: "create").user
+    return unless current_file_version
+    create_audit = current_file_version.audits.find_by(action: "create")
+    return unless create_audit
+    create_audit.user
   end
 end
