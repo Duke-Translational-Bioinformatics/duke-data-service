@@ -141,19 +141,39 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe 'creator' do
+  describe '#creator' do
     let(:creator) { FactoryGirl.create(:user) }
-    subject {
-      Audited.audit_class.as_user(creator) do
-        FactoryGirl.create(:folder)
-      end
-    }
-
     it { is_expected.to respond_to :creator }
-    it {
-      expect(subject.audits.find_by(action: 'create')).not_to be_nil
-      expect(subject.creator.id).to eq(subject.audits.find_by(action: 'create').user.id)
-    }
+
+    context 'with nil creation audit' do
+      subject {
+        FactoryGirl.create(:folder)
+      }
+
+      around(:each) do |example|
+          Folder.auditing_enabled = false
+          example.run
+          Folder.auditing_enabled = true
+      end
+
+      it {
+        expect(subject.audits.find_by(action: 'create')).to be_nil
+        expect(subject.creator).to be_nil
+      }
+    end
+
+    context 'with creation audit' do
+      subject {
+        Audited.audit_class.as_user(creator) do
+          FactoryGirl.create(:folder)
+        end
+      }
+
+      it {
+        expect(subject.audits.find_by(action: 'create')).not_to be_nil
+        expect(subject.creator.id).to eq(subject.audits.find_by(action: 'create').user.id)
+      }
+    end
   end
 
   describe 'elasticsearch' do

@@ -61,6 +61,8 @@ class Folder < Container
   end
 
   def creator
-    audits.find_by(action: "create").user
+    creation_audit = audits.find_by(action: "create")
+    return unless creation_audit
+    creation_audit.user
   end
 end
