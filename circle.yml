@@ -71,3 +71,5 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
+    - echo "apiToken="`heroku run rake api_test_user:create -a dukeds-dev | tail -1 | sed 's/\*\*.*\[NewRelic\].*//'` >> dredd.env
+    - docker-compose -f docker-compose.dredd.yml run dredd
