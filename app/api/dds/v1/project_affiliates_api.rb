@@ -72,7 +72,7 @@ module DDS
         detail 'Remove project level affiliation for a user'
         named 'delete project affiliation'
         failure [
-          [204, 'Success'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
         ]

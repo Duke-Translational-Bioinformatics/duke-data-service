@@ -9,7 +9,7 @@ module DDS
         named 'initiate project transfer'
         failure [
           [200, 'This will never actually happen'],
-          [201, 'Created Successfully'],
+          [201, 'Successfully Created'],
           [400, 'Project Transfer Already Exists'],
           [401, 'Unauthorized'],
           [403, 'Forbidden']

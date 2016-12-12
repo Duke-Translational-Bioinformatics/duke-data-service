@@ -20,8 +20,8 @@ module DDS
         detail 'Creates an activity for the given payload.'
         named 'create activity'
         failure [
-          [200, 'This will never actually happen'],
-          [201, 'Created Successfully'],
+          [200, 'This will never happen'],
+          [201, 'Successfully Created'],
           [400, 'Activity requires a name'],
           [401, 'Unauthorized'],
           [403, 'Forbidden']
@@ -76,9 +76,9 @@ module DDS
         named 'update activity'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (activity restricted)'],
-          [400, 'Validation Error'],
           [404, 'Activity Does not Exist']
         ]
       end

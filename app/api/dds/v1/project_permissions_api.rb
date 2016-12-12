@@ -81,7 +81,7 @@ module DDS
         named 'revoke project permissions'
         failure [
           [200, 'This will never happen'],
-          [204, 'Success'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [404, 'Project or User Does not Exist']
         ]

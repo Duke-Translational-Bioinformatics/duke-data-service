@@ -80,7 +80,7 @@ module DDS
         detail 'Delete a Current User API key'
         named 'delete current_user api_key'
         failure [
-          [200, 'Success'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (software_agent restricted)'],
           [404, 'Current User Does not Exist']
