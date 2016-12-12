@@ -3,6 +3,8 @@ HOST: https://apidev.dataservice.duke.edu/api/v1
 
 # Duke Data Service
 
+[A link](admin_index.html)
+
 The Duke Data Service (DDS) API allows Duke researchers to store, organize, retrieve, share and generate provenance for data.
 
 This the documentation for the Data Service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
@@ -174,6 +176,10 @@ Represents the set of discrete permissions that can be granted to a user.
 ### List roles [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unsupported Context
 
 + Response 200 (application/json)
 
@@ -194,18 +200,6 @@ Represents the set of discrete permissions that can be granted to a user.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Unsupported Context
-
 ## Authorization Role instance [/auth_roles/{id}]
 + Parameters
     + id (string, required, `file_editor`) ... The unique `id` for an authorization role.
@@ -213,6 +207,10 @@ Represents the set of discrete permissions that can be granted to a user.
 ### View role [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unknown AuthRole
 
 + Response 200 (application/json)
 
@@ -232,18 +230,6 @@ Represents the set of discrete permissions that can be granted to a user.
             "is_deprecated": false
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Unknown AuthRole
-
 ## Group Software Agents
 Represents a software agent and associated secret that can be used to access the API actions from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of storage for failed uploads, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see **Current User** actions).
 
@@ -259,6 +245,13 @@ Creates software agent and an associated secret API key; the secret key is visib
 + **name (string)** - A short name for the software agent.
 + **description (string, optional)** - A verbose description for the software agent.
 + **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
+
+**Response messages:**
+* 200: This will never actually happen
+* 201: Created Successfully
+* 400: Software agent requires a name
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
 
 + Request (application/json)
 
@@ -277,26 +270,6 @@ Creates software agent and an associated secret API key; the secret key is visib
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Software agent requires a name
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (softrware_agent restricted)
-
 ## List software agents [GET]
 >**Permission:** authenticated
 - - - - -
@@ -304,6 +277,11 @@ Creates software agent and an associated secret API key; the secret key is visib
 >**Rules**
 - - - - -
 + Software Agents that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
 
 + Response 200 (application/json)
 
@@ -320,18 +298,6 @@ Creates software agent and an associated secret API key; the secret key is visib
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ## Software Agent instance [/software_agents/{id}]
 + Parameters
     + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
@@ -339,6 +305,11 @@ Creates software agent and an associated secret API key; the secret key is visib
 ## View software agent [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
 
 + Response 200 (application/json)
 
@@ -351,25 +322,15 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "audit": { }
             }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
-
 ## Update software agent [PUT]
 >**Permission:** creator or system_admin
 - - - - -
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
 
 + Request (application/json)
 
@@ -388,42 +349,16 @@ Creates software agent and an associated secret API key; the secret key is visib
                 "audit": { }
             }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
-
 ## Delete software agent [DELETE]
 >**Permission:** creator or system_admin
 
-+ Response 204 (text/plain)
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
 
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
++ Response 204
 
 ## Software Agent API Key [/software_agents/{id}/api_key]
 Generates a secret key for the software agent that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid user secret key (see **Current User** actions).
@@ -441,28 +376,18 @@ Generates a new secret key for the software agent.
 - - - - -
 + If the software agent already has an API key, this action deletes exisiting key and generates a new key.
 
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
 + Response 200 (application/json)
 
         {
             "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
             "created_on": "2015-06-01T12:00:00Z"
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
 
 ## View software agent API key [GET]
 Shows the secret key for the software agent.
@@ -475,6 +400,12 @@ Shows the secret key for the software agent.
 + **key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
 + **created_on (datetime)** - The date the software agent key was generated.
 
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
 + Response 200 (application/json)
 
             {
@@ -482,39 +413,17 @@ Shows the secret key for the software agent.
                 "created_on": "2015-01-01T12:00:00Z"
             }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
-
 ## Delete software agent API key [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
 
-+ Response 204 (text/plain)
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
 
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Software Agent Does not Exist
++ Response 204
 
 ## Software Agent Access Token [/software_agents/api_token]
 
@@ -539,6 +448,12 @@ Using a software agent secret key and a user secret key, get an access token.
 - - - - -
 + The agent associated with the agent key must not have been logically deleted.
 
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 400: Missing Required Keys
+* 404: Software Agent or User Does not Exist
+
 + Request
 
         {
@@ -554,22 +469,6 @@ Using a software agent secret key and a user secret key, get an access token.
             "time_to_live": 14400
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Missing Required Keys
-
-+ Response 404 (text/plain)
-
-        Software Agent or User Does not Exist
-
 ## Group Current User
 Represents the currently authenticated user.
 
@@ -583,6 +482,10 @@ Get profile for the currently authenticated user.
 >**Rules**
 - - - - -
 + The `agent` property is populated if user is authenticated via software agent token, otherwise the `agent` property is `null`.
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 
 + Response 200 (application/json)
 
@@ -602,14 +505,6 @@ Get profile for the currently authenticated user.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
 ## Current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 >**Permission:** authenticated [scope: view_project]
@@ -626,6 +521,10 @@ View summary usage for current user across all projects.
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
 + Counts/totals are only for project resources that are visible to the current user.
 
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+
 + Response 200 (application/json)
 
         {
@@ -633,14 +532,6 @@ View summary usage for current user across all projects.
             "file_count": 126,
             "storage_bytes": 304006007009
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
 
 ## Current User API Key [/current_user/api_key]
 
@@ -658,6 +549,11 @@ Generates a secret key for the current user that can be used to access the API a
 - - - - -
 + If the current user already has an API key, this action deletes their exisiting key and generates a new key.
 
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 403: Forbidden (software_agent restricted)
+
 + Response 200 (application/json)
 
         {
@@ -665,21 +561,15 @@ Generates a secret key for the current user that can be used to access the API a
             "created_on": "2015-01-01T12:00:00Z"
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
 ## View current user API key [GET]
 >**Permission:** authenticated
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (software_agent restricted)
+* 404: Current User or ApiKey Does not Exist
 
 + Response 200 (application/json)
 
@@ -688,41 +578,16 @@ Generates a secret key for the current user that can be used to access the API a
             "created_on": "2015-01-01T12:00:00Z"
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Current User or ApiKey Does not Exist
-
 ## Delete current user API key [DELETE]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (software_agent restricted)
+* 404: Current User Does not Exist
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (software_agent restricted)
-
-+ Response 404 (text/plain)
-
-        Current User Does not Exist
++ Response 204
 
 ## Group Users
 Represents registered users.
@@ -732,6 +597,9 @@ Represents registered users.
 ### List users [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Parameters
     + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
@@ -759,14 +627,6 @@ Represents registered users.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## User instance [/users/{id}]
 + Parameters
     + id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `id` for a user.
@@ -774,6 +634,10 @@ Represents registered users.
 ### View user [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: User does not exist
 
 + Response 200 (application/json)
 
@@ -792,18 +656,6 @@ Represents registered users.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        User does not exist
-
 ## Group System Permissions
 Represents system level authorization roles that have been granted to a user.
 
@@ -812,6 +664,9 @@ Represents system level authorization roles that have been granted to a user.
 ### List system permissions [GET]
 >**Permission:** system_admin
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200 (application/json)
 
@@ -831,14 +686,6 @@ Represents system level authorization roles that have been granted to a user.
                 }
             ]
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
 
 ## System Permission instance [/system/permissions/{user_id}]
 + Parameters
@@ -870,6 +717,11 @@ Represents system level authorization roles that have been granted to a user.
 + Revokes any existing system level authorization role for the user and grants the new role.
 + The role specified must be a system level authorization role (i.e. `system` in `auth_role.contexts`).
 
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: User or AuthRole Does not Exist
+
 + Request (application/json)
 
         {
@@ -880,62 +732,32 @@ Represents system level authorization roles that have been granted to a user.
 
     [System Permission instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        User or AuthRole Does not Exist
-
 ### View system permission [GET]
 >**Permission:** system_admin
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: User Does not Exist
 
 + Response 200
 
     [System Permission instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        User Does not Exist
-
 ### Revoke system permission [DELETE]
 >**Permission:** system_admin
 - - - - -
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: User Does not Exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        User Does not Exist
 
 ## Group Projects
 Represents a container for storing, organizing, retrieving and sharing research data files and their associated metadata.
 
 ## Projects collection [/projects]
-
-+ Model (application/json)
-
-    + Body
-
-
 
 ### Create project [POST]
 >**Permission:** authenticated
@@ -944,6 +766,13 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + User who creates project is granted the `project_admin` authorization role.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Created Successfully
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Request (application/json)
 
@@ -963,26 +792,6 @@ Represents a container for storing, organizing, retrieving and sharing research 
           "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Project Name Already Exists
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
 ### List projects [GET]
 >**Permission:** authenticated [scope: view_project]
 - - - - -
@@ -990,6 +799,10 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + Projects that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200 (application/json)
 
@@ -1026,18 +839,13 @@ Represents a container for storing, organizing, retrieving and sharing research 
 ### View project [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200
 
     [Project instance][]
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
 
 ### Update project [PUT]
 >**Permission:** update_project
@@ -1046,6 +854,13 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + Only `name` and `description` properties may be updated via this action.
+
+**Response messages:**
+* 200: Success
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project Does not Exist
 
 + Request (application/json)
 
@@ -1058,26 +873,6 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
     [Project instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Project Name Already Exists
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
 ### Delete project [DELETE]
 >**Permission:** delete_project
 - - - - -
@@ -1086,19 +881,13 @@ Represents a container for storing, organizing, retrieving and sharing research 
 - - - - -
 + This operation recursively deletes all of the project children (i.e. folders,files and file versions).
 
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project Does not Exist
+
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
 
 ## NOT_IMPLEMENTED_NEW Project usage [GET /projects/{id}/usage]
 View summary usage for the project.
@@ -1115,6 +904,9 @@ View summary usage for the project.
 >**Rules**
 - - - - -
 + Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
+
+**Response messages:**
+* 200: Success
 
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
@@ -1137,6 +929,10 @@ Represents project level authorization roles that have been granted to a user.
 ### List project permissions [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Response 200 (application/json)
 
@@ -1157,18 +953,6 @@ Represents project level authorization roles that have been granted to a user.
                 }
             ]
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
 
 ## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
 + Parameters
@@ -1203,6 +987,11 @@ Represents project level authorization roles that have been granted to a user.
 + The role specified must be a project level authorization role (i.e. `project` in `auth_role.contexts`).
 + The current user cannot grant or revoke their own project level role.
 
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project, User or Authrole Does not Exist
+
 + Request (application/json)
 
         {
@@ -1213,37 +1002,17 @@ Represents project level authorization roles that have been granted to a user.
 
     [Project Permission instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project, User, or AuthRole Does not Exist
-
 ### View project permission [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project, User or Authrole Does not Exist
 
 + Response 200
 
     [Project Permission instance][]
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project, User, or AuthRole Does not Exist
 
 ### Revoke project permission [DELETE]
 >**Permission:** manage_project_permissions
@@ -1254,19 +1023,13 @@ Represents project level authorization roles that have been granted to a user.
 + The project must have at least one user with the `project_admin` role.
 + The current user cannot revoke their own project level role.
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: Project, User or Authrole Does not Exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project, User, or AuthRole Does not Exist
 
 ## Group Project Roles
 Represents an organizational role that an individual (i.e. user) may assume in the context of a project.  These organizational roles have no relationship to authorization roles.
@@ -1283,6 +1046,9 @@ Represents an organizational role that an individual (i.e. user) may assume in t
 ### List project roles [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200 (application/json)
 
@@ -1303,14 +1069,6 @@ Represents an organizational role that an individual (i.e. user) may assume in t
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Project Role instance [/project_roles/{id}]
 + Parameters
     + id (string, required, `principal_investigator`) ... The unique `id` for a project role.
@@ -1318,6 +1076,10 @@ Represents an organizational role that an individual (i.e. user) may assume in t
 ### View project role [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unknown ProjectRole
 
 + Response 200 (application/json)
 
@@ -1327,18 +1089,6 @@ Represents an organizational role that an individual (i.e. user) may assume in t
             "description": "Lead investigator for the research project",
             "is_deprecated": false
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Unkown ProjectRole
 
 ### Group Affiliates
 Represents an individual that plays some project level role of interest from a collaboration perspective.  The affiliate must be a registered user.
@@ -1350,6 +1100,10 @@ Represents an individual that plays some project level role of interest from a c
 ### List affiliates [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Response 200 (application/json)
 
@@ -1369,18 +1123,6 @@ Represents an individual that plays some project level role of interest from a c
                 }
             ]
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
 
 ## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
 + Parameters
@@ -1412,6 +1154,12 @@ Represents an individual that plays some project level role of interest from a c
 - - - - -
 + Deletes any existing project role for the user and assigns new role.
 
+**Response messages:**
+* 200: Success
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 404: Project Does not Exist
+
 + Request (application/json)
 
         {
@@ -1422,55 +1170,27 @@ Represents an individual that plays some project level role of interest from a c
 
     [Affiliate instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Project Name Already Exists
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
 ### View affiliate [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Response 200
 
     [Affiliate instance][]
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
 ### Delete affiliate [DELETE]
 >**Permission:** update_project
 - - - - -
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
 
 ## Group Storage Providers
 Represents an external service that provides physical storage space for files.
@@ -1480,6 +1200,9 @@ Represents an external service that provides physical storage space for files.
 ### List storage providers [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200 (application/json)
 
@@ -1502,13 +1225,6 @@ Represents an external service that provides physical storage space for files.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
 ## Storage Provider instance [/storage_providers/{id}]
 + Parameters
     + id (string, required, `g5579f73-0558-4f96-afc7-9d251e65bv33`) ... The unique `id` of the storage provider.
@@ -1517,6 +1233,10 @@ Represents an external service that provides physical storage space for files.
 ### View storage provider [GET]
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: StorageProvider Does not Exist
 
 + Response 200 (application/json)
 
@@ -1527,19 +1247,6 @@ Represents an external service that provides physical storage space for files.
             "chunk_hash_algorithm": "md5",
             "is_deprecated": false
         }
-
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        StorageProvider Does not Exist
 
 ## Group Folders
 A folder is a container for files and sub-folders; folders are located in the top-level project root or a parent folder.
@@ -1559,6 +1266,12 @@ A folder is a container for files and sub-folders; folders are located in the to
 >**Response Properties**
 - - - - -
 + **ancestors (object[ ])** - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Project Does not Exist, Parent Folder does not exist in Project
 
 + Request (application/json)
 
@@ -1599,22 +1312,6 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist, Parent Folder does not exist in Project
-
 ## Folder instance [/folders/{id}]
 + Parameters
     + id (string, required, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... The unique `id` of the folder.
@@ -1622,6 +1319,10 @@ A folder is a container for files and sub-folders; folders are located in the to
 ### View folder [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Folder does not exist
 
 + Response 200 (application/json)
 
@@ -1652,18 +1353,6 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Folder does not exist
-
 ### Delete folder [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -1672,20 +1361,13 @@ A folder is a container for files and sub-folders; folders are located in the to
 - - - - -
 + This operation recursively deletes all of the folder children (i.e. folders, files and file versions).
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Folder does not exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Folder does not exist
-
 
 ## Move folder [PUT /folders/{id}/move]
 >**Permission:** create_file
@@ -1694,6 +1376,11 @@ A folder is a container for files and sub-folders; folders are located in the to
 >**Rules**
 - - - - -
 + The destination folder cannot be a child of the folder being moved.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Folder does not exist, Parent does not exist.
 
 + Parameters
     + id (string, required, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... The unique `id` of the folder.
@@ -1736,21 +1423,13 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Folder does not exist, Parent does not exist
-
 ## Rename folder [PUT /folders/{id}/rename]
 >**Permission:** create_file
 - - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Folder does not exist
 
 + Parameters
     + id (string, required, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... The unique `id` of the folder.
@@ -1788,18 +1467,6 @@ A folder is a container for files and sub-folders; folders are located in the to
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Folder does not exist
-
 ## Group Uploads
 All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following actions must be used by the client to manage the chunked upload process.
 
@@ -1823,6 +1490,12 @@ This is the first step in uploading a large file. An upload objects is created a
 + **chunks (object)** - The chunks the client has requested to upload.
 + **storage_location (object)** - Object that contains target storage details.
 + **status (object)** - Object used to track status of overall file upload.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Created Successfully
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Request (application/json)
 
@@ -1856,25 +1529,13 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
 ### List chunked uploads [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
 
 + Response 200 (application/json)
 
@@ -1903,19 +1564,6 @@ This is the first step in uploading a large file. An upload objects is created a
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist
-
-
 ## Upload instance [/uploads/{id}]
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -1923,6 +1571,10 @@ This is the first step in uploading a large file. An upload objects is created a
 ### View chunked upload [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Upload does not exist
 
 + Response 200 (application/json)
 
@@ -1958,18 +1610,6 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Upload Does not Exist
-
 ## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
 Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
 >**Permission:** create_file
@@ -1988,6 +1628,12 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
 + **host (string)** - The storage provider host.
 + **url (string)** - The pre-signed URL for uploading the chunk to the storage provider.
 + **http_headers (object[ ])** - Array of headers (i.e. key/value pairs) that must be included in the client upload request.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Upload does not exist
+* 500: Unexpected StorageProviderException experienced
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -2014,22 +1660,6 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Upload Does not Exist
-
-+ Response 500 (text/plain)
-
-        Unexpected StorageProviderException experienced
-
 ## Complete chunked file upload [PUT /uploads/{id}/complete]
 This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
 >**Permission:** create_file
@@ -2047,6 +1677,13 @@ This operation is called by the client after all file chunks have been successfu
 + The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.
 + The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
 + If there are no errors, the `upload_status.completed_on` is set to the current timestamp.
+
+**Response messages:**
+* 200: Success
+* 400: IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider
+* 401: Unauthorized
+* 404: Upload does not exist
+* 500: Unexpected StorageProviderException experienced
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -2107,26 +1744,6 @@ This operation is called by the client after all file chunks have been successfu
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Upload Does not Exist
-
-+ Response 500 (text/plain)
-
-        Unexpected StorageProviderException experienced
-
 ## Report upload hash [PUT /uploads/{id}/hashes]
 Report a hash (fingerprint) for the uploaded file.
 >**Permission:** update_file
@@ -2141,6 +1758,13 @@ Report a hash (fingerprint) for the uploaded file.
 - - - - -
 + The reported `value` must be a valid algorithm - supported/valid algorithms are: `md5`, `sha256`, and `sha1`.
 + The upload must be in a completed state (i.e. `upload_status.completed_on`).
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 404: Upload does not exist
+* 500: Unexpected StorageProviderException experienced
 
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
@@ -2199,26 +1823,6 @@ Report a hash (fingerprint) for the uploaded file.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Upload Does not Exist
-
-+ Response 500 (text/plain)
-
-        Unexpected StorageProviderException experienced
-
 ## Group Files
 A file resource represents a virtual container for a physical data file (i.e. `upload`) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).
 
@@ -2244,6 +1848,13 @@ Creates a file metadata resource; the client is responsible for the creation of 
 + The current user must be the user who uploaded the file.
 + The parent object (`dds-project` or `dds-folder`) must be associated with the same project that the upload is associated with.
 + The upload must be in a completed state (i.e. `upload.completed_on != null`).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Upload has an IntegrityException
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Project Does not Exist, Parent Folder or Upload does not exist in Project
 
 + Request (application/json)
 
@@ -2307,26 +1918,6 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Upload has an IntegrityException
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Project Does not Exist, Parent Folder or Upload does not exist in Project
-
 ## File instance [/files/{id}]
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2334,6 +1925,10 @@ Creates a file metadata resource; the client is responsible for the creation of 
 ### View file [GET]
 >**Permission:** view_project
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Response 200 (application/json)
 
@@ -2385,18 +1980,6 @@ Creates a file metadata resource; the client is responsible for the creation of 
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ### Update file [PUT]
 Updates one or more file resource properties; if this action includes an `upload.id` property in the request, a new file version is created and associated to the file - this becomes the `current_version` of the file (see **File Versions**).
 
@@ -2416,6 +1999,11 @@ Updates one or more file resource properties; if this action includes an `upload
 + The upload must be in a completed state (i.e. `upload.completed_on != null`).
 + Only `upload.id`, `label` properties can be updated via this action.
 + New versions are assigned the next sequential `version` number. (see **File Versions**)
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Request (application/json)
 
@@ -2476,18 +2064,6 @@ Updates one or more file resource properties; if this action includes an `upload
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ### Delete file [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -2496,19 +2072,13 @@ Updates one or more file resource properties; if this action includes an `upload
 - - - - -
 + This operation recursively deletes all the related file versions.
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
 
 ## Get file download URL [GET /files/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download file; the download URL is for the current version of the specified file.
@@ -2517,6 +2087,11 @@ Generates and returns a storage provider specific pre-signed URL that client can
 
 >**Permission:** download_file
 - - - - -
+**Response messages:**
+* 200: Success
+* 301: Redirect to file
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2530,27 +2105,15 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 301 (text/plain)
-
-        Redirect to file
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ## Move file [PUT /files/{id}/move]
 Move file to a different parent project or parent folder.
 
 >**Permission:** create_file
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist, Parent does not exist in Project
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2614,23 +2177,15 @@ Move file to a different parent project or parent folder.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist, Parent does not exist in Project
-
 ## Rename file [PUT /files/{id}/rename]
 Change the name of a file.
 
 >**Permission:** update_file
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Parameters
     + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique `id` of the file.
@@ -2692,18 +2247,6 @@ Change the name of a file.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist, Parent does not exist in Project
-
 ## Group File Versions
 The actions herein are used to interact with prior versions of a file resource.
 
@@ -2722,6 +2265,11 @@ This action can be used to list all prior versions of a file, including the curr
 >**Rules**
 - - - - -
 + File versions that have been deleted (i.e. `"is_deleted": true`) are included in this listing, but are immutable.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Response 200 (application/json)
 
@@ -2761,18 +2309,6 @@ This action can be used to list all prior versions of a file, including the curr
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ## File Version instance [/file_versions/{id}]
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
@@ -2780,6 +2316,10 @@ This action can be used to list all prior versions of a file, including the curr
 ### View file version [GET]
 >**Permission** view_project
 - - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Response 200 (application/json)
 
@@ -2815,18 +2355,6 @@ This action can be used to list all prior versions of a file, including the curr
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ### Update file version [PUT]
 >**Permission:** update_file
 - - - - -
@@ -2834,6 +2362,11 @@ This action can be used to list all prior versions of a file, including the curr
 >**Rules**
 - - - - -
 + Only the `label` property for a file version can be updated via this action.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File does not exist
 
 + Request (application/json)
 
@@ -2875,18 +2408,6 @@ This action can be used to list all prior versions of a file, including the curr
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File does not exist
-
 ### Delete file version [DELETE]
 >**Permission:** delete_file
 - - - - -
@@ -2895,24 +2416,23 @@ This action can be used to list all prior versions of a file, including the curr
 - - - - -
 + The current file version cannot be deleted.
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File version does not exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File version does not exist
 
 ## Get file version download URL [GET /file_versions/{id}/url]
 Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.
 >**Permission:** download_file
 - - - - -
+**Response messages:**
+* 200: Success
+* 301: Redirect to file version
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File version does not exist
 
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version.
@@ -2926,22 +2446,6 @@ Generates and returns a storage provider specific pre-signed URL that client can
             "http_headers": [ ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 301 (text/plain)
-
-        Redirect to file version
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File version does not exist
-
 ## Promote file version [POST /file_versions/{id}/current]
 This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the version stack.
 >**Permission:** update_file
@@ -2950,6 +2454,11 @@ This action can be used to promote a prior file version to the current version. 
 >**Rules**
 - - - - -
 + The current file version cannot be promoted.
+
+**Response messages:**
+* 201: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: File version does not exist
 
 + Parameters
     + id (string, required, `89ef1e77-1a0b-40a8-aaca-260d13987f2b`) ... The unique `id` of the file version to be promoted to the current version.
@@ -2988,18 +2497,6 @@ This action can be used to promote a prior file version to the current version. 
             "audit": { }
         }
 
-+ Response 201 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        File version does not exist
-
 ## Group Search Children
 Search for the children (i.e. folders and files) of a project or folder.
 
@@ -3011,6 +2508,11 @@ Search for the children (i.e. folders and files) of a project or folder.
 - - - - -
 + Searches the immediate children of the project unless the `name_contains` parameter is specified; when specified, the `name_contains` parameter invokes a recursive search of the project hierarchy.
 + Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in search.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Project does not exist
 
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
@@ -3097,18 +2599,6 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Project does not exist
-
 ## Search folder children [GET /folders/{id}/children{?name_contains,kind}]
 >**Permission:** view_project
 - - - - -
@@ -3117,6 +2607,11 @@ Search for the children (i.e. folders and files) of a project or folder.
 - - - - -
 + Searches the immediate children of the folder unless the `name_contains` parameter is specified; when specified, the `name_contains` parameter invokes a recursive search of the folder hierarchy.
 + Folders/files that have been deleted (i.e. `"is_deleted": true`) are not included in search.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Folder does not exist
 
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the folder.
@@ -3203,18 +2698,6 @@ Search for the children (i.e. folders and files) of a project or folder.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Folder does not exist
-
 ## Group Provenance Activities
 Represents the main record of provenance in DDS; it is analogous to *Activity* defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Activities are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
 
@@ -3237,6 +2720,13 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 - - - - -
 + The `ended_on` time must be greater than or equal to the `started_on` time.
 
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Activity requires a name
+* 401: Unauthorized
+* 403: Forbidden
+
 + Request (application/json)
 
         {
@@ -3257,26 +2747,6 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Activity requires a name
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ### List activities [GET]
 >**Permission:**
 - - - - -
@@ -3285,6 +2755,11 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 >**Rules**
 - - - - -
 + Activities that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
 
 + Response 200 (application/json)
 
@@ -3303,18 +2778,6 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             ]
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ## Activities instance [/activities/{id}]
 + Parameters
     + id (string, required, `a1ff02a4-b7e9-999d-87x1-66f4c881jka1`) ... The unique id of the activity.
@@ -3323,6 +2786,12 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 >**Permission:**
 - - - - -
 + creator *or* visiblity to single entity that has a provenance relation to the activity
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Activity does not exist
 
 + Response 200 (application/json)
 
@@ -3337,22 +2806,6 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Activity does not exist
-
 ### Update activity [PUT]
 >**Permission:** creator
 - - - - -
@@ -3360,6 +2813,13 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
 >**Rules**
 - - - - -
 + Only `name`, `description`, `started_on`, and `ended_on` properties may be updated via this action.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (activity restricted)
+* 404: Activity does not exist
 
 + Request (application/json)
 
@@ -3380,43 +2840,17 @@ Represents the main record of provenance in DDS; it is analogous to *Activity* d
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (activity restricted)
-
-+ Response 404 (text/plain)
-
-        Activity Does not Exist
-
 ### Delete activity [DELETE]
 >**Permission:** creator
 - - - - -
 
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (activity restricted)
+* 404: Activity does not exist
+
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (activity restricted)
-
-+ Response 404 (text/plain)
-
-        Activity Does not Exist
 
 ## Group Provenance Relations
 Represents provenance relations as defined in the [W3C Specification on Provenance](https://www.w3.org/TR/prov-primer/).  Relations are recorded/tracked by researchers and their *Software Agents* with the intent of maintaining comprehensive data provenance.
@@ -3436,6 +2870,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 >**Rules**
 - - - - -
 + An entity (i.e. `file_version`) cannot be used and generated by the same activity (i.e. `dds-activity`).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Activity and Entity are required, Activity generated Entity
+* 401: Unauthorized
+* 403: Forbidden
 
 + Request (application/json)
 
@@ -3498,26 +2939,6 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Activity and Entity are required, Activity generated Entity.
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ### Create was generated by relation [POST /relations/was_generated_by]
 >**Permission:** creator of the activity *and* update_file for the `wasGeneratedBy` entity
 - - - - -
@@ -3532,6 +2953,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 - - - - -
 + An entity (i.e. `file_version`) can be generated by one and only one activity (i.e. `dds-activity`).
 + An entity (i.e. `file_version`) cannot be used and generated by the same activity (i.e. `dds-activity`).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Activity and Entity are required, Activity generated Entity
+* 401: Unauthorized
+* 403: Forbidden
 
 + Request (application/json)
 
@@ -3594,26 +3022,6 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Activity and Entity are required, Entity can only be generated by one Activity, cannot be used by the same Activity.
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ### Create was derived from relation [POST /relations/was_derived_from]
 >**Permission:** visibility to the `used` entity and update_file for the `generated` entity.
 - - - - -
@@ -3624,6 +3032,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 + **generated_entity.id (string, required)** - The unique id of the generated entity.
 + **used_entity.kind (string, required)** - The kind of entity used by the derivation; this must be a file version (i.e. `dds-file-version`).
 + **used_entity.id (string, required)** - The unique id of the used entity.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Activity and Entity are required
+* 401: Unauthorized
+* 403: Forbidden
 
 + Request (application/json)
 
@@ -3708,27 +3123,6 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Activity and Entity are required
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-
 ### Create was invalidated by relation [POST /relations/was_invalidated_by]
 >**Permission:** creator of the activity *and* delete_file for `wasInvalidatedBy` entity
 - - - - -
@@ -3743,6 +3137,13 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
 - - - - -
 + The `invalidated` entity must be in a deleted state (i.e. `"is_deleted": true`).
 + An entity (i.e. `file_version`) can be invalidated by one and only one activity (i.e. `dds-activity`).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Activity and Entity are required
+* 401: Unauthorized
+* 403: Forbidden
 
 + Request (application/json)
 
@@ -3805,26 +3206,6 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never actually happen
-
-+ Response 201 (text/plain)
-
-        Created Successfully
-
-+ Response 400 (text/plain)
-
-        Activity and Entity are required
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ### List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
@@ -3833,6 +3214,12 @@ List the relations for a provenance node; this only lists direct relations for t
 >**Rules**
 - - - - -
 + Provenance relations that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Object kind or id does not exist
 
 + Parameters
     + object_kind (string, required, `dds-activity`) ... The kind of provenance node; can be one of dds-activity or dds-file-version.
@@ -3891,28 +3278,18 @@ List the relations for a provenance node; this only lists direct relations for t
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Object kind or id Does not Exist
-
 ## Relation instance [/relations/{id}]
 + Parameters
     + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
 ### View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 403: Forbidden
+* 404: Relation does not exist
 
 + Response 200 (application/json)
 
@@ -4097,19 +3474,13 @@ List the relations for a provenance node; this only lists direct relations for t
 ### Delete relation [DELETE]
 >**Permission:** creator
 
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Relation does not exist
+
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Relation Does not Exist
 
 ## Group Search Provenance
 The `Provenance Relations` API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a [graph structure](https://en.wikipedia.org/wiki/Graph_database).  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation.
@@ -4130,6 +3501,12 @@ Given a starting node, returns a graph structure for the provenance chain.  This
 + **start_node.kind (string, required)** - The kind of provenance node; can be one of `dds-activity` or `dds-file-version`.
 + **start_node.id (string, required)** - The unique id of the node.
 + **max_hops (number, optional)** -  The max number of hops (degree of node separation) to traverse from the starting node; defaults to infinity.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 401: Unauthorized
+* 404: start_node or start_node kind does not exist
 
 + Request (application/json)
 
@@ -4216,22 +3593,6 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        start_node or start_node kind does not exist
-
 ## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/origin]
 This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each *File Version*:
 
@@ -4251,6 +3612,11 @@ A graph structure of the unique nodes and relationships is returned.
 - - - - -
 + **file_versions (object[ ], required)** - The list of file versions (i.e. `dds-file-version`)
 + **file_versions[ ].id (string, required)** - The unique file version id.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 401: Unauthorized
 
 + Request (application/json)
 
@@ -4338,18 +3704,6 @@ A graph structure of the unique nodes and relationships is returned.
             }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Group Tags
 A tag is a label (i.e. word or phrase) that can be associated to an object to facilitate classification and searching.
 
@@ -4372,6 +3726,13 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
 - - - - -
 + The specified `label` must not already exist for the `(object.kind, object.id)`, the `label` comparison is *case-insensitive*.
 
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Tag requires a label
+* 401: Unauthorized
+* 404: Tag does not exist
+
 + Request (application/json)
 
         {
@@ -4390,29 +3751,12 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Tag requires a label
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Tag does not exist
-
 ### List object tags [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Response 200 (application/json)
 
@@ -4430,14 +3774,6 @@ A tag is a label (i.e. word or phrase) that can be associated to an object to fa
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
 Append a list of tags to an object.
 >**Permission:** update_file when tagged object is file (`dds-file`)
@@ -4453,6 +3789,13 @@ Append a list of tags to an object.
 + If the object has an exisiting tag with the specified `label`, the `label` is ignored and a tag is not appended (i.e. created); the `label` comparison is *case-insensitive*.
 + The request must specify at least one `label`.
 + The response only contains the list of `tags` that were appended (i.e. created).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Tag requires a label
+* 401: Unauthorized
+* 404: Tag does not exist
 
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
@@ -4482,26 +3825,6 @@ Append a list of tags to an object.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Tag requires a label
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Tag does not exist
-
 ## List tag labels [GET /tags/labels{?object_kind,label_contains}]
 Get a list of the **distinct** tag `label` values visible to the current user.
 
@@ -4513,6 +3836,10 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 >**Rules:**
 - - - - -
 + The returned tags are sorted in most recently used (i.e. `last_used_on`) order.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Parameters
     + object_kind (string, optional, `dds-file`) ... Restricts search scope to tags for this kind of object.
@@ -4540,14 +3867,6 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Tag instance [/tags/{id}]
 + Parameters
     + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
@@ -4555,6 +3874,10 @@ Get a list of the **distinct** tag `label` values visible to the current user.
 ### View tag [GET]
 >**Permission:** view_project when tagged object is file (`dds-file`)
 - - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Tag does not exist
 
 + Response 200 (application/json)
 
@@ -4567,35 +3890,16 @@ Get a list of the **distinct** tag `label` values visible to the current user.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Valid API Token in 'Authorization' Header
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Tag does not exist
-
 ### Delete tag [DELETE]
 >**Permission:** update_file when tagged object is file (`dds-file`)
 - - - - -
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Tag does not exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Tag does not exist
 
 ## Group Metadata
 The metadata actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, metadata are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
@@ -4621,6 +3925,12 @@ Metadata must be defined and captured in the context of a metadata template. Tem
 - - - - -
 + The template `name` must be unique in the global context.
 
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
+
 + Request (application/json)
 
         {
@@ -4639,26 +3949,13 @@ Metadata must be defined and captured in the context of a metadata template. Tem
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## List metadata templates [GET /templates{?name_contains}]
 List all of the global metadata templates.
 >**Permission:** authenticated
 - - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Parameters
     + name_contains (string, optional, `Sequencing`) ... Returns templates in which `name` contains the specified string.
@@ -4677,14 +3974,6 @@ List all of the global metadata templates.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Metadata Template instance [/templates/{id}]
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
@@ -4693,6 +3982,12 @@ List all of the global metadata templates.
 ### View metadata template [GET]
 >**Permission:** authenticated
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
 
 + Response 200 (application/json)
 
@@ -4704,22 +3999,6 @@ List all of the global metadata templates.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (template restricted)
-
-+ Response 404 (text/plain)
-
-        Template does not exist
-
 ### Update metadata template [PUT]
 >**Permission:** creator or system_admin
 - - - - -
@@ -4727,6 +4006,13 @@ List all of the global metadata templates.
 >**Rules**
 - - - - -
 + The `name` cannot be updated if the template has been associated to one or more DDS objects.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
 
 + Request (application/json)
 
@@ -4744,26 +4030,6 @@ List all of the global metadata templates.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (template restricted)
-
-+ Response 404 (text/plain)
-
-        Template does not exist
-
 ### Delete metadata template [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
@@ -4772,19 +4038,13 @@ List all of the global metadata templates.
 - - - - -
 + The template cannot be deleted if it has been associated to one or more DDS objects.
 
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
+
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (template restricted)
-
-+ Response 404 (text/plain)
-
-        Template does not exist
 
 ## Metadata Properties collection [/templates/{id}/properties]
 + Parameters
@@ -4807,6 +4067,12 @@ List all of the global metadata templates.
 >**Rules:**
 - - - - -
 + The property `key` must be unique within the context of the template.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
 
 + Request (application/json)
 
@@ -4832,26 +4098,14 @@ List all of the global metadata templates.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## List metadata properties [GET /templates/{id}/properties]
 List metadata template properties.
 >**Permission:** authenticated
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Parameters
     + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
@@ -4875,14 +4129,6 @@ List metadata template properties.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
 ## Metadata Property instance [/template_properties/{id}]
 + Parameters
     + id (string, required, `48d34c8f-4284-4327-9ca6-7a9145a1c957`) ... The unique `id` of the template property.
@@ -4891,6 +4137,12 @@ List metadata template properties.
 ### View metadata property [GET]
 >**Permission:** authenticated
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (property restricted)
+* 404: Property does not exist
 
 + Response 200 (application/json)
 
@@ -4907,22 +4159,6 @@ List metadata template properties.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (property restricted)
-
-+ Response 404 (text/plain)
-
-        Property does not exist
-
 ### Update metadata property [PUT]
 >**Permission:** creator or system_admin
 - - - - -
@@ -4930,6 +4166,12 @@ List metadata template properties.
 >**Rules**
 - - - - -
 + The `key` or `type` cannot be updated if the template property has been associated to one or more DDS objects.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (template property restricted)
+* 404: Property does not exist
 
 + Request (application/json)
 
@@ -4953,22 +4195,6 @@ List metadata template properties.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (template property restricted)
-
-+ Response 404 (text/plain)
-
-        Property does not exist
-
 ### Delete metadata property [DELETE]
 >**Permission:** creator or system_admin
 - - - - -
@@ -4977,19 +4203,13 @@ List metadata template properties.
 - - - - -
 + The template property cannot be deleted if it is assigned to one or more DDS objects.
 
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (template property restricted)
+* 404: Template does not exist
+
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden (template property restricted)
-
-+ Response 404 (text/plain)
-
-        Template does not exist
 
 ## Object Metadata instance [/meta/{object_kind}/{object_id}/{template_id}]
 + Parameters
@@ -5012,6 +4232,14 @@ Used to create a metadata template instance for a corresponding DDS object (i.e.
 - - - - -
 + All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
 + If the template instance already exists for the DDS object, a validation (unique conflict) error will be returned and the update method should be used.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
+* 404: Object or template does not exist
+* 409: Template instance already exists for the DDS object
 
 + Request (application/json)
 
@@ -5046,34 +4274,16 @@ Used to create a metadata template instance for a corresponding DDS object (i.e.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Object or template does not exist
-
-+ Response 409 (text/plain)
-
-        Template instance already exists for the DDS object
-
 ### View object metadata [GET]
 Used to retrieve the metadata template instance for a corresponding DDS object.
 >**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Object or template does not exist
 
 + Response 200 (application/json)
 
@@ -5097,22 +4307,6 @@ Used to retrieve the metadata template instance for a corresponding DDS object.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Object or template does not exist
-
 ### Update object metadata [PUT]
 Used to update a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When updating metadata, only values that adhere to the metadata template schema will be accepted.
 >**Permission:** update_file when annotated object is file (`dds-file`)
@@ -5129,6 +4323,13 @@ Used to update a metadata template instance for a corresponding DDS object (i.e.
 + All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
 + If the specified `key` already exists, the value is updated, otherwise it is appended to the template instance.
 + If the template instance specified does not exist, a validation error will be returned and the create method should be used.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Object or template does not exist
 
 + Request (application/json)
 
@@ -5163,44 +4364,18 @@ Used to update a metadata template instance for a corresponding DDS object (i.e.
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Object or Template does not exist
-
 ### Delete object metadata [DELETE]
 Used to delete the metadata template instance.
 >**Permission:** update_file when annotated object is file (`dds-file`)
 - - - - -
 
-+ Response 200 (text/plain)
-
-        This will never happen
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Object or template does not exist
 
 + Response 204
-
-+ Response 401 (text/plain)
-
-        Missing, Expired, or Invalid API Token in 'Authorization' Header
-
-+ Response 404 (text/plain)
-
-        Object or Template does not exist
 
 ## View All Object Metadata [/meta/{object_kind}/{object_id}]
 + Parameters
@@ -5211,6 +4386,11 @@ Used to delete the metadata template instance.
 Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.
 >**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Object or template does not exist
 
 + Response 200 (application/json)
 
@@ -5238,18 +4418,6 @@ Used to retrieve all metadata associated with a DDS object, optionally find a te
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Object or Template does not exist
-
 ## Group Search Objects
 The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages [Elasticsearch](https://www.elastic.co/) to perform document based searches.  All queries must be specified in [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html).
 
@@ -5266,6 +4434,12 @@ Search for DDS objects (i.e. Elasticsearch documents).
 - - - - -
 + **include_kinds (string[ ], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
 + **search_query (object, required)** - The Elasticsearch query criteria (i.e. Query DSL).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 401: Unauthorized
+* 404: One or more included kinds is not supported, or not indexed
 
 + Request (application/json)
 
@@ -5344,22 +4518,6 @@ Search for DDS objects (i.e. Elasticsearch documents).
             ]
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        One or more included kinds is not supported, or not indexed
-
 ## Group Project Transfer
 **Proposed endpoints to meet the needs of the GCB project transfer workflow**
 The *Project Transfer* actions can be used by research core facilities to formally transfer ownership of a project to a researcher (customer).  These endpoints support the transfer workflow and retain a record of the transfer history.
@@ -5387,6 +4545,13 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
 >**Rules:**
 - - - - -
 + There must be no existing transfers for the `project` in a `pending` state.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Project transfer already exists
+* 401: Unauthorized
+* 403: Forbidden
 
 + Request (application/json)
 
@@ -5422,29 +4587,14 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        This will never happen
-
-+ Response 201 (text/plain)
-
-        Successfully Created
-
-+ Response 400 (text/plain)
-
-        Project Transfer Already Exists
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
 ### NOT_IMPLEMENTED_NEW List project transfers [GET]
 >**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project does not exist
 
 + Response 200 (application/json)
 
@@ -5474,18 +4624,6 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             ]
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Project does not exist
-
 ## Project Transfer instance [/project_transfers/{id}]
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
@@ -5493,6 +4631,12 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
 ### NOT_IMPLEMENTED_NEW View a project transfer [GET]
 >**Permission:** manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer doe not exist
 
 + Response 200 (application/json)
 
@@ -5518,22 +4662,6 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project Transfer does not exist
-
 ## NOT_IMPLEMENTED_NEW Accept a project transfer [PUT /project_transfers/{id}/accept]
 Accept a *pending* project transfer.
 >**Permission:** transfer recipient (i.e. in `to_users`)]
@@ -5547,6 +4675,13 @@ Accept a *pending* project transfer.
 - - - - -
 + The project transfer must be in a `pending` state.
 + All exisiting permissions for the project are removed, `project_viewer` is granted to the transfer initiater (i.e. `from_user`), and `project_admin` is granted to the list of recipients (i.e. `to_users`)
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
 
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
@@ -5581,26 +4716,6 @@ Accept a *pending* project transfer.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project transfer does not exist
-
 ## NOT_IMPLEMENTED_NEW Reject a project transfer [PUT /project_transfers/{id}/reject]
 Reject a *pending* project transfer.
 >**Permission:** transfer recipient (i.e. in `to_users`)]
@@ -5613,6 +4728,13 @@ Reject a *pending* project transfer.
 >**Rules:**
 - - - - -
 + The project transfer must be in a `pending` state.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
 
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
@@ -5647,26 +4769,6 @@ Reject a *pending* project transfer.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project transfer does not exist
-
 ## NOT_IMPLEMENTED_NEW Cancel a project transfer [PUT /project_transfers/{id}/cancel]
 Cancel a *pending* project transfer.
 >**Permission:** manage_project_permissions
@@ -5679,6 +4781,13 @@ Cancel a *pending* project transfer.
 >**Rules:**
 - - - - -
 + The project transfer must be in a `pending` state.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
 
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
@@ -5713,26 +4822,6 @@ Cancel a *pending* project transfer.
             "audit": { }
         }
 
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 400 (text/plain)
-
-        Validation Error
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 403 (text/plain)
-
-        Forbidden
-
-+ Response 404 (text/plain)
-
-        Project transfer does not exist
-
 ## View All Project Transfers [/project_transfers{?status}]
 + Parameters
     + status (string, optional, `pending`) ... The `status` of the project transfer; can be one of `pending`,`accepted`, or `canceled`.
@@ -5741,6 +4830,11 @@ Cancel a *pending* project transfer.
 Used to retrieve all project transfers visible to the current user, optionally filtered by status.
 >**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unsupported status
 
 + Response 200 (application/json)
 
@@ -5769,18 +4863,6 @@ Used to retrieve all project transfers visible to the current user, optionally f
                 }
             ]
         }
-
-+ Response 200 (text/plain)
-
-        Success
-
-+ Response 401 (text/plain)
-
-        Unauthorized
-
-+ Response 404 (text/plain)
-
-        Unsupported Status
 
 ## Group Authentication Providers
 Represents the authentication providers (services) that are supported by DDS.
