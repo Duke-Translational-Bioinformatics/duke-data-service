@@ -80,3 +80,5 @@ deployment:
     - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:drop --app 'dukeds'"
     - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:create  --app 'dukeds'"
     - "[[ -z ${RECREATE_SEARCH_MAPPINGS} ]] || heroku run --exit-code rake elasticsearch:index:index_documents  --app 'dukeds'"
+    - echo "apiToken="`heroku run rake api_test_user:create -a dukeds-dev | tail -1 | sed 's/\*\*.*\[NewRelic\].*//'` >> dredd.env
+    - docker-compose -f docker-compose.dredd.yml run dredd
