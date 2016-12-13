@@ -67,7 +67,7 @@ class DataFile < Container
   end
 
   def as_indexed_json(options={})
-    DataFileSearchDocumentSerializer.new(self).as_json
+    Search::DataFileSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do
@@ -83,6 +83,30 @@ class DataFile < Container
           raw: {type: "string", index: "not_analyzed"}
         }
       end
+      indexes :project do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :parent do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :creator do
+        indexes :id, type: "string"
+        indexes :username, type: "string"
+        indexes :first_name, type: "string"
+        indexes :last_name, type: "string"
+        indexes :email, type: "string"
+      end
     end
+  end
+
+  def creator
+    return unless current_file_version
+    create_audit = current_file_version.audits.find_by(action: "create")
+    return unless create_audit
+    create_audit.user
   end
 end
