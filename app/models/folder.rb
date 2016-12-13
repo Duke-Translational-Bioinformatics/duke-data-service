@@ -4,7 +4,7 @@ class Folder < Container
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
   has_many :folders, -> { readonly }, foreign_key: "parent_id"
   has_many :meta_templates, as: :templatable
-  
+
   after_set_parent_attribute :set_project_to_parent_project
 
   validates :project_id, presence: true, immutable: true
@@ -33,7 +33,7 @@ class Folder < Container
   end
 
   def as_indexed_json(options={})
-    FolderSearchDocumentSerializer.new(self).as_json
+    Search::FolderSerializer.new(self).as_json
   end
 
   settings index: { number_of_shards: 1 } do
@@ -43,6 +43,26 @@ class Folder < Container
       indexes :is_deleted, type: "boolean"
       indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
       indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+
+      indexes :parent do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :creator do
+        indexes :id, type: "string"
+        indexes :username, type: "string"
+        indexes :first_name, type: "string"
+        indexes :last_name, type: "string"
+        indexes :email, type: "string"
+      end
+
     end
+  end
+
+  def creator
+    creation_audit = audits.find_by(action: "create")
+    return unless creation_audit
+    creation_audit.user
   end
 end
