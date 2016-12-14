@@ -4,6 +4,13 @@ FORMAT: 1A
 
 ## Group API Change Log
 
+14-Dec-2016
+--------------
++ Changed format of overall Apiary document to incorporate links to endpoint groupings
++ Moved apiary apib files to their own folder rather than have them scattered throughout root
++ Created a bash script to loop through and then generate the apiary html files.
++ Changed all endpoints to include typical response codes (this will align more so with the swagger documentation)
+
 17-Oct-2016
 --------------
 + For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/origin`; this search action now includes `wasDerivedFrom` file versions in the results.
@@ -53,7 +60,7 @@ In addition to the API usage documentation herein, users may experiment with the
 Collection Pagination
 --------------
 For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` property will reference the array as follows:
-+ Response (application/json)
++ 
 
         {
             "results": [
@@ -75,7 +82,7 @@ Audit Object
 --------------
 Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` property in resource specific payloads.
 
-+ Response (application/json)
++ 
 
         "audit": {
             "created_on": "2015-01-01T12:00:00Z",
@@ -109,7 +116,7 @@ We should respond with context appropriate error codes, especially for 400 class
 * 404: user requesting resource that does not exist
 
 All error responses should include a JSON response that provides the HTTP status code, details of the error that occurred, and possible steps to address the problem. For example:
-+ Response (application/json)
++ 
 
         {
             "error": "404",
@@ -118,7 +125,7 @@ All error responses should include a JSON response that provides the HTTP status
         }
 
 Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the error encountered.
-+ Response (application/json)
++ 
 
         {
             "error": "400",

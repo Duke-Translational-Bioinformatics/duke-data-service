@@ -1,0 +1,525 @@
+FORMAT: 1A
+
+## Group Software Agents
+Represents a software agent and associated secret that can be used to access the API actions from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of storage for failed uploads, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see **Current User** actions).
+
+## Software Agents collection [/software_agents]
+
+## Create software agent [POST]
+Creates software agent and an associated secret API key; the secret key is visible and managed through the `software_agents/{id}/api_key` action.
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **name (string)** - A short name for the software agent.
++ **description (string, optional)** - A verbose description for the software agent.
++ **repo_url (string, optional)** - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Created Successfully
+* 400: Software agent requires a name
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+
++ Request (application/json)
+
+        {
+            "name": "Hash computation agent"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+            "name": "Hash computation agent",
+            "description": null,
+            "repo_url": null,
+            "is_deleted": false,
+            "audit": { }
+        }
+
+## List software agents [GET]
+>**Permission:** authenticated
+- - - - -
+
+>**Rules**
+- - - - -
++ Software Agents that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                    "name": "Hash computation agent",
+                    "description": null,
+                    "repo_url": null,
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Software Agent instance [/software_agents/{id}]
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## View software agent [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Response 200 (application/json)
+
+           {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": null,
+                "is_deleted": false,
+                "audit": { }
+            }
+
+## Update software agent [PUT]
+>**Permission:** creator or system_admin
+- - - - -
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Request (application/json)
+
+        {
+            "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd"
+        }
+
++ Response 200 (application/json)
+
+            {
+                "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                "name": "Hash computation agent",
+                "description": null,
+                "repo_url": "https://github.com/mgardnerpsu/dukeds-dredd",
+                "is_deleted": false,
+                "audit": { }
+            }
+
+## Delete software agent [DELETE]
+>**Permission:** creator or system_admin
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Response 204
+
+## Software Agent API Key [/software_agents/{id}/api_key]
+Generates a secret key for the software agent that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid user secret key (see **Current User** actions).
+
++ Parameters
+    + id (string, required, `9a4c28a2-ec18-40ed-b75c-3bf5b309715`) ... The unique `id` for a software agent.
+
+## Generate software agent API key [PUT]
+Generates a new secret key for the software agent.
+
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ If the software agent already has an API key, this action deletes exisiting key and generates a new key.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-06-01T12:00:00Z"
+        }
+
+## View software agent API key [GET]
+Shows the secret key for the software agent.
+
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Properties**
+- - - - -
++ **key (string)** - A secret key that can be used in tandem with a user secret key to obtain an API access token.
++ **created_on (datetime)** - The date the software agent key was generated.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Response 200 (application/json)
+
+            {
+                "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...",
+                "created_on": "2015-01-01T12:00:00Z"
+            }
+
+## Delete software agent API key [DELETE]
+>**Permission:** creator or system_admin
+- - - - -
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (softrware_agent restricted)
+* 404: Software Agent Does not Exist
+
++ Response 204
+
+## Software Agent Access Token [/software_agents/api_token]
+
+## Get software agent access token [POST]
+Using a software agent secret key and a user secret key, get an access token.
+
+>**Permission:** public
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **agent_key (string)** - The secret key for a software agent.
++ **user_key (string)** - The secret key for a user.
+
+>**Response Properties**
+- - - - -
++ **api_token (string)** - The access token.
++ **expires_on (number)** - Token expiration as posix/epoch time.
++ **time_to_live (number)** - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.
+
+>**Rules**
+- - - - -
++ The agent associated with the agent key must not have been logically deleted.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 400: Missing Required Keys
+* 404: Software Agent or User Does not Exist
+
++ Request
+
+        {
+            "agent_key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "user_key": "klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R..."
+        }
+
++ Response 201 (application/json)
+
+        {
+            "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
+            "expires_on": 1455571739,
+            "time_to_live": 14400
+        }
+
+## Group Current User
+Represents the currently authenticated user.
+
+## Current User instance [/current_user]
+
+### View current user [GET]
+Get profile for the currently authenticated user.
+>**Permission:** authenticated
+- - - - -
+
+>**Rules**
+- - - - -
++ The `agent` property is populated if user is authenticated via software agent token, otherwise the `agent` property is `null`.
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 200 (application/json)
+
+        {
+            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+            "username": "mrgardner01",
+            "first_name": "Matthew",
+            "last_name": "Gardner",
+            "full_name": "Matthew Gardner",
+            "email": "mrgardner01@duke.edu",
+            "auth_provider": {
+                "source": "duke_shibboleth",
+                "uid": "gardner100"
+            },
+            "agent": null,
+            "last_login_on": "2015-01-01T12:00:00Z",
+            "audit": { }
+        }
+
+## Current user usage [GET /current_user/usage]
+View summary usage for current user across all projects.
+>**Permission:** authenticated [scope: view_project]
+- - - - -
+
+>**Properties**
+- - - - -
++ **project_count (number)** - Total number of projects where the user has been granted a project level authorization role.
++ **file_count (integer)** - Total number of files the user has created (i.e. uploaded) across all projects.
++ **storage_bytes (integer)** - Total bytes for files the user has created (i.e. uploaded) across all projects.
+
+>**Rules**
+- - - - -
++ Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
++ Counts/totals are only for project resources that are visible to the current user.
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+
++ Response 200 (application/json)
+
+        {
+            "project_count": 10,
+            "file_count": 126,
+            "storage_bytes": 304006007009
+        }
+
+## Current User API Key [/current_user/api_key]
+
+## Generate current user API key [PUT]
+Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents** actions).
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **key (string)** - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.
++ **created_on (datetime)** - The date the user key was generated.
+
+>**Rules**
+- - - - -
++ If the current user already has an API key, this action deletes their exisiting key and generates a new key.
+
+**Response messages:**
+* 200: Success
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 403: Forbidden (software_agent restricted)
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+            "created_on": "2015-01-01T12:00:00Z"
+        }
+
+## View current user API key [GET]
+>**Permission:** authenticated
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (software_agent restricted)
+* 404: Current User or ApiKey Does not Exist
+
++ Response 200 (application/json)
+
+        {
+            "key": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...",
+            "created_on": "2015-01-01T12:00:00Z"
+        }
+
+## Delete current user API key [DELETE]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (software_agent restricted)
+* 404: Current User Does not Exist
+
++ Response 204
+
+## Group Users
+Represents registered users.
+
+## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with}]
+
+### List users [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Parameters
+    + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
+    + first_name_begins_with (string, optional, `mat`) ... Returns users where their first name begins with the specified string.
+    + last_name_begins_with (string, optional, `gar`) ... Returns users where their last name begins with the specified string.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "first_name": "Matthew",
+                    "last_name": "Gardner",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu",
+                    "auth_provider": {
+                        "source": "duke_shibboleth",
+                        "uid": "gardner100"
+                    },
+                    "last_login_on": "2015-01-01T12:00:00Z",
+                    "audit": { }
+                }
+            ]
+        }
+
+## User instance [/users/{id}]
++ Parameters
+    + id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique `id` for a user.
+
+### View user [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: User does not exist
+
++ Response 200 (application/json)
+
+        {
+            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+            "username": "mrgardner01",
+            "first_name": "Matthew",
+            "last_name": "Gardner",
+            "full_name": "Matthew Gardner",
+            "email": "mrgardner01@duke.edu",
+            "auth_provider": {
+                "source": "duke_shibboleth",
+                "uid": "gardner100"
+            },
+            "last_login_on": "2015-01-01T12:00:00Z",
+            "audit": { }
+        }
+
+## Group Authentication Providers
+Represents the authentication providers (services) that are supported by DDS.
+
+## Authentication Providers collection [/auth_providers]
+
+### NOT_IMPLEMENTED_NEW List authentication providers [GET]
+>**Permission:** public
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                    "name": "duke",
+                    "description": "Duke Authentication Service"
+                }
+            ]
+        }
+
+## Authentication Provider instance [/auth_providers/{id}]
++ Parameters
+    + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
+
+### NOT_IMPLEMENTED_NEW View authentication provider [GET]
+>**Permission:** public
+- - - - -
+
++ Response 200 (application/json)
+
+        {
+            "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+            "name": "duke",
+            "description": "Duke Authentication Service"
+        }
+
+## NOT_IMPLEMENTED_NEW Get All Authentication Provider Affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
+Get a list of affiliates (potential users), for a supported authentication provider.
+>**Permission:** public
+- - - - -
+
++ Parameters
+    + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
+    + full_name_contains (string, optional, `gardner`) ... Returns affiliates where their full name contains the specified string.
+
++ Response 200 (application/json)
+
+        {
+            "results":
+                [
+                    {
+                        "uid": "mrgardner01",
+                        "first_name": "Matthew",
+                        "last_name": "Gardner",
+                        "full_name": "Matthew Gardner",
+                        "email": "mrgardner01@duke.edu",
+                        "auth_provider": {
+                            "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                            "name": "duke"
+                        }
+                    }
+                ]
+        }
+
+### NOT_IMPLEMENTED_NEW View User by Auth Provider ID [GET /auth_providers/{id}/affiliates/{uid}/dds_user]
+Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.
+>**Permission:** authenticated
+- - - - -
+
+>**Rules:**
+- - - - -
++ If the `id` and `uid` are valid and a corresponding DDS user does not exist, the affiliate is registered as DDS user and returned.
+
++ Parameters
+    + id (string, required, `duke`) ... The `id` of an authentication provider (service) supported by the DDS application.
+    + uid (string, required, `gardner001`) ... The unique `uid` (user id) in the context of the specified auth provider.
+
++ Response 200 (application/json)
+
+        {
+            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+            "username": "mrgardner01",
+            "first_name": "Matthew",
+            "last_name": "Gardner",
+            "full_name": "Matthew Gardner",
+            "email": "mrgardner01@duke.edu",
+            "auth_provider": {
+                "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                "name": "duke",
+                "affiliate": {
+                    "uid": "mrgardner01"
+                }
+            },
+            "last_login_on": "2015-01-01T12:00:00Z",
+            "audit": { }
+        }

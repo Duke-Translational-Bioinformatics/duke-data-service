@@ -1,0 +1,1750 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>API Documentation</title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"><style>@import url('https://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200');.hljs-comment,.hljs-title{color:#8e908c}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#c82829}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f5871f}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#eab700}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#718c00}.css .hljs-hexcolor{color:#3e999f}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#4271ae}.hljs-keyword,.javascript .hljs-function{color:#8959a8}.hljs{display:block;background:white;color:#4d4d4c;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}.right .hljs-comment{color:#969896}.right .css .hljs-class,.right .css .hljs-id,.right .css .hljs-pseudo,.right .hljs-attribute,.right .hljs-regexp,.right .hljs-tag,.right .hljs-variable,.right .html .hljs-doctype,.right .ruby .hljs-constant,.right .xml .hljs-doctype,.right .xml .hljs-pi,.right .xml .hljs-tag .hljs-title{color:#c66}.right .hljs-built_in,.right .hljs-constant,.right .hljs-literal,.right .hljs-number,.right .hljs-params,.right .hljs-pragma,.right .hljs-preprocessor{color:#de935f}.right .css .hljs-rule .hljs-attribute,.right .ruby .hljs-class .hljs-title{color:#f0c674}.right .hljs-header,.right .hljs-inheritance,.right .hljs-name,.right .hljs-string,.right .hljs-value,.right .ruby .hljs-symbol,.right .xml .hljs-cdata{color:#b5bd68}.right .css .hljs-hexcolor,.right .hljs-title{color:#8abeb7}.right .coffeescript .hljs-title,.right .hljs-function,.right .javascript .hljs-title,.right .perl .hljs-sub,.right .python .hljs-decorator,.right .python .hljs-title,.right .ruby .hljs-function .hljs-title,.right .ruby .hljs-title .hljs-keyword{color:#81a2be}.right .hljs-keyword,.right .javascript .hljs-function{color:#b294bb}.right .hljs{display:block;overflow-x:auto;background:#1d1f21;color:#c5c8c6;padding:.5em;-webkit-text-size-adjust:none}.right .coffeescript .javascript,.right .javascript .xml,.right .tex .hljs-formula,.right .xml .css,.right .xml .hljs-cdata,.right .xml .javascript,.right .xml .vbscript{opacity:.5}body{color:black;background:white;font:400 14px / 1.42 'Roboto',Helvetica,sans-serif}header{border-bottom:1px solid #f2f2f2;margin-bottom:12px}h1,h2,h3,h4,h5{color:black;margin:12px 0}h1 .permalink,h2 .permalink,h3 .permalink,h4 .permalink,h5 .permalink{margin-left:0;opacity:0;transition:opacity .25s ease}h1:hover .permalink,h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,h5:hover .permalink{opacity:1}.triple h1 .permalink,.triple h2 .permalink,.triple h3 .permalink,.triple h4 .permalink,.triple h5 .permalink{opacity:.15}.triple h1:hover .permalink,.triple h2:hover .permalink,.triple h3:hover .permalink,.triple h4:hover .permalink,.triple h5:hover .permalink{opacity:.15}h1{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:36px}h2{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:30px}h3{font-size:100%;text-transform:uppercase}h5{font-size:100%;font-weight:normal}p{margin:0 0 10px}p.choices{line-height:1.6}a{color:#428bca;text-decoration:none}li p{margin:0}hr.split{border:0;height:1px;width:100%;padding-left:6px;margin:12px auto;background-image:linear-gradient(to right, rgba(0,0,0,0) 20%, rgba(0,0,0,0.2) 51.4%, rgba(255,255,255,0.2) 51.4%, rgba(255,255,255,0) 80%)}dl dt{float:left;width:130px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}dl dd{margin-left:150px}blockquote{color:rgba(0,0,0,0.5);font-size:15.5px;padding:10px 20px;margin:12px 0;border-left:5px solid #e8e8e8}blockquote p:last-child{margin-bottom:0}pre{background-color:#f5f5f5;padding:12px;border:1px solid #cfcfcf;border-radius:6px;overflow:auto}pre code{color:black;background-color:transparent;padding:0;border:none}code{color:#444;background-color:#f5f5f5;font:'Inconsolata',monospace;padding:1px 4px;border:1px solid #cfcfcf;border-radius:3px}ul,ol{padding-left:2em}table{border-collapse:collapse;border-spacing:0;margin-bottom:12px}table tr:nth-child(2n){background-color:#fafafa}table th,table td{padding:6px 12px;border:1px solid #e6e6e6}.text-muted{opacity:.5}.note,.warning{padding:.3em 1em;margin:1em 0;border-radius:2px;font-size:90%}.note h1,.warning h1,.note h2,.warning h2,.note h3,.warning h3,.note h4,.warning h4,.note h5,.warning h5,.note h6,.warning h6{font-family:200 36px 'Raleway',Helvetica,sans-serif;font-size:135%;font-weight:500}.note p,.warning p{margin:.5em 0}.note{color:black;background-color:#f0f6fb;border-left:4px solid #428bca}.note h1,.note h2,.note h3,.note h4,.note h5,.note h6{color:#428bca}.warning{color:black;background-color:#fbf1f0;border-left:4px solid #c9302c}.warning h1,.warning h2,.warning h3,.warning h4,.warning h5,.warning h6{color:#c9302c}header{margin-top:24px}nav{position:fixed;top:24px;bottom:0;overflow-y:auto}nav .resource-group{padding:0}nav .resource-group .heading{position:relative}nav .resource-group .heading .chevron{position:absolute;top:12px;right:12px;opacity:.5}nav .resource-group .heading a{display:block;color:black;opacity:.7;border-left:2px solid transparent;margin:0}nav .resource-group .heading a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul{list-style-type:none;padding-left:0}nav ul a{display:block;font-size:13px;color:rgba(0,0,0,0.7);padding:8px 12px;border-top:1px solid #d9d9d9;border-left:2px solid transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}nav ul a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul>li{margin:0}nav ul>li:first-child{margin-top:-12px}nav ul>li:last-child{margin-bottom:-12px}nav ul ul a{padding-left:24px}nav ul ul li{margin:0}nav ul ul li:first-child{margin-top:0}nav ul ul li:last-child{margin-bottom:0}nav>div>div>ul>li:first-child>a{border-top:none}.preload *{transition:none !important}.pull-left{float:left}.pull-right{float:right}.badge{display:inline-block;float:right;min-width:10px;min-height:14px;padding:3px 7px;font-size:12px;color:#000;background-color:#f2f2f2;border-radius:10px;margin:-2px 0}.badge.get{color:#70bbe1;background-color:#d9edf7}.badge.head{color:#70bbe1;background-color:#d9edf7}.badge.options{color:#70bbe1;background-color:#d9edf7}.badge.put{color:#f0db70;background-color:#fcf8e3}.badge.patch{color:#f0db70;background-color:#fcf8e3}.badge.post{color:#93cd7c;background-color:#dff0d8}.badge.delete{color:#ce8383;background-color:#f2dede}.collapse-button{float:right}.collapse-button .close{display:none;color:#428bca;cursor:pointer}.collapse-button .open{color:#428bca;cursor:pointer}.collapse-button.show .close{display:inline}.collapse-button.show .open{display:none}.collapse-content{max-height:0;overflow:hidden;transition:max-height .3s ease-in-out}nav{width:220px}.container{max-width:940px;margin-left:auto;margin-right:auto}.container .row .content{margin-left:244px;width:696px}.container .row:after{content:'';display:block;clear:both}.container-fluid nav{width:22%}.container-fluid .row .content{margin-left:24%}.container-fluid.triple nav{width:16.5%;padding-right:1px}.container-fluid.triple .row .content{position:relative;margin-left:16.5%;padding-left:24px}.middle:before,.middle:after{content:'';display:table}.middle:after{clear:both}.middle{box-sizing:border-box;width:51.5%;padding-right:12px}.right{box-sizing:border-box;float:right;width:48.5%;padding-left:12px}.right a{color:#428bca}.right h1,.right h2,.right h3,.right h4,.right h5,.right p,.right div{color:white}.right pre{background-color:#1d1f21;border:1px solid #1d1f21}.right pre code{color:#c5c8c6}.right .description{margin-top:12px}.triple .resource-heading{font-size:125%}.definition{margin-top:12px;margin-bottom:12px}.definition .method{font-weight:bold}.definition .method.get{color:#2e8ab8}.definition .method.head{color:#2e8ab8}.definition .method.options{color:#2e8ab8}.definition .method.post{color:#56b82e}.definition .method.put{color:#b8a22e}.definition .method.patch{color:#b8a22e}.definition .method.delete{color:#b82e2e}.definition .uri{word-break:break-all;word-wrap:break-word}.definition .hostname{opacity:.5}.example-names{background-color:#eee;padding:12px;border-radius:6px}.example-names .tab-button{cursor:pointer;color:black;border:1px solid #ddd;padding:6px;margin-left:12px}.example-names .tab-button.active{background-color:#d5d5d5}.right .example-names{background-color:#444}.right .example-names .tab-button{color:white;border:1px solid #666;border-radius:6px}.right .example-names .tab-button.active{background-color:#5e5e5e}#nav-background{position:fixed;left:0;top:0;bottom:0;width:16.5%;padding-right:14.4px;background-color:#fbfbfb;border-right:1px solid #f0f0f0;z-index:-1}#right-panel-background{position:absolute;right:-12px;top:-12px;bottom:-12px;width:48.6%;background-color:#333;z-index:-1}@media (max-width:1200px){nav{width:198px}.container{max-width:840px}.container .row .content{margin-left:224px;width:606px}}@media (max-width:992px){nav{width:169.4px}.container{max-width:720px}.container .row .content{margin-left:194px;width:526px}}@media (max-width:768px){nav{display:none}.container{width:95%;max-width:none}.container .row .content,.container-fluid .row .content,.container-fluid.triple .row .content{margin-left:auto;margin-right:auto;width:95%}#nav-background{display:none}#right-panel-background{width:48.6%}}.back-to-top{position:fixed;z-index:1;bottom:0;right:24px;padding:4px 8px;color:rgba(0,0,0,0.5);background-color:#f2f2f2;text-decoration:none !important;border-top:1px solid #d9d9d9;border-left:1px solid #d9d9d9;border-right:1px solid #d9d9d9;border-top-left-radius:3px;border-top-right-radius:3px}.resource-group{padding:12px;margin-bottom:12px;background-color:white;border:1px solid #d9d9d9;border-radius:6px}.resource-group h2.group-heading,.resource-group .heading a{padding:12px;margin:-12px -12px 12px -12px;background-color:#f2f2f2;border-bottom:1px solid #d9d9d9;border-top-left-radius:6px;border-top-right-radius:6px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.triple .content .resource-group{padding:0;border:none}.triple .content .resource-group h2.group-heading,.triple .content .resource-group .heading a{margin:0 0 12px 0;border:1px solid #d9d9d9}nav .resource-group .heading a{padding:12px;margin-bottom:0}nav .resource-group .collapse-content{padding:0}.action{margin-bottom:12px;padding:12px 12px 0 12px;overflow:hidden;border:1px solid transparent;border-radius:6px}.action h4.action-heading{padding:6px 12px;margin:-12px -12px 12px -12px;border-bottom:1px solid transparent;border-top-left-radius:6px;border-top-right-radius:6px;overflow:hidden}.action h4.action-heading .name{float:right;font-weight:normal;padding:6px 0}.action h4.action-heading .method{padding:6px 12px;margin-right:12px;border-radius:3px;display:inline-block}.action h4.action-heading .method.get{color:#000;background-color:#337ab7}.action h4.action-heading .method.head{color:#000;background-color:#337ab7}.action h4.action-heading .method.options{color:#000;background-color:#337ab7}.action h4.action-heading .method.put{color:#000;background-color:#ed9c28}.action h4.action-heading .method.patch{color:#000;background-color:#ed9c28}.action h4.action-heading .method.post{color:#000;background-color:#5cb85c}.action h4.action-heading .method.delete{color:#000;background-color:#d9534f}.action h4.action-heading code{color:#444;background-color:#f5f5f5;border-color:#cfcfcf;font-weight:normal;word-break:break-all;display:inline-block;margin-top:2px}.action dl.inner{padding-bottom:2px}.action .title{border-bottom:1px solid white;margin:0 -12px -1px -12px;padding:12px}.action.get{border-color:#bce8f1}.action.get h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.head{border-color:#bce8f1}.action.head h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.options{border-color:#bce8f1}.action.options h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.post{border-color:#d6e9c6}.action.post h4.action-heading{color:#5cb85c;background:#dff0d8;border-bottom-color:#d6e9c6}.action.put{border-color:#faebcc}.action.put h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.patch{border-color:#faebcc}.action.patch h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.delete{border-color:#ebccd1}.action.delete h4.action-heading{color:#d9534f;background:#f2dede;border-bottom-color:#ebccd1}</style></head><body class="preload"><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><nav><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#storage-providers">Storage Providers</a></div><div class="collapse-content"><ul><li><a href="#storage-providers-storage-providers-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List storage providers</a></li><li><a href="#storage-providers-storage-provider-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View storage provider</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#folders">Folders</a></div><div class="collapse-content"><ul><li><a href="#folders-folders-collection-post"><span class="badge post"><i class="fa fa-plus"></i></span>Create folder</a></li><li><a href="#folders-folder-instance">Folder instance</a><ul><li><a href="#folders-folder-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View folder</a></li><li><a href="#folders-folder-instance-delete"><span class="badge delete"><i class="fa fa-times"></i></span>Delete folder</a></li><li><a href="#folders-folder-instance-put"><span class="badge put"><i class="fa fa-pencil"></i></span>Move folder</a></li><li><a href="#folders-folder-instance-put-1"><span class="badge put"><i class="fa fa-pencil"></i></span>Rename folder</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#uploads">Uploads</a></div><div class="collapse-content"><ul><li><a href="#uploads-uploads-collection">Uploads collection</a><ul><li><a href="#uploads-uploads-collection-post"><span class="badge post"><i class="fa fa-plus"></i></span>Initiate chunked upload</a></li><li><a href="#uploads-uploads-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List chunked uploads</a></li></ul></li><li><a href="#uploads-upload-instance">Upload instance</a><ul><li><a href="#uploads-upload-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View chunked upload</a></li><li><a href="#uploads-upload-instance-put"><span class="badge put"><i class="fa fa-pencil"></i></span>Get pre-signed chunk URL</a></li><li><a href="#uploads-upload-instance-put-1"><span class="badge put"><i class="fa fa-pencil"></i></span>Complete chunked file upload</a></li><li><a href="#uploads-upload-instance-put-2"><span class="badge put"><i class="fa fa-pencil"></i></span>Report upload hash</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#files">Files</a></div><div class="collapse-content"><ul><li><a href="#files-files-collection-post"><span class="badge post"><i class="fa fa-plus"></i></span>Create file</a></li><li><a href="#files-file-instance">File instance</a><ul><li><a href="#files-file-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View file</a></li><li><a href="#files-file-instance-put"><span class="badge put"><i class="fa fa-pencil"></i></span>Update file</a></li><li><a href="#files-file-instance-delete"><span class="badge delete"><i class="fa fa-times"></i></span>Delete file</a></li><li><a href="#files-file-instance-get-1"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get file download URL</a></li><li><a href="#files-file-instance-put-1"><span class="badge put"><i class="fa fa-pencil"></i></span>Move file</a></li><li><a href="#files-file-instance-put-2"><span class="badge put"><i class="fa fa-pencil"></i></span>Rename file</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#file-versions">File Versions</a></div><div class="collapse-content"><ul><li><a href="#file-versions-file-versions-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List file versions</a></li><li><a href="#file-versions-file-version-instance">File Version instance</a><ul><li><a href="#file-versions-file-version-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View file version</a></li><li><a href="#file-versions-file-version-instance-put"><span class="badge put"><i class="fa fa-pencil"></i></span>Update file version</a></li><li><a href="#file-versions-file-version-instance-delete"><span class="badge delete"><i class="fa fa-times"></i></span>Delete file version</a></li><li><a href="#file-versions-file-version-instance-get-1"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get file version download URL</a></li><li><a href="#file-versions-file-version-instance-post"><span class="badge post"><i class="fa fa-plus"></i></span>Promote file version</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#search-children">Search Children</a></div><div class="collapse-content"><ul><li><a href="#search-children-search-project-children-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Search project children</a></li><li><a href="#search-children-search-folder-children-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Search folder children</a></li></ul></div></div></nav><div class="content"><header><h1 id="top">API Documentation</h1></header><section id="storage-providers" class="resource-group"><h2 class="group-heading">Storage Providers <a href="#storage-providers" class="permalink">&para;</a></h2><p>Represents an external service that provides physical storage space for files.</p>
+<div id="storage-providers-storage-providers-collection" class="resource"><h3 class="resource-heading">Storage Providers collection <a href="#storage-providers-storage-providers-collection" class="permalink">&nbsp;&para;</a></h3><div id="storage-providers-storage-providers-collection-get" class="action get"><h4 class="action-heading"><div class="name">List storage providers</div><a href="#storage-providers-storage-providers-collection-get" class="method get">GET</a><code class="uri">/storage_providers</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/storage_providers</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span></span>,
+      "<span class="hljs-attribute">chunk_hash_algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+      "<span class="hljs-attribute">is_deprecated</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"t4479f73-0774-4f96-afc7-9d251e65by88"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"amazon_s3_glacier"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Amazon Glacier Cloud Storage"</span></span>,
+      "<span class="hljs-attribute">chunk_hash_algorithm</span>": <span class="hljs-value"><span class="hljs-string">"sha1"</span></span>,
+      "<span class="hljs-attribute">is_deprecated</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="storage-providers-storage-provider-instance" class="resource"><h3 class="resource-heading">Storage Provider instance <a href="#storage-providers-storage-provider-instance" class="permalink">&nbsp;&para;</a></h3><div id="storage-providers-storage-provider-instance-get" class="action get"><h4 class="action-heading"><div class="name">View storage provider</div><a href="#storage-providers-storage-provider-instance-get" class="method get">GET</a><code class="uri">/storage_providers/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: StorageProvider Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/storage_providers/<span class="hljs-attribute" title="id">g5579f73-0558-4f96-afc7-9d251e65bv33</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>g5579f73-0558-4f96-afc7-9d251e65bv33</span></span><p>The unique <code>id</code> of the storage provider.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+  "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke Office of Information Technology Storage"</span></span>,
+  "<span class="hljs-attribute">chunk_hash_algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+  "<span class="hljs-attribute">is_deprecated</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="folders" class="resource-group"><h2 class="group-heading">Folders <a href="#folders" class="permalink">&para;</a></h2><p>A folder is a container for files and sub-folders; folders are located in the top-level project root or a parent folder.</p>
+<div id="folders-folders-collection" class="resource"><h3 class="resource-heading">Folders collection <a href="#folders-folders-collection" class="permalink">&nbsp;&para;</a></h3><div id="folders-folders-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create folder</div><a href="#folders-folders-collection-post" class="method post">POST</a><code class="uri">/folders</code></h4><blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>parent.kind (string, required)</strong> - The kind of parent container for the folder; this can be a project (i.e. <code>dds-project</code>) or a folder (i.e. <code>dds-folder</code>).</li>
+<li><strong><a href="http://parent.id">parent.id</a> (string, required)</strong> - The unique id of the parent.</li>
+<li><strong>name (string, required)</strong> - A short name for the folder.</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>ancestors (object[ ])</strong> - Represents entire ancestral path, from the root node (project or folder), down to its parent, in hierarchical order.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Project Does not Exist, Parent Folder does not exist in Project</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="folders-folder-instance" class="resource"><h3 class="resource-heading">Folder instance <a href="#folders-folder-instance" class="permalink">&nbsp;&para;</a></h3><div id="folders-folder-instance-get" class="action get"><h4 class="action-heading"><div class="name">View folder</div><a href="#folders-folder-instance-get" class="method get">GET</a><code class="uri">/folders/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Valid API Token in ‘Authorization’ Header</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: Folder does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>The unique <code>id</code> of the folder.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="folders-folder-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete folder</div><a href="#folders-folder-instance-delete" class="method delete">DELETE</a><code class="uri">/folders/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> delete_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>This operation recursively deletes all of the folder children (i.e. folders, files and file versions).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Folder does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>The unique <code>id</code> of the folder.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div><div id="folders-folder-instance-put" class="action put"><h4 class="action-heading"><div class="name">Move folder</div><a href="#folders-folder-instance-put" class="method put">PUT</a><code class="uri">/folders/{id}/move</code></h4><blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The destination folder cannot be a child of the folder being moved.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Folder does not exist, Parent does not exist.</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span>/move</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>The unique <code>id</code> of the folder.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Flow Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="folders-folder-instance-put-1" class="action put"><h4 class="action-heading"><div class="name">Rename folder</div><a href="#folders-folder-instance-put-1" class="method put">PUT</a><code class="uri">/folders/{id}/rename</code></h4><blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Valid API Token in ‘Authorization’ Header</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: Folder does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span>/rename</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>The unique <code>id</code> of the folder.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Model Data"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Model Data"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"482be8c5-209d-4e3b-afaf-cb66686ffbcc"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Flow Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="uploads" class="resource-group"><h2 class="group-heading">Uploads <a href="#uploads" class="permalink">&para;</a></h2><p>All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following actions must be used by the client to manage the chunked upload process.</p>
+<div id="uploads-uploads-collection" class="resource"><h3 class="resource-heading">Uploads collection <a href="#uploads-uploads-collection" class="permalink">&nbsp;&para;</a></h3><div id="uploads-uploads-collection-post" class="action post"><h4 class="action-heading"><div class="name">Initiate chunked upload</div><a href="#uploads-uploads-collection-post" class="method post">POST</a><code class="uri">/projects/{id}/uploads</code></h4><p>This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.</p>
+<blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>name (string, required)</strong> - The name of the client file to upload.</li>
+<li><strong>content_type (string, optional)</strong> - Valid content type per <a href="https://en.wikipedia.org/wiki/Internet_media_type">media types</a>.</li>
+<li><strong>size (number, required)</strong> - The size in bytes of entire file (computed by client).</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>chunks (object)</strong> - The chunks the client has requested to upload.</li>
+<li><strong>storage_location (object)</strong> - Object that contains target storage details.</li>
+<li><strong>status (object)</strong> - Object used to track status of overall file upload.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Created Successfully</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span>/uploads</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+  "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">chunks</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">status</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">initiated_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">completed_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_message</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="uploads-uploads-collection-get" class="action get"><h4 class="action-heading"><div class="name">List chunked uploads</div><a href="#uploads-uploads-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/uploads</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Project Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span>/uploads</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>d5ae02a4-b9e6-473d-87c4-66f4c881ae7a</span></span><p>Globally unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[]</span>,
+      "<span class="hljs-attribute">chunks</span>": <span class="hljs-value">[]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">status</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">initiated_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+        "<span class="hljs-attribute">completed_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">error_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">error_message</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="uploads-upload-instance" class="resource"><h3 class="resource-heading">Upload instance <a href="#uploads-upload-instance" class="permalink">&nbsp;&para;</a></h3><div id="uploads-upload-instance-get" class="action get"><h4 class="action-heading"><div class="name">View chunked upload</div><a href="#uploads-upload-instance-get" class="method get">GET</a><code class="uri">/uploads/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Upload does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/uploads/<span class="hljs-attribute" title="id">666be35a-98e0-4c2e-9a17-7bc009f9bb23</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>666be35a-98e0-4c2e-9a17-7bc009f9bb23</span></span><p>The unique <code>id</code> of the upload.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+  "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">chunks</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">10000</span></span>,
+      "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+      </span>}
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">status</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">initiated_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">completed_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_message</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="uploads-upload-instance-put" class="action put"><h4 class="action-heading"><div class="name">Get pre-signed chunk URL</div><a href="#uploads-upload-instance-put" class="method put">PUT</a><code class="uri">/uploads/{id}/chunks</code></h4><p>Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.</p>
+<blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>number (number, required)</strong> - The chunk number.</li>
+<li><strong>size (number, required)</strong> - The size of the chunk in bytes (computed by client).</li>
+<li><strong>hash.value (string, required)</strong> - The chunk hash (computed by client).</li>
+<li><strong>hash.algorithm (string, required)</strong> - The hash algorithm used (i.e. md5, sha256, sha1, etc.); this must be the default algorithm (i.e. <code>chunk_hash_algorithm</code>) supported by storage provider (see <strong>Storage Providers</strong> actions)</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>http_verb (string)</strong> - The http verb to use for uploading the next chunk.</li>
+<li><strong>host (string)</strong> - The storage provider host.</li>
+<li><strong>url (string)</strong> - The pre-signed URL for uploading the chunk to the storage provider.</li>
+<li><strong>http_headers (object[ ])</strong> - Array of headers (i.e. key/value pairs) that must be included in the client upload request.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Upload does not exist</p>
+</li>
+<li>
+<p>500: Unexpected StorageProviderException experienced</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/uploads/<span class="hljs-attribute" title="id">666be35a-98e0-4c2e-9a17-7bc009f9bb23</span>/chunks</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>666be35a-98e0-4c2e-9a17-7bc009f9bb23</span></span><p>The unique <code>id</code> of the upload.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">5024000</span></span>,
+  "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"ey23df2207d99a74fbe169e3eba035e633b65d76"</span></span>,
+    "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">http_verb</span>": <span class="hljs-value"><span class="hljs-string">"PUT"</span></span>,
+  "<span class="hljs-attribute">host</span>": <span class="hljs-value"><span class="hljs-string">"duke_data_service_prod.s3.amazonaws.com"</span></span>,
+  "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/666be35a-98e0-4c2e-9a17-7bc009f9bb23?partNumber=1&amp;uploadId=EXAMPLEJZ6e0YupT2...&amp;X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=AKIAIOSFODNN..."</span></span>,
+  "<span class="hljs-attribute">http_headers</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">Content-Length</span>": <span class="hljs-value"><span class="hljs-string">"5024000"</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="uploads-upload-instance-put-1" class="action put"><h4 class="action-heading"><div class="name">Complete chunked file upload</div><a href="#uploads-upload-instance-put-1" class="method put">PUT</a><code class="uri">/uploads/{id}/complete</code></h4><p>This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.</p>
+<blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>hash.value (string, required)</strong> - The entire file hash (computed by client).</li>
+<li><strong>hash.algorithm (string, required)</strong> - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>If the storage provider requires the individual chunks to be assembled, such as Amazon S3, this operation will call the storage provider actions to assemble the parts into a single file object.</li>
+<li>The reported <code>hash.value</code> must be a valid algorithm - supported/valid algorithms are: <code>md5</code>, <code>sha256</code>, and <code>sha1</code>.</li>
+<li>The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.</li>
+<li>The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.</li>
+<li>If there are no errors, the <code>upload_status.completed_on</code> is set to the current timestamp.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Upload does not exist</p>
+</li>
+<li>
+<p>500: Unexpected StorageProviderException experienced</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/uploads/<span class="hljs-attribute" title="id">666be35a-98e0-4c2e-9a17-7bc009f9bb23</span>/complete</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>666be35a-98e0-4c2e-9a17-7bc009f9bb23</span></span><p>The unique <code>id</code> of the upload.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+    "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+  "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+      "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">chunks</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">5024000</span></span>,
+      "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"jw23df2207d99a74fbe169e3eba035e633b65d88"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+      </span>}
+    </span>},
+    {
+      "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">5024000</span></span>,
+      "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"ry23df2207d99a74fbe169e3eba035e633b65dkq"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+      </span>}
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">status</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">initiated_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">completed_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">error_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_message</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="uploads-upload-instance-put-2" class="action put"><h4 class="action-heading"><div class="name">Report upload hash</div><a href="#uploads-upload-instance-put-2" class="method put">PUT</a><code class="uri">/uploads/{id}/hashes</code></h4><p>Report a hash (fingerprint) for the uploaded file.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>value (string, required)</strong> - The entire file hash (computed by client).</li>
+<li><strong>algorithm (string, required)</strong> - The algorithm used by client to compute entire file hash (i.e. md5, sha256, sha1, etc.).</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The reported <code>value</code> must be a valid algorithm - supported/valid algorithms are: <code>md5</code>, <code>sha256</code>, and <code>sha1</code>.</li>
+<li>The upload must be in a completed state (i.e. <code>upload_status.completed_on</code>).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Upload does not exist</p>
+</li>
+<li>
+<p>500: Unexpected StorageProviderException experienced</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/uploads/<span class="hljs-attribute" title="id">666be35a-98e0-4c2e-9a17-7bc009f9bb23</span>/hashes</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>666be35a-98e0-4c2e-9a17-7bc009f9bb23</span></span><p>The unique <code>id</code> of the upload.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+  "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">content_type</span>": <span class="hljs-value"><span class="hljs-string">"application/octet-stream"</span></span>,
+  "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+  "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+      "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">chunks</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">5024000</span></span>,
+      "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"jw23df2207d99a74fbe169e3eba035e633b65d88"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+      </span>}
+    </span>},
+    {
+      "<span class="hljs-attribute">number</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">5024000</span></span>,
+      "<span class="hljs-attribute">hash</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"ry23df2207d99a74fbe169e3eba035e633b65dkq"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span>
+      </span>}
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">status</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">initiated_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">completed_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-07-10T13:00:00Z"</span></span>,
+    "<span class="hljs-attribute">error_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">error_message</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="files" class="resource-group"><h2 class="group-heading">Files <a href="#files" class="permalink">&para;</a></h2><p>A file resource represents a virtual container for a physical data file (i.e. <code>upload</code>) that is persisted in a storage backend supported by Duke Data Services (e.g. Duke OIT Swift Service).</p>
+<div id="files-files-collection" class="resource"><h3 class="resource-heading">Files collection <a href="#files-files-collection" class="permalink">&nbsp;&para;</a></h3><div id="files-files-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create file</div><a href="#files-files-collection-post" class="method post">POST</a><code class="uri">/files</code></h4><p>Creates a file metadata resource; the client is responsible for the creation of this resource after confirming the associated physical file has been successfully uploaded to a storage provider (see <code>Uploads</code> actions).</p>
+<p><em>Note: A file is a versionable resource; this action creates the initial version of a file.  New file versions can be created (uploaded) via the</em> <code>/file/{id}/update</code> <em>action.  Versions can be managed via the</em> <strong>File Versions</strong> <em>actions.</em></p>
+<blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>parent.kind (string, required)</strong> - The kind of parent container for the file; this can be a project (i.e. <code>dds-project</code>) or a folder (i.e. <code>dds-folder</code>).</li>
+<li><strong><a href="http://parent.id">parent.id</a> (string, required)</strong> - The unique id of the parent.</li>
+<li><strong><a href="http://upload.id">upload.id</a> (string, required)</strong> - The unique id for an upload that completed successfully.</li>
+<li><strong>label (string, optional)</strong> - An optional version label for the file.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The current user must be the user who uploaded the file.</li>
+<li>The parent object (<code>dds-project</code> or <code>dds-folder</code>) must be associated with the same project that the upload is associated with.</li>
+<li>The upload must be in a completed state (i.e. <code>upload.completed_on != null</code>).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Upload has an IntegrityException</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Project Does not Exist, Parent Folder or Upload does not exist in Project</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/files</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ad9115b8-1e4a-4399-b606-56622eb462e1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="files-file-instance" class="resource"><h3 class="resource-heading">File instance <a href="#files-file-instance" class="permalink">&nbsp;&para;</a></h3><div id="files-file-instance-get" class="action get"><h4 class="action-heading"><div class="name">View file</div><a href="#files-file-instance-get" class="method get">GET</a><code class="uri">/files/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="files-file-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update file</div><a href="#files-file-instance-put" class="method put">PUT</a><code class="uri">/files/{id}</code></h4><p>Updates one or more file resource properties; if this action includes an <code>upload.id</code> property in the request, a new file version is created and associated to the file - this becomes the <code>current_version</code> of the file (see <strong>File Versions</strong>).</p>
+<p><em>Note: Only the</em> <code>upload</code> <em>and</em> <code>label</code> <em>properties for the file are versioned; all other file properties and relationships, such as name, tags, metadata properties, etc. are not versioned, and they will not vary from version to version.</em></p>
+<blockquote>
+<p><strong>Permission:</strong> update_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong><a href="http://upload.id">upload.id</a> (string, optional)</strong> - An optional unique id for an upload that completed successfully; if specified, a new file version is created.</li>
+<li><strong>label (string, optional)</strong> - An optional version label for the file.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The current user must be the user who uploaded the file.</li>
+<li>The upload must be in a completed state (i.e. <code>upload.completed_on != null</code>).</li>
+<li>Only <code>upload.id</code>, <code>label</code> properties can be updated via this action.</li>
+<li>New versions are assigned the next sequential <code>version</code> number. (see <strong>File Versions</strong>)</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"422f8778-a62c-4918-8b1b-f398a041345a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Archive"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment"</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"56a0431f-5a89-455a-aa2d-996ae9226601"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="files-file-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete file</div><a href="#files-file-instance-delete" class="method delete">DELETE</a><code class="uri">/files/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> delete_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>This operation recursively deletes all the related file versions.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div><div id="files-file-instance-get-1" class="action get"><h4 class="action-heading"><div class="name">Get file download URL</div><a href="#files-file-instance-get-1" class="method get">GET</a><code class="uri">/files/{id}/url</code></h4><p>Generates and returns a storage provider specific pre-signed URL that client can use to download file; the download URL is for the current version of the specified file.</p>
+<p><em>Note: This action returns URL to download current version of the file - to download a prior version see</em> <strong>File Versions</strong> <em>actions.</em></p>
+<blockquote>
+<p><strong>Permission:</strong> download_file</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>301: Redirect to file</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span>/url</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">http_verb</span>": <span class="hljs-value"><span class="hljs-string">"GET"</span></span>,
+  "<span class="hljs-attribute">host</span>": <span class="hljs-value"><span class="hljs-string">"swift.oit.duke.edu"</span></span>,
+  "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&amp;temp_url_expires=1448918738"</span></span>,
+  "<span class="hljs-attribute">http_headers</span>": <span class="hljs-value">[]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="files-file-instance-put-1" class="action put"><h4 class="action-heading"><div class="name">Move file</div><a href="#files-file-instance-put-1" class="method put">PUT</a><code class="uri">/files/{id}/move</code></h4><p>Move file to a different parent project or parent folder.</p>
+<blockquote>
+<p><strong>Permission:</strong> create_file</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File does not exist, Parent does not exist in Project</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span>/move</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Archive"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment"</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"56a0431f-5a89-455a-aa2d-996ae9226601"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="files-file-instance-put-2" class="action put"><h4 class="action-heading"><div class="name">Rename file</div><a href="#files-file-instance-put-2" class="method put">PUT</a><code class="uri">/files/{id}/rename</code></h4><p>Change the name of a file.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span>/rename</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+  "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix_V2.Rdata"</span></span>,
+  "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Archive"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment"</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"56a0431f-5a89-455a-aa2d-996ae9226601"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="file-versions" class="resource-group"><h2 class="group-heading">File Versions <a href="#file-versions" class="permalink">&para;</a></h2><p>The actions herein are used to interact with prior versions of a file resource.</p>
+<p><em>Note: Only the</em> <code>upload</code> <em>and</em> <code>label</code> <em>properties for the file are versioned; all other file properties and relationships, such as name, tags, etc. are not versioned, and they will not vary from version to version.</em></p>
+<div id="file-versions-file-versions-collection" class="resource"><h3 class="resource-heading">File Versions collection <a href="#file-versions-file-versions-collection" class="permalink">&nbsp;&para;</a></h3><div id="file-versions-file-versions-collection-get" class="action get"><h4 class="action-heading"><div class="name">List file versions</div><a href="#file-versions-file-versions-collection-get" class="method get">GET</a><code class="uri">/files/{id}/versions</code></h4><p>This action can be used to list all prior versions of a file, including the current version.</p>
+<blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>File versions that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are included in this listing, but are immutable.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/files/<span class="hljs-attribute" title="id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span>/versions</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique <code>id</code> of the file.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+      "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+        "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+        </span>}
+      </span>}</span>,
+      "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+        "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+        "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+          {
+            "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+            "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+            "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+          </span>}
+        ]</span>,
+        "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+          "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+        </span>}
+      </span>}</span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="file-versions-file-version-instance" class="resource"><h3 class="resource-heading">File Version instance <a href="#file-versions-file-version-instance" class="permalink">&nbsp;&para;</a></h3><div id="file-versions-file-version-instance-get" class="action get"><h4 class="action-heading"><div class="name">View file version</div><a href="#file-versions-file-version-instance-get" class="method get">GET</a><code class="uri">/file_versions/{id}</code></h4><blockquote>
+<p><strong>Permission</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Valid API Token in ‘Authorization’ Header</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/file_versions/<span class="hljs-attribute" title="id">89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span><p>The unique <code>id</code> of the file version.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+  "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+    "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+    "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+    "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+        "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+      </span>}
+    ]</span>,
+    "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="file-versions-file-version-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update file version</div><a href="#file-versions-file-version-instance-put" class="method put">PUT</a><code class="uri">/file_versions/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Only the <code>label</code> property for a file version can be updated via this action.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/file_versions/<span class="hljs-attribute" title="id">89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span><p>The unique <code>id</code> of the file version.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+  "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+    "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+    "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+    "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+        "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+      </span>}
+    ]</span>,
+    "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="file-versions-file-version-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete file version</div><a href="#file-versions-file-version-instance-delete" class="method delete">DELETE</a><code class="uri">/file_versions/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> delete_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The current file version cannot be deleted.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File version does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/file_versions/<span class="hljs-attribute" title="id">89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span><p>The unique <code>id</code> of the file version.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div><div id="file-versions-file-version-instance-get-1" class="action get"><h4 class="action-heading"><div class="name">Get file version download URL</div><a href="#file-versions-file-version-instance-get-1" class="method get">GET</a><code class="uri">/file_versions/{id}/url</code></h4><p>Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.</p>
+<blockquote>
+<p><strong>Permission:</strong> download_file</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>301: Redirect to file version</li>
+<li>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</li>
+<li>404: File version does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/file_versions/<span class="hljs-attribute" title="id">89ef1e77-1a0b-40a8-aaca-260d13987f2b</span>/url</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span><p>The unique <code>id</code> of the file version.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">http_verb</span>": <span class="hljs-value"><span class="hljs-string">"GET"</span></span>,
+  "<span class="hljs-attribute">host</span>": <span class="hljs-value"><span class="hljs-string">"swift.oit.duke.edu"</span></span>,
+  "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&amp;temp_url_expires=1448918738"</span></span>,
+  "<span class="hljs-attribute">http_headers</span>": <span class="hljs-value">[]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="file-versions-file-version-instance-post" class="action post"><h4 class="action-heading"><div class="name">Promote file version</div><a href="#file-versions-file-version-instance-post" class="method post">POST</a><code class="uri">/file_versions/{id}/current</code></h4><p>This action can be used to promote a prior file version to the current version. This actually mints a copy of the specified version and puts it on the top of the version stack.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The current file version cannot be promoted.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>201: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: File version does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/file_versions/<span class="hljs-attribute" title="id">89ef1e77-1a0b-40a8-aaca-260d13987f2b</span>/current</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>89ef1e77-1a0b-40a8-aaca-260d13987f2b</span></span><p>The unique <code>id</code> of the file version to be promoted to the current version.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"66ed147e-2312-4974-999a-58ec77230182"</span></span>,
+  "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+    "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">3</span></span>,
+  "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"56a0431f-5a89-455a-aa2d-996ae9226601"</span></span>,
+    "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+    "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+        "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+        "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+      </span>}
+    ]</span>,
+    "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+    </span>}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="search-children" class="resource-group"><h2 class="group-heading">Search Children <a href="#search-children" class="permalink">&para;</a></h2><p>Search for the children (i.e. folders and files) of a project or folder.</p>
+<div id="search-children-search-project-children" class="resource"><h3 class="resource-heading">Search project children <a href="#search-children-search-project-children" class="permalink">&nbsp;&para;</a></h3><div id="search-children-search-project-children-get" class="action get"><h4 class="action-heading"><div class="name">Search project children</div><a href="#search-children-search-project-children-get" class="method get">GET</a><code class="uri">/projects/{id}/children{?name_contains,kind}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Searches the immediate children of the project unless the <code>name_contains</code> parameter is specified; when specified, the <code>name_contains</code> parameter invokes a recursive search of the project hierarchy.</li>
+<li>Folders/files that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included in search.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Project does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/children?<span class="hljs-attribute">name_contains=</span><span class="hljs-literal">Sequencing</span>&<span class="hljs-attribute">kind=</span><span class="hljs-literal">dds-folder</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd><dt>name_contains</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Sequencing</span></span><p>Returns children where their <code>name</code> contains the specified string.</p>
+</dd><dt>kind</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>dds-folder</span></span><p>Returns children of the specified kind; supported kinds are <code>dds-folder</code> and <code>dds-file</code>.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+      "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+        </span>},
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+        </span>},
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Archive"</span>
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+        "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+          "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+          "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+            {
+              "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+              "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+              "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+            </span>}
+          ]</span>,
+          "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+            "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+          </span>}
+        </span>}
+      </span>}</span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="search-children-search-folder-children" class="resource"><h3 class="resource-heading">Search folder children <a href="#search-children-search-folder-children" class="permalink">&nbsp;&para;</a></h3><div id="search-children-search-folder-children-get" class="action get"><h4 class="action-heading"><div class="name">Search folder children</div><a href="#search-children-search-folder-children-get" class="method get">GET</a><code class="uri">/folders/{id}/children{?name_contains,kind}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Searches the immediate children of the folder unless the <code>name_contains</code> parameter is specified; when specified, the <code>name_contains</code> parameter invokes a recursive search of the folder hierarchy.</li>
+<li>Folders/files that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included in search.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Valid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>404: Folder does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/folders/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/children?<span class="hljs-attribute">name_contains=</span><span class="hljs-literal">Sequencing</span>&<span class="hljs-attribute">kind=</span><span class="hljs-literal">dds-folder</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the folder.</p>
+</dd><dt>name_contains</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Sequencing</span></span><p>Returns children where their <code>name</code> contains the specified string.</p>
+</dd><dt>kind</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>dds-folder</span></span><p>Returns children of the specified kind; supported kinds are <code>dds-folder</code> and <code>dds-file</code>.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span></span>,
+      "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raw Data"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+        </span>},
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"552be8c5-209d-4e3b-afaf-cb66686ffbyy"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Core"</span>
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>},
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">parent</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"</span>
+      </span>}</span>,
+      "<span class="hljs-attribute">ancestors</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-project"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Knockout Mouse Project (KOMP)"</span>
+        </span>},
+        {
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-folder"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2b91658a-2b0f-4ac6-83f5-287391610d0e"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sequencing Archive"</span>
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">current_version</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+        "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+          "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+          "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+            {
+              "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+              "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+              "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+            </span>}
+          ]</span>,
+          "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+            "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+          </span>}
+        </span>}
+      </span>}</span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 14 Dec 2016</p><script>/* eslint-env browser */
+/* eslint quotes: [2, "single"] */
+'use strict';
+
+/*
+  Determine if a string ends with another string.
+*/
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+/*
+  Get a list of direct child elements by class name.
+*/
+function childrenByClass(element, name) {
+  var filtered = [];
+
+  for (var i = 0; i < element.children.length; i++) {
+    var child = element.children[i];
+    var classNames = child.className.split(' ');
+    if (classNames.indexOf(name) !== -1) {
+      filtered.push(child);
+    }
+  }
+
+  return filtered;
+}
+
+/*
+  Get an array [width, height] of the window.
+*/
+function getWindowDimensions() {
+  var w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.body,
+      x = w.innerWidth || e.clientWidth || g.clientWidth,
+      y = w.innerHeight || e.clientHeight || g.clientHeight;
+
+  return [x, y];
+}
+
+/*
+  Collapse or show a request/response example.
+*/
+function toggleCollapseButton(event) {
+    var button = event.target.parentNode;
+    var content = button.parentNode.nextSibling;
+    var inner = content.children[0];
+
+    if (button.className.indexOf('collapse-button') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        // Currently showing, so let's hide it
+        button.className = 'collapse-button';
+        content.style.maxHeight = '0px';
+    } else {
+        // Currently hidden, so let's show it
+        button.className = 'collapse-button show';
+        content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+function toggleTabButton(event) {
+    var i, index;
+    var button = event.target;
+
+    // Get index of the current button.
+    var buttons = childrenByClass(button.parentNode, 'tab-button');
+    for (i = 0; i < buttons.length; i++) {
+        if (buttons[i] === button) {
+            index = i;
+            button.className = 'tab-button active';
+        } else {
+            buttons[i].className = 'tab-button';
+        }
+    }
+
+    // Hide other tabs and show this one.
+    var tabs = childrenByClass(button.parentNode.parentNode, 'tab');
+    for (i = 0; i < tabs.length; i++) {
+        if (i === index) {
+            tabs[i].style.display = 'block';
+        } else {
+            tabs[i].style.display = 'none';
+        }
+    }
+}
+
+/*
+  Collapse or show a navigation menu. It will not be hidden unless it
+  is currently selected or `force` has been passed.
+*/
+function toggleCollapseNav(event, force) {
+    var heading = event.target.parentNode;
+    var content = heading.nextSibling;
+    var inner = content.children[0];
+
+    if (heading.className.indexOf('heading') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+      // Currently showing, so let's hide it, but only if this nav item
+      // is already selected. This prevents newly selected items from
+      // collapsing in an annoying fashion.
+      if (force || window.location.hash && endsWith(event.target.href, window.location.hash)) {
+        content.style.maxHeight = '0px';
+      }
+    } else {
+      // Currently hidden, so let's show it
+      content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+/*
+  Refresh the page after a live update from the server. This only
+  works in live preview mode (using the `--server` parameter).
+*/
+function refresh(body) {
+    document.querySelector('body').className = 'preload';
+    document.body.innerHTML = body;
+
+    // Re-initialize the page
+    init();
+    autoCollapse();
+
+    document.querySelector('body').className = '';
+}
+
+/*
+  Determine which navigation items should be auto-collapsed to show as many
+  as possible on the screen, based on the current window height. This also
+  collapses them.
+*/
+function autoCollapse() {
+  var windowHeight = getWindowDimensions()[1];
+  var itemsHeight = 64; /* Account for some padding */
+  var itemsArray = Array.prototype.slice.call(
+    document.querySelectorAll('nav .resource-group .heading'));
+
+  // Get the total height of the navigation items
+  itemsArray.forEach(function (item) {
+    itemsHeight += item.parentNode.offsetHeight;
+  });
+
+  // Should we auto-collapse any nav items? Try to find the smallest item
+  // that can be collapsed to show all items on the screen. If not possible,
+  // then collapse the largest item and do it again. First, sort the items
+  // by height from smallest to largest.
+  var sortedItems = itemsArray.sort(function (a, b) {
+    return a.parentNode.offsetHeight - b.parentNode.offsetHeight;
+  });
+
+  while (sortedItems.length && itemsHeight > windowHeight) {
+    for (var i = 0; i < sortedItems.length; i++) {
+      // Will collapsing this item help?
+      var itemHeight = sortedItems[i].nextSibling.offsetHeight;
+      if ((itemsHeight - itemHeight <= windowHeight) || i === sortedItems.length - 1) {
+        // It will, so let's collapse it, remove its content height from
+        // our total and then remove it from our list of candidates
+        // that can be collapsed.
+        itemsHeight -= itemHeight;
+        toggleCollapseNav({target: sortedItems[i].children[0]}, true);
+        sortedItems.splice(i, 1);
+        break;
+      }
+    }
+  }
+}
+
+/*
+  Initialize the interactive functionality of the page.
+*/
+function init() {
+    var i, j;
+
+    // Make collapse buttons clickable
+    var buttons = document.querySelectorAll('.collapse-button');
+    for (i = 0; i < buttons.length; i++) {
+        buttons[i].onclick = toggleCollapseButton;
+
+        // Show by default? Then toggle now.
+        if (buttons[i].className.indexOf('show') !== -1) {
+            toggleCollapseButton({target: buttons[i].children[0]});
+        }
+    }
+
+    var responseCodes = document.querySelectorAll('.example-names');
+    for (i = 0; i < responseCodes.length; i++) {
+        var tabButtons = childrenByClass(responseCodes[i], 'tab-button');
+        for (j = 0; j < tabButtons.length; j++) {
+            tabButtons[j].onclick = toggleTabButton;
+
+            // Show by default?
+            if (j === 0) {
+                toggleTabButton({target: tabButtons[j]});
+            }
+        }
+    }
+
+    // Make nav items clickable to collapse/expand their content.
+    var navItems = document.querySelectorAll('nav .resource-group .heading');
+    for (i = 0; i < navItems.length; i++) {
+        navItems[i].onclick = toggleCollapseNav;
+
+        // Show all by default
+        toggleCollapseNav({target: navItems[i].children[0]});
+    }
+}
+
+// Initial call to set up buttons
+init();
+
+window.onload = function () {
+    autoCollapse();
+    // Remove the `preload` class to enable animations
+    document.querySelector('body').className = '';
+};
+</script></body></html>
