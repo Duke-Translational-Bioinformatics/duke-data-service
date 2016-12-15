@@ -8,7 +8,7 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-#    - ./docker/circle/cache_docker_image.sh neo4j 3.0.2
+#    - ./docker/circle/cache_docker_image.sh dredd latest
     - sudo pip install --upgrade docker-compose==1.8.0
 
 deployment:
