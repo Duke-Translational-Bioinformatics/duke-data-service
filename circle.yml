@@ -10,6 +10,9 @@ dependencies:
   pre:
 #    - ./docker/circle/cache_docker_image.sh dredd latest
     - sudo pip install --upgrade docker-compose==1.8.0
+test:
+  override:
+    - echo
 
 deployment:
  zz_dredd_circle_testing:
