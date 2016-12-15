@@ -78,7 +78,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'pry-byebug'
-  gem 'simplecov', :require => false
+  gem 'simplecov', :require => false, :group => :test
 end
 
 #heroku requires this
