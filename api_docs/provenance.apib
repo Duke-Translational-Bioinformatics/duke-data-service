@@ -895,7 +895,7 @@ Given a starting node, returns a graph structure for the provenance chain.  This
             }
         }
 
-## NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy [POST /search/provenance/origin]
+## Search Provenance Origin [POST /search/provenance/origin]
 This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each *File Version*:
 
 1. Gets all related *wasDerivedFrom* file versions (if they exist).
@@ -906,7 +906,7 @@ A graph structure of the unique nodes and relationships is returned.
 
 >**Rules:**
 - - - - -
-+ All of the provided file versions must exist or a validation error is returned.
++ For file versions that do not exist, no provenance nodes/relations will be returned
 + If a file version does not have a generating activity, then only the file version node is returned.
 + If the user does not have visibilty to a `node` in the resulting graph, the `properties` attribute for that `node` will be a partial resource containing: `kind`, `id`, and `is_deleted`.
 
