@@ -30,15 +30,17 @@
 </li>
 </ul>
 <h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/search</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-    "<span class="hljs-attribute">include_kinds</span>": <span class="hljs-value">[<span class="hljs-string">"dds-file"</span>]</span>,
-    "<span class="hljs-attribute">search_query</span>": <span class="hljs-value">{
-        "<span class="hljs-attribute">query</span>": <span class="hljs-value">{
-            "<span class="hljs-attribute">match</span>" : <span class="hljs-value">{
-                "<span class="hljs-attribute">_all</span>" : <span class="hljs-value"><span class="hljs-string">"SMRT sequencing"</span>
-        </span>}
+  "<span class="hljs-attribute">include_kinds</span>": <span class="hljs-value">[
+    <span class="hljs-string">"dds-file"</span>
+  ]</span>,
+  "<span class="hljs-attribute">search_query</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">query</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">match</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">_all</span>": <span class="hljs-value"><span class="hljs-string">"SMRT sequencing"</span>
+      </span>}
     </span>}
-</span>}
-</span></code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file"</span></span>,
