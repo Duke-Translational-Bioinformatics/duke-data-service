@@ -184,4 +184,56 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       end
     }
   end
+
+  describe "elasticsearch:index:rebuild" do
+    include_context "rake"
+    let(:task_name) { "elasticsearch:index:rebuild" }
+    it { expect(subject.prerequisites).to  include("environment") }
+
+    around :each do |example|
+      current_indices = DataFile.__elasticsearch__.client.cat.indices
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        if current_indices.include? indexed_model.index_name
+          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+        end
+        indexed_model.__elasticsearch__.client.indices.create(
+          index: indexed_model.index_name,
+          body: {
+            settings: indexed_model.settings.to_hash,
+            mappings: indexed_model.mappings.to_hash
+          }
+        )
+      end
+      Elasticsearch::Model.client.indices.flush
+
+      @data_file = FactoryGirl.create(:data_file)
+      @folder = FactoryGirl.create(:folder)
+
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        indexed_model.__elasticsearch__.refresh_index!
+      end
+
+      example.run
+
+      ElasticsearchResponse.indexed_models.each do |indexed_model|
+        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+      end
+    end
+
+    context 'ENV[RECREATE_SEARCH_MAPPINGS] not true' do
+      it {
+        invoke_task expected_stderr: /ENV\[RECREATE_SEARCH_MAPPINGS\] false/
+      }
+    end
+
+    context 'ENV[RECREATE_SEARCH_MAPPINGS] true' do
+      before do
+        ENV['RECREATE_SEARCH_MAPPINGS'] = "true"
+      end
+
+      it {
+        invoke_task expected_stdout: /mappings rebuilt/
+      }
+    end
+  end
 end
