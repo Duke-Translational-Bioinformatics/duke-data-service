@@ -429,6 +429,45 @@ Represents registered users.
             "audit": { }
         }
 
+## User Access Token [/user/api_token]
+
+### User API Token [GET]
+This allows a client to present an access token from a registered authentication service and get an api token.
+
+>**Permission:** authenticated
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **access_token (string)**
++ **auth_provider.id (string)**
+
+>**Response Properties**
++ **api_token (string)** - The access token.
++ **expires_on (number)** - Token expiration as posix/epoch time.
++ **time_to_live (number)** - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.
+
+**Response messages:**
+* 200: Success
+* 401: Missing, or Invalid API Token
+
++ Request
+
+        {
+            "access_token": "nennemxdmnd..",
+            "auth_provider": {
+                "id": "a3967cab-6cfd-4d3c-b118-56e6b11d4022"
+            }
+         }
+
++ Response 200 (application/json)
+
+        {
+            "api_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...",
+            "expires_on": 1455571739,
+            "time_to_live": 14400
+        }
+
 ## Group Authentication Providers
 Represents the authentication providers (services) that are supported by DDS.
 
