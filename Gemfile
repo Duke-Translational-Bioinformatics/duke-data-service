@@ -79,6 +79,7 @@ group :test do
   gem 'webmock'
   gem 'pry-byebug'
   gem 'simplecov', :require => false, :group => :test
+  gem 'coveralls', require: false
 end
 
 #heroku requires this

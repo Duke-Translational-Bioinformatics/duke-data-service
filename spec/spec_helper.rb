@@ -23,6 +23,11 @@ if ENV['CIRCLE_ARTIFACTS']
   SimpleCov.coverage_dir(dir)
 end
 
+if ENV['CIRCLECI']
+  # If running in CircleCI, run with Coveralls too
+  require 'coveralls'
+  Coveralls.wear!('rails')
+end
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
