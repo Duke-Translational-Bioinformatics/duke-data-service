@@ -84,7 +84,7 @@ module DDS
         detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.'
         named 'download file_version'
         failure [
-          [200, "This will never happen"],
+          [200, "Success"],
           [301, 'Redirect to file version'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'File version does not exist']

@@ -82,9 +82,9 @@ module DDS
         named 'update project'
         failure [
           [200, 'Success'],
+          [400, 'Project Name Already Exists'],
           [401, 'Unauthorized'],
           [403, 'Forbidden'],
-          [400, 'Project Name Already Exists'],
           [404, 'Project Does not Exist']
         ]
       end

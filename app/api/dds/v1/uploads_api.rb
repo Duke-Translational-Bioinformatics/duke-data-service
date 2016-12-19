@@ -9,7 +9,7 @@ module DDS
             detail 'This is the first step in uploading a large file. An upload objects is created along with a composite status object used to track the progress of the chunked upload.'
             named 'create upload'
             failure [
-              [200, 'This will never actually happen'],
+              [200, 'This will never happen'],
               [201, 'Created Successfully'],
               [401, 'Unauthorized'],
               [404, 'Project Does not Exist']
@@ -133,9 +133,9 @@ module DDS
             named 'complete upload'
             failure [
               [200, 'Success'],
+              [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
               [401, 'Unauthorized'],
               [404, 'Upload Does not Exist'],
-              [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
               [500, 'Unexpected StorageProviderException experienced']
             ]
           end
@@ -172,9 +172,9 @@ module DDS
             named 'report upload hash'
             failure [
               [200, 'Success'],
+              [400, 'Validation Error'],
               [401, 'Unauthorized'],
               [404, 'Upload Does not Exist'],
-              [400, 'Validation Error'],
               [500, 'Unexpected StorageProviderException experienced']
             ]
           end
