@@ -8,8 +8,6 @@ The search action can be used to find specific DDS objects (e.g. folders, files,
 
 *Note: Only search for DDS folders and files* (i.e. `dds-folder`, `dds-file`) *is currently supported.  These objects are replicated to Elasticsearch as indexed documents.  The objects (i.e. documents) are extended with a* `tags` *and* `meta` *property when stored in Elaticsearch.  These properties have composite metadata to facilitate search.  See response payload for concrete example format of these properties.*
 
-*Deprecation: The* **Search Children** *actions will be deprecated once this action has been implemented.*
-
 ## Search Objects [POST /search]
 Search for DDS objects (i.e. Elasticsearch documents).
 >**Permission:** authenticated [scope: view_project for objects of kind (`dds-folder`, `dds-file`)]
