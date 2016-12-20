@@ -243,11 +243,9 @@ Using a software agent secret key and a user secret key, get an access token.
         }
 
 ## Group Current User
-Represents the currently authenticated user.
+Represents the current application user.
 
-## Current User instance [/current_user]
-
-### NOT_IMPL_CHANGE View current user [GET]
+## NOT_IMPL_CHANGE View current user [GET /current_user]
 Get profile for the currently authenticated user.
 >**Permission:** authenticated
 - - - - -
@@ -281,7 +279,7 @@ Get profile for the currently authenticated user.
             "audit": { }
         }
 
-## NOT_IMPL_NEW Current user API token [POST /current_user/api_token]
+## NOT_IMPL_NEW Get current user access token [POST /current_user/api_token]
 This allows a Web or native UX client to present an access token (i.e. OAuth token) from a registered authentication service and get an API token.
 
 >**Permission:** authenticated
@@ -318,7 +316,7 @@ This allows a Web or native UX client to present an access token (i.e. OAuth tok
             "time_to_live": 14400
         }
 
-## Current user usage [GET /current_user/usage]
+## View current user usage [GET /current_user/usage]
 View summary usage for current user across all projects.
 >**Permission:** authenticated [scope: view_project]
 - - - - -
@@ -346,7 +344,7 @@ View summary usage for current user across all projects.
             "storage_bytes": 304006007009
         }
 
-## Current User API Key [/current_user/api_key]
+### Current User API Key [/current_user/api_key]
 
 ## Generate current user API key [PUT]
 Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc...); this secret key must be used in tandem with a valid software agent secret key (see **Software Agents** actions).
@@ -474,12 +472,12 @@ Represents registered users.
             "audit": { }
         }
 
-## Group Authentication Providers
+## Group Auth Providers
 Represents the authentication providers (services) that are supported by DDS.
 
-## Authentication Providers collection [/auth_providers]
+## Auth Providers collection [/auth_providers]
 
-### List authentication providers [GET]
+### List auth providers [GET]
 >**Permission:** public
 - - - - -
 
@@ -497,11 +495,11 @@ Represents the authentication providers (services) that are supported by DDS.
             ]
         }
 
-## Authentication Provider instance [/auth_providers/{id}]
+## Auth Provider instance [/auth_providers/{id}]
 + Parameters
     + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
 
-### View authentication provider [GET]
+### View auth provider [GET]
 >**Permission:** public
 - - - - -
 
@@ -515,7 +513,9 @@ Represents the authentication providers (services) that are supported by DDS.
             "login_initiation_url": "https://das.duke.edu/authenticate?response_type=token&client_id=abc123"
         }
 
-## NOT_IMPL_NEW List Authentication Provider Affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
+### Group Auth Provider Affiliates
+
+## NOT_IMPL_NEW List auth provider affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
 Get a list of affiliates (potential users), for a supported authentication provider.
 >**Permission:** public
 - - - - -
@@ -546,7 +546,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
                 ]
         }
 
-### NOT_IMPL_NEW View Auth Provider Affiliate [GET /auth_providers/{id}/affiliates/{uid}]
+### NOT_IMPL_NEW View auth provider affiliate [GET /auth_providers/{id}/affiliates/{uid}]
 >**Permission:** authenticated
 - - - - -
 **Response messages:**
@@ -578,7 +578,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
             "audit": { }
         }
 
-### NOT_IMPL_NEW Register User by Auth Provider ID [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
+### NOT_IMPL_NEW Create user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
 Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.
 >**Permission:** authenticated
 - - - - -
