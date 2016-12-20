@@ -5,7 +5,7 @@ module DDS
         detail 'Search Provenance related to a start_node by max_hops degrees of separation (default inifinite)'
         named 'Search Provenance'
         failure [
-          [200, 'Will never happen'],
+          [200, 'This will never happen'],
           [201, 'Success'],
           [401, 'Unauthorized'],
           [404, 'start_node or start_node kind does not exist']
@@ -35,7 +35,7 @@ module DDS
         detail 'This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions. Given a list of file versions, this action perform the following query for each file version: 1. Gets the generating activity. 2. For the generating activity, gets the list of wasGeneratedBy and used file versions. A graph structure of the unique nodes and relationships is returned.'
         named 'Search Provenance wasGeneratedBy'
         failure [
-          [200, 'Will never happen'],
+          [200, 'This will never happen'],
           [201, 'Success'],
           [401, 'Unauthorized']
         ]
@@ -57,10 +57,10 @@ module DDS
         detail 'Search for DDS objects using the elasticsearch query_dsl on supported kinds of objects'
         named 'Search Objects'
         failure [
-          [200, 'Will never happen'],
+          [200, 'This will never happen'],
           [201, 'Success'],
           [401, 'Unauthorized'],
-          [404, 'one or more included kinds is not supported, or not indexed']
+          [404, 'One or more included kinds is not supported, or not indexed']
         ]
       end
       params do

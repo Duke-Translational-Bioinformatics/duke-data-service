@@ -1,0 +1,719 @@
+FORMAT: 1A
+
+## Metadata
+[Home](index.html)
+
+## Group Tags
+A tag is a label (i.e. word or phrase) that can be associated to an object to facilitate classification and searching.
+
+*Note: Tags are composite metadata that become part of the tagged resource - they do not live in a global namespace. Only tagging of files* (i.e. `dds-file`) *is currently supported.*
+
+## Tags collection [/tags/{object_kind}/{object_id}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+
+### Create object tag [POST]
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **label (string, required)** - The textual tag content.
+
+>**Rules:**
+- - - - -
++ The specified `label` must not already exist for the `(object.kind, object.id)`, the `label` comparison is *case-insensitive*.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Tag requires a label
+* 401: Unauthorized
+* 404: Tag does not exist
+
++ Request (application/json)
+
+        {
+            "label": "SMRT sequencing"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+            "object": {
+                "kind": "dds-file",
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+            },
+            "label": "SMRT sequencing",
+            "audit": { }
+        }
+
+### List object tags [GET]
+>**Permission:** view_project when tagged object is file (`dds-file`)
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+                    "object": {
+                        "kind": "dds-file", "id":
+                        "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "label": "SMRT sequencing",
+                    "audit": { }
+                }
+            ]
+        }
+
+## Append a list of object tags [POST /tags/{object_kind}/{object_id}/append]
+Append a list of tags to an object.
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **tags (object[], required)** - An array of tags to apply to the object; object structure is as follows:
++ **label (string, required)** - The textual tag content.
+
+>**Rules:**
+- - - - -
++ If the object has an exisiting tag with the specified `label`, the `label` is ignored and a tag is not appended (i.e. created); the `label` comparison is *case-insensitive*.
++ The request must specify at least one `label`.
++ The response only contains the list of `tags` that were appended (i.e. created).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Tag requires a label
+* 401: Unauthorized
+* 404: Tag does not exist
+
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+
++ Request (application/json)
+
+        {
+            "tags": [
+                {"label": "SMRT sequencing"}
+            ]
+        }
+
++ Response 201 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+                    "object": {
+                        "kind": "dds-file", "id":
+                        "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "label": "SMRT sequencing",
+                    "audit": { }
+                }
+            ]
+        }
+
+## List tag labels [GET /tags/labels{?object_kind,label_contains}]
+Get a list of the **distinct** tag `label` values visible to the current user.
+
+*Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.*
+
+>**Permission:** authenticated [scope: view_project when tagged object is file (`dds-file`)]
+- - - - -
+
+>**Rules:**
+- - - - -
++ The returned tags are sorted in most recently used (i.e. `last_used_on`) order.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Parameters
+    + object_kind (string, optional, `dds-file`) ... Restricts search scope to tags for this kind of object.
+    + label_contains (string, optional, `sequen`) ... If provided, searches for tags that contain this text fragment.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "label": "SMRT sequencing",
+                    "count": 47,
+                    "last_used_on": "2015-01-01T12:10:00Z"
+                },
+                {
+                    "label": "Polony sequencing",
+                    "count": 21,
+                    "last_used_on": "2015-01-01T12:05:00Z"
+                },
+                {
+                    "label": "DNA nanoball sequencing",
+                    "count": 13,
+                    "last_used_on": "2015-01-01T12:00:00Z"
+                }
+            ]
+        }
+
+## Tag instance [/tags/{id}]
++ Parameters
+    + id (string, required, `66211c4e-a49e-42d7-9793-87989d56e1e3`) ... The unique id of the tag.
+
+### View tag [GET]
+>**Permission:** view_project when tagged object is file (`dds-file`)
+- - - - -
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Tag does not exist
+
++ Response 200 (application/json)
+
+        {
+            "id": "66211c4e-a49e-42d7-9793-87989d56e1e3",
+            "object": {
+                "kind": "dds-file",
+                "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111" },
+            "label": "SMRT sequencing",
+            "audit": { }
+        }
+
+### Delete tag [DELETE]
+>**Permission:** update_file when tagged object is file (`dds-file`)
+- - - - -
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Tag does not exist
+
++ Response 204
+
+## Group Metadata
+The metadata actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike *Tags*, which are just textual labels, metadata are structured `key:value` pairs.  For example, an experiment (i.e. represented as a provenance *Activity*) may have the following metadata properties: `[{"assay": "ChIP-seq"}, {"organism": "Mus Musculus"}, {"biosample_type": "tissue"}]`.
+
+Metadata must be defined and captured in the context of a metadata template. Templates allow related keys (i.e. properties) to be grouped together.  For example, a template named *seq_platform_info* may contain properties that describe the characteristics of the sequencing platform.  In addition, templates enforce data type (i.e. string, integer, etc.) integrity for the contained keys, so that clients are type aware when referencing key values from a search or data processing perspective. Metatdata templates are global in scope and visible to all users.
+
+## Metadata Templates collection [/templates]
+
+### Create metadata template [POST]
+>**Permission:** authenticated
+- - - - -
+
+>**Properties**
+- - - - -
++ **name (string, required)** - The unique name of the template; the name must meet the following criteria:
+    - contain only alphanumerics and underscores
+    - no whitespace
+    - maximum of 60 characters
++ **label (string, required)** - A short display label for the template.
++ **description (string, optional)** - A verbose description of the template.
+
+>**Rules:**
+- - - - -
++ The template `name` must be unique in the global context.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
+
++ Request (application/json)
+
+        {
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files."
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "168f3f51-6800-403a-973d-78b23c08049b",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files.",
+            "audit": { }
+        }
+
+## List metadata templates [GET /templates{?name_contains}]
+List all of the global metadata templates.
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Parameters
+    + name_contains (string, optional, `Sequencing`) ... Returns templates in which `name` contains the specified string.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                    "name": "sequencing_file_info",
+                    "label": "Sequencing File Info",
+                    "description": "Extended attributes for sequencing output files.",
+                    "audit": { }
+                }
+            ]
+        }
+
+## Metadata Template instance [/templates/{id}]
++ Parameters
+    + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
+
+
+### View metadata template [GET]
+>**Permission:** authenticated
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
+
++ Response 200 (application/json)
+
+        {
+            "id": "168f3f51-6800-403a-973d-78b23c08049b",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files (raw and processed).",
+            "audit": { }
+        }
+
+### Update metadata template [PUT]
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ The `name` cannot be updated if the template has been associated to one or more DDS objects.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
+
++ Request (application/json)
+
+        {
+            "description": "Extended attributes for sequencing output files (raw and processed)."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "168f3f51-6800-403a-973d-78b23c08049b",
+            "name": "sequencing_file_info",
+            "label": "Sequencing File Info",
+            "description": "Extended attributes for sequencing output files (raw and processed).",
+            "audit": { }
+        }
+
+### Delete metadata template [DELETE]
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ The template cannot be deleted if it has been associated to one or more DDS objects.
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (template restricted)
+* 404: Template does not exist
+
++ Response 204
+
+## Metadata Properties collection [/templates/{id}/properties]
++ Parameters
+    + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
+
+### Create metadata property [POST]
+>**Permission:** template creator or system_admin
+- - - - -
+
+>**Properties**
+- - - - -
++ **key (string, required)** - The unique key for the property; the key must meet the following criteria:
+    - contain only alphanumerics and underscores
+    - no whitespace
+    - maximum of 60 characters
++ **label (string, required)** - A short display label for the property.
++ **description (string, required)** - A verbose description of the property.
++ **type (string, required)** - The datatype of the key's value; currenty only the Elasticsearch core datatypes are supported: [Elasticsearch Core Datatypes](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html).
+
+>**Rules:**
+- - - - -
++ The property `key` must be unique within the context of the template.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
+
++ Request (application/json)
+
+        {
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file.",
+            "type": "string"
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file.",
+            "type": "string",
+            "audit": { }
+        }
+
+## List metadata properties [GET /templates/{id}/properties]
+List metadata template properties.
+>**Permission:** authenticated
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Parameters
+    + id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique `id` of the template.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                    "template": {
+                        "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                        "name": "sequencing_file_info"
+                    },
+                    "key": "output_type",
+                    "label": "Output Type",
+                    "description": "The type of data in the sequencing output file.",
+                    "type": "string",
+                    "audit": { }
+                }
+            ]
+        }
+
+## Metadata Property instance [/template_properties/{id}]
++ Parameters
+    + id (string, required, `48d34c8f-4284-4327-9ca6-7a9145a1c957`) ... The unique `id` of the template property.
+
+
+### View metadata property [GET]
+>**Permission:** authenticated
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden (property restricted)
+* 404: Property does not exist
+
++ Response 200 (application/json)
+
+        {
+            "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
+            "type": "string",
+            "audit": { }
+        }
+
+### Update metadata property [PUT]
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ The `key` or `type` cannot be updated if the template property has been associated to one or more DDS objects.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden (template property restricted)
+* 404: Property does not exist
+
++ Request (application/json)
+
+        {
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)"
+        }
+
+
++ Response 200 (application/json)
+
+        {
+            "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "key": "output_type",
+            "label": "Output Type",
+            "description": "The type of data in the sequencing output file. (alignments, peaks, signal)",
+            "type": "string",
+            "audit": { }
+        }
+
+### Delete metadata property [DELETE]
+>**Permission:** creator or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ The template property cannot be deleted if it is assigned to one or more DDS objects.
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden (template property restricted)
+* 404: Template property does not exist
+
++ Response 204
+
+## Object Metadata instance [/meta/{object_kind}/{object_id}/{template_id}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `b80a2679-f6bf-46da-acaa-b7a4582b1eda`) ... The unique id of the object.
+    + template_id (string, required, `168f3f51-6800-403a-973d-78b23c08049b`) ... The unique id of the template.
+
+### Create object metadata [POST]
+Used to create a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When creating metadata, only values that adhere to the metadata template schema will be accepted.
+>**Permission:** update_file when annotated object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **properties (object[ ], required)** - A list of the `key:value` pairs to set for the template instance.
++ **properties[ ].key (string, required)** - The property key to set.
++ **properties[ ].value (any, required)** - The key value.
+
+>**Rules:**
+- - - - -
++ All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
++ If the template instance already exists for the DDS object, a validation (unique conflict) error will be returned and the update method should be used.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Validation Error
+* 401: Unauthorized
+* 404: Object or template does not exist
+* 409: Template instance already exists for the DDS object
+
++ Request (application/json)
+
+        {
+            "properties": [
+                {
+                    "key": "output_type",
+                    "value": "alignments"
+                }
+            ]
+        }
+
++ Response 201 (application/json)
+
+        {
+            "object": {
+                "kind": "dds-file",
+                "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+            },
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
+                    },
+                    "value": "alignments"
+                }
+            ]
+        }
+
+### View object metadata [GET]
+Used to retrieve the metadata template instance for a corresponding DDS object.
+>**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Object or template does not exist
+
++ Response 200 (application/json)
+
+        {
+            "object": {
+                "kind": "dds-file",
+                "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+            },
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
+                    },
+                    "value": "alignments"
+                }
+            ]
+        }
+
+### Update object metadata [PUT]
+Used to update a metadata template instance for a corresponding DDS object (i.e. `dds-file`). When updating metadata, only values that adhere to the metadata template schema will be accepted.
+>**Permission:** update_file when annotated object is file (`dds-file`)
+- - - - -
+
+>**Properties**
+- - - - -
++ **properties (object[ ], required)** - A list of the `key:value` pairs to set for the template instance.
++ **properties[ ].key (string, required)** - The property key to set.
++ **properties[ ].value (any, required)** - The key value.
+
+>**Rules:**
+- - - - -
++ All specified `key:values` must adhere to the metadata template schema or a validation error will be returned.
++ If the specified `key` already exists, the value is updated, otherwise it is appended to the template instance.
++ If the template instance specified does not exist, a validation error will be returned and the create method should be used.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Object or template does not exist
+
++ Request (application/json)
+
+        {
+            "properties": [
+                {
+                    "key": "output_type",
+                    "value": "peaks"
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "object": {
+                "kind": "dds-file",
+                "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+            },
+            "template": {
+                "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                "name": "sequencing_file_info"
+            },
+            "properties": [
+                {
+                    "template_property": {
+                        "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                        "key": "output_type"
+                    },
+                    "value": "peaks"
+                }
+            ]
+        }
+
+### Delete object metadata [DELETE]
+Used to delete the metadata template instance.
+>**Permission:** update_file when annotated object is file (`dds-file`)
+- - - - -
+
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Object or template does not exist
+
++ Response 204
+
+## View All Object Metadata [/meta/{object_kind}/{object_id}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `b80a2679-f6bf-46da-acaa-b7a4582b1eda`) ... The unique id of the object.
+
+### View All Object Metadata [GET]
+Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.
+>**Permission:** authenticated [scope: view_project when annotated object is file (`dds-file`)]
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Object or template does not exist
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "object": {
+                        "kind": "dds-file",
+                        "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda"
+                    },
+                    "template": {
+                        "id": "168f3f51-6800-403a-973d-78b23c08049b",
+                        "name": "sequencing_file_info"
+                    },
+                    "properties": [
+                        {
+                            "template_property": {
+                                "id": "48d34c8f-4284-4327-9ca6-7a9145a1c957",
+                                "key": "output_type"
+                            },
+                            "value": "alignments"
+                        }
+                    ]
+                }
+            ]
+        }

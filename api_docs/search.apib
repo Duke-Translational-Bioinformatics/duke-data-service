@@ -1,0 +1,103 @@
+FORMAT: 1A
+
+## Search
+[Home](index.html)
+
+## Group Search Objects
+The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages [Elasticsearch](https://www.elastic.co/) to perform document based searches.  All queries must be specified in [Elasticsearch Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html).
+
+*Note: Only search for DDS folders and files* (i.e. `dds-folder`, `dds-file`) *is currently supported.  These objects are replicated to Elasticsearch as indexed documents.  The objects (i.e. documents) are extended with a* `tags` *and* `meta` *property when stored in Elaticsearch.  These properties have composite metadata to facilitate search.  See response payload for concrete example format of these properties.*
+
+## Search Objects [POST /search]
+Search for DDS objects (i.e. Elasticsearch documents).
+>**Permission:** authenticated [scope: view_project for objects of kind (`dds-folder`, `dds-file`)]
+- - - - -
+
+>**Properties**
+- - - - -
++ **include_kinds (string[ ], required)** - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. `dds-folder`, `dds-file`).
++ **search_query (object, required)** - The Elasticsearch query criteria (i.e. Query DSL).
+
+**Response messages:**
+* 200: This will never happen
+* 201: Success
+* 401: Unauthorized
+* 404: One or more included kinds is not supported, or not indexed
+
++ Request (application/json)
+
+        {
+            "include_kinds": ["dds-file"],
+            "search_query": {
+                "query": {
+                    "match" : {
+                        "_all" : "SMRT sequencing"
+                    }
+                }
+            }
+        }
+
++ Response 201 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-file",
+                    "id": "b80a2679-f6bf-46da-acaa-b7a4582b1eda",
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+                    },
+                    "name": "ENCFF000SJR.bam",
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1", "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                            "name": "Sequencing Core"
+                        }
+                    ],
+                    "is_deleted": false,
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Processed sequence data",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                {
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": {
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                "name": "duke_oit_swift",
+                                "description": "Duke OIT Storage"
+                            }
+                        }
+                    },
+                    "audit": { },
+                    "tags": [
+                        "SMRT sequencing",
+                        "GCB lab"
+                    ],
+                    "meta": [
+                        {
+                            "sequencing_file_info": {
+                                "output_type": "alignments",
+                                "mapping_assembly": "hg19"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }

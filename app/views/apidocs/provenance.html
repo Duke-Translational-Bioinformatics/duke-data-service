@@ -1,0 +1,1326 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Provenance</title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"><style>@import url('https://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200');.hljs-comment,.hljs-title{color:#8e908c}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#c82829}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f5871f}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#eab700}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#718c00}.css .hljs-hexcolor{color:#3e999f}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#4271ae}.hljs-keyword,.javascript .hljs-function{color:#8959a8}.hljs{display:block;background:white;color:#4d4d4c;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}.right .hljs-comment{color:#969896}.right .css .hljs-class,.right .css .hljs-id,.right .css .hljs-pseudo,.right .hljs-attribute,.right .hljs-regexp,.right .hljs-tag,.right .hljs-variable,.right .html .hljs-doctype,.right .ruby .hljs-constant,.right .xml .hljs-doctype,.right .xml .hljs-pi,.right .xml .hljs-tag .hljs-title{color:#c66}.right .hljs-built_in,.right .hljs-constant,.right .hljs-literal,.right .hljs-number,.right .hljs-params,.right .hljs-pragma,.right .hljs-preprocessor{color:#de935f}.right .css .hljs-rule .hljs-attribute,.right .ruby .hljs-class .hljs-title{color:#f0c674}.right .hljs-header,.right .hljs-inheritance,.right .hljs-name,.right .hljs-string,.right .hljs-value,.right .ruby .hljs-symbol,.right .xml .hljs-cdata{color:#b5bd68}.right .css .hljs-hexcolor,.right .hljs-title{color:#8abeb7}.right .coffeescript .hljs-title,.right .hljs-function,.right .javascript .hljs-title,.right .perl .hljs-sub,.right .python .hljs-decorator,.right .python .hljs-title,.right .ruby .hljs-function .hljs-title,.right .ruby .hljs-title .hljs-keyword{color:#81a2be}.right .hljs-keyword,.right .javascript .hljs-function{color:#b294bb}.right .hljs{display:block;overflow-x:auto;background:#1d1f21;color:#c5c8c6;padding:.5em;-webkit-text-size-adjust:none}.right .coffeescript .javascript,.right .javascript .xml,.right .tex .hljs-formula,.right .xml .css,.right .xml .hljs-cdata,.right .xml .javascript,.right .xml .vbscript{opacity:.5}body{color:black;background:white;font:400 14px / 1.42 'Roboto',Helvetica,sans-serif}header{border-bottom:1px solid #f2f2f2;margin-bottom:12px}h1,h2,h3,h4,h5{color:black;margin:12px 0}h1 .permalink,h2 .permalink,h3 .permalink,h4 .permalink,h5 .permalink{margin-left:0;opacity:0;transition:opacity .25s ease}h1:hover .permalink,h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,h5:hover .permalink{opacity:1}.triple h1 .permalink,.triple h2 .permalink,.triple h3 .permalink,.triple h4 .permalink,.triple h5 .permalink{opacity:.15}.triple h1:hover .permalink,.triple h2:hover .permalink,.triple h3:hover .permalink,.triple h4:hover .permalink,.triple h5:hover .permalink{opacity:.15}h1{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:36px}h2{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:30px}h3{font-size:100%;text-transform:uppercase}h5{font-size:100%;font-weight:normal}p{margin:0 0 10px}p.choices{line-height:1.6}a{color:#428bca;text-decoration:none}li p{margin:0}hr.split{border:0;height:1px;width:100%;padding-left:6px;margin:12px auto;background-image:linear-gradient(to right, rgba(0,0,0,0) 20%, rgba(0,0,0,0.2) 51.4%, rgba(255,255,255,0.2) 51.4%, rgba(255,255,255,0) 80%)}dl dt{float:left;width:130px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}dl dd{margin-left:150px}blockquote{color:rgba(0,0,0,0.5);font-size:15.5px;padding:10px 20px;margin:12px 0;border-left:5px solid #e8e8e8}blockquote p:last-child{margin-bottom:0}pre{background-color:#f5f5f5;padding:12px;border:1px solid #cfcfcf;border-radius:6px;overflow:auto}pre code{color:black;background-color:transparent;padding:0;border:none}code{color:#444;background-color:#f5f5f5;font:'Inconsolata',monospace;padding:1px 4px;border:1px solid #cfcfcf;border-radius:3px}ul,ol{padding-left:2em}table{border-collapse:collapse;border-spacing:0;margin-bottom:12px}table tr:nth-child(2n){background-color:#fafafa}table th,table td{padding:6px 12px;border:1px solid #e6e6e6}.text-muted{opacity:.5}.note,.warning{padding:.3em 1em;margin:1em 0;border-radius:2px;font-size:90%}.note h1,.warning h1,.note h2,.warning h2,.note h3,.warning h3,.note h4,.warning h4,.note h5,.warning h5,.note h6,.warning h6{font-family:200 36px 'Raleway',Helvetica,sans-serif;font-size:135%;font-weight:500}.note p,.warning p{margin:.5em 0}.note{color:black;background-color:#f0f6fb;border-left:4px solid #428bca}.note h1,.note h2,.note h3,.note h4,.note h5,.note h6{color:#428bca}.warning{color:black;background-color:#fbf1f0;border-left:4px solid #c9302c}.warning h1,.warning h2,.warning h3,.warning h4,.warning h5,.warning h6{color:#c9302c}header{margin-top:24px}nav{position:fixed;top:24px;bottom:0;overflow-y:auto}nav .resource-group{padding:0}nav .resource-group .heading{position:relative}nav .resource-group .heading .chevron{position:absolute;top:12px;right:12px;opacity:.5}nav .resource-group .heading a{display:block;color:black;opacity:.7;border-left:2px solid transparent;margin:0}nav .resource-group .heading a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul{list-style-type:none;padding-left:0}nav ul a{display:block;font-size:13px;color:rgba(0,0,0,0.7);padding:8px 12px;border-top:1px solid #d9d9d9;border-left:2px solid transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}nav ul a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul>li{margin:0}nav ul>li:first-child{margin-top:-12px}nav ul>li:last-child{margin-bottom:-12px}nav ul ul a{padding-left:24px}nav ul ul li{margin:0}nav ul ul li:first-child{margin-top:0}nav ul ul li:last-child{margin-bottom:0}nav>div>div>ul>li:first-child>a{border-top:none}.preload *{transition:none !important}.pull-left{float:left}.pull-right{float:right}.badge{display:inline-block;float:right;min-width:10px;min-height:14px;padding:3px 7px;font-size:12px;color:#000;background-color:#f2f2f2;border-radius:10px;margin:-2px 0}.badge.get{color:#70bbe1;background-color:#d9edf7}.badge.head{color:#70bbe1;background-color:#d9edf7}.badge.options{color:#70bbe1;background-color:#d9edf7}.badge.put{color:#f0db70;background-color:#fcf8e3}.badge.patch{color:#f0db70;background-color:#fcf8e3}.badge.post{color:#93cd7c;background-color:#dff0d8}.badge.delete{color:#ce8383;background-color:#f2dede}.collapse-button{float:right}.collapse-button .close{display:none;color:#428bca;cursor:pointer}.collapse-button .open{color:#428bca;cursor:pointer}.collapse-button.show .close{display:inline}.collapse-button.show .open{display:none}.collapse-content{max-height:0;overflow:hidden;transition:max-height .3s ease-in-out}nav{width:220px}.container{max-width:940px;margin-left:auto;margin-right:auto}.container .row .content{margin-left:244px;width:696px}.container .row:after{content:'';display:block;clear:both}.container-fluid nav{width:22%}.container-fluid .row .content{margin-left:24%}.container-fluid.triple nav{width:16.5%;padding-right:1px}.container-fluid.triple .row .content{position:relative;margin-left:16.5%;padding-left:24px}.middle:before,.middle:after{content:'';display:table}.middle:after{clear:both}.middle{box-sizing:border-box;width:51.5%;padding-right:12px}.right{box-sizing:border-box;float:right;width:48.5%;padding-left:12px}.right a{color:#428bca}.right h1,.right h2,.right h3,.right h4,.right h5,.right p,.right div{color:white}.right pre{background-color:#1d1f21;border:1px solid #1d1f21}.right pre code{color:#c5c8c6}.right .description{margin-top:12px}.triple .resource-heading{font-size:125%}.definition{margin-top:12px;margin-bottom:12px}.definition .method{font-weight:bold}.definition .method.get{color:#2e8ab8}.definition .method.head{color:#2e8ab8}.definition .method.options{color:#2e8ab8}.definition .method.post{color:#56b82e}.definition .method.put{color:#b8a22e}.definition .method.patch{color:#b8a22e}.definition .method.delete{color:#b82e2e}.definition .uri{word-break:break-all;word-wrap:break-word}.definition .hostname{opacity:.5}.example-names{background-color:#eee;padding:12px;border-radius:6px}.example-names .tab-button{cursor:pointer;color:black;border:1px solid #ddd;padding:6px;margin-left:12px}.example-names .tab-button.active{background-color:#d5d5d5}.right .example-names{background-color:#444}.right .example-names .tab-button{color:white;border:1px solid #666;border-radius:6px}.right .example-names .tab-button.active{background-color:#5e5e5e}#nav-background{position:fixed;left:0;top:0;bottom:0;width:16.5%;padding-right:14.4px;background-color:#fbfbfb;border-right:1px solid #f0f0f0;z-index:-1}#right-panel-background{position:absolute;right:-12px;top:-12px;bottom:-12px;width:48.6%;background-color:#333;z-index:-1}@media (max-width:1200px){nav{width:198px}.container{max-width:840px}.container .row .content{margin-left:224px;width:606px}}@media (max-width:992px){nav{width:169.4px}.container{max-width:720px}.container .row .content{margin-left:194px;width:526px}}@media (max-width:768px){nav{display:none}.container{width:95%;max-width:none}.container .row .content,.container-fluid .row .content,.container-fluid.triple .row .content{margin-left:auto;margin-right:auto;width:95%}#nav-background{display:none}#right-panel-background{width:48.6%}}.back-to-top{position:fixed;z-index:1;bottom:0;right:24px;padding:4px 8px;color:rgba(0,0,0,0.5);background-color:#f2f2f2;text-decoration:none !important;border-top:1px solid #d9d9d9;border-left:1px solid #d9d9d9;border-right:1px solid #d9d9d9;border-top-left-radius:3px;border-top-right-radius:3px}.resource-group{padding:12px;margin-bottom:12px;background-color:white;border:1px solid #d9d9d9;border-radius:6px}.resource-group h2.group-heading,.resource-group .heading a{padding:12px;margin:-12px -12px 12px -12px;background-color:#f2f2f2;border-bottom:1px solid #d9d9d9;border-top-left-radius:6px;border-top-right-radius:6px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.triple .content .resource-group{padding:0;border:none}.triple .content .resource-group h2.group-heading,.triple .content .resource-group .heading a{margin:0 0 12px 0;border:1px solid #d9d9d9}nav .resource-group .heading a{padding:12px;margin-bottom:0}nav .resource-group .collapse-content{padding:0}.action{margin-bottom:12px;padding:12px 12px 0 12px;overflow:hidden;border:1px solid transparent;border-radius:6px}.action h4.action-heading{padding:6px 12px;margin:-12px -12px 12px -12px;border-bottom:1px solid transparent;border-top-left-radius:6px;border-top-right-radius:6px;overflow:hidden}.action h4.action-heading .name{float:right;font-weight:normal;padding:6px 0}.action h4.action-heading .method{padding:6px 12px;margin-right:12px;border-radius:3px;display:inline-block}.action h4.action-heading .method.get{color:#000;background-color:#337ab7}.action h4.action-heading .method.head{color:#000;background-color:#337ab7}.action h4.action-heading .method.options{color:#000;background-color:#337ab7}.action h4.action-heading .method.put{color:#000;background-color:#ed9c28}.action h4.action-heading .method.patch{color:#000;background-color:#ed9c28}.action h4.action-heading .method.post{color:#000;background-color:#5cb85c}.action h4.action-heading .method.delete{color:#000;background-color:#d9534f}.action h4.action-heading code{color:#444;background-color:#f5f5f5;border-color:#cfcfcf;font-weight:normal;word-break:break-all;display:inline-block;margin-top:2px}.action dl.inner{padding-bottom:2px}.action .title{border-bottom:1px solid white;margin:0 -12px -1px -12px;padding:12px}.action.get{border-color:#bce8f1}.action.get h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.head{border-color:#bce8f1}.action.head h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.options{border-color:#bce8f1}.action.options h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.post{border-color:#d6e9c6}.action.post h4.action-heading{color:#5cb85c;background:#dff0d8;border-bottom-color:#d6e9c6}.action.put{border-color:#faebcc}.action.put h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.patch{border-color:#faebcc}.action.patch h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.delete{border-color:#ebccd1}.action.delete h4.action-heading{color:#d9534f;background:#f2dede;border-bottom-color:#ebccd1}</style></head><body class="preload"><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><nav><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#provenance-activities">Provenance Activities</a></div><div class="collapse-content"><ul><li><a href="#provenance-activities-activities-collection">Activities collection</a><ul><li><a href="#provenance-activities-activities-collection-post"><span class="badge post"><i class="fa fa-plus"></i></span>Create activity</a></li><li><a href="#provenance-activities-activities-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List activities</a></li></ul></li><li><a href="#provenance-activities-activities-instance">Activities instance</a><ul><li><a href="#provenance-activities-activities-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>View activity</a></li><li><a href="#provenance-activities-activities-instance-put"><span class="badge put"><i class="fa fa-pencil"></i></span>Update activity</a></li><li><a href="#provenance-activities-activities-instance-delete"><span class="badge delete"><i class="fa fa-times"></i></span>Delete activity</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#provenance-relations">Provenance Relations</a></div><div class="collapse-content"><ul><li><a href="#provenance-relations-relations-collection">Relations collection</a><ul><li><a href="#provenance-relations-relations-collection-post"><span class="badge post"><i class="fa fa-plus"></i></span>Create used relation</a></li><li><a href="#provenance-relations-relations-collection-post-1"><span class="badge post"><i class="fa fa-plus"></i></span>Create was generated by relation</a></li><li><a href="#provenance-relations-relations-collection-post-2"><span class="badge post"><i class="fa fa-plus"></i></span>Create was derived from relation</a></li><li><a href="#provenance-relations-relations-collection-post-3"><span class="badge post"><i class="fa fa-plus"></i></span>Create was invalidated by relation</a></li><li><a href="#provenance-relations-relations-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>NOT_IMPL_CHANGE List provenance relations</a></li></ul></li><li><a href="#provenance-relations-relation-instance">Relation instance</a><ul><li><a href="#provenance-relations-relation-instance-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>NOT_IMPL_CHANGE View relation</a></li><li><a href="#provenance-relations-relation-instance-delete"><span class="badge delete"><i class="fa fa-times"></i></span>Delete relation</a></li></ul></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#search-provenance">Search Provenance</a></div><div class="collapse-content"><ul><li><a href="#search-provenance-search-provenance-post"><span class="badge post"><i class="fa fa-plus"></i></span>Search Provenance</a></li><li><a href="#search-provenance-search-provenance-origin-post"><span class="badge post"><i class="fa fa-plus"></i></span>Search Provenance Origin</a></li></ul></div></div></nav><div class="content"><header><h1 id="top">Provenance</h1></header><p><a href="index.html">Home</a></p>
+<section id="provenance-activities" class="resource-group"><h2 class="group-heading">Provenance Activities <a href="#provenance-activities" class="permalink">&para;</a></h2><p>Represents the main record of provenance in DDS; it is analogous to <em>Activity</em> defined in the <a href="https://www.w3.org/TR/prov-primer/">W3C Specification on Provenance</a>.  Activities are recorded/tracked by researchers and their <em>Software Agents</em> with the intent of maintaining comprehensive data provenance.</p>
+<p><em>Note: Provenance relations to an activity, such as</em> <code>used</code> <em>and</em> <code>wasGeneratedBy</code> <em>are managed through the</em> <strong>Provenance Relations</strong> <em>API actions.</em></p>
+<div id="provenance-activities-activities-collection" class="resource"><h3 class="resource-heading">Activities collection <a href="#provenance-activities-activities-collection" class="permalink">&nbsp;&para;</a></h3><div id="provenance-activities-activities-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create activity</div><a href="#provenance-activities-activities-collection-post" class="method post">POST</a><code class="uri">/activities</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>name (string, required)</strong> - A short name for this activity.</li>
+<li><strong>description (string, optional)</strong> - A verbose description for this activity.</li>
+<li><strong>started_on (string, optional)</strong> - The time this activity was started; defaults to the current datetime if not specified.</li>
+<li><strong>ended_on (string, optional)</strong> - The time this activity ended.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The <code>ended_on</code> time must be greater than or equal to the <code>started_on</code> time.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Activity requires a name</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/activities</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+  "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+  "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+  "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+  "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-activities-activities-collection-get" class="action get"><h4 class="action-heading"><div class="name">List activities</div><a href="#provenance-activities-activities-collection-get" class="method get">GET</a><code class="uri">/activities</code></h4><blockquote>
+<p><strong>Permission:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>authenticated [scope: creator <em>or</em> visiblity to single entity that has a provenance relation to the activity]</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Activities that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/activities</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+      "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+      "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+      "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="provenance-activities-activities-instance" class="resource"><h3 class="resource-heading">Activities instance <a href="#provenance-activities-activities-instance" class="permalink">&nbsp;&para;</a></h3><div id="provenance-activities-activities-instance-get" class="action get"><h4 class="action-heading"><div class="name">View activity</div><a href="#provenance-activities-activities-instance-get" class="method get">GET</a><code class="uri">/activities/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>creator <em>or</em> visiblity to single entity that has a provenance relation to the activity</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Activity does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/activities/<span class="hljs-attribute" title="id">a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span><p>The unique id of the activity.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+  "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+  "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+  "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-activities-activities-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update activity</div><a href="#provenance-activities-activities-instance-put" class="method put">PUT</a><code class="uri">/activities/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Only <code>name</code>, <code>description</code>, <code>started_on</code>, and <code>ended_on</code> properties may be updated via this action.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (activity restricted)</p>
+</li>
+<li>
+<p>404: Activity does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/activities/<span class="hljs-attribute" title="id">a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span><p>The unique id of the activity.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+  "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+  "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+  "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+  "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-activities-activities-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete activity</div><a href="#provenance-activities-activities-instance-delete" class="method delete">DELETE</a><code class="uri">/activities/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (activity restricted)</p>
+</li>
+<li>
+<p>404: Activity does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/activities/<span class="hljs-attribute" title="id">a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span><p>The unique id of the activity.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="provenance-relations" class="resource-group"><h2 class="group-heading">Provenance Relations <a href="#provenance-relations" class="permalink">&para;</a></h2><p>Represents provenance relations as defined in the <a href="https://www.w3.org/TR/prov-primer/">W3C Specification on Provenance</a>.  Relations are recorded/tracked by researchers and their <em>Software Agents</em> with the intent of maintaining comprehensive data provenance.</p>
+<div id="provenance-relations-relations-collection" class="resource"><h3 class="resource-heading">Relations collection <a href="#provenance-relations-relations-collection" class="permalink">&nbsp;&para;</a></h3><div id="provenance-relations-relations-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create used relation</div><a href="#provenance-relations-relations-collection-post" class="method post">POST</a><code class="uri">/relations/used</code></h4><blockquote>
+<p><strong>Permission:</strong> creator of the activity <em>and</em> visibility to the <code>used</code> entity</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong><a href="http://activity.id">activity.id</a> (string, required)</strong> - The activity that used the entity.</li>
+<li><strong>entity.kind (string, required)</strong> - The kind of entity that was used; this must be a file version (i.e. <code>dds-file-version</code>).</li>
+<li><strong><a href="http://entity.id">entity.id</a> (string, required)</strong> - The unique id of the used entity.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>An entity (i.e. <code>file_version</code>) cannot be used and generated by the same activity (i.e. <code>dds-activity</code>).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Activity and Entity are required, Activity generated Entity</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/used</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">activity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">entity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-used"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+    "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-relations-relations-collection-post-1" class="action post"><h4 class="action-heading"><div class="name">Create was generated by relation</div><a href="#provenance-relations-relations-collection-post-1" class="method post">POST</a><code class="uri">/relations/was_generated_by</code></h4><blockquote>
+<p><strong>Permission:</strong> creator of the activity <em>and</em> update_file for the <code>wasGeneratedBy</code> entity</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>entity.kind (string, required)</strong> - The kind of entity that was generated; this must be a file version (i.e. <code>dds-file-version</code>).</li>
+<li><strong><a href="http://entity.id">entity.id</a> (string, required)</strong> - The unique id of the generated entity.</li>
+<li><strong><a href="http://activity.id">activity.id</a> (string, required)</strong> - The activity that generated the entity.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>An entity (i.e. <code>file_version</code>) can be generated by one and only one activity (i.e. <code>dds-activity</code>).</li>
+<li>An entity (i.e. <code>file_version</code>) cannot be used and generated by the same activity (i.e. <code>dds-activity</code>).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Activity and Entity are required, Entity can only be generated by one Activity, cannot be used by the same Activity</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/was_generated_by</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">entity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">activity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-generated-by"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+    "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-relations-relations-collection-post-2" class="action post"><h4 class="action-heading"><div class="name">Create was derived from relation</div><a href="#provenance-relations-relations-collection-post-2" class="method post">POST</a><code class="uri">/relations/was_derived_from</code></h4><blockquote>
+<p><strong>Permission:</strong> visibility to the <code>used</code> entity and update_file for the <code>generated</code> entity.</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>generated_entity.kind (string, required)</strong> - The kind of entity generated by the derivation; this must be a file version (i.e. <code>dds-file-version</code>).</li>
+<li><strong>generated_entity.id (string, required)</strong> - The unique id of the generated entity.</li>
+<li><strong>used_entity.kind (string, required)</strong> - The kind of entity used by the derivation; this must be a file version (i.e. <code>dds-file-version</code>).</li>
+<li><strong>used_entity.id (string, required)</strong> - The unique id of the used entity.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Activity and Entity are required</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/was_derived_from</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">generated_entity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">used_entity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-derived-from"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"6bf31123-b078-4655-ae4e-be599d52adc5"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-relations-relations-collection-post-3" class="action post"><h4 class="action-heading"><div class="name">Create was invalidated by relation</div><a href="#provenance-relations-relations-collection-post-3" class="method post">POST</a><code class="uri">/relations/was_invalidated_by</code></h4><blockquote>
+<p><strong>Permission:</strong> creator of the activity <em>and</em> delete_file for <code>wasInvalidatedBy</code> entity</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>entity.kind (string, required)</strong> - The kind of entity that was invalidated; this must be a file version (i.e. <code>dds-file-version</code>).</li>
+<li><strong><a href="http://entity.id">entity.id</a> (string, required)</strong> - The unique id of the invalidated entity.</li>
+<li><strong><a href="http://activity.id">activity.id</a> (string, required)</strong> - The activity that invalidated the entity.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The <code>invalidated</code> entity must be in a deleted state (i.e. <code>&quot;is_deleted&quot;: true</code>).</li>
+<li>An entity (i.e. <code>file_version</code>) can be invalidated by one and only one activity (i.e. <code>dds-activity</code>).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Activity and Entity are required</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/was_invalidated_by</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">entity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span>
+  </span>}</span>,
+  "<span class="hljs-attribute">activity</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-generated-by"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+    "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-relations-relations-collection-get" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_CHANGE List provenance relations</div><a href="#provenance-relations-relations-collection-get" class="method get">GET</a><code class="uri">/relations/{object_kind}/{object_id}</code></h4><p>List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.</p>
+<blockquote>
+<p><strong>Permission:</strong> visibility to the specified (starting) provenance node (i.e. <code>object_kind</code>, <code>object_id</code>) - which may be an activity <em>or</em> an entity</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Provenance relations that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Object kind or id does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/<span class="hljs-attribute" title="object_kind">dds-activity</span>/<span class="hljs-attribute" title="object_id">a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>dds-activity</span></span><p>The kind of provenance node; can be one of dds-activity or dds-file-version.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>a1ff02a4-b7e9-999d-87x1-66f4c881jka1</span></span><p>The unique id of the node.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-used"</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+      "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+        "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+        "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+        "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+        "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+      </span>}</span>,
+      "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+          "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+          </span>}
+        </span>}</span>,
+        "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span></span>,
+        "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+        "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+          "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+          "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+            {
+              "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+              "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+              "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+            </span>}
+          ]</span>,
+          "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+            "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+          </span>}
+        </span>}</span>,
+        "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+      </span>}</span>,
+      "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="provenance-relations-relation-instance" class="resource"><h3 class="resource-heading">Relation instance <a href="#provenance-relations-relation-instance" class="permalink">&nbsp;&para;</a></h3><div id="provenance-relations-relation-instance-get" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_CHANGE View relation</div><a href="#provenance-relations-relation-instance-get" class="method get">GET</a><code class="uri">/relations/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> visibility to a single node for the specified relation - which may be the activity <em>or</em> the entity</p>
+</blockquote>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in ‘Authorization’ Header</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Relation does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/<span class="hljs-attribute" title="id">ac242faf-fba0-4293-a949-0b82ae7ba810</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ac242faf-fba0-4293-a949-0b82ae7ba810</span></span><p>The unique id of the provenance relation.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-used"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Post pairwise sequence alignment (piecewise)"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-associated-with"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Building a Random Forest as a heuristic for PI3-Kinase pathway activity"</span></span>,
+    "<span class="hljs-attribute">started_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">ended_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T14:30:00Z"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-user"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"c1179f73-0558-4f96-afc7-9d251e65b7bb"</span></span>,
+    "<span class="hljs-attribute">username</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01"</span></span>,
+    "<span class="hljs-attribute">first_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew"</span></span>,
+    "<span class="hljs-attribute">last_name</span>": <span class="hljs-value"><span class="hljs-string">"Gardner"</span></span>,
+    "<span class="hljs-attribute">full_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew Gardner"</span></span>,
+    "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01@duke.edu"</span></span>,
+    "<span class="hljs-attribute">auth_provider</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke"</span></span>,
+      "<span class="hljs-attribute">affiliate</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">uid</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">last_login_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-attributed-to"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-user"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"c1179f73-0558-4f96-afc7-9d251e65b7bb"</span></span>,
+    "<span class="hljs-attribute">username</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01"</span></span>,
+    "<span class="hljs-attribute">first_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew"</span></span>,
+    "<span class="hljs-attribute">last_name</span>": <span class="hljs-value"><span class="hljs-string">"Gardner"</span></span>,
+    "<span class="hljs-attribute">full_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew Gardner"</span></span>,
+    "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01@duke.edu"</span></span>,
+    "<span class="hljs-attribute">auth_provider</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke"</span></span>,
+      "<span class="hljs-attribute">affiliate</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">uid</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">last_login_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-attributed-to"</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+  "<span class="hljs-attribute">from</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+    "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span></span>,
+      "<span class="hljs-attribute">project</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ca29f7df-33ca-46dd-a015-92c46fdb6fd1"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+    "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">upload</span>": <span class="hljs-value">{
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"666be35a-98e0-4c2e-9a17-7bc009f9bb23"</span></span>,
+      "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+      "<span class="hljs-attribute">hashes</span>": <span class="hljs-value">[
+        {
+          "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"cf23df2207d99a74fbe169e3eba035e633b65d94"</span></span>,
+          "<span class="hljs-attribute">algorithm</span>": <span class="hljs-value"><span class="hljs-string">"md5"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      ]</span>,
+      "<span class="hljs-attribute">storage_provider</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"g5579f73-0558-4f96-afc7-9d251e65bv33"</span></span>,
+        "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke_oit_swift"</span></span>,
+        "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Duke OIT Storage"</span>
+      </span>}
+    </span>}</span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">to</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-software-agent"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"9a4c28a2-ec18-40ed-b75c-3bf5b309715f"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Sample pipeline agent"</span></span>,
+    "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">repo_url</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+  </span>}</span>,
+  "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="provenance-relations-relation-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete relation</div><a href="#provenance-relations-relation-instance-delete" class="method delete">DELETE</a><code class="uri">/relations/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator</p>
+</blockquote>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Relation does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/relations/<span class="hljs-attribute" title="id">ac242faf-fba0-4293-a949-0b82ae7ba810</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>ac242faf-fba0-4293-a949-0b82ae7ba810</span></span><p>The unique id of the provenance relation.</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="search-provenance" class="resource-group"><h2 class="group-heading">Search Provenance <a href="#search-provenance" class="permalink">&para;</a></h2><p>The <code>Provenance Relations</code> API actions allows users and software agents to record the use and production of entities (i.e. files, file versions, etc.) by research activities, which may be influenced in various ways by agents.  The resulting provenace chain is organized as a <a href="https://en.wikipedia.org/wiki/Graph_database">graph structure</a>.  The search API can be used by client applications to extract the provenace graph in a JSON data format that can be transformed to a visual representation.</p>
+<p><em>Note: The provenance graph structure is stored in a</em> <a href="http://neo4j.com">Neo4J</a> <em>database and ubiquitous JavaScript libraries can be used for</em> <a href="http://neo4j.com/developer/guide-data-visualization">graph rendering</a>.</p>
+<div id="search-provenance-search-provenance" class="resource"><h3 class="resource-heading">Search Provenance <a href="#search-provenance-search-provenance" class="permalink">&nbsp;&para;</a></h3><div id="search-provenance-search-provenance-post" class="action post"><h4 class="action-heading"><div class="name">Search Provenance</div><a href="#search-provenance-search-provenance-post" class="method post">POST</a><code class="uri">/search/provenance</code></h4><p>Given a starting node, returns a graph structure for the provenance chain.  This structure is based on the Neo4J JSON graph format.</p>
+<blockquote>
+<p><strong>Permission:</strong> visibility to the specified (starting) provenance node (i.e. <code>start_node.kind</code>, <code>start_node.id</code>) - which may be an activity <em>or</em> an entity</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>If the user does not have visibilty to a <code>node</code> in the resulting graph, the <code>properties</code> attribute for that <code>node</code> will be a partial resource containing: <code>kind</code>, <code>id</code>, and <code>is_deleted</code>.</li>
+</ul>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>start_node.kind (string, required)</strong> - The kind of provenance node; can be one of <code>dds-activity</code> or <code>dds-file-version</code>.</li>
+<li><strong>start_node.id (string, required)</strong> - The unique id of the node.</li>
+<li><strong>max_hops (number, optional)</strong> -  The max number of hops (degree of node separation) to traverse from the starting node; defaults to infinity.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: start_node or start_node kind does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/search/provenance</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">start_node</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">graph</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">nodes</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"Activity"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"File Version"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+          "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span>
+          </span>}</span>,
+          "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+          "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"File Version"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+          "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span>
+          </span>}</span>,
+          "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+          "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>}
+    ]</span>,
+    "<span class="hljs-attribute">relationships</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"used"</span></span>,
+        "<span class="hljs-attribute">start_node</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">end_node</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-used"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"wasGeneratedBy"</span></span>,
+        "<span class="hljs-attribute">start_node</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+        "<span class="hljs-attribute">end_node</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-generated-by"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>}
+    ]
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="search-provenance-search-provenance-origin" class="resource"><h3 class="resource-heading">Search Provenance Origin <a href="#search-provenance-search-provenance-origin" class="permalink">&nbsp;&para;</a></h3><div id="search-provenance-search-provenance-origin-post" class="action post"><h4 class="action-heading"><div class="name">Search Provenance Origin</div><a href="#search-provenance-search-provenance-origin-post" class="method post">POST</a><code class="uri">/search/provenance/origin</code></h4><p>This is a targeted query that navigates “up” the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions.  Given a list of file versions, this action perform the following query for each <em>File Version</em>:</p>
+<ol>
+<li>
+<p>Gets all related <em>wasDerivedFrom</em> file versions (if they exist).</p>
+</li>
+<li>
+<p>Gets the generating activity (if it exists).</p>
+</li>
+<li>
+<p>For the generating activity, gets the list of <em>wasGeneratedBy</em> and <em>used</em> file versions.</p>
+</li>
+</ol>
+<p>A graph structure of the unique nodes and relationships is returned.</p>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>For file versions that do not exist, no provenance nodes/relations will be returned</li>
+<li>If a file version does not have a generating activity, then only the file version node is returned.</li>
+<li>If the user does not have visibilty to a <code>node</code> in the resulting graph, the <code>properties</code> attribute for that <code>node</code> will be a partial resource containing: <code>kind</code>, <code>id</code>, and <code>is_deleted</code>.</li>
+</ul>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>file_versions (object[ ], required)</strong> - The list of file versions (i.e. <code>dds-file-version</code>)</li>
+<li><strong>file_versions[ ].id (string, required)</strong> - The unique file version id.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/search/provenance/origin</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">file_versions</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">graph</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">nodes</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"Activity"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-activity"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+          "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RF PI3-Kinase"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"File Version"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+          "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span>
+          </span>}</span>,
+          "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+          "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Initial raw data from device"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+        "<span class="hljs-attribute">labels</span>": <span class="hljs-value">[
+          <span class="hljs-string">"File Version"</span>
+        ]</span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-file-version"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+          "<span class="hljs-attribute">file</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"777be35a-98e0-4c2e-9a17-7bc009f9b111"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata"</span>
+          </span>}</span>,
+          "<span class="hljs-attribute">version</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+          "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Alignment performed on raw data"</span></span>,
+          "<span class="hljs-attribute">is_deleted</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>}
+    ]</span>,
+    "<span class="hljs-attribute">relationships</span>": <span class="hljs-value">[
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"used"</span></span>,
+        "<span class="hljs-attribute">start_node</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">end_node</span>": <span class="hljs-value"><span class="hljs-string">"89ef1e77-1a0b-40a8-aaca-260d13987f2b"</span></span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-used"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"ac242faf-fba0-4293-a949-0b82ae7ba810"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>},
+      {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"wasGeneratedBy"</span></span>,
+        "<span class="hljs-attribute">start_node</span>": <span class="hljs-value"><span class="hljs-string">"1b80a313-97cf-482d-8d17-9b911bf815b3"</span></span>,
+        "<span class="hljs-attribute">end_node</span>": <span class="hljs-value"><span class="hljs-string">"a1ff02a4-b7e9-999d-87x1-66f4c881jka1"</span></span>,
+        "<span class="hljs-attribute">properties</span>": <span class="hljs-value">{
+          "<span class="hljs-attribute">kind</span>": <span class="hljs-value"><span class="hljs-string">"dds-relation-was-generated-by"</span></span>,
+          "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"372f25e1-01b0-4b8d-9524-e26dd573cc95"</span></span>,
+          "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
+        </span>}
+      </span>}
+    ]
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 20 Dec 2016</p><script>/* eslint-env browser */
+/* eslint quotes: [2, "single"] */
+'use strict';
+
+/*
+  Determine if a string ends with another string.
+*/
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+/*
+  Get a list of direct child elements by class name.
+*/
+function childrenByClass(element, name) {
+  var filtered = [];
+
+  for (var i = 0; i < element.children.length; i++) {
+    var child = element.children[i];
+    var classNames = child.className.split(' ');
+    if (classNames.indexOf(name) !== -1) {
+      filtered.push(child);
+    }
+  }
+
+  return filtered;
+}
+
+/*
+  Get an array [width, height] of the window.
+*/
+function getWindowDimensions() {
+  var w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.body,
+      x = w.innerWidth || e.clientWidth || g.clientWidth,
+      y = w.innerHeight || e.clientHeight || g.clientHeight;
+
+  return [x, y];
+}
+
+/*
+  Collapse or show a request/response example.
+*/
+function toggleCollapseButton(event) {
+    var button = event.target.parentNode;
+    var content = button.parentNode.nextSibling;
+    var inner = content.children[0];
+
+    if (button.className.indexOf('collapse-button') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        // Currently showing, so let's hide it
+        button.className = 'collapse-button';
+        content.style.maxHeight = '0px';
+    } else {
+        // Currently hidden, so let's show it
+        button.className = 'collapse-button show';
+        content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+function toggleTabButton(event) {
+    var i, index;
+    var button = event.target;
+
+    // Get index of the current button.
+    var buttons = childrenByClass(button.parentNode, 'tab-button');
+    for (i = 0; i < buttons.length; i++) {
+        if (buttons[i] === button) {
+            index = i;
+            button.className = 'tab-button active';
+        } else {
+            buttons[i].className = 'tab-button';
+        }
+    }
+
+    // Hide other tabs and show this one.
+    var tabs = childrenByClass(button.parentNode.parentNode, 'tab');
+    for (i = 0; i < tabs.length; i++) {
+        if (i === index) {
+            tabs[i].style.display = 'block';
+        } else {
+            tabs[i].style.display = 'none';
+        }
+    }
+}
+
+/*
+  Collapse or show a navigation menu. It will not be hidden unless it
+  is currently selected or `force` has been passed.
+*/
+function toggleCollapseNav(event, force) {
+    var heading = event.target.parentNode;
+    var content = heading.nextSibling;
+    var inner = content.children[0];
+
+    if (heading.className.indexOf('heading') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+      // Currently showing, so let's hide it, but only if this nav item
+      // is already selected. This prevents newly selected items from
+      // collapsing in an annoying fashion.
+      if (force || window.location.hash && endsWith(event.target.href, window.location.hash)) {
+        content.style.maxHeight = '0px';
+      }
+    } else {
+      // Currently hidden, so let's show it
+      content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+/*
+  Refresh the page after a live update from the server. This only
+  works in live preview mode (using the `--server` parameter).
+*/
+function refresh(body) {
+    document.querySelector('body').className = 'preload';
+    document.body.innerHTML = body;
+
+    // Re-initialize the page
+    init();
+    autoCollapse();
+
+    document.querySelector('body').className = '';
+}
+
+/*
+  Determine which navigation items should be auto-collapsed to show as many
+  as possible on the screen, based on the current window height. This also
+  collapses them.
+*/
+function autoCollapse() {
+  var windowHeight = getWindowDimensions()[1];
+  var itemsHeight = 64; /* Account for some padding */
+  var itemsArray = Array.prototype.slice.call(
+    document.querySelectorAll('nav .resource-group .heading'));
+
+  // Get the total height of the navigation items
+  itemsArray.forEach(function (item) {
+    itemsHeight += item.parentNode.offsetHeight;
+  });
+
+  // Should we auto-collapse any nav items? Try to find the smallest item
+  // that can be collapsed to show all items on the screen. If not possible,
+  // then collapse the largest item and do it again. First, sort the items
+  // by height from smallest to largest.
+  var sortedItems = itemsArray.sort(function (a, b) {
+    return a.parentNode.offsetHeight - b.parentNode.offsetHeight;
+  });
+
+  while (sortedItems.length && itemsHeight > windowHeight) {
+    for (var i = 0; i < sortedItems.length; i++) {
+      // Will collapsing this item help?
+      var itemHeight = sortedItems[i].nextSibling.offsetHeight;
+      if ((itemsHeight - itemHeight <= windowHeight) || i === sortedItems.length - 1) {
+        // It will, so let's collapse it, remove its content height from
+        // our total and then remove it from our list of candidates
+        // that can be collapsed.
+        itemsHeight -= itemHeight;
+        toggleCollapseNav({target: sortedItems[i].children[0]}, true);
+        sortedItems.splice(i, 1);
+        break;
+      }
+    }
+  }
+}
+
+/*
+  Initialize the interactive functionality of the page.
+*/
+function init() {
+    var i, j;
+
+    // Make collapse buttons clickable
+    var buttons = document.querySelectorAll('.collapse-button');
+    for (i = 0; i < buttons.length; i++) {
+        buttons[i].onclick = toggleCollapseButton;
+
+        // Show by default? Then toggle now.
+        if (buttons[i].className.indexOf('show') !== -1) {
+            toggleCollapseButton({target: buttons[i].children[0]});
+        }
+    }
+
+    var responseCodes = document.querySelectorAll('.example-names');
+    for (i = 0; i < responseCodes.length; i++) {
+        var tabButtons = childrenByClass(responseCodes[i], 'tab-button');
+        for (j = 0; j < tabButtons.length; j++) {
+            tabButtons[j].onclick = toggleTabButton;
+
+            // Show by default?
+            if (j === 0) {
+                toggleTabButton({target: tabButtons[j]});
+            }
+        }
+    }
+
+    // Make nav items clickable to collapse/expand their content.
+    var navItems = document.querySelectorAll('nav .resource-group .heading');
+    for (i = 0; i < navItems.length; i++) {
+        navItems[i].onclick = toggleCollapseNav;
+
+        // Show all by default
+        toggleCollapseNav({target: navItems[i].children[0]});
+    }
+}
+
+// Initial call to set up buttons
+init();
+
+window.onload = function () {
+    autoCollapse();
+    // Remove the `preload` class to enable animations
+    document.querySelector('body').className = '';
+};
+</script></body></html>
