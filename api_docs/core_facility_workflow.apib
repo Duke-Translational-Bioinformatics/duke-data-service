@@ -11,7 +11,7 @@ The *Project Transfer* actions can be used by research core facilities to formal
 + Parameters
     + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
 
-### NOT_IMPLEMENTED_NEW Initiate a project transfer [POST]
+### Initiate a project transfer [POST]
 Initiates a project transfer from the current owner (i.e. `project_admin`) to a new owner or list of owners.
 >**Permission:** manage_project_permissions
 - - - - -
@@ -72,7 +72,7 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "audit": { }
         }
 
-### NOT_IMPLEMENTED_NEW List project transfers [GET]
+### List project transfers [GET]
 >**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
 - - - - -
 
@@ -113,7 +113,7 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
 + Parameters
     + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
 
-### NOT_IMPLEMENTED_NEW View a project transfer [GET]
+### View a project transfer [GET]
 >**Permission:** manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)
 - - - - -
 
@@ -147,7 +147,7 @@ Initiates a project transfer from the current owner (i.e. `project_admin`) to a 
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_NEW Accept a project transfer [PUT /project_transfers/{id}/accept]
+## Accept a project transfer [PUT /project_transfers/{id}/accept]
 Accept a *pending* project transfer.
 >**Permission:** transfer recipient (i.e. in `to_users`)]
 - - - - -
@@ -201,7 +201,7 @@ Accept a *pending* project transfer.
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_NEW Reject a project transfer [PUT /project_transfers/{id}/reject]
+## Reject a project transfer [PUT /project_transfers/{id}/reject]
 Reject a *pending* project transfer.
 >**Permission:** transfer recipient (i.e. in `to_users`)]
 - - - - -
@@ -254,7 +254,7 @@ Reject a *pending* project transfer.
             "audit": { }
         }
 
-## NOT_IMPLEMENTED_NEW Cancel a project transfer [PUT /project_transfers/{id}/cancel]
+## Cancel a project transfer [PUT /project_transfers/{id}/cancel]
 Cancel a *pending* project transfer.
 >**Permission:** manage_project_permissions
 - - - - -
@@ -311,7 +311,7 @@ Cancel a *pending* project transfer.
 + Parameters
     + status (string, optional, `pending`) ... The `status` of the project transfer; can be one of `pending`,`accepted`, or `canceled`.
 
-### NOT_IMPLEMENTED_NEW View All Project Transfers [GET]
+### View All Project Transfers [GET]
 Used to retrieve all project transfers visible to the current user, optionally filtered by status.
 >**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
 - - - - -

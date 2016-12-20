@@ -511,7 +511,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-### List provenance relations [GET /relations/{object_kind}/{object_id}]
+### NOT_IMPL_CHANGE List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
 - - - - -
@@ -587,7 +587,7 @@ List the relations for a provenance node; this only lists direct relations for t
 + Parameters
     + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
-### View relation [GET]
+### NOT_IMPL_CHANGE View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
 
 **Response messages:**
@@ -665,8 +665,11 @@ List the relations for a provenance node; this only lists direct relations for t
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
                 "auth_provider": {
-                    "source": "duke_shibboleth",
-                    "uid": "gardner100"
+                    "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                    "name": "duke",
+                    "affiliate": {
+                        "uid": "mrgardner01"
+                    }
                 },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": { }
@@ -719,8 +722,11 @@ List the relations for a provenance node; this only lists direct relations for t
                 "full_name": "Matthew Gardner",
                 "email": "mrgardner01@duke.edu",
                 "auth_provider": {
-                    "source": "duke_shibboleth",
-                    "uid": "gardner100"
+                    "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
+                    "name": "duke",
+                    "affiliate": {
+                        "uid": "mrgardner01"
+                    }
                 },
                 "last_login_on": "2015-01-01T12:00:00Z",
                 "audit": { }
