@@ -5,5 +5,5 @@ class SimpleCov::Formatter::MergedFormatter
 end
 
 SimpleCov.start 'rails' do
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
+  SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
 end
