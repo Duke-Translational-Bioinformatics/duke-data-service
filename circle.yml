@@ -78,4 +78,4 @@ deployment:
       - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'
 notify:
   webhooks:
-    - url: https://coveralls.io/webhook?repo_token='QcHfsdKXFs0POXs6JWgUR0HSPzBSWgHwN'
+    - url: https://coveralls.io/webhook?repo_token
