@@ -4,7 +4,7 @@ module DDS
       helpers PaginationParams
 
       desc 'api_token' do
-        detail 'This allows a client to present an access token from a registred authentication service and get an api token'
+        detail 'This allows a client to present an access token from a registered authentication service and get an api token'
         named 'api_token'
         failure [
           [200,'Success'],
