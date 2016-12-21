@@ -27,9 +27,8 @@ if ENV['CIRCLECI']
   # If running in CircleCI, run with Coveralls too
   require 'coveralls'
   SimpleCov.formatter = Coveralls::SimpleCov::Formatter
+  Coveralls.wear!('rails')
 end
-
-SimpleCov.start 'rails' unless ENV.key?('NO_COVERAGE')
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
