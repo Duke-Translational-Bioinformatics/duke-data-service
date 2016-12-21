@@ -26,7 +26,6 @@ end
 if ENV['CIRCLECI']
   # If running in CircleCI, run with Coveralls too
   require 'coveralls'
-  SimpleCov.formatter = Coveralls::SimpleCov::Formatter
   Coveralls.wear!('rails')
 end
 
