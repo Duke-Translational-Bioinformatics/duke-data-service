@@ -32,7 +32,8 @@ https://api.dataservice.duke.edu/apidocs
 ### converse
 [![Join the chat at https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-
+### coveralls
+[![Coverage Status](https://coveralls.io/repos/github/Duke-Translational-Bioinformatics/duke-data-service/badge.svg?branch=develop)](https://coveralls.io/github/Duke-Translational-Bioinformatics/duke-data-service?branch=develop)
 ### contributing
 The master branch of the project is considered the stable, production branch.
 All commits should propogate from 'develop' to 'uatest', and then to master
