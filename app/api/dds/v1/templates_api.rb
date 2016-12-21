@@ -74,9 +74,9 @@ module DDS
         named 'update template'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (template restricted)'],
-          [400, 'Validation Error'],
           [404, 'Template Does not Exist']
         ]
       end

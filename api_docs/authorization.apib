@@ -1,0 +1,192 @@
+FORMAT: 1A
+
+## Authorization
+[Home](index.html)
+
+## Group Authorization Roles
+Represents the set of discrete permissions that can be granted to a user.
+
+**Authorization Roles:**
+
+| role | name | description | permission(s) |
+|:-----|:-----|:------------|:--------------|
+| **system_admin** | System Admin | Can manage system level permissions and perform all operations across all projects | system_admin |
+| **project_admin** | Project Admin | Can update project details, delete project, manage project level permissions and perform all file operations | view_project, update_project, delete_project, manage_project_permissions, download_file, create_file, update_file, delete_file |
+| **project_viewer** | Project Viewer | Can only view project and file metadata | view_project |
+| **file_downloader** | File Downloader | Can download files | view_project, download_file |
+| **file_uploader** | File Uploader | Can upload files | view_project, create_file, update_file |
+| **file_editor** | File Editor | Can view, download, create, update and delete files | view_project, download_file, create_file, update_file, delete_file |
+
+
+**Permissions:**
+
+| permission | description |
+|:------------|:------------|
+| **system_admin** | Can manage system level permissions and perform all operations across all projects |
+| **view_project** | Can view project and file metadata |
+| **update_project** | Can update project header details and project affiliations |
+| **delete_project** | Can delete project |
+| **manage_project_permissions** | Can grant/revoke project level permissions |
+| **download_file** | Can download file |
+| **create_file** | Can upload new file and modify file metadata |
+| **update_file** | Can upload new version of existing file and modify file metadata |
+| **delete_file** | Can delete a file |
+
+## Authorization Roles collection [/auth_roles{?context}]
++ Parameters
+    + context (string, optional, `system`) ... The `context` or scope in which permission can be granted; valid context values are `system` or `project`.
+
+### List roles [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unsupported Context
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "system_admin",
+                    "name": "System Admin",
+                    "description": "Can manage system level permissions and perform all operations across all projects",
+                    "permissions": [
+                        {
+                            "id": "system_admin"
+                        }
+                    ],
+                    "contexts": ["system"],
+                    "is_deprecated": false
+                }
+            ]
+        }
+
+## Authorization Role instance [/auth_roles/{id}]
++ Parameters
+    + id (string, required, `file_editor`) ... The unique `id` for an authorization role.
+
+### View role [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unknown AuthRole
+
++ Response 200 (application/json)
+
+        {
+            "id": "file_editor",
+            "name": "File Editor",
+            "description": "Can view, download, create, update and delete files",
+            "permissions": [
+                {
+                    "id": "view_project"
+                },
+                {
+                    "id": "download_file"
+                }
+            ],
+            "contexts": ["project"],
+            "is_deprecated": false
+        }
+
+## Group System Permissions
+Represents system level authorization roles that have been granted to a user.
+
+## System Permissions collection [/system/permissions]
+
+### List system permissions [GET]
+>**Permission:** system_admin
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "auth_role": {
+                        "id": "system_admin",
+                        "name": "System Admin",
+                        "description": "Can manage system level permissions and perform all operations across all projects"
+                    }
+                }
+            ]
+        }
+
+## System Permission instance [/system/permissions/{user_id}]
++ Parameters
+    + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the user.
+
++ Model (application/json)
+
+    + Body
+
+            {
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_role": {
+                    "id": "system_admin",
+                    "name": "System Admin",
+                    "description": "Can manage system level permissions and perform all operations across all projects"
+                }
+            }
+
+### Grant system permission [PUT]
+>**Permission:** system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ Revokes any existing system level authorization role for the user and grants the new role.
++ The role specified must be a system level authorization role (i.e. `system` in `auth_role.contexts`).
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: User or AuthRole Does not Exist
+
++ Request (application/json)
+
+        {
+            "auth_role": {"id": "system_admin"}
+        }
+
++ Response 200
+
+    [System Permission instance][]
+
+### View system permission [GET]
+>**Permission:** system_admin
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: User Does not Exist
+
++ Response 200
+
+    [System Permission instance][]
+
+### Revoke system permission [DELETE]
+>**Permission:** system_admin
+- - - - -
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: User Does not Exist
+
++ Response 204
