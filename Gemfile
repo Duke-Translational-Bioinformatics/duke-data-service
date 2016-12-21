@@ -80,7 +80,6 @@ group :test do
   gem 'pry-byebug'
   gem 'simplecov', :require => false, :group => :test
   gem 'coveralls', require: false
-  gem 'codecov', :require => false, :group => :test
 end
 
 #heroku requires this
