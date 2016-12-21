@@ -16,8 +16,6 @@
 # users commonly want.
 #
 require 'simplecov'
-require 'codecov'
-SimpleCov.formatter = SimpleCov::Formatter::Codecov
 
 # save to CircleCI's artifacts directory if we're on CircleCI
 if ENV['CIRCLE_ARTIFACTS']
@@ -28,8 +26,11 @@ end
 if ENV['CIRCLECI']
   # If running in CircleCI, run with Coveralls too
   require 'coveralls'
-  Coveralls.wear!('rails')
+  SimpleCov.formatter = Coveralls::SimpleCov::Formatter
 end
+
+SimpleCov.start 'rails' unless ENV.key?('NO_COVERAGE')
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
