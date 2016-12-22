@@ -29,11 +29,18 @@ https://api.dataservice.duke.edu/apidocs
 ### circleci production
 [![Circle CI](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/production.svg?style=svg)](https://circleci.com/gh/Duke-Translational-Bioinformatics/duke-data-service/tree/production)
 
+### codecov develop
+ [![codecov](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service/branch/develop/graph/badge.svg)](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service)
+
+### codecov test
+ [![codecov](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service/branch/ua_test/graph/badge.svg)](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service)
+
+### codecov production
+[![codecov](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service/branch/production/graph/badge.svg)](https://codecov.io/gh/Duke-Translational-Bioinformatics/duke-data-service)
+
 ### converse
 [![Join the chat at https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Duke-Translational-Bioinformatics/duke-data-service?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### coveralls
-[![Coverage Status](https://coveralls.io/repos/github/Duke-Translational-Bioinformatics/duke-data-service/badge.svg?branch=develop)](https://coveralls.io/github/Duke-Translational-Bioinformatics/duke-data-service?branch=develop)
 ### contributing
 The master branch of the project is considered the stable, production branch.
 All commits should propogate from 'develop' to 'uatest', and then to master
@@ -60,7 +67,7 @@ very good reason for doing so (such as a specific need to test a branch in circl
 
 Once you are ready to submit your changes to the official repo, merge and push them
 into your 'develop' branch, and then submit a pull request from your 'develop' to
-the official 'developm' branch **MAKE SURE NOT TO CREATE A PR TO PRODUCTION**
+the official 'develop' branch **MAKE SURE NOT TO CREATE A PR TO PRODUCTION**
 
 Once you have cloned your fork into your working directory, it is useful to
 perform the following commands, using the git commandline, to create a
