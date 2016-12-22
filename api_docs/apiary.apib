@@ -6,40 +6,31 @@ The Duke Data Service (DDS) API allows Duke researchers to store, organize, retr
 
 This the documentation for the Data Service API. Key focuses are on API endpoints that enhance usability for "shallow end of the pool" users, endpoints that support the needs of investigators for managing their research groups, endpoints that accommodate shared resource and core facility needs, endpoints that support SOM administration of data resources, and endpoints that facilitate reproducible scientific workflows. There are tensions to resolve to meet these needs, and we should consider whether the API might be broken up into multiple APIs, whether some business logic be pushed to the users, etc.
 
-Adhere as well as possible to the [Heroku API Design Best Practices:](https://geemus.gitbooks.io/http-api-design/content/en/index.html) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
+Adhere as well as possible to the [Heroku API Design Best Practices:](/https://geemus.gitbooks.io/http-api-design/content/en/index.html) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
-### API Basics and Change Log
+### **[API Basics and Change Log](/apidocs/api_basics.html)**
++ Contains change log and general usage details (i.e. authentication, standard errors, pagination, etc.)
 
-render api_basics header-api-basics-and-change-log
+### **[Users and Software Agents](/apidocs/users_software_agents.html)**
++ Contains endpoints for Current User, Users, Software Agents, Authentication Providers
 
-### Users and Software Agents
+### **[Authorization](/apidocs/authorization.html)**
++ Contains endpoints for Authorization Roles, System Permissions
 
-render users_software_agents header-users-and-software-agents
+### **[Projects](/apidocs/projects.html)**
++ Contains endpoints for Projects, Project Member Permissions, Project Affiliates
 
-### Authorization
+### **[Folders and Files](/apidocs/folders_files.html)**
++ Contains endpoints for Folders, Uploads, Files, File Versions, Browse Project/Folder Tree (Search Children), Storage Providers
 
-render authorization header-authorization
+### **[Provenance](/apidocs/provenance.html)**
++ Contains endpoints for Provenance Activities, Provenance Relations, Search Provenance Graph
 
-### Projects
+### **[Metadata](/apidocs/metadata.html)**
++ Contains endpoints for Tags and Metadata (Key/Value Pairs)
 
-render projects header-projects
+### **[Search](/apidocs/search.html)**
++ Contains endpoint Search Objects
 
-### Folders and Files
-
-render folders_files header-folders-and-files
-
-### Provenance
-
-render provenance header-provenance
-
-### Metadata
-
-render metadata header-metadata
-
-### Search
-
-render search header-search
-
-### Core Facility Workflow
-
-render core_facility_workflow header-core-facility-workflow
+### **[Core Facility Workflow](/apidocs/core_facility_workflow.html)**
++ Contains endpoints for Project Transfers
