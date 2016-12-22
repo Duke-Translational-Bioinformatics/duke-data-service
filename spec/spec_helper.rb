@@ -23,6 +23,9 @@ if ENV['CIRCLE_ARTIFACTS']
   SimpleCov.coverage_dir(dir)
 end
 SimpleCov.start
+
+require 'codecov'
+SimpleCov.formatter = SimpleCov::Formatter::Codecov
 # if ENV['CIRCLECI']
 #   # If running in CircleCI, run with Coveralls too
 #   require 'coveralls'
