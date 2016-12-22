@@ -22,12 +22,12 @@ if ENV['CIRCLE_ARTIFACTS']
   dir = File.join(ENV['CIRCLE_ARTIFACTS'], "coverage")
   SimpleCov.coverage_dir(dir)
 end
-
-if ENV['CIRCLECI']
-  # If running in CircleCI, run with Coveralls too
-  require 'coveralls'
-  Coveralls.wear!('rails')
-end
+SimpleCov.start
+# if ENV['CIRCLECI']
+#   # If running in CircleCI, run with Coveralls too
+#   require 'coveralls'
+#   Coveralls.wear!('rails')
+# end
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
