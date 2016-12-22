@@ -1,0 +1,621 @@
+<section id="software-agents" class="resource-group"><h2 class="group-heading">Software Agents <a href="#software-agents" class="permalink">&#xB6;</a></h2><p>Represents a software agent and associated secret that can be used to access the API actions from programmatic clients, such as research core pipelines, or background jobs/tasks (e.g. hash computations, deletion of storage for failed uploads, etc.).  In an effort to promote provenance, all programmatic access to the API must be via an agent secret key in tandem with a user account secret key (see <strong>Current User</strong> actions).</p>
+<div id="software-agents-software-agents-collection" class="resource"><h3 class="resource-heading">Software Agents collection <a href="#software-agents-software-agents-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="software-agents-software-agents-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create software agent</div><a href="#software-agents-software-agents-collection-post" class="method post">POST</a><code class="uri">/software_agents</code></h4><p>Creates software agent and an associated secret API key; the secret key is visible and managed through the <code>software_agents/{id}/api_key</code> action.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>name (string)</strong> - A short name for the software agent.</li>
+<li><strong>description (string, optional)</strong> - A verbose description for the software agent.</li>
+<li><strong>repo_url (string, optional)</strong> - The url of the repository (e.g. Git, Bitbucket, etc.) that contains the agent source code.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Created Successfully</p>
+</li>
+<li>
+<p>400: Software agent requires a name</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (softrware_agent restricted)</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Hash computation agent&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;9a4c28a2-ec18-40ed-b75c-3bf5b309715f&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Hash computation agent&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">repo_url</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="software-agents-software-agents-collection-get" class="action get"><h4 class="action-heading"><div class="name">List software agents</div><a href="#software-agents-software-agents-collection-get" class="method get">GET</a><code class="uri">/software_agents</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Software Agents that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;9a4c28a2-ec18-40ed-b75c-3bf5b309715f&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Hash computation agent&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      &quot;<span class="hljs-attribute">repo_url</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="software-agents-software-agent-instance" class="resource"><h3 class="resource-heading">Software Agent instance <a href="#software-agents-software-agent-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="software-agents-software-agent-instance-get" class="action get"><h4 class="action-heading"><div class="name">View software agent</div><a href="#software-agents-software-agent-instance-get" class="method get">GET</a><code class="uri">/software_agents/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>403: Forbidden (softrware_agent restricted)</li>
+<li>404: Software Agent Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;9a4c28a2-ec18-40ed-b75c-3bf5b309715f&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Hash computation agent&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">repo_url</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="software-agents-software-agent-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update software agent</div><a href="#software-agents-software-agent-instance-put" class="method put">PUT</a><code class="uri">/software_agents/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>400: Validation Error</li>
+<li>401: Unauthorized</li>
+<li>403: Forbidden (softrware_agent restricted)</li>
+<li>404: Software Agent Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">repo_url</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;https://github.com/mgardnerpsu/dukeds-dredd&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;9a4c28a2-ec18-40ed-b75c-3bf5b309715f&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Hash computation agent&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">repo_url</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;https://github.com/mgardnerpsu/dukeds-dredd&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="software-agents-software-agent-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete software agent</div><a href="#software-agents-software-agent-instance-delete" class="method delete">DELETE</a><code class="uri">/software_agents/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (softrware_agent restricted)</p>
+</li>
+<li>
+<p>404: Software Agent Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div><div id="software-agents-software-agent-api-key" class="resource"><h3 class="resource-heading">Software Agent API Key <a href="#software-agents-software-agent-api-key" class="permalink">&#xA0;&#xB6;</a></h3><p>Generates a secret key for the software agent that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc&#x2026;); this secret key must be used in tandem with a valid user secret key (see <strong>Current User</strong> actions).</p>
+<div id="software-agents-software-agent-api-key-put" class="action put"><h4 class="action-heading"><div class="name">Generate software agent API key</div><a href="#software-agents-software-agent-api-key-put" class="method put">PUT</a><code class="uri">/software_agents/{id}/api_key</code></h4><p>Generates a new secret key for the software agent.</p>
+<blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>If the software agent already has an API key, this action deletes exisiting key and generates a new key.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (softrware_agent restricted)</p>
+</li>
+<li>
+<p>404: Software Agent Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span>/api_key</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">created_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-06-01T12:00:00Z&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="software-agents-software-agent-api-key-get" class="action get"><h4 class="action-heading"><div class="name">View software agent API key</div><a href="#software-agents-software-agent-api-key-get" class="method get">GET</a><code class="uri">/software_agents/{id}/api_key</code></h4><p>Shows the secret key for the software agent.</p>
+<blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>key (string)</strong> - A secret key that can be used in tandem with a user secret key to obtain an API access token.</li>
+<li><strong>created_on (datetime)</strong> - The date the software agent key was generated.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (softrware_agent restricted)</p>
+</li>
+<li>
+<p>404: Software Agent Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span>/api_key</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">created_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="software-agents-software-agent-api-key-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete software agent API key</div><a href="#software-agents-software-agent-api-key-delete" class="method delete">DELETE</a><code class="uri">/software_agents/{id}/api_key</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (softrware_agent restricted)</p>
+</li>
+<li>
+<p>404: Software Agent Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/<span class="hljs-attribute" title="id">9a4c28a2-ec18-40ed-b75c-3bf5b309715</span>/api_key</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>9a4c28a2-ec18-40ed-b75c-3bf5b309715</span></span><p>The unique <code>id</code> for a software agent.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div><div id="software-agents-software-agent-access-token" class="resource"><h3 class="resource-heading">Software Agent Access Token <a href="#software-agents-software-agent-access-token" class="permalink">&#xA0;&#xB6;</a></h3><div id="software-agents-software-agent-access-token-post" class="action post"><h4 class="action-heading"><div class="name">Get software agent access token</div><a href="#software-agents-software-agent-access-token-post" class="method post">POST</a><code class="uri">/software_agents/api_token</code></h4><p>Using a software agent secret key and a user secret key, get an access token.</p>
+<blockquote>
+<p><strong>Permission:</strong> public</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>agent_key (string)</strong> - The secret key for a software agent.</li>
+<li><strong>user_key (string)</strong> - The secret key for a user.</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>api_token (string)</strong> - The access token.</li>
+<li><strong>expires_on (number)</strong> - Token expiration as posix/epoch time.</li>
+<li><strong>time_to_live (number)</strong> - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The agent associated with the agent key must not have been logically deleted.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Success</p>
+</li>
+<li>
+<p>400: Missing Required Keys</p>
+</li>
+<li>
+<p>404: Software Agent or User Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/software_agents/api_token</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">agent_key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">user_key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;klmOiJKV1QiLYHkl098EfNiJJIUzI1NiJ93R...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">api_token</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">expires_on</span>&quot;: <span class="hljs-value"><span class="hljs-number">1455571739</span></span>,
+  &quot;<span class="hljs-attribute">time_to_live</span>&quot;: <span class="hljs-value"><span class="hljs-number">14400</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="current-user" class="resource-group"><h2 class="group-heading">Current User <a href="#current-user" class="permalink">&#xB6;</a></h2><p>Represents the current application user.</p>
+<div id="current-user-not_impl_change-view-current-user" class="resource"><h3 class="resource-heading">NOT_IMPL_CHANGE View current user <a href="#current-user-not_impl_change-view-current-user" class="permalink">&#xA0;&#xB6;</a></h3><div id="current-user-not_impl_change-view-current-user-get" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_CHANGE View current user</div><a href="#current-user-not_impl_change-view-current-user-get" class="method get">GET</a><code class="uri">/current_user</code></h4><p>Get profile for the currently authenticated user.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The <code>agent</code> property is populated if user is authenticated via software agent token, otherwise the <code>agent</code> property is <code>null</code>.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+  &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+  &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+  &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span></span>,
+  &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+    &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+      &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+    </span>}
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">agent</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">last_login_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="current-user-not_impl_new-get-current-user-access-token" class="resource"><h3 class="resource-heading">NOT_IMPL_NEW Get current user access token <a href="#current-user-not_impl_new-get-current-user-access-token" class="permalink">&#xA0;&#xB6;</a></h3><div id="current-user-not_impl_new-get-current-user-access-token-post" class="action post"><h4 class="action-heading"><div class="name">NOT_IMPL_NEW Get current user access token</div><a href="#current-user-not_impl_new-get-current-user-access-token-post" class="method post">POST</a><code class="uri">/current_user/api_token</code></h4><p>This allows a Web or native UX client to present an access token (i.e. OAuth token) from a registered authentication service and get an API token.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>access_token (string)</strong> - A valid (non-expired) token for an authtication provider.</li>
+<li><strong>auth_provider.id (string)</strong> - A supported authentiction provider.</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<ul>
+<li><strong>api_token (string)</strong> - The access token.</li>
+<li><strong>expires_on (number)</strong> - Token expiration as posix/epoch time.</li>
+<li><strong>time_to_live (number)</strong> - The number of seconds token is valid for; can be used by client apps to compare relative to their local time, and determine if token must be refreshed.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>201: Success</p>
+</li>
+<li>
+<p>401: Missing, or Invalid API Token</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user/api_token</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">access_token</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;KjTWXC67OiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpNjK88T...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;a3967cab-6cfd-4d3c-b118-56e6b11d4022&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">api_token</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6I...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">expires_on</span>&quot;: <span class="hljs-value"><span class="hljs-number">1455571739</span></span>,
+  &quot;<span class="hljs-attribute">time_to_live</span>&quot;: <span class="hljs-value"><span class="hljs-number">14400</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="current-user-view-current-user-usage" class="resource"><h3 class="resource-heading">View current user usage <a href="#current-user-view-current-user-usage" class="permalink">&#xA0;&#xB6;</a></h3><div id="current-user-view-current-user-usage-get" class="action get"><h4 class="action-heading"><div class="name">View current user usage</div><a href="#current-user-view-current-user-usage-get" class="method get">GET</a><code class="uri">/current_user/usage</code></h4><p>View summary usage for current user across all projects.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>project_count (number)</strong> - Total number of projects where the user has been granted a project level authorization role.</li>
+<li><strong>file_count (integer)</strong> - Total number of files the user has created (i.e. uploaded) across all projects.</li>
+<li><strong>storage_bytes (integer)</strong> - Total bytes for files the user has created (i.e. uploaded) across all projects.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Deleted objects (i.e. <code>&quot;is_deleted&quot;: true</code>) are excluded from all counts/totals.</li>
+<li>Counts/totals are only for project resources that are visible to the current user.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user/usage</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project_count</span>&quot;: <span class="hljs-value"><span class="hljs-number">10</span></span>,
+  &quot;<span class="hljs-attribute">file_count</span>&quot;: <span class="hljs-value"><span class="hljs-number">126</span></span>,
+  &quot;<span class="hljs-attribute">storage_bytes</span>&quot;: <span class="hljs-value"><span class="hljs-number">304006007009</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="current-user-current-user-api-key" class="resource"><h3 class="resource-heading">Current User API Key <a href="#current-user-current-user-api-key" class="permalink">&#xA0;&#xB6;</a></h3><div id="current-user-current-user-api-key-put" class="action put"><h4 class="action-heading"><div class="name">Generate current user API key</div><a href="#current-user-current-user-api-key-put" class="method put">PUT</a><code class="uri">/current_user/api_key</code></h4><p>Generates a secret key for the current user that can be used to access the API actions from a scripting context (i.e. bash, python, R, etc&#x2026;); this secret key must be used in tandem with a valid software agent secret key (see <strong>Software Agents</strong> actions).</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>key (string)</strong> - A secret key that can be used in tandem with a software agent secret key to obtain an API access token.</li>
+<li><strong>created_on (datetime)</strong> - The date the user key was generated.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>If the current user already has an API key, this action deletes their exisiting key and generates a new key.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</p>
+</li>
+<li>
+<p>403: Forbidden (software_agent restricted)</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user/api_key</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">created_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="current-user-current-user-api-key-get" class="action get"><h4 class="action-heading"><div class="name">View current user API key</div><a href="#current-user-current-user-api-key-get" class="method get">GET</a><code class="uri">/current_user/api_key</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (software_agent restricted)</p>
+</li>
+<li>
+<p>404: Current User or ApiKey Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user/api_key</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">created_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="current-user-current-user-api-key-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete current user API key</div><a href="#current-user-current-user-api-key-delete" class="method delete">DELETE</a><code class="uri">/current_user/api_key</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>204: Successfully Deleted</li>
+<li>401: Unauthorized</li>
+<li>403: Forbidden (software_agent restricted)</li>
+<li>404: Current User Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/current_user/api_key</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div></section><section id="users" class="resource-group"><h2 class="group-heading">Users <a href="#users" class="permalink">&#xB6;</a></h2><p>Represents registered users.</p>
+<div id="users-not_impl_change-users-collection" class="resource"><h3 class="resource-heading">NOT_IMPL_CHANGE Users collection <a href="#users-not_impl_change-users-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="users-not_impl_change-users-collection-get" class="action get"><h4 class="action-heading"><div class="name">List users</div><a href="#users-not_impl_change-users-collection-get" class="method get">GET</a><code class="uri">/users{?full_name_contains,first_name_begins_with,last_name_begins_with}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/users?<span class="hljs-attribute">full_name_contains=</span><span class="hljs-literal">gardner</span>&amp;<span class="hljs-attribute">first_name_begins_with=</span><span class="hljs-literal">mat</span>&amp;<span class="hljs-attribute">last_name_begins_with=</span><span class="hljs-literal">gar</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>full_name_contains</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>gardner</span></span><p>Returns users where their full name contains the specified string.</p>
+</dd><dt>first_name_begins_with</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>mat</span></span><p>Returns users where their first name begins with the specified string.</p>
+</dd><dt>last_name_begins_with</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>gar</span></span><p>Returns users where their last name begins with the specified string.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+      &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+      &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+        &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+          &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+        </span>}
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">last_login_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="users-not_impl_change-user-instance" class="resource"><h3 class="resource-heading">NOT_IMPL_CHANGE User instance <a href="#users-not_impl_change-user-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="users-not_impl_change-user-instance-get" class="action get"><h4 class="action-heading"><div class="name">View user</div><a href="#users-not_impl_change-user-instance-get" class="method get">GET</a><code class="uri">/users/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Valid API Token in &#x2018;Authorization&#x2019; Header</li>
+<li>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</li>
+<li>404: User does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/users/<span class="hljs-attribute" title="id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique <code>id</code> for a user.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+  &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+  &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+  &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span></span>,
+  &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+    &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+      &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+    </span>}
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">last_login_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="auth-providers" class="resource-group"><h2 class="group-heading">Auth Providers <a href="#auth-providers" class="permalink">&#xB6;</a></h2><p>Represents the authentication providers (services) that are supported by DDS.</p>
+<div id="auth-providers-auth-providers-collection" class="resource"><h3 class="resource-heading">Auth Providers collection <a href="#auth-providers-auth-providers-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="auth-providers-auth-providers-collection-get" class="action get"><h4 class="action-heading"><div class="name">List auth providers</div><a href="#auth-providers-auth-providers-collection-get" class="method get">GET</a><code class="uri">/auth_providers</code></h4><blockquote>
+<p><strong>Permission:</strong> public</p>
+</blockquote>
+<hr>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/auth_providers</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+      &quot;<span class="hljs-attribute">is_deprecated</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      &quot;<span class="hljs-attribute">is_default</span>&quot;: <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+      &quot;<span class="hljs-attribute">login_initiation_url</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;https://das.duke.edu/authenticate?response_type=token&amp;client_id=abc123&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="auth-providers-auth-provider-instance" class="resource"><h3 class="resource-heading">Auth Provider instance <a href="#auth-providers-auth-provider-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="auth-providers-auth-provider-instance-get" class="action get"><h4 class="action-heading"><div class="name">View auth provider</div><a href="#auth-providers-auth-provider-instance-get" class="method get">GET</a><code class="uri">/auth_providers/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> public</p>
+</blockquote>
+<hr>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/auth_providers/<span class="hljs-attribute" title="id">3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c</span></span><p>The unique <code>id</code> of the authentication provider.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deprecated</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">is_default</span>&quot;: <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+  &quot;<span class="hljs-attribute">login_initiation_url</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;https://das.duke.edu/authenticate?response_type=token&amp;client_id=abc123&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="auth-provider-affiliates" class="resource-group"><h2 class="group-heading">Auth Provider Affiliates <a href="#auth-provider-affiliates" class="permalink">&#xB6;</a></h2><div id="auth-provider-affiliates-not_impl_new-list-auth-provider-affiliates" class="resource"><h3 class="resource-heading">NOT_IMPL_NEW List auth provider affiliates <a href="#auth-provider-affiliates-not_impl_new-list-auth-provider-affiliates" class="permalink">&#xA0;&#xB6;</a></h3><div id="auth-provider-affiliates-not_impl_new-list-auth-provider-affiliates-get" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_NEW List auth provider affiliates</div><a href="#auth-provider-affiliates-not_impl_new-list-auth-provider-affiliates-get" class="method get">GET</a><code class="uri">/auth_providers/{id}/affiliates{?full_name_contains}</code></h4><p>Get a list of affiliates (potential users), for a supported authentication provider.</p>
+<blockquote>
+<p><strong>Permission:</strong> public</p>
+</blockquote>
+<hr>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/auth_providers/<span class="hljs-attribute" title="id">3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c</span>/affiliates?<span class="hljs-attribute">full_name_contains=</span><span class="hljs-literal">gardner</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c</span></span><p>The unique <code>id</code> of the authentication provider.</p>
+</dd><dt>full_name_contains</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>gardner</span></span><p>Returns affiliates where their full name contains the specified string.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+      &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+      &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span></span>,
+      &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+        &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+          &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+        </span>}
+      </span>}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="auth-provider-affiliates-not_impl_new-view-auth-provider-affiliate" class="resource"><h3 class="resource-heading">NOT_IMPL_NEW View auth provider affiliate <a href="#auth-provider-affiliates-not_impl_new-view-auth-provider-affiliate" class="permalink">&#xA0;&#xB6;</a></h3><div id="auth-provider-affiliates-not_impl_new-view-auth-provider-affiliate-get" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_NEW View auth provider affiliate</div><a href="#auth-provider-affiliates-not_impl_new-view-auth-provider-affiliate-get" class="method get">GET</a><code class="uri">/auth_providers/{id}/affiliates/{uid}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Auth provider or affiliate does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/auth_providers/<span class="hljs-attribute" title="id">duke</span>/affiliates/<span class="hljs-attribute" title="uid">gardner001</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>duke</span></span><p>The <code>id</code> of an authentication provider (service) supported by the DDS application.</p>
+</dd><dt>uid</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>gardner001</span></span><p>The unique <code>uid</code> (user id) in the context of the specified auth provider.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+  &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+  &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+  &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span></span>,
+  &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+    &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+      &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+    </span>}
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">last_login_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="auth-provider-affiliates-not_impl_new-create-user-account-for-affiliate" class="resource"><h3 class="resource-heading">NOT_IMPL_NEW Create user account for affiliate <a href="#auth-provider-affiliates-not_impl_new-create-user-account-for-affiliate" class="permalink">&#xA0;&#xB6;</a></h3><div id="auth-provider-affiliates-not_impl_new-create-user-account-for-affiliate-post" class="action post"><h4 class="action-heading"><div class="name">NOT_IMPL_NEW Create user account for affiliate</div><a href="#auth-provider-affiliates-not_impl_new-create-user-account-for-affiliate-post" class="method post">POST</a><code class="uri">/auth_providers/{id}/affiliates/{uid}/dds_user</code></h4><p>Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: This will never happen</li>
+<li>201: Created Successfully</li>
+<li>401: Unauthorized</li>
+<li>404: Auth provider or affiliate does not exist</li>
+<li>409: Affiliate already registered</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/auth_providers/<span class="hljs-attribute" title="id">duke</span>/affiliates/<span class="hljs-attribute" title="uid">gardner001</span>/dds_user</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>duke</span></span><p>The <code>id</code> of an authentication provider (service) supported by the DDS application.</p>
+</dd><dt>uid</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>gardner001</span></span><p>The unique <code>uid</code> (user id) in the context of the specified auth provider.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+  &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+  &quot;<span class="hljs-attribute">first_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew&quot;</span></span>,
+  &quot;<span class="hljs-attribute">last_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+  &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span></span>,
+  &quot;<span class="hljs-attribute">auth_provider</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke&quot;</span></span>,
+    &quot;<span class="hljs-attribute">affiliate</span>&quot;: <span class="hljs-value">{
+      &quot;<span class="hljs-attribute">uid</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span>
+    </span>}
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">last_login_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section>

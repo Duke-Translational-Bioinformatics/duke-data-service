@@ -1,0 +1,381 @@
+<section id="project-transfer" class="resource-group"><h2 class="group-heading">Project Transfer <a href="#project-transfer" class="permalink">&#xB6;</a></h2><p><strong>Proposed endpoints to meet the needs of the GCB project transfer workflow</strong>
+The <em>Project Transfer</em> actions can be used by research core facilities to formally transfer ownership of a project to a researcher (customer).  These endpoints support the transfer workflow and retain a record of the transfer history.</p>
+<div id="project-transfer-project-transfer-collection" class="resource"><h3 class="resource-heading">Project Transfer collection <a href="#project-transfer-project-transfer-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-transfer-project-transfer-collection-post" class="action post"><h4 class="action-heading"><div class="name">Initiate a project transfer</div><a href="#project-transfer-project-transfer-collection-post" class="method post">POST</a><code class="uri">/projects/{id}/transfers</code></h4><p>Initiates a project transfer from the current owner (i.e. <code>project_admin</code>) to a new owner or list of owners.</p>
+<blockquote>
+<p><strong>Permission:</strong> manage_project_permissions</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Request Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>to_users (object[ ], required)</strong> - The list of users to transfer project ownership to.</li>
+<li><strong>to_users[ ].id (string, required)</strong> - The unique <code>id</code> of a user.</li>
+</ul>
+<blockquote>
+<p><strong>Response Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>from_user (object)</strong> - The user who initiated the project transfer.</li>
+<li><strong>status (string)</strong> - The current status of the project transfer; defaults to <code>pending</code>.</li>
+<li><strong>status_comment (string)</strong> - An optional comment that can be provided when status transfers to a terminal state.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>There must be no existing transfers for the <code>project</code> in a <code>pending</code> state.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Project transfer already exists</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/transfers</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+    </span>}
+  ]</span>,
+  &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;pending&quot;</span></span>,
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-transfer-project-transfer-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project transfers</div><a href="#project-transfer-project-transfer-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/transfers</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated [scope: manage_project_permissions, transfer initiator (i.e. <code>from_user</code>), or a transfer recipient (i.e. in <code>to_users</code>)]</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/transfers</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+      &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+        &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+        &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+        {
+          &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+          &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+          &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+        </span>}
+      ]</span>,
+      &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;pending&quot;</span></span>,
+      &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-transfer-project-transfer-instance" class="resource"><h3 class="resource-heading">Project Transfer instance <a href="#project-transfer-project-transfer-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-transfer-project-transfer-instance-get" class="action get"><h4 class="action-heading"><div class="name">View a project transfer</div><a href="#project-transfer-project-transfer-instance-get" class="method get">GET</a><code class="uri">/project_transfers/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> manage_project_permissions, transfer initiator (i.e. <code>from_user</code>), or a transfer recipient (i.e. in <code>to_users</code>)</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project transfer does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_transfers/<span class="hljs-attribute" title="id">be8ac3c5-84e9-4969-8308-21cd5456946d</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>be8ac3c5-84e9-4969-8308-21cd5456946d</span></span><p>The unique <code>id</code> of the project transfer.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+    </span>}
+  ]</span>,
+  &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;pending&quot;</span></span>,
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-transfer-project-transfer-instance-put" class="action put"><h4 class="action-heading"><div class="name">Accept a project transfer</div><a href="#project-transfer-project-transfer-instance-put" class="method put">PUT</a><code class="uri">/project_transfers/{id}/accept</code></h4><p>Accept a <em>pending</em> project transfer.</p>
+<blockquote>
+<p><strong>Permission:</strong> transfer recipient (i.e. in <code>to_users</code>)]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>status_comment (string, optional)</strong> - An optional comment that can be provided.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The project transfer must be in a <code>pending</code> state.</li>
+<li>All exisiting permissions for the project are removed, <code>project_viewer</code> is granted to the transfer initiater (i.e. <code>from_user</code>), and <code>project_admin</code> is granted to the list of recipients (i.e. <code>to_users</code>)</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project transfer does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_transfers/<span class="hljs-attribute" title="id">be8ac3c5-84e9-4969-8308-21cd5456946d</span>/accept</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>be8ac3c5-84e9-4969-8308-21cd5456946d</span></span><p>The unique <code>id</code> of the project transfer.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;This data looks great...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+    </span>}
+  ]</span>,
+  &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;accepted&quot;</span></span>,
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;This data looks great...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-transfer-project-transfer-instance-put-1" class="action put"><h4 class="action-heading"><div class="name">Reject a project transfer</div><a href="#project-transfer-project-transfer-instance-put-1" class="method put">PUT</a><code class="uri">/project_transfers/{id}/reject</code></h4><p>Reject a <em>pending</em> project transfer.</p>
+<blockquote>
+<p><strong>Permission:</strong> transfer recipient (i.e. in <code>to_users</code>)]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>status_comment (string, optional)</strong> - An optional comment that can be provided.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The project transfer must be in a <code>pending</code> state.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project transfer does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_transfers/<span class="hljs-attribute" title="id">be8ac3c5-84e9-4969-8308-21cd5456946d</span>/reject</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>be8ac3c5-84e9-4969-8308-21cd5456946d</span></span><p>The unique <code>id</code> of the project transfer.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Missing alignment files...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+    </span>}
+  ]</span>,
+  &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;rejected&quot;</span></span>,
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Missing alignment files...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-transfer-project-transfer-instance-put-2" class="action put"><h4 class="action-heading"><div class="name">Cancel a project transfer</div><a href="#project-transfer-project-transfer-instance-put-2" class="method put">PUT</a><code class="uri">/project_transfers/{id}/cancel</code></h4><p>Cancel a <em>pending</em> project transfer.</p>
+<blockquote>
+<p><strong>Permission:</strong> manage_project_permissions</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>status_comment (string, optional)</strong> - An optional comment that can be provided.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The project transfer must be in a <code>pending</code> state.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project transfer does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_transfers/<span class="hljs-attribute" title="id">be8ac3c5-84e9-4969-8308-21cd5456946d</span>/cancel</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>be8ac3c5-84e9-4969-8308-21cd5456946d</span></span><p>The unique <code>id</code> of the project transfer.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sent to the wrong PI...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+      &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+      &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+    </span>}
+  ]</span>,
+  &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;canceled&quot;</span></span>,
+  &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sent to the wrong PI...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-transfer-view-all-project-transfers" class="resource"><h3 class="resource-heading">View All Project Transfers <a href="#project-transfer-view-all-project-transfers" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-transfer-view-all-project-transfers-get" class="action get"><h4 class="action-heading"><div class="name">View All Project Transfers</div><a href="#project-transfer-view-all-project-transfers-get" class="method get">GET</a><code class="uri">/project_transfers{?status}</code></h4><p>Used to retrieve all project transfers visible to the current user, optionally filtered by status.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: manage_project_permissions, transfer initiator (i.e. <code>from_user</code>), or a transfer recipient (i.e. in <code>to_users</code>)]</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Unsupported status</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_transfers?<span class="hljs-attribute">status=</span><span class="hljs-literal">pending</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>status</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>pending</span></span><p>The <code>status</code> of the project transfer; can be one of <code>pending</code>,<code>accepted</code>, or <code>canceled</code>.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;be8ac3c5-84e9-4969-8308-21cd5456946d&quot;</span></span>,
+      &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">from_user</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+        &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+        &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">to_users</span>&quot;: <span class="hljs-value">[
+        {
+          &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;7bbf009d-c26e-401e-a9d5-0faa99b9b712&quot;</span></span>,
+          &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cbrandon01&quot;</span></span>,
+          &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Chad Brandon&quot;</span>
+        </span>}
+      ]</span>,
+      &quot;<span class="hljs-attribute">status</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;pending&quot;</span></span>,
+      &quot;<span class="hljs-attribute">status_comment</span>&quot;: <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section>
