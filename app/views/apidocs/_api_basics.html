@@ -1,0 +1,233 @@
+<section id="api-change-log" class="resource-group"><h2 class="group-heading">API Change Log <a href="#api-change-log" class="permalink">&#xB6;</a></h2><h2 id="header-20-dec-2016">20-Dec-2016 <a class="permalink" href="#header-20-dec-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>For serialization of <code>user</code> resource - changed the format of the composite <code>auth_provider</code> object to be consistent with format returned by <em>Authentication Providers</em> actions. <em>Note:</em> In addition to user endpoints, this impacts list/view <em>Provenance Relations</em> which contain <code>user</code> in the response when the returned relation is <code>wasAttributedTo</code> or <code>wasAssociatedWith</code>.</p>
+</li>
+<li>
+<p>Moved <code>/user/api_token</code> to the <em>Current User</em> resource - endpoint is now <code>/current_user/api_token</code>.  In addition, modified request payload and changed HTTP verb to a <code>POST</code> for this operation.</p>
+</li>
+<li>
+<p>Added <code>login_initiation_url</code>, <code>is_deprecated</code>, <code>is_default</code> properties to <em>Auth Providers</em> resource.</p>
+</li>
+<li>
+<p>Changed <code>NOT_IMPLEMENTED_*</code> labels for endpoints to <code>NOT_IMPL_*</code> to improve readablility of rendered docs.</p>
+</li>
+<li>
+<p>Changed HTTP verb from <code>GET</code> to <code>POST</code> for endpoint <code>/auth_providers/{id}/affiliates/{uid}/dds_user</code>.  Added endpoint <code>GET /auth_providers/{id}/affiliates/{uid}</code> to get a specific auth provider (i.e. Duke) affiliate.</p>
+</li>
+</ul>
+<h2 id="header-19-dec-2016">19-Dec-2016 <a class="permalink" href="#header-19-dec-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>Added Home links to each of the sub-directories</p>
+</li>
+<li>
+<p>Added links to each of the Web Portal instances (dev, ua_test and prod)</p>
+</li>
+<li>
+<p>Added links to each of the API Explorer instances (dev, ua_test and prod)</p>
+</li>
+<li>
+<p>Added user/get api_token endpoint documentation</p>
+</li>
+</ul>
+<h2 id="header-14-dec-2016">14-Dec-2016 <a class="permalink" href="#header-14-dec-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>Changed format of overall Apiary document to incorporate links to endpoint groupings</p>
+</li>
+<li>
+<p>Moved apiary apib files to their own folder rather than have them scattered throughout root</p>
+</li>
+<li>
+<p>Created a bash script to loop through and then generate the apiary html files.</p>
+</li>
+<li>
+<p>Changed all endpoints to include typical response codes (this will align more so with the swagger documentation)</p>
+</li>
+</ul>
+<h2 id="header-30-nov-2016">30-Nov-2016 <a class="permalink" href="#header-30-nov-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>Fixed example request payload for <em>Search Objects</em> endpoint.</p>
+</li>
+<li>
+<p>For <em>Search Provenance Origin</em> endpoint, removed validation of file versions query param; if file version does not exist, then no provenance nodes/relations are returned.</p>
+</li>
+</ul>
+<h2 id="header-17-oct-2016">17-Oct-2016 <a class="permalink" href="#header-17-oct-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>For <em>Search Provenance</em> - changed <code>/search/provenance/was_generated_by</code> to <code>/search/provenance/origin</code>; this search action now includes <code>wasDerivedFrom</code> file versions in the results.</p>
+</li>
+<li>
+<p>For <em>Metadata</em> - changed <code>/templates{?name}</code> to <code>/templates{?name_contains}</code> - facilitates contains search vs. exact match.</p>
+</li>
+<li>
+<p>Changed <code>/templates/{id}/properties{?key}</code> to <code>/templates/{id}/properties</code> - if we need <code>key</code> based lookup we will extend API to return the instance by <code>key</code>, not an array of 1.</p>
+</li>
+<li>
+<p>Changed <code>/meta/{object_kind}/{object_id}{?meta_template_name}</code> to <code>/meta/{object_kind}/{object_id}</code> - if we need <code>template_name</code> based lookup we will extend API to return the instance by <code>template_name</code>, not an array of 1.</p>
+</li>
+</ul>
+<h2 id="header-23-sep-2016">23-Sep-2016 <a class="permalink" href="#header-23-sep-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>Added <em>Authentication Providers</em> actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.</li>
+</ul>
+<h2 id="header-12-sep-2016">12-Sep-2016 <a class="permalink" href="#header-12-sep-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>Refactored <em>Metadata</em> actions - objects can now be annotated with metadata via bulk <code>POST</code> and <code>PUT</code> actions.</p>
+</li>
+<li>
+<p>Added <code>name</code> query param to <code>GET /templates</code> and <code>key</code> query param to <code>GET /templates/{id}/properties</code>; these query params allow clients to lookup templates and template properties by their alternate unique key.</p>
+</li>
+</ul>
+<h2 id="header-07-sep-2016">07-Sep-2016 <a class="permalink" href="#header-07-sep-2016" aria-hidden="true">&#xB6;</a></h2>
+<ul>
+<li>
+<p>Added endpoint <code>/search/provenance/was_generated_by</code> - allows targeted search &#x201C;up&#x201D; the provenance chain for a set of file versions.</p>
+</li>
+<li>
+<p>Added rules/constraints for <em>Provenance Relations</em> actions.</p>
+</li>
+</ul>
+</section><section id="api-basics" class="resource-group"><h2 class="group-heading">API Basics <a href="#api-basics" class="permalink">&#xB6;</a></h2><h2 id="header-web-portal">Web Portal <a class="permalink" href="#header-web-portal" aria-hidden="true">&#xB6;</a></h2>
+<p>There is a Web Portal that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.</p>
+<ul>
+<li>
+<p><a href="https://dev.dataservice.duke.edu/">Development</a></p>
+</li>
+<li>
+<p><a href="https://uatest.dataservice.duke.edu/">Test</a></p>
+</li>
+<li>
+<p><a href="https://dataservice.duke.edu/">Production</a></p>
+</li>
+</ul>
+<h2 id="header-programmatic-keys">Programmatic Keys <a class="permalink" href="#header-programmatic-keys" aria-hidden="true">&#xB6;</a></h2>
+<p>In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token from a programmatic context.  For usage details, see the actions for <strong>Software Agents</strong> and <strong>Current User</strong>.</p>
+<h2 id="header-exploring-the-api">Exploring the API <a class="permalink" href="#header-exploring-the-api" aria-hidden="true">&#xB6;</a></h2>
+<p>In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the API Explorer.</p>
+<ul>
+<li>
+<p><a href="https://apidev.dataservice.duke.edu/apiexplorer">Development</a></p>
+</li>
+<li>
+<p><a href="https://apiuatest.dataservice.duke.edu/apiexplorer">Test</a></p>
+</li>
+<li>
+<p><a href="https://api.dataservice.duke.edu/apiexplorer">Production</a></p>
+</li>
+</ul>
+<h2 id="header-collection-pagination">Collection Pagination <a class="permalink" href="#header-collection-pagination" aria-hidden="true">&#xB6;</a></h2>
+<p>For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters <code>page</code>, and <code>per_page</code>.  For example: <code>/projects?per_page=25</code> will return the first 25 projects, and <code>/projects?page=3&amp;per_page=25</code> will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the <code>results</code> property will reference the array as follows:</p>
+<ul>
+<li>
+<p>Response</p>
+<pre><code>{
+      &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+          { },
+          { },
+      ]
+  </span>}</code></pre>
+</li>
+</ul>
+<p>To make it easy for clients to manage pagination, the following headers will always be included in the response:</p>
+<ul>
+<li>
+<p>X-Total: The total number of objects that would be returned by the query unpaginated</p>
+</li>
+<li>
+<p>X-Total-Pages: The total number of pages given X-Total and X-Per-Page</p>
+</li>
+<li>
+<p>X-Page: Current Page (passed in as query parameter)</p>
+</li>
+<li>
+<p>X-Per-Page: per_page (passed in as query parameter)</p>
+</li>
+<li>
+<p>X-Next-Page: Next page to be collected</p>
+</li>
+<li>
+<p>X-Prev-Page: Previous page (will be empty on first page)</p>
+</li>
+</ul>
+<h2 id="header-audit-object">Audit Object <a class="permalink" href="#header-audit-object" aria-hidden="true">&#xB6;</a></h2>
+<p>Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the <code>audit</code> property in resource specific payloads.</p>
+<ul>
+<li>
+<p>Response</p>
+<pre><code><span class="hljs-string">&quot;audit&quot;</span>: {
+      <span class="hljs-string">&quot;created_on&quot;</span>: <span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span>,
+      <span class="hljs-string">&quot;created_by&quot;</span>: {
+          <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;ce245d81-bae1-452b-8589-24f736ca7735&quot;</span>,
+          <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;mrgardner01&quot;</span>,
+          <span class="hljs-string">&quot;full_name&quot;</span>: <span class="hljs-string">&quot;Matthew Gardner&quot;</span>,
+          <span class="hljs-string">&quot;software_agent&quot;</span>: {
+              <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;9a4c28a2-ec18-40ed-b75c-3bf5b309715f&quot;</span>,
+              <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Hashing computation agent&quot;</span>
+          }
+      },
+      <span class="hljs-string">&quot;last_updated_on&quot;</span>: <span class="hljs-string">&quot;2015-01-01T13:00:00Z&quot;</span>,
+      <span class="hljs-string">&quot;last_updated_by&quot;</span>: {
+          <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-string">&quot;d240ef3d-8d43-441b-be90-78f51a02e47f&quot;</span>,
+          <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;jturner01&quot;</span>,
+          <span class="hljs-string">&quot;full_name&quot;</span>: <span class="hljs-string">&quot;Jon Turner&quot;</span>,
+          <span class="hljs-string">&quot;software_agent&quot;</span>: null
+      },
+      <span class="hljs-string">&quot;deleted_on&quot;</span>: null,
+      <span class="hljs-string">&quot;deleted_by&quot;</span>: null
+  }</code></pre>
+</li>
+</ul>
+<h2 id="header-api-errors">API Errors <a class="permalink" href="#header-api-errors" aria-hidden="true">&#xB6;</a></h2>
+<p>We should respond with context appropriate error codes, especially for 400 class errors, using the <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">Standard List</a></p>
+<ul>
+<li>
+<p>400: no API token, validation errors</p>
+</li>
+<li>
+<p>401: bad API token</p>
+</li>
+<li>
+<p>403: user performing request which they do not have permission to perform</p>
+</li>
+<li>
+<p>404: user requesting resource that does not exist</p>
+</li>
+</ul>
+<p>All error responses should include a JSON response that provides the HTTP status code, details of the error that occurred, and possible steps to address the problem. For example:</p>
+<ul>
+<li>
+<p>Response</p>
+<pre><code>{
+      &quot;<span class="hljs-attribute">error</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;404&quot;</span></span>,
+      &quot;<span class="hljs-attribute">reason</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Project does not exist&quot;</span></span>,
+      &quot;<span class="hljs-attribute">suggestion</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;You may have chosen the wrong ID.&quot;</span>
+  </span>}</code></pre>
+</li>
+</ul>
+<p>Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the error encountered.</p>
+<ul>
+<li>
+<p>Response</p>
+<pre><code>{
+      &quot;<span class="hljs-attribute">error</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;400&quot;</span></span>,
+      &quot;<span class="hljs-attribute">reason</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;validation failed&quot;</span></span>,
+      &quot;<span class="hljs-attribute">suggestion</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Fix the following invalid fields and resubmit&quot;</span>
+      <span class="hljs-string">&quot;errors&quot;</span> : [
+          {
+              &quot;<span class="hljs-attribute">field</span>&quot; : <span class="hljs-value"><span class="hljs-string">&quot;name&quot;</span></span>,
+              &quot;<span class="hljs-attribute">message</span>&quot; : <span class="hljs-value"><span class="hljs-string">&quot;Project needs a name.&quot;</span>
+          </span>},
+          {
+              &quot;<span class="hljs-attribute">field</span>&quot; : <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+              &quot;<span class="hljs-attribute">message</span>&quot; : <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator must be specified for each project.&quot;</span>
+          </span>}
+      ]
+  </span>}</code></pre>
+</li>
+</ul>
+</section>

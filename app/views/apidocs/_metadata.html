@@ -1,0 +1,812 @@
+<section id="tags" class="resource-group"><h2 class="group-heading">Tags <a href="#tags" class="permalink">&#xB6;</a></h2><p>A tag is a label (i.e. word or phrase) that can be associated to an object to facilitate classification and searching.</p>
+<p><em>Note: Tags are composite metadata that become part of the tagged resource - they do not live in a global namespace. Only tagging of files</em> (i.e. <code>dds-file</code>) <em>is currently supported.</em></p>
+<div id="tags-tags-collection" class="resource"><h3 class="resource-heading">Tags collection <a href="#tags-tags-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="tags-tags-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create object tag</div><a href="#tags-tags-collection-post" class="method post">POST</a><code class="uri">/tags/{object_kind}/{object_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_file when tagged object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>label (string, required)</strong> - The textual tag content.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The specified <code>label</code> must not already exist for the <code>(object.kind, object.id)</code>, the <code>label</code> comparison is <em>case-insensitive</em>.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Tag requires a label</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Tag does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique id of the object.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;66211c4e-a49e-42d7-9793-87989d56e1e3&quot;</span></span>,
+  &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;777be35a-98e0-4c2e-9a17-7bc009f9b111&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="tags-tags-collection-get" class="action get"><h4 class="action-heading"><div class="name">List object tags</div><a href="#tags-tags-collection-get" class="method get">GET</a><code class="uri">/tags/{object_kind}/{object_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project when tagged object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique id of the object.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;66211c4e-a49e-42d7-9793-87989d56e1e3&quot;</span></span>,
+      &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;777be35a-98e0-4c2e-9a17-7bc009f9b111&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="tags-tags-collection-post-1" class="action post"><h4 class="action-heading"><div class="name">Append a list of object tags</div><a href="#tags-tags-collection-post-1" class="method post">POST</a><code class="uri">/tags/{object_kind}/{object_id}/append</code></h4><p>Append a list of tags to an object.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file when tagged object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>tags (object[], required)</strong> - An array of tags to apply to the object; object structure is as follows:</li>
+<li><strong>label (string, required)</strong> - The textual tag content.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>If the object has an exisiting tag with the specified <code>label</code>, the <code>label</code> is ignored and a tag is not appended (i.e. created); the <code>label</code> comparison is <em>case-insensitive</em>.</li>
+<li>The request must specify at least one <code>label</code>.</li>
+<li>The response only contains the list of <code>tags</code> that were appended (i.e. created).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Tag requires a label</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Tag does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">777be35a-98e0-4c2e-9a17-7bc009f9b111</span>/append</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>777be35a-98e0-4c2e-9a17-7bc009f9b111</span></span><p>The unique id of the object.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">tags</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;66211c4e-a49e-42d7-9793-87989d56e1e3&quot;</span></span>,
+      &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;777be35a-98e0-4c2e-9a17-7bc009f9b111&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="tags-tags-collection-get-1" class="action get"><h4 class="action-heading"><div class="name">List tag labels</div><a href="#tags-tags-collection-get-1" class="method get">GET</a><code class="uri">/tags/labels{?object_kind,label_contains}</code></h4><p>Get a list of the <strong>distinct</strong> tag <code>label</code> values visible to the current user.</p>
+<p><em>Note: Intent of this action is to allow Web and native UX apps to render tag clouds and enable auto-complete widgets.</em></p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project when tagged object is file (<code>dds-file</code>)]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The returned tags are sorted in most recently used (i.e. <code>last_used_on</code>) order.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/labels?<span class="hljs-attribute">object_kind=</span><span class="hljs-literal">dds-file</span>&amp;<span class="hljs-attribute">label_contains=</span><span class="hljs-literal">sequen</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>Restricts search scope to tags for this kind of object.</p>
+</dd><dt>label_contains</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>sequen</span></span><p>If provided, searches for tags that contain this text fragment.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span></span>,
+      &quot;<span class="hljs-attribute">count</span>&quot;: <span class="hljs-value"><span class="hljs-number">47</span></span>,
+      &quot;<span class="hljs-attribute">last_used_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:10:00Z&quot;</span>
+    </span>},
+    {
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Polony sequencing&quot;</span></span>,
+      &quot;<span class="hljs-attribute">count</span>&quot;: <span class="hljs-value"><span class="hljs-number">21</span></span>,
+      &quot;<span class="hljs-attribute">last_used_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:05:00Z&quot;</span>
+    </span>},
+    {
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;DNA nanoball sequencing&quot;</span></span>,
+      &quot;<span class="hljs-attribute">count</span>&quot;: <span class="hljs-value"><span class="hljs-number">13</span></span>,
+      &quot;<span class="hljs-attribute">last_used_on</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;2015-01-01T12:00:00Z&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="tags-tag-instance" class="resource"><h3 class="resource-heading">Tag instance <a href="#tags-tag-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="tags-tag-instance-get" class="action get"><h4 class="action-heading"><div class="name">View tag</div><a href="#tags-tag-instance-get" class="method get">GET</a><code class="uri">/tags/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project when tagged object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Valid API Token in &#x2018;Authorization&#x2019; Header</li>
+<li>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</li>
+<li>404: Tag does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/<span class="hljs-attribute" title="id">66211c4e-a49e-42d7-9793-87989d56e1e3</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>66211c4e-a49e-42d7-9793-87989d56e1e3</span></span><p>The unique id of the tag.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;66211c4e-a49e-42d7-9793-87989d56e1e3&quot;</span></span>,
+  &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;777be35a-98e0-4c2e-9a17-7bc009f9b111&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="tags-tag-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete tag</div><a href="#tags-tag-instance-delete" class="method delete">DELETE</a><code class="uri">/tags/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_file when tagged object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</p>
+</li>
+<li>
+<p>404: Tag does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/tags/<span class="hljs-attribute" title="id">66211c4e-a49e-42d7-9793-87989d56e1e3</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>66211c4e-a49e-42d7-9793-87989d56e1e3</span></span><p>The unique id of the tag.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div></section><section id="metadata" class="resource-group"><h2 class="group-heading">Metadata <a href="#metadata" class="permalink">&#xB6;</a></h2><p>The metadata actions allow researchers to define, store, and associate custom attributes with their digital assets (e.g. activities, files, etc.).  Unlike <em>Tags</em>, which are just textual labels, metadata are structured <code>key:value</code> pairs.  For example, an experiment (i.e. represented as a provenance <em>Activity</em>) may have the following metadata properties: <code>[{&quot;assay&quot;: &quot;ChIP-seq&quot;}, {&quot;organism&quot;: &quot;Mus Musculus&quot;}, {&quot;biosample_type&quot;: &quot;tissue&quot;}]</code>.</p>
+<p>Metadata must be defined and captured in the context of a metadata template. Templates allow related keys (i.e. properties) to be grouped together.  For example, a template named <em>seq_platform_info</em> may contain properties that describe the characteristics of the sequencing platform.  In addition, templates enforce data type (i.e. string, integer, etc.) integrity for the contained keys, so that clients are type aware when referencing key values from a search or data processing perspective. Metatdata templates are global in scope and visible to all users.</p>
+<div id="metadata-metadata-templates-collection" class="resource"><h3 class="resource-heading">Metadata Templates collection <a href="#metadata-metadata-templates-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-metadata-templates-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create metadata template</div><a href="#metadata-metadata-templates-collection-post" class="method post">POST</a><code class="uri">/templates</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>name (string, required)</strong> - The unique name of the template; the name must meet the following criteria:
+<ul>
+<li>contain only alphanumerics and underscores</li>
+<li>no whitespace</li>
+<li>maximum of 60 characters</li>
+</ul>
+</li>
+<li><strong>label (string, required)</strong> - A short display label for the template.</li>
+<li><strong>description (string, optional)</strong> - A verbose description of the template.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The template <code>name</code> must be unique in the global context.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing File Info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files.&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing File Info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files.&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-templates-collection-get" class="action get"><h4 class="action-heading"><div class="name">List metadata templates</div><a href="#metadata-metadata-templates-collection-get" class="method get">GET</a><code class="uri">/templates{?name_contains}</code></h4><p>List all of the global metadata templates.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates?<span class="hljs-attribute">name_contains=</span><span class="hljs-literal">Sequencing</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>name_contains</dt><dd><code>string</code>&#xA0;<span>(optional)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>Sequencing</span></span><p>Returns templates in which <code>name</code> contains the specified string.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span></span>,
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing File Info&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files.&quot;</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="metadata-metadata-template-instance" class="resource"><h3 class="resource-heading">Metadata Template instance <a href="#metadata-metadata-template-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-metadata-template-instance-get" class="action get"><h4 class="action-heading"><div class="name">View metadata template</div><a href="#metadata-metadata-template-instance-get" class="method get">GET</a><code class="uri">/templates/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (template restricted)</p>
+</li>
+<li>
+<p>404: Template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates/<span class="hljs-attribute" title="id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique <code>id</code> of the template.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing File Info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files (raw and processed).&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-template-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update metadata template</div><a href="#metadata-metadata-template-instance-put" class="method put">PUT</a><code class="uri">/templates/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The <code>name</code> cannot be updated if the template has been associated to one or more DDS objects.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (template restricted)</p>
+</li>
+<li>
+<p>404: Template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates/<span class="hljs-attribute" title="id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique <code>id</code> of the template.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files (raw and processed).&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing File Info&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Extended attributes for sequencing output files (raw and processed).&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-template-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete metadata template</div><a href="#metadata-metadata-template-instance-delete" class="method delete">DELETE</a><code class="uri">/templates/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The template cannot be deleted if it has been associated to one or more DDS objects.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (template restricted)</p>
+</li>
+<li>
+<p>404: Template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates/<span class="hljs-attribute" title="id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique <code>id</code> of the template.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div><div id="metadata-metadata-properties-collection" class="resource"><h3 class="resource-heading">Metadata Properties collection <a href="#metadata-metadata-properties-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-metadata-properties-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create metadata property</div><a href="#metadata-metadata-properties-collection-post" class="method post">POST</a><code class="uri">/templates/{id}/properties</code></h4><blockquote>
+<p><strong>Permission:</strong> template creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>key (string, required)</strong> - The unique key for the property; the key must meet the following criteria:
+<ul>
+<li>contain only alphanumerics and underscores</li>
+<li>no whitespace</li>
+<li>maximum of 60 characters</li>
+</ul>
+</li>
+<li><strong>label (string, required)</strong> - A short display label for the property.</li>
+<li><strong>description (string, required)</strong> - A verbose description of the property.</li>
+<li><strong>type (string, required)</strong> - The datatype of the key&#x2019;s value; currenty only the Elasticsearch core datatypes are supported: <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html">Elasticsearch Core Datatypes</a>.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The property <code>key</code> must be unique within the context of the template.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates/<span class="hljs-attribute" title="id">168f3f51-6800-403a-973d-78b23c08049b</span>/properties</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique <code>id</code> of the template.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Output Type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file.&quot;</span></span>,
+  &quot;<span class="hljs-attribute">type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;string&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Output Type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file.&quot;</span></span>,
+  &quot;<span class="hljs-attribute">type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;string&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-properties-collection-get" class="action get"><h4 class="action-heading"><div class="name">List metadata properties</div><a href="#metadata-metadata-properties-collection-get" class="method get">GET</a><code class="uri">/templates/{id}/properties</code></h4><p>List metadata template properties.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/templates/<span class="hljs-attribute" title="id">168f3f51-6800-403a-973d-78b23c08049b</span>/properties</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique <code>id</code> of the template.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+      &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+      &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Output Type&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file.&quot;</span></span>,
+      &quot;<span class="hljs-attribute">type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;string&quot;</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="metadata-metadata-property-instance" class="resource"><h3 class="resource-heading">Metadata Property instance <a href="#metadata-metadata-property-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-metadata-property-instance-get" class="action get"><h4 class="action-heading"><div class="name">View metadata property</div><a href="#metadata-metadata-property-instance-get" class="method get">GET</a><code class="uri">/template_properties/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (property restricted)</p>
+</li>
+<li>
+<p>404: Property does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/template_properties/<span class="hljs-attribute" title="id">48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span><p>The unique <code>id</code> of the template property.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Output Type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file. (alignments, peaks, signal)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;string&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-property-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update metadata property</div><a href="#metadata-metadata-property-instance-put" class="method put">PUT</a><code class="uri">/template_properties/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The <code>key</code> or <code>type</code> cannot be updated if the template property has been associated to one or more DDS objects.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (template property restricted)</p>
+</li>
+<li>
+<p>404: Property does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/template_properties/<span class="hljs-attribute" title="id">48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span><p>The unique <code>id</code> of the template property.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file. (alignments, peaks, signal)&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Output Type&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;The type of data in the sequencing output file. (alignments, peaks, signal)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;string&quot;</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-metadata-property-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete metadata property</div><a href="#metadata-metadata-property-instance-delete" class="method delete">DELETE</a><code class="uri">/template_properties/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> creator or system_admin</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The template property cannot be deleted if it is assigned to one or more DDS objects.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden (template property restricted)</p>
+</li>
+<li>
+<p>404: Template property does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/template_properties/<span class="hljs-attribute" title="id">48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>48d34c8f-4284-4327-9ca6-7a9145a1c957</span></span><p>The unique <code>id</code> of the template property.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div><div id="metadata-object-metadata-instance" class="resource"><h3 class="resource-heading">Object Metadata instance <a href="#metadata-object-metadata-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-object-metadata-instance-post" class="action post"><h4 class="action-heading"><div class="name">Create object metadata</div><a href="#metadata-object-metadata-instance-post" class="method post">POST</a><code class="uri">/meta/{object_kind}/{object_id}/{template_id}</code></h4><p>Used to create a metadata template instance for a corresponding DDS object (i.e. <code>dds-file</code>). When creating metadata, only values that adhere to the metadata template schema will be accepted.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file when annotated object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>properties (object[ ], required)</strong> - A list of the <code>key:value</code> pairs to set for the template instance.</li>
+<li><strong>properties[ ].key (string, required)</strong> - The property key to set.</li>
+<li><strong>properties[ ].value (any, required)</strong> - The key value.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>All specified <code>key:values</code> must adhere to the metadata template schema or a validation error will be returned.</li>
+<li>If the template instance already exists for the DDS object, a validation (unique conflict) error will be returned and the update method should be used.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Successfully Created</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Object or template does not exist</p>
+</li>
+<li>
+<p>409: Template instance already exists for the DDS object</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/meta/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">b80a2679-f6bf-46da-acaa-b7a4582b1eda</span>/<span class="hljs-attribute" title="template_id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span><p>The unique id of the object.</p>
+</dd><dt>template_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique id of the template.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+      &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;alignments&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;b80a2679-f6bf-46da-acaa-b7a4582b1eda&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">template_property</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+        &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;alignments&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-object-metadata-instance-get" class="action get"><h4 class="action-heading"><div class="name">View object metadata</div><a href="#metadata-object-metadata-instance-get" class="method get">GET</a><code class="uri">/meta/{object_kind}/{object_id}/{template_id}</code></h4><p>Used to retrieve the metadata template instance for a corresponding DDS object.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project when annotated object is file (<code>dds-file</code>)]</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Object or template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/meta/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">b80a2679-f6bf-46da-acaa-b7a4582b1eda</span>/<span class="hljs-attribute" title="template_id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span><p>The unique id of the object.</p>
+</dd><dt>template_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique id of the template.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;b80a2679-f6bf-46da-acaa-b7a4582b1eda&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">template_property</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+        &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;alignments&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-object-metadata-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update object metadata</div><a href="#metadata-object-metadata-instance-put" class="method put">PUT</a><code class="uri">/meta/{object_kind}/{object_id}/{template_id}</code></h4><p>Used to update a metadata template instance for a corresponding DDS object (i.e. <code>dds-file</code>). When updating metadata, only values that adhere to the metadata template schema will be accepted.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file when annotated object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>properties (object[ ], required)</strong> - A list of the <code>key:value</code> pairs to set for the template instance.</li>
+<li><strong>properties[ ].key (string, required)</strong> - The property key to set.</li>
+<li><strong>properties[ ].value (any, required)</strong> - The key value.</li>
+</ul>
+<blockquote>
+<p><strong>Rules:</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>All specified <code>key:values</code> must adhere to the metadata template schema or a validation error will be returned.</li>
+<li>If the specified <code>key</code> already exists, the value is updated, otherwise it is appended to the template instance.</li>
+<li>If the template instance specified does not exist, a validation error will be returned and the create method should be used.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Validation Error</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Object or template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/meta/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">b80a2679-f6bf-46da-acaa-b7a4582b1eda</span>/<span class="hljs-attribute" title="template_id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span><p>The unique id of the object.</p>
+</dd><dt>template_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique id of the template.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span></span>,
+      &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;peaks&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;b80a2679-f6bf-46da-acaa-b7a4582b1eda&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">template_property</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+        &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;peaks&quot;</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="metadata-object-metadata-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete object metadata</div><a href="#metadata-object-metadata-instance-delete" class="method delete">DELETE</a><code class="uri">/meta/{object_kind}/{object_id}/{template_id}</code></h4><p>Used to delete the metadata template instance.</p>
+<blockquote>
+<p><strong>Permission:</strong> update_file when annotated object is file (<code>dds-file</code>)</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Missing, Expired, or Invalid API Token in &#x2018;Authorization&#x2019; Header</p>
+</li>
+<li>
+<p>404: Object or template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/meta/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">b80a2679-f6bf-46da-acaa-b7a4582b1eda</span>/<span class="hljs-attribute" title="template_id">168f3f51-6800-403a-973d-78b23c08049b</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span><p>The unique id of the object.</p>
+</dd><dt>template_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>168f3f51-6800-403a-973d-78b23c08049b</span></span><p>The unique id of the template.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div><div id="metadata-view-all-object-metadata" class="resource"><h3 class="resource-heading">View All Object Metadata <a href="#metadata-view-all-object-metadata" class="permalink">&#xA0;&#xB6;</a></h3><div id="metadata-view-all-object-metadata-get" class="action get"><h4 class="action-heading"><div class="name">View All Object Metadata</div><a href="#metadata-view-all-object-metadata-get" class="method get">GET</a><code class="uri">/meta/{object_kind}/{object_id}</code></h4><p>Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project when annotated object is file (<code>dds-file</code>)]</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Object or template does not exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/meta/<span class="hljs-attribute" title="object_kind">dds-file</span>/<span class="hljs-attribute" title="object_id">b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>object_kind</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>dds-file</span></span><p>The kind of object.</p>
+</dd><dt>object_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>b80a2679-f6bf-46da-acaa-b7a4582b1eda</span></span><p>The unique id of the object.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">object</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;b80a2679-f6bf-46da-acaa-b7a4582b1eda&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">template</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;168f3f51-6800-403a-973d-78b23c08049b&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;sequencing_file_info&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">properties</span>&quot;: <span class="hljs-value">[
+        {
+          &quot;<span class="hljs-attribute">template_property</span>&quot;: <span class="hljs-value">{
+            &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;48d34c8f-4284-4327-9ca6-7a9145a1c957&quot;</span></span>,
+            &quot;<span class="hljs-attribute">key</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;output_type&quot;</span>
+          </span>}</span>,
+          &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;alignments&quot;</span>
+        </span>}
+      ]
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section>

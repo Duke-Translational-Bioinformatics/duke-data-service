@@ -1,0 +1,492 @@
+<section id="projects" class="resource-group"><h2 class="group-heading">Projects <a href="#projects" class="permalink">&#xB6;</a></h2><p>Represents a container for storing, organizing, retrieving and sharing research data files and their associated metadata.</p>
+<div id="projects-projects-collection" class="resource"><h3 class="resource-heading">Projects collection <a href="#projects-projects-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="projects-projects-collection-post" class="action post"><h4 class="action-heading"><div class="name">Create project</div><a href="#projects-projects-collection-post" class="method post">POST</a><code class="uri">/projects</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>User who creates project is granted the <code>project_admin</code> authorization role.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Created Successfully</p>
+</li>
+<li>
+<p>400: Project Name Already Exists</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-project&quot;</span></span>,
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-projects-collection-get" class="action get"><h4 class="action-heading"><div class="name">List projects</div><a href="#projects-projects-collection-get" class="method get">GET</a><code class="uri">/projects</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Projects that have been deleted (i.e. <code>&quot;is_deleted&quot;: true</code>) are not included.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-project&quot;</span></span>,
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span></span>,
+      &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="projects-project-instance" class="resource"><h3 class="resource-heading">Project instance <a href="#projects-project-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="projects-project-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project</div><a href="#projects-project-instance-get" class="method get">GET</a><code class="uri">/projects/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>403: Forbidden</li>
+<li>404: Project does not exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-project&quot;</span></span>,
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-project-instance-put" class="action put"><h4 class="action-heading"><div class="name">Update project</div><a href="#projects-project-instance-put" class="method put">PUT</a><code class="uri">/projects/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Only <code>name</code> and <code>description</code> properties may be updated via this action.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Project Name Already Exists</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-project&quot;</span></span>,
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Goal of generating a targeted knockout mutation...&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+  &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="projects-project-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete project</div><a href="#projects-project-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> delete_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>This operation recursively deletes all of the project children (i.e. folders,files and file versions).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>403: Forbidden</p>
+</li>
+<li>
+<p>404: Project Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div><div id="projects-project-instance-get-1" class="action get"><h4 class="action-heading"><div class="name">NOT_IMPL_NEW Project usage</div><a href="#projects-project-instance-get-1" class="method get">GET</a><code class="uri">/projects/{id}/usage</code></h4><p>View summary usage for the project.</p>
+<blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>member_count (number)</strong> - Total number of users granted a project level permission.</li>
+<li><strong>file_count (integer)</strong> - Total number of files contained in the project.</li>
+<li><strong>storage_bytes (integer)</strong> - Total bytes for all files contained in the project.</li>
+</ul>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Deleted objects (i.e. <code>&quot;is_deleted&quot;: true</code>) are excluded from all counts/totals.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/usage</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">member_count</span>&quot;: <span class="hljs-value"><span class="hljs-number">10</span></span>,
+  &quot;<span class="hljs-attribute">file_count</span>&quot;: <span class="hljs-value"><span class="hljs-number">126</span></span>,
+  &quot;<span class="hljs-attribute">storage_bytes</span>&quot;: <span class="hljs-value"><span class="hljs-number">804006007009</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="project-member-permissions" class="resource-group"><h2 class="group-heading">Project Member Permissions <a href="#project-member-permissions" class="permalink">&#xB6;</a></h2><p>Represents project level authorization roles that have been granted to a user.</p>
+<div id="project-member-permissions-project-permissions-collection" class="resource"><h3 class="resource-heading">Project Permissions collection <a href="#project-member-permissions-project-permissions-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-member-permissions-project-permissions-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project permissions</div><a href="#project-member-permissions-project-permissions-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/permissions</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Project Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/permissions</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+        &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+        &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">auth_role</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;file_editor&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;File Editor&quot;</span></span>,
+        &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Can view, download, create, update and delete files&quot;</span>
+      </span>}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-member-permissions-project-permission-instance" class="resource"><h3 class="resource-heading">Project Permission instance <a href="#project-member-permissions-project-permission-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-member-permissions-project-permission-instance-put" class="action put"><h4 class="action-heading"><div class="name">Grant project permission</div><a href="#project-member-permissions-project-permission-instance-put" class="method put">PUT</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> manage_project_permissions</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Revokes any existing project level authorization role for the user and grants the new role.</li>
+<li>The role specified must be a project level authorization role (i.e. <code>project</code> in <code>auth_role.contexts</code>).</li>
+<li>The current user cannot grant or revoke their own project level role.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project or User Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/permissions/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">auth_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;file_editor&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">auth_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;file_editor&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;File Editor&quot;</span></span>,
+    &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Can view, download, create, update and delete files&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-member-permissions-project-permission-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project permission</div><a href="#project-member-permissions-project-permission-instance-get" class="method get">GET</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Project or User Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/permissions/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">username</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">auth_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;file_editor&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;File Editor&quot;</span></span>,
+    &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Can view, download, create, update and delete files&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-member-permissions-project-permission-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Revoke project permission</div><a href="#project-member-permissions-project-permission-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{project_id}/permissions/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> manage_project_permissions</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>The project must have at least one user with the <code>project_admin</code> role.</li>
+<li>The current user cannot revoke their own project level role.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>204: Successfully Deleted</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project, User or Authrole Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/permissions/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div></section><section id="project-roles" class="resource-group"><h2 class="group-heading">Project Roles <a href="#project-roles" class="permalink">&#xB6;</a></h2><p>Represents an organizational role that an individual (i.e. user) may assume in the context of a project.  These organizational roles have no relationship to authorization roles.</p>
+<p><strong>Project Roles:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">role</th>
+<th style="text-align:left">name</th>
+<th style="text-align:left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>principal_investigator</strong></td>
+<td style="text-align:left">Principal Investigator</td>
+<td style="text-align:left">Lead investigator for the research project</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>research_coordinator</strong></td>
+<td style="text-align:left">Research Coordinator</td>
+<td style="text-align:left">Coordinator for the research project</td>
+</tr>
+</tbody>
+</table>
+<div id="project-roles-project-roles-collection" class="resource"><h3 class="resource-heading">Project Roles collection <a href="#project-roles-project-roles-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-roles-project-roles-collection-get" class="action get"><h4 class="action-heading"><div class="name">List project roles</div><a href="#project-roles-project-roles-collection-get" class="method get">GET</a><code class="uri">/project_roles</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_roles</span></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Lead investigator for the research project&quot;</span></span>,
+      &quot;<span class="hljs-attribute">is_deprecated</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span>
+    </span>},
+    {
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;research_coordinator&quot;</span></span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Research Coordinator&quot;</span></span>,
+      &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Coordinator for the research project&quot;</span></span>,
+      &quot;<span class="hljs-attribute">is_deprecated</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span>
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-roles-project-role-instance" class="resource"><h3 class="resource-heading">Project Role instance <a href="#project-roles-project-role-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-roles-project-role-instance-get" class="action get"><h4 class="action-heading"><div class="name">View project role</div><a href="#project-roles-project-role-instance-get" class="method get">GET</a><code class="uri">/project_roles/{id}</code></h4><blockquote>
+<p><strong>Permission:</strong> authenticated</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Unknown ProjectRole</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/project_roles/<span class="hljs-attribute" title="id">principal_investigator</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>principal_investigator</span></span><p>The unique <code>id</code> for a project role.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+  &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator&quot;</span></span>,
+  &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Lead investigator for the research project&quot;</span></span>,
+  &quot;<span class="hljs-attribute">is_deprecated</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="project-affiliates" class="resource-group"><h2 class="group-heading">Project Affiliates <a href="#project-affiliates" class="permalink">&#xB6;</a></h2><p>Represents an individual that plays some project level role of interest from a collaboration perspective.  The affiliate must be a registered user.</p>
+<div id="project-affiliates-affiliates-collection" class="resource"><h3 class="resource-heading">Affiliates collection <a href="#project-affiliates-affiliates-collection" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-affiliates-affiliates-collection-get" class="action get"><h4 class="action-heading"><div class="name">List affiliates</div><a href="#project-affiliates-affiliates-collection-get" class="method get">GET</a><code class="uri">/projects/{id}/affiliates</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Project Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/affiliates</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique <code>id</code> of the project.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+        &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+        &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">project_role</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+        &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator&quot;</span>
+      </span>}
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="project-affiliates-affiliate-instance" class="resource"><h3 class="resource-heading">Affiliate instance <a href="#project-affiliates-affiliate-instance" class="permalink">&#xA0;&#xB6;</a></h3><div id="project-affiliates-affiliate-instance-put" class="action put"><h4 class="action-heading"><div class="name">Associate affiliate</div><a href="#project-affiliates-affiliate-instance-put" class="method put">PUT</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_project</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Rules</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li>Deletes any existing project role for the user and assigns new role.</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: Success</p>
+</li>
+<li>
+<p>400: Project Name Already Exists</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: Project Does not Exist</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method put">PUT</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/affiliates/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+    &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">project_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-affiliates-affiliate-instance-get" class="action get"><h4 class="action-heading"><div class="name">View affiliate</div><a href="#project-affiliates-affiliate-instance-get" class="method get">GET</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> view_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>200: Success</li>
+<li>401: Unauthorized</li>
+<li>404: Project Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/affiliates/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">user</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;c1179f73-0558-4f96-afc7-9d251e65b7bb&quot;</span></span>,
+    &quot;<span class="hljs-attribute">full_name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Matthew Gardner&quot;</span></span>,
+    &quot;<span class="hljs-attribute">email</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;mrgardner01@duke.edu&quot;</span>
+  </span>}</span>,
+  &quot;<span class="hljs-attribute">project_role</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;principal_investigator&quot;</span></span>,
+    &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Principal Investigator&quot;</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div id="project-affiliates-affiliate-instance-delete" class="action delete"><h4 class="action-heading"><div class="name">Delete affiliate</div><a href="#project-affiliates-affiliate-instance-delete" class="method delete">DELETE</a><code class="uri">/projects/{project_id}/affiliates/{user_id}</code></h4><blockquote>
+<p><strong>Permission:</strong> update_project</p>
+</blockquote>
+<hr>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>204: Successfully Deleted</li>
+<li>401: Unauthorized</li>
+<li>404: Project Does not Exist</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&#xA0;<span class="uri"><span class="hostname"></span>/projects/<span class="hljs-attribute" title="project_id">ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span>/affiliates/<span class="hljs-attribute" title="user_id">c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>project_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>ca29f7df-33ca-46dd-a015-92c46fdb6fd1</span></span><p>The unique id of the project.</p>
+</dd><dt>user_id</dt><dd><code>string</code>&#xA0;<span class="required">(required)</span>&#xA0;<span class="text-muted example"><strong>Example:&#xA0;</strong><span>c1179f73-0558-4f96-afc7-9d251e65b7bb</span></span><p>The unique id of the user.</p>
+</dd></dl></div><div class="title"><strong>Response&#xA0;&#xA0;<code>204</code></strong></div></div></div></section>

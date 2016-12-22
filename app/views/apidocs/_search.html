@@ -1,0 +1,104 @@
+<section id="search-objects" class="resource-group"><h2 class="group-heading">Search Objects <a href="#search-objects" class="permalink">&#xB6;</a></h2><p>The search action can be used to find specific DDS objects (e.g. folders, files, etc.).  The DDS platform leverages <a href="https://www.elastic.co/">Elasticsearch</a> to perform document based searches.  All queries must be specified in <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">Elasticsearch Query DSL</a>.</p>
+<p><em>Note: Only search for DDS folders and files</em> (i.e. <code>dds-folder</code>, <code>dds-file</code>) <em>is currently supported.  These objects are replicated to Elasticsearch as indexed documents.  The objects (i.e. documents) are extended with a</em> <code>tags</code> <em>and</em> <code>meta</code> <em>property when stored in Elaticsearch.  These properties have composite metadata to facilitate search.  See response payload for concrete example format of these properties.</em></p>
+<div id="search-objects-search-objects" class="resource"><h3 class="resource-heading">Search Objects <a href="#search-objects-search-objects" class="permalink">&#xA0;&#xB6;</a></h3><div id="search-objects-search-objects-post" class="action post"><h4 class="action-heading"><div class="name">Search Objects</div><a href="#search-objects-search-objects-post" class="method post">POST</a><code class="uri">/search</code></h4><p>Search for DDS objects (i.e. Elasticsearch documents).</p>
+<blockquote>
+<p><strong>Permission:</strong> authenticated [scope: view_project for objects of kind (<code>dds-folder</code>, <code>dds-file</code>)]</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>Properties</strong></p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>include_kinds (string[ ], required)</strong> - The kind of objects (i.e. Elasticsearch document types) to include in the search; can include folders and/or files (i.e. <code>dds-folder</code>, <code>dds-file</code>).</li>
+<li><strong>search_query (object, required)</strong> - The Elasticsearch query criteria (i.e. Query DSL).</li>
+</ul>
+<p><strong>Response messages:</strong></p>
+<ul>
+<li>
+<p>200: This will never happen</p>
+</li>
+<li>
+<p>201: Success</p>
+</li>
+<li>
+<p>401: Unauthorized</p>
+</li>
+<li>
+<p>404: One or more included kinds is not supported, or not indexed</p>
+</li>
+</ul>
+<h4>Example URI</h4><div class="definition"><span class="method post">POST</span>&#xA0;<span class="uri"><span class="hostname"></span>/search</span></div><div class="title"><strong>Request</strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">include_kinds</span>&quot;: <span class="hljs-value">[
+    <span class="hljs-string">&quot;dds-file&quot;</span>
+  ]</span>,
+  &quot;<span class="hljs-attribute">search_query</span>&quot;: <span class="hljs-value">{
+    &quot;<span class="hljs-attribute">query</span>&quot;: <span class="hljs-value">{
+      &quot;<span class="hljs-attribute">match</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">_all</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;SMRT sequencing&quot;</span>
+      </span>}
+    </span>}
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&#xA0;&#xA0;<code>201</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  &quot;<span class="hljs-attribute">results</span>&quot;: <span class="hljs-value">[
+    {
+      &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-file&quot;</span></span>,
+      &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;b80a2679-f6bf-46da-acaa-b7a4582b1eda&quot;</span></span>,
+      &quot;<span class="hljs-attribute">parent</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-folder&quot;</span></span>,
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;552be8c5-209d-4e3b-afaf-cb66686ffbyy&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ENCFF000SJR.bam&quot;</span></span>,
+      &quot;<span class="hljs-attribute">project</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;d5ae02a4-b9e6-473d-87c4-66f4c881ae7a&quot;</span>
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">ancestors</span>&quot;: <span class="hljs-value">[
+        {
+          &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-project&quot;</span></span>,
+          &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;ca29f7df-33ca-46dd-a015-92c46fdb6fd1&quot;</span></span>,
+          &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Knockout Mouse Project (KOMP)&quot;</span>
+        </span>},
+        {
+          &quot;<span class="hljs-attribute">kind</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;dds-folder&quot;</span></span>,
+          &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;552be8c5-209d-4e3b-afaf-cb66686ffbyy&quot;</span></span>,
+          &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Sequencing Core&quot;</span>
+        </span>}
+      ]</span>,
+      &quot;<span class="hljs-attribute">is_deleted</span>&quot;: <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      &quot;<span class="hljs-attribute">current_version</span>&quot;: <span class="hljs-value">{
+        &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;89ef1e77-1a0b-40a8-aaca-260d13987f2b&quot;</span></span>,
+        &quot;<span class="hljs-attribute">version</span>&quot;: <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        &quot;<span class="hljs-attribute">label</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Processed sequence data&quot;</span></span>,
+        &quot;<span class="hljs-attribute">upload</span>&quot;: <span class="hljs-value">{
+          &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;666be35a-98e0-4c2e-9a17-7bc009f9bb23&quot;</span></span>,
+          &quot;<span class="hljs-attribute">size</span>&quot;: <span class="hljs-value"><span class="hljs-number">30024000</span></span>,
+          &quot;<span class="hljs-attribute">hashes</span>&quot;: <span class="hljs-value">[
+            {
+              &quot;<span class="hljs-attribute">value</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;cf23df2207d99a74fbe169e3eba035e633b65d94&quot;</span></span>,
+              &quot;<span class="hljs-attribute">algorithm</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;md5&quot;</span></span>,
+              &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}
+            </span>}
+          ]</span>,
+          &quot;<span class="hljs-attribute">storage_provider</span>&quot;: <span class="hljs-value">{
+            &quot;<span class="hljs-attribute">id</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;g5579f73-0558-4f96-afc7-9d251e65bv33&quot;</span></span>,
+            &quot;<span class="hljs-attribute">name</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;duke_oit_swift&quot;</span></span>,
+            &quot;<span class="hljs-attribute">description</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;Duke OIT Storage&quot;</span>
+          </span>}
+        </span>}
+      </span>}</span>,
+      &quot;<span class="hljs-attribute">audit</span>&quot;: <span class="hljs-value">{}</span>,
+      &quot;<span class="hljs-attribute">tags</span>&quot;: <span class="hljs-value">[
+        <span class="hljs-string">&quot;SMRT sequencing&quot;</span>,
+        <span class="hljs-string">&quot;GCB lab&quot;</span>
+      ]</span>,
+      &quot;<span class="hljs-attribute">meta</span>&quot;: <span class="hljs-value">[
+        {
+          &quot;<span class="hljs-attribute">sequencing_file_info</span>&quot;: <span class="hljs-value">{
+            &quot;<span class="hljs-attribute">output_type</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;alignments&quot;</span></span>,
+            &quot;<span class="hljs-attribute">mapping_assembly</span>&quot;: <span class="hljs-value"><span class="hljs-string">&quot;hg19&quot;</span>
+          </span>}
+        </span>}
+      ]
+    </span>}
+  ]
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section>

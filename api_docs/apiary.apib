@@ -8,29 +8,38 @@ This the documentation for the Data Service API. Key focuses are on API endpoint
 
 Adhere as well as possible to the [Heroku API Design Best Practices:](https://geemus.gitbooks.io/http-api-design/content/en/index.html) requiring secure TLS connections, versioning in the accepts header, supporting Etags, including a Request-id in each response header, among others.
 
-### **[API Basics and Change Log](api_basics.html)**
-+ Contains change log and general usage details (i.e. authentication, standard errors, pagination, etc.)
+### API Basics and Change Log
 
-### **[Users and Software Agents](users_software_agents.html)**
-+ Contains endpoints for Current User, Users, Software Agents, Authentication Providers
+render api_basics header-api-basics-and-change-log
 
-### **[Authorization](authorization.html)**
-+ Contains endpoints for Authorization Roles, System Permissions
+### Users and Software Agents
 
-### **[Projects](projects.html)**
-+ Contains endpoints for Projects, Project Member Permissions, Project Affiliates
+render users_software_agents header-users-and-software-agents
 
-### **[Folders and Files](folders_files.html)**
-+ Contains endpoints for Folders, Uploads, Files, File Versions, Browse Project/Folder Tree (Search Children), Storage Providers
+### Authorization
 
-### **[Provenance](provenance.html)**
-+ Contains endpoints for Provenance Activities, Provenance Relations, Search Provenance Graph
+render authorization header-authorization
 
-### **[Metadata](metadata.html)**
-+ Contains endpoints for Tags and Metadata (Key/Value Pairs)
+### Projects
 
-### **[Search](search.html)**
-+ Contains endpoint Search Objects
+render projects header-projects
 
-### **[Core Facility Workflow](core_facility_workflow.html)**
-+ Contains endpoints for Project Transfers
+### Folders and Files
+
+render folders_files header-folders-and-files
+
+### Provenance
+
+render provenance header-provenance
+
+### Metadata
+
+render metadata header-metadata
+
+### Search
+
+render search header-search
+
+### Core Facility Workflow
+
+render core_facility_workflow header-core-facility-workflow
