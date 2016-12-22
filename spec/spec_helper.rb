@@ -16,21 +16,13 @@
 # users commonly want.
 #
 require 'simplecov'
+require 'codecov'
 
 # save to CircleCI's artifacts directory if we're on CircleCI
 if ENV['CIRCLE_ARTIFACTS']
   dir = File.join(ENV['CIRCLE_ARTIFACTS'], "coverage")
   SimpleCov.coverage_dir(dir)
 end
-SimpleCov.start
-
-require 'codecov'
-SimpleCov.formatter = SimpleCov::Formatter::Codecov
-# if ENV['CIRCLECI']
-#   # If running in CircleCI, run with Coveralls too
-#   require 'coveralls'
-#   Coveralls.wear!('rails')
-# end
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
