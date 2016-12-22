@@ -1,5 +1,3 @@
-
-
 class SimpleCov::Formatter::MergedFormatter
   def format(result)
     SimpleCov::Formatter::HTMLFormatter.new.format(result) # for the simplecov report

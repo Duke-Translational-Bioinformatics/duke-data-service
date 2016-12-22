@@ -74,9 +74,6 @@ deployment:
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
     - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'
-# notify:
-#   webhooks:
-#     - url: https://coveralls.io/webhook?repo_token=repo_token
 test:
   post:
     - bash <(curl -s https://codecov.io/bash)
