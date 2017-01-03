@@ -88,5 +88,4 @@ services:
     image: dukedataservice_apiary
     volumes:
       - .:/var/www/app
-    entrypoint: ['aglio']
-    command: ['-i','apiary.apib', '-o', 'app/views/apidocs/index.html']
+    entrypoint: ['bin/gen_apiary.sh']
