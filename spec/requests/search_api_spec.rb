@@ -196,8 +196,8 @@ describe DDS::V1::SearchAPI do
       )
     }
 
-    describe 'POST /api/v1/search/provenance/was_generated_by' do
-      let(:url) { "/api/v1/search/provenance/was_generated_by" }
+    describe 'POST /api/v1/search/provenance/origin' do
+      let(:url) { "/api/v1/search/provenance/origin" }
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
 
