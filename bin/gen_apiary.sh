@@ -8,8 +8,7 @@ do
   else
     target=`echo ${apifile} | sed 's/apib/html/'`
   fi
-  echo "generating app/views/apidocs/${target}"
-  docker-compose run genapiary -i api_docs/${apifile} -o app/views/apidocs/${target}
+  echo "generating ${target}"
+  aglio -i api_docs/${apifile} -o public/apidocs/${target}
 done
-docker-compose down
 echo "FIN"
