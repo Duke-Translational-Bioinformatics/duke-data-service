@@ -15,7 +15,7 @@ utils = imp.load_source("utils",os.path.join(os.getcwd(),'utils.py'))
 def justPass14_1(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     upload_id = utils.upload_a_file(proj_id,True)
     file_id = utils.create_a_file(proj_id,upload_id)
@@ -27,7 +27,7 @@ def justPass14_1(transaction):
 def justPass214_1(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww ['id']
     upload_id = utils.upload_a_file(proj_id,True)
     file_id = utils.create_a_file(proj_id,upload_id)

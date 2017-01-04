@@ -18,7 +18,7 @@ def used_by16_1(transaction):
     global file_version_id
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     upload_id = utils.upload_a_file(proj_id,unique=True)
     file_id = utils.create_a_file(proj_id,upload_id)
@@ -32,7 +32,7 @@ def used_by16_1(transaction):
 def derived16_1(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     upload_id = utils.upload_a_file(proj_id,unique=True)
     file_id = utils.create_a_file(proj_id,upload_id)
@@ -50,7 +50,7 @@ def get_prov_rel_id(transaction):
 def invalidate16_1(transaction):
     name = str(uuid.uuid4())
     description = "Created by dredd under: Projects > Projects collection > Create project"
-    neww = utils.create_a_project(transaction,name,description)
+    neww = utils.create_a_project(name,description)
     proj_id = neww['id']
     upload_id = utils.upload_a_file(proj_id,unique=True)
     file_id = utils.create_a_file(proj_id,upload_id)
@@ -72,6 +72,12 @@ def change_activity_id16_2(transaction):
 def changeid216_2(transaction):
     url = transaction['fullPath']
     transaction['fullPath'] = str(url).replace('ac242faf-fba0-4293-a949-0b82ae7ba810',prov_rel_id)
-@hooks.before("Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance")
+@hooks.before("Search Provenance > Search Provenance > Search Provenance")
 def skippy16_3(transaction):
+    activity_id = utils.create_provenance_activity()
+    requestBody = json.loads(transaction[u'request'][u'body'])
+    requestBody['start_node']['id'] = activity_id
+    transaction[u'request'][u'body'] = json.dumps(requestBody)
+@hooks.before("Search Provenance > NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy > NOT_IMPLEMENTED_NEW Search Provenance wasGeneratedBy")
+def skipy16_32(transaction):
     utils.skip_this_endpoint(transaction)
