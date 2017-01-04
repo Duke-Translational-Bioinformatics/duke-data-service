@@ -102,9 +102,9 @@ module DDS
         named 'update object metadata'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden'],
-          [400, 'Validation Error'],
           [404, 'Object or Template does not exist']
         ]
       end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe WasGeneratedByProvenanceGraph do
+RSpec.describe OriginProvenanceGraph do
   let(:policy_scope) { Proc.new {|scope| scope } }
 
   # (fv1ga)-[generated]->(fv1)
@@ -65,7 +65,7 @@ RSpec.describe WasGeneratedByProvenanceGraph do
   context 'instantiations' do
     context 'default' do
       subject{
-        WasGeneratedByProvenanceGraph.new(
+        OriginProvenanceGraph.new(
           file_versions: file_versions,
           policy_scope: policy_scope
         )
@@ -88,7 +88,7 @@ RSpec.describe WasGeneratedByProvenanceGraph do
 
     context 'restrictive policy_scope' do
       subject{
-        WasGeneratedByProvenanceGraph.new(
+        OriginProvenanceGraph.new(
           file_versions: file_versions,
           policy_scope: Proc.new { |scope| scope.none }
         )

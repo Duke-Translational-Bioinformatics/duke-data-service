@@ -5,7 +5,7 @@ module DDS
         detail 'Creates a project file for the given payload.'
         named 'create project file'
         failure [
-          [200, "this will never happen"],
+          [200, "This will never happen"],
           [201, "Successfully Created"],
           [400, 'Upload has an IntegrityException'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
@@ -114,7 +114,7 @@ module DDS
         detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download file.'
         named 'download file'
         failure [
-          [200, "This will never happen"],
+          [200, "Success"],
           [301, 'Redirect to file'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'File does not exist']

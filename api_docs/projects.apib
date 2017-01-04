@@ -1,0 +1,444 @@
+FORMAT: 1A
+
+# Project Resources
+
+## Group << API Summary
+
+## Group Projects
+Represents a container for storing, organizing, retrieving and sharing research data files and their associated metadata.
+
+## Projects collection [/projects]
+
+### Create project [POST]
+>**Permission:** authenticated
+- - - - -
+
+>**Rules**
+- - - - -
++ User who creates project is granted the `project_admin` authorization role.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Created Successfully
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Request (application/json)
+
+        {
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation..."
+        }
+
++ Response 201 (application/json)
+
+        {
+          "kind": "dds-project",
+          "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+          "name": "Knockout Mouse Project (KOMP)",
+          "description": "Goal of generating a targeted knockout mutation...",
+          "is_deleted": false,
+          "audit": { }
+        }
+
+### List projects [GET]
+>**Permission:** authenticated [scope: view_project]
+- - - - -
+
+>**Rules**
+- - - - -
++ Projects that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)",
+                    "description": "Goal of generating a targeted knockout mutation...",
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Project instance [/projects/{id}]
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
++ Model (application/json)
+
+    + Body
+
+            {
+                "kind": "dds-project",
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                "name": "Knockout Mouse Project (KOMP)",
+                "description": "Goal of generating a targeted knockout mutation...",
+                "is_deleted": false,
+                "audit": { }
+            }
+
+### View project [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project does not exist
+
++ Response 200
+
+    [Project instance][]
+
+### Update project [PUT]
+>**Permission:** update_project
+- - - - -
+
+>**Rules**
+- - - - -
++ Only `name` and `description` properties may be updated via this action.
+
+**Response messages:**
+* 200: Success
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project Does not Exist
+
++ Request (application/json)
+
+        {
+            "name": "Knockout Mouse Project (KOMP)",
+            "description": "Goal of generating a targeted knockout mutation..."
+        }
+
++ Response 200
+
+    [Project instance][]
+
+### Delete project [DELETE]
+>**Permission:** delete_project
+- - - - -
+
+>**Rules**
+- - - - -
++ This operation recursively deletes all of the project children (i.e. folders,files and file versions).
+
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project Does not Exist
+
++ Response 204
+
+## NOT_IMPL_NEW Project usage [GET /projects/{id}/usage]
+View summary usage for the project.
+
+>**Permission:** view_project
+- - - - -
+
+>**Properties**
+- - - - -
++ **member_count (number)** - Total number of users granted a project level permission.
++ **file_count (integer)** - Total number of files contained in the project.
++ **storage_bytes (integer)** - Total bytes for all files contained in the project.
+
+>**Rules**
+- - - - -
++ Deleted objects (i.e. `"is_deleted": true`) are excluded from all counts/totals.
+
+**Response messages:**
+* 200: Success
+
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
++ Response 200 (application/json)
+
+        {
+            "member_count": 10,
+            "file_count": 126,
+            "storage_bytes": 804006007009
+        }
+
+## Group Project Member Permissions
+Represents project level authorization roles that have been granted to a user.
+
+## Project Permissions collection [/projects/{id}/permissions]
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
+### List project permissions [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "auth_role": {
+                        "id": "file_editor",
+                        "name": "File Editor",
+                        "description": "Can view, download, create, update and delete files"
+                    }
+                }
+            ]
+        }
+
+## Project Permission instance [/projects/{project_id}/permissions/{user_id}]
++ Parameters
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
+
++ Model (application/json)
+
+    + Body
+
+             {
+                "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "username": "mrgardner01",
+                    "full_name": "Matthew Gardner"
+                },
+                "auth_role": {
+                    "id": "file_editor",
+                    "name": "File Editor",
+                    "description": "Can view, download, create, update and delete files"
+                }
+            }
+
+### Grant project permission [PUT]
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Rules**
+- - - - -
++ Revokes any existing project level authorization role for the user and grants the new role.
++ The role specified must be a project level authorization role (i.e. `project` in `auth_role.contexts`).
++ The current user cannot grant or revoke their own project level role.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project or User Does not Exist
+
++ Request (application/json)
+
+        {
+            "auth_role": {"id": "file_editor"}
+        }
+
++ Response 200
+
+    [Project Permission instance][]
+
+### View project permission [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project or User Does not Exist
+
++ Response 200
+
+    [Project Permission instance][]
+
+### Revoke project permission [DELETE]
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Rules**
+- - - - -
++ The project must have at least one user with the `project_admin` role.
++ The current user cannot revoke their own project level role.
+
+**Response messages:**
+* 200: This will never happen
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: Project, User or Authrole Does not Exist
+
++ Response 204
+
+## Group Project Roles
+Represents an organizational role that an individual (i.e. user) may assume in the context of a project.  These organizational roles have no relationship to authorization roles.
+
+**Project Roles:**
+
+| role | name | description |
+|:-----|:-----|:------------|
+| **principal_investigator** | Principal Investigator | Lead investigator for the research project |
+| **research_coordinator** | Research Coordinator | Coordinator for the research project |
+
+## Project Roles collection [/project_roles]
+
+### List project roles [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "principal_investigator",
+                    "name": "Principal Investigator",
+                    "description": "Lead investigator for the research project",
+                    "is_deprecated": false
+                },
+                {
+                    "id": "research_coordinator",
+                    "name": "Research Coordinator",
+                    "description": "Coordinator for the research project",
+                    "is_deprecated": false
+                }
+            ]
+        }
+
+## Project Role instance [/project_roles/{id}]
++ Parameters
+    + id (string, required, `principal_investigator`) ... The unique `id` for a project role.
+
+### View project role [GET]
+>**Permission:** authenticated
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unknown ProjectRole
+
++ Response 200 (application/json)
+
+        {
+            "id": "principal_investigator",
+            "name": "Principal Investigator",
+            "description": "Lead investigator for the research project",
+            "is_deprecated": false
+        }
+### Group Project Affiliates
+Represents an individual that plays some project level role of interest from a collaboration perspective.  The affiliate must be a registered user.
+
+## Affiliates collection [/projects/{id}/affiliates]
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
+### List affiliates [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                    "user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "full_name": "Matthew Gardner",
+                        "email": "mrgardner01@duke.edu"
+                    },
+                    "project_role": {
+                        "id": "principal_investigator",
+                        "name": "Principal Investigator"
+                    }
+                }
+            ]
+        }
+
+## Affiliate instance [/projects/{project_id}/affiliates/{user_id}]
++ Parameters
+    + project_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the project.
+    + user_id (string, required, `c1179f73-0558-4f96-afc7-9d251e65b7bb`) ... The unique id of the user.
+
++ Model (application/json)
+
+    + Body
+
+            {
+                "project": {"id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"},
+                "user": {
+                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                    "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu"
+                },
+                "project_role": {
+                    "id": "principal_investigator",
+                    "name": "Principal Investigator"
+                }
+            }
+
+### Associate affiliate [PUT]
+>**Permission:** update_project
+- - - - -
+
+>**Rules**
+- - - - -
++ Deletes any existing project role for the user and assigns new role.
+
+**Response messages:**
+* 200: Success
+* 400: Project Name Already Exists
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Request (application/json)
+
+        {
+            "project_role": {"id": "principal_investigator"}
+        }
+
++ Response 200
+
+    [Affiliate instance][]
+
+### View affiliate [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Response 200
+
+    [Affiliate instance][]
+
+### Delete affiliate [DELETE]
+>**Permission:** update_project
+- - - - -
+**Response messages:**
+* 204: Successfully Deleted
+* 401: Unauthorized
+* 404: Project Does not Exist
+
++ Response 204
