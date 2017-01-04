@@ -2,8 +2,8 @@ version: '2'
 services:
   rails:
     image: dukedataservice_server
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['rails']
     links:
       - db:postgres.db.host
@@ -16,13 +16,13 @@ services:
       - elastic.client.env
   bundle:
     image: dukedataservice_server
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['bundle']
   rake:
     image: dukedataservice_server
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['rake']
     links:
       - db:postgres.db.host
@@ -39,8 +39,8 @@ services:
       - auth_service.env
       - neo4j.client.env
       - elastic.client.env
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['rake']
     command: auth_service:duke:create
     links:
@@ -54,8 +54,8 @@ services:
       - OPENID_CLIENT_ID=test
       - OPENID_CLIENT_SECRET=testpass
       - OPENID_URL=http://oit.oauth.edu
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
@@ -76,16 +76,16 @@ services:
       - ./apiary.apib:/home/dredd_scripts/apiary.apib
   apiary:
     build: ./docker/builds/apiary
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
   validateapiary:
     image: dukedataservice_apiary
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['api-blueprint-validator']
     command: apiary.apib
   genapiary:
     image: dukedataservice_apiary
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     entrypoint: ['bin/gen_apiary.sh']
