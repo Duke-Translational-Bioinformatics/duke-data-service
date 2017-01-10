@@ -317,7 +317,7 @@ shared_examples 'a ProvRelationSerializer' do |from:, to:|
   end
 end
 
-shared_examples 'a serialized DataFile' do |resource_sym|
+shared_examples 'a serialized DataFile' do |resource_sym, with_label: false|
   let(:resource) { send(resource_sym) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
@@ -336,7 +336,9 @@ shared_examples 'a serialized DataFile' do |resource_sym|
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }
     it { is_expected.not_to have_key('upload') }
-    it { is_expected.not_to have_key('label') }
+    unless with_label
+      it { is_expected.not_to have_key('label') }
+    end
 
     it_behaves_like 'a serializer with a serialized audit'
   end
