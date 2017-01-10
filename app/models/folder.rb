@@ -38,15 +38,64 @@ class Folder < Container
 
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
+      indexes :kind
       indexes :id
-      indexes :name
-      indexes :is_deleted, type: "boolean"
-      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
-      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
-
+      indexes :label
+      
       indexes :parent do
         indexes :id, type: "string"
         indexes :name, type: "string"
+      end
+
+      indexes :name
+      indexes :is_deleted, type: "boolean"
+      indexes :audit do
+        indexes :created_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :created_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+
+        indexes :last_updated_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :last_updated_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+
+        indexes :deleted_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :deleted_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+      end
+
+      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
+
+      indexes :project do
+        indexes :id, type: "string"
+        indexes :name, type: "string"
+      end
+
+      indexes :ancestors do
+        indexes :kind
+        indexes :id
+        indexes :name
       end
 
       indexes :creator do
