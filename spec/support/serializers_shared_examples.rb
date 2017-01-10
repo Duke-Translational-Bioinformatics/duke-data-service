@@ -347,20 +347,22 @@ end
 shared_examples 'a serialized Folder' do |resource_sym, with_parent: false|
   let (:resource) { send(resource_sym) }
   let(:is_logically_deleted) { true }
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'parent' => parent,
+    'name' => resource.name,
+    'is_deleted' => resource.is_deleted
+  }}
+
   if with_parent
-    let(:expected_attributes) {{
-      'id' => resource.id,
-      'parent' => { 'kind' => resource.parent.kind,
-                    'id' => resource.parent.id
-                  },
-      'name' => resource.name,
-      'is_deleted' => resource.is_deleted
+    let(:parent) {{
+      'kind' => resource.parent.kind,
+      'id' => resource.parent.id
     }}
   else
-    let(:expected_attributes) {{
-      'parent' => { 'kind' => resource.project.kind,
-                    'id' => resource.project.id
-                  }
+    let(:parent) {{
+      'kind' => resource.project.kind,
+      'id' => resource.project.id
     }}
   end
 
