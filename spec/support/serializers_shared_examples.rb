@@ -343,3 +343,31 @@ shared_examples 'a serialized DataFile' do |resource_sym, with_label: false|
     it_behaves_like 'a serializer with a serialized audit'
   end
 end
+
+shared_examples 'a serialized Folder' do |resource_sym, with_parent: false|
+  let (:resource) { send(resource_sym) }
+  let(:is_logically_deleted) { true }
+  if with_parent
+    let(:expected_attributes) {{
+      'id' => resource.id,
+      'parent' => { 'kind' => resource.parent.kind,
+                    'id' => resource.parent.id
+                  },
+      'name' => resource.name,
+      'is_deleted' => resource.is_deleted
+    }}
+  else
+    let(:expected_attributes) {{
+      'parent' => { 'kind' => resource.project.kind,
+                    'id' => resource.project.id
+                  }
+    }}
+  end
+
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
+  it_behaves_like 'a has_many association with', :ancestors, AncestorSerializer
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
+  end
+end
