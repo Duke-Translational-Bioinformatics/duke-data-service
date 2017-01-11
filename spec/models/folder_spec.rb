@@ -179,12 +179,17 @@ RSpec.describe Folder, type: :model do
   describe 'elasticsearch' do
     let(:search_serializer) { Search::FolderSerializer }
     let(:property_mappings) {{
+      kind: "string",
       id: "string",
       name: "string",
+      label: "string",
+      parent: "object",
+      audit: "object",
+      project: "object",
+      ancestors: "object",
       is_deleted: "boolean",
       created_at: "date",
       updated_at: "date",
-      parent: "object",
       creator: "object"
     }}
 
@@ -210,6 +215,75 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:creator][:properties][:first_name][:type]).to eq "string"
         expect(subject[:folder][:properties][:creator][:properties]).to have_key :last_name
         expect(subject[:folder][:properties][:creator][:properties][:last_name][:type]).to eq "string"
+
+        #project
+        expect(subject[:folder][:properties][:project]).to have_key :properties
+        expect(subject[:folder][:properties][:project][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:project][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:project][:properties][:name][:type]).to eq "string"
+
+        #audit
+        expect(subject[:folder][:properties][:audit]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :created_on
+        expect(subject[:folder][:properties][:audit][:properties][:created_on][:type]).to eq "date"
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :created_by
+        expect(subject[:folder][:properties][:audit][:properties][:created_by]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :username
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :full_name
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :agent
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :last_updated_on
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_on][:type]).to eq "date"
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :last_updated_by
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :username
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :full_name
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :agent
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :deleted_on
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_on][:type]).to eq "date"
+        expect(subject[:folder][:properties][:audit][:properties]).to have_key :deleted_by
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :username
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :full_name
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :agent
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent]).to have_key :properties
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        #ancestors
+        expect(subject[:folder][:properties][:ancestors]).to have_key :properties
+        expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :kind
+        expect(subject[:folder][:properties][:ancestors][:properties][:kind][:type]).to eq "string"
+        expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :id
+        expect(subject[:folder][:properties][:ancestors][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :name
+        expect(subject[:folder][:properties][:ancestors][:properties][:name][:type]).to eq "string"
       }
     end
   end

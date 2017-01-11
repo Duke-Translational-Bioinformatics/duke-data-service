@@ -72,25 +72,92 @@ class DataFile < Container
 
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
+      indexes :kind
       indexes :id
+      indexes :label
+      
+      indexes :parent do
+        indexes :kind
+        indexes :id
+      end
+
       indexes :name
+      indexes :audit do
+        indexes :created_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :created_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+
+        indexes :last_updated_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :last_updated_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+
+        indexes :deleted_on, type: "date", format: "strict_date_optional_time||epoch_millis"
+        indexes :deleted_by do
+          indexes :id
+          indexes :username
+          indexes :full_name
+          indexes :agent do
+            indexes :id
+            indexes :name
+          end
+        end
+      end
+
       indexes :is_deleted, type: "boolean"
       indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
       indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
       indexes :label
+
       indexes :tags do
         indexes :label, type: "string", fields: {
           raw: {type: "string", index: "not_analyzed"}
         }
       end
+
+      indexes :current_version do
+        indexes :id
+        indexes :version
+        indexes :label
+
+        indexes :upload do
+          indexes :id
+          indexes :size
+          indexes :storage_provider do
+            indexes :id
+            indexes :name
+            indexes :description
+          end
+
+          indexes :hashes do
+            indexes :algorithm
+            indexes :value
+          end
+        end
+      end
+
       indexes :project do
         indexes :id, type: "string"
         indexes :name, type: "string"
       end
 
-      indexes :parent do
-        indexes :id, type: "string"
-        indexes :name, type: "string"
+      indexes :ancestors do
+        indexes :kind
+        indexes :id
+        indexes :name
       end
 
       indexes :creator do
