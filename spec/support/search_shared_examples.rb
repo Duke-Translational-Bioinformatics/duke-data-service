@@ -111,7 +111,9 @@ shared_examples 'an Elasticsearch index mapping model' do |expected_property_map
     expect(subject[described_class.name.underscore.to_sym]).to have_key :properties
     expected_property_mappings.keys.each do |expected_property|
       expect(subject[described_class.name.underscore.to_sym][:properties]).to have_key expected_property
-      expect(subject[described_class.name.underscore.to_sym][:properties][expected_property][:type]).to eq expected_property_mappings[expected_property]
+      expected_property_mappings[expected_property].keys.each do |expected_property_aspect|
+        expect(subject[described_class.name.underscore.to_sym][:properties][expected_property][expected_property_aspect]).to eq expected_property_mappings[expected_property][expected_property_aspect]
+      end
     end
   }
 end
