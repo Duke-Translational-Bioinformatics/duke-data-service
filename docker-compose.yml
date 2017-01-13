@@ -33,6 +33,6 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:2.2.2
+    image: elasticsearch:2.4
     ports:
       - '9200:9200'
