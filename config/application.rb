@@ -32,12 +32,22 @@ module DukeDataService
     cors_origins = '*'
     cors_origins = ENV['CORS_ORIGINS'].split(',') if ENV['CORS_ORIGINS']
 
+    pagination_headers = [
+      'X-Total',
+      'X-Total-Pages',
+      'X-Page',
+      'X-Per-Page',
+      'X-Next-Page',
+      'X-Prev-Page'
+    ]
+
     config.middleware.insert_before 0, Rack::Cors, :debug => true, :logger => (-> { Rails.logger }) do
       allow do
         origins cors_origins
 
         resource '*',
           :headers => :any,
+          :expose => pagination_headers,
           :methods => [:get, :post, :delete, :put, :options, :head],
           :max_age => 0
       end
