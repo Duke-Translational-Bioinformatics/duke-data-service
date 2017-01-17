@@ -38,12 +38,12 @@ class Folder < Container
 
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
-      indexes :kind
-      indexes :id
+      indexes :kind, type: "string", index: "not_analyzed"
+      indexes :id, type: "string", index: "not_analyzed"
       indexes :label
-      
+
       indexes :parent do
-        indexes :id, type: "string"
+        indexes :id, type: "string", index: "not_analyzed"
         indexes :name, type: "string"
       end
 
@@ -52,33 +52,33 @@ class Folder < Container
       indexes :audit do
         indexes :created_on, type: "date", format: "strict_date_optional_time||epoch_millis"
         indexes :created_by do
-          indexes :id
+          indexes :id, type: "string", index: "not_analyzed"
           indexes :username
           indexes :full_name
           indexes :agent do
-            indexes :id
+            indexes :id, type: "string", index: "not_analyzed"
             indexes :name
           end
         end
 
         indexes :last_updated_on, type: "date", format: "strict_date_optional_time||epoch_millis"
         indexes :last_updated_by do
-          indexes :id
+          indexes :id, type: "string", index: "not_analyzed"
           indexes :username
           indexes :full_name
           indexes :agent do
-            indexes :id
+            indexes :id, type: "string", index: "not_analyzed"
             indexes :name
           end
         end
 
         indexes :deleted_on, type: "date", format: "strict_date_optional_time||epoch_millis"
         indexes :deleted_by do
-          indexes :id
+          indexes :id, type: "string", index: "not_analyzed"
           indexes :username
           indexes :full_name
           indexes :agent do
-            indexes :id
+            indexes :id, type: "string", index: "not_analyzed"
             indexes :name
           end
         end
@@ -88,18 +88,18 @@ class Folder < Container
       indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
 
       indexes :project do
-        indexes :id, type: "string"
+        indexes :id, type: "string", index: "not_analyzed"
         indexes :name, type: "string"
       end
 
       indexes :ancestors do
-        indexes :kind
-        indexes :id
+        indexes :kind, type: "string", index: "not_analyzed"
+        indexes :id, type: "string", index: "not_analyzed"
         indexes :name
       end
 
       indexes :creator do
-        indexes :id, type: "string"
+        indexes :id, type: "string", index: "not_analyzed"
         indexes :username, type: "string"
         indexes :first_name, type: "string"
         indexes :last_name, type: "string"

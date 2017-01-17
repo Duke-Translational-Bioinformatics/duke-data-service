@@ -179,18 +179,18 @@ RSpec.describe Folder, type: :model do
   describe 'elasticsearch' do
     let(:search_serializer) { Search::FolderSerializer }
     let(:property_mappings) {{
-      kind: "string",
-      id: "string",
-      name: "string",
-      label: "string",
-      parent: "object",
-      audit: "object",
-      project: "object",
-      ancestors: "object",
-      is_deleted: "boolean",
-      created_at: "date",
-      updated_at: "date",
-      creator: "object"
+      kind: {type: "string", index: "not_analyzed"},
+      id: {type: "string", index: "not_analyzed"},
+      name: {type: "string"},
+      label: {type: "string"},
+      parent: {type: "object"},
+      audit: {type: "object"},
+      project: {type: "object"},
+      ancestors: {type: "object"},
+      is_deleted: {type: "boolean"},
+      created_at: {type: "date"},
+      updated_at: {type: "date"},
+      creator: {type: "object"}
     }}
 
     it_behaves_like 'an Elasticsearch::Model'
@@ -200,6 +200,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:parent]).to have_key :properties
         expect(subject[:folder][:properties][:parent][:properties]).to have_key :id
         expect(subject[:folder][:properties][:parent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:parent][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:parent][:properties]).to have_key :name
         expect(subject[:folder][:properties][:parent][:properties][:name][:type]).to eq "string"
 
@@ -207,6 +208,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:creator]).to have_key :properties
         expect(subject[:folder][:properties][:creator][:properties]).to have_key :id
         expect(subject[:folder][:properties][:creator][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:creator][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:creator][:properties]).to have_key :username
         expect(subject[:folder][:properties][:creator][:properties][:username][:type]).to eq "string"
         expect(subject[:folder][:properties][:creator][:properties]).to have_key :email
@@ -220,6 +222,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:project]).to have_key :properties
         expect(subject[:folder][:properties][:project][:properties]).to have_key :id
         expect(subject[:folder][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:project][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:project][:properties]).to have_key :name
         expect(subject[:folder][:properties][:project][:properties][:name][:type]).to eq "string"
 
@@ -231,6 +234,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:created_by]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :username
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:username][:type]).to eq "string"
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties]).to have_key :full_name
@@ -239,6 +243,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :name
         expect(subject[:folder][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:name][:type]).to eq "string"
 
@@ -248,6 +253,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :username
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:username][:type]).to eq "string"
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :full_name
@@ -256,6 +262,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :name
         expect(subject[:folder][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:name][:type]).to eq "string"
 
@@ -265,6 +272,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :username
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:username][:type]).to eq "string"
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :full_name
@@ -273,6 +281,7 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent]).to have_key :properties
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :id
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :name
         expect(subject[:folder][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:name][:type]).to eq "string"
 
@@ -280,8 +289,10 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:ancestors]).to have_key :properties
         expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :kind
         expect(subject[:folder][:properties][:ancestors][:properties][:kind][:type]).to eq "string"
+        expect(subject[:folder][:properties][:ancestors][:properties][:kind][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :id
         expect(subject[:folder][:properties][:ancestors][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:ancestors][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:folder][:properties][:ancestors][:properties]).to have_key :name
         expect(subject[:folder][:properties][:ancestors][:properties][:name][:type]).to eq "string"
       }
