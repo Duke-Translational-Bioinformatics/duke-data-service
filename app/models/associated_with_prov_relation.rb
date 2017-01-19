@@ -2,6 +2,6 @@
 
 class AssociatedWithProvRelation < ProvRelation
   def kind
-    'dds-was-associated-with'
+    'dds-relation-was-associated-with'
   end
 end

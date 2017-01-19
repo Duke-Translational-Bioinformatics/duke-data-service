@@ -6,7 +6,7 @@ RSpec.describe AttributedToUserProvRelation, type: :model do
   let(:expected_relationship_type) { 'was-attributed-to' }
 
   it_behaves_like 'a ProvRelation' do
-    let(:expected_kind) { 'dds-was-attributed-to' }
+    let(:expected_kind) { 'dds-relation-was-attributed-to' }
     let(:serialized_kind) { true }
     let(:kinded_class) { AttributedToProvRelation }
   end
