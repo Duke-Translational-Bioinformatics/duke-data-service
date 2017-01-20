@@ -1,11 +1,12 @@
-class DataFileSearchDocumentSerializer < ActiveModel::Serializer
-  attributes :id, :name, :is_deleted, :created_at, :updated_at, :label, :meta
+class Search::DataFileSerializer < DataFileSerializer
+  attributes :kind, :id, :parent, :name, :audit, :is_deleted,
+             :created_at,
+             :updated_at,
+             :label,
+             :meta
 
-  has_many :tags, serializer: TagSearchDocumentSerializer
-
-  def is_deleted
-    object.is_deleted?
-  end
+  has_many :tags, serializer: Search::TagSummarySerializer
+  has_one :creator, serializer: Search::UserSummarySerializer
 
   def meta
     object.meta_templates.each_with_object({}) do |meta_template, metadata|

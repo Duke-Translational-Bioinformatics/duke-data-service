@@ -1,9 +1,8 @@
-class FolderSearchDocumentSerializer < ActiveModel::Serializer
-  attributes :id, :name, :is_deleted, :created_at, :updated_at, :label, :meta
+class Search::FolderSerializer < FolderSerializer
+  attributes :kind, :id, :parent, :name, :is_deleted, :audit,
+  :created_at, :updated_at, :label, :meta
 
-  def is_deleted
-    object.is_deleted?
-  end
+  has_one :creator, serializer: Search::UserSummarySerializer
 
   def meta
     object.meta_templates.each_with_object({}) do |meta_template, metadata|

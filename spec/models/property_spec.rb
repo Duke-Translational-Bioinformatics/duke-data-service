@@ -40,7 +40,7 @@ RSpec.describe Property, type: :model do
     it { is_expected.to validate_presence_of(:data_type) }
 
     it { is_expected.to validate_length_of(:key).is_at_most(60) }
-    it { is_expected.to validate_uniqueness_of(:key).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:key).scoped_to(:template_id).case_insensitive }
     it { is_expected.to allow_values(*good_keys).for(:key) }
     it { is_expected.not_to allow_values(*bad_keys).for(:key) }
     it { is_expected.to validate_inclusion_of(:data_type).in_array(elastic_core_data_types) }

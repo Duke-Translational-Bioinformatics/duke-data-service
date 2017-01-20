@@ -33,7 +33,8 @@ module DDS
           [201, 'Successfully Created'],
           [400, 'Validation error'],
           [401, 'Unauthorized'],
-          [404, 'Object or template does not exist']
+          [404, 'Object or template does not exist'],
+          [409, 'Template instance already exists for the DDS object']
         ]
       end
       params do
@@ -64,7 +65,15 @@ module DDS
         if meta_template.save
           meta_template
         else
-          validation_error!(meta_template)
+          if meta_template.errors.added? :template, :taken
+            error!({
+              error: '409',
+              reason: 'unique conflict',
+              suggestion: 'Resubmit as an update request'
+            }, 409)
+          else
+            validation_error!(meta_template)
+          end
         end
       end
 
@@ -93,9 +102,9 @@ module DDS
         named 'update object metadata'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden'],
-          [400, 'Validation Error'],
           [404, 'Object or Template does not exist']
         ]
       end

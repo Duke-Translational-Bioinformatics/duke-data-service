@@ -77,7 +77,7 @@ module DDS
           )
           authorize tag, :create?
           if taggable_object.tags << tag
-            new_tags << tag 
+            new_tags << tag
           end
         end
         new_tags
@@ -129,7 +129,6 @@ module DDS
         detail 'Deletes the tag'
         named 'delete tag'
         failure [
-          [200, "This will never happen"],
           [204, 'Successfully Deleted'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
           [404, 'Tag does not exist']

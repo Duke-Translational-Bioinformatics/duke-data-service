@@ -111,3 +111,22 @@ shared_examples 'a logically deleted model' do
     expect(described_class.column_defaults['is_deleted']).not_to be_nil
   end
 end
+
+shared_context 'with concurrent calls' do |object_list:, method:|
+  self.use_transactional_fixtures = false
+  let(:objects) { send(object_list) }
+  after do
+    ActiveRecord::Base.subclasses.each(&:delete_all)
+  end
+  before do
+    expect(ActiveRecord::Base.connection.pool.size).to be > 4
+
+    threads = objects.collect do |object|
+      Thread.new do
+        expect{object.send(method)}.not_to raise_error
+      end
+    end
+
+    threads.each(&:join)
+  end
+end

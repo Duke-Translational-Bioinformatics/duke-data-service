@@ -316,3 +316,60 @@ shared_examples 'a ProvRelationSerializer' do |from:, to:|
     it_behaves_like 'a serializer with a serialized audit'
   end
 end
+
+shared_examples 'a serialized DataFile' do |resource_sym, with_label: false|
+  let(:resource) { send(resource_sym) }
+  let(:is_logically_deleted) { true }
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'parent' => { 'kind' => resource.parent.kind,
+                  'id' => resource.parent_id
+                },
+    'name' => resource.name,
+    'is_deleted' => resource.is_deleted
+  }}
+
+  it_behaves_like 'a has_one association with', :current_file_version, FileVersionPreviewSerializer, root: :current_version
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
+  it_behaves_like 'a has_many association with', :ancestors, AncestorSerializer
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
+    it { is_expected.not_to have_key('upload') }
+    unless with_label
+      it { is_expected.not_to have_key('label') }
+    end
+
+    it_behaves_like 'a serializer with a serialized audit'
+  end
+end
+
+shared_examples 'a serialized Folder' do |resource_sym, with_parent: false|
+  let (:resource) { send(resource_sym) }
+  let(:is_logically_deleted) { true }
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'parent' => parent,
+    'name' => resource.name,
+    'is_deleted' => resource.is_deleted
+  }}
+
+  if with_parent
+    let(:parent) {{
+      'kind' => resource.parent.kind,
+      'id' => resource.parent.id
+    }}
+  else
+    let(:parent) {{
+      'kind' => resource.project.kind,
+      'id' => resource.project.id
+    }}
+  end
+
+  it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer
+  it_behaves_like 'a has_many association with', :ancestors, AncestorSerializer
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
+  end
+end
