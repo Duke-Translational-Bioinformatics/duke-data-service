@@ -252,7 +252,7 @@ describe DDS::V1::SearchAPI do
       let(:url) { "/api/v1/search" }
       subject { post(url, payload.to_json, headers) }
       let(:called_action) { 'POST' }
-      let(:included_kinds) { ['dds-file'] }
+      let(:include_kinds) { ['dds-file'] }
       let(:elastic_query) {
         {
           query: {
@@ -276,7 +276,7 @@ describe DDS::V1::SearchAPI do
 
       let(:payload) {
         {
-          included_kinds: included_kinds,
+          include_kinds: include_kinds,
           search_query: elastic_query
         }
       }
@@ -300,13 +300,13 @@ describe DDS::V1::SearchAPI do
 
       context 'single included kind' do
         context 'invalid kind' do
-          let(:included_kinds) { ['dds-not-a-kind'] }
+          let(:include_kinds) { ['dds-not-a-kind'] }
           let(:resource_kind) { 'dds-not-a-kind' }
           it_behaves_like 'a kinded resource'
         end
 
         context 'unindexed kind' do
-          let(:included_kinds) { ['dds-project'] }
+          let(:include_kinds) { ['dds-project'] }
           let(:resource_class) { Project }
           it_behaves_like 'an indexed resource'
         end
@@ -328,7 +328,7 @@ describe DDS::V1::SearchAPI do
       end
 
       context 'multiple included kinds' do
-        let(:included_kinds) { ['dds-folder','dds-file'] }
+        let(:include_kinds) { ['dds-folder','dds-file'] }
         let(:expected_response_status) { 201 }
 
         it 'should return a list of resources' do
@@ -341,13 +341,13 @@ describe DDS::V1::SearchAPI do
         end
 
         context 'invalid kind' do
-          let(:included_kinds) { ['dds-not-a-kind', 'dds-folder'] }
+          let(:include_kinds) { ['dds-not-a-kind', 'dds-folder'] }
           let(:resource_kind) { 'dds-not-a-kind' }
           it_behaves_like 'a kinded resource'
         end
 
         context 'unindexed kind' do
-          let(:included_kinds) { ['dds-project', 'dds-folder'] }
+          let(:include_kinds) { ['dds-project', 'dds-folder'] }
           let(:resource_class) { Project }
           it_behaves_like 'an indexed resource'
         end

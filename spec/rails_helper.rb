@@ -66,7 +66,8 @@ VCR.configure do |c|
   c.hook_into :webmock
   c.configure_rspec_metadata!
   c.ignore_hosts URI(Rails.application.config.neo4j.session_path).host,
-                 ENV['BONSAI_URL'].split(':').first
+                 ENV['BONSAI_URL'].split(':').first,
+                 URI(ENV['OPENID_URL']).host
   c.register_request_matcher :header_keys do |request_1, request_2|
     request_1.headers.keys == request_2.headers.keys
   end

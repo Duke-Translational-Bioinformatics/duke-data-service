@@ -9,7 +9,7 @@ FactoryGirl.define do
     description { Faker::Hacker.say_something_smart }
     contexts  { (0..Faker::Number.digit.to_i).collect { Faker::Internet.slug } }
 
-    permissions { 
+    permissions {
       if without_permissions
         AuthRole.available_permissions - (without_permissions.collect {|x| x.to_s})
       else
@@ -30,6 +30,14 @@ FactoryGirl.define do
       permissions { AuthRole.available_permissions(:project) }
     end
 
+    trait :project_viewer do
+      id "project_viewer"
+      name "Project Viewer"
+      description "Can only view project and file meta-data"
+      contexts %w(project)
+      permissions %w(view_project)
+    end
+    
     trait :random_id do
       id { "#{Faker::Internet.domain_word}_#{rand(10**3)}" }
     end

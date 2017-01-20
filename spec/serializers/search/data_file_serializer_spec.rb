@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
+RSpec.describe Search::DataFileSerializer, type: :serializer do
   let(:resource) { FactoryGirl.create(:data_file) }
-  let(:expected_file_attributes) {{
+  let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name,
     'is_deleted' => resource.is_deleted?,
@@ -10,10 +10,14 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     'updated_at' => resource.updated_at.as_json,
     'label' => resource.label
   }}
-  it_behaves_like 'a has_many association with', :tags, TagSearchDocumentSerializer
+
+  it_behaves_like 'a has_many association with', :tags, Search::TagSummarySerializer
+  it_behaves_like 'a has_one association with', :project, Search::ProjectSummarySerializer
+  it_behaves_like 'a has_one association with', :parent, Search::FolderSummarySerializer
+  it_behaves_like 'a has_one association with', :creator, Search::UserSummarySerializer
 
   it_behaves_like 'a json serializer' do
-    it { is_expected.to include(expected_file_attributes) }
+    it { is_expected.to include(expected_attributes) }
   end
 
   context 'with tags' do
@@ -21,7 +25,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     let(:tag) { FactoryGirl.create(:tag, taggable: resource) }
 
     it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_file_attributes) }
+      it { is_expected.to include(expected_attributes) }
       it_behaves_like 'a tagged document'
     end
   end
@@ -33,7 +37,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     include_context 'elasticsearch prep', [:meta_template, :property, :meta_property], [:resource]
 
     it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_file_attributes) }
+      it { is_expected.to include(expected_attributes) }
       it_behaves_like 'a metadata annotated document'
     end
   end
@@ -48,7 +52,7 @@ RSpec.describe DataFileSearchDocumentSerializer, type: :serializer do
     include_context 'elasticsearch prep', [:tag, :meta_template, :property, :meta_property], [:resource]
 
     it_behaves_like 'a json serializer' do
-      it { is_expected.to include(expected_file_attributes) }
+      it { is_expected.to include(expected_attributes) }
       it_behaves_like 'a tagged document'
       it_behaves_like 'a metadata annotated document'
     end
