@@ -1,4 +1,4 @@
-class AttributedToUserProvRelationPolicy < ApplicationPolicy
+class AttributedToProvRelationPolicy < ApplicationPolicy
   def index?
     false
   end
@@ -12,9 +12,7 @@ class AttributedToUserProvRelationPolicy < ApplicationPolicy
   end
 
   def create?
-    system_permission ||
-    (project_permission(:view_project) &&
-     record.relatable_to.id == user.id)
+    permission :view_project
   end
 
   def destroy?
@@ -28,7 +26,7 @@ class AttributedToUserProvRelationPolicy < ApplicationPolicy
       else
         prov_relation_scope = scope.where(creator: user)
         prov_relation_scope = prov_relation_scope.union(
-          AttributedToUserProvRelation.where(
+          AttributedToProvRelation.where(
             relatable_from_id: policy_scope(FileVersion.all)
         ))
         prov_relation_scope

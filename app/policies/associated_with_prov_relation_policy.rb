@@ -1,4 +1,4 @@
-class AssociatedWithSoftwareAgentProvRelationPolicy < ApplicationPolicy
+class AssociatedWithProvRelationPolicy < ApplicationPolicy
   def index?
     false
   end
@@ -26,7 +26,7 @@ class AssociatedWithSoftwareAgentProvRelationPolicy < ApplicationPolicy
       else
         prov_relation_scope = scope.where(creator: user)
         prov_relation_scope = prov_relation_scope.union(
-          AssociatedWithSoftwareAgentProvRelation.where(
+          AssociatedWithProvRelation.where(
             relatable_to_id: Activity.where(creator: user)
         ))
         prov_relation_scope
