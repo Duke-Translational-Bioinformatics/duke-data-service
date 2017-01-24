@@ -1,0 +1,2 @@
+class AttributedToUserProvRelationPolicy < AttributedToProvRelationPolicy
+end

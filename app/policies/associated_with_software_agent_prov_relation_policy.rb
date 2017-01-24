@@ -1,0 +1,2 @@
+class AssociatedWithSoftwareAgentProvRelationPolicy < AssociatedWithProvRelationPolicy
+end

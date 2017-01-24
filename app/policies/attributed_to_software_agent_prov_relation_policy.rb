@@ -1,0 +1,2 @@
+class AttributedToSoftwareAgentProvRelationPolicy < AttributedToProvRelationPolicy
+end

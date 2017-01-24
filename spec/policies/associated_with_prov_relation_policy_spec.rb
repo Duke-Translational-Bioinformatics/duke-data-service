@@ -13,6 +13,20 @@ describe AssociatedWithProvRelationPolicy do
     let(:users_sa) { FactoryGirl.create(:software_agent, creator: user) }
     let(:other_users_sa) { FactoryGirl.create(:software_agent, creator: other_user) }
 
+    context 'inheritance' do
+      let(:prov_relation) { FactoryGirl.create(:associated_with_software_agent_prov_relation,
+        relatable_from: users_sa,
+        creator: user,
+        relatable_to: users_activity)
+      }
+      subject { Pundit.policy(user, prov_relation) }
+
+      it {
+        is_expected.to be
+        is_expected.to be_a AssociatedWithProvRelationPolicy
+      }
+    end
+
     context 'destroy' do
       let(:prov_relation) { FactoryGirl.create(:associated_with_software_agent_prov_relation,
         relatable_from: users_sa,
@@ -70,6 +84,21 @@ describe AssociatedWithProvRelationPolicy do
   end
 
   describe 'AssociatedWithUserProvRelationPolicy' do
+
+    context 'inheritance' do
+      let(:prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation,
+        relatable_from: user,
+        creator: user,
+        relatable_to: users_activity)
+      }
+      subject { Pundit.policy(user, prov_relation) }
+
+      it {
+        is_expected.to be
+        is_expected.to be_a AssociatedWithProvRelationPolicy
+      }
+    end
+
     context 'destroy' do
       let(:prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation,
         relatable_from: user,
