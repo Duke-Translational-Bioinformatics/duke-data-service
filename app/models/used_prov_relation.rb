@@ -24,4 +24,8 @@ class UsedProvRelation < ProvRelation
       errors.add(:relatable_from_id, "UsedProvRelation cannot be made from an Activity that has a GeneratedByActivityProvRelation to the used FileVersion")
     end
   end
+
+  def kind
+    'dds-relation-used'
+  end
 end

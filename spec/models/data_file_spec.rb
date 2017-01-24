@@ -13,7 +13,9 @@ RSpec.describe DataFile, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
-    let!(:kind_name) { 'file' }
+    let(:expected_kind) { 'dds-file' }
+    let(:kinded_class) { DataFile }
+    let(:serialized_kind) { true }
   end
   it_behaves_like 'a logically deleted model'
 
