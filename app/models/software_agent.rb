@@ -19,4 +19,8 @@ class SoftwareAgent < ActiveRecord::Base
   def graph_node
     super('Agent')
   end
+
+  def kind
+    super('software-agent')
+  end
 end

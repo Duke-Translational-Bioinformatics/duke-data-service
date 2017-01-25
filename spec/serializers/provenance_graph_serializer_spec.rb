@@ -52,7 +52,7 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
       expected_object_relationship_syms: [:activity_used_focus]
   end
 
-  context 'WasGeneratedByProvenanceGraph' do
+  context 'OriginProvenanceGraph' do
     # (fv1ga)-[generated]->(fv1)
     let!(:fv1) { FactoryGirl.create(:file_version, label: "FV1") }
     let!(:fv1ga) { FactoryGirl.create(:activity, name: "FV1GA") }
@@ -72,7 +72,7 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
 
     let!(:file_versions) { [ {id: fv1.id} ] }
     let(:resource) {
-      WasGeneratedByProvenanceGraph.new(
+      OriginProvenanceGraph.new(
         file_versions: file_versions,
         policy_scope: policy_scope
       )

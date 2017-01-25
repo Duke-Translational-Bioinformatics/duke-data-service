@@ -45,10 +45,10 @@ module DDS
           requires :id, type: String, desc: 'The unique file version id.'
         end
       end
-      post '/search/provenance/was_generated_by', root: 'graph', serializer: ProvenanceGraphSerializer do
+      post '/search/provenance/origin', root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_params = declared(params, include_missing: false)
-        WasGeneratedByProvenanceGraph.new(
+        OriginProvenanceGraph.new(
           file_versions: prov_params[:file_versions],
           policy_scope: method(:policy_scope))
       end

@@ -1,5 +1,11 @@
 version: '2'
 services:
+  localdev:
+    #make sure image matches what the root Dockerfile is FROM
+    image: ruby:2.2.2
+    command: ['echo','setting up localdev']
+    volumes:
+      - .:/var/www/app
   server:
     build: .
     env_file:
@@ -10,8 +16,8 @@ services:
       - elastic.client.env
     ports:
       - 3001:3000
-    volumes:
-      - .:/var/www/app
+    volumes_from:
+      - localdev
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
@@ -27,6 +33,6 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:2.2.2
+    image: elasticsearch:2.4
     ports:
       - '9200:9200'

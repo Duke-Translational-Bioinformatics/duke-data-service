@@ -5,7 +5,11 @@ RSpec.describe UsedProvRelation, type: :model do
   let(:resource_serializer) { UsedProvRelationSerializer }
   let(:expected_relationship_type) { 'used' }
 
-  it_behaves_like 'a ProvRelation'
+  it_behaves_like 'a ProvRelation' do
+    let(:expected_kind) { 'dds-relation-used' }
+    let(:serialized_kind) { true }
+    let(:kinded_class) { UsedProvRelation }
+  end
 
   describe 'validations' do
     it { is_expected.to allow_value('Activity').for(:relatable_from_type) }
