@@ -460,6 +460,7 @@ end
 shared_examples 'an authentication_service_serializer serializable resource' do
   let(:expected_attributes) {{
     'id' => resource.id,
+    'service_id' => resource.service_id,
     'name' => resource.name,
     'login_initiation_url' => resource.login_initiation_url,
     'is_deprecated' => resource.is_deprecated,

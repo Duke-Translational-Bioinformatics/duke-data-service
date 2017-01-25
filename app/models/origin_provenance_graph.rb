@@ -1,4 +1,4 @@
-class WasGeneratedByProvenanceGraph < ProvenanceGraph
+class OriginProvenanceGraph < ProvenanceGraph
   #pass a method with ProvenanceGraph.new(focus, policy_scope: method(:method_name))
   def initialize(file_versions:, policy_scope:)
     super(policy_scope)

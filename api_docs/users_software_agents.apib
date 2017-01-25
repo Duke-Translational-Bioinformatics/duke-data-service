@@ -538,10 +538,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
                         "email": "mrgardner01@duke.edu",
                         "auth_provider": {
                             "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
-                            "name": "duke",
-                            "affiliate": {
-                                "uid": "mrgardner01"
-                            }
+                            "name": "duke"
                         }
                     }
                 ]
@@ -562,21 +559,15 @@ Get a list of affiliates (potential users), for a supported authentication provi
 + Response 200 (application/json)
 
         {
-            "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-            "username": "mrgardner01",
+            "uid": "mrgardner01",
             "first_name": "Matthew",
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
             "email": "mrgardner01@duke.edu",
             "auth_provider": {
                 "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
-                "name": "duke",
-                "affiliate": {
-                    "uid": "mrgardner01"
-                }
-            },
-            "last_login_on": "2015-01-01T12:00:00Z",
-            "audit": { }
+                "name": "duke"
+            }
         }
 
 ### NOT_IMPL_NEW Create user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]

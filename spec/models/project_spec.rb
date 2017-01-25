@@ -4,7 +4,11 @@ RSpec.describe Project, type: :model do
   subject { FactoryGirl.create(:project) }
 
   it_behaves_like 'an audited model'
-  it_behaves_like 'a kind'
+  it_behaves_like 'a kind' do
+    let(:expected_kind) { 'dds-project' }
+    let(:kinded_class) { Project }
+    let(:serialized_kind) { true }
+  end
   it_behaves_like 'a logically deleted model'
 
   describe 'associations' do

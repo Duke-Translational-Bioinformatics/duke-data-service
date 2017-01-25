@@ -15,6 +15,12 @@ class MetaTemplate < ActiveRecord::Base
       !templatable_classes.include?(value.class)
   end
 
+  before_validation :lock_it_down
+
+  def lock_it_down
+    template.lock! if template
+  end
+
   def project_permissions
     templatable.project_permissions
   end

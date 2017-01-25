@@ -8,6 +8,8 @@ do
   else
     target=`echo ${apifile} | sed 's/apib/html/'`
   fi
+  echo "validating ${apifile}"
+  api-blueprint-validator api_docs/${apifile}
   echo "generating ${target}"
   # add html hack to provide a quick link back to the API summary (index) page
   aglio -i api_docs/${apifile} -o - | \

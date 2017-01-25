@@ -11,8 +11,11 @@ RSpec.describe FileVersion, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
-    let!(:kind_name) { 'file-version' }
+    let(:expected_kind) { 'dds-file-version' }
+    let(:kinded_class) { FileVersion }
+    let(:serialized_kind) { true }
   end
+
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
 
