@@ -83,7 +83,7 @@ services:
     volumes_from:
       - apiary
     entrypoint: ['api-blueprint-validator']
-    command: apiary.apib
+    command: api_docs/apiary.apib
   genapiary:
     image: dukedataservice_apiary
     volumes_from:
