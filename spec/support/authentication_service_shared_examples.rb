@@ -472,3 +472,14 @@ shared_examples 'an authentication_service_serializer serializable resource' do
     it { is_expected.to include(expected_attributes) }
   end
 end
+
+shared_examples 'an authentication_service_preview_serializer serializable resource' do
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'name' => resource.name
+  }}
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
+  end
+end
