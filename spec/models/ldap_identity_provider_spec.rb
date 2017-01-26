@@ -5,15 +5,6 @@ RSpec.describe LdapIdentityProvider, type: :model do
   subject { auth_provider.identity_provider }
   let(:auth_provider) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
   let(:test_user) { FactoryGirl.build(:user) }
-  let(:expected_entry) {
-    expected_entry = Net::LDAP::Entry.new
-    expected_entry[:uid] = test_user.username
-    expected_entry[:givenName] = test_user.display_name
-    expected_entry[:sn] = test_user.last_name
-    expected_entry[:mail] = test_user.email
-    expected_entry[:displayName] = test_user.display_name
-    expected_entry
-  }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :ldap_base }
@@ -38,10 +29,8 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
 
     context 'with uid and authentication_service' do
+      include_context 'mocked ldap'
       subject { auth_provider.identity_provider.affiliate(auth_provider, test_user.username) }
-      before do
-        allow_any_instance_of(Net::LDAP).to receive(:search).and_return([expected_entry])
-      end
 
       it {
         is_expected.to be
@@ -86,14 +75,11 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'greater than 3 characters' do
+        include_context 'mocked ldap'
         subject { auth_provider.identity_provider.affiliates(
           auth_provider,
           test_user.last_name
         ) }
-
-        before do
-          allow_any_instance_of(Net::LDAP).to receive(:search).and_return([expected_entry])
-        end
 
         it {
           is_expected.to be_a Array
