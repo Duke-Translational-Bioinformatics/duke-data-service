@@ -1,0 +1,74 @@
+require 'rails_helper'
+
+RSpec.describe LdapIdentityProvider, type: :model do
+
+  subject { auth_provider.identity_provider }
+  let(:auth_provider) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+
+  describe 'validations' do
+    it { is_expected.to validate_presence_of :ldap_base }
+  end
+
+  describe 'affiliates' do
+    it { is_expected.to respond_to(:affiliates) }
+
+    it {
+      expect{
+        subject.affiliates
+      }.to raise_error(ArgumentError)
+    }
+
+    context 'full_name_contains' do
+      context 'not provided' do
+        subject { auth_provider.identity_provider.affiliates(auth_provider) }
+        it {
+          is_expected.to be_a Array
+          expect(subject.length).to eq 0
+        }
+      end
+
+      context 'less than 3 characters' do
+        subject { auth_provider.identity_provider.affiliates(
+          auth_provider,
+          'a'*2
+        ) }
+        it {
+          is_expected.to be_a Array
+          expect(subject.length).to eq 0
+        }
+      end
+
+      context 'greater than 3 characters' do
+        let(:test_user) { FactoryGirl.build(:user) }
+        subject { auth_provider.identity_provider.affiliates(
+          auth_provider,
+          test_user.last_name
+        ) }
+
+        before do
+          fooby_entry = Net::LDAP::Entry.new
+          fooby_entry[:uid] = test_user.username
+          fooby_entry[:givenName] = test_user.display_name
+          fooby_entry[:sn] = test_user.last_name
+          fooby_entry[:mail] = test_user.email
+          fooby_entry[:displayName] = test_user.display_name
+          allow_any_instance_of(Net::LDAP).to receive(:search).and_return([fooby_entry])
+        end
+
+        it {
+          is_expected.to be_a Array
+          expect(subject.length).to be > 0
+          subject.each do |response|
+            expect(response).to be_a User
+            expect(response).not_to be_persisted
+            expect(response.display_name).to eq test_user.display_name
+            user_authentication_service = response.user_authentication_services.first
+            expect(user_authentication_service).to be
+            expect(user_authentication_service).not_to be_persisted
+            expect(user_authentication_service.authentication_service_id).to eq auth_provider.id
+          end
+        }
+      end
+    end
+  end
+end
