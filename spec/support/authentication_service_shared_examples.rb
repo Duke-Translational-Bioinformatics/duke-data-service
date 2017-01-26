@@ -36,6 +36,7 @@ shared_examples 'an authentication service' do
   describe 'associations' do
     it {
       is_expected.to have_many(:user_authentication_services)
+      is_expected.to belong_to(:identity_provider)
     }
   end
 
