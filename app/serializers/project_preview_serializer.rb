@@ -1,3 +1,3 @@
 class ProjectPreviewSerializer < ActiveModel::Serializer
-  attributes :id
+  attributes :id, :name
 end

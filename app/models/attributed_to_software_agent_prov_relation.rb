@@ -1,6 +1,6 @@
 # AttributedToSoftwareAgentProvRelation is a ProvRelation through Single Table inheritance
 
-class AttributedToSoftwareAgentProvRelation < ProvRelation
+class AttributedToSoftwareAgentProvRelation < AttributedToProvRelation
   # AttributedToSoftwareAgentProvRelation requires relationship_type 'was-attributed-to'
   # which maps to a Graph::WasAttributedTo graphed relationship
   validates :relatable_from_type, inclusion: { in: %w(FileVersion),

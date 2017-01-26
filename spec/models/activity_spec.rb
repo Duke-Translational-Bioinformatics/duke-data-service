@@ -6,7 +6,12 @@ RSpec.describe Activity, type: :model do
   let(:deleted_activity) { FactoryGirl.create(:activity, :deleted) }
 
   it_behaves_like 'an audited model'
-  it_behaves_like 'a kind'
+  it_behaves_like 'a kind' do
+    let(:expected_kind) { 'dds-activity' }
+    let(:kinded_class) { Activity }
+    let(:serialized_kind) { true }
+  end
+
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
 

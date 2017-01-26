@@ -79,9 +79,9 @@ module DDS
         named 'update template property'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (template property restricted)'],
-          [400, 'Validation Error'],
           [404, 'Property Does not Exist']
         ]
       end

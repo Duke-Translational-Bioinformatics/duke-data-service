@@ -12,16 +12,35 @@ class ProjectTransfer < ActiveRecord::Base
   validates :project, presence: true
   validates :status, uniqueness: {
       scope: [:project_id],
-      case_sensitive: false,
       message: 'Pending transfer already exists'
     }, if: :pending?
+  validates_each :status, on: :update, unless: :status_was_pending? do |record, attr, value|
+    record.errors.add(attr, 'cannot be changed when not pending')
+  end
+  validates :status_comment, immutable: true, unless: :status_was_pending?
   validates :from_user, presence: true
   validates :project_transfer_users, presence: true
 
-  private
+  enum status: [:pending, :rejected, :accepted, :canceled]
 
-  def pending?
-    status && status.downcase == 'pending'
+  #callbacks
+  before_validation :reassign_permissions
+
+  def status_was_pending?
+    status_was == 'pending'
+  end
+
+  def reassign_permissions
+    if accepted?
+      project.project_permissions.destroy_all
+      project_viewer = AuthRole.find("project_viewer")
+      project_admin = AuthRole.find("project_admin")
+      project.project_permissions.build(user: from_user, auth_role: project_viewer)
+      to_users.each do |to_user|
+        project.project_permissions.build(user: to_user, auth_role: project_admin)
+      end
+      project.save
+    end
   end
 
 end

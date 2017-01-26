@@ -36,9 +36,7 @@ describe DDS::V1::ChildrenAPI do
     let(:query_params) { '' }
     let(:url) { "/api/v1/folders/#{parent_id}/children#{query_params}" }
 
-    describe 'GET' do
-      subject { get(url, nil, headers) }
-
+    it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { 1 }
         let!(:unexpected_resources) { [
@@ -46,6 +44,10 @@ describe DDS::V1::ChildrenAPI do
           deleted_folder,
           other_folder
         ] }
+      end
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { parent.children.count }
+        let(:extras) { FactoryGirl.create_list(:folder, 5, parent: parent, project: project) }
       end
 
       context 'with name_contains query parameter' do
@@ -211,15 +213,17 @@ describe DDS::V1::ChildrenAPI do
     let(:query_params) { '' }
     let(:url) { "/api/v1/projects/#{parent_id}/children#{query_params}" }
 
-    describe 'GET' do
-      subject { get(url, nil, headers) }
-
+    it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { 2 }
         let(:unexpected_resources) { [
           root_deleted_folder,
           other_folder
         ] }
+      end
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { project.children.count }
+        let(:extras) { FactoryGirl.create_list(:folder, 5, :root, project: project) }
       end
 
       context 'with name_contains query parameter' do

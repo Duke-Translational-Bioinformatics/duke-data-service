@@ -75,9 +75,9 @@ module DDS
         named 'update software agent'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (software_agent restricted)'],
-          [400, 'Validation Error'],
           [404, 'Software Agent Does not Exist']
         ]
       end
@@ -167,7 +167,7 @@ module DDS
         detail 'delete software_agent api_key'
         named 'delete software_agent api_key'
         failure [
-          [204, 'Success'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (software_agent restricted)'],
           [404, 'Software Agent Does not Exist']

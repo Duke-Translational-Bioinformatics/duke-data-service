@@ -152,6 +152,14 @@ module DDS
           }
           error!(error_body, 405)
         end
+
+        def get_auth_service(service_id = nil)
+          if service_id
+            AuthenticationService.where(service_id: service_id).take or raise InvalidAuthenticationServiceIDException.new()
+          else
+            AuthenticationService.where(is_default: true).take!
+          end
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
@@ -195,6 +203,22 @@ module DDS
         error!(error_json, 500)
       end
 
+      rescue_from InvalidAccessTokenException do
+        error!({
+          error: 401,
+          reason: 'invalid access_token',
+          suggestion: 'token not properly signed'
+        },401)
+      end
+
+      rescue_from InvalidAuthenticationServiceIDException do
+        error!({
+          error: 401,
+          reason: 'invalid access_token',
+          suggestion: 'authentication service not registered'
+        },401)
+      end
+
       mount DDS::V1::UsersAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
@@ -219,6 +243,7 @@ module DDS
       mount DDS::V1::PropertiesAPI
       mount DDS::V1::MetaTemplatesAPI
       mount DDS::V1::ProjectTransfersAPI
+      mount DDS::V1::AuthProvidersAPI
       add_swagger_documentation \
         doc_version: '0.0.2',
         hide_documentation_path: true,

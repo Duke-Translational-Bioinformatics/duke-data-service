@@ -14,4 +14,8 @@ class DerivedFromFileVersionProvRelation < ProvRelation
   def set_relationship_type
     self.relationship_type = 'was-derived-from'
   end
+
+  def kind
+    'dds-relation-was-derived-from'
+  end
 end

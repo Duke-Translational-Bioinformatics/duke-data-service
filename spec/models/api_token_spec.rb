@@ -10,7 +10,7 @@ RSpec.describe ApiToken do
   end
 
   context 'with UserAuthenticationService Authenticated User' do
-    let(:auth_service) { FactoryGirl.create(:authentication_service) }
+    let(:auth_service) { FactoryGirl.create(:duke_authentication_service) }
     let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service,
       user: user,
       authentication_service: auth_service
