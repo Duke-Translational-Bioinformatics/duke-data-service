@@ -7,6 +7,8 @@ RSpec.describe SoftwareAgent, type: :model do
   it_behaves_like 'an audited model'
 
   it_behaves_like 'a kind' do
+    let(:expected_kind) { 'dds-software-agent' }
+    let(:kinded_class) { SoftwareAgent }
     let(:serialized_kind) { false }
   end
   it_behaves_like 'a graphed node', auto_create: true do

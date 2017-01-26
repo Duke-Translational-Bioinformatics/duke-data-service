@@ -33,7 +33,7 @@ module DDS
         authenticate!
         system_params = declared(params, include_missing: false)
         user = User.find(params[:user_id])
-        permission = SystemPermission.find_by(user: user) || 
+        permission = SystemPermission.find_by(user: user) ||
           SystemPermission.new(user: user)
         permission.auth_role = AuthRole.find(system_params[:auth_role][:id])
         authorize permission, :create?
@@ -66,7 +66,7 @@ module DDS
         detail 'Deletes system permissions for a given user'
         named 'delete permissions'
         failure [
-          [200, 'Success'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [404, 'User Does not Exist']
         ]

@@ -1,6 +1,6 @@
 # AssociatedWithUserProvRelation is a ProvRelation through Single Table inheritance
 
-class AssociatedWithUserProvRelation < ProvRelation
+class AssociatedWithUserProvRelation < AssociatedWithProvRelation
   # AssociatedWithUserProvRelation requires relationship_type 'was-associated-with'
   # which maps to a Graph::WasAssociatedWith graphed relationship
   validates :relationship_type, inclusion: { in: %w(was-associated-with),

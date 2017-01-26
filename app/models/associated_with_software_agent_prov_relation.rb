@@ -1,6 +1,6 @@
 # AssociatedWithSoftwareAgentProvRelation is a ProvRelation through Single Table inheritance
 
-class AssociatedWithSoftwareAgentProvRelation < ProvRelation
+class AssociatedWithSoftwareAgentProvRelation < AssociatedWithProvRelation
   # AssociatedWithSoftwareAgentProvRelation requires relationship_type 'was-associated-with'
   # which maps to a Graph::WasAssociatedWith graphed relationship
   validates :relationship_type, inclusion: { in: %w(was-associated-with),

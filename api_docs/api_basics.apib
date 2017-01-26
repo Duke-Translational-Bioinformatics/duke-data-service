@@ -1,0 +1,160 @@
+FORMAT: 1A
+
+# API Change Log and Basics
+
+## Group << API Summary
+
+## Group API Change Log
+20-Dec-2016
+-------------
++ For serialization of `user` resource - changed the format of the composite `auth_provider` object to be consistent with format returned by *Authentication Providers* actions. *Note:* In addition to user endpoints, this impacts list/view *Provenance Relations* which contain `user` in the response when the returned relation is `wasAttributedTo` or `wasAssociatedWith`.
++ Moved `/user/api_token` to the *Current User* resource - endpoint is now `/current_user/api_token`.  In addition, modified request payload and changed HTTP verb to a `POST` for this operation.
++ Added `login_initiation_url`, `is_deprecated`, `is_default` properties to *Auth Providers* resource.
++ Changed `NOT_IMPLEMENTED_*` labels for endpoints to `NOT_IMPL_*` to improve readablility of rendered docs.
++ Changed HTTP verb from `GET` to `POST` for endpoint `/auth_providers/{id}/affiliates/{uid}/dds_user`.  Added endpoint `GET /auth_providers/{id}/affiliates/{uid}` to get a specific auth provider (i.e. Duke) affiliate.
+
+19-Dec-2016
+--------------
++ Added Home links to each of the sub-directories
++ Added links to each of the Web Portal instances (dev, ua_test and prod)
++ Added links to each of the API Explorer instances (dev, ua_test and prod)
++ Added user/get api_token endpoint documentation
+
+14-Dec-2016
+--------------
++ Changed format of overall Apiary document to incorporate links to endpoint groupings
++ Moved apiary apib files to their own folder rather than have them scattered throughout root
++ Created a bash script to loop through and then generate the apiary html files.
++ Changed all endpoints to include typical response codes (this will align more so with the swagger documentation)
+
+30-Nov-2016
+--------------
++ Fixed example request payload for *Search Objects* endpoint.
++ For *Search Provenance Origin* endpoint, removed validation of file versions query param; if file version does not exist, then no provenance nodes/relations are returned.
+
+17-Oct-2016
+--------------
++ For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/origin`; this search action now includes `wasDerivedFrom` file versions in the results.
++ For *Metadata* - changed `/templates{?name}` to `/templates{?name_contains}` - facilitates contains search vs. exact match.
++ Changed `/templates/{id}/properties{?key}` to `/templates/{id}/properties` - if we need `key` based lookup we will extend API to return the instance by `key`, not an array of 1.
++ Changed `/meta/{object_kind}/{object_id}{?meta_template_name}` to `/meta/{object_kind}/{object_id}` - if we need `template_name` based lookup we will extend API to return the instance by `template_name`, not an array of 1.
+
+23-Sep-2016
+--------------
++ Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
+
+12-Sep-2016
+--------------
++ Refactored *Metadata* actions - objects can now be annotated with metadata via bulk `POST` and `PUT` actions.
++ Added `name` query param to `GET /templates` and `key` query param to `GET /templates/{id}/properties`; these query params allow clients to lookup templates and template properties by their alternate unique key.
+
+07-Sep-2016
+--------------
++ Added endpoint `/search/provenance/was_generated_by` - allows targeted search "up" the provenance chain for a set of file versions.
++ Added rules/constraints for *Provenance Relations* actions.
+
+## Group API Basics
+
+Web Portal
+--------------
+There is a Web Portal that allows users to interact with the Web services API.  Access is currently restricted to Duke staff with a valid Duke NetID and password.  To access the Web portal, Duke staff must successfully authenticate via the Duke single sign-on process.
++ [Development](https://dev.dataservice.duke.edu/)
++ [Test](https://uatest.dataservice.duke.edu/)
++ [Production](https://dataservice.duke.edu/)
+
+Programmatic Keys
+--------------
+In an effort to promote provenance, all programmatic access to the API must utilize the concept of a software agent.  From the Web portal, an authorized user can generate secret keys for both a software agent and their user account.  In tandem, these secret keys can be used to obtain an access token from a programmatic context.  For usage details, see the actions for **Software Agents** and **Current User**.
+
+Exploring the API
+--------------
+In addition to the API usage documentation herein, users may experiment with the live API actions in a test environment via the API Explorer.
++ [Development](https://apidev.dataservice.duke.edu/apiexplorer)
++ [Test](https://apiuatest.dataservice.duke.edu/apiexplorer)
++ [Production](https://api.dataservice.duke.edu/apiexplorer)
+
+Collection Pagination
+--------------
+For actions that return a collection of resources/objects, the number of objects returned will be paginated. The number of objects returned per page, and the desired page can be controlled using the query parameters `page`, and `per_page`.  For example: `/projects?per_page=25` will return the first 25 projects, and `/projects?page=3&per_page=25` will return the third batch of 25 projects.  Collection payloads will always be returned as an array of objects; the `results` property will reference the array as follows:
++ Response
+
+        {
+            "results": [
+                { },
+                { },
+            ]
+        }
+
+To make it easy for clients to manage pagination, the following headers will always be included in the response:
+
+* X-Total: The total number of objects that would be returned by the query unpaginated
+* X-Total-Pages: The total number of pages given X-Total and X-Per-Page
+* X-Page: Current Page (passed in as query parameter)
+* X-Per-Page: per_page (passed in as query parameter)
+* X-Next-Page: Next page to be collected
+* X-Prev-Page: Previous page (will be empty on first page)
+
+Audit Object
+--------------
+Resource payloads may include a composite audit object. An example structure of that object is represented here and will be referenced by the `audit` property in resource specific payloads.
+
++ Response
+
+        "audit": {
+            "created_on": "2015-01-01T12:00:00Z",
+            "created_by": {
+                "id": "ce245d81-bae1-452b-8589-24f736ca7735",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner",
+                "software_agent": {
+                    "id": "9a4c28a2-ec18-40ed-b75c-3bf5b309715f",
+                    "name": "Hashing computation agent"
+                }
+            },
+            "last_updated_on": "2015-01-01T13:00:00Z",
+            "last_updated_by": {
+                "id": "d240ef3d-8d43-441b-be90-78f51a02e47f",
+                "username": "jturner01",
+                "full_name": "Jon Turner",
+                "software_agent": null
+            },
+            "deleted_on": null,
+            "deleted_by": null
+        }
+
+API Errors
+----------------
+We should respond with context appropriate error codes, especially for 400 class errors, using the [Standard List](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+
+* 400: no API token, validation errors
+* 401: bad API token
+* 403: user performing request which they do not have permission to perform
+* 404: user requesting resource that does not exist
+
+All error responses should include a JSON response that provides the HTTP status code, details of the error that occurred, and possible steps to address the problem. For example:
++ Response
+
+        {
+            "error": "404",
+            "reason": "Project does not exist",
+            "suggestion": "You may have chosen the wrong ID."
+        }
+
+Validation errors require a field-level breakdown with an array of errors (even if multiple errors occur for the same field), each describing the field with the error, and message describing the error encountered.
++ Response
+
+        {
+            "error": "400",
+            "reason": "validation failed",
+            "suggestion": "Fix the following invalid fields and resubmit"
+            "errors" : [
+                {
+                    "field" : "name",
+                    "message" : "Project needs a name."
+                },
+                {
+                    "field" : "principal_investigator",
+                    "message" : "Principal Investigator must be specified for each project."
+                }
+            ]
+        }

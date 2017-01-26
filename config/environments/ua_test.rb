@@ -11,7 +11,10 @@ Rails.application.configure do
   config.assets.js_compressor = :uglifier
   config.assets.compile = false
   config.assets.digest = true
-  config.log_level = :info
+
+  # :debug :info :warn :error :fatal :unknown (0-5)
+  config.log_level = ENV['RAILS_LOG_LEVEL'] || :info
+
   config.i18n.fallbacks = true
   config.active_support.deprecation = :notify
   config.log_formatter = ::Logger::Formatter.new
