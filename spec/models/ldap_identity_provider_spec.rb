@@ -44,15 +44,18 @@ RSpec.describe LdapIdentityProvider, type: :model do
           auth_provider,
           test_user.last_name
         ) }
+        let(:expected_entry) {
+          expected_entry = Net::LDAP::Entry.new
+          expected_entry[:uid] = test_user.username
+          expected_entry[:givenName] = test_user.display_name
+          expected_entry[:sn] = test_user.last_name
+          expected_entry[:mail] = test_user.email
+          expected_entry[:displayName] = test_user.display_name
+          expected_entry
+        }
 
         before do
-          fooby_entry = Net::LDAP::Entry.new
-          fooby_entry[:uid] = test_user.username
-          fooby_entry[:givenName] = test_user.display_name
-          fooby_entry[:sn] = test_user.last_name
-          fooby_entry[:mail] = test_user.email
-          fooby_entry[:displayName] = test_user.display_name
-          allow_any_instance_of(Net::LDAP).to receive(:search).and_return([fooby_entry])
+          allow_any_instance_of(Net::LDAP).to receive(:search).and_return([expected_entry])
         end
 
         it {
