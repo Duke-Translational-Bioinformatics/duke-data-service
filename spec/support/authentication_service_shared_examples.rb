@@ -476,7 +476,8 @@ end
 shared_examples 'an authentication_service_preview_serializer serializable resource' do
   let(:expected_attributes) {{
     'id' => resource.id,
-    'name' => resource.name
+    'name' => resource.name,
+    'affilate_search_supported' => !resource.identity_provider.nil?
   }}
 
   it_behaves_like 'a json serializer' do
