@@ -8,11 +8,7 @@ RSpec.describe AffiliateSerializer, type: :serializer do
     'first_name' => resource.first_name,
     'last_name' => resource.last_name,
     'full_name' => resource.display_name,
-    'email' => resource.email,
-    'auth_provider' => {
-      'id' => resource.user_authentication_services.first.authentication_service.id,
-      'name' => resource.user_authentication_services.first.authentication_service.name,
-    }
+    'email' => resource.email
   }}
 
   it_behaves_like 'a json serializer' do

@@ -3,8 +3,7 @@ class AffiliateSerializer < ActiveModel::Serializer
              :full_name,
              :first_name,
              :last_name,
-             :email,
-             :auth_provider
+             :email
 
   def uid
     object.username
@@ -12,9 +11,5 @@ class AffiliateSerializer < ActiveModel::Serializer
 
   def full_name
     object.display_name
-  end
-
-  def auth_provider
-    AffiliateAuthenticationServiceSerializer.new(object.user_authentication_services.first.authentication_service)
   end
 end
