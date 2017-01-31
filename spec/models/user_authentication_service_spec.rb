@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe UserAuthenticationService, type: :model do
   let(:user) { FactoryGirl.create(:user) }
-  let(:auth_service) { FactoryGirl.create(:authentication_service) }
+  let(:auth_service) { FactoryGirl.create(:duke_authentication_service) }
   subject { FactoryGirl.create(:user_authentication_service,
     user: user,
     authentication_service: auth_service
