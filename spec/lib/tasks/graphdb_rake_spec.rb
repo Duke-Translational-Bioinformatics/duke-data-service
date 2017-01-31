@@ -135,7 +135,6 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
   describe "graphdb:build" do
     include_context "rake"
     let(:task_name) { "graphdb:build" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     it { expect(subject.prerequisites).to  include("environment") }
 
     before do
@@ -193,7 +192,6 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
   describe 'graphdb:clean' do
     include_context "rake"
     let(:task_name) { "graphdb:clean" }
-    let(:invoke_task) { silence_stream(STDOUT) { subject.invoke } }
     it { expect(subject.prerequisites).to  include("environment") }
 
     it 'should remove all graph nodes and relationships' do

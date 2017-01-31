@@ -164,7 +164,7 @@ describe DDS::V1::AppAPI do
       context 'is not connected' do
         let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
         let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-        let(:authentication_service) { FactoryGirl.create(:authentication_service)}
+        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
         before do
           ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
           ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
@@ -222,7 +222,7 @@ describe DDS::V1::AppAPI do
 
     context 'when properly integrated' do
       let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-      let(:authentication_service) { FactoryGirl.create(:authentication_service)}
+      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
       let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
 
       before do
