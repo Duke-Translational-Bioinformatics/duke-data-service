@@ -51,15 +51,19 @@ shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, header
   subject { get(request_url, request_payload, request_headers) }
 end
 
-shared_examples 'a listable resource' do
+shared_examples 'a listable resource' do |persisted_resource: true|
   let(:expected_resources) { resource_class.all }
   let(:serializable_resource) { resource }
   let(:expected_list_length) { expected_resources.count }
   let(:unexpected_resources) { [] }
   let(:expected_response_status) { 200 }
-  before do
-    expect(resource).to be_persisted
+
+  if persisted_resource
+    before do
+      expect(resource).to be_persisted
+    end
   end
+
   it 'should return a list that includes a serialized resource' do
     is_expected.to eq(expected_response_status)
     expect(response.status).to eq(expected_response_status)
