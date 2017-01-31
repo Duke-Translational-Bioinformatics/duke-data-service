@@ -32,11 +32,7 @@ class LdapIdentityProvider < IdentityProvider
         first_name: entry.givenName.first,
         last_name: entry.sn.first,
         email: entry.mail.first,
-        display_name: entry.displayName.first,
-        user_authentication_services_attributes: [{
-          uid: entry.uid.first,
-          authentication_service: authentication_service
-        }] #http://billpatrianakos.me/blog/2013/09/29/rails-tricky-error-no-implicit-conversion-from-symbol-to-integer/
+        display_name: entry.displayName.first
       )
     }
   end

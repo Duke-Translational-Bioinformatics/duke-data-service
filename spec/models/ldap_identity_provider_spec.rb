@@ -4,7 +4,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
   subject { auth_provider.identity_provider }
   let(:auth_provider) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
-  let(:test_user) { FactoryGirl.build(:user) }
+  let(:test_user) { FactoryGirl.attributes_for(:user) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :ldap_base }
@@ -29,18 +29,15 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
 
     context 'with uid and authentication_service' do
-      include_context 'mocked ldap'
-      subject { auth_provider.identity_provider.affiliate(auth_provider, test_user.username) }
+      let(:ldap_returns) { [test_user] }
+      include_context 'mocked ldap', returns: :ldap_returns
+      subject { auth_provider.identity_provider.affiliate(auth_provider, test_user[:username]) }
 
       it {
         is_expected.to be
         is_expected.to be_a User
         is_expected.not_to be_persisted
-        expect(subject.display_name).to eq test_user.display_name
-        user_authentication_service = subject.user_authentication_services.first
-        expect(user_authentication_service).to be
-        expect(user_authentication_service).not_to be_persisted
-        expect(user_authentication_service.authentication_service_id).to eq auth_provider.id
+        expect(subject.display_name).to eq test_user[:display_name]
       }
     end
   end
@@ -75,10 +72,11 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'greater than 3 characters' do
-        include_context 'mocked ldap'
+        let(:ldap_returns) { [test_user] }
+        include_context 'mocked ldap', returns: :ldap_returns
         subject { auth_provider.identity_provider.affiliates(
           auth_provider,
-          test_user.last_name
+          test_user[:last_name]
         ) }
 
         it {
@@ -87,11 +85,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
           subject.each do |response|
             expect(response).to be_a User
             expect(response).not_to be_persisted
-            expect(response.display_name).to eq test_user.display_name
-            user_authentication_service = response.user_authentication_services.first
-            expect(user_authentication_service).to be
-            expect(user_authentication_service).not_to be_persisted
-            expect(user_authentication_service.authentication_service_id).to eq auth_provider.id
+            expect(response.display_name).to eq test_user[:display_name]
           end
         }
       end
