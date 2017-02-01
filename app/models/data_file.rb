@@ -134,7 +134,7 @@ class DataFile < Container
 
         indexes :upload do
           indexes :id, type: "string", index: "not_analyzed"
-          indexes :size, type: "integer"
+          indexes :size, type: "long" #https://github.com/karmi/retire/issues/474
           indexes :storage_provider do
             indexes :id, type: "string", index: "not_analyzed"
             indexes :name

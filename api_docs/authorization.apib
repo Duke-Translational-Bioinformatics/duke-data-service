@@ -128,24 +128,7 @@ Represents system level authorization roles that have been granted to a user.
 ## System Permission instance [/system/permissions/{user_id}]
 + Parameters
     + user_id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique id of the user.
-
-+ Model (application/json)
-
-    + Body
-
-            {
-                "user": {
-                    "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
-                    "username": "mrgardner01",
-                    "full_name": "Matthew Gardner"
-                },
-                "auth_role": {
-                    "id": "system_admin",
-                    "name": "System Admin",
-                    "description": "Can manage system level permissions and perform all operations across all projects"
-                }
-            }
-
+            
 ### Grant system permission [PUT]
 >**Permission:** system_admin
 - - - - -
@@ -168,7 +151,18 @@ Represents system level authorization roles that have been granted to a user.
 
 + Response 200
 
-    [System Permission instance][]
+        {
+            "user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "auth_role": {
+                "id": "system_admin",
+                "name": "System Admin",
+                "description": "Can manage system level permissions and perform all operations across all projects"
+            }
+        }
 
 ### View system permission [GET]
 >**Permission:** system_admin
@@ -180,7 +174,18 @@ Represents system level authorization roles that have been granted to a user.
 
 + Response 200
 
-    [System Permission instance][]
+        {
+            "user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "auth_role": {
+                "id": "system_admin",
+                "name": "System Admin",
+                "description": "Can manage system level permissions and perform all operations across all projects"
+            }
+        }
 
 ### Revoke system permission [DELETE]
 >**Permission:** system_admin

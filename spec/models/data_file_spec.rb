@@ -432,7 +432,7 @@ RSpec.describe DataFile, type: :model do
         expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:id][:type]).to eq "string"
         expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:id][:index]).to eq "not_analyzed"
         expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :size
-        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:size][:type]).to eq "integer"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:size][:type]).to eq "long"
 
         expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :storage_provider
         expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider]).to have_key :properties
