@@ -84,7 +84,7 @@ module DDS
           if auth_service.identity_provider.nil?
             unsupported_affiliate_search_error!
           else
-            auth_service.identity_provider.affiliates(auth_service, affiliate_params[:full_name_contains])
+            auth_service.identity_provider.affiliates(affiliate_params[:full_name_contains])
           end
         end
       end
@@ -111,7 +111,7 @@ module DDS
         if auth_service.identity_provider.nil?
           unsupported_affiliate_search_error!
         else
-          user = auth_service.identity_provider.affiliate(auth_service, affiliate_params[:uid])
+          user = auth_service.identity_provider.affiliate(affiliate_params[:uid])
           if user
             user
           else
@@ -142,13 +142,17 @@ module DDS
         if auth_service.identity_provider.nil?
           unsupported_affiliate_search_error!
         else
-          if User.where(username: affiliate_params[:uid]).exists?
+          if UserAuthenticationService.where(
+            uid: affiliate_params[:uid],
+            authentication_service_id: auth_service.id
+          ).exists?
             affiliate_exists_error!
           else
-            user = auth_service.identity_provider.affiliate(auth_service, affiliate_params[:uid])
+            user = auth_service.identity_provider.affiliate(affiliate_params[:uid])
             if user
               user.id = SecureRandom.uuid
               authorize user, :create?
+              user.user_authentication_services.build(uid: user.username, authentication_service: auth_service)
               if user.save
                 user
               else

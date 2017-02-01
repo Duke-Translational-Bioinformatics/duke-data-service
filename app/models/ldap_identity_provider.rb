@@ -3,22 +3,20 @@ require 'net/ldap'
 class LdapIdentityProvider < IdentityProvider
   validates :ldap_base, presence: true
 
-  def affiliate(authentication_service, uid)
+  def affiliate(uid)
     ldap_search(
-      authentication_service,
       Net::LDAP::Filter.construct("uid=#{uid}")
     ).first
   end
 
-  def affiliates(authentication_service, full_name_contains=nil)
+  def affiliates(full_name_contains=nil)
     return [] unless full_name_contains && full_name_contains.length > 3
     ldap_search(
-      authentication_service,
       Net::LDAP::Filter.construct("displayName=*#{full_name_contains}*")
     )
   end
 
-  def ldap_search(authentication_service, ldap_filter)
+  def ldap_search(ldap_filter)
     Net::LDAP.new(
         host: host,
         port: port,

@@ -162,7 +162,15 @@ describe DDS::V1::AuthProvidersAPI do
             let(:expected_response_status) { 201 }
           end
         end
-        it_behaves_like 'a creatable resource'
+        it_behaves_like 'a creatable resource' do
+          it 'should have a persisted user_authentication_service' do
+            expect {
+              is_expected.to eq(expected_response_status)
+            }.to change{UserAuthenticationService.count}.by(1)
+            expect(new_object).to be
+            expect(new_object.user_authentication_services.where(authentication_service_id: authentication_service_id)).to exist
+          end
+        end
         it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'POST' }
           let(:expected_response_status) { 201 }
@@ -174,17 +182,19 @@ describe DDS::V1::AuthProvidersAPI do
       end
       it_behaves_like 'an identified affiliate'
       context 'affiliate dds_user already exists' do
-        let(:existing_user) {
-          user = FactoryGirl.create(:user)
+        let(:existing_user) { FactoryGirl.create(:user) }
+        let(:existing_user_authentication_service) {
           FactoryGirl.create(:user_authentication_service,
+            uid: existing_user.username,
             authentication_service: authentication_service,
-            user: user
+            user: existing_user
           )
-          user
         }
         let(:resource_uid) { existing_user.username }
 
         it {
+          expect(existing_user).to be
+          expect(existing_user_authentication_service).to be
           is_expected.to eq(409)
           expect(response.body).to be
           expect(response.body).not_to eq('null')

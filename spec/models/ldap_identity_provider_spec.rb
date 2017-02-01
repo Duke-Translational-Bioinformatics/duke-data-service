@@ -12,7 +12,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
   describe 'affiliate' do
     it { is_expected.to respond_to(:affiliate) }
-    context 'without authentication_service' do
+    context 'without uid' do
       it {
         expect{
           subject.affiliate
@@ -20,18 +20,10 @@ RSpec.describe LdapIdentityProvider, type: :model do
       }
     end
 
-    context 'without uid' do
-      it {
-        expect{
-          subject.affiliate(auth_provider)
-        }.to raise_error(ArgumentError)
-      }
-    end
-
     context 'with uid and authentication_service' do
       let(:ldap_returns) { [test_user] }
       include_context 'mocked ldap', returns: :ldap_returns
-      subject { auth_provider.identity_provider.affiliate(auth_provider, test_user[:username]) }
+      subject { auth_provider.identity_provider.affiliate(test_user[:username]) }
 
       it {
         is_expected.to be
@@ -45,15 +37,9 @@ RSpec.describe LdapIdentityProvider, type: :model do
   describe 'affiliates' do
     it { is_expected.to respond_to(:affiliates) }
 
-    it {
-      expect{
-        subject.affiliates
-      }.to raise_error(ArgumentError)
-    }
-
     context 'full_name_contains' do
       context 'not provided' do
-        subject { auth_provider.identity_provider.affiliates(auth_provider) }
+        subject { auth_provider.identity_provider.affiliates }
         it {
           is_expected.to be_a Array
           expect(subject.length).to eq 0
@@ -62,7 +48,6 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
       context 'less than 3 characters' do
         subject { auth_provider.identity_provider.affiliates(
-          auth_provider,
           'a'*2
         ) }
         it {
@@ -75,7 +60,6 @@ RSpec.describe LdapIdentityProvider, type: :model do
         let(:ldap_returns) { [test_user] }
         include_context 'mocked ldap', returns: :ldap_returns
         subject { auth_provider.identity_provider.affiliates(
-          auth_provider,
           test_user[:last_name]
         ) }
 
