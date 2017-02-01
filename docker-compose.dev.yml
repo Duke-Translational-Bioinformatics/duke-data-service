@@ -9,11 +9,13 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env
+      - rabbitmq.client.env
   bundle:
     image: dukedataservice_server
     volumes_from:
@@ -28,17 +30,20 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env
+      - rabbitmq.client.env
   authservice:
     image: dukedataservice_server
     env_file:
       - auth_service.env
       - neo4j.client.env
       - elastic.client.env
+      - rabbitmq.client.env
     volumes_from:
       - localdev
     entrypoint: ['rake']
@@ -47,6 +52,7 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
   rspec:
     image: dukedataservice_server
     environment:
@@ -60,11 +66,13 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env
+      - rabbitmq.client.env
     entrypoint: ['rspec']
     command: spec
   dredd:
