@@ -8,6 +8,7 @@ require 'shoulda-matchers'
 require 'vcr'
 require 'pundit/rspec'
 require 'uri'
+require 'bunny-mock'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -81,3 +82,14 @@ VCR.configure do |c|
     match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
   }
 end
+
+# Mocking Bunny for Sneakers ActiveJob testing
+module BunnyMock
+  class Queue
+    def durable?
+      opts[:durable]
+    end
+  end
+end
+Sneakers.configure(connection: BunnyMock.new)
+Sneakers.logger = Rails.logger # Must reset logger whenever configure is called

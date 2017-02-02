@@ -18,7 +18,7 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.conn
-    @conn ||= Bunny.new(opts[:amqp])
+    @conn ||= opts[:connection] || Bunny.new(opts[:amqp])
     @conn.start
   end
 
