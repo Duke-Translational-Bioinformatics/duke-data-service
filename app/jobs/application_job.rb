@@ -12,6 +12,10 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.job_wrapper
+    if self == ApplicationJob
+      raise NotImplementedError, 'The job_wrapper method should only be called on subclasses of ApplicationJob'
+    end
+
     distributor_exchange.bind(gateway_exchange)
     message_log_queue.bind(gateway_exchange)
     klass = self

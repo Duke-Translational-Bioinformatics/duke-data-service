@@ -51,21 +51,7 @@ RSpec.describe ApplicationJob, type: :job do
 
   it { expect(described_class).to respond_to(:job_wrapper) }
   describe '::job_wrapper' do
-    let(:job_wrapper) { described_class.job_wrapper }
-    let(:queue_opts) {{
-      exchange: described_class.distributor_exchange.name,
-      exchange_type: described_class.distributor_exchange.type
-    }}
-    it { expect(job_wrapper).to be_a Class }
-    it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
-    it { expect(job_wrapper.queue_name).to eq described_class.queue_name }
-    it { expect(job_wrapper.queue_opts).to eq queue_opts }
-
-    context 'once called' do
-      before { job_wrapper }
-      it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
-      it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
-    end
+    it { expect{described_class.job_wrapper}.to raise_error NotImplementedError}
   end
 
   context 'child_class' do
