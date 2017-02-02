@@ -60,6 +60,12 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
     it { expect(job_wrapper.queue_name).to eq described_class.queue_name }
     it { expect(job_wrapper.queue_opts).to eq queue_opts }
+
+    context 'once called' do
+      before { job_wrapper }
+      it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
+      it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
+    end
   end
 
   context 'child_class' do
@@ -76,6 +82,12 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
       it { expect(job_wrapper.queue_name).to eq child_class.queue_name }
       it { expect(job_wrapper.queue_opts).to eq queue_opts }
+
+      context 'once called' do
+        before { job_wrapper }
+        it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
+        it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
+      end
     end
   end
 end

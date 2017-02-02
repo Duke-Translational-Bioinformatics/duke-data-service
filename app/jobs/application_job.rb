@@ -12,6 +12,8 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.job_wrapper
+    distributor_exchange.bind(gateway_exchange)
+    message_log_queue.bind(gateway_exchange)
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
       from_queue klass.queue_name,
