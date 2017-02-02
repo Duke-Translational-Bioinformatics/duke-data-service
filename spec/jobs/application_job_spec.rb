@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ApplicationJob, type: :job do
   let(:gateway_exchange_name) { 'test.'+Faker::Internet.slug }
   let(:distributor_exchange_name) { 'active_jobs' }
+  let(:message_log_name) { 'message_log' }
   let(:queue_name) { Faker::Internet.slug(nil, '_').to_sym }
   let(:child_class) {
     Class.new(described_class) do
@@ -23,6 +24,7 @@ RSpec.describe ApplicationJob, type: :job do
     conn.start.with_channel do |channel|
       channel.exchange_delete(gateway_exchange_name)
       channel.exchange_delete(distributor_exchange_name)
+      channel.queue_delete(message_log_name)
     end
     conn.close
   end
@@ -46,6 +48,14 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(distributor_exchange.name).to eq(distributor_exchange_name) }
     it { expect(distributor_exchange.type).to eq(:direct) }
     it { expect(distributor_exchange).to be_durable }
+  end
+
+  it { expect(described_class).to respond_to(:message_log_queue) }
+  describe '::message_log_queue' do
+    let(:message_log_queue) { described_class.message_log_queue }
+    it { expect(message_log_queue).to be_a Bunny::Queue }
+    it { expect(message_log_queue.name).to eq(message_log_name) }
+    it { expect(message_log_queue).to be_durable }
   end
 
   context 'child_class' do

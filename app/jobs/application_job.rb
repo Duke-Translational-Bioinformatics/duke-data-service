@@ -7,6 +7,10 @@ class ApplicationJob < ActiveJob::Base
     channel.exchange('active_jobs', type: :direct, durable: true)
   end
 
+  def self.message_log_queue
+    channel.queue('message_log', durable: true)
+  end
+
   private
 
   def self.opts
