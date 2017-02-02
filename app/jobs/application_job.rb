@@ -11,6 +11,15 @@ class ApplicationJob < ActiveJob::Base
     channel.queue('message_log', durable: true)
   end
 
+  def self.job_wrapper
+    klass = self
+    Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
+      from_queue klass.queue_name,
+        exchange: klass.distributor_exchange.name,
+        exchange_type: klass.distributor_exchange.type
+    end
+  end
+
   private
 
   def self.opts

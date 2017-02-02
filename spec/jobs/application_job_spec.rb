@@ -49,8 +49,33 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(message_log_queue).to be_durable }
   end
 
+  it { expect(described_class).to respond_to(:job_wrapper) }
+  describe '::job_wrapper' do
+    let(:job_wrapper) { described_class.job_wrapper }
+    let(:queue_opts) {{
+      exchange: described_class.distributor_exchange.name,
+      exchange_type: described_class.distributor_exchange.type
+    }}
+    it { expect(job_wrapper).to be_a Class }
+    it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
+    it { expect(job_wrapper.queue_name).to eq described_class.queue_name }
+    it { expect(job_wrapper.queue_opts).to eq queue_opts }
+  end
+
   context 'child_class' do
     it { expect{child_class.perform_now}.not_to raise_error }
     it { expect{child_class.perform_later}.not_to raise_error }
+
+    describe '::job_wrapper' do
+      let(:job_wrapper) { child_class.job_wrapper }
+      let(:queue_opts) {{
+        exchange: child_class.distributor_exchange.name,
+        exchange_type: child_class.distributor_exchange.type
+      }}
+      it { expect(job_wrapper).to be_a Class }
+      it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
+      it { expect(job_wrapper.queue_name).to eq child_class.queue_name }
+      it { expect(job_wrapper.queue_opts).to eq queue_opts }
+    end
   end
 end
