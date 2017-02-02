@@ -3,6 +3,10 @@ class ApplicationJob < ActiveJob::Base
     channel.exchange(opts[:exchange], opts[:exchange_options])
   end
 
+  def self.distributor_exchange
+    channel.exchange('active_jobs', type: :direct, durable: true)
+  end
+
   private
 
   def self.opts
