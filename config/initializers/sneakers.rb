@@ -1,7 +1,8 @@
 Sneakers.configure(
   :amqp => ENV['CLOUDAMQP_URL'],
   :exchange => 'message_gateway',
-  :exchange_type => :fanout,
-  :durable => true
+  :exchange_options => {
+    :type => :fanout
+  }
 )
 Sneakers.logger = Rails.logger
