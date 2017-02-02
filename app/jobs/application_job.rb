@@ -17,8 +17,8 @@ class ApplicationJob < ActiveJob::Base
     Sneakers::CONFIG
   end
 
-  def self.conn
-    @conn ||= opts[:connection] || Bunny.new(opts[:amqp])
+  def self.session
+    @conn ||= opts[:connection] || Bunny.new(@opts[:amqp], :vhost => @opts[:vhost], :heartbeat => @opts[:heartbeat], :logger => Sneakers::logger)
     @conn.start
   end
 
