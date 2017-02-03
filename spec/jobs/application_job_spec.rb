@@ -5,10 +5,10 @@ RSpec.describe ApplicationJob, type: :job do
   let(:distributor_exchange_name) { 'active_jobs' }
   let(:message_log_name) { 'message_log' }
   let(:bunny) { BunnyMock }
-  let(:bunny_session) { BunnyMock.new }
+  let(:bunny_session) { Sneakers::CONFIG[:connection] }
 
   before do
-    Sneakers.configure(connection: bunny_session, exchange: gateway_exchange_name)
+    Sneakers.configure(exchange: gateway_exchange_name)
   end
   
   it { is_expected.to be_a ActiveJob::Base }
