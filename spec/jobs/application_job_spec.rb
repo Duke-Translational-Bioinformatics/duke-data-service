@@ -90,6 +90,15 @@ RSpec.describe ApplicationJob, type: :job do
         expect(described_class).to receive(:create_bindings)
         job_wrapper
       end
+      it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
+      context 'instance created' do
+        before { child_class.job_wrapper.new.run }
+        let(:child_class_queue) { bunny_session.channel.queue(child_class_queue_name) }
+        let(:distributor_exchange) { bunny_session.channel.exchange(distributor_exchange_name) }
+        it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_truthy }
+        it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
+        it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
+      end
     end
   end
 end
