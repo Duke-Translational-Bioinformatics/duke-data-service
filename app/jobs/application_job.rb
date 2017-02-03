@@ -37,11 +37,11 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.conn
-    @conn ||= opts[:connection] || Bunny.new(@opts[:amqp], :vhost => @opts[:vhost], :heartbeat => @opts[:heartbeat], :logger => Sneakers::logger)
-    @conn.start
+    conn = opts[:connection] || Bunny.new(opts[:amqp], :vhost => opts[:vhost], :heartbeat => opts[:heartbeat], :logger => Sneakers::logger)
+    conn.start
   end
 
   def self.channel
-    @channel ||= conn.create_channel
+    conn.create_channel
   end
 end
