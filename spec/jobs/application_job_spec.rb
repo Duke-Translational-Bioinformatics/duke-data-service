@@ -4,15 +4,6 @@ RSpec.describe ApplicationJob, type: :job do
   let(:gateway_exchange_name) { 'test.'+Faker::Internet.slug }
   let(:distributor_exchange_name) { 'active_jobs' }
   let(:message_log_name) { 'message_log' }
-  let(:queue_name) { Faker::Internet.slug(nil, '_').to_sym }
-  let(:child_class) {
-    Class.new(described_class) do
-      queue_as queue_name
-      def perform
-        true
-      end
-    end
-  }
   let(:bunny) { BunnyMock }
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
 
@@ -71,6 +62,17 @@ RSpec.describe ApplicationJob, type: :job do
   end
 
   context 'child_class' do
+    let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
+    let(:child_class) {
+      klass_queue_name = child_class_queue_name
+      Class.new(described_class) do
+        queue_as klass_queue_name
+        def perform
+          true
+        end
+      end
+    }
+
     it { expect{child_class.perform_now}.not_to raise_error }
     it { expect{child_class.perform_later}.not_to raise_error }
 
