@@ -1,4 +1,10 @@
 class ApplicationJob < ActiveJob::Base
+  class QueueNotFound < ::StandardError
+  end
+  before_enqueue do |job|
+    raise QueueNotFound.new("Queue #{queue_name} does not exist") unless ApplicationJob.conn.queue_exists? queue_name
+  end
+
   def self.distributor_exchange_name
     'active_jobs'
   end

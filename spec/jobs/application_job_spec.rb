@@ -51,6 +51,7 @@ RSpec.describe ApplicationJob, type: :job do
 
   context 'child_class' do
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
+    let(:child_class_queue) { channel.queue(child_class_queue_name) }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
       Class.new(described_class) do
@@ -62,7 +63,11 @@ RSpec.describe ApplicationJob, type: :job do
     }
 
     it { expect{child_class.perform_now}.not_to raise_error }
-    it { expect{child_class.perform_later}.not_to raise_error }
+
+    context 'without job_wrapper running' do
+      it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
+      it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{child_class_queue_name} does not exist") }
+    end
 
     describe '::job_wrapper' do
       let(:job_wrapper) { child_class.job_wrapper }
@@ -81,7 +86,6 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
       context 'instance created' do
         before { child_class.job_wrapper.new.run }
-        let(:child_class_queue) { channel.queue(child_class_queue_name) }
         it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
