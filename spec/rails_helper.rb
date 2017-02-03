@@ -92,4 +92,3 @@ module BunnyMock
   end
 end
 Sneakers.configure(connection: BunnyMock.new)
-Sneakers.logger = Rails.logger # Must reset logger whenever configure is called

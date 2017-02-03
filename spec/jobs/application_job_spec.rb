@@ -18,7 +18,6 @@ RSpec.describe ApplicationJob, type: :job do
 
   before do
     Sneakers.configure(exchange: gateway_exchange_name)
-    Sneakers.logger = Rails.logger # Must reset logger whenever configure is called
   end
   
   it { is_expected.to be_a ActiveJob::Base }
