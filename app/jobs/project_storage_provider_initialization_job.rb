@@ -1,4 +1,4 @@
-class ProjectStorageProviderInitializationJob < ActiveJob::Base
+class ProjectStorageProviderInitializationJob < ApplicationJob
   queue_as :default
 
   def perform(storage_provider:, project:)

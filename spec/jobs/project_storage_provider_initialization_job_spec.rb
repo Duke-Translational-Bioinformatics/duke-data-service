@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
   let(:project) { FactoryGirl.create(:project) }
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  it { is_expected.to be_an ApplicationJob }
 
   context 'perform_now', :vcr do
     it 'should require a project argument' do
