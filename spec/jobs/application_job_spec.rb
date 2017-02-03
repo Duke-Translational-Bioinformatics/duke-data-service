@@ -14,6 +14,7 @@ RSpec.describe ApplicationJob, type: :job do
     end
   }
   let(:bunny) { BunnyMock }
+  let(:bunny_session) { Sneakers::CONFIG[:connection] }
 
   before do
     Sneakers.configure(exchange: gateway_exchange_name)
@@ -49,6 +50,22 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(message_log_queue).to be_durable }
   end
 
+  it { expect(described_class).to respond_to(:create_bindings) }
+  describe '::create_bindings' do
+    let(:create_bindings) { described_class.create_bindings }
+    it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_falsey }
+    it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_falsey }
+    it { expect(bunny_session.queue_exists?(message_log_name)).to be_falsey }
+    context 'once called' do
+      before { create_bindings }
+      it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_truthy }
+      it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
+      it { expect(bunny_session.queue_exists?(message_log_name)).to be_truthy }
+      it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
+      it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
+    end
+  end
+
   it { expect(described_class).to respond_to(:job_wrapper) }
   describe '::job_wrapper' do
     it { expect{described_class.job_wrapper}.to raise_error NotImplementedError}
@@ -68,11 +85,9 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
       it { expect(job_wrapper.queue_name).to eq child_class.queue_name }
       it { expect(job_wrapper.queue_opts).to eq queue_opts }
-
-      context 'once called' do
-        before { job_wrapper }
-        it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
-        it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
+      it 'calls ::create_bindings' do
+        expect(described_class).to receive(:create_bindings)
+        job_wrapper
       end
     end
   end

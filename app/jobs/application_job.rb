@@ -11,13 +11,17 @@ class ApplicationJob < ActiveJob::Base
     channel.queue('message_log', durable: true)
   end
 
+  def self.create_bindings
+    distributor_exchange.bind(gateway_exchange)
+    message_log_queue.bind(gateway_exchange)
+  end
+
   def self.job_wrapper
     if self == ApplicationJob
       raise NotImplementedError, 'The job_wrapper method should only be called on subclasses of ApplicationJob'
     end
 
-    distributor_exchange.bind(gateway_exchange)
-    message_log_queue.bind(gateway_exchange)
+    create_bindings
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
       from_queue klass.queue_name,
