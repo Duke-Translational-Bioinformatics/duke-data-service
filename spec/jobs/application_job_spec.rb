@@ -2,10 +2,15 @@ require 'rails_helper'
 
 RSpec.describe ApplicationJob, type: :job do
   let(:gateway_exchange_name) { 'test.'+Faker::Internet.slug }
+  let(:gateway_exchange) { channel.exchange(gateway_exchange_name) }
   let(:distributor_exchange_name) { 'active_jobs' }
+  let(:distributor_exchange) { channel.exchange(distributor_exchange_name) }
   let(:message_log_name) { 'message_log' }
+  let(:message_log_queue) { channel.queue(message_log_name) }
+
   let(:bunny) { BunnyMock }
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
+  let(:channel) { bunny_session.channel }
 
   before do
     Sneakers.configure(exchange: gateway_exchange_name)
@@ -51,8 +56,8 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_truthy }
       it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
       it { expect(bunny_session.queue_exists?(message_log_name)).to be_truthy }
-      it { expect(described_class.distributor_exchange).to be_bound_to(described_class.gateway_exchange) }
-      it { expect(described_class.message_log_queue).to be_bound_to(described_class.gateway_exchange) }
+      it { expect(distributor_exchange).to be_bound_to(gateway_exchange) }
+      it { expect(message_log_queue).to be_bound_to(gateway_exchange) }
     end
   end
 
@@ -93,8 +98,7 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
       context 'instance created' do
         before { child_class.job_wrapper.new.run }
-        let(:child_class_queue) { bunny_session.channel.queue(child_class_queue_name) }
-        let(:distributor_exchange) { bunny_session.channel.exchange(distributor_exchange_name) }
+        let(:child_class_queue) { channel.queue(child_class_queue_name) }
         it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
