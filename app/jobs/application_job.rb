@@ -1,19 +1,24 @@
 class ApplicationJob < ActiveJob::Base
-  def self.gateway_exchange
-    channel.exchange(opts[:exchange], opts[:exchange_options])
+  def self.distributor_exchange_name
+    'active_jobs'
   end
 
-  def self.distributor_exchange
-    channel.exchange('active_jobs', type: :direct, durable: true)
-  end
-
-  def self.message_log_queue
-    channel.queue('message_log', durable: true)
+  def self.distributor_exchange_type
+    :direct
   end
 
   def self.create_bindings
-    distributor_exchange.bind(gateway_exchange)
-    message_log_queue.bind(gateway_exchange)
+    conn.with_channel do |channel|
+      gateway = channel.exchange(opts[:exchange], opts[:exchange_options])
+      distributor = channel.exchange(
+        distributor_exchange_name, 
+        type: distributor_exchange_type, durable: true
+      )
+      message_log = channel.queue('message_log', durable: true)
+
+      distributor.bind(gateway)
+      message_log.bind(gateway)
+    end
   end
 
   def self.job_wrapper
@@ -25,8 +30,8 @@ class ApplicationJob < ActiveJob::Base
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
       from_queue klass.queue_name,
-        exchange: klass.distributor_exchange.name,
-        exchange_type: klass.distributor_exchange.type
+        exchange: klass.distributor_exchange_name,
+        exchange_type: klass.distributor_exchange_type
     end
   end
 
@@ -39,9 +44,5 @@ class ApplicationJob < ActiveJob::Base
   def self.conn
     conn = opts[:connection] || Bunny.new(opts[:amqp], :vhost => opts[:vhost], :heartbeat => opts[:heartbeat], :logger => Sneakers::logger)
     conn.start
-  end
-
-  def self.channel
-    conn.create_channel
   end
 end
