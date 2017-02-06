@@ -56,13 +56,28 @@ RSpec.describe ApplicationJob, type: :job do
       klass_queue_name = child_class_queue_name
       Class.new(described_class) do
         queue_as klass_queue_name
+        @run_count = 0
         def perform
-          true
+          self.class.run_count = self.class.run_count.next
+        end
+        def self.run_count=(val)
+          @run_count = val
+        end
+        def self.run_count
+          @run_count
         end
       end
     }
 
     it { expect{child_class.perform_now}.not_to raise_error }
+    it { expect(child_class).to respond_to :run_count }
+    describe '::run_count' do
+      it { expect(child_class.run_count).to eq 0 }
+      context 'after perform_now call' do
+        before { child_class.perform_now }
+        it { expect(child_class.run_count).to eq 1 }
+      end
+    end
 
     context 'without job_wrapper running' do
       it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
