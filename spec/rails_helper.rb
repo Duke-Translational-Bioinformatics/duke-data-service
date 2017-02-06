@@ -92,5 +92,9 @@ module BunnyMock
     def durable?
       opts[:durable]
     end
+
+    def cancel
+      @consumers = []
+    end
   end
 end
