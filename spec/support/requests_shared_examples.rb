@@ -111,7 +111,7 @@ shared_examples 'a searchable resource' do
   end
 end
 
-shared_examples 'a paginated resource' do |payload_sym: :payload|
+shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_page: 100, max_per_page: 1000|
   let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }
   let(:per_page) { 1 }
@@ -132,7 +132,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload|
 
   let(:expected_response_headers) {{
      'X-Total' => expected_total_length.to_s,
-     'X-Total-Pages' => (expected_total_length/per_page).to_s,
+     'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
      'X-Page' => page.to_s,
      'X-Per-Page' => per_page.to_s,
      'X-Next-Page' => (page+1).to_s,
@@ -153,6 +153,51 @@ shared_examples 'a paginated resource' do |payload_sym: :payload|
     returned_results = response_json['results']
     expect(returned_results).to be_a(Array)
     expect(returned_results.length).to eq(per_page)
+  end
+
+  context 'without per_page parameter' do
+    let(:pagination_parameters) {
+      {
+        page: page
+      }
+    }
+    let(:per_page) { default_per_page }
+    let(:page) { 1 }
+    let(:expected_response_headers) {{
+       'X-Total' => expected_total_length.to_s,
+       'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
+       'X-Page' => page.to_s,
+       'X-Per-Page' => per_page.to_s,
+    }}
+
+    it 'should return default per_page' do
+       expect(extras.count).to be > 0
+       is_expected.to eq(expected_response_status)
+       expect(response.headers).to include(expected_response_headers)
+    end
+  end
+
+  context 'when per_page parameter > max_per_page' do
+    let(:pagination_parameters) {
+      {
+        per_page: (max_per_page + 1),
+        page: page
+      }
+    }
+    let(:per_page) { max_per_page }
+    let(:page) { 1 }
+    let(:expected_response_headers) {{
+       'X-Total' => expected_total_length.to_s,
+       'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
+       'X-Page' => page.to_s,
+       'X-Per-Page' => per_page.to_s,
+    }}
+
+    it 'should return default per_page' do
+       expect(extras.count).to be > 0
+       is_expected.to eq(expected_response_status)
+       expect(response.headers).to include(expected_response_headers)
+    end
   end
 end
 
