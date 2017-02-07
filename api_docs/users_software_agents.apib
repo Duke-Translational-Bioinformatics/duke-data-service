@@ -289,7 +289,7 @@ This allows a Web or native UX client to present an access token (i.e. OAuth tok
 >**Request Properties**
 - - - - -
 + **access_token (string)** - A valid (non-expired) token for an authtication provider.
-+ **auth_provider.id (string)** - A supported authentiction provider.
++ **auth_provider_id (string)** - A supported authentiction provider.
 
 >**Response Properties**
 + **api_token (string)** - The access token.
@@ -304,9 +304,7 @@ This allows a Web or native UX client to present an access token (i.e. OAuth tok
 
         {
             "access_token": "KjTWXC67OiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpNjK88T...",
-            "auth_provider": {
-                "id": "a3967cab-6cfd-4d3c-b118-56e6b11d4022"
-            }
+            "auth_provider_id": "a3967cab-6cfd-4d3c-b118-56e6b11d4022"
          }
 
 + Response 201 (application/json)
@@ -393,6 +391,7 @@ Generates a secret key for the current user that can be used to access the API a
 ## Delete current user API key [DELETE]
 >**Permission:** authenticated
 - - - - -
+
 **Response messages:**
 * 204: Successfully Deleted
 * 401: Unauthorized
@@ -409,6 +408,7 @@ Represents registered users.
 ### List users [GET]
 >**Permission:** authenticated
 - - - - -
+
 **Response messages:**
 * 200: Success
 * 401: Unauthorized
@@ -448,6 +448,7 @@ Represents registered users.
 ### View user [GET]
 >**Permission:** authenticated
 - - - - -
+
 **Response messages:**
 * 200: Valid API Token in 'Authorization' Header
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
@@ -491,6 +492,7 @@ Represents the authentication providers (services) that are supported by DDS.
                     "name": "duke",
                     "is_deprecated": false,
                     "is_default": true,
+                    "is_affiliate_search_provided": true,
                     "login_initiation_url": "https://das.duke.edu/authenticate?response_type=token&client_id=abc123"
                 }
             ]
@@ -511,6 +513,7 @@ Represents the authentication providers (services) that are supported by DDS.
             "name": "duke",
             "is_deprecated": false,
             "is_default": true,
+            "is_affiliate_search_provided": true,
             "login_initiation_url": "https://das.duke.edu/authenticate?response_type=token&client_id=abc123"
         }
 
@@ -518,12 +521,16 @@ Represents the authentication providers (services) that are supported by DDS.
 
 ## NOT_IMPL_NEW List auth provider affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
 Get a list of affiliates (potential users), for a supported authentication provider.
->**Permission:** public
+>**Permission:** authenticated
 - - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
 
 + Parameters
     + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
-    + full_name_contains (string, optional, `gardner`) ... Returns affiliates where their full name contains the specified string.
+    + full_name_contains (string, required, `gard`) ... Returns affiliates where their full name contains the specified string; the supplied string must have a minimum length of three characters, otherwise an empty array is returned.
 
 + Response 200 (application/json)
 
@@ -535,11 +542,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
                         "first_name": "Matthew",
                         "last_name": "Gardner",
                         "full_name": "Matthew Gardner",
-                        "email": "mrgardner01@duke.edu",
-                        "auth_provider": {
-                            "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
-                            "name": "duke"
-                        }
+                        "email": "mrgardner01@duke.edu"
                     }
                 ]
         }
@@ -547,6 +550,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
 ### NOT_IMPL_NEW View auth provider affiliate [GET /auth_providers/{id}/affiliates/{uid}]
 >**Permission:** authenticated
 - - - - -
+
 **Response messages:**
 * 200: Success
 * 401: Unauthorized
@@ -563,23 +567,23 @@ Get a list of affiliates (potential users), for a supported authentication provi
             "first_name": "Matthew",
             "last_name": "Gardner",
             "full_name": "Matthew Gardner",
-            "email": "mrgardner01@duke.edu",
-            "auth_provider": {
-                "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
-                "name": "duke"
-            }
+            "email": "mrgardner01@duke.edu"
         }
 
-### NOT_IMPL_NEW Create user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
+### NOT_IMPL_NEW Create or Get user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
 Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.
 >**Permission:** authenticated
 - - - - -
+
 **Response messages:**
 * 200: This will never happen
-* 201: Created Successfully
+* 201: Created Successfully (or user already registered)
 * 401: Unauthorized
 * 404: Auth provider or affiliate does not exist
-* 409: Affiliate already registered
+
+>**Rules**
+- - - - -
++ If the affiliate has already been registered in DDS, the exisitng DDS user is not modified, and a `201` response is returned.
 
 + Parameters
     + id (string, required, `duke`) ... The `id` of an authentication provider (service) supported by the DDS application.
