@@ -16,6 +16,8 @@ class LdapIdentityProvider < IdentityProvider
     )
   end
 
+  private
+
   def ldap_search(ldap_filter)
     Net::LDAP.new(
         host: host,
