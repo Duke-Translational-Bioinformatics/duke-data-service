@@ -52,9 +52,10 @@ RSpec.describe ApplicationJob, type: :job do
   context 'child_class' do
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:child_class_queue) { channel.queue(child_class_queue_name) }
+    let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
-      Class.new(described_class) do
+      Object.const_set(child_class_name, Class.new(described_class) do
         queue_as klass_queue_name
         @run_count = 0
         def perform
@@ -66,7 +67,7 @@ RSpec.describe ApplicationJob, type: :job do
         def self.run_count
           @run_count
         end
-      end
+      end)
     }
 
     it { expect{child_class.perform_now}.not_to raise_error }
