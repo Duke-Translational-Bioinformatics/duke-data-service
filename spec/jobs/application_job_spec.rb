@@ -14,7 +14,7 @@ RSpec.describe ApplicationJob, type: :job do
   let(:channel) { bunny_session.channel }
 
   before do
-    Sneakers.configure(exchange: gateway_exchange_name)
+    Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 300, threads: 1)
   end
   
   it { is_expected.to be_a ActiveJob::Base }
@@ -108,6 +108,10 @@ RSpec.describe ApplicationJob, type: :job do
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
         it { expect{child_class.perform_later}.not_to raise_error }
+        it { expect{
+          child_class.perform_later
+          sleep 1
+        }.to change{child_class.run_count}.by(1) }
 
         context 'when stopped' do
           before { job_wrapper_instance.stop }
