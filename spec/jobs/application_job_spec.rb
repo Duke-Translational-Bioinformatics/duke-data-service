@@ -100,17 +100,19 @@ RSpec.describe ApplicationJob, type: :job do
         job_wrapper
       end
       it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
-      context 'instance created and run once' do
+      context 'instance created and run' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
-        before {
-          job_wrapper_instance.run # setup bindings
-          job_wrapper_instance.stop # allows messages to build up in queue
-        }
+        before { job_wrapper_instance.run }
+
         it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
         it { expect{child_class.perform_later}.not_to raise_error }
-        it { expect{child_class.perform_later}.to change{child_class_queue.message_count}.by(1) }
+
+        context 'when stopped' do
+          before { job_wrapper_instance.stop }
+          it { expect{child_class.perform_later}.to change{child_class_queue.message_count}.by(1) }
+        end
       end
     end
   end
