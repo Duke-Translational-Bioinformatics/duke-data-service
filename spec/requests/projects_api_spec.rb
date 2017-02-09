@@ -45,6 +45,7 @@ describe DDS::V1::ProjectsAPI do
         name: resource.name,
         description: resource.description
       }}
+      before { ProjectStorageProviderInitializationJob.job_wrapper.new.run }
 
       context 'with queued ActiveJob' do
         before do

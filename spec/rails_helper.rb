@@ -8,6 +8,7 @@ require 'shoulda-matchers'
 require 'vcr'
 require 'pundit/rspec'
 require 'uri'
+require 'bunny-mock'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -51,6 +52,9 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+  config.before(:each) do
+    Sneakers.configure(connection: BunnyMock.new)
+  end
   config.after(:each) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
@@ -80,4 +84,17 @@ VCR.configure do |c|
   c.default_cassette_options = {
     match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
   }
+end
+
+# Mocking Bunny for Sneakers ActiveJob testing
+module BunnyMock
+  class Queue
+    def durable?
+      opts[:durable]
+    end
+
+    def cancel
+      @consumers = []
+    end
+  end
 end

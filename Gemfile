@@ -13,6 +13,9 @@ gem 'neo4j'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
+# Use sneakers(RabbitMQ) for background jobs
+gem 'sneakers'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4' # Remove in rails 5
@@ -78,6 +81,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'pry-byebug'
+  gem 'bunny-mock'
 end
 
 #heroku requires this

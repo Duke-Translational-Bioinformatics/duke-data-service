@@ -55,5 +55,10 @@ module DukeDataService
     # Neo4j using Graph Story
     config.neo4j.session_type = :server_db
     config.neo4j.session_path = ENV["GRAPHSTORY_URL"]
+
+    # ActiveJob using Sneakers(RabbitMQ)
+    config.active_job.queue_adapter = :sneakers
+    # config.active_job.queue_name_prefix = Rails.env
+    # config.active_job.queue_name_delimiter = '.'
   end
 end
