@@ -16,7 +16,7 @@ RSpec.describe ApplicationJob, type: :job do
   before do
     Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 300, threads: 1)
   end
-  
+
   it { is_expected.to be_a ActiveJob::Base }
   it { expect{described_class.perform_now}.to raise_error(NotImplementedError) }
 
@@ -69,6 +69,7 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
+    it { expect(child_class.queue_name).to eq(child_class_queue_name) }
 
     it { expect{child_class.perform_now}.not_to raise_error }
     it { expect(child_class).to respond_to :run_count }
