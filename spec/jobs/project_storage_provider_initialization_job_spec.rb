@@ -4,6 +4,7 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
   let(:project) { FactoryGirl.create(:project) }
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   it { is_expected.to be_an ApplicationJob }
+  it { expect(described_class.queue_name).to eq("project_storage_provider_initialization") }
 
   context 'perform_now', :vcr do
     it 'should require a project argument' do
