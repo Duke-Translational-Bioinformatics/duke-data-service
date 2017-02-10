@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe DDS::V1::AuthProvidersAPI do
+  before { allow_any_instance_of(Net::LDAP).to receive(:search).and_raise(Net::LDAP::Error) }
   include_context 'without authentication'
   let(:auth_providers) {[
       FactoryGirl.create(:duke_authentication_service),
