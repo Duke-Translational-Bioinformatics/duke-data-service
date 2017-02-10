@@ -1,8 +1,6 @@
 shared_examples 'a kind' do
-  let(:kind_name) { subject.class.name }
   let(:resource_serializer) { ActiveModel::Serializer.serializer_for(subject) }
-  let(:expected_kind) { ['dds', kind_name.downcase].join('-') }
-  let(:serialized_kind) { true }
+
   it 'should have a kind' do
     expect(subject).to respond_to('kind')
     expect(subject.kind).to eq(expected_kind)
@@ -15,20 +13,24 @@ shared_examples 'a kind' do
       expect(payload).to be
       parsed_json = JSON.parse(payload)
       expect(parsed_json).to have_key('kind')
-      expect(parsed_json["kind"]).to eq(subject.kind)
+      expect(parsed_json["kind"]).to eq(expected_kind)
     end
   end
 
   it 'should be registered in KindnessFactory.kinded_models' do
-    expect(KindnessFactory.kinded_models).to include(subject.class)
+    expect(KindnessFactory.kinded_models).to include(kinded_class)
   end
 
   it 'should be returned by KindnessFactory.by_kind(expected_kind)' do
-    expect(KindnessFactory.by_kind(expected_kind)).to eq(subject.class)
+    expect(KindnessFactory.by_kind(expected_kind)).to eq(kinded_class)
   end
 end
 
 shared_examples 'a ProvRelation' do
+  let(:expected_kind) { ['dds', subject.class.name].join('-') }
+  let(:serialized_kind) { true }
+  let(:kinded_class) { subject.class }
+
   describe 'validations' do
     let(:deleted_copy) {
       described_class.new(
@@ -72,9 +74,8 @@ shared_examples 'a ProvRelation' do
   end
 
   it_behaves_like 'an audited model'
-  it_behaves_like 'a kind' do
-    let!(:kind_name) { subject.class.name.underscore }
-  end
+  it_behaves_like 'a kind'
+
   it_behaves_like 'a logically deleted model'
 
   it_behaves_like 'a graphed relation', auto_create: true do
@@ -109,5 +110,24 @@ shared_examples 'a logically deleted model' do
   # t.boolean :is_deleted, :default => false
   it 'should ensure is_deleted is false even if not specified in create' do
     expect(described_class.column_defaults['is_deleted']).not_to be_nil
+  end
+end
+
+shared_context 'with concurrent calls' do |object_list:, method:|
+  self.use_transactional_fixtures = false
+  let(:objects) { send(object_list) }
+  after do
+    ActiveRecord::Base.subclasses.each(&:delete_all)
+  end
+  before do
+    expect(ActiveRecord::Base.connection.pool.size).to be > 4
+
+    threads = objects.collect do |object|
+      Thread.new do
+        expect{object.send(method)}.not_to raise_error
+      end
+    end
+
+    threads.each(&:join)
   end
 end

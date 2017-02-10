@@ -13,7 +13,9 @@ RSpec.describe DataFile, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
-    let!(:kind_name) { 'file' }
+    let(:expected_kind) { 'dds-file' }
+    let(:kinded_class) { DataFile }
+    let(:serialized_kind) { true }
   end
   it_behaves_like 'a logically deleted model'
 
@@ -245,48 +247,222 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 
-  describe 'elasticsearch' do
-    it { expect(described_class).to include(Elasticsearch::Model) }
+  describe '#creator' do
+    let(:creator) { FactoryGirl.create(:user) }
+    it { is_expected.to respond_to :creator }
 
-    # TODO, when we move to asynchronous indexing, remove this and replace with
-    # a test to ensure that jobs are created on create, update, delete
-    it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
-
-    it { is_expected.to respond_to 'as_indexed_json' }
-    it { expect(subject.as_indexed_json).to eq(DataFileSearchDocumentSerializer.new(subject).as_json) }
-
-    describe 'mappings' do
-      subject { root_file.class.mapping.to_hash }
+    context 'with nil current_file_version' do
+      subject {
+        df = FactoryGirl.create(:data_file)
+        df.file_versions.destroy_all
+        df
+      }
       it {
-        is_expected.to have_key :data_file
+        expect(subject.current_file_version).to be_nil
+        expect(subject.creator).to be_nil
+      }
+    end
 
-        expect(subject[:data_file]).to have_key :dynamic
-        expect(subject[:data_file][:dynamic]).to eq "false"
+    context 'with nil current_file_version create audit' do
+      subject {
+        FactoryGirl.create(:data_file)
+      }
 
-        expect(subject[:data_file]).to have_key :properties
-        [:id, :name, :is_deleted, :created_at, :updated_at, :label, :tags].each do |expected_property|
-          expect(subject[:data_file][:properties]).to have_key expected_property
+      around(:each) do |example|
+          FileVersion.auditing_enabled = false
+          example.run
+          FileVersion.auditing_enabled = true
+      end
+
+      it {
+        expect(subject.current_file_version).not_to be_nil
+        expect(subject.current_file_version.audits.find_by(action: 'create')).to be_nil
+        expect(subject.creator).to be_nil
+      }
+    end
+
+    context 'with current_file_version and create audit' do
+      subject {
+        Audited.audit_class.as_user(creator) do
+          FactoryGirl.create(:data_file)
         end
+      }
+      it {
+        expect(subject.current_file_version).not_to be_nil
+        expect(subject.current_file_version.audits.find_by(action: 'create')).not_to be_nil
+        expect(subject.creator.id).to eq(subject.current_file_version.audits.find_by(action: 'create').user.id)
+      }
+    end
+  end
 
-        expect(subject[:data_file][:properties][:id][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:name][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:label][:type]).to eq "string"
+  describe 'elasticsearch' do
+    let(:search_serializer) { Search::DataFileSerializer }
+    let(:property_mappings) {{
+      kind: {type: "string", index: "not_analyzed"},
+      id: {type: "string", index: "not_analyzed"},
+      label: {type: "string"},
+      parent: {type: "object"},
+      name: {type: "string"},
+      audit: {type: "object"},
+      is_deleted: {type: "boolean"},
+      created_at: {type: "date"},
+      updated_at: {type: "date"},
+      tags: {type: "object"},
+      current_version: {type: "object"},
+      project: {type: "object"},
+      ancestors: {type: "object"},
+      creator: {type: "object"}
+    }}
 
-        expect(subject[:data_file][:properties][:is_deleted][:type]).to eq "boolean"
-
-        expect(subject[:data_file][:properties][:created_at][:type]).to eq "date"
-        expect(subject[:data_file][:properties][:updated_at][:type]).to eq "date"
-
-        expect(subject[:data_file][:properties][:tags][:type]).to eq "object"
-
+    it_behaves_like 'an Elasticsearch::Model'
+    it_behaves_like 'an Elasticsearch index mapping model' do
+      it {
+        #tags
         expect(subject[:data_file][:properties][:tags]).to have_key :properties
         expect(subject[:data_file][:properties][:tags][:properties]).to have_key :label
         expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "string"
-
         expect(subject[:data_file][:properties][:tags][:properties][:label]).to have_key :fields
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields]).to have_key :raw
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "string"
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:index]).to eq "not_analyzed"
+
+        #project
+        expect(subject[:data_file][:properties][:project]).to have_key :properties
+        expect(subject[:data_file][:properties][:project][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:project][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:project][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:project][:properties][:name][:type]).to eq "string"
+
+        #parent
+        expect(subject[:data_file][:properties][:parent]).to have_key :properties
+        expect(subject[:data_file][:properties][:parent][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:parent][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:parent][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:parent][:properties]).to have_key :kind
+        expect(subject[:data_file][:properties][:parent][:properties][:kind][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:parent][:properties][:kind][:index]).to eq "not_analyzed"
+
+        #creator
+        expect(subject[:data_file][:properties][:creator]).to have_key :properties
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:creator][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :username
+        expect(subject[:data_file][:properties][:creator][:properties][:username][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :email
+        expect(subject[:data_file][:properties][:creator][:properties][:email][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :first_name
+        expect(subject[:data_file][:properties][:creator][:properties][:first_name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:creator][:properties]).to have_key :last_name
+        expect(subject[:data_file][:properties][:creator][:properties][:last_name][:type]).to eq "string"
+
+        #audit
+        expect(subject[:data_file][:properties][:audit]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :created_on
+        expect(subject[:data_file][:properties][:audit][:properties][:created_on][:type]).to eq "date"
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :created_by
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties]).to have_key :username
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties]).to have_key :full_name
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties]).to have_key :agent
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:audit][:properties][:created_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :last_updated_on
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_on][:type]).to eq "date"
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :last_updated_by
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :username
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :full_name
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties]).to have_key :agent
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:audit][:properties][:last_updated_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :deleted_on
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_on][:type]).to eq "date"
+        expect(subject[:data_file][:properties][:audit][:properties]).to have_key :deleted_by
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :username
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:username][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :full_name
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:full_name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties]).to have_key :agent
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent]).to have_key :properties
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:audit][:properties][:deleted_by][:properties][:agent][:properties][:name][:type]).to eq "string"
+
+        #current_version
+        expect(subject[:data_file][:properties][:current_version]).to have_key :properties
+        expect(subject[:data_file][:properties][:current_version][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:current_version][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:current_version][:properties]).to have_key :version
+        expect(subject[:data_file][:properties][:current_version][:properties][:version][:type]).to eq "integer"
+        expect(subject[:data_file][:properties][:current_version][:properties]).to have_key :label
+        expect(subject[:data_file][:properties][:current_version][:properties][:label][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:current_version][:properties]).to have_key :upload
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload]).to have_key :properties
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :size
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:size][:type]).to eq "long"
+
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :storage_provider
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider]).to have_key :properties
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties][:name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties]).to have_key :description
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:storage_provider][:properties][:description][:type]).to eq "string"
+
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties]).to have_key :hashes
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes]).to have_key :properties
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties]).to have_key :algorithm
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties][:algorithm][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties][:algorithm][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties]).to have_key :value
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties][:value][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:current_version][:properties][:upload][:properties][:hashes][:properties][:value][:index]).to eq "not_analyzed"
+
+        #ancestors
+        expect(subject[:data_file][:properties][:ancestors]).to have_key :properties
+        expect(subject[:data_file][:properties][:ancestors][:properties]).to have_key :kind
+        expect(subject[:data_file][:properties][:ancestors][:properties][:kind][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:ancestors][:properties][:kind][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:ancestors][:properties]).to have_key :id
+        expect(subject[:data_file][:properties][:ancestors][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:ancestors][:properties][:id][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:ancestors][:properties]).to have_key :name
+        expect(subject[:data_file][:properties][:ancestors][:properties][:name][:type]).to eq "string"
       }
     end
   end

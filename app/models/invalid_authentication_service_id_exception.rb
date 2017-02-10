@@ -1,0 +1,2 @@
+class InvalidAuthenticationServiceIDException < StandardError
+end

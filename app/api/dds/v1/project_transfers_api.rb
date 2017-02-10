@@ -9,7 +9,7 @@ module DDS
         named 'initiate project transfer'
         failure [
           [200, 'This will never actually happen'],
-          [201, 'Created Successfully'],
+          [201, 'Successfully Created'],
           [400, 'Project Transfer Already Exists'],
           [401, 'Unauthorized'],
           [403, 'Forbidden']
@@ -36,13 +36,162 @@ module DDS
             })
         end
         authorize project_transfer, :create?
-
         if project_transfer.save
           project_transfer
         else
           validation_error!(project_transfer)
         end
+      end
 
+      desc 'List project transfers' do
+        detail 'list project transfers'
+        named 'list project transfers'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Project does not exist']
+        ]
+      end
+      get '/projects/:project_id/transfers', root: 'results' do
+        authenticate!
+        project = Project.find(params[:project_id])
+        policy_scope(ProjectTransfer).where(project: project)
+      end
+
+      desc 'View a project transfer' do
+        detail 'Used to view an instance of a project transfer.'
+        named 'view a project transfer'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      get '/project_transfers/:id', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        authorize project_transfer, :show?
+        project_transfer
+      end
+
+      desc 'Reject a project transfer' do
+        detail 'Reject a pending project transfer.'
+        named 'reject a project transfer'
+        failure [
+          [200, 'Success'],
+          [400, 'Validation Error'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'The unique id of the project transfer.'
+        optional :status_comment, type: String, desc: 'An optional comment that can be provided.'
+      end
+      put '/project_transfers/:id/reject', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
+        project_transfer.status = 'rejected'
+        project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
+        authorize project_transfer, :update?
+        if project_transfer.save
+          project_transfer
+        else
+          validation_error!(project_transfer)
+        end
+      end
+
+      desc 'Cancel a project transfer' do
+        detail 'Cancel a pending project transfer.'
+        named 'cancel a project transfer'
+        failure [
+          [200, 'Success'],
+          [400, 'Validation Error'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'The unique id of the project transfer.'
+        optional :status_comment, type: String, desc: 'An optional comment that can be provided.'
+      end
+      put '/project_transfers/:id/cancel', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
+        project_transfer.status = 'canceled'
+        project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
+        authorize project_transfer, :destroy?
+        if project_transfer.save
+          project_transfer
+        else
+          validation_error!(project_transfer)
+        end
+      end
+
+      desc 'Accept a project transfer' do
+        detail 'Accept a pending project transfer.'
+        named 'accept a project transfer'
+        failure [
+          [200, 'Success'],
+          [400, 'Validation Error'],
+          [401, 'Unauthorized'],
+          [403, 'Forbidden'],
+          [404, 'Project transfer does not exist']
+        ]
+      end
+      params do
+        requires :id, type: String, desc: 'The unique id of the project transfer.'
+        optional :status_comment, type: String, desc: 'An optional comment that can be provided.'
+      end
+      put '/project_transfers/:id/accept', root: false do
+        authenticate!
+        project_transfer = ProjectTransfer.find(params[:id])
+        project_transfer_params = declared(params, {include_missing: false}, [:status_comment])
+        authorize project_transfer, :update?
+        project_transfer.status = 'accepted'
+        project_transfer.status_comment = project_transfer_params[:status_comment] if project_transfer_params[:status_comment]
+        if project_transfer.save
+          project_transfer
+        else
+          validation_error!(project_transfer)
+        end
+      end
+
+      desc 'View all project transfers' do
+        detail 'View all project transfers.'
+        named 'view all project transfers'
+        failure [
+          [200, 'Success'],
+          [401, 'Unauthorized'],
+          [404, 'Unsupported Status']
+        ]
+      end
+      params do
+        optional :status, values: ProjectTransfer.statuses.keys,
+                          type: String,
+                          desc: 'Status must be one of the allowed statuses'
+      end
+      rescue_from Grape::Exceptions::ValidationErrors do |e|
+        error_json = {
+          "error" => "404",
+          "reason" => "Unknown Status",
+          "suggestion" => "Status should be one of the following: #{ProjectTransfer.statuses.keys}",
+        }
+        error!(error_json, 404)
+      end
+      get '/project_transfers', root: 'results' do
+        authenticate!
+        project_transfer_params = declared(params, include_missing: false)
+        project_transfers = policy_scope(ProjectTransfer)
+        if project_transfer_params[:status]
+          project_transfers = project_transfers.where(status: ProjectTransfer.statuses[project_transfer_params[:status]])
+        end
+        project_transfers
       end
     end
   end
