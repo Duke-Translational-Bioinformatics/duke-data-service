@@ -85,3 +85,35 @@ shared_examples 'a metadata annotated document' do
     end
   end
 end
+
+shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :search_serializer|
+  let(:resource_search_serializer) { send(resource_search_serializer_sym) }
+  it { expect(described_class).to include(Elasticsearch::Model) }
+
+  # TODO, when we move to asynchronous indexing, remove this and replace with
+  # a test to ensure that jobs are created on create, update, delete
+  it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
+
+  it { is_expected.to respond_to 'as_indexed_json' }
+  it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
+end
+
+shared_examples 'an Elasticsearch index mapping model' do |expected_property_mappings_sym: :property_mappings|
+  let(:expected_property_mappings) { send(expected_property_mappings_sym)}
+  subject { described_class.mapping.to_hash }
+
+  it {
+    is_expected.to have_key described_class.name.underscore.to_sym
+
+    expect(subject[described_class.name.underscore.to_sym]).to have_key :dynamic
+    expect(subject[described_class.name.underscore.to_sym][:dynamic]).to eq "false"
+
+    expect(subject[described_class.name.underscore.to_sym]).to have_key :properties
+    expected_property_mappings.keys.each do |expected_property|
+      expect(subject[described_class.name.underscore.to_sym][:properties]).to have_key expected_property
+      expected_property_mappings[expected_property].keys.each do |expected_property_aspect|
+        expect(subject[described_class.name.underscore.to_sym][:properties][expected_property][expected_property_aspect]).to eq expected_property_mappings[expected_property][expected_property_aspect]
+      end
+    end
+  }
+end

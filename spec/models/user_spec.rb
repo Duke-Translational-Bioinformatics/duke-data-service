@@ -7,8 +7,11 @@ RSpec.describe User, type: :model do
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
+    let(:expected_kind) { 'dds-user' }
+    let(:kinded_class) { User }
     let(:serialized_kind) { false }
   end
+
   it_behaves_like 'a graphed node', auto_create: true do
     let(:kind_name) { 'Agent' }
   end
@@ -34,6 +37,14 @@ RSpec.describe User, type: :model do
       should respond_to('current_software_agent')
       subject.current_software_agent = software_agent
       expect(subject.current_software_agent.id).to eq(software_agent.id)
+    end
+  end
+
+  context 'current_user_authenticaiton_service attribute' do
+    it 'should be an accessor' do
+      should respond_to('current_user_authenticaiton_service')
+      subject.current_user_authenticaiton_service = user_authentication_service
+      expect(subject.current_user_authenticaiton_service.id).to eq(user_authentication_service.id)
     end
   end
 

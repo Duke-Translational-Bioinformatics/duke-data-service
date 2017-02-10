@@ -50,7 +50,8 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :info
+  # :debug :info :warn :error :fatal :unknown (0-5)
+  config.log_level = ENV['RAILS_LOG_LEVEL'] || :info
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]

@@ -1,0 +1,351 @@
+FORMAT: 1A
+
+# Core Facility Workflow Resources
+
+## Group << API Summary
+
+## Group Project Transfer
+**Proposed endpoints to meet the needs of the GCB project transfer workflow**
+The *Project Transfer* actions can be used by research core facilities to formally transfer ownership of a project to a researcher (customer).  These endpoints support the transfer workflow and retain a record of the transfer history.
+
+## Project Transfer collection [/projects/{id}/transfers]
++ Parameters
+    + id (string, required, `ca29f7df-33ca-46dd-a015-92c46fdb6fd1`) ... The unique `id` of the project.
+
+### Initiate a project transfer [POST]
+Initiates a project transfer from the current owner (i.e. `project_admin`) to a new owner or list of owners.
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Request Properties**
+- - - - -
++ **to_users (object[ ], required)** - The list of users to transfer project ownership to.
++ **to_users[ ].id (string, required)** - The unique `id` of a user.
+
+>**Response Properties**
+- - - - -
++ **from_user (object)** - The user who initiated the project transfer.
++ **status (string)** - The current status of the project transfer; defaults to `pending`.
++ **status_comment (string)** - An optional comment that can be provided when status transfers to a terminal state.
+
+>**Rules:**
+- - - - -
++ There must be no existing transfers for the `project` in a `pending` state.
+
+**Response messages:**
+* 200: This will never happen
+* 201: Successfully Created
+* 400: Project transfer already exists
+* 401: Unauthorized
+* 403: Forbidden
+
++ Request (application/json)
+
+        {
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712"
+                }
+            ]
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "pending",
+            "status_comment": null,
+            "audit": { }
+        }
+
+### List project transfers [GET]
+>**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Project does not exist
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
+                    "from_user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "to_users": [
+                        {
+                            "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                            "username": "cbrandon01",
+                            "full_name": "Chad Brandon"
+                        }
+                    ],
+                    "status": "pending",
+                    "status_comment": null,
+                    "audit": { }
+                }
+            ]
+        }
+
+## Project Transfer instance [/project_transfers/{id}]
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
+### View a project transfer [GET]
+>**Permission:** manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "pending",
+            "status_comment": null,
+            "audit": { }
+        }
+
+## Accept a project transfer [PUT /project_transfers/{id}/accept]
+Accept a *pending* project transfer.
+>**Permission:** transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
++ All exisiting permissions for the project are removed, `project_viewer` is granted to the transfer initiater (i.e. `from_user`), and `project_admin` is granted to the list of recipients (i.e. `to_users`)
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "This data looks great..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "accepted",
+            "status_comment": "This data looks great...",
+            "audit": { }
+        }
+
+## Reject a project transfer [PUT /project_transfers/{id}/reject]
+Reject a *pending* project transfer.
+>**Permission:** transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "Missing alignment files..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "rejected",
+            "status_comment": "Missing alignment files...",
+            "audit": { }
+        }
+
+## Cancel a project transfer [PUT /project_transfers/{id}/cancel]
+Cancel a *pending* project transfer.
+>**Permission:** manage_project_permissions
+- - - - -
+
+>**Properties**
+- - - - -
++ **status_comment (string, optional)** - An optional comment that can be provided.
+
+>**Rules:**
+- - - - -
++ The project transfer must be in a `pending` state.
+
+**Response messages:**
+* 200: Success
+* 400: Validation Error
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Project transfer does not exist
+
++ Parameters
+    + id (string, required, `be8ac3c5-84e9-4969-8308-21cd5456946d`) ... The unique `id` of the project transfer.
+
++ Request (application/json)
+
+        {
+            "status_comment": "Sent to the wrong PI..."
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "from_user": {
+                "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                "username": "mrgardner01",
+                "full_name": "Matthew Gardner"
+            },
+            "to_users": [
+                {
+                    "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                    "username": "cbrandon01",
+                    "full_name": "Chad Brandon"
+                }
+            ],
+            "status": "canceled",
+            "status_comment": "Sent to the wrong PI...",
+            "audit": { }
+        }
+
+## View All Project Transfers [/project_transfers{?status}]
++ Parameters
+    + status (string, optional, `pending`) ... The `status` of the project transfer; can be one of `pending`,`accepted`, or `canceled`.
+
+### View All Project Transfers [GET]
+Used to retrieve all project transfers visible to the current user, optionally filtered by status.
+>**Permission:** authenticated [scope: manage_project_permissions, transfer initiator (i.e. `from_user`), or a transfer recipient (i.e. in `to_users`)]
+- - - - -
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 404: Unsupported status
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "be8ac3c5-84e9-4969-8308-21cd5456946d",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
+                    "from_user": {
+                        "id": "c1179f73-0558-4f96-afc7-9d251e65b7bb",
+                        "username": "mrgardner01",
+                        "full_name": "Matthew Gardner"
+                    },
+                    "to_users": [
+                        {
+                            "id": "7bbf009d-c26e-401e-a9d5-0faa99b9b712",
+                            "username": "cbrandon01",
+                            "full_name": "Chad Brandon"
+                        }
+                    ],
+                    "status": "pending",
+                    "status_comment": null,
+                    "audit": { }
+                }
+            ]
+        }

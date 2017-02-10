@@ -1,6 +1,7 @@
-# AttributedToUserProvRelation is a ProvRelation through Single Table inheritance
+# AttributedToUserProvRelation is a AttributedToProvRelation
+# AttributedtoProvRelation is a ProvRelation through Single Table inheritance
 
-class AttributedToUserProvRelation < ProvRelation
+class AttributedToUserProvRelation < AttributedToProvRelation
   # AttributedToUserProvRelation requires relationship_type 'was-attributed-to'
   # which maps to a Graph::WasAttributedTo graphed relationship
   validates :relatable_from_type, inclusion: { in: %w(FileVersion),

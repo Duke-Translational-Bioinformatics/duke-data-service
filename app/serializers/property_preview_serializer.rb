@@ -1,3 +1,3 @@
 class PropertyPreviewSerializer < ActiveModel::Serializer
-  attributes :id, :key
+  attributes :id, :key, :label
 end

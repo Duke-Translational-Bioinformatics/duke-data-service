@@ -3,14 +3,14 @@ require 'rails_helper'
 RSpec.describe Template, type: :model do
   let(:good_names) {[
     'sequencing_file_info',
-    Faker::Name.first_name
+    Faker::Internet.slug(nil, '_')
   ]}
   let(:bad_names) {[
     Faker::Name.name,
     Faker::Internet.email,
     Faker::Internet.url,
     Faker::SlackEmoji.emoji,
-    "#{Faker::Name.first_name}\n#{Faker::Name.first_name}"
+    "#{Faker::Internet.slug(nil, '_')}\n#{Faker::Internet.slug(nil, '_')}"
   ]}
 
   it_behaves_like 'an audited model'

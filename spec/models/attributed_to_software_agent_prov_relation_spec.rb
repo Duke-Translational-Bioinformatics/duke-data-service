@@ -4,7 +4,11 @@ RSpec.describe AttributedToSoftwareAgentProvRelation, type: :model do
   subject { FactoryGirl.create(:attributed_to_software_agent_prov_relation) }
   let(:resource_serializer) { AttributedToSoftwareAgentProvRelationSerializer }
   let(:expected_relationship_type) { 'was-attributed-to' }
-  it_behaves_like 'a ProvRelation'
+  it_behaves_like 'a ProvRelation' do
+    let(:expected_kind) { 'dds-relation-was-attributed-to' }
+    let(:serialized_kind) { true }
+    let(:kinded_class) { AttributedToProvRelation }
+  end
 
   describe 'validations' do
     it { is_expected.to allow_value('FileVersion').for(:relatable_from_type) }
