@@ -36,18 +36,18 @@ module DDS
         permission_params = declared(params)
         project = hide_logically_deleted Project.find(params[:project_id])
         user = User.find(params[:user_id])
-        if permission = ProjectPermission.find_by(project: project, user: user) 
+        if permission = ProjectPermission.find_by(project: project, user: user)
           authorize permission, :update?
         else
           permission = ProjectPermission.new(project: project, user: user)
           authorize permission, :create?
         end
-        
+
         permission.auth_role = AuthRole.find(permission_params[:auth_role][:id])
         unless permission.auth_role
           raise ActiveRecord::RecordNotFound.new(message: "Couldn't find AuthRole with id #{permission_params[:auth_role][:id]}")
         end
-        
+
         if permission.save
           permission
         else
@@ -80,8 +80,8 @@ module DDS
         detail 'Revoke project permissions'
         named 'revoke project permissions'
         failure [
-          [200, 'this will never happen'],
-          [204, 'Success'],
+          [200, 'This will never happen'],
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [404, 'Project or User Does not Exist']
         ]

@@ -23,10 +23,6 @@ class ProvRelation < ActiveRecord::Base
   belongs_to :relatable_from, polymorphic: true
   belongs_to :relatable_to, polymorphic: true
 
-  def kind
-    super(self.class.name.underscore)
-  end
-
   def create_graph_relation
     super(
       relationship_type.split('-').map{|part| part.capitalize}.join(''),

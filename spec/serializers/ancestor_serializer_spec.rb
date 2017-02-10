@@ -3,20 +3,16 @@ require 'rails_helper'
 RSpec.describe AncestorSerializer, type: :serializer do
   let(:folder) { FactoryGirl.create(:folder) }
   let(:project) { FactoryGirl.create(:project) }
-
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'kind' => resource.kind,
+    'name' => resource.name
+  }}
   context 'with Folder resource' do
     let(:resource) { folder }
 
     it_behaves_like 'a json serializer' do
-      it 'should have expected keys and values' do
-        is_expected.to have_key('kind')
-        is_expected.to have_key('id')
-        is_expected.to have_key('name')
-
-        expect(subject['id']).to eq(resource.id)
-        expect(subject['kind']).to eq(resource.kind)
-        expect(subject['name']).to eq(resource.name)
-      end
+      it { is_expected.to include(expected_attributes) }
     end
   end
 
@@ -24,15 +20,7 @@ RSpec.describe AncestorSerializer, type: :serializer do
     let(:resource) { project }
 
     it_behaves_like 'a json serializer' do
-      it 'should have expected keys and values' do
-        is_expected.to have_key('kind')
-        is_expected.to have_key('id')
-        is_expected.to have_key('name')
-
-        expect(subject['id']).to eq(resource.id)
-        expect(subject['kind']).to eq(resource.kind)
-        expect(subject['name']).to eq(resource.name)
-      end
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end

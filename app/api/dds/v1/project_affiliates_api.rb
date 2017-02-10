@@ -5,6 +5,7 @@ module DDS
         detail 'Deletes any existing project role for the user and assigns new role.'
         named 'create project affiliation'
         failure [
+          [200, 'Success'],
           [400, 'Project Name Already Exists'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
@@ -37,6 +38,7 @@ module DDS
         detail 'List project affiliations'
         named 'list project affiliation'
         failure [
+          [200, 'Success'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
         ]
@@ -52,6 +54,7 @@ module DDS
         detail 'View project level affiliation for a user'
         named 'get project affiliation'
         failure [
+          [200, 'Success'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
         ]
@@ -69,6 +72,7 @@ module DDS
         detail 'Remove project level affiliation for a user'
         named 'delete project affiliation'
         failure [
+          [204, 'Successfully Deleted'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
         ]

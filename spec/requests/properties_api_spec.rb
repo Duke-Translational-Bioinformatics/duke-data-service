@@ -5,6 +5,7 @@ describe DDS::V1::PropertiesAPI do
 
   let(:template) { property.template }
   let(:property) { FactoryGirl.create(:property) }
+  let(:sibling_property) { FactoryGirl.create(:property, template: template) }
   let(:other_property) { FactoryGirl.create(:property) }
   let(:property_stub) { FactoryGirl.build(:property) }
   let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
@@ -164,7 +165,7 @@ describe DDS::V1::PropertiesAPI do
       end
 
       context 'with existing key' do
-        let(:payload_key) { other_property.key }
+        let(:payload_key) { sibling_property.key }
         it_behaves_like 'a validated resource'
       end
     end
