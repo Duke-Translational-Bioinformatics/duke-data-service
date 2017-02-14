@@ -121,7 +121,7 @@ module S3StorageProvider
 
   def get_object_metadata(bucket, key)
     begin
-      object = Aws::S3::Object.new(bucket_name: bucket, key: key, client: get_s3_client)
+      obj = Aws::S3::Object.new(bucket_name: bucket, key: key, client: get_s3_client)
       # NOTE(cedric): In Swift this returns a dict with keys:
       # content-length
       # etag
