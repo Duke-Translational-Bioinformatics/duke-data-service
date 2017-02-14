@@ -244,6 +244,11 @@ ActiveRecord::Schema.define(version: 20161121165841) do
     t.string   "service_pass"
     t.string   "primary_key"
     t.string   "secondary_key"
+    t.string   "storage_type"
+    t.string   "endpoint"
+    t.string   "region"
+    t.string   "access_key"
+    t.string   "secret_access_key"
     t.boolean  "is_deprecated",        default: false, null: false
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false

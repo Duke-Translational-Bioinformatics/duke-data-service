@@ -440,7 +440,7 @@ api_token=`docker-compose -f docker-compose.yml -f docker-compose.dev.yml run ra
 ```
 - run the workflow with the api_token
 ```
-˝./workflow/workflow.sh ${api_token}
+./workflow/workflow.sh ${api_token}
 ```
 
 You will need to clean up after each run to get rid of all of the DDS objects, and Swift

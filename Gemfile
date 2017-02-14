@@ -62,6 +62,9 @@ gem "faker"
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Use AWS module for S3 storage provider access
+gem 'aws-sdk', '~> 2.7', '>= 2.7.4'
+
 group :development, :docker do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'

@@ -9,6 +9,7 @@ services:
   server:
     build: .
     env_file:
+      - s3.env
       - swift.env
       - webapp.env
       - portal.env
