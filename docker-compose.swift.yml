@@ -21,6 +21,11 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - swift:swift.local
+  worker:
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - swift:swift.local
   rake:
     links:
       - db:postgres.db.host
