@@ -1,5 +1,21 @@
 version: '2'
 services:
+  worker:
+    image: dukedataservice_server
+    volumes_from:
+      - localdev
+    entrypoint: ['rake', 'workers:run']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
+    env_file:
+      - webapp.env
+      - swift.env
+      - neo4j.client.env
+      - elastic.client.env
+      - rabbitmq.client.env
   rails:
     image: dukedataservice_server
     volumes_from:
@@ -47,7 +63,7 @@ services:
     volumes_from:
       - localdev
     entrypoint: ['rake']
-    command: auth_service:duke:create
+    command: auth_service:openid:create
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
