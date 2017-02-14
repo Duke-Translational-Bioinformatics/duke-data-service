@@ -28,6 +28,8 @@ module DukeDataService
     config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
     config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
 
+    config.eager_load_paths += %W( #{Rails.root}.join('app','jobs') )
+
     config.force_ssl = false
     cors_origins = '*'
     cors_origins = ENV['CORS_ORIGINS'].split(',') if ENV['CORS_ORIGINS']
