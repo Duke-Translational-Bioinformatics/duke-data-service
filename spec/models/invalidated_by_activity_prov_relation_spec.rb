@@ -5,7 +5,11 @@ RSpec.describe InvalidatedByActivityProvRelation, type: :model do
   let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-invalidated-by' }
 
-  it_behaves_like 'a ProvRelation'
+  it_behaves_like 'a ProvRelation' do
+    let(:expected_kind) { 'dds-relation-was-invalidated-by' }
+    let(:serialized_kind) { true }
+    let(:kinded_class) { InvalidatedByActivityProvRelation }
+  end
 
   describe 'validations' do
     it { is_expected.to allow_value('FileVersion').for(:relatable_from_type) }

@@ -32,4 +32,8 @@ class GeneratedByActivityProvRelation < ProvRelation
       errors.add(:relatable_to_id, "GeneratedByActivityProvRelation cannot be made to an Activity that has a UsedProvRelation to the generated FileVersion")
     end
   end
+
+  def kind
+    'dds-relation-was-generated-by'
+  end
 end

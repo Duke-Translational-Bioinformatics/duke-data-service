@@ -139,7 +139,10 @@ shared_examples 'a policy for' do |user_sym, on:, allows: [:scope, :index?, :sho
   context " #{on}" do
     if allows.include? :scope
       describe '.scope' do
-        it { expect(resolved_scope).to include(record) }
+        it {
+          expect(record).to be
+          expect(resolved_scope).to include(record)
+        }
       end
     else
       describe '.scope' do

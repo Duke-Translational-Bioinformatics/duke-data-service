@@ -48,32 +48,56 @@
     }
     else if (window.location.href.indexOf('#access_token') > 0){
       $('#login').hide();
-      var parts = window.location.hash.split('&');
-      var access_token = parts[0].split('=')[1];
-      validateAccessToken(access_token).then(
+      var hashParams = new URLSearchParams(window.location.hash);
+      //we store the service_id in the state for the round-trip
+      //URLSearchParams doesnt really handle the first param after the # correctly
+      getApiToken(hashParams.get('state'), hashParams.get('#access_token')).then(
         function(data) {
-          signed_token = data['signed_info'];
-          getApiToken(signed_token).then(
-            function(data) {
-              api_token = data['api_token'];
-              window.localStorage.api_token = api_token;
-              $('#login').hide();
-              addApiKeyAuthorization();
-              window.location.replace("#");
-            },
-            handleInvalidSignedToken
-          );
+          api_token = data['api_token'];
+          window.localStorage.api_token = api_token;
+          $('#login').hide();
+          addApiKeyAuthorization();
+          window.location.replace("#");
         },
-        handleInvalidAccessToken
+        handleInvalidSignedToken
       );
     }
     else {
+      getLoginChoices().then(
+        populateLoginChoices,
+        handleAjaxError
+      );
       $('#login').show();
+    }
+
+    function getLoginChoices() {
+      return $.ajax({
+        type: 'GET',
+        url: '/api/v1/auth_providers',
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+    }
+
+    function populateLoginChoices(data) {
+      var authLogin = '<div class="dropdown"><button class="btn btn-default dropdown-toggle" type="button" id="loginChoicesButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Use Authentication Provider<span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right" aria-labelledby="loginChoicesButton">'
+      data['results'].forEach(function(login_choice) {
+        if (!login_choice['is_deprecated']) {
+          var newLink = '<li><a href="'+login_choice['login_initiation_url']+'&state='+login_choice['service_id']+'&redirect_uri='+window.location.toString()+'">'+login_choice['name']+'</a></li>';
+          authLogin = authLogin+newLink;
+        }
+      });
+      authLogin = authLogin+'</ul></div>';
+      $( authLogin ).insertBefore($('#UseAuthToken'))
     }
 
     function handleLogout() {
       window.localStorage.removeItem('api_token');
       $('#current_user_info').hide();
+      getLoginChoices().then(
+        populateLoginChoices,
+        handleAjaxError
+      );
       $('#login').show();
       removeApiKeyAuthorization();
     }
@@ -115,15 +139,6 @@
       $('#current_user_info').show();
     }
 
-    function validateAccessToken(access_token) {
-      return $.ajax({
-        type: 'GET',
-        url: "<%= @auth_service.base_uri -%>/api/v1/token_info?access_token="+access_token,
-        contentType: 'application/json',
-        dataType: 'json'
-      })
-    }
-
     function handleInvalidAccessToken(jqXHR, status, err) {
       if ('console' in window) {
         console.log(jqXHR.responseText);
@@ -145,10 +160,10 @@
       }
     };
 
-    function getApiToken(signed_token) {
+    function getApiToken(service_id, signed_token) {
       return $.ajax({
         type: 'GET',
-        url: '/api/v1/user/api_token?access_token='+signed_token,
+        url: '/api/v1/user/api_token?access_token='+signed_token+'&authentication_service_id='+service_id,
         contentType: 'application/json',
         dataType: 'json'
       })
@@ -212,7 +227,6 @@
       <div class="modal-content">
         <div class="swagger-ui-wrap">
           <form class="form-inline">
-            <a href="<%= @auth_service.base_uri -%>/authenticate?client_id=<%= Rails.application.secrets.apiexplorer_id -%>&state=<%= @state -%>&response_type=Bearer&scope=display_name mail uid" class="btn btn-default">Use <%= @auth_service.name -%></a>
             <button id="UseAuthToken" type="submit" class="btn btn-default" data-dismiss="modal">Use AuthToken</button>
             <input id="UserSuppliedToken" type="textbox" class="form-control" placeholder="paste token here">
           </form>

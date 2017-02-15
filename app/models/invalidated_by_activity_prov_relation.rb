@@ -22,4 +22,8 @@ class InvalidatedByActivityProvRelation < ProvRelation
   def set_relationship_type
     self.relationship_type = 'was-invalidated-by'
   end
+
+  def kind
+    'dds-relation-was-invalidated-by'
+  end
 end

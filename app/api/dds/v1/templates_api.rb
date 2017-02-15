@@ -37,13 +37,13 @@ module DDS
         ]
       end
       params do
-        optional :name, type: String, desc: 'list templates whose name contains this string'
+        optional :name_contains, type: String, desc: 'list templates whose name contains the specified string'
       end
       get '/templates', root: 'results' do
         authenticate!
         template_params = declared(params, include_missing: false)
-        if template_params[:name]
-          template = Template.where("name = ?", template_params[:name])
+        if name_contains = template_params[:name_contains]
+          template = Template.where(Template.arel_table[:name].matches("%#{name_contains}%"))
         else
           Template.all
         end
@@ -74,9 +74,9 @@ module DDS
         named 'update template'
         failure [
           [200, 'Success'],
+          [400, 'Validation Error'],
           [401, 'Unauthorized'],
           [403, 'Forbidden (template restricted)'],
-          [400, 'Validation Error'],
           [404, 'Template Does not Exist']
         ]
       end
