@@ -85,6 +85,7 @@ describe DDS::V1::AuthProvidersAPI do
       }])
       user
     }
+    let(:resource_class) { User }
     let(:resource_uid) { resource.username }
     let(:returned_users) { [resource] }
 
@@ -103,16 +104,16 @@ describe DDS::V1::AuthProvidersAPI do
 
       it_behaves_like 'an identity provider', returns: :returned_users do
         it_behaves_like 'a listable resource', persisted_resource: false do
-          let(:resource_class) { User }
           let(:expected_resources) { returned_users }
           let(:expected_list_length) { expected_resources.count }
           let(:serializable_resource) {
             resource
           }
         end
-        it_behaves_like 'an identified resource' do
-          let(:resource_class) { AuthenticationService }
+        context 'with invalid authentication_service_id' do
           let(:authentication_service_id) { "doesNotExist" }
+          let(:resource_class) { AuthenticationService }
+          it_behaves_like 'an identified resource'
         end
       end
     end
@@ -131,9 +132,10 @@ describe DDS::V1::AuthProvidersAPI do
       it_behaves_like 'an identity provider', returns: :returned_users do
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a viewable resource'
-        it_behaves_like 'an identified resource' do
-          let(:resource_class) { AuthenticationService }
+        context 'with invalid authentication_service_id' do
           let(:authentication_service_id) { "doesNotExist" }
+          let(:resource_class) { AuthenticationService }
+          it_behaves_like 'an identified resource'
         end
       end
       it_behaves_like 'an identified affiliate'
@@ -143,7 +145,6 @@ describe DDS::V1::AuthProvidersAPI do
       include_context 'with authentication'
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates/#{resource_uid}/dds_user" }
       let(:resource_serializer) { UserSerializer }
-      let(:resource_class) { User }
       let(:expected_response_status) { 201 }
       subject { post(url, nil, headers) }
 
@@ -176,9 +177,10 @@ describe DDS::V1::AuthProvidersAPI do
           let(:called_action) { 'POST' }
           let(:expected_response_status) { 201 }
         end
-        it_behaves_like 'an identified resource' do
-          let(:resource_class) { AuthenticationService }
+        context 'with invalid authentication_service_id' do
           let(:authentication_service_id) { "doesNotExist" }
+          let(:resource_class) { AuthenticationService }
+          it_behaves_like 'an identified resource'
         end
       end
       it_behaves_like 'an identified affiliate'
