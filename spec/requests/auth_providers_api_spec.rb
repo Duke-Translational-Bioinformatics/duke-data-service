@@ -94,26 +94,28 @@ describe DDS::V1::AuthProvidersAPI do
 
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates" }
       let(:resource_serializer) { AffiliateSerializer }
-      let(:payload) {{
-        full_name_contains: resource.last_name
-      }}
       let(:expected_response_status) { 200 }
-      subject { get(url, payload, headers) }
 
-      it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
+      it_behaves_like 'a GET request' do
+        let(:payload) {{
+          full_name_contains: resource.last_name
+        }}
 
-      it_behaves_like 'an identity provider', returns: :returned_users do
-        it_behaves_like 'a listable resource', persisted_resource: false do
-          let(:expected_resources) { returned_users }
-          let(:expected_list_length) { expected_resources.count }
-          let(:serializable_resource) {
-            resource
-          }
-        end
-        context 'with invalid authentication_service_id' do
-          let(:authentication_service_id) { "doesNotExist" }
-          let(:resource_class) { AuthenticationService }
-          it_behaves_like 'an identified resource'
+        it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
+
+        it_behaves_like 'an identity provider', returns: :returned_users do
+          it_behaves_like 'a listable resource', persisted_resource: false do
+            let(:expected_resources) { returned_users }
+            let(:expected_list_length) { expected_resources.count }
+            let(:serializable_resource) {
+              resource
+            }
+          end
+          context 'with invalid authentication_service_id' do
+            let(:authentication_service_id) { "doesNotExist" }
+            let(:resource_class) { AuthenticationService }
+            it_behaves_like 'an identified resource'
+          end
         end
       end
     end
