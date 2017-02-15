@@ -15,6 +15,7 @@ describe DDS::V1::Base do
   end
   before do
     described_class.mount dummy
+    DDS::Base.change!
   end
 
   let(:url) {"/api/v1" + path }
