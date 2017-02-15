@@ -72,6 +72,9 @@ module DDS
         requires :id, type: String, desc: 'AuthenticationProvider UUID'
         requires :full_name_contains, type: String, desc: 'string contained in name(must be at least 3 characters)'
       end
+      params do
+        use :pagination
+      end
       get '/auth_providers/:id/affiliates', root: 'results', each_serializer: AffiliateSerializer do
         affiliate_params = declared(params, {include_missing: false}, [:full_name_contains])
         auth_service = AuthenticationService.find(params[:id])
@@ -79,7 +82,9 @@ module DDS
         affiliate_exists_error! if auth_service.user_authentication_services.where(
           uid: affiliate_params[:uid]
         ).exists?
-        auth_service.identity_provider.affiliates(affiliate_params[:full_name_contains])
+        affiliates = auth_service.identity_provider.affiliates(affiliate_params[:full_name_contains])
+        affiliates = Kaminari.paginate_array(affiliates)
+        paginate(affiliates)
       end
 
       desc 'View Auth Provider Affiliate' do

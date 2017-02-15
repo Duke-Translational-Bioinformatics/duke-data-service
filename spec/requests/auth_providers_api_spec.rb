@@ -111,6 +111,11 @@ describe DDS::V1::AuthProvidersAPI do
               resource
             }
           end
+          it_behaves_like 'a paginated resource' do
+            let(:returned_users) { extras + [resource] }
+            let(:extras) { FactoryGirl.create_list(:user, 5) }
+            let(:expected_total_length) { returned_users.count }
+          end
           context 'with invalid authentication_service_id' do
             let(:authentication_service_id) { "doesNotExist" }
             let(:resource_class) { AuthenticationService }
