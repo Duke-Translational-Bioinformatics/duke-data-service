@@ -74,19 +74,12 @@ module DDS
       end
       get '/auth_providers/:id/affiliates', root: 'results', each_serializer: AffiliateSerializer do
         affiliate_params = declared(params, {include_missing: false}, [:full_name_contains])
-        if UserAuthenticationService.where(
-          authentication_service_id: params[:id],
+        auth_service = AuthenticationService.find(params[:id])
+        unsupported_affiliate_search_error! unless auth_service.identity_provider
+        affiliate_exists_error! if auth_service.user_authentication_services.where(
           uid: affiliate_params[:uid]
         ).exists?
-          affiliate_exists_error!
-        else
-          auth_service = AuthenticationService.find(params[:id])
-          if auth_service.identity_provider.nil?
-            unsupported_affiliate_search_error!
-          else
-            auth_service.identity_provider.affiliates(affiliate_params[:full_name_contains])
-          end
-        end
+        auth_service.identity_provider.affiliates(affiliate_params[:full_name_contains])
       end
 
       desc 'View Auth Provider Affiliate' do
