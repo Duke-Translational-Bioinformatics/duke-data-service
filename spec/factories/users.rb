@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user do
     etag { SecureRandom.hex }
-    sequence(:username) { |n| "#{Faker::Internet.user_name}_#{n}" }
+    sequence(:username) { |n| "#{Faker::Internet.user_name(nil, ['_'])}_#{n}" }
     email { Faker::Internet.email }
     display_name { Faker::Name.name }
     first_name { Faker::Name.first_name }
