@@ -19,10 +19,22 @@ def create_indices
 end
 
 def index_documents
+  batch_size = 500
   ElasticsearchResponse.indexed_models.each do |indexed_model|
-    indexed_model.all.each do |im|
-      im.__elasticsearch__.index_document
-      $stderr.puts "+"
+    indexed_model.paginates_per batch_size
+    (1 .. indexed_model.page.total_pages).each do |page_num|
+      current_batch = indexed_model
+        .page(page_num)
+        .map { |f|
+          { index: {
+            _index: f.__elasticsearch__.index_name,
+            _type: f.__elasticsearch__.document_type,
+            _id: f.__elasticsearch__.id,
+            data: f.__elasticsearch__.as_indexed_json }
+          }
+      }
+      Elasticsearch::Model.client.bulk body: current_batch
+      $stderr.print "+" * current_batch.length
     end
   end
 end
