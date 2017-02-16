@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :user_authentication_service do
-    uid { "#{Faker::Name.first_name}_#{Faker::Number.number(3) }" }
+    uid { "#{Faker::Internet.user_name(nil, ['_'])}_#{Faker::Number.number(3) }" }
 
     trait :populated do
       user
