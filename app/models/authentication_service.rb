@@ -1,5 +1,6 @@
 class AuthenticationService < ActiveRecord::Base
   has_many :user_authentication_services
+  belongs_to :identity_provider
 
   validates :service_id, presence: true
   validates :name, presence: true
