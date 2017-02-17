@@ -18,6 +18,11 @@ def create_indices
   end
 end
 
+def index_batch(current_batch)
+
+  []
+end
+
 def index_documents
   batch_size = 500
   ElasticsearchResponse.indexed_models.each do |indexed_model|
@@ -33,8 +38,27 @@ def index_documents
             data: f.__elasticsearch__.as_indexed_json }
           }
       }
-      Elasticsearch::Model.client.bulk body: current_batch
-      $stderr.print "+" * current_batch.length
+      trys = 0
+      error_ids = []
+      while trys < 5
+        bulk_response = Elasticsearch::Model.client.bulk body: current_batch
+        if bulk_response["errors"]
+          trys += 1
+          error_ids = bulk_response["items"].select {|item|
+            item["index"]["status"] >= 400
+          }.map {|i|
+            i["index"]["_id"]
+          }
+          current_batch = current_batch.select {|b| error_ids.include? b[:index][:_id] }
+        else
+          trys = 5
+        end
+      end
+      unless error_ids.empty?
+        $stderr.puts "page #{page_num} Ids Not Loaded after #{trys} tries:"
+        $stderr.puts error_ids.join(',')
+      end
+      $stderr.print "+" * (current_batch.length - error_ids.length)
     end
   end
 end
