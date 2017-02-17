@@ -18,11 +18,6 @@ def create_indices
   end
 end
 
-def index_batch(current_batch)
-
-  []
-end
-
 def index_documents
   batch_size = 500
   ElasticsearchResponse.indexed_models.each do |indexed_model|
