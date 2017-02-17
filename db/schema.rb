@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161121165841) do
+ActiveRecord::Schema.define(version: 20170125192343) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20161121165841) do
     t.string   "login_initiation_uri"
     t.string   "login_response_type"
     t.boolean  "is_deprecated",        default: false, null: false
+    t.integer  "identity_provider_id"
   end
 
   create_table "chunks", id: :uuid, default: "uuid_generate_v4()", force: :cascade do |t|
@@ -133,6 +134,15 @@ ActiveRecord::Schema.define(version: 20161121165841) do
     t.uuid     "upload_id"
     t.string   "algorithm"
     t.string   "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "identity_providers", force: :cascade do |t|
+    t.string   "host"
+    t.string   "port"
+    t.string   "type"
+    t.string   "ldap_base"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
