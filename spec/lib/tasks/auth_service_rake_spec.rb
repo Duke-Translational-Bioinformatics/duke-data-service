@@ -24,19 +24,6 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     it_behaves_like 'an authentication_service:create task'
   end
 
-  describe 'auth_service:duke:destroy' do
-    include_context "rake"
-    let(:rake_task_name) { "auth_service:duke:destroy" }
-    let(:resource_class) { DukeAuthenticationService }
-
-    before do
-      FactoryGirl.attributes_for(:openid_authentication_service).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
-    end
-    it_behaves_like 'an authentication_service:destroy task'
-  end
-
   describe "auth_service:openid:create" do
     include_context "rake"
     let(:rake_task_name) { "auth_service:openid:create" }
@@ -59,17 +46,19 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     it_behaves_like 'an authentication_service:create task'
   end
 
-  describe 'auth_service:openid:destroy' do
+  describe 'auth_service:destroy' do
     include_context "rake"
-    let(:rake_task_name) { "auth_service:openid:destroy" }
-    let(:resource_class) { OpenidAuthenticationService }
+    let(:rake_task_name) { "auth_service:destroy" }
 
-    before do
-      FactoryGirl.attributes_for(:openid_authentication_service).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
+    context 'OpenidAuthenticationService' do
+      let(:resource_class) { OpenidAuthenticationService }
+      it_behaves_like 'an authentication_service:destroy task'
     end
-    it_behaves_like 'an authentication_service:destroy task'
+
+    context 'DukeAuthenticationService' do
+      let(:resource_class) { DukeAuthenticationService }
+      it_behaves_like 'an authentication_service:destroy task'
+    end
   end
 
   describe 'auth_service:transfer_default' do
@@ -268,6 +257,163 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
         }.not_to raise_error
         authentication_service.reload
         expect(authentication_service).to be_is_deprecated
+      }
+    end
+  end
+
+  describe 'auth_service:identity_provider:register' do
+    include_context "rake"
+    let(:task_name) { "auth_service:identity_provider:register" }
+
+    context 'missing ENV[AUTH_SERVICE_ID]' do
+      it {
+        expect {
+          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'missing ENV[IDENTITY_PROVIDER_ID]' do
+      it {
+        expect {
+          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'unknown AUTH_SERVICE_ID' do
+      let(:identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+      before do
+        ENV['AUTH_SERVICE_ID'] = SecureRandom.uuid
+        ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
+      end
+
+      it {
+        expect {
+          invoke_task epected_stderr: /authentication_service does not exist/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'unknown IDENTITY_PROVIDER_ID' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      before do
+        ENV['AUTH_SERVICE_ID'] = authentication_service.id
+        ENV['IDENTITY_PROVIDER_ID'] = "#{SecureRandom.random_number}"
+      end
+
+      it {
+        expect {
+          invoke_task epected_stderr: /identity_provider does not exist/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'identity_provider already set' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+      let(:identity_provider) { authentication_service.identity_provider }
+
+      context 'to requested identity_provider' do
+        before do
+          ENV['AUTH_SERVICE_ID'] = authentication_service.id
+          ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
+        end
+
+        it {
+          expect {
+            invoke_task expected_stderr: /AUTH_SERVICE_ID already registered with IDENTITY_PROVIDER_ID/
+          }.not_to raise_error
+        }
+      end
+
+      context 'to a different identity_provider than the requested identity_provider' do
+        let(:other_identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+        before do
+          ENV['AUTH_SERVICE_ID'] = authentication_service.id
+          ENV['IDENTITY_PROVIDER_ID'] = "#{other_identity_provider.id}"
+        end
+
+        it {
+          expect {
+            invoke_task epected_stderr: /AUTH_SERVICE_ID service is registered to a different identity_provider, use auth_service:identity_provider:remove/
+          }.to raise_error(StandardError)
+        }
+      end
+    end
+
+    context 'identity_provder not set' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+      before do
+        ENV['AUTH_SERVICE_ID'] = authentication_service.id
+        ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
+      end
+
+      it {
+        expect(authentication_service.identity_provider).to be_nil
+        expect {
+          invoke_task
+        }.not_to raise_error
+        authentication_service.reload
+        expect(authentication_service.identity_provider).not_to be_nil
+        expect(authentication_service.identity_provider.id).to eq(identity_provider.id)
+      }
+    end
+  end
+
+  describe 'auth_service:identity_provider:remove' do
+    include_context "rake"
+    let(:task_name) { "auth_service:identity_provider:remove" }
+
+    context 'missing ENV[AUTH_SERVICE_ID]' do
+      it {
+        expect {
+          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] is required/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'unknown AUTH_SERVICE_ID' do
+      before do
+        ENV['AUTH_SERVICE_ID'] = SecureRandom.uuid
+      end
+
+      it {
+        expect {
+          invoke_task epected_stderr: /authentication_service does not exist/
+        }.to raise_error(StandardError)
+      }
+    end
+
+    context 'auth_service does not have an identity_provider' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      before do
+        ENV['AUTH_SERVICE_ID'] = authentication_service.id
+      end
+      it {
+        expect {
+          invoke_task
+        }.not_to raise_error
+        authentication_service.reload
+        expect(authentication_service.identity_provider).to be_nil
+      }
+    end
+
+    context 'auth_service has an identity_provider' do
+      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+      before do
+        ENV['AUTH_SERVICE_ID'] = authentication_service.id
+      end
+      it {
+        expect(authentication_service.identity_provider).not_to be_nil
+        original_identity_provider = authentication_service.identity_provider
+        expect {
+          invoke_task
+        }.not_to raise_error
+        authentication_service.reload
+        expect(authentication_service.identity_provider).to be_nil
+        original_identity_provider.reload
+        expect(original_identity_provider).to be_persisted
       }
     end
   end
