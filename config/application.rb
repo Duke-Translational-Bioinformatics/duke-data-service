@@ -60,7 +60,7 @@ module DukeDataService
 
     # ActiveJob using Sneakers(RabbitMQ)
     config.active_job.queue_adapter = :sneakers
-    # config.active_job.queue_name_prefix = Rails.env
-    # config.active_job.queue_name_delimiter = '.'
+    config.active_job.queue_name_prefix = Rails.env
+    config.active_job.queue_name_delimiter = '.'
   end
 end
