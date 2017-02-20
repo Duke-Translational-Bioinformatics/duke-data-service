@@ -50,8 +50,11 @@ RSpec.describe ApplicationJob, type: :job do
   end
 
   context 'child_class' do
+    let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
+    let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
-    let(:child_class_queue) { channel.queue(child_class_queue_name) }
+    let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
+    let(:child_class_queue) { channel.queue(prefixed_queue_name) }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
@@ -69,7 +72,9 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
-    it { expect(child_class.queue_name).to eq(child_class_queue_name) }
+    it { expect(prefix).not_to be_nil }
+    it { expect(prefix_delimiter).not_to be_nil }
+    it { expect(child_class.queue_name).to eq(prefixed_queue_name) }
 
     it { expect{child_class.perform_now}.not_to raise_error }
     it { expect(child_class).to respond_to :run_count }
@@ -82,8 +87,8 @@ RSpec.describe ApplicationJob, type: :job do
     end
 
     context 'without job_wrapper running' do
-      it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
-      it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{child_class_queue_name} does not exist") }
+      it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
+      it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{prefixed_queue_name} does not exist") }
     end
 
     describe '::job_wrapper' do
@@ -105,7 +110,7 @@ RSpec.describe ApplicationJob, type: :job do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
 
-        it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_truthy }
+        it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
         it { expect{child_class.perform_later}.not_to raise_error }
