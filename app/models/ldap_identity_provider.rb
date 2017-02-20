@@ -10,7 +10,7 @@ class LdapIdentityProvider < IdentityProvider
   end
 
   def affiliates(full_name_contains=nil)
-    return [] unless full_name_contains && full_name_contains.length > 3
+    return [] unless full_name_contains && full_name_contains.length >= 3
     ldap_search(
       Net::LDAP::Filter.construct("displayName=*#{full_name_contains}*")
     )
