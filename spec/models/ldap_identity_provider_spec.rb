@@ -45,6 +45,16 @@ RSpec.describe LdapIdentityProvider, type: :model do
         }
       end
 
+      context 'is 3 characters' do
+        let(:ldap_returns) { [test_user] }
+        include_context 'mocked ldap', returns: :ldap_returns
+        subject { auth_provider.identity_provider.affiliates('foo') }
+        it {
+          is_expected.to be_a Array
+          expect(subject.length).to be > 0
+        }
+      end
+
       context 'greater than 3 characters' do
         let(:ldap_returns) { [test_user] }
         include_context 'mocked ldap', returns: :ldap_returns
