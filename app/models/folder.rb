@@ -30,10 +30,6 @@ class Folder < Container
     delete_children if newly_deleted
   end
 
-  def newly_deleted
-    @newly_deleted
-  end
-
   def delete_children
     folder_ids.each do |child_folder_id|
       FolderDeletionJob.perform_later(child_folder_id)
