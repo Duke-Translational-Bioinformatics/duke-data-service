@@ -131,3 +131,101 @@ shared_context 'with concurrent calls' do |object_list:, method:|
     threads.each(&:join)
   end
 end
+
+shared_examples 'a child minder' do |resource_factory,
+  valid_child_file_sym,
+  invalid_child_file_sym,
+  child_folder_sym|
+  let(:valid_child_file) { send(valid_child_file_sym) }
+  let(:invalid_child_file) { send(invalid_child_file_sym) }
+  let(:child_folder) { send(child_folder_sym) }
+
+  it {
+    is_expected.to respond_to(:folder_ids)
+  }
+  describe '#manage_children' do
+    it {
+      is_expected.to respond_to(:manage_children)
+    }
+    context 'when is_deleted not changed' do
+      it {
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        expect(subject).not_to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when is_deleted changed from false to true' do
+      it {
+        subject.is_deleted = true
+        yield_called = false
+        expect(subject).to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when is_deleted changed from true to false' do
+      subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        subject.is_deleted = false
+        yield_called = false
+        expect(subject).not_to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when something else changed' do
+      it {
+        subject.name = 'changed_name'
+        expect(subject.is_deleted?).to be_falsey
+        is_expected.to be_changed
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        expect(subject).not_to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+  end
+
+  describe '#delete_children' do
+    it {
+      is_expected.to respond_to(:delete_children)
+    }
+    it {
+      expect(valid_child_file).to be_persisted
+      expect(valid_child_file.is_deleted?).to be_falsey
+      expect(invalid_child_file).to be_persisted
+      expect(invalid_child_file.is_deleted?).to be_falsey
+      subject.delete_children
+      valid_child_file.reload
+      expect(valid_child_file.is_deleted?).to be_truthy
+      invalid_child_file.reload
+      expect(invalid_child_file.is_deleted?).to be_truthy
+    }
+
+    it {
+      expect(child_folder).to be_persisted
+      expect(subject.folder_ids).to include child_folder.id
+      expect(FolderDeletionJob).to receive(:perform_later).with(child_folder.id)
+      subject.delete_children
+    }
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:manage_children).around(:update) }
+  end
+end

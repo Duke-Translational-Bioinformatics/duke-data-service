@@ -1,11 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
-  subject { child_folder }
-  let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
-  let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
-  let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
-  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, parent: child_folder) }
+  subject { FactoryGirl.create(:folder, :with_parent) }
+  let(:immediate_child_folder) { FactoryGirl.create(:folder, parent: subject) }
+  let(:immediate_child_file) { FactoryGirl.create(:data_file, parent: subject) }
+  let(:invalid_immediate_child_file) { FactoryGirl.create(:data_file, :invalid, parent: subject) }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
@@ -38,13 +37,13 @@ RSpec.describe Folder, type: :model do
 
     it 'should not allow project_id to be changed' do
       should allow_value(project).for(:project)
-      expect(subject).to be_valid
+      is_expected.to be_valid
       should allow_value(project.id).for(:project_id)
       should_not allow_value(other_project.id).for(:project_id)
       should allow_value(project.id).for(:project_id)
-      expect(subject).to be_valid
+      is_expected.to be_valid
       should allow_value(other_project).for(:project)
-      expect(subject).not_to be_valid
+      is_expected.not_to be_valid
     end
 
     it 'should allow is_deleted to be set' do
@@ -54,33 +53,29 @@ RSpec.describe Folder, type: :model do
 
     it 'should not be its own parent' do
       should_not allow_value(subject).for(:parent)
-      expect(child_folder.reload).to be_truthy
+      expect(subject.reload).to be_truthy
       should_not allow_value(subject.id).for(:parent_id)
     end
 
     context 'with children' do
-      subject { child_folder.parent }
-
       it 'should allow is_deleted to be set to true' do
-        should allow_value(true).for(:is_deleted)
+        is_expected.to allow_value(true).for(:is_deleted)
         expect(subject.is_deleted?).to be_truthy
-        should allow_value(false).for(:is_deleted)
+        is_expected.to allow_value(false).for(:is_deleted)
       end
 
       it 'should not allow child as parent' do
-        should_not allow_value(child_folder).for(:parent)
-        expect(child_folder.reload).to be_truthy
-        should_not allow_value(child_folder.id).for(:parent_id)
+        is_expected.not_to allow_value(subject).for(:parent)
+        expect(subject.reload).to be_truthy
+        is_expected.not_to allow_value(subject.id).for(:parent_id)
       end
     end
 
     context 'with invalid child file' do
-      subject { invalid_file.parent }
-
       it 'should allow is_deleted to be set to true' do
-        should allow_value(true).for(:is_deleted)
+        is_expected.to allow_value(true).for(:is_deleted)
         expect(subject.is_deleted?).to be_truthy
-        should allow_value(false).for(:is_deleted)
+        is_expected.to allow_value(false).for(:is_deleted)
       end
     end
   end
@@ -97,6 +92,8 @@ RSpec.describe Folder, type: :model do
     end
   end
 
+  it_behaves_like 'a child minder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
+
   describe '#parent_id=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
@@ -107,87 +104,6 @@ RSpec.describe Folder, type: :model do
       expect(subject.project).to eq other_folder.project
       expect(subject.project_id).to eq other_folder.project_id
     end
-  end
-
-  describe '#manage_children' do
-    it {
-      is_expected.to respond_to(:manage_children)
-    }
-
-    context 'when is_deleted not changed' do
-      it {
-        expect(subject.is_deleted_changed?).to be_falsey
-        yield_called = false
-        expect(subject).not_to receive(:delete_children)
-        subject.manage_children do
-          yield_called = true
-        end
-        expect(yield_called).to be_truthy
-      }
-    end
-
-    context 'when is_deleted changed from false to true' do
-      it {
-        subject.is_deleted = true
-        yield_called = false
-        expect(subject).to receive(:delete_children)
-        subject.manage_children do
-          yield_called = true
-        end
-        expect(yield_called).to be_truthy
-      }
-    end
-
-    context 'when is_deleted changed from true to false' do
-      subject { FactoryGirl.create(:folder, is_deleted: true) }
-      it {
-        expect(subject.is_deleted?).to be_truthy
-        subject.is_deleted = false
-        yield_called = false
-        expect(subject).not_to receive(:delete_children)
-        subject.manage_children do
-          yield_called = true
-        end
-        expect(yield_called).to be_truthy
-      }
-    end
-
-    context 'when something else changed' do
-      it {
-        subject.name = 'changed_name'
-        expect(subject.is_deleted?).to be_falsey
-        is_expected.to be_changed
-        expect(subject.is_deleted_changed?).to be_falsey
-        expect(subject.newly_deleted).to be_falsey
-      }
-    end
-  end
-  describe '#delete_children' do
-    it {
-      is_expected.to respond_to(:delete_children)
-    }
-    it {
-      expect(grand_child_file).to be_persisted
-      expect(grand_child_file.is_deleted?).to be_falsey
-      expect(invalid_file).to be_persisted
-      expect(invalid_file.is_deleted?).to be_falsey
-      subject.delete_children
-      grand_child_file.reload
-      expect(grand_child_file.is_deleted?).to be_truthy
-      invalid_file.reload
-      expect(invalid_file.is_deleted?).to be_truthy
-    }
-
-    it {
-      expect(grand_child_folder).to be_persisted
-      expect(subject.folder_ids).to include grand_child_folder.id
-      expect(FolderDeletionJob).to receive(:perform_later).with(grand_child_folder.id)
-      subject.delete_children
-    }
-  end
-
-  describe 'callbacks' do
-    it { is_expected.to callback(:manage_children).around(:update) }
   end
 
   describe '.creator' do
