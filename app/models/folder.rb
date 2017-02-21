@@ -6,6 +6,7 @@ class Folder < Container
   has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
+  around_update :manage_children
 
   validates :project_id, presence: true, immutable: true
   validates_each :parent, :parent_id do |record, attr, value|
@@ -23,13 +24,21 @@ class Folder < Container
     project.containers.where(parent_id: [id, folder_ids].flatten)
   end
 
-  def is_deleted=(val)
-    if val
-      children.each do |child|
-        child.is_deleted = true
-      end
+  def manage_children
+    newly_deleted = is_deleted_changed? && is_deleted?
+    yield
+    delete_children if newly_deleted
+  end
+
+  def newly_deleted
+    @newly_deleted
+  end
+
+  def delete_children
+    folder_ids.each do |child_folder_id|
+      FolderDeletionJob.perform_later(child_folder_id)
     end
-    super(val)
+    DataFile.where(parent_id: id).update_all(is_deleted: true)
   end
 
   def as_indexed_json(options={})

@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe Folder, type: :model do
   subject { child_folder }
   let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
-  let(:root_folder) { FactoryGirl.create(:folder, :root) }
   let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
   let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, parent: child_folder) }
@@ -86,7 +85,7 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.parent=' do
+  describe '#parent=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
       expect(subject.project).not_to eq other_folder.project
@@ -98,7 +97,7 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.parent_id=' do
+  describe '#parent_id=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
       expect(subject.project).not_to eq other_folder.project
@@ -110,42 +109,88 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.is_deleted= on parent' do
-    subject { child_folder.parent }
+  describe '#manage_children' do
+    it {
+      is_expected.to respond_to(:manage_children)
+    }
 
-    it 'should set is_deleted on children' do
-      expect(child_folder.is_deleted?).to be_falsey
-      should allow_value(true).for(:is_deleted)
-      expect(subject.save).to be_truthy
-      expect(child_folder.reload).to be_truthy
-      expect(child_folder.is_deleted?).to be_truthy
+    context 'when is_deleted not changed' do
+      it {
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        expect(subject).not_to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
     end
 
-    it 'should set is_deleted on grand-children' do
-      expect(grand_child_folder.is_deleted?).to be_falsey
-      expect(grand_child_file.is_deleted?).to be_falsey
-      should allow_value(true).for(:is_deleted)
-      expect(subject.save).to be_truthy
-      expect(grand_child_folder.reload).to be_truthy
-      expect(grand_child_file.reload).to be_truthy
-      expect(grand_child_folder.is_deleted?).to be_truthy
-      expect(grand_child_file.is_deleted?).to be_truthy
+    context 'when is_deleted changed from false to true' do
+      it {
+        subject.is_deleted = true
+        yield_called = false
+        expect(subject).to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
     end
 
-    context 'with invalid child file' do
-      subject { invalid_file.parent }
+    context 'when is_deleted changed from true to false' do
+      subject { FactoryGirl.create(:folder, is_deleted: true) }
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        subject.is_deleted = false
+        yield_called = false
+        expect(subject).not_to receive(:delete_children)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
 
-      it 'should set is_deleted on children' do
-        expect(invalid_file.is_deleted?).to be_falsey
-        should allow_value(true).for(:is_deleted)
-        expect(subject.save).to be_truthy
-        expect(invalid_file.reload).to be_truthy
-        expect(invalid_file.is_deleted?).to be_truthy
-      end
+    context 'when something else changed' do
+      it {
+        subject.name = 'changed_name'
+        expect(subject.is_deleted?).to be_falsey
+        is_expected.to be_changed
+        expect(subject.is_deleted_changed?).to be_falsey
+        expect(subject.newly_deleted).to be_falsey
+      }
     end
   end
+  describe '#delete_children' do
+    it {
+      is_expected.to respond_to(:delete_children)
+    }
+    it {
+      expect(grand_child_file).to be_persisted
+      expect(grand_child_file.is_deleted?).to be_falsey
+      expect(invalid_file).to be_persisted
+      expect(invalid_file.is_deleted?).to be_falsey
+      subject.delete_children
+      grand_child_file.reload
+      expect(grand_child_file.is_deleted?).to be_truthy
+      invalid_file.reload
+      expect(invalid_file.is_deleted?).to be_truthy
+    }
 
-  describe '#creator' do
+    it {
+      expect(grand_child_folder).to be_persisted
+      expect(subject.folder_ids).to include grand_child_folder.id
+      expect(FolderDeletionJob).to receive(:perform_later).with(grand_child_folder.id)
+      subject.delete_children
+    }
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:manage_children).around(:update) }
+  end
+
+  describe '.creator' do
     let(:creator) { FactoryGirl.create(:user) }
     it { is_expected.to respond_to :creator }
 
