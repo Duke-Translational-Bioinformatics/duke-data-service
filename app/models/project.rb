@@ -13,6 +13,8 @@ class Project < ActiveRecord::Base
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
 
+  around_update :manage_children
+
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
@@ -37,5 +39,22 @@ class Project < ActiveRecord::Base
       end
     end
     super(val)
+  end
+
+  def manage_children
+    newly_deleted = is_deleted_changed? && is_deleted?
+    yield
+    delete_children if newly_deleted
+  end
+
+  def folder_ids
+    (folders.where(parent_id: nil).collect {|x| [x.id, x.folder_ids]}).flatten
+  end
+
+  def delete_children
+    folder_ids.each do |child_folder_id|
+      FolderDeletionJob.perform_later(child_folder_id)
+    end
+    data_files.where(parent_id: nil).update_all(is_deleted: true)
   end
 end
