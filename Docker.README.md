@@ -21,7 +21,6 @@ Table of Contents
 * [Running the Workflow](#running-the-workflow)
 * [Run Dredd](#run-dredd)
 * [The Api Explorer](#the-api-explorer)
-* [The Portal](#the-portal)
 * [Connecting a Duke Authentication Service microservice](#connecting-a-duke-authentication-service-microservice)
 * [Dockerfile](#dockerfile)
 * [Deploying Secrets](#deploying-secrets)

@@ -35,9 +35,6 @@ gem "audited-activerecord"
 # Unions in policy scopes
 gem 'active_record_union'
 
-# portal
-gem 'sinatra' # Remove in rails 5
-
 gem 'jwt'
 gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
