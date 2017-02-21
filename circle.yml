@@ -72,3 +72,6 @@ deployment:
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake auth_service:set_default --app 'dukeds'
     - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'
+test:
+  post:
+    - bash <(curl -s https://codecov.io/bash)
