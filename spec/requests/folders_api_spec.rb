@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
-  let(:folder_deletion_job) { FolderDeletionJob.job_wrapper.new }
+  let(:expected_job_wrapper) { FolderDeletionJob.job_wrapper.new }
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
@@ -63,9 +63,6 @@ describe DDS::V1::FoldersAPI do
 
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
-        before {
-          folder_deletion_job.run
-        }
       end
 
       context 'with project as parent' do
@@ -80,10 +77,6 @@ describe DDS::V1::FoldersAPI do
 
         it_behaves_like 'a logically deleted resource' do
           let(:deleted_resource) { project }
-          before {
-            folder_deletion_job.run
-            folder_deletion_job.stop
-          }
         end
       end
 
@@ -138,8 +131,8 @@ describe DDS::V1::FoldersAPI do
       let(:called_action) { 'DELETE' }
 
       before {
-        folder_deletion_job.run
-        folder_deletion_job.stop
+        expected_job_wrapper.run
+        expected_job_wrapper.stop
       }
 
       it_behaves_like 'a removable resource' do

@@ -434,7 +434,7 @@ shared_examples 'a logically deleted resource' do
   it 'should return 404 with error when resource found is logically deleted' do
     expect(deleted_resource).to be_persisted
     expect(deleted_resource).to respond_to 'is_deleted'
-    expect(deleted_resource.update_attribute(:is_deleted, true)).to be_truthy
+    expect(deleted_resource.update_column(:is_deleted, true)).to be_truthy
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
