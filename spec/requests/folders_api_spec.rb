@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
-
+  let(:folder_deletion_job) { FolderDeletionJob.job_wrapper.new }
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
@@ -63,6 +63,9 @@ describe DDS::V1::FoldersAPI do
 
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
+        before {
+          folder_deletion_job.run
+        }
       end
 
       context 'with project as parent' do
@@ -77,6 +80,10 @@ describe DDS::V1::FoldersAPI do
 
         it_behaves_like 'a logically deleted resource' do
           let(:deleted_resource) { project }
+          before {
+            folder_deletion_job.run
+            folder_deletion_job.stop
+          }
         end
       end
 
@@ -130,6 +137,11 @@ describe DDS::V1::FoldersAPI do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
 
+      before {
+        folder_deletion_job.run
+        folder_deletion_job.stop
+      }
+
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 
@@ -165,24 +177,55 @@ describe DDS::V1::FoldersAPI do
       context 'with children' do
         let(:resource) { parent }
         let!(:child) { folder }
+        let!(:file_child) { FactoryGirl.create(:data_file, parent: parent) }
         let!(:grand_child) { child_file }
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
-          let(:expected_count_change) { -3 }
+          let(:expected_count_change) { -2 }
 
-          it 'should be marked as deleted' do
-            is_expected.to eq(204)
-            expect(resource.reload).to be_truthy
-            expect(resource.is_deleted?).to be_truthy
+          context 'with inline ActiveJob' do
+            before do
+              ActiveJob::Base.queue_adapter = :inline
+            end
+
+            it 'should be marked as deleted' do
+              is_expected.to eq(204)
+              expect(resource.reload).to be_truthy
+              expect(resource.is_deleted?).to be_truthy
+            end
+
+            it 'should mark children as deleted' do
+              is_expected.to eq(204)
+              expect(folder.reload).to be_truthy
+              expect(folder.is_deleted?).to be_truthy
+              expect(file_child.reload).to be_truthy
+              expect(file_child.is_deleted?).to be_truthy
+              expect(child_file.reload).to be_truthy
+              expect(child_file.is_deleted?).to be_truthy
+            end
           end
 
-          it 'should be mark children as deleted' do
-            is_expected.to eq(204)
-            expect(folder.reload).to be_truthy
-            expect(folder.is_deleted?).to be_truthy
-            expect(child_file.reload).to be_truthy
-            expect(child_file.is_deleted?).to be_truthy
+          context 'with queued ActiveJob' do
+            before do
+              ActiveJob::Base.queue_adapter = :test
+            end
+
+            it 'should be marked as deleted' do
+              is_expected.to eq(204)
+              expect(resource.reload).to be_truthy
+              expect(resource.is_deleted?).to be_truthy
+            end
+
+            it 'should create FolderDeletionJob entries for child folders and their files' do
+              expect(folder).to be_persisted
+              expect(parent.folder_ids).to include folder.id
+              expect {
+                is_expected.to eq(204)
+              }.to have_enqueued_job(FolderDeletionJob).with(folder.id)
+              expect(file_child.reload).to be_truthy
+              expect(file_child.is_deleted?).to be_truthy
+            end
           end
         end
       end
