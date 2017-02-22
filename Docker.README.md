@@ -470,6 +470,7 @@ rm webapp.env
 ln -s webapp.local.env webapp.env
 ./launch_application.sh
 MY_GENERATED_JWT=$(docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create | tail -1)
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user_pool:create
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml run -e "MY_GENERATED_JWT=${MY_GENERATED_JWT}" -e "HOST_NAME=http://dds.host:3000/api/v1" dredd
 ```
 
