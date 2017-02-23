@@ -87,6 +87,6 @@ RSpec.describe Project, type: :model do
     let(:file) { FactoryGirl.create(:data_file, :root, project: subject) }
     let(:invalid_file) { FactoryGirl.create(:data_file, :root, :invalid, project: subject) }
 
-    it_behaves_like 'a child minder', :project, :file, :invalid_file, :folder
+    it_behaves_like 'a ChildMinder', :project, :file, :invalid_file, :folder
   end
 end

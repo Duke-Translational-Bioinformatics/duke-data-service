@@ -1,6 +1,8 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class Folder < Container
+  include ChildMinder
+
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
   has_many :folders, -> { readonly }, foreign_key: "parent_id"
   has_many :meta_templates, as: :templatable
@@ -22,19 +24,6 @@ class Folder < Container
 
   def descendants
     project.containers.where(parent_id: [id, folder_ids].flatten)
-  end
-
-  def manage_children
-    newly_deleted = is_deleted_changed? && is_deleted?
-    yield
-    delete_children if newly_deleted
-  end
-
-  def delete_children
-    folder_ids.each do |child_folder_id|
-      FolderDeletionJob.perform_later(child_folder_id)
-    end
-    DataFile.where(parent_id: id).update_all(is_deleted: true)
   end
 
   def as_indexed_json(options={})

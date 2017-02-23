@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
+  include ChildMinder
   include RequestAudited
   audited
 
@@ -30,31 +31,5 @@ class Project < ActiveRecord::Base
       )
       pp
     end
-  end
-
-  def is_deleted=(val)
-    if val
-      children.each do |child|
-        child.is_deleted = true
-      end
-    end
-    super(val)
-  end
-
-  def manage_children
-    newly_deleted = is_deleted_changed? && is_deleted?
-    yield
-    delete_children if newly_deleted
-  end
-
-  def folder_ids
-    (folders.where(parent_id: nil).collect {|x| [x.id, x.folder_ids]}).flatten
-  end
-
-  def delete_children
-    folder_ids.each do |child_folder_id|
-      FolderDeletionJob.perform_later(child_folder_id)
-    end
-    data_files.where(parent_id: nil).update_all(is_deleted: true)
   end
 end
