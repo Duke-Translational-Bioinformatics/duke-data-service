@@ -184,7 +184,7 @@ describe DDS::V1::ProjectsAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
-      let(:expected_job_wrapper) { FolderDeletionJob.job_wrapper.new }
+      let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
       before {
         expected_job_wrapper.run
         expected_job_wrapper.stop
@@ -249,13 +249,9 @@ describe DDS::V1::ProjectsAPI do
             end
 
             it {
-              expect(root_folder.is_deleted?).to be_falsey
-              expect(root_file.is_deleted?).to be_falsey
               expect {
                 is_expected.to eq(204)
-              }.to have_enqueued_job(FolderDeletionJob).with(root_folder.id)
-              expect(root_file.reload).to be_truthy
-              expect(root_file.is_deleted?).to be_truthy
+              }.to have_enqueued_job(ChildDeletionJob).with(resource)
             }
           end
         end
