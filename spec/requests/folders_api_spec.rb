@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
-  let(:expected_job_wrapper) { FolderDeletionJob.job_wrapper.new }
+  let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
@@ -161,10 +161,6 @@ describe DDS::V1::FoldersAPI do
             expect(resource.is_deleted?).to be_truthy
           end
         end
-
-        it_behaves_like 'a removable resource' do
-          let(:resource_counter) { DataFile.where(is_deleted: false) }
-        end
       end
 
       context 'with children' do
@@ -175,7 +171,6 @@ describe DDS::V1::FoldersAPI do
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
-          let(:expected_count_change) { -2 }
 
           context 'with inline ActiveJob' do
             before do
@@ -210,14 +205,10 @@ describe DDS::V1::FoldersAPI do
               expect(resource.is_deleted?).to be_truthy
             end
 
-            it 'should create FolderDeletionJob entries for child folders and their files' do
-              expect(folder).to be_persisted
-              expect(parent.folder_ids).to include folder.id
+            it 'should create ChildDeletionJob entries for child folders and their files' do
               expect {
                 is_expected.to eq(204)
-              }.to have_enqueued_job(FolderDeletionJob).with(folder.id)
-              expect(file_child.reload).to be_truthy
-              expect(file_child.is_deleted?).to be_truthy
+              }.to have_enqueued_job(ChildDeletionJob).with(resource)
             end
           end
         end
