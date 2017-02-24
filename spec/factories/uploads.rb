@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :upload do
     project
-    name { "#{Faker::Team.name}_#{rand(10**3)}" }
+    name { "#{Faker::Internet.slug}#{rand(10**3)}" }
     content_type "text/plain"
     size { Faker::Number.number(2) }
     etag { SecureRandom.hex }
