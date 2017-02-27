@@ -1,5 +1,5 @@
 class ProjectStorageProviderInitializationJob < ApplicationJob
-  queue_as self.name.underscore.gsub('_job','').to_sym
+  queue_as :project_storage_provider_initialization
 
   def perform(storage_provider:, project:)
     storage_provider.put_container(project.id)

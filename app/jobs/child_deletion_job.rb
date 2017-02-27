@@ -1,5 +1,5 @@
 class ChildDeletionJob < ApplicationJob
-  queue_as self.name.underscore.gsub('_job','').to_sym
+  queue_as :child_deletion
 
   def perform(parent)
     parent.children.each do |child|
