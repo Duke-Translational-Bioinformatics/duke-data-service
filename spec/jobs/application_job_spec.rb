@@ -9,7 +9,6 @@ RSpec.describe ApplicationJob, type: :job do
   let(:message_log_name) { 'message_log' }
   let(:message_log_queue) { channel.queue(message_log_name) }
 
-  let(:bunny) { BunnyMock }
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
 
