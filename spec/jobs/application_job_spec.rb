@@ -13,7 +13,7 @@ RSpec.describe ApplicationJob, type: :job do
   let(:channel) { bunny_session.channel }
 
   before do
-    Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 300, threads: 1)
+    Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 1, retry_timeout: 60000, retry_max_times: 1, threads: 1)
   end
 
   it { is_expected.to be_a ActiveJob::Base }
@@ -99,7 +99,7 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(job_wrapper).to be_a Class }
       it { expect(job_wrapper.ancestors).to include ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper }
       it { expect(job_wrapper.queue_name).to eq child_class.queue_name }
-      it { expect(job_wrapper.queue_opts).to eq queue_opts }
+      it { expect(job_wrapper.queue_opts).to include queue_opts }
       it 'calls ::create_bindings' do
         expect(described_class).to receive(:create_bindings)
         job_wrapper
