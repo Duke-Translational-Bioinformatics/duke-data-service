@@ -12,10 +12,10 @@ describe "workers", :if => ENV['TEST_WORKERS'] do
     it_behaves_like 'a queued job worker', :expected_job_class
   end
 
-  describe 'workers:delete_folders:run' do
+  describe 'workers:delete_children:run' do
     include_context "rake"
-    let(:task_name) { "workers:delete_folders:run" }
-    let(:expected_job_class) { FolderDeletionJob }
+    let(:task_name) { "workers:delete_children:run" }
+    let(:expected_job_class) { ChildDeletionJob }
 
     it { expect(subject.prerequisites).to  include("environment") }
     it_behaves_like 'a queued job worker', :expected_job_class
