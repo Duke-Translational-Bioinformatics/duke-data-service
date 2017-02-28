@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'sneakers/runner'
 Dir[Rails.root.join('app/jobs/*.rb')].each { |f| require f }
 
-describe "workers", :if => ENV['TEST_WORKERS'] do
+describe "workers" do
   describe 'workers:initialize_project_storage:run' do
     include_context "rake"
     let(:task_name) { "workers:initialize_project_storage:run" }
