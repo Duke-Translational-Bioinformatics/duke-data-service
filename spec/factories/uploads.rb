@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :upload do
     project
-    name { Faker::Internet.slug }
+    sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
     content_type "text/plain"
     size { Faker::Number.number(2) }
     etag { SecureRandom.hex }
