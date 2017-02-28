@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe ApplicationJob, type: :job do
   let(:gateway_exchange_name) { 'test.'+Faker::Internet.slug }
-  let(:gateway_exchange) { channel.exchange(gateway_exchange_name) }
+  let(:gateway_exchange) { channel.exchange(gateway_exchange_name, type: :fanout, durable: true) }
   let(:distributor_exchange_name) { 'active_jobs' }
   let(:distributor_exchange_type) { :direct }
-  let(:distributor_exchange) { channel.exchange(distributor_exchange_name) }
+  let(:distributor_exchange) { channel.exchange(distributor_exchange_name, type: distributor_exchange_type, durable: true) }
   let(:message_log_name) { 'message_log' }
-  let(:message_log_queue) { channel.queue(message_log_name) }
+  let(:message_log_queue) { channel.queue(message_log_name, durable: true) }
 
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
@@ -53,7 +53,7 @@ RSpec.describe ApplicationJob, type: :job do
     let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
-    let(:child_class_queue) { channel.queue(prefixed_queue_name) }
+    let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
