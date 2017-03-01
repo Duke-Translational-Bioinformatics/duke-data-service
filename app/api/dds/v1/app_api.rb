@@ -10,7 +10,7 @@ module DDS
         ]
       end
       get '/app/status', root: false do
-        status = {status: 'ok', environment: "#{Rails.env}", rdbms: 'ok', authentication_service: 'not tested', storage_provider: 'not tested', graphdb: 'not tested'}
+        status = {status: 'ok', environment: "#{Rails.env}", rdbms: 'ok', authentication_service: 'not tested', storage_provider: 'not tested', graphdb: 'not tested', queue: 'not tested'}
         begin
           #rdbms must be connected and seeded
           auth_roles = AuthRole.all.count
@@ -20,54 +20,32 @@ module DDS
           end
 
           # authentication_service must be configured
-          if ENV["AUTH_SERVICE_ID"] &&
-             ENV["AUTH_SERVICE_BASE_URI"] &&
-             ENV["AUTH_SERVICE_NAME"]
-            as_count = AuthenticationService.count
-            if as_count == 0
-              status[:status] = 'error'
-              status[:authentication_service] = 'has not been created'
-            else
-              status[:authentication_service] = 'ok'
-            end
+          as_count = AuthenticationService.count
+          if as_count == 0
+            status[:status] = 'error'
+            status[:authentication_service] = 'has not been created'
           else
-           status[:status] = 'error'
-           status["authentication_service"] = 'environment is not set'
+            status[:authentication_service] = 'ok'
           end
 
-          # storage_provider must be configured
-          if ENV['SWIFT_DESCRIPTION'] &&
-             ENV["SWIFT_ACCT"] &&
-             ENV["SWIFT_URL_ROOT"] &&
-             ENV['SWIFT_VERSION'] &&
-             ENV['SWIFT_AUTH_URI'] &&
-             ENV["SWIFT_USER"] &&
-             ENV["SWIFT_PASS"] &&
-             ENV["SWIFT_PRIMARY_KEY"] &&
-             ENV["SWIFT_SECONDARY_KEY"] &&
-             ENV['SWIFT_CHUNK_HASH_ALGORITHM']
-            #storage_provider must be created
-            sp = StorageProvider.first
-            if sp
-              #storage_provider must be accessible over http without network or CORS issues
-              sp_acct = sp.get_account_info
-              # storage_provider must register_keys
-              if sp_acct.has_key?("x-account-meta-temp-url-key") &&
-                     sp_acct.has_key?("x-account-meta-temp-url-key-2") &&
-                     sp_acct["x-account-meta-temp-url-key"] &&
-                     sp_acct["x-account-meta-temp-url-key-2"]
-                status[:storage_provider] = 'ok'
-              else
-                status[:status] = 'error'
-                status[:storage_provider] = 'has not registered its keys'
-              end
+          #storage_provider must be created
+          sp = StorageProvider.first
+          if sp
+            #storage_provider must be accessible over http without network or CORS issues
+            sp_acct = sp.get_account_info
+            # storage_provider must register_keys
+            if sp_acct.has_key?("x-account-meta-temp-url-key") &&
+                   sp_acct.has_key?("x-account-meta-temp-url-key-2") &&
+                   sp_acct["x-account-meta-temp-url-key"] &&
+                   sp_acct["x-account-meta-temp-url-key-2"]
+              status[:storage_provider] = 'ok'
             else
               status[:status] = 'error'
-              status[:storage_provider] = 'has not been created'
+              status[:storage_provider] = 'has not registered its keys'
             end
           else
             status[:status] = 'error'
-            status[:storage_provider] = 'environment is not set'
+            status[:storage_provider] = 'has not been created'
           end
 
           #graphdb must be configured
@@ -78,6 +56,32 @@ module DDS
           else
             status[:status] = 'error'
             status[:graphdb] = 'environment is not set'
+          end
+
+          if ENV['CLOUDAMQP_URL']
+            missing_exchanges = [
+              ApplicationJob.opts[:exchange],
+              ApplicationJob.distributor_exchange_name
+            ].reject do |expected_exchange|
+              ApplicationJob.conn.exchange_exists? expected_exchange
+            end
+
+            if missing_exchanges.empty?
+              queue_names = (ApplicationJob.descendants.collect {|d| d.queue_name }).uniq
+              missing_queues = ['message_log'].concat(queue_names).reject do |expected_queue|
+                ApplicationJob.conn.queue_exists? expected_queue
+              end
+
+              if missing_queues.empty?
+                status[:queue] = 'ok'
+              else
+                status[:queue] = "is missing expected queues #{missing_queues.join(' ')}"
+              end
+            else
+              status[:queue] = "is missing expected exchanges #{missing_exchanges.join(' ')}"
+            end
+          else
+            status[:queue] = 'environment is not set'
           end
 
           if status[:status] == 'ok'
@@ -95,6 +99,11 @@ module DDS
           status[:status] = 'error'
           status[:graphdb] = 'is not connected'
           error!(status,503)
+        rescue Bunny::TCPConnectionFailedForAllHosts => e
+          logger.error("RabbitMQ Connection error #{e.message}")
+          status[:status] = 'error'
+          status[:queue] = 'is not connected'
+          error!(status, 503)
         rescue Exception => e
           logger.error("GOT UNKOWNN Exception "+e.inspect)
           status[:status] = 'error'
