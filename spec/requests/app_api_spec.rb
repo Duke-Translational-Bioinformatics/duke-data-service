@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe DDS::V1::AppAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
+  let(:queue_prefix) { Rails.application.config.active_job.queue_name_prefix }
+  let(:queue_prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
 
   describe 'app status', :vcr do
     context 'when rdbms is not seeded' do
@@ -22,34 +24,7 @@ describe DDS::V1::AppAPI do
     end #when rdbms not seeded
 
     context 'authentication_service' do
-      context 'environment is not set' do
-        before do
-          ENV['AUTH_SERVICE_ID'] = nil
-          ENV['AUTH_SERVICE_BASE_URI'] = nil
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        end
-
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('authentication_service')
-          expect(returned_configs['authentication_service']).to eq('environment is not set')
-        end
-      end
-
       context 'is not created' do
-        before do
-          ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        end
-
         it 'should return response.status 503' do
           get '/api/v1/app/status', json_headers
           expect(response.status).to eq(503)
@@ -66,49 +41,7 @@ describe DDS::V1::AppAPI do
     end #authentication_service
 
     context 'storage_provider' do
-      context 'environment is not set' do
-        before do
-          ENV['SWIFT_DISPLAY_NAME'] = nil
-          ENV['SWIFT_DESCRIPTION'] = nil
-          ENV['SWIFT_ACCT'] = nil
-          ENV['SWIFT_URL_ROOT'] = nil
-          ENV['SWIFT_VERSION'] = nil
-          ENV['SWIFT_AUTH_URI'] = nil
-          ENV['SWIFT_USER'] = nil
-          ENV['SWIFT_PASS'] = nil
-          ENV['SWIFT_PRIMARY_KEY'] = nil
-          ENV['SWIFT_SECONDARY_KEY'] = nil
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = nil
-        end
-
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('storage_provider')
-          expect(returned_configs['storage_provider']).to eq('environment is not set')
-        end
-      end
-
       context 'has not been created' do
-        before do
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-        end
         it 'should return response.status 503' do
           get '/api/v1/app/status', json_headers
           expect(response.status).to eq(503)
@@ -126,17 +59,6 @@ describe DDS::V1::AppAPI do
       context 'has not registered its keys' do
         let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
         before do
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
           resp = HTTParty.post(
             swift_storage_provider.storage_url,
             headers: swift_storage_provider.auth_header.merge({
@@ -166,20 +88,6 @@ describe DDS::V1::AppAPI do
         let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
         let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
         before do
-          ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
           stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
         end
         it 'should return response.status 503' do
@@ -220,6 +128,178 @@ describe DDS::V1::AppAPI do
       # cannot test is not connected because vcr ignores all requests to neo4j
     end #graphdb
 
+    context 'queue' do
+      context 'environment is not set' do
+        before do
+          ENV["CLOUDAMQP_URL"] = nil
+        end
+        it 'should return response.status 503' do
+          get '/api/v1/app/status', json_headers
+          expect(response.status).to eq(503)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+          returned_configs = JSON.parse(response.body)
+          expect(returned_configs).to be_a Hash
+          expect(returned_configs).to have_key('status')
+          expect(returned_configs['status']).to eq('error')
+          expect(returned_configs).to have_key('queue')
+          expect(returned_configs['queue']).to eq('environment is not set')
+        end
+      end
+
+      context 'is not connected' do
+        before do
+          ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
+        end
+        it 'should return response.status 503' do
+          expect(ApplicationJob).to receive(:conn)
+            .and_raise(Bunny::TCPConnectionFailedForAllHosts)
+          get '/api/v1/app/status', json_headers
+          expect(response.status).to eq(503)
+          expect(response.body).to be
+          expect(response.body).not_to eq('null')
+          returned_configs = JSON.parse(response.body)
+          expect(returned_configs).to be_a Hash
+          expect(returned_configs).to have_key('status')
+          expect(returned_configs['status']).to eq('error')
+          expect(returned_configs).to have_key('queue')
+          expect(returned_configs['queue']).to eq('is not connected')
+        end
+      end
+
+      context 'missing expected exchange' do
+        before do
+          ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
+          queue_names = (ApplicationJob.descendants.collect {|d| d.queue_name }).uniq
+          mocked_bunny_session = instance_double(BunnyMock::Session)
+          [ApplicationJob.opts[:exchange], ApplicationJob.distributor_exchange_name].each do |this_exchange|
+            should_exist = this_exchange != expected_exchange
+            allow(mocked_bunny_session).to receive(:exchange_exists?)
+              .with(this_exchange)
+              .and_return(should_exist)
+          end
+          ['message_log'].concat(queue_names).each do |expected_queue|
+            allow(mocked_bunny_session).to receive(:queue_exists?)
+              .with(expected_queue)
+              .and_return(true)
+          end
+          allow(ApplicationJob).to receive(:conn).and_return(mocked_bunny_session)
+        end
+
+        context ApplicationJob.opts[:exchange] do
+          let(:expected_exchange) { ApplicationJob.opts[:exchange] }
+          it {
+            get '/api/v1/app/status', json_headers
+            expect(response.status).to eq(503)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            returned_configs = JSON.parse(response.body)
+            expect(returned_configs).to be_a Hash
+            expect(returned_configs).to have_key('status')
+            expect(returned_configs['status']).to eq('error')
+            expect(returned_configs).to have_key('queue')
+            expect(returned_configs['queue']).to match(/is missing expected exchange.*#{expected_exchange}/)
+          }
+        end
+
+        context ApplicationJob.distributor_exchange_name do
+          let(:expected_exchange) { ApplicationJob.distributor_exchange_name }
+          it {
+            get '/api/v1/app/status', json_headers
+            expect(response.status).to eq(503)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            returned_configs = JSON.parse(response.body)
+            expect(returned_configs).to be_a Hash
+            expect(returned_configs).to have_key('status')
+            expect(returned_configs['status']).to eq('error')
+            expect(returned_configs).to have_key('queue')
+            expect(returned_configs['queue']).to match(/is missing expected exchange.*#{expected_exchange}/)
+          }
+        end
+      end
+
+      context 'missing expected queues' do
+        before do
+          ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
+          silence_warnings do
+            Rails.application.eager_load! unless Rails.application.config.eager_load
+          end
+          queue_names = (ApplicationJob.descendants.collect {|d| d.queue_name }).uniq
+          mocked_bunny_session = instance_double(BunnyMock::Session)
+
+          [ApplicationJob.opts[:exchange], ApplicationJob.distributor_exchange_name].each do |expected_exchange|
+            allow(mocked_bunny_session).to receive(:exchange_exists?)
+              .with(expected_exchange)
+              .and_return(true)
+          end
+
+          ['message_log'].concat(queue_names).each do |this_queue|
+            if this_queue.include? queue_prefix
+              should_exist = "#{queue_prefix}#{queue_prefix_delimiter}#{expected_queue}" != this_queue
+            else
+              should_exist = expected_queue != this_queue
+            end
+            allow(mocked_bunny_session).to receive(:queue_exists?)
+              .with(this_queue)
+              .and_return(should_exist)
+          end
+          allow(ApplicationJob).to receive(:conn).and_return(mocked_bunny_session)
+        end
+
+        context 'message_log' do
+          let(:expected_queue) { 'message_log' }
+
+          it {
+            get '/api/v1/app/status', json_headers
+            expect(response.status).to eq(503)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            returned_configs = JSON.parse(response.body)
+            expect(returned_configs).to be_a Hash
+            expect(returned_configs).to have_key('status')
+            expect(returned_configs['status']).to eq('error')
+            expect(returned_configs).to have_key('queue')
+            expect(returned_configs['queue']).to match(/is missing expected queues.*#{expected_queue}/)
+          }
+        end
+
+        context 'child_deletion' do
+          let(:expected_queue) { 'child_deletion' }
+
+          it {
+            get '/api/v1/app/status', json_headers
+            expect(response.status).to eq(503)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            returned_configs = JSON.parse(response.body)
+            expect(returned_configs).to be_a Hash
+            expect(returned_configs).to have_key('status')
+            expect(returned_configs['status']).to eq('error')
+            expect(returned_configs).to have_key('queue')
+            expect(returned_configs['queue']).to match(/is missing expected queues.*#{expected_queue}/)
+          }
+        end
+
+        context 'project_storage_provider_initialization' do
+          let(:expected_queue) { 'project_storage_provider_initialization' }
+
+          it {
+            get '/api/v1/app/status', json_headers
+            expect(response.status).to eq(503)
+            expect(response.body).to be
+            expect(response.body).not_to eq('null')
+            returned_configs = JSON.parse(response.body)
+            expect(returned_configs).to be_a Hash
+            expect(returned_configs).to have_key('status')
+            expect(returned_configs['status']).to eq('error')
+            expect(returned_configs).to have_key('queue')
+            expect(returned_configs['queue']).to match(/is missing expected queues.*#{expected_queue}/)
+          }
+        end
+      end
+    end
+
     context 'when properly integrated' do
       let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
       let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
@@ -227,22 +307,24 @@ describe DDS::V1::AppAPI do
 
       before do
         WebMock.reset!
-        ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-        ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-        ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-        ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-        ENV['SWIFT_ACCT'] = 'AUTH_test'
-        ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-        ENV['SWIFT_VERSION'] = 'v1'
-        ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-        ENV['SWIFT_USER'] = 'test:tester'
-        ENV['SWIFT_PASS'] = 'testing'
-        ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-        ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-        ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
         ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
         swift_storage_provider.register_keys
+        ENV["CLOUDAMQP_URL"] = Faker::Internet.slug
+        queue_names = (ApplicationJob.descendants.collect {|d| d.queue_name }).uniq
+        mocked_bunny_session = instance_double(BunnyMock::Session)
+
+        [ApplicationJob.opts[:exchange], ApplicationJob.distributor_exchange_name].each do |expected_exchange|
+          allow(mocked_bunny_session).to receive(:exchange_exists?)
+            .with(expected_exchange)
+            .and_return(true)
+        end
+
+        ['message_log'].concat(queue_names).each do |expected_queue|
+          allow(mocked_bunny_session).to receive(:queue_exists?)
+            .with(expected_queue)
+            .and_return(true)
+        end
+        allow(ApplicationJob).to receive(:conn).and_return(mocked_bunny_session)
       end
 
       it 'should return {status: ok}' do
@@ -271,6 +353,9 @@ describe DDS::V1::AppAPI do
 
         expect(returned_configs).to have_key('graphdb')
         expect(returned_configs['graphdb']).to eq('ok')
+
+        expect(returned_configs).to have_key('queue')
+        expect(returned_configs['queue']).to eq('ok')
       end
     end #when properly integrated
   end #app status
