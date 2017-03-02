@@ -140,7 +140,9 @@ RSpec.describe ApplicationJob, type: :job do
         it { expect{child_class.perform_later}.not_to raise_error }
         it { expect{
           child_class.perform_later
-          sleep 0.1 while Thread.list.count {|t| t.status == "run"} > 1
+          begin
+            sleep 0.1
+          end while Thread.list.count {|t| t.status == "run"} > 1
         }.to change{child_class.run_count}.by(1) }
 
         context 'when stopped' do
