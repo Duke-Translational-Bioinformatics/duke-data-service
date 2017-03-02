@@ -55,6 +55,17 @@ RSpec.configure do |config|
   config.before(:each) do
     Sneakers.configure(connection: BunnyMock.new)
   end
+#  config.before(:suite) do
+#    opts = Sneakers::CONFIG
+#    Sneakers.configure(
+#      connection: Bunny.new( opts[:amqp],
+#        :vhost => opts[:vhost], 
+#        :heartbeat => opts[:heartbeat], 
+#        :logger => Sneakers::logger
+#      )
+#    )
+#    Sneakers::CONFIG[:connection].start
+#  end
   config.after(:each) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
