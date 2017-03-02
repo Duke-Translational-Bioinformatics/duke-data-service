@@ -64,6 +64,11 @@ RSpec.describe ApplicationJob, type: :job do
     let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
+    let(:retry_queue_name) { prefixed_queue_name + '-retry' }
+    let(:error_queue_name) { prefixed_queue_name + '-error' }
+    let(:retry_exchange_name) { prefixed_queue_name + '-retry' }
+    let(:requeue_exchange_name) { prefixed_queue_name + '-retry-requeue' }
+    let(:error_exchange_name) { prefixed_queue_name + '-error' }
     let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
@@ -118,6 +123,7 @@ RSpec.describe ApplicationJob, type: :job do
     describe '::job_wrapper' do
       let(:job_wrapper) { child_class.job_wrapper }
       let(:queue_opts) {{
+        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"},
         exchange: distributor_exchange_name,
         exchange_type: distributor_exchange_type
       }}
@@ -134,9 +140,15 @@ RSpec.describe ApplicationJob, type: :job do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
 
+        it { expect(job_wrapper_instance.opts[:handler]).to eq Sneakers::Handlers::Maxretry }
         it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
+        it { expect(bunny_session.queue_exists?(retry_queue_name)).to be_truthy }
+        it { expect(bunny_session.queue_exists?(error_queue_name)).to be_truthy }
+        it { expect(bunny_session.exchange_exists?(retry_exchange_name)).to be_truthy }
+        it { expect(bunny_session.exchange_exists?(requeue_exchange_name)).to be_truthy }
+        it { expect(bunny_session.exchange_exists?(error_exchange_name)).to be_truthy }
         it { expect{child_class.perform_later}.not_to raise_error }
         it { expect{
           child_class.perform_later
