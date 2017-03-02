@@ -64,11 +64,12 @@ RSpec.describe ApplicationJob, type: :job do
     let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
+    # Maxretry queue and exchange names
     let(:retry_queue_name) { prefixed_queue_name + '-retry' }
-    let(:error_queue_name) { prefixed_queue_name + '-error' }
+    let(:error_queue_name) { 'active_jobs-error' }
     let(:retry_exchange_name) { prefixed_queue_name + '-retry' }
     let(:requeue_exchange_name) { prefixed_queue_name + '-retry-requeue' }
-    let(:error_exchange_name) { prefixed_queue_name + '-error' }
+    let(:error_exchange_name) { error_queue_name }
     let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
