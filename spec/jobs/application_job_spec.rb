@@ -15,13 +15,17 @@ RSpec.describe ApplicationJob, type: :job do
   before do
     Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 1, retry_timeout: 60000, retry_max_times: 1, threads: 1)
   end
-#  after do
-#    bunny_session.with_channel do |channel|
-#      channel.exchange_delete(gateway_exchange_name)
-#      channel.exchange_delete(distributor_exchange_name)
-#      channel.queue_delete(message_log_name)
-#    end
-#  end    
+  after do
+    bunny_session.with_channel do |channel|
+      if channel.respond_to? :exchange_delete
+        channel.exchange_delete(gateway_exchange_name)
+        channel.exchange_delete(distributor_exchange_name)
+      end
+      if channel.respond_to? :queue_delete
+        channel.queue_delete(message_log_name)
+      end
+    end
+  end
 
   it { is_expected.to be_a ActiveJob::Base }
   it { expect{described_class.perform_now}.to raise_error(NotImplementedError) }
@@ -78,11 +82,20 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
-#    after do
-#      bunny_session.with_channel do |channel|
-#        channel.queue_delete(prefixed_queue_name)
-#      end
-#    end    
+    after do
+      bunny_session.with_channel do |channel|
+        if channel.respond_to? :queue_delete
+          channel.queue_delete(prefixed_queue_name)
+          channel.queue_delete(prefixed_queue_name + '-error')
+          channel.queue_delete(prefixed_queue_name + '-retry')
+        end
+        if channel.respond_to? :exchange_delete
+          channel.exchange_delete(prefixed_queue_name + '-error')
+          channel.exchange_delete(prefixed_queue_name + '-retry')
+          channel.exchange_delete(prefixed_queue_name + '-retry-requeue')
+        end
+      end
+    end
     it { expect(prefix).not_to be_nil }
     it { expect(prefix_delimiter).not_to be_nil }
     it { expect(child_class.queue_name).to eq(prefixed_queue_name) }
