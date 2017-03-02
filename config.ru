@@ -5,8 +5,3 @@ require ::File.expand_path('../config/environment', __FILE__)
 map '/' do
   run Rails.application
 end
-
-map '/portal' do
-  require './portal'
-  run Portal
-end

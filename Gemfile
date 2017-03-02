@@ -13,6 +13,9 @@ gem 'neo4j'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
+# User ldap for ldap_identity_provider searches
+gem 'net-ldap'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4' # Remove in rails 5
@@ -31,9 +34,6 @@ gem "audited-activerecord"
 
 # Unions in policy scopes
 gem 'active_record_union'
-
-# portal
-gem 'sinatra' # Remove in rails 5
 
 gem 'jwt'
 gem 'grape'
