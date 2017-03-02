@@ -10,4 +10,15 @@ namespace :workers do
       Sneakers::Runner.new(workers).run
     end
   end
+
+  namespace :delete_children do
+    desc 'run a ChildDeletionJob'
+    task run: :environment do
+      silence_warnings do
+        Rails.application.eager_load! unless Rails.application.config.eager_load
+      end
+      workers = [ ChildDeletionJob.job_wrapper ]
+      Sneakers::Runner.new(workers).run
+    end
+  end
 end

@@ -1,6 +1,7 @@
 class Project < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
+  include ChildMinder
   include RequestAudited
   audited
 
@@ -12,6 +13,8 @@ class Project < ActiveRecord::Base
   has_many :data_files
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
+
+  around_update :manage_children
 
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
@@ -28,14 +31,5 @@ class Project < ActiveRecord::Base
       )
       pp
     end
-  end
-
-  def is_deleted=(val)
-    if val
-      children.each do |child|
-        child.is_deleted = true
-      end
-    end
-    super(val)
   end
 end

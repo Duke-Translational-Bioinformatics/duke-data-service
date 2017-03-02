@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe DDS::V1::ProjectsAPI do
   include_context 'with authentication'
-
   let(:project_admin_role) { FactoryGirl.create(:auth_role, :project_admin) }
   let(:project) { FactoryGirl.create(:project) }
   let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
@@ -45,7 +44,12 @@ describe DDS::V1::ProjectsAPI do
         name: resource.name,
         description: resource.description
       }}
-      before { ProjectStorageProviderInitializationJob.job_wrapper.new.run }
+      let(:expected_job_wrapper) { ProjectStorageProviderInitializationJob.job_wrapper.new }
+
+      before {
+        expected_job_wrapper.run
+        expected_job_wrapper.stop
+      }
 
       context 'with queued ActiveJob' do
         before do
@@ -180,6 +184,12 @@ describe DDS::V1::ProjectsAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
+      let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
+      before {
+        expected_job_wrapper.run
+        expected_job_wrapper.stop
+      }
+
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
 
@@ -206,6 +216,43 @@ describe DDS::V1::ProjectsAPI do
             is_expected.to eq(204)
             resource.reload
             expect(resource.is_deleted?).to be_truthy
+          end
+        end
+      end
+
+      context 'with root file and folder' do
+        let(:root_folder) { FactoryGirl.create(:folder, :root, project: resource) }
+        let(:root_file) { FactoryGirl.create(:data_file, :root, project: resource) }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          context 'with inline ActiveJob' do
+            before do
+              ActiveJob::Base.queue_adapter = :inline
+            end
+
+            it {
+              expect(root_folder.is_deleted?).to be_falsey
+              expect(root_file.is_deleted?).to be_falsey
+              is_expected.to eq(204)
+              expect(root_folder.reload).to be_truthy
+              expect(root_folder.is_deleted?).to be_truthy
+              expect(root_file.reload).to be_truthy
+              expect(root_file.is_deleted?).to be_truthy
+            }
+          end
+
+          context 'with queued ActiveJob' do
+            before do
+              ActiveJob::Base.queue_adapter = :test
+            end
+
+            it {
+              expect {
+                is_expected.to eq(204)
+              }.to have_enqueued_job(ChildDeletionJob).with(resource)
+            }
           end
         end
       end

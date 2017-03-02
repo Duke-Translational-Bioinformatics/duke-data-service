@@ -131,3 +131,152 @@ shared_context 'with concurrent calls' do |object_list:, method:|
     threads.each(&:join)
   end
 end
+
+shared_examples 'a ChildMinder' do |resource_factory,
+  valid_child_file_sym,
+  invalid_child_file_sym,
+  child_folder_sym|
+  let(:valid_child_file) { send(valid_child_file_sym) }
+  let(:invalid_child_file) { send(invalid_child_file_sym) }
+  let(:child_folder) { send(child_folder_sym) }
+  let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
+
+  before {
+    ActiveJob::Base.queue_adapter = :test
+    expected_job_wrapper.run
+    expected_job_wrapper.stop
+  }
+
+  it {
+    expect(described_class).to include(ChildMinder)
+    is_expected.to respond_to(:children)
+  }
+  describe '#manage_children' do
+    it {
+      is_expected.to respond_to(:manage_children)
+    }
+
+    describe 'callbacks' do
+      it {
+        is_expected.to callback(:manage_children).around(:update)
+      }
+    end
+
+    context 'when is_deleted not changed' do
+      it {
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        expect(ChildDeletionJob).not_to receive(:perform_later).with(subject)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when is_deleted changed from false to true' do
+      it {
+        subject.is_deleted = true
+        yield_called = false
+        expect(ChildDeletionJob).to receive(:perform_later).with(subject)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when is_deleted changed from true to false' do
+      subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        subject.is_deleted = false
+        yield_called = false
+        expect(ChildDeletionJob).not_to receive(:perform_later).with(subject)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when something else changed' do
+      it {
+        subject.name = 'changed_name'
+        expect(subject.is_deleted?).to be_falsey
+        is_expected.to be_changed
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        expect(ChildDeletionJob).not_to receive(:perform_later).with(subject)
+        subject.manage_children do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+  end
+
+  describe '#delete_children' do
+    it {
+      is_expected.to respond_to(:delete_children)
+    }
+    it {
+      expect(child_folder).to be_persisted
+      expect(child_folder.is_deleted?).to be_falsey
+      expect(valid_child_file).to be_persisted
+      expect(valid_child_file.is_deleted?).to be_falsey
+      expect(invalid_child_file).to be_persisted
+      expect(invalid_child_file.is_deleted?).to be_falsey
+      subject.delete_children
+      expect(child_folder.reload).to be_truthy
+      expect(child_folder.is_deleted?).to be_truthy
+      valid_child_file.reload
+      expect(valid_child_file.is_deleted?).to be_truthy
+      invalid_child_file.reload
+      expect(invalid_child_file.is_deleted?).to be_truthy
+    }
+  end
+end
+
+shared_examples 'a ChildDeletionJob' do |
+    parent_sym,
+    child_folder_sym,
+    child_file_sym
+  |
+  let(:parent) { send(parent_sym) }
+  let(:child_folder) { send(child_folder_sym) }
+  let(:child_file) { send(child_file_sym) }
+  let(:expected_job_wrapper) { described_class.job_wrapper.new }
+  let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
+  let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
+
+  before {
+    ActiveJob::Base.queue_adapter = :test
+    expected_job_wrapper.run
+    expected_job_wrapper.stop
+  }
+
+  it { is_expected.to be_an ApplicationJob }
+  it { expect(prefix).not_to be_nil }
+  it { expect(prefix_delimiter).not_to be_nil }
+  it { expect(described_class.queue_name).to eq("#{prefix}#{prefix_delimiter}child_deletion") }
+
+  context 'perform_now', :vcr do
+    it 'should require one argument' do
+      expect {
+        described_class.perform_now
+      }.to raise_error(ArgumentError)
+    end
+
+    it {
+      expect(child_folder).to be_persisted
+      expect(child_file.is_deleted?).to be_falsey
+      expect(described_class).to receive(:perform_later).with(child_folder)
+      described_class.perform_now(parent)
+      expect(child_folder.reload).to be_truthy
+      expect(child_folder.is_deleted?).to be_truthy
+      expect(child_file.reload).to be_truthy
+      expect(child_file.is_deleted?).to be_truthy
+    }
+  end
+end
