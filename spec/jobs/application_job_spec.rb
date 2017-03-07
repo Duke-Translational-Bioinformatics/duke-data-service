@@ -6,8 +6,6 @@ RSpec.describe ApplicationJob, type: :job do
   let(:distributor_exchange_name) { 'active_jobs' }
   let(:distributor_exchange_type) { :direct }
   let(:distributor_exchange) { channel.exchange(distributor_exchange_name, type: distributor_exchange_type, durable: true) }
-  let(:message_log_name) { 'message_log' }
-  let(:message_log_queue) { channel.queue(message_log_name, durable: true) }
 
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
@@ -21,9 +19,6 @@ RSpec.describe ApplicationJob, type: :job do
         channel.exchange_delete(gateway_exchange_name)
         channel.exchange_delete(distributor_exchange_name)
       end
-      if channel.respond_to? :queue_delete
-        channel.queue_delete(message_log_name)
-      end
     end
   end
 
@@ -35,7 +30,6 @@ RSpec.describe ApplicationJob, type: :job do
     let(:create_bindings) { described_class.create_bindings }
     it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_falsey }
     it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_falsey }
-    it { expect(bunny_session.queue_exists?(message_log_name)).to be_falsey }
     context 'once called' do
       before { create_bindings }
       it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_truthy }
@@ -46,11 +40,8 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(distributor_exchange.type).to eq(:direct) }
       it { expect(distributor_exchange).to be_durable }
 
-      it { expect(bunny_session.queue_exists?(message_log_name)).to be_truthy }
-      it { expect(message_log_queue).to be_durable }
 
       it { expect(distributor_exchange).to be_bound_to(gateway_exchange) }
-      it { expect(message_log_queue).to be_bound_to(gateway_exchange) }
     end
   end
 
@@ -65,11 +56,11 @@ RSpec.describe ApplicationJob, type: :job do
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
     # Maxretry queue and exchange names
-    let(:retry_queue_name) { prefixed_queue_name + '-retry' }
-    let(:error_queue_name) { 'active_jobs-error' }
     let(:retry_exchange_name) { prefixed_queue_name + '-retry' }
     let(:requeue_exchange_name) { prefixed_queue_name + '-retry-requeue' }
-    let(:error_exchange_name) { error_queue_name }
+    let(:error_exchange_name) { 'active_jobs-error' }
+    let(:retry_queue_name) { retry_exchange_name }
+    let(:error_queue_name) { error_exchange_name }
     let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
@@ -92,13 +83,13 @@ RSpec.describe ApplicationJob, type: :job do
       bunny_session.with_channel do |channel|
         if channel.respond_to? :queue_delete
           channel.queue_delete(prefixed_queue_name)
-          channel.queue_delete(prefixed_queue_name + '-error')
-          channel.queue_delete(prefixed_queue_name + '-retry')
+          channel.queue_delete(retry_queue_name)
+          channel.queue_delete(error_queue_name)
         end
         if channel.respond_to? :exchange_delete
-          channel.exchange_delete(prefixed_queue_name + '-error')
-          channel.exchange_delete(prefixed_queue_name + '-retry')
-          channel.exchange_delete(prefixed_queue_name + '-retry-requeue')
+          channel.exchange_delete(retry_exchange_name)
+          channel.exchange_delete(requeue_exchange_name)
+          channel.exchange_delete(error_exchange_name)
         end
       end
     end
@@ -136,7 +127,7 @@ RSpec.describe ApplicationJob, type: :job do
         expect(described_class).to receive(:create_bindings)
         job_wrapper
       end
-      it { expect(bunny_session.queue_exists?(child_class_queue_name)).to be_falsey }
+      it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
       context 'instance created and run' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
