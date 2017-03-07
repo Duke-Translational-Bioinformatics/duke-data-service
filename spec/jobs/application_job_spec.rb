@@ -6,8 +6,6 @@ RSpec.describe ApplicationJob, type: :job do
   let(:distributor_exchange_name) { 'active_jobs' }
   let(:distributor_exchange_type) { :direct }
   let(:distributor_exchange) { channel.exchange(distributor_exchange_name, type: distributor_exchange_type, durable: true) }
-  let(:message_log_name) { 'message_log' }
-  let(:message_log_queue) { channel.queue(message_log_name, durable: true) }
 
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
@@ -21,9 +19,6 @@ RSpec.describe ApplicationJob, type: :job do
         channel.exchange_delete(gateway_exchange_name)
         channel.exchange_delete(distributor_exchange_name)
       end
-      if channel.respond_to? :queue_delete
-        channel.queue_delete(message_log_name)
-      end
     end
   end
 
@@ -35,7 +30,6 @@ RSpec.describe ApplicationJob, type: :job do
     let(:create_bindings) { described_class.create_bindings }
     it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_falsey }
     it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_falsey }
-    it { expect(bunny_session.queue_exists?(message_log_name)).to be_falsey }
     context 'once called' do
       before { create_bindings }
       it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_truthy }
@@ -46,11 +40,8 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(distributor_exchange.type).to eq(:direct) }
       it { expect(distributor_exchange).to be_durable }
 
-      it { expect(bunny_session.queue_exists?(message_log_name)).to be_truthy }
-      it { expect(message_log_queue).to be_durable }
 
       it { expect(distributor_exchange).to be_bound_to(gateway_exchange) }
-      it { expect(message_log_queue).to be_bound_to(gateway_exchange) }
     end
   end
 
