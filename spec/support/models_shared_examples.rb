@@ -139,12 +139,10 @@ shared_examples 'a ChildMinder' do |resource_factory,
   let(:valid_child_file) { send(valid_child_file_sym) }
   let(:invalid_child_file) { send(invalid_child_file_sym) }
   let(:child_folder) { send(child_folder_sym) }
-  let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
+  include_context 'with job runner', ChildDeletionJob
 
   before {
     ActiveJob::Base.queue_adapter = :test
-    expected_job_wrapper.run
-    expected_job_wrapper.stop
   }
 
   it {
@@ -246,14 +244,11 @@ shared_examples 'a ChildDeletionJob' do |
   let(:parent) { send(parent_sym) }
   let(:child_folder) { send(child_folder_sym) }
   let(:child_file) { send(child_file_sym) }
-  let(:expected_job_wrapper) { described_class.job_wrapper.new }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
-
+  include_context 'with job runner', described_class
   before {
     ActiveJob::Base.queue_adapter = :test
-    expected_job_wrapper.run
-    expected_job_wrapper.stop
   }
 
   it { is_expected.to be_an ApplicationJob }
