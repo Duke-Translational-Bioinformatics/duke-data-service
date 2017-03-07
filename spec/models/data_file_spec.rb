@@ -296,7 +296,6 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'elasticsearch' do
-    let(:expected_job_wrapper) { ElasticsearchIndexJob.job_wrapper.new }
     let(:search_serializer) { Search::DataFileSerializer }
     let(:property_mappings) {{
       kind: {type: "string", index: "not_analyzed"},
@@ -314,6 +313,7 @@ RSpec.describe DataFile, type: :model do
       ancestors: {type: "object"},
       creator: {type: "object"}
     }}
+    include_context 'with job runner', ElasticsearchIndexJob
 
     it_behaves_like 'an Elasticsearch::Model'
     it_behaves_like 'an Elasticsearch index mapping model' do

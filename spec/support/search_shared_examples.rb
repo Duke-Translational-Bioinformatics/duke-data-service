@@ -91,8 +91,6 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
 
   before {
     ActiveJob::Base.queue_adapter = :test
-    expected_job_wrapper.run
-    expected_job_wrapper.stop
   }
 
   it { expect(described_class).to include(Elasticsearch::Model) }
