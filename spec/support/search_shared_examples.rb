@@ -88,14 +88,39 @@ end
 
 shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :search_serializer|
   let(:resource_search_serializer) { send(resource_search_serializer_sym) }
-  it { expect(described_class).to include(Elasticsearch::Model) }
 
-  # TODO, when we move to asynchronous indexing, remove this and replace with
-  # a test to ensure that jobs are created on create, update, delete
-  it { expect(described_class).to include(Elasticsearch::Model::Callbacks) }
+  before {
+    ActiveJob::Base.queue_adapter = :test
+    expected_job_wrapper.run
+    expected_job_wrapper.stop
+  }
+
+  it { expect(described_class).to include(Elasticsearch::Model) }
+  it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
+
+  it { is_expected.to respond_to(:create_elasticsearch_index) }
+  it { is_expected.to respond_to(:update_elasticsearch_index) }
+
+  it {
+    is_expected.to callback(:create_elasticsearch_index).after(:commit).on(:create)
+  }
+  it {
+    is_expected.to callback(:update_elasticsearch_index).after(:commit).on(:update)
+  }
 
   it { is_expected.to respond_to 'as_indexed_json' }
   it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
+
+  it {
+    expect {
+      subject.create_elasticsearch_index
+    }.to have_enqueued_job(ElasticsearchIndexJob).with(subject)
+  }
+  it {
+    expect {
+      subject.update_elasticsearch_index
+    }.to have_enqueued_job(ElasticsearchIndexJob).with(subject, update: true)
+  }
 end
 
 shared_examples 'an Elasticsearch index mapping model' do |expected_property_mappings_sym: :property_mappings|
@@ -116,4 +141,37 @@ shared_examples 'an Elasticsearch index mapping model' do |expected_property_map
       end
     end
   }
+end
+
+shared_examples 'an ElasticsearchIndexJob' do |container_sym|
+
+  before {
+    ActiveJob::Base.queue_adapter = :test
+    expected_job_wrapper.run
+    expected_job_wrapper.stop
+  }
+
+  context 'update' do
+    context 'perform_now' do
+      it {
+        existing_container = FactoryGirl.create(container_sym)
+        mocked_proxy = double()
+        expect(mocked_proxy).to receive(:update_document)
+        expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
+        ElasticsearchIndexJob.perform_now(existing_container, update: true)
+      }
+    end
+  end
+
+  context 'create' do
+    context 'perform_now' do
+      it {
+        new_container = FactoryGirl.create(container_sym)
+        mocked_proxy = double()
+        expect(mocked_proxy).to receive(:index_document)
+        expect(new_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
+        ElasticsearchIndexJob.perform_now(new_container)
+      }
+    end
+  end
 end
