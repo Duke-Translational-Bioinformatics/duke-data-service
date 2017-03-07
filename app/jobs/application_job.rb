@@ -20,10 +20,8 @@ class ApplicationJob < ActiveJob::Base
         distributor_exchange_name, 
         type: distributor_exchange_type, durable: true
       )
-      message_log = channel.queue('message_log', durable: true)
 
       distributor.bind(gateway)
-      message_log.bind(gateway)
     end
   end
 
