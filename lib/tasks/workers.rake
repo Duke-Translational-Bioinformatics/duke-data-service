@@ -21,4 +21,15 @@ namespace :workers do
       Sneakers::Runner.new(workers).run
     end
   end
+
+  namespace :index_documents do
+    desc 'run an ElasticsearchIndexJob'
+    task run: :environment do
+      silence_warnings do
+        Rails.application.eager_load! unless Rails.application.config.eager_load
+      end
+      workers = [ ElasticsearchIndexJob.job_wrapper ]
+      Sneakers::Runner.new(workers).run
+    end
+  end
 end
