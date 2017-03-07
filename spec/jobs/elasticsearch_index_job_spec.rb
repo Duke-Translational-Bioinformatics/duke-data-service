@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ElasticsearchIndexJob, type: :job do
-  let(:expected_job_wrapper) { described_class.job_wrapper.new }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
   it { is_expected.to be_an ApplicationJob }

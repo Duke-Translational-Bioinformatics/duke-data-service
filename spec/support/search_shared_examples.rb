@@ -142,36 +142,3 @@ shared_examples 'an Elasticsearch index mapping model' do |expected_property_map
     end
   }
 end
-
-shared_examples 'an ElasticsearchIndexJob' do |container_sym|
-
-  before {
-    ActiveJob::Base.queue_adapter = :test
-    expected_job_wrapper.run
-    expected_job_wrapper.stop
-  }
-
-  context 'update' do
-    context 'perform_now' do
-      it {
-        existing_container = FactoryGirl.create(container_sym)
-        mocked_proxy = double()
-        expect(mocked_proxy).to receive(:update_document)
-        expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
-        ElasticsearchIndexJob.perform_now(existing_container, update: true)
-      }
-    end
-  end
-
-  context 'create' do
-    context 'perform_now' do
-      it {
-        new_container = FactoryGirl.create(container_sym)
-        mocked_proxy = double()
-        expect(mocked_proxy).to receive(:index_document)
-        expect(new_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
-        ElasticsearchIndexJob.perform_now(new_container)
-      }
-    end
-  end
-end
