@@ -22,19 +22,16 @@ RSpec.describe MessageLogWorker do
     it { expect(ack).not_to be_nil }
     it { expect(method_call).to eq ack }
 
-    context 'calls Rails.logger' do
-      let(:log_message) {{
-        MESSAGE_LOG: {
-          message: message,
-          delivery_info: delivery_info,
-          metadata: metadata
-        }
-      }.to_json}
-      before do
-        allow(Rails.logger).to receive(:info)
-        expect{method_call}.not_to raise_error
-      end
-      it { expect(Rails.logger).to have_received(:info).with(log_message) }
+    let(:log_message) {{
+      MESSAGE_LOG: {
+        message: message,
+        delivery_info: delivery_info,
+        metadata: metadata
+      }
+    }.to_json}
+    it 'calls Rails.logger' do
+      expect(Rails.logger).to receive(:info).with(log_message)
+      expect{method_call}.not_to raise_error
     end
   end
 end
