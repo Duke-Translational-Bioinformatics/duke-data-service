@@ -4,7 +4,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    system_permission
+    true
   end
 
   def update?

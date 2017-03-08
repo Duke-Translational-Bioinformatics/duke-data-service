@@ -36,6 +36,7 @@ shared_examples 'an authentication service' do
   describe 'associations' do
     it {
       is_expected.to have_many(:user_authentication_services)
+      is_expected.to belong_to(:identity_provider)
     }
   end
 
@@ -432,6 +433,9 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'default authentication_service' do
     before do
+      FactoryGirl.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
+        ENV["AUTH_SERVICE_#{key.upcase}"] = value
+      end
       FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
     end
 
@@ -446,6 +450,9 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'non default authentication_service' do
     before do
+      FactoryGirl.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
+        ENV["AUTH_SERVICE_#{key.upcase}"] = value
+      end
       FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
     end
 
@@ -465,6 +472,18 @@ shared_examples 'an authentication_service_serializer serializable resource' do
     'login_initiation_url' => resource.login_initiation_url,
     'is_deprecated' => resource.is_deprecated,
     'is_default' => resource.is_default
+  }}
+
+  it_behaves_like 'a json serializer' do
+    it { is_expected.to include(expected_attributes) }
+  end
+end
+
+shared_examples 'an authentication_service_preview_serializer serializable resource' do
+  let(:expected_attributes) {{
+    'id' => resource.id,
+    'name' => resource.name,
+    'is_affiliate_search_supported' => !resource.identity_provider.nil?
   }}
 
   it_behaves_like 'a json serializer' do

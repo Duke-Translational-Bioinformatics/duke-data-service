@@ -20,5 +20,9 @@ FactoryGirl.define do
       base_uri { ENV['AUTH_SERVICE_BASE_URI'] }
       name { ENV['AUTH_SERVICE_NAME'] }
     end
+
+    trait :with_ldap_identity_provider do
+      association :identity_provider, factory: :ldap_identity_provider
+    end
   end
 end

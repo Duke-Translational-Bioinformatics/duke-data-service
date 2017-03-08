@@ -5,6 +5,12 @@ FORMAT: 1A
 ## Group << API Summary
 
 ## Group API Change Log
+07-Feb-2017
+-------------
++ Simplified *Auth Provider Affiliates* response payload based on feedback from development team.
++ In *API Basics - Collection Pagination* - added default and max `per_page` pagination rules.
++ For `GET /auth_providers/{id}/affiliates{?full_name_contains}` - endpoint now requires a minumum of three characters for `full_name_contains` query parameter.
+
 20-Dec-2016
 -------------
 + For serialization of `user` resource - changed the format of the composite `auth_provider` object to be consistent with format returned by *Authentication Providers* actions. *Note:* In addition to user endpoints, this impacts list/view *Provenance Relations* which contain `user` in the response when the returned relation is `wasAttributedTo` or `wasAssociatedWith`.
@@ -43,16 +49,6 @@ FORMAT: 1A
 --------------
 + Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
 
-12-Sep-2016
---------------
-+ Refactored *Metadata* actions - objects can now be annotated with metadata via bulk `POST` and `PUT` actions.
-+ Added `name` query param to `GET /templates` and `key` query param to `GET /templates/{id}/properties`; these query params allow clients to lookup templates and template properties by their alternate unique key.
-
-07-Sep-2016
---------------
-+ Added endpoint `/search/provenance/was_generated_by` - allows targeted search "up" the provenance chain for a set of file versions.
-+ Added rules/constraints for *Provenance Relations* actions.
-
 ## Group API Basics
 
 Web Portal
@@ -84,6 +80,8 @@ For actions that return a collection of resources/objects, the number of objects
                 { },
             ]
         }
+
+*If `per_page` is not specified by the client, the default is `100`; the maximum `per_page` that can be specified is `1000`.*
 
 To make it easy for clients to manage pagination, the following headers will always be included in the response:
 
