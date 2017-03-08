@@ -481,3 +481,18 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
   end
   it { expect(response_json).to eq(expected_response) }
 end
+
+shared_examples 'a status error' do |expected_error|
+  it {
+    expect(Rails.logger).to receive(:error).with(expected_error)
+    allow(Rails.logger).to receive(:error).with(any_args)
+    get '/api/v1/app/status', json_headers
+    expect(response.status).to eq(503)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    returned_configs = JSON.parse(response.body)
+    expect(returned_configs).to be_a Hash
+    expect(returned_configs).to have_key('status')
+    expect(returned_configs['status']).to eq('error')
+  }
+end
