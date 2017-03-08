@@ -42,3 +42,15 @@ shared_examples 'a queued job worker' do |job_class_sym|
     invoke_task
   }
 end
+
+shared_examples 'a queued worker' do |worker_class_sym|
+  let(:worker_class) { send(worker_class_sym) }
+  it {
+    mocked_sneakers_runner = instance_double(Sneakers::Runner)
+    expect(Sneakers::Runner).to receive(:new)
+      .with([worker_class])
+      .and_return(mocked_sneakers_runner)
+    expect(mocked_sneakers_runner).to receive(:run).and_return(true)
+    invoke_task
+  }
+end

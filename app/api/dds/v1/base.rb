@@ -219,6 +219,24 @@ module DDS
         },401)
       end
 
+      rescue_from Net::LDAP::Error do |e|
+        error_json = {
+          "error" => "503",
+          "reason" => "identity provider communication failure",
+          "suggestion" => "please try again in a few minutes, or report an issue"
+        }
+        error!(error_json, 503)
+      end
+
+      rescue_from Rack::Timeout::RequestTimeoutError do |e|
+        error_json = {
+          "error" => "503",
+          "reason" => 'Request Timeout',
+          "suggestion" => 'try again in a few minutes, or contact the systems administrators'
+        }
+        error!(error_json, 503)
+      end
+
       mount DDS::V1::UsersAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI

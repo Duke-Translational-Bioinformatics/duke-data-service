@@ -1,7 +1,6 @@
 workers Integer(ENV['WEB_CONCURRENCY'] || 2)
 threads_count = Integer(ENV['MAX_THREADS'] || 5)
 threads threads_count, threads_count
-worker_timeout Integer(ENV['WORKER_TIMEOUT']) if ENV['WORKER_TIMEOUT']
 
 preload_app!
 

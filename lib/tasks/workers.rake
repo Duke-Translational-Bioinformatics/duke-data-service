@@ -1,5 +1,12 @@
 require 'sneakers/runner'
 namespace :workers do
+  namespace :message_logger do
+    desc 'run a MessageLogWorker'
+    task run: :environment do
+      Sneakers::Runner.new([MessageLogWorker]).run
+    end
+  end
+
   namespace :initialize_project_storage do
     desc 'run a ProjectStorageProviderInitializationJob'
     task run: :environment do
