@@ -60,6 +60,15 @@ namespace :auth_service do
     end
   end
 
+  desc "destroys the authentication_service defined in ENV[AUTH_SERVICE_SERVICE_ID], warns if specified authentication_service is the default"
+  task destroy: :environment do
+    auths = AuthenticationService.find_by(service_id: ENV['AUTH_SERVICE_SERVICE_ID'])
+    if auths
+      $stderr.puts "WARNING: destroying default authentication_service" if auths.is_default?
+      auths.destroy
+    end
+  end
+
   namespace :duke do
     desc "creates a duke_authentication_service using
       ENV[AUTH_SERVICE_SERVICE_ID]
@@ -82,15 +91,6 @@ namespace :auth_service do
           login_initiation_uri: ENV['AUTH_SERVICE_LOGIN_INITIATION_URI'],
           login_response_type: ENV['AUTH_SERVICE_LOGIN_RESPONSE_TYPE']
         )
-      end
-    end
-
-    desc "destroys the duke_authentication_service defined in ENV[AUTH_SERVICE_SERVICE_ID], warns if there is not a default authentication_service"
-    task destroy: :environment do
-      auths = DukeAuthenticationService.where(service_id: ENV['AUTH_SERVICE_SERVICE_ID']).first
-      if auths
-        $stderr.puts "WARNING: destroying default authentication_service" if auths.is_default?
-        auths.destroy
       end
     end
   end
@@ -121,13 +121,58 @@ namespace :auth_service do
         )
       end
     end
+  end
 
-    desc "destroys the openid_authentication_service defined in ENV[AUTH_SERVICE_SERVICE_ID], warns if there is not a default authentication_service"
-    task destroy: :environment do
-      auths = OpenidAuthenticationService.where(service_id: ENV['AUTH_SERVICE_SERVICE_ID']).first
-      if auths
-        $stderr.puts "WARNING: destroying default authentication_service" if auths.is_default?
-        auths.destroy
+  namespace :identity_provider do
+    desc "registers identity_provider with id ENV[IDENTITY_PROVIDER_ID]
+    to authentication service with id ENV[AUTH_SERVICE_ID].
+    this will fail if
+      ENV variables are not provided
+      identified authentication_service or identity_provider do not exist
+      the authentication_service already has a different registered identity_provider\n"
+    task register: :environment do
+      auth_service_id = ENV['AUTH_SERVICE_ID']
+      identity_provider_id = ENV['IDENTITY_PROVIDER_ID']
+      raise 'ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required' unless( auth_service_id && identity_provider_id )
+
+      auth_service = AuthenticationService.find_by(id: auth_service_id)
+      raise 'authentication_service does not exist' unless auth_service
+      if auth_service.identity_provider && auth_service.identity_provider_id == identity_provider_id.to_i
+        $stderr.puts "AUTH_SERVICE_ID already registered with IDENTITY_PROVIDER_ID"
+      else
+        identity_provider = IdentityProvider.find_by(id: identity_provider_id.to_i)
+        raise 'identity_provider does not exist' unless identity_provider
+
+        if auth_service.identity_provider.nil?
+          auth_service.identity_provider = identity_provider
+          if auth_service.save
+            $stderr.puts "finished"
+          else
+            raise "Unknown error #{auth_service.errors.messages}"
+          end
+        else
+          raise "AUTH_SERVICE_ID service is registered to a different identity_provider, use auth_service:identity_provider:remove"
+        end
+      end
+    end
+    desc "removes identity_provider from authentication service
+    with id ENV[AUTH_SERVICE_ID].
+    this will fail if
+      ENV variable is not provided
+      identified authentication_service does not exist\n"
+    task remove: :environment do
+      auth_service_id = ENV['AUTH_SERVICE_ID']
+      raise 'ENV\[AUTH_SERVICE_ID\] is required' unless auth_service_id
+
+      auth_service = AuthenticationService.find_by(id: auth_service_id)
+      raise 'authentication_service does not exist' unless auth_service
+
+      if auth_service.identity_provider
+        if auth_service.update(identity_provider_id: nil)
+          $stderr.puts "finished"
+        else
+          raise "Unknown error #{auth_service.errors.messages}"
+        end
       end
     end
   end

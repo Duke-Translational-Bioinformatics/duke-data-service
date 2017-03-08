@@ -16,11 +16,15 @@ gem 'elasticsearch-rails'
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers'
 
+# User ldap for ldap_identity_provider searches
+gem 'net-ldap'
+
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack', '1.6.4' # Remove in rails 5
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-middleware-lograge'
+gem "rack-timeout"
 
 gem 'grape-swagger'
 gem 'kaminari'
@@ -33,9 +37,6 @@ gem "audited-activerecord"
 
 # Unions in policy scopes
 gem 'active_record_union'
-
-# portal
-gem 'sinatra' # Remove in rails 5
 
 gem 'jwt'
 gem 'grape'

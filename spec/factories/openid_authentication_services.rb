@@ -29,5 +29,9 @@ FactoryGirl.define do
       client_id { ENV['OPENID_CLIENT_ID'] }
       client_secret { ENV['OPENID_CLIENT_SECRET'] }
     end
+
+    trait :with_ldap_identity_provider do
+      association :identity_provider, factory: :ldap_identity_provider
+    end
   end
 end
