@@ -25,6 +25,9 @@ RSpec.describe ApplicationJob, type: :job do
   it { is_expected.to be_a ActiveJob::Base }
   it { expect{described_class.perform_now}.to raise_error(NotImplementedError) }
 
+  it { expect(ENV['ACTIVE_JOB_QUEUE_ADAPTER']).to be_nil }
+  it { expect(ActiveJob::Base.queue_adapter).to eq(ActiveJob::QueueAdapters::SneakersAdapter) }
+
   it { expect(described_class).to respond_to(:create_bindings) }
   describe '::create_bindings' do
     let(:create_bindings) { described_class.create_bindings }
