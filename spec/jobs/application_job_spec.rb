@@ -25,6 +25,9 @@ RSpec.describe ApplicationJob, type: :job do
   it { is_expected.to be_a ActiveJob::Base }
   it { expect{described_class.perform_now}.to raise_error(NotImplementedError) }
 
+  it { expect(ENV['ACTIVE_JOB_QUEUE_ADAPTER']).to be_nil }
+  it { expect(ActiveJob::Base.queue_adapter).to eq(ActiveJob::QueueAdapters::SneakersAdapter) }
+
   it { expect(described_class).to respond_to(:create_bindings) }
   describe '::create_bindings' do
     let(:create_bindings) { described_class.create_bindings }
@@ -79,6 +82,7 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
+    before { expect{ActiveJob::Base.queue_adapter = :sneakers}.not_to raise_error }
     after do
       bunny_session.with_channel do |channel|
         if channel.respond_to? :queue_delete
@@ -110,6 +114,11 @@ RSpec.describe ApplicationJob, type: :job do
     context 'without job_wrapper running' do
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
       it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{prefixed_queue_name} does not exist") }
+
+      context 'when not using sneakers' do
+        before { expect{ActiveJob::Base.queue_adapter = :inline}.not_to raise_error }
+        it { expect{child_class.perform_later}.not_to raise_error }
+      end
     end
 
     describe '::job_wrapper' do
