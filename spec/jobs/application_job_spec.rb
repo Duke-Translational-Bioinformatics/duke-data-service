@@ -79,6 +79,7 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
+    before { expect{ActiveJob::Base.queue_adapter = :sneakers}.not_to raise_error }
     after do
       bunny_session.with_channel do |channel|
         if channel.respond_to? :queue_delete
@@ -110,6 +111,11 @@ RSpec.describe ApplicationJob, type: :job do
     context 'without job_wrapper running' do
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
       it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{prefixed_queue_name} does not exist") }
+
+      context 'when not using sneakers' do
+        before { expect{ActiveJob::Base.queue_adapter = :inline}.not_to raise_error }
+        it { expect{child_class.perform_later}.not_to raise_error }
+      end
     end
 
     describe '::job_wrapper' do
