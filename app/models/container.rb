@@ -4,7 +4,6 @@ class Container < ActiveRecord::Base
   include RequestAudited
 
   include Elasticsearch::Model
-  include Elasticsearch::Model::Callbacks
 
   audited
   belongs_to :project
@@ -14,6 +13,9 @@ class Container < ActiveRecord::Base
 
   define_model_callbacks :set_parent_attribute
   validates :name, presence: true, unless: :is_deleted
+
+  after_commit :create_elasticsearch_index, on: [:create]
+  after_commit :update_elasticsearch_index, on: [:update]
 
   def ancestors
     if parent
@@ -37,5 +39,13 @@ class Container < ActiveRecord::Base
 
   def set_project_to_parent_project
     self.project = self.parent.project if self.parent
+  end
+
+  def update_elasticsearch_index
+    ElasticsearchIndexJob.perform_later(self, update: true)
+  end
+
+  def create_elasticsearch_index
+    ElasticsearchIndexJob.perform_later(self)
   end
 end

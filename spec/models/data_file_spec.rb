@@ -313,6 +313,7 @@ RSpec.describe DataFile, type: :model do
       ancestors: {type: "object"},
       creator: {type: "object"}
     }}
+    include_context 'with job runner', ElasticsearchIndexJob
 
     it_behaves_like 'an Elasticsearch::Model'
     it_behaves_like 'an Elasticsearch index mapping model' do

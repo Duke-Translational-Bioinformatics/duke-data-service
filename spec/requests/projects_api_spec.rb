@@ -44,12 +44,7 @@ describe DDS::V1::ProjectsAPI do
         name: resource.name,
         description: resource.description
       }}
-      let(:expected_job_wrapper) { ProjectStorageProviderInitializationJob.job_wrapper.new }
-
-      before {
-        expected_job_wrapper.run
-        expected_job_wrapper.stop
-      }
+      include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
         before do
@@ -184,11 +179,7 @@ describe DDS::V1::ProjectsAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
-      let(:expected_job_wrapper) { ChildDeletionJob.job_wrapper.new }
-      before {
-        expected_job_wrapper.run
-        expected_job_wrapper.stop
-      }
+      include_context 'with job runner', ChildDeletionJob
 
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }

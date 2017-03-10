@@ -157,6 +157,7 @@ RSpec.describe Folder, type: :model do
       updated_at: {type: "date"},
       creator: {type: "object"}
     }}
+    include_context 'with job runner', ElasticsearchIndexJob
 
     it_behaves_like 'an Elasticsearch::Model'
     it_behaves_like 'an Elasticsearch index mapping model' do

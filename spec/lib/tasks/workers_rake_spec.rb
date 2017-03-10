@@ -29,4 +29,13 @@ describe "workers" do
     it { expect(subject.prerequisites).to  include("environment") }
     it_behaves_like 'a queued job worker', :expected_job_class
   end
+
+  describe 'workers:index_documents:run' do
+    include_context "rake"
+    let(:task_name) { "workers:index_documents:run" }
+    let(:expected_job_class) { ElasticsearchIndexJob }
+
+    it { expect(subject.prerequisites).to  include("environment") }
+    it_behaves_like 'a queued job worker', :expected_job_class
+  end
 end

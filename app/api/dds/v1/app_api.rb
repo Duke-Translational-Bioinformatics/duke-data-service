@@ -10,22 +10,20 @@ module DDS
         ]
       end
       get '/app/status', root: false do
-        status = {status: 'ok', environment: "#{Rails.env}", rdbms: 'ok', authentication_service: 'not tested', storage_provider: 'not tested', graphdb: 'not tested', queue: 'not tested'}
+        status = {status: 'ok', environment: "#{Rails.env}"}
         begin
           #rdbms must be connected and seeded
           auth_roles = AuthRole.all.count
           if auth_roles < 1
             status[:status] = 'error'
-            status[:rdbms] = 'is not seeded'
+            logger.error('rdbms is not seeded')
           end
 
           # authentication_service must be configured
           as_count = AuthenticationService.count
           if as_count == 0
             status[:status] = 'error'
-            status[:authentication_service] = 'has not been created'
-          else
-            status[:authentication_service] = 'ok'
+            logger.error 'authentication_service has not been created'
           end
 
           #storage_provider must be created
@@ -34,18 +32,16 @@ module DDS
             #storage_provider must be accessible over http without network or CORS issues
             sp_acct = sp.get_account_info
             # storage_provider must register_keys
-            if sp_acct.has_key?("x-account-meta-temp-url-key") &&
+            unless sp_acct.has_key?("x-account-meta-temp-url-key") &&
                    sp_acct.has_key?("x-account-meta-temp-url-key-2") &&
                    sp_acct["x-account-meta-temp-url-key"] &&
                    sp_acct["x-account-meta-temp-url-key-2"]
-              status[:storage_provider] = 'ok'
-            else
               status[:status] = 'error'
-              status[:storage_provider] = 'has not registered its keys'
+              logger.error 'storage_provider has not registered its keys'
             end
           else
             status[:status] = 'error'
-            status[:storage_provider] = 'has not been created'
+            logger.error 'storage_provider has not been created'
           end
 
           #graphdb must be configured
@@ -55,33 +51,36 @@ module DDS
             status[:graphdb] = 'ok'
           else
             status[:status] = 'error'
-            status[:graphdb] = 'environment is not set'
+            logger.error 'graphdb environment is not set'
           end
 
           if ENV['CLOUDAMQP_URL']
-            missing_exchanges = [
-              ApplicationJob.opts[:exchange],
+            [
+              Sneakers::CONFIG[:exchange],
+              Sneakers::CONFIG[:retry_error_exchange],
               ApplicationJob.distributor_exchange_name
-            ].reject do |expected_exchange|
-              ApplicationJob.conn.exchange_exists? expected_exchange
+            ].each do |expected_exchange|
+              unless ApplicationJob.conn.exchange_exists? expected_exchange
+                logger.error "queue is missing expected exchange #{expected_exchange}"
+              end
             end
 
-            if missing_exchanges.empty?
-              queue_names = (ApplicationJob.descendants.collect {|d| d.queue_name }).uniq
-              missing_queues = ['message_log'].concat(queue_names).reject do |expected_queue|
-                ApplicationJob.conn.queue_exists? expected_queue
-              end
+            application_job_workers = (ApplicationJob.descendants
+            .collect {|d| [d.queue_name, "#{d.queue_name}-retry"] })
+            .flatten.uniq
 
-              if missing_queues.empty?
-                status[:queue] = 'ok'
-              else
-                status[:queue] = "is missing expected queues #{missing_queues.join(' ')}"
+            [
+              MessageLogWorker.new.queue.name,
+              "#{MessageLogWorker.new.queue.name}-retry",
+              Sneakers::CONFIG[:retry_error_exchange]
+            ].concat(application_job_workers)
+            .each do |expected_queue|
+              unless ApplicationJob.conn.queue_exists? expected_queue
+                logger.error "queue is missing expected queue #{expected_queue}"
               end
-            else
-              status[:queue] = "is missing expected exchanges #{missing_exchanges.join(' ')}"
             end
           else
-            status[:queue] = 'environment is not set'
+            logger.error 'queue environment is not set'
           end
 
           if status[:status] == 'ok'
@@ -92,17 +91,17 @@ module DDS
         rescue StorageProviderException => e
           logger.error("StorageProvider error #{e.message}")
           status[:status] = 'error'
-          status[:storage_provider] = "is not connected"
+          logger.error "storage_provider is not connected"
           error!(status,503)
         rescue Faraday::ConnectionFailed => e
           logger.error("GraphDB Connection error #{e.message}")
           status[:status] = 'error'
-          status[:graphdb] = 'is not connected'
+          logger.error 'graphdb is not connected'
           error!(status,503)
         rescue Bunny::TCPConnectionFailedForAllHosts => e
           logger.error("RabbitMQ Connection error #{e.message}")
           status[:status] = 'error'
-          status[:queue] = 'is not connected'
+          logger.error 'queue is not connected'
           error!(status, 503)
         rescue Exception => e
           logger.error("GOT UNKOWNN Exception "+e.inspect)
