@@ -5,25 +5,29 @@ describe DDS::V1::AppAPI do
 
   describe 'app status', :vcr do
     context 'when rdbms is not seeded' do
+      let(:status_error) { 'rdbms is not seeded' }
       before do
         #AuthRoles are seeded
         expect(AuthRole.count).to be < 1
       end
-      it_behaves_like 'a status error', 'rdbms is not seeded'
+      it_behaves_like 'a status error', :status_error
     end #when rdbms not seeded
 
     context 'authentication_service' do
       context 'is not created' do
-        it_behaves_like 'a status error', 'authentication_service has not been created'
+        let(:status_error) { 'authentication_service has not been created' }
+        it_behaves_like 'a status error', :status_error
       end
     end #authentication_service
 
     context 'storage_provider' do
       context 'has not been created' do
-        it_behaves_like 'a status error', 'storage_provider has not been created'
+        let(:status_error) { 'storage_provider has not been created' }
+        it_behaves_like 'a status error', :status_error
       end
 
       context 'has not registered its keys' do
+        let(:status_error) { 'storage_provider has not registered its keys' }
         let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
         before do
           expect(swift_storage_provider).to be_persisted
@@ -36,10 +40,11 @@ describe DDS::V1::AppAPI do
             })
           )
         end
-        it_behaves_like 'a status error', 'storage_provider has not registered its keys'
+        it_behaves_like 'a status error', :status_error
       end
 
       context 'is not connected' do
+        let(:status_error) { 'storage_provider is not connected' }
         let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
         let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
         let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
@@ -48,50 +53,61 @@ describe DDS::V1::AppAPI do
           expect(swift_storage_provider).to be_persisted
           expect(authentication_service).to be_persisted
         end
-        it_behaves_like 'a status error', 'storage_provider is not connected'
+        it_behaves_like 'a status error', :status_error
       end
     end #storage_provider
 
     context 'graphdb' do
       context 'environment is not set' do
+        let(:status_error) { 'graphdb environment is not set' }
         before do
           ENV["GRAPHSTORY_URL"] = nil
         end
-        it_behaves_like 'a status error', 'graphdb environment is not set'
+        it_behaves_like 'a status error', :status_error
       end
       # cannot test is not connected because vcr ignores all requests to neo4j
     end #graphdb
 
     context 'queue' do
+      let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
+      let(:retry_error_exchange_name) { Sneakers::CONFIG[:retry_error_exchange] }
+      let(:distributor_exchange_name) { ApplicationJob.distributor_exchange_name }
+      let(:message_log_worker_queue_name) { MessageLogWorker.new.queue.name }
+      let(:message_log_worker_retry_queue_name) { "#{MessageLogWorker.new.queue.name}-retry" }
+      let(:retry_error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
+
       context 'environment is not set' do
+        let(:status_error) { 'queue environment is not set' }
         before do
           ENV["CLOUDAMQP_URL"] = nil
         end
 
-        it_behaves_like 'a status error', 'queue environment is not set'
+        it_behaves_like 'a status error', :status_error
       end
 
       context 'is not connected' do
+        let(:status_error) { 'queue is not connected' }
         before do
           ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
           expect(ApplicationJob).to receive(:conn)
           .and_raise(Bunny::TCPConnectionFailedForAllHosts)
         end
-        it_behaves_like 'a status error', 'queue is not connected'
+        it_behaves_like 'a status error', :status_error
       end
 
-      it_behaves_like 'it requires exchange', ApplicationJob.opts[:exchange]
-      it_behaves_like 'it requires exchange', ApplicationJob.opts[:retry_error_exchange]
-      it_behaves_like 'it requires exchange', ApplicationJob.distributor_exchange_name
+      it_behaves_like 'it requires exchange', :gateway_exchange_name
+      it_behaves_like 'it requires exchange', :retry_error_exchange_name
+      it_behaves_like 'it requires exchange', :distributor_exchange_name
 
-      it_behaves_like 'it requires queue', MessageLogWorker.new.queue.name
-      it_behaves_like 'it requires queue', "#{MessageLogWorker.new.queue.name}-retry"
-      it_behaves_like 'it requires queue', ApplicationJob.opts[:retry_error_exchange]
-      it_behaves_like 'it requires queue', ApplicationJob.opts[:retry_error_exchange]
+      it_behaves_like 'it requires queue', :message_log_worker_queue_name
+      it_behaves_like 'it requires queue', :message_log_worker_retry_queue_name
+      it_behaves_like 'it requires queue', :retry_error_queue_name
+
       (ApplicationJob.descendants.collect {|d|
         [d.queue_name, "#{d.queue_name}-retry"]
       }).flatten.uniq.each do |this_queue|
-        it_behaves_like 'it requires queue', this_queue
+        let(:job_queue) { this_queue }
+        it_behaves_like 'it requires queue', :job_queue
       end
     end
 

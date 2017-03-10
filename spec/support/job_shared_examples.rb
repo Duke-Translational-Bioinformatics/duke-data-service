@@ -38,48 +38,71 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
 end
 
 shared_context 'expected bunny exchanges and queues' do |
-    except_queue: '',
-    except_exchange: ''
+    except_queue: nil,
+    except_exchange: nil
   |
+
+  if except_queue
+    let(:reject_queue) { send(except_queue) }
+  else
+    let(:reject_queue) { '' }
+  end
+
+  if except_exchange
+    let(:reject_exchange) { send(except_exchange) }
+  else
+    let(:reject_exchange) { '' }
+  end
 
   before do
     ENV['CLOUDAMQP_URL'] = Faker::Internet.slug
-    mocked_bunny_session = instance_double(BunnyMock::Session)
+    unless reject_exchange.empty?
+      allow_any_instance_of(BunnyMock::Session).to receive(:exchange_exists?)
+        .with(reject_exchange)
+        .and_return(false)
+    end
+
+    unless reject_queue.empty?
+      allow_any_instance_of(BunnyMock::Session).to receive(:queue_exists?)
+        .with(reject_queue)
+        .and_return(false)
+    end
     [
-      ApplicationJob.opts[:exchange],
-      ApplicationJob.opts[:retry_error_exchange],
+      Sneakers::CONFIG[:exchange],
+      Sneakers::CONFIG[:retry_error_exchange],
       ApplicationJob.distributor_exchange_name
-    ].each do |this_exchange|
-      should_exist = this_exchange != except_exchange
-      allow(mocked_bunny_session).to receive(:exchange_exists?)
+    ].reject{|q| q == reject_exchange }.each do |this_exchange|
+      allow_any_instance_of(BunnyMock::Session).to receive(:exchange_exists?)
         .with(this_exchange)
-        .and_return(should_exist)
+        .and_return(true)
     end
 
     application_job_workers = (ApplicationJob.descendants.collect {|d|
       [d.queue_name, "#{d.queue_name}-retry"]
     }).flatten.uniq
+
     [
       MessageLogWorker.new.queue.name,
       "#{MessageLogWorker.new.queue.name}-retry",
-      ApplicationJob.opts[:retry_error_exchange]
+      Sneakers::CONFIG[:retry_error_exchange]
     ].concat(application_job_workers)
+    .reject{|q| q == reject_queue }
     .each do |this_queue|
-      should_exist = this_queue != except_queue
-      allow(mocked_bunny_session).to receive(:queue_exists?)
+      allow_any_instance_of(BunnyMock::Session).to receive(:queue_exists?)
         .with(this_queue)
-        .and_return(should_exist)
+        .and_return(true)
     end
-    allow(ApplicationJob).to receive(:conn).and_return(mocked_bunny_session)
   end
 end
 
 shared_examples 'it requires queue' do |expected_queue|
+  let(:status_error) { "queue is missing expected queue #{send(expected_queue)}" }
   include_context 'expected bunny exchanges and queues', except_queue: expected_queue
-  it_behaves_like 'a status error', "queue is missing expected queue #{expected_queue}"
+  it_behaves_like 'a status error', :status_error
 end
 
 shared_examples 'it requires exchange' do |expected_exchange|
+  let(:status_error) { "queue is missing expected exchange #{send(expected_exchange)}" }
   include_context 'expected bunny exchanges and queues', except_exchange: expected_exchange
-  it_behaves_like 'a status error', "queue is missing expected exchange #{expected_exchange}"
+  it_behaves_like 'a status error', :status_error
 end

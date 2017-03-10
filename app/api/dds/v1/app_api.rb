@@ -56,8 +56,8 @@ module DDS
 
           if ENV['CLOUDAMQP_URL']
             [
-              ApplicationJob.opts[:exchange],
-              ApplicationJob.opts[:retry_error_exchange],
+              Sneakers::CONFIG[:exchange],
+              Sneakers::CONFIG[:retry_error_exchange],
               ApplicationJob.distributor_exchange_name
             ].each do |expected_exchange|
               unless ApplicationJob.conn.exchange_exists? expected_exchange
@@ -72,7 +72,7 @@ module DDS
             [
               MessageLogWorker.new.queue.name,
               "#{MessageLogWorker.new.queue.name}-retry",
-              ApplicationJob.opts[:retry_error_exchange]
+              Sneakers::CONFIG[:retry_error_exchange]
             ].concat(application_job_workers)
             .each do |expected_queue|
               unless ApplicationJob.conn.queue_exists? expected_queue

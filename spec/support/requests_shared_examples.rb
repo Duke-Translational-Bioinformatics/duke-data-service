@@ -486,7 +486,8 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
   it { expect(response_json).to eq(expected_response) }
 end
 
-shared_examples 'a status error' do |expected_error|
+shared_examples 'a status error' do |expected_error_sym|
+  let(:expected_error) { send(expected_error_sym) }
   it {
     expect(Rails.logger).to receive(:error).with(expected_error)
     allow(Rails.logger).to receive(:error).with(any_args)
