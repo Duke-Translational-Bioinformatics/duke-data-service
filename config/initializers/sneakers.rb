@@ -1,7 +1,6 @@
 require 'sneakers/handlers/maxretry'
 
 Sneakers.configure(
-  :amqp => ENV['CLOUDAMQP_URL'],
   :exchange => 'message_gateway',
   :log => Rails.logger,
   :handler => Sneakers::Handlers::Maxretry,
@@ -10,6 +9,13 @@ Sneakers.configure(
   :exchange_options => {
     :type => :fanout
   }
+)
+Sneakers.configure(
+  connection: Bunny.new( ENV['CLOUDAMQP_URL'],
+    :vhost => Sneakers::CONFIG[:vhost],
+    :heartbeat => Sneakers::CONFIG[:heartbeat],
+    :logger => Sneakers::logger
+  )
 )
 
 # Create a new Sneakers::Publisher for each JobWrapper
