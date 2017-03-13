@@ -53,19 +53,14 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
   config.before(:each) do
-    Sneakers.configure(connection: BunnyMock.new)
+    unless ENV['TEST_WITH_BUNNY']
+      allow_any_instance_of(Bunny::Session).to receive(:start).and_raise("Use BunnyMock when testing")
+      Sneakers.configure(connection: BunnyMock.new)
+    end
   end
-#  config.before(:suite) do
-#    opts = Sneakers::CONFIG
-#    Sneakers.configure(
-#      connection: Bunny.new( opts[:amqp],
-#        :vhost => opts[:vhost], 
-#        :heartbeat => opts[:heartbeat], 
-#        :logger => Sneakers::logger
-#      )
-#    )
-#    Sneakers::CONFIG[:connection].start
-#  end
+  config.before(:suite) do
+    Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
+  end
   config.after(:each) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
