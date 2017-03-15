@@ -87,10 +87,12 @@ describe DDS::V1::AppAPI do
 
       context 'is not connected' do
         let(:status_error) { 'queue is not connected' }
+        let(:bunny_session) { Sneakers::CONFIG[:connection] }
         before do
           ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
-          expect(ApplicationJob).to receive(:conn)
-          .and_raise(Bunny::TCPConnectionFailedForAllHosts)
+          expect(bunny_session).to receive(:exchange_exists?).and_raise(
+            Bunny::TCPConnectionFailedForAllHosts
+          )
         end
         it_behaves_like 'a status error', :status_error
       end
