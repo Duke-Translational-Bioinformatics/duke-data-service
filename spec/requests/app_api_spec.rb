@@ -158,6 +158,7 @@ describe DDS::V1::AppAPI do
           expect(bunny_session).to receive(:exchange_exists?).and_raise(
             Bunny::TCPConnectionFailedForAllHosts
           )
+          allow(Rails.logger).to receive(:error).with(/^RabbitMQ Connection error/)
         end
         it_behaves_like 'a status error', :status_error
       end
