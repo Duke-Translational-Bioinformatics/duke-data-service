@@ -60,7 +60,7 @@ module DDS
               Sneakers::CONFIG[:retry_error_exchange],
               ApplicationJob.distributor_exchange_name
             ].each do |expected_exchange|
-              unless ApplicationJob.conn.exchange_exists? expected_exchange
+              unless Sneakers::CONFIG[:connection].exchange_exists? expected_exchange
                 logger.error "queue is missing expected exchange #{expected_exchange}"
               end
             end
@@ -75,7 +75,7 @@ module DDS
               Sneakers::CONFIG[:retry_error_exchange]
             ].concat(application_job_workers)
             .each do |expected_queue|
-              unless ApplicationJob.conn.queue_exists? expected_queue
+              unless Sneakers::CONFIG[:connection].queue_exists? expected_queue
                 logger.error "queue is missing expected queue #{expected_queue}"
               end
             end
