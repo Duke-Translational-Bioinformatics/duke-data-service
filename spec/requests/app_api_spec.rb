@@ -53,6 +53,9 @@ describe DDS::V1::AppAPI do
           expect(swift_storage_provider).to be_persisted
           expect(authentication_service).to be_persisted
         end
+        after do
+          WebMock.reset!
+        end
         it_behaves_like 'a status error', :status_error
       end
     end #storage_provider
@@ -119,7 +122,6 @@ describe DDS::V1::AppAPI do
       let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
 
       before do
-        WebMock.reset!
         ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
         swift_storage_provider.register_keys
       end
