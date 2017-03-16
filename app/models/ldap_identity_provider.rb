@@ -19,21 +19,29 @@ class LdapIdentityProvider < IdentityProvider
   private
 
   def ldap_search(ldap_filter)
-    Net::LDAP.new(
+    ldap = Net::LDAP.new(
         host: host,
         port: port,
         base: ldap_base
-    ).search(
+    )
+    results = []
+    success = ldap.search(
       filter: ldap_filter,
-      attributes: %w(uid duDukeID sn givenName mail displayName)
-    ).reject {|entry| !entry.attribute_names.include?(:uid)}.map { |entry|
-      User.new(
-        username: entry.uid.first,
-        first_name: entry.givenName.first,
-        last_name: entry.sn.first,
-        email: entry.mail.first,
-        display_name: entry.displayName.first
-      )
-    }
+      attributes: %w(uid duDukeID sn givenName mail displayName),
+      size: 500,
+      return_results: false
+    ) do |entry|
+      if entry.attribute_names.include?(:uid)
+        results << User.new(
+          username: entry.uid.first,
+          first_name: entry.givenName.first,
+          last_name: entry.sn.first,
+          email: entry.mail.first,
+          display_name: entry.displayName.first
+        )
+      end
+    end
+    logger.warn "#{ldap.get_operation_result.inspect} results may have been truncated" unless success
+    results
   end
 end
