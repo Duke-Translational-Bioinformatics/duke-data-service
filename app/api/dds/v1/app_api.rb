@@ -96,11 +96,6 @@ module DDS
           status[:status] = 'error'
           logger.error "storage_provider is not connected"
           error!(status,503)
-        rescue Faraday::ConnectionFailed => e
-          logger.error("GraphDB Connection error #{e.message}")
-          status[:status] = 'error'
-          logger.error 'graphdb is not connected'
-          error!(status,503)
         rescue Bunny::TCPConnectionFailedForAllHosts => e
           logger.error("RabbitMQ Connection error #{e.message}")
           status[:status] = 'error'
