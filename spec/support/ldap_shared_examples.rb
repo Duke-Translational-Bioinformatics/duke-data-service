@@ -13,9 +13,7 @@ shared_context 'mocked ldap' do |returns:|
   }
   before do
     allow_any_instance_of(Net::LDAP).to receive(:search) { |&block|
-      expected_entries.each do |f|
-        block.call(f);
-      end
+      expected_entries.each &block
     }
   end
 end

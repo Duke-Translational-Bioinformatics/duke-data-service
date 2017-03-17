@@ -36,7 +36,7 @@ class LdapIdentityProvider < IdentityProvider
           username: entry.uid.first,
           first_name: entry.givenName.first,
           last_name: entry.sn.first,
-          email: entry.mail.first,
+          email: entry.attribute_names.include?(:uid) ? entry.mail.first : nil,
           display_name: entry.displayName.first
         )
       end
