@@ -10,6 +10,7 @@ RSpec.describe Project, type: :model do
     let(:serialized_kind) { true }
   end
   it_behaves_like 'a logically deleted model'
+  it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
     it 'should have many project permissions' do

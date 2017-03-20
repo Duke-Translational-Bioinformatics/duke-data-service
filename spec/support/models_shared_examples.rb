@@ -275,3 +275,11 @@ shared_examples 'a ChildDeletionJob' do |
     }
   end
 end
+
+shared_examples 'a job_transactionable model' do
+  it {
+    is_expected.to respond_to('job_transactionable?')
+    is_expected.to be_job_transactionable
+    is_expected.to have_many(:job_transactions).with_foreign_key('transactionable_id')
+  }
+end

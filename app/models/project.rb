@@ -3,6 +3,7 @@ class Project < ActiveRecord::Base
   include Kinded
   include ChildMinder
   include RequestAudited
+  include JobTransactionable
   audited
 
   belongs_to :creator, class_name: "User"
