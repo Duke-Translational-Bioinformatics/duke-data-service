@@ -88,6 +88,7 @@ end
 
 shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :search_serializer|
   let(:resource_search_serializer) { send(resource_search_serializer_sym) }
+  let(:job_transaction) { ElasticsearchIndexJob.initialize_job(subject) }
 
   before {
     ActiveJob::Base.queue_adapter = :test
@@ -110,14 +111,20 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
   it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
 
   it {
+    expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
+      subject
+    ).and_return(job_transaction)
     expect {
       subject.create_elasticsearch_index
-    }.to have_enqueued_job(ElasticsearchIndexJob).with(subject)
+    }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject)
   }
   it {
+    expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
+      subject
+    ).and_return(job_transaction)
     expect {
       subject.update_elasticsearch_index
-    }.to have_enqueued_job(ElasticsearchIndexJob).with(subject, update: true)
+    }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject, update: true)
   }
 end
 

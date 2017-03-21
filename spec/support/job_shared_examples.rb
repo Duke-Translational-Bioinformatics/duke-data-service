@@ -7,31 +7,41 @@ shared_context 'with job runner' do |runner_class|
 end
 
 shared_examples 'an ElasticsearchIndexJob' do |container_sym|
+  it {
+    expect{described_class.perform_now}.to raise_error(ArgumentError)
+  }
   before {
     ActiveJob::Base.queue_adapter = :test
   }
   include_context 'with job runner', described_class
 
   context 'update' do
+    let(:existing_container) { FactoryGirl.create(container_sym) }
+    let(:job_transaction) { described_class.initialize_job(existing_container) }
     context 'perform_now' do
+      include_context 'tracking job', :job_transaction
       it {
-        existing_container = FactoryGirl.create(container_sym)
+        expect(existing_container).to be_persisted
         mocked_proxy = double()
         expect(mocked_proxy).to receive(:update_document)
         expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
-        ElasticsearchIndexJob.perform_now(existing_container, update: true)
+        ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
       }
     end
   end
 
   context 'create' do
+    let(:new_container) { FactoryGirl.create(container_sym) }
+    let(:job_transaction) { described_class.initialize_job(new_container) }
     context 'perform_now' do
+      include_context 'tracking job', :job_transaction
       it {
-        new_container = FactoryGirl.create(container_sym)
+        expect(new_container).to be_persisted
         mocked_proxy = double()
         expect(mocked_proxy).to receive(:index_document)
         expect(new_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
-        ElasticsearchIndexJob.perform_now(new_container)
+        ElasticsearchIndexJob.perform_now(job_transaction, new_container)
+        job_transaction.reload
       }
     end
   end
@@ -105,4 +115,76 @@ shared_examples 'it requires exchange' do |expected_exchange|
   let(:status_error) { "queue is missing expected exchange #{send(expected_exchange)}" }
   include_context 'expected bunny exchanges and queues', except_exchange: expected_exchange
   it_behaves_like 'a status error', :status_error
+end
+
+shared_context 'tracking job' do |tracked_job_sym|
+  let(:tracked_job) { send(tracked_job_sym) }
+  before do
+    expect(described_class).to receive(:start_job)
+      .with(tracked_job)
+      .and_call_original
+    expect(described_class).to receive(:complete_job)
+      .with(tracked_job)
+      .and_call_original
+  end
+end
+
+shared_examples 'a ChildDeletionJob' do |
+    parent_sym,
+    child_folder_sym,
+    child_file_sym
+  |
+  let(:parent) { send(parent_sym) }
+  let(:job_transaction) { described_class.initialize_job(parent) }
+  let(:child_folder) { send(child_folder_sym) }
+  let(:child_file) { send(child_file_sym) }
+  let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
+  let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
+  include_context 'with job runner', described_class
+  before {
+    ActiveJob::Base.queue_adapter = :test
+  }
+
+  it { is_expected.to be_an ApplicationJob }
+  it { expect(prefix).not_to be_nil }
+  it { expect(prefix_delimiter).not_to be_nil }
+  it { expect(described_class.queue_name).to eq("#{prefix}#{prefix_delimiter}child_deletion") }
+  it {
+    expect {
+      described_class.perform_now
+    }.to raise_error(ArgumentError)
+    expect {
+      described_class.perform_now(parent)
+    }.to raise_error(ArgumentError)
+  }
+
+  context 'perform_now', :vcr do
+    let(:child_job_transaction) { described_class.initialize_job(child_folder) }
+    include_context 'tracking job', :job_transaction
+
+    it {
+      expect(child_folder).to be_persisted
+      expect(child_file.is_deleted?).to be_falsey
+
+      expect(described_class).to receive(:initialize_job)
+        .with(child_folder)
+        .and_return(child_job_transaction)
+      expect(described_class).to receive(:perform_later)
+        .with(child_job_transaction, child_folder).and_call_original
+
+      described_class.perform_now(job_transaction, parent)
+      expect(child_folder.reload).to be_truthy
+      expect(child_folder.is_deleted?).to be_truthy
+      expect(child_file.reload).to be_truthy
+      expect(child_file.is_deleted?).to be_truthy
+    }
+  end
+end
+
+shared_examples 'a job_transactionable model' do
+  it {
+    is_expected.to respond_to('job_transactionable?')
+    is_expected.to be_job_transactionable
+    is_expected.to have_many(:job_transactions).with_foreign_key('transactionable_id')
+  }
 end
