@@ -56,21 +56,57 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'greater than 3 characters' do
-        let(:ldap_returns) { [test_user] }
-        include_context 'mocked ldap', returns: :ldap_returns
-        subject { auth_provider.identity_provider.affiliates(
-          test_user[:last_name]
-        ) }
+        context 'missing uid' do
+          let(:test_user) { FactoryGirl.attributes_for(:user).reject{|k| k == :username } }
+          let(:ldap_returns) { [test_user] }
+          include_context 'mocked ldap', returns: :ldap_returns
+          subject { auth_provider.identity_provider.affiliates(
+            test_user[:last_name]
+          ) }
 
-        it {
-          is_expected.to be_a Array
-          expect(subject.length).to be > 0
-          subject.each do |response|
-            expect(response).to be_a User
-            expect(response).not_to be_persisted
-            expect(response.display_name).to eq test_user[:display_name]
-          end
-        }
+          it {
+            is_expected.to be_a Array
+            expect(subject.length).to eq 0
+          }
+        end
+
+        context 'missing mail' do
+          let(:test_user) { FactoryGirl.attributes_for(:user).reject{|k| k == :email } }
+          let(:ldap_returns) { [test_user] }
+          include_context 'mocked ldap', returns: :ldap_returns
+          subject { auth_provider.identity_provider.affiliates(
+            test_user[:last_name]
+          ) }
+
+          it {
+            is_expected.to be_a Array
+            expect(subject.length).to be > 0
+            subject.each do |response|
+              expect(response).to be_a User
+              expect(response).not_to be_persisted
+              expect(response.display_name).to eq test_user[:display_name]
+              expect(response.email).not_to be
+            end
+          }
+        end
+
+        context 'complete record' do
+          let(:ldap_returns) { [test_user] }
+          include_context 'mocked ldap', returns: :ldap_returns
+          subject { auth_provider.identity_provider.affiliates(
+            test_user[:last_name]
+          ) }
+
+          it {
+            is_expected.to be_a Array
+            expect(subject.length).to be > 0
+            subject.each do |response|
+              expect(response).to be_a User
+              expect(response).not_to be_persisted
+              expect(response.display_name).to eq test_user[:display_name]
+            end
+          }
+        end
       end
     end
   end
