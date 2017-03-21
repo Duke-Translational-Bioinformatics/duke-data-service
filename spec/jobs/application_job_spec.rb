@@ -23,6 +23,8 @@ RSpec.describe ApplicationJob, type: :job do
   end
 
   it { is_expected.to be_a ActiveJob::Base }
+  it { expect(described_class).to respond_to(:start_job).with(1).argument }
+  it { expect(described_class).to respond_to(:complete_job).with(1).argument }
   it { expect{described_class.perform_now}.to raise_error(NotImplementedError) }
 
   it { expect(ENV['ACTIVE_JOB_QUEUE_ADAPTER']).to be_nil }

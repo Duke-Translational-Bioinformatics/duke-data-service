@@ -21,7 +21,7 @@ class ApplicationJob < ActiveJob::Base
     conn.with_channel do |channel|
       gateway = channel.exchange(opts[:exchange], opts[:exchange_options])
       distributor = channel.exchange(
-        distributor_exchange_name, 
+        distributor_exchange_name,
         type: distributor_exchange_type, durable: true
       )
 
@@ -53,5 +53,13 @@ class ApplicationJob < ActiveJob::Base
   def self.conn
     conn = opts[:connection] || Bunny.new(opts[:amqp], :vhost => opts[:vhost], :heartbeat => opts[:heartbeat], :logger => Sneakers::logger)
     conn.start
+  end
+
+  def self.start_job(transaction)
+    transaction.update(state: 'in progress')
+  end
+
+  def self.complete_job(transaction)
+    transaction.update(state: 'complete')
   end
 end
