@@ -183,8 +183,17 @@ end
 
 shared_examples 'a job_transactionable model' do
   it {
-    is_expected.to respond_to('job_transactionable?')
-    is_expected.to be_job_transactionable
+    expect(described_class).to include(JobTransactionable)
     is_expected.to have_many(:job_transactions).with_foreign_key('transactionable_id')
+  }
+end
+
+shared_examples 'a JobTracking resource' do
+  it {
+    expect(described_class).to include(JobTracking)
+    expect(described_class).to respond_to(:initialize_job).with(1).argument
+    expect(described_class).to respond_to(:start_job).with(1).argument
+    expect(described_class).to respond_to(:complete_job).with(1).argument
+    expect(described_class).to respond_to(:transaction_key)
   }
 end

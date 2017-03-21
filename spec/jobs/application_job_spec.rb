@@ -30,31 +30,7 @@ RSpec.describe ApplicationJob, type: :job do
 
   it { expect(described_class).to respond_to(:create_bindings) }
 
-  describe '::initialize_job' do
-    let(:argument) { FactoryGirl.create(:folder) }
-    it { expect(described_class).to respond_to(:initialize_job).with(1).argument }
-    it { expect{described_class.initialize_job(argument)}.to raise_error NotImplementedError}
-  end
-
-  describe '::start_job' do
-    let(:transaction) { FactoryGirl.create(:job_transaction) }
-    it { expect(described_class).to respond_to(:start_job).with(1).argument }
-    it {
-      described_class.start_job(transaction)
-      transaction.reload
-      expect(transaction.state).to eq('in progress')
-    }
-  end
-
-  describe '::complete_job' do
-    let(:transaction) { FactoryGirl.create(:job_transaction) }
-    it { expect(described_class).to respond_to(:complete_job).with(1).argument }
-    it {
-      described_class.complete_job(transaction)
-      transaction.reload
-      expect(transaction.state).to eq('complete')
-    }
-  end
+  it_behaves_like 'a JobTracking resource'
 
   describe '::create_bindings' do
     let(:create_bindings) { described_class.create_bindings }
@@ -109,6 +85,8 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
+    it { expect(child_class.transaction_key).to eq(child_class.queue_name) }
+
     before { expect{ActiveJob::Base.queue_adapter = :sneakers}.not_to raise_error }
     after do
       bunny_session.with_channel do |channel|
@@ -189,35 +167,6 @@ RSpec.describe ApplicationJob, type: :job do
           before { job_wrapper_instance.stop }
           it { expect{child_class.perform_later}.to change{child_class_queue.message_count}.by(1) }
         end
-      end
-    end
-
-    context '::initialize_job' do
-      context 'argument not transactionable' do
-        let(:argument) { FactoryGirl.create(:user) }
-
-        it {
-          expect(argument).not_to respond_to('job_transactionable?')
-          expect {
-            child_class.initialize_job(argument)
-          }.to raise_error(ArgumentError)
-        }
-      end
-
-      context 'argument transactionable' do
-        let(:argument) { FactoryGirl.create(:folder) }
-
-        it {
-          expect(argument).to respond_to('job_transactionable?')
-          job_transaction = nil
-          expect {
-            job_transaction = child_class.initialize_job(argument)
-          }.not_to raise_error
-          expect(job_transaction).to be
-          expect(job_transaction).to be_persisted
-          expect(job_transaction.key).to eq(child_class.queue_name)
-          expect(job_transaction.state).to eq('initialized')
-        }
       end
     end
   end

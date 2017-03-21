@@ -1,4 +1,6 @@
 class ApplicationJob < ActiveJob::Base
+  include JobTracking
+
   class QueueNotFound < ::StandardError
   end
   before_enqueue do |job|
@@ -30,7 +32,10 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.job_wrapper
-    check_interface_error
+    if self == ApplicationJob
+      raise NotImplementedError, 'This method should only be called on subclasses of ApplicationJob'
+    end
+
     create_bindings
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
@@ -39,6 +44,11 @@ class ApplicationJob < ActiveJob::Base
         exchange: klass.distributor_exchange_name,
         exchange_type: klass.distributor_exchange_type
     end
+  end
+
+  #JobTracking.transaction_key
+  def self.transaction_key
+    self.queue_name
   end
 
   private
@@ -50,26 +60,5 @@ class ApplicationJob < ActiveJob::Base
   def self.conn
     conn = opts[:connection] || Bunny.new(opts[:amqp], :vhost => opts[:vhost], :heartbeat => opts[:heartbeat], :logger => Sneakers::logger)
     conn.start
-  end
-
-  def self.initialize_job(transactionable)
-    check_interface_error
-    raise ArgumentError.new("object is not job_transactionable") unless transactionable.respond_to?('job_transactionable?')
-    JobTransaction.create(transactionable: transactionable, key: self.queue_name, state: 'initialized')
-  end
-
-  def self.start_job(transaction)
-    transaction.update(state: 'in progress')
-  end
-
-  def self.complete_job(transaction)
-    transaction.update(state: 'complete')
-  end
-
-  def self.check_interface_error
-    if self == ApplicationJob
-      raise NotImplementedError, 'The job_wrapper method should only be called on subclasses of ApplicationJob'
-    end
-    true
   end
 end
