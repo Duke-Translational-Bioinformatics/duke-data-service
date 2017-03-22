@@ -3,6 +3,7 @@ class CreateJobTransactions < ActiveRecord::Migration
     create_table :job_transactions do |t|
       t.string :transactionable_type
       t.uuid :transactionable_id
+      t.string :request_id
       t.string :key
       t.string :state
 

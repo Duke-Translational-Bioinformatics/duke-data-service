@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20170320141138) do
   create_table "job_transactions", force: :cascade do |t|
     t.string   "transactionable_type"
     t.uuid     "transactionable_id"
+    t.string   "request_id"
     t.string   "key"
     t.string   "state"
     t.datetime "created_at",           null: false
