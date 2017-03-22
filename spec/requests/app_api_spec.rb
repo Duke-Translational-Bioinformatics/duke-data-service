@@ -178,5 +178,7 @@ describe DDS::V1::AppAPI do
         it_behaves_like 'it requires queue', :job_queue
       end
     end
+
+    it { expect(ApplicationJob.descendants).not_to be_empty }
   end #app status
 end
