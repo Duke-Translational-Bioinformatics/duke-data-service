@@ -28,12 +28,17 @@ module DDS
           creator_id: current_user.id,
         })
         storage_provider = StorageProvider.first
-        if project.save
-          project.set_project_admin
-          ProjectStorageProviderInitializationJob.perform_later(
-            storage_provider: storage_provider,
-            project: project
-          )
+        Project.transaction do
+          if project.save
+            project.set_project_admin
+            ProjectStorageProviderInitializationJob.perform_later(
+              job_transaction: ProjectStorageProviderInitializationJob.initialize_job(project),
+              storage_provider: storage_provider,
+              project: project
+            )
+          end
+        end
+        if project.persisted?
           project
         else
           validation_error!(project)
@@ -122,7 +127,9 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :destroy?
-        project.update(is_deleted: true)
+        Project.transaction do
+          project.update(is_deleted: true)
+        end
         body false
       end
     end
