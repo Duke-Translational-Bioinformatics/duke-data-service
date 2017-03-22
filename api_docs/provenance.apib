@@ -512,7 +512,7 @@ Represents provenance relations as defined in the [W3C Specification on Provenan
             "audit": { }
         }
 
-### NOT_IMPL_CHANGE List provenance relations [GET /relations/{object_kind}/{object_id}]
+### List provenance relations [GET /relations/{object_kind}/{object_id}]
 List the relations for a provenance node; this only lists direct relations for the node that are a single hop away.
 >**Permission:** visibility to the specified (starting) provenance node (i.e. `object_kind`, `object_id`) - which may be an activity *or* an entity
 - - - - -
@@ -588,7 +588,7 @@ List the relations for a provenance node; this only lists direct relations for t
 + Parameters
     + id (string, required, `ac242faf-fba0-4293-a949-0b82ae7ba810`) ... The unique id of the provenance relation.
 
-### NOT_IMPL_CHANGE View relation [GET]
+### View relation [GET]
 >**Permission:** visibility to a single node for the specified relation - which may be the activity *or* the entity
 
 **Response messages:**
