@@ -3,7 +3,18 @@ require 'rails_helper'
 RSpec.describe JobTracking do
   subject { Class.new { include JobTracking } }
 
+  context '::transaction_key' do
+    it {
+      expect(subject).to respond_to(:transaction_key)
+      expect(subject.transaction_key).to eq(subject.class.name)
+    }
+  end
+
   context '::initialize_job' do
+    it {
+      is_expected.to respond_to(:initialize_job).with(1).argument
+    }
+
     context 'argument not transactionable' do
       let(:argument) { FactoryGirl.create(:user) }
 

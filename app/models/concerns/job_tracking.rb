@@ -8,10 +8,13 @@ module JobTracking
 
     def self.initialize_job(transactionable)
       raise ArgumentError.new("object is not job_transactionable") unless transactionable.class.include?(JobTransactionable)
-      JobTransaction.create(transactionable: transactionable, key: self.transaction_key, state: 'initialized')
+      JobTransaction.create(
+        transactionable: transactionable,
+        request_id: transactionable.current_transaction.request_id,
+        key: self.transaction_key,
+        state: 'initialized'
+      )
     end
-
-    private
 
     def self.start_job(transaction)
       transaction.update(state: 'in progress')

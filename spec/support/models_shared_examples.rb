@@ -164,7 +164,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
       it {
         expect(subject.is_deleted_changed?).to be_falsey
         yield_called = false
-        expect(ChildDeletionJob).not_to receive(:perform_later).with(subject)
+        expect(ChildDeletionJob).not_to receive(:perform_later)
         subject.manage_children do
           yield_called = true
         end
@@ -173,7 +173,10 @@ shared_examples 'a ChildMinder' do |resource_factory,
     end
 
     context 'when is_deleted changed from false to true' do
-      let(:job_transaction) { ChildDeletionJob.initialize_job(subject) }
+      let(:job_transaction) {
+        subject.create_transaction('testing')
+        ChildDeletionJob.initialize_job(subject)
+      }
       it {
         subject.is_deleted = true
         yield_called = false
