@@ -32,7 +32,10 @@ module DDS
           name: folder_params[:name]
         })
         authorize folder, :create?
-        if folder.save
+        Folder.transaction do
+          folder.save
+        end
+        if folder.persisted?
           folder
         else
           validation_error!(folder)
@@ -69,7 +72,9 @@ module DDS
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :destroy?
-        folder.update(is_deleted: true)
+        Folder.transaction do
+          folder.update(is_deleted: true)
+        end
         body false
       end
 
