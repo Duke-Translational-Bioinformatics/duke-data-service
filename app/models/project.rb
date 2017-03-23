@@ -15,8 +15,6 @@ class Project < ActiveRecord::Base
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
 
-  around_update :manage_children
-
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted

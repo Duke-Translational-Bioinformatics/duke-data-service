@@ -1,4 +1,10 @@
 module ChildMinder
+  extend ActiveSupport::Concern
+
+  included do
+    around_update :manage_children
+  end
+
   def manage_children
     newly_deleted = is_deleted_changed? && is_deleted?
     yield
