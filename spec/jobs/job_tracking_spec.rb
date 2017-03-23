@@ -33,8 +33,10 @@ RSpec.describe JobTracking do
         expect(argument.class).to include(JobTransactionable)
         job_transaction = nil
         expect {
-          job_transaction = subject.initialize_job(argument)
-        }.not_to raise_error
+          expect {
+            job_transaction = subject.initialize_job(argument)
+          }.not_to raise_error
+        }.to change{JobTransaction.count}.by(1)
         expect(job_transaction).to be
         expect(job_transaction).to be_persisted
         expect(job_transaction.key).to eq(subject.transaction_key)
@@ -44,22 +46,34 @@ RSpec.describe JobTracking do
   end
 
   describe '::start_job' do
-    let(:transaction) { FactoryGirl.create(:job_transaction) }
+    let(:initial_transaction) { FactoryGirl.create(:job_transaction, state: 'initialized') }
     it { is_expected.to respond_to(:start_job).with(1).argument }
     it {
-      subject.start_job(transaction)
-      transaction.reload
-      expect(transaction.state).to eq('in progress')
+      expect {
+        subject.start_job(initial_transaction)
+      }.to change{
+          initial_transaction.transactionable.job_transactions.where(
+            key: initial_transaction.key,
+            request_id: initial_transaction.request_id,
+            state: 'in progress'
+          ).count
+      }.by(1)
     }
   end
 
   describe '::complete_job' do
-    let(:transaction) { FactoryGirl.create(:job_transaction) }
+    let(:initial_transaction) { FactoryGirl.create(:job_transaction) }
     it { is_expected.to respond_to(:complete_job).with(1).argument }
     it {
-      subject.complete_job(transaction)
-      transaction.reload
-      expect(transaction.state).to eq('complete')
+      expect {
+        subject.complete_job(initial_transaction)
+      }.to change{
+          initial_transaction.transactionable.job_transactions.where(
+            key: initial_transaction.key,
+            request_id: initial_transaction.request_id,
+            state: 'complete'
+          ).count
+      }.by(1)
     }
   end
 end

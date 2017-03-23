@@ -16,12 +16,24 @@ module JobTracking
       )
     end
 
-    def self.start_job(transaction)
-      transaction.update(state: 'in progress')
+    def self.start_job(initial_transaction)
+      initial_transaction.transactionable
+      .job_transactions
+      .create(
+        key: initial_transaction.key,
+        request_id: initial_transaction.request_id,
+        state: 'in progress'
+      )
     end
 
-    def self.complete_job(transaction)
-      transaction.update(state: 'complete')
+    def self.complete_job(initial_transaction)
+      initial_transaction.transactionable
+      .job_transactions
+      .create(
+        key: initial_transaction.key,
+        request_id: initial_transaction.request_id,
+        state: 'complete'
+      )
     end
   end
 end
