@@ -60,7 +60,7 @@ RSpec.describe Project, type: :model do
   describe '.set_project_admin' do
     subject { FactoryGirl.build(:project) }
     let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
-    it { is_expected.to callback(:set_project_admin).after(:save) }
+    it { is_expected.to callback(:set_project_admin).after(:create) }
 
     it 'should give the project creator a project_admin permission' do
       expect(auth_role).to be_persisted
