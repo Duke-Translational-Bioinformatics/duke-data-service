@@ -3,8 +3,52 @@ require 'rails_helper'
 describe DDS::V1::AppAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
 
+  shared_context 'seeded rdbms' do
+    let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
+  end
+  shared_context 'authentication_service created' do
+    let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
+    before { expect(authentication_service).to be_persisted }
+  end
+  shared_context 'storage_provider setup' do
+    let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+
+    before do
+      swift_storage_provider.register_keys
+    end
+  end
+  before do
+    ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
+  end
+
   describe 'app status', :vcr do
+    context 'when properly integrated' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
+      it {
+        get '/api/v1/app/status', json_headers
+        expect(response.status).to eq(200)
+        expect(response.body).to be
+        expect(response.body).not_to eq('null')
+        returned_configs = JSON.parse(response.body)
+        expect(returned_configs).to be_a Hash
+
+        expect(returned_configs).to have_key('status')
+        expect(returned_configs['status']).to eq('ok')
+
+        expect(returned_configs).to have_key('environment')
+        expect(returned_configs['environment']).to eq("#{Rails.env}")
+      }
+    end #when properly integrated
+
     context 'when rdbms is not seeded' do
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
       let(:status_error) { 'rdbms is not seeded' }
       before do
         #AuthRoles are seeded
@@ -14,6 +58,10 @@ describe DDS::V1::AppAPI do
     end #when rdbms not seeded
 
     context 'authentication_service' do
+      include_context 'seeded rdbms'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
       context 'is not created' do
         let(:status_error) { 'authentication_service has not been created' }
         it_behaves_like 'a status error', :status_error
@@ -21,6 +69,10 @@ describe DDS::V1::AppAPI do
     end #authentication_service
 
     context 'storage_provider' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'expected bunny exchanges and queues'
+
       context 'has not been created' do
         let(:status_error) { 'storage_provider has not been created' }
         it_behaves_like 'a status error', :status_error
@@ -52,12 +104,21 @@ describe DDS::V1::AppAPI do
           stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
           expect(swift_storage_provider).to be_persisted
           expect(authentication_service).to be_persisted
+          allow(Rails.logger).to receive(:error).with(/^StorageProvider error/)
+        end
+        after do
+          WebMock.reset!
         end
         it_behaves_like 'a status error', :status_error
       end
     end #storage_provider
 
     context 'graphdb' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
       context 'environment is not set' do
         let(:status_error) { 'graphdb environment is not set' }
         before do
@@ -69,6 +130,10 @@ describe DDS::V1::AppAPI do
     end #graphdb
 
     context 'queue' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+
       let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
       let(:retry_error_exchange_name) { Sneakers::CONFIG[:retry_error_exchange] }
       let(:distributor_exchange_name) { ApplicationJob.distributor_exchange_name }
@@ -93,6 +158,7 @@ describe DDS::V1::AppAPI do
           expect(bunny_session).to receive(:exchange_exists?).and_raise(
             Bunny::TCPConnectionFailedForAllHosts
           )
+          allow(Rails.logger).to receive(:error).with(/^RabbitMQ Connection error/)
         end
         it_behaves_like 'a status error', :status_error
       end
@@ -113,33 +179,6 @@ describe DDS::V1::AppAPI do
       end
     end
 
-    context 'when properly integrated' do
-      let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
-      let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-
-      before do
-        WebMock.reset!
-        ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
-        swift_storage_provider.register_keys
-      end
-      include_context 'expected bunny exchanges and queues'
-
-      it {
-        expect(authentication_service).to be_persisted
-        get '/api/v1/app/status', json_headers
-        expect(response.status).to eq(200)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-        returned_configs = JSON.parse(response.body)
-        expect(returned_configs).to be_a Hash
-
-        expect(returned_configs).to have_key('status')
-        expect(returned_configs['status']).to eq('ok')
-
-        expect(returned_configs).to have_key('environment')
-        expect(returned_configs['environment']).to eq("#{Rails.env}")
-      }
-    end #when properly integrated
+    it { expect(ApplicationJob.descendants).not_to be_empty }
   end #app status
 end

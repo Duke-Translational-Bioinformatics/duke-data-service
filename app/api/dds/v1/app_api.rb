@@ -61,6 +61,7 @@ module DDS
               ApplicationJob.distributor_exchange_name
             ].each do |expected_exchange|
               unless Sneakers::CONFIG[:connection].exchange_exists? expected_exchange
+                status[:status] = 'error'
                 logger.error "queue is missing expected exchange #{expected_exchange}"
               end
             end
@@ -76,10 +77,12 @@ module DDS
             ].concat(application_job_workers)
             .each do |expected_queue|
               unless Sneakers::CONFIG[:connection].queue_exists? expected_queue
+                status[:status] = 'error'
                 logger.error "queue is missing expected queue #{expected_queue}"
               end
             end
           else
+            status[:status] = 'error'
             logger.error 'queue environment is not set'
           end
 
@@ -92,11 +95,6 @@ module DDS
           logger.error("StorageProvider error #{e.message}")
           status[:status] = 'error'
           logger.error "storage_provider is not connected"
-          error!(status,503)
-        rescue Faraday::ConnectionFailed => e
-          logger.error("GraphDB Connection error #{e.message}")
-          status[:status] = 'error'
-          logger.error 'graphdb is not connected'
           error!(status,503)
         rescue Bunny::TCPConnectionFailedForAllHosts => e
           logger.error("RabbitMQ Connection error #{e.message}")

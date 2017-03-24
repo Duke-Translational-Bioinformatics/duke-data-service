@@ -490,7 +490,6 @@ shared_examples 'a status error' do |expected_error_sym|
   let(:expected_error) { send(expected_error_sym) }
   it {
     expect(Rails.logger).to receive(:error).with(expected_error)
-    allow(Rails.logger).to receive(:error).with(any_args)
     get '/api/v1/app/status', json_headers
     expect(response.status).to eq(503)
     expect(response.body).to be
