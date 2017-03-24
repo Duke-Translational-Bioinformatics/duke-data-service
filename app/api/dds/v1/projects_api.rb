@@ -27,16 +27,8 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id,
         })
-        storage_provider = StorageProvider.first
         Project.transaction do
-          if project.save
-            project.set_project_admin
-            ProjectStorageProviderInitializationJob.perform_later(
-              job_transaction: ProjectStorageProviderInitializationJob.initialize_job(project),
-              storage_provider: storage_provider,
-              project: project
-            )
-          end
+          project.save
         end
         if project.persisted?
           project

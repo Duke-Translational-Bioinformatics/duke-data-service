@@ -55,9 +55,7 @@ describe DDS::V1::ProjectsAPI do
           let(:resource) { project_stub }
           it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
             expect {
-              expect {
-                is_expected.to eq(201)
-              }.to have_enqueued_job(ProjectStorageProviderInitializationJob)
+              is_expected.to eq(201)
             }.to change{ ProjectPermission.count }.by(1)
             response_json = JSON.parse(response.body)
             expect(response_json).to have_key('id')
@@ -118,17 +116,20 @@ describe DDS::V1::ProjectsAPI do
         end
       end
 
-      context 'with inline ActiveJob', :vcr do
-        before do
-          ActiveJob::Base.queue_adapter = :inline
-        end
-
-        let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-        it_behaves_like 'a creatable resource' do
-          let(:resource) { project_stub }
-          it_behaves_like 'a storage_provider backed resource'
-        end
-      end
+      # this test does not work because the after_commit on: :create
+      # callback does not play well with transactional fixtures
+      # http://apidock.com/rails/ActiveRecord/Transactions/ClassMethods/after_commit
+      # context 'with inline ActiveJob', :vcr do
+      #   before do
+      #     ActiveJob::Base.queue_adapter = :inline
+      #   end
+      #
+      #   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+      #   it_behaves_like 'a creatable resource' do
+      #     let(:resource) { project_stub }
+      #     it_behaves_like 'a storage_provider backed resource'
+      #   end
+      # end
     end
   end
 
@@ -179,7 +180,6 @@ describe DDS::V1::ProjectsAPI do
     describe 'DELETE' do
       subject { delete(url, nil, headers) }
       let(:called_action) { 'DELETE' }
-      include_context 'with job runner', ChildDeletionJob
 
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
@@ -241,6 +241,8 @@ describe DDS::V1::ProjectsAPI do
 
             it {
               expect {
+                expect(root_folder.is_deleted?).to be_falsey
+                expect(root_file.is_deleted?).to be_falsey
                 is_expected.to eq(204)
               }.to have_enqueued_job(ChildDeletionJob)
             }
