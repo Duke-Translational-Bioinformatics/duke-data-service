@@ -32,7 +32,9 @@ shared_examples 'a job_transactionable model' do
       }
 
       it {
+        expect(existing_current_transaction).not_to be_nil
         expect(subject.current_transaction).not_to be_nil
+        expect(subject.current_transaction.id).to eq(existing_current_transaction.id)
         subject.create_transaction(transaction_state)
         expect(subject.current_transaction).not_to be_nil
         expect(subject.current_transaction).not_to be_persisted
