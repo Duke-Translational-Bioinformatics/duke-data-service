@@ -438,7 +438,7 @@ shared_examples 'a logically deleted resource' do
   it 'should return 404 with error when resource found is logically deleted' do
     expect(deleted_resource).to be_persisted
     expect(deleted_resource).to respond_to 'is_deleted'
-    expect(deleted_resource.update_attribute(:is_deleted, true)).to be_truthy
+    expect(deleted_resource.update_column(:is_deleted, true)).to be_truthy
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -484,4 +484,19 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
     ENV.delete(env_key)
   end
   it { expect(response_json).to eq(expected_response) }
+end
+
+shared_examples 'a status error' do |expected_error_sym|
+  let(:expected_error) { send(expected_error_sym) }
+  it {
+    expect(Rails.logger).to receive(:error).with(expected_error)
+    get '/api/v1/app/status', json_headers
+    expect(response.status).to eq(503)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    returned_configs = JSON.parse(response.body)
+    expect(returned_configs).to be_a Hash
+    expect(returned_configs).to have_key('status')
+    expect(returned_configs['status']).to eq('error')
+  }
 end

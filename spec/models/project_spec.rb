@@ -10,6 +10,7 @@ RSpec.describe Project, type: :model do
     let(:serialized_kind) { true }
   end
   it_behaves_like 'a logically deleted model'
+  it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
     it 'should have many project permissions' do
@@ -56,14 +57,16 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  describe 'set_project_admin' do
+  describe '#set_project_admin' do
+    subject { FactoryGirl.build(:project) }
     let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
+    it { is_expected.to callback(:set_project_admin).after(:create) }
+
     it 'should give the project creator a project_admin permission' do
+      expect(auth_role).to be_persisted
       expect(AuthRole.where(id: 'project_admin').count).to eq(1)
-      expect(subject).to be_persisted
-      expect(subject).to respond_to 'set_project_admin'
       expect {
-        subject.set_project_admin
+        expect(subject.save).to be_truthy
       }.to change{ProjectPermission.count}.by(1)
       expect(subject.project_permissions.count).to eq(1)
       permission = subject.project_permissions.first
@@ -76,7 +79,7 @@ RSpec.describe Project, type: :model do
       auth_role.destroy
       expect(AuthRole.where(id: 'project_admin').count).to eq(0)
       expect {
-        expect(subject).to be_persisted
+        expect(subject.save).to be_truthy
       }.to change{ProjectPermission.count}.by(0)
       expect(subject.project_permissions.count).to eq(0)
     end
@@ -84,32 +87,30 @@ RSpec.describe Project, type: :model do
 
   context 'with descendants' do
     let(:folder) { FactoryGirl.create(:folder, :root, project: subject) }
-    let(:child_folder) { FactoryGirl.create(:folder, parent: folder, project: subject) }
-    let(:grandchild_folder) { FactoryGirl.create(:folder, parent: child_folder, project: subject) }
-    let(:grandchild_file) { FactoryGirl.create(:data_file, parent: child_folder, project: subject) }
-    let(:child_file) { FactoryGirl.create(:data_file, parent: folder, project: subject) }
     let(:file) { FactoryGirl.create(:data_file, :root, project: subject) }
-    let(:descendants) { [
-      file, folder,
-      child_file, child_folder,
-      grandchild_file, grandchild_folder
-    ] }
+    let(:invalid_file) { FactoryGirl.create(:data_file, :root, :invalid, project: subject) }
 
-    describe '.is_deleted=' do
-      it 'should set is_deleted on containers' do
-        expect(subject.is_deleted?).to be_falsey
-        expect(descendants).to be_a Array
-        descendants.each do |child|
-          expect(child.is_deleted?).to be_falsey
-        end
-        should allow_value(true).for(:is_deleted)
-        expect(subject.save).to be_truthy
-        expect(subject.is_deleted?).to be_truthy
-        descendants.each do |child|
-          expect(child.reload).to be_truthy
-          expect(child.is_deleted?).to be_truthy
-        end
-      end
+    it_behaves_like 'a ChildMinder', :project, :file, :invalid_file, :folder
+  end
+
+  describe '#initialize_storage' do
+    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
+    let(:default_storage_provider) { FactoryGirl.create(:storage_provider) }
+    it { is_expected.to callback(:initialize_storage).after(:commit).on(:create) }
+
+    before do
+      ActiveJob::Base.queue_adapter = :test
+      expect(default_storage_provider).to be_persisted
+      expect(auth_role).to be_persisted
+    end
+
+    it 'should enqueue a ProjectStorageProviderInitializationJob with the default StorageProvider' do
+      #TODO change this when storage_providers become configurable
+      expect(StorageProvider.count).to eq 1
+      expect(StorageProvider.first.id).to eq(default_storage_provider.id)
+      expect {
+        subject.initialize_storage
+      }.to have_enqueued_job(ProjectStorageProviderInitializationJob)
     end
   end
 end

@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txce07d369acba4d0dad249-0057b5e7f4
+      - txe927a8df64e245f792af6-0058d08f4f
       Date:
-      - Thu, 18 Aug 2016 16:53:08 GMT
+      - Tue, 21 Mar 2017 02:26:23 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:53:08 GMT
+  recorded_at: Tue, 21 Mar 2017 02:26:23 GMT
 - request:
     method: post
     uri: http://swift.local:12345/v1/AUTH_test
@@ -43,11 +43,11 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
-      X-Remove-Account-Meta-Temp-Url-Key:
-      - 'yes'
-      X-Remove-Account-Meta-Temp-Url-Key-2:
-      - 'yes'
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
+      X-Account-Meta-Temp-Url-Key:
+      - 71e4575b72e0ec2795e1519f93922215
+      X-Account-Meta-Temp-Url-Key-2:
+      - a0d739431e20dfd78d083a19ccebfe63
   response:
     status:
       code: 204
@@ -58,14 +58,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx4ff788299c8d46988ea89-0057b5e7f4
+      - tx8ad245af47c949f6816f4-0058d08f4f
       Date:
-      - Thu, 18 Aug 2016 16:53:08 GMT
+      - Tue, 21 Mar 2017 02:26:24 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:53:08 GMT
+  recorded_at: Tue, 21 Mar 2017 02:26:24 GMT
 - request:
     method: get
     uri: http://swift.local:12345/auth/v1.0
@@ -85,22 +85,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx80663f103f1e40adb1afa-0057b5e7f4
+      - txa1709e235c8f48f1b6e81-0058d08f50
       Date:
-      - Thu, 18 Aug 2016 16:53:08 GMT
+      - Tue, 21 Mar 2017 02:26:24 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:53:08 GMT
+  recorded_at: Tue, 21 Mar 2017 02:26:24 GMT
 - request:
     method: get
     uri: http://swift.local:12345/v1/AUTH_test
@@ -109,38 +109,37 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tk54625d3066bc4151b56314a997a4883c
   response:
     status:
-      code: 200
-      message: OK
+      code: 204
+      message: No Content
     headers:
       Content-Length:
-      - '162'
-      Accept-Ranges:
-      - bytes
+      - '0'
+      X-Account-Object-Count:
+      - '0'
+      X-Account-Meta-Temp-Url-Key-2:
+      - a0d739431e20dfd78d083a19ccebfe63
       X-Timestamp:
-      - '1471538767.86845'
+      - '1489588696.99804'
+      X-Account-Meta-Temp-Url-Key:
+      - 71e4575b72e0ec2795e1519f93922215
       X-Account-Bytes-Used:
       - '0'
       X-Account-Container-Count:
-      - '5'
+      - '0'
       Content-Type:
       - text/plain; charset=utf-8
-      X-Account-Object-Count:
-      - '0'
+      Accept-Ranges:
+      - bytes
       X-Trans-Id:
-      - txda113d5f744645969b6af-0057b5e7f4
+      - tx7d5c9b85f6ab4572ab22b-0058d08f50
       Date:
-      - Thu, 18 Aug 2016 16:53:08 GMT
+      - Tue, 21 Mar 2017 02:26:24 GMT
     body:
       encoding: UTF-8
-      string: |
-        025c73f7-87da-4775-bc82-b020e272594a
-        267d0e00-b7f2-4f5c-aa76-44bb6b28d601
-        525ff6e5-02ca-4f2f-b349-281e529964ed
-        fec2ba4f-9f69-4764-bfab-d580c29cbf60
-        the_container
+      string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:53:08 GMT
+  recorded_at: Tue, 21 Mar 2017 02:26:24 GMT
 recorded_with: VCR 3.0.3

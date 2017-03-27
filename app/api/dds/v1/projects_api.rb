@@ -27,13 +27,7 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id,
         })
-        storage_provider = StorageProvider.first
         if project.save
-          project.set_project_admin
-          ProjectStorageProviderInitializationJob.perform_later(
-            storage_provider: storage_provider,
-            project: project
-          )
           project
         else
           validation_error!(project)

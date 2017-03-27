@@ -13,6 +13,9 @@ gem 'neo4j'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
+# Use sneakers(RabbitMQ) for background jobs
+gem 'sneakers'
+
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
 
@@ -79,6 +82,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'pry-byebug'
+  gem 'bunny-mock'
 end
 
 #heroku requires this
