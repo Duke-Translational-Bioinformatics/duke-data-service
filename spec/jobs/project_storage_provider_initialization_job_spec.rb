@@ -16,12 +16,21 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
     expect {
       described_class.perform_now
     }.to raise_error(ArgumentError)
+  }
+
+  it {
     expect {
       described_class.perform_now(storage_provider: storage_provider)
     }.to raise_error(ArgumentError)
+  }
+
+  it {
     expect {
       described_class.perform_now(project: project)
     }.to raise_error(ArgumentError)
+  }
+
+  it {
     expect {
       described_class.perform_now(project: project, storage_provider: storage_provider)
     }.to raise_error(ArgumentError)
