@@ -57,7 +57,7 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  describe '.set_project_admin' do
+  describe '#set_project_admin' do
     subject { FactoryGirl.build(:project) }
     let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
     it { is_expected.to callback(:set_project_admin).after(:create) }
@@ -93,7 +93,7 @@ RSpec.describe Project, type: :model do
     it_behaves_like 'a ChildMinder', :project, :file, :invalid_file, :folder
   end
 
-  describe '.initialize_storage' do
+  describe '#initialize_storage' do
     let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
     let(:default_storage_provider) { FactoryGirl.create(:storage_provider) }
     it { is_expected.to callback(:initialize_storage).after(:commit).on(:create) }
