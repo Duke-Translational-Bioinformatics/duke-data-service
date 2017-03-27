@@ -41,7 +41,6 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
         expect(mocked_proxy).to receive(:index_document)
         expect(new_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
         ElasticsearchIndexJob.perform_now(job_transaction, new_container)
-        job_transaction.reload
       }
     end
   end
