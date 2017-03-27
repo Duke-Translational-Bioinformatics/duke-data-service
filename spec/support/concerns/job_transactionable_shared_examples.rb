@@ -17,8 +17,10 @@ shared_examples 'a job_transactionable model' do
 
     context 'with nil current_transaction' do
       it {
+        subject.current_transaction = nil
+        expect(subject.current_transaction).to be_nil
         subject.create_transaction(transaction_state)
-        expect(subject.current_transaction).to be
+        expect(subject.current_transaction).not_to be_nil
         expect(subject.current_transaction).not_to be_persisted
         expect(subject.current_transaction.state).to eq(transaction_state)
       }
@@ -30,8 +32,9 @@ shared_examples 'a job_transactionable model' do
       }
 
       it {
+        expect(subject.current_transaction).not_to be_nil
         subject.create_transaction(transaction_state)
-        expect(subject.current_transaction).to be
+        expect(subject.current_transaction).not_to be_nil
         expect(subject.current_transaction).not_to be_persisted
         expect(subject.current_transaction.state).to eq(transaction_state)
         expect(subject.current_transaction.request_id).to eq(existing_current_transaction.request_id)
