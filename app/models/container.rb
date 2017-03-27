@@ -2,6 +2,7 @@ class Container < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
   include RequestAudited
+  include JobTransactionable
 
   include Elasticsearch::Model
 
@@ -42,10 +43,17 @@ class Container < ActiveRecord::Base
   end
 
   def update_elasticsearch_index
-    ElasticsearchIndexJob.perform_later(self, update: true)
+    ElasticsearchIndexJob.perform_later(
+      ElasticsearchIndexJob.initialize_job(self),
+      self,
+      update: true
+    )
   end
 
   def create_elasticsearch_index
-    ElasticsearchIndexJob.perform_later(self)
+    ElasticsearchIndexJob.perform_later(
+      ElasticsearchIndexJob.initialize_job(self),
+      self
+    )
   end
 end

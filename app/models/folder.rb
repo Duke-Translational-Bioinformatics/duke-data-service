@@ -8,7 +8,6 @@ class Folder < Container
   has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
-  around_update :manage_children
 
   validates :project_id, presence: true, immutable: true
   validates_each :parent, :parent_id do |record, attr, value|

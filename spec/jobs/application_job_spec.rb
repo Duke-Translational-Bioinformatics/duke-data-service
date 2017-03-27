@@ -29,6 +29,9 @@ RSpec.describe ApplicationJob, type: :job do
   it { expect(ActiveJob::Base.queue_adapter).to eq(ActiveJob::QueueAdapters::SneakersAdapter) }
 
   it { expect(described_class).to respond_to(:create_bindings) }
+
+  it_behaves_like 'a JobTracking resource'
+
   describe '::create_bindings' do
     let(:create_bindings) { described_class.create_bindings }
     it { expect(bunny_session.exchange_exists?(gateway_exchange_name)).to be_falsey }
@@ -82,6 +85,8 @@ RSpec.describe ApplicationJob, type: :job do
         end
       end)
     }
+    it { expect(child_class.transaction_key).to eq(child_class.queue_name) }
+
     before { expect{ActiveJob::Base.queue_adapter = :sneakers}.not_to raise_error }
     after do
       bunny_session.with_channel do |channel|

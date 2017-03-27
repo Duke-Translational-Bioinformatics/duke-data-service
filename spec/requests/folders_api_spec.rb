@@ -203,7 +203,7 @@ describe DDS::V1::FoldersAPI do
             it 'should create ChildDeletionJob entries for child folders and their files' do
               expect {
                 is_expected.to eq(204)
-              }.to have_enqueued_job(ChildDeletionJob).with(resource)
+              }.to have_enqueued_job(ChildDeletionJob)
             end
           end
         end

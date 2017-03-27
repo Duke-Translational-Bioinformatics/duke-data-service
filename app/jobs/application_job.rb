@@ -1,4 +1,6 @@
 class ApplicationJob < ActiveJob::Base
+  include JobTracking
+
   class QueueNotFound < ::StandardError
   end
   before_enqueue do |job|
@@ -21,7 +23,7 @@ class ApplicationJob < ActiveJob::Base
     conn.with_channel do |channel|
       gateway = channel.exchange(opts[:exchange], opts[:exchange_options])
       distributor = channel.exchange(
-        distributor_exchange_name, 
+        distributor_exchange_name,
         type: distributor_exchange_type, durable: true
       )
 
@@ -31,7 +33,7 @@ class ApplicationJob < ActiveJob::Base
 
   def self.job_wrapper
     if self == ApplicationJob
-      raise NotImplementedError, 'The job_wrapper method should only be called on subclasses of ApplicationJob'
+      raise NotImplementedError, 'This method should only be called on subclasses of ApplicationJob'
     end
 
     create_bindings
@@ -42,6 +44,11 @@ class ApplicationJob < ActiveJob::Base
         exchange: klass.distributor_exchange_name,
         exchange_type: klass.distributor_exchange_type
     end
+  end
+
+  #JobTracking.transaction_key
+  def self.transaction_key
+    self.queue_name
   end
 
   private

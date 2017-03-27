@@ -3,6 +3,7 @@ class Project < ActiveRecord::Base
   include Kinded
   include ChildMinder
   include RequestAudited
+  include JobTransactionable
   audited
 
   belongs_to :creator, class_name: "User"
@@ -14,11 +15,12 @@ class Project < ActiveRecord::Base
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
 
-  around_update :manage_children
-
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
+
+  after_create :set_project_admin
+  after_commit :initialize_storage, on: :create
 
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
@@ -31,5 +33,14 @@ class Project < ActiveRecord::Base
       )
       pp
     end
+  end
+
+  def initialize_storage
+    storage_provider = StorageProvider.first
+    ProjectStorageProviderInitializationJob.perform_later(
+      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      project: self
+    )
   end
 end
