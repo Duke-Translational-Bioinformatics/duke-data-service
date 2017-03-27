@@ -10,6 +10,62 @@ RSpec.describe JobTracking do
     }
   end
 
+  context '::register_job_status' do
+    let(:transaction) { FactoryGirl.create(:job_transaction) }
+    let(:expected_state) { 'testing' }
+    before do
+      expect(transaction).to be_persisted
+      expect(transaction.transactionable).to be_persisted
+    end
+
+    it {
+      is_expected.to respond_to(:register_job_status).with(3).arguments
+    }
+
+    context 'without key' do
+      it {
+        job_transaction = nil
+        expect {
+          expect {
+            job_transaction = subject.register_job_status(
+              transaction,
+              expected_state
+            )
+          }.not_to raise_error
+        }.to change{JobTransaction.count}.by(1)
+        expect(job_transaction).to be
+        expect(job_transaction).to be_persisted
+        expect(job_transaction.transactionable_id).to eq(transaction.transactionable_id)
+        expect(job_transaction.key).to eq(transaction.key)
+        expect(job_transaction.request_id).to eq(transaction.request_id)
+        expect(job_transaction.state).to eq(expected_state)
+      }
+    end
+
+    context 'with key' do
+      let(:expected_key) { 'TestKey' }
+
+      it {
+        job_transaction = nil
+        expect {
+          expect {
+            job_transaction = subject.register_job_status(
+              transaction,
+              expected_state,
+              expected_key
+            )
+          }.not_to raise_error
+        }.to change{JobTransaction.count}.by(1)
+        expect(job_transaction).to be
+        expect(job_transaction).to be_persisted
+        expect(job_transaction.transactionable_id).to eq(transaction.transactionable_id)
+        expect(job_transaction.key).to eq(expected_key)
+        expect(job_transaction.request_id).to eq(transaction.request_id)
+        expect(job_transaction.state).to eq(expected_state)
+      }
+    end
+  end
+
   context '::initialize_job' do
     it {
       is_expected.to respond_to(:initialize_job).with(1).argument
