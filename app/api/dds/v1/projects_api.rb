@@ -27,10 +27,7 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id,
         })
-        Project.transaction do
-          project.save
-        end
-        if project.persisted?
+        if project.save
           project
         else
           validation_error!(project)
@@ -119,9 +116,7 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :destroy?
-        Project.transaction do
-          project.update(is_deleted: true)
-        end
+        project.update(is_deleted: true)
         body false
       end
     end
