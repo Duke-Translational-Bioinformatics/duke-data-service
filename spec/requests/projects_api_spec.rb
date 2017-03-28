@@ -217,10 +217,12 @@ describe DDS::V1::ProjectsAPI do
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.where(is_deleted: false) }
+          let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
 
           context 'with inline ActiveJob' do
             before do
               ActiveJob::Base.queue_adapter = :inline
+              allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
             end
 
             it {
