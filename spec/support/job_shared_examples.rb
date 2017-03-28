@@ -1,3 +1,15 @@
+shared_context 'with sneakers' do
+  before(:each) do
+    Sneakers.clear!
+    Sneakers.configure(SNEAKERS_CONFIG_ORIGINAL.to_hash)
+    unless ENV['TEST_WITH_BUNNY']
+      allow_any_instance_of(Bunny::Session).to receive(:start).and_raise("Use BunnyMock when testing")
+      Sneakers.configure(connection: BunnyMock.new)
+    end
+    ActiveJob::Base.queue_adapter = :sneakers
+  end
+end
+
 shared_context 'with job runner' do |runner_class|
   let(:expected_job_wrapper) { runner_class.job_wrapper.new }
   before {

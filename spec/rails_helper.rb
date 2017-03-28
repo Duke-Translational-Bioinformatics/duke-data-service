@@ -55,12 +55,6 @@ RSpec.configure do |config|
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
   config.before(:each) do
-    Sneakers.clear!
-    Sneakers.configure(SNEAKERS_CONFIG_ORIGINAL.to_hash)
-    unless ENV['TEST_WITH_BUNNY']
-      allow_any_instance_of(Bunny::Session).to receive(:start).and_raise("Use BunnyMock when testing")
-      Sneakers.configure(connection: BunnyMock.new)
-    end
     ActiveJob::Base.queue_adapter = :test
   end
   config.before(:suite) do
