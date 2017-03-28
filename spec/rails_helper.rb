@@ -61,6 +61,7 @@ RSpec.configure do |config|
       allow_any_instance_of(Bunny::Session).to receive(:start).and_raise("Use BunnyMock when testing")
       Sneakers.configure(connection: BunnyMock.new)
     end
+    ActiveJob::Base.queue_adapter = :test
   end
   config.before(:suite) do
     Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
