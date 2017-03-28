@@ -10,9 +10,6 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
   it {
     expect{described_class.perform_now}.to raise_error(ArgumentError)
   }
-  before {
-    ActiveJob::Base.queue_adapter = :test
-  }
   include_context 'with job runner', described_class
 
   context 'update' do
@@ -140,9 +137,6 @@ shared_examples 'a ChildDeletionJob' do |
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
   include_context 'with job runner', described_class
-  before {
-    ActiveJob::Base.queue_adapter = :test
-  }
 
   it { is_expected.to be_an ApplicationJob }
   it { expect(prefix).not_to be_nil }

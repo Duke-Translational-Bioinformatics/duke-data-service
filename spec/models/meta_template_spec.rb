@@ -41,9 +41,6 @@ RSpec.describe MetaTemplate, type: :model do
     let(:template) { FactoryGirl.create(:template) }
     let(:templatable) { FactoryGirl.create(:data_file) }
     let(:meta_templates) { FactoryGirl.build_list(:meta_template, 4, template: template, templatable: templatable) }
-    before do
-      ActiveJob::Base.queue_adapter = :test
-    end
     include_context 'with job runner', ProjectStorageProviderInitializationJob
     include_context 'with concurrent calls', object_list: :meta_templates, method: :save
     it { expect(MetaTemplate.count).to eq(1) }

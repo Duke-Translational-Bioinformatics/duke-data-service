@@ -7,10 +7,6 @@ shared_examples 'a ChildMinder' do |resource_factory,
   let(:child_folder) { send(child_folder_sym) }
   include_context 'with job runner', ChildDeletionJob
 
-  before {
-    ActiveJob::Base.queue_adapter = :test
-  }
-
   it {
     expect(described_class).to include(ChildMinder)
     is_expected.to respond_to(:children)
@@ -76,7 +72,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
           expect(invalid_child_file).to be_persisted
           expect(invalid_child_file.is_deleted?).to be_falsey
         end
-        
+
         it {
           expect(subject).to be_has_children
           subject.is_deleted = true

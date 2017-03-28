@@ -47,10 +47,6 @@ describe DDS::V1::ProjectsAPI do
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
-        before do
-          ActiveJob::Base.queue_adapter = :test
-        end
-
         it_behaves_like 'a creatable resource' do
           let(:resource) { project_stub }
           it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
@@ -237,10 +233,6 @@ describe DDS::V1::ProjectsAPI do
           end
 
           context 'with queued ActiveJob' do
-            before do
-              ActiveJob::Base.queue_adapter = :test
-            end
-
             it {
               expect {
                 expect(root_folder.is_deleted?).to be_falsey

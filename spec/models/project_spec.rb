@@ -99,9 +99,9 @@ RSpec.describe Project, type: :model do
     it { is_expected.to callback(:initialize_storage).after(:commit).on(:create) }
 
     before do
-      ActiveJob::Base.queue_adapter = :test
       expect(default_storage_provider).to be_persisted
       expect(auth_role).to be_persisted
+      expect(subject).to be_persisted
     end
 
     it 'should enqueue a ProjectStorageProviderInitializationJob with the default StorageProvider' do
