@@ -47,10 +47,6 @@ describe DDS::V1::ProjectsAPI do
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
-        before do
-          ActiveJob::Base.queue_adapter = :test
-        end
-
         it_behaves_like 'a creatable resource' do
           let(:resource) { project_stub }
           it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
@@ -217,10 +213,12 @@ describe DDS::V1::ProjectsAPI do
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.where(is_deleted: false) }
+          let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
 
           context 'with inline ActiveJob' do
             before do
               ActiveJob::Base.queue_adapter = :inline
+              allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
             end
 
             it {
@@ -235,10 +233,6 @@ describe DDS::V1::ProjectsAPI do
           end
 
           context 'with queued ActiveJob' do
-            before do
-              ActiveJob::Base.queue_adapter = :test
-            end
-
             it {
               expect {
                 expect(root_folder.is_deleted?).to be_falsey

@@ -1,3 +1,15 @@
+shared_context 'with sneakers' do
+  before(:each) do
+    Sneakers.clear!
+    Sneakers.configure(SNEAKERS_CONFIG_ORIGINAL.to_hash)
+    unless ENV['TEST_WITH_BUNNY']
+      allow_any_instance_of(Bunny::Session).to receive(:start).and_raise("Use BunnyMock when testing")
+      Sneakers.configure(connection: BunnyMock.new)
+    end
+    ActiveJob::Base.queue_adapter = :sneakers
+  end
+end
+
 shared_context 'with job runner' do |runner_class|
   let(:expected_job_wrapper) { runner_class.job_wrapper.new }
   before {
@@ -9,9 +21,6 @@ end
 shared_examples 'an ElasticsearchIndexJob' do |container_sym|
   it {
     expect{described_class.perform_now}.to raise_error(ArgumentError)
-  }
-  before {
-    ActiveJob::Base.queue_adapter = :test
   }
   include_context 'with job runner', described_class
 
@@ -140,9 +149,6 @@ shared_examples 'a ChildDeletionJob' do |
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
   include_context 'with job runner', described_class
-  before {
-    ActiveJob::Base.queue_adapter = :test
-  }
 
   it { is_expected.to be_an ApplicationJob }
   it { expect(prefix).not_to be_nil }

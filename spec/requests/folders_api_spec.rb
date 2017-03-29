@@ -190,10 +190,6 @@ describe DDS::V1::FoldersAPI do
           end
 
           context 'with queued ActiveJob' do
-            before do
-              ActiveJob::Base.queue_adapter = :test
-            end
-
             it 'should be marked as deleted' do
               is_expected.to eq(204)
               expect(resource.reload).to be_truthy

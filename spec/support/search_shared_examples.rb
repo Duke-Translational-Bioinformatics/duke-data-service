@@ -90,10 +90,6 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
   let(:resource_search_serializer) { send(resource_search_serializer_sym) }
   let(:job_transaction) { ElasticsearchIndexJob.initialize_job(subject) }
 
-  before {
-    ActiveJob::Base.queue_adapter = :test
-  }
-
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
 

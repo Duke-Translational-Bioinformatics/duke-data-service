@@ -10,6 +10,7 @@ RSpec.describe ApplicationJob, type: :job do
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
 
+  include_context 'with sneakers'
   before do
     Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 1, retry_timeout: 60000, retry_max_times: 1, threads: 1)
   end

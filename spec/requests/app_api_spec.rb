@@ -3,6 +3,7 @@ require 'rails_helper'
 describe DDS::V1::AppAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
 
+  include_context 'with sneakers'
   shared_context 'seeded rdbms' do
     let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
   end

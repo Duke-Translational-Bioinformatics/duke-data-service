@@ -10,9 +10,11 @@ shared_examples 'a job_transactionable model' do
       .before(:create)
     is_expected.to callback(:root_update_transaction)
       .before(:update)
+    is_expected.to callback(:root_update_transaction)
+      .after(:touch)
   }
 
-  describe '.create_transaction' do
+  describe '#create_transaction' do
     let(:transaction_state) {'testing'}
 
     context 'with nil current_transaction' do
@@ -47,7 +49,7 @@ shared_examples 'a job_transactionable model' do
     it { expect{subject.save}.to change{JobTransaction.count} }
   end
 
-  describe '.root_create_transaction' do
+  describe '#root_create_transaction' do
     before do
       expect(subject).to receive(:create_transaction).with('created').and_call_original
     end
@@ -59,5 +61,12 @@ shared_examples 'a job_transactionable model' do
       expect(subject).to receive(:create_transaction).with('updated').and_call_original
     end
     it { expect(subject.root_update_transaction).to be_a JobTransaction }
+  end
+
+  describe '#touch' do
+    before do
+      expect(subject).to receive(:root_update_transaction)
+    end
+    it { expect{subject.touch}.not_to raise_error }
   end
 end

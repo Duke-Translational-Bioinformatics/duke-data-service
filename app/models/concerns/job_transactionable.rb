@@ -6,6 +6,7 @@ module JobTransactionable
     has_many :job_transactions, as: :transactionable
     before_create :root_create_transaction
     before_update :root_update_transaction
+    after_touch :root_update_transaction
   end
 
   def create_transaction(state)

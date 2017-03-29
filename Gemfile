@@ -83,6 +83,7 @@ group :test do
   gem 'webmock'
   gem 'pry-byebug'
   gem 'bunny-mock'
+  gem 'test_after_commit'
 end
 
 #heroku requires this
