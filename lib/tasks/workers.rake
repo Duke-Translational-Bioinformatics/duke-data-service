@@ -3,31 +3,28 @@ namespace :workers do
   namespace :message_logger do
     desc 'run a MessageLogWorker'
     task run: :environment do
-      Sneakers::Runner.new([MessageLogWorker]).run
+      JobsRunner.new(MessageLogWorker).run
     end
   end
 
   namespace :initialize_project_storage do
     desc 'run a ProjectStorageProviderInitializationJob'
     task run: :environment do
-      workers = [ ProjectStorageProviderInitializationJob.job_wrapper ]
-      Sneakers::Runner.new(workers).run
+      JobsRunner.new(ProjectStorageProviderInitializationJob.job_wrapper).run
     end
   end
 
   namespace :delete_children do
     desc 'run a ChildDeletionJob'
     task run: :environment do
-      workers = [ ChildDeletionJob.job_wrapper ]
-      Sneakers::Runner.new(workers).run
+      JobsRunner.new(ChildDeletionJob.job_wrapper).run
     end
   end
 
   namespace :index_documents do
     desc 'run an ElasticsearchIndexJob'
     task run: :environment do
-      workers = [ ElasticsearchIndexJob.job_wrapper ]
-      Sneakers::Runner.new(workers).run
+      JobsRunner.new(ElasticsearchIndexJob.job_wrapper).run
     end
   end
 end
