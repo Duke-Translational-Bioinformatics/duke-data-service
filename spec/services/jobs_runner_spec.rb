@@ -30,4 +30,17 @@ RSpec.describe JobsRunner do
       end
     end
   end
+
+  describe '::workers_registry' do
+    it { expect(described_class).to respond_to(:workers_registry) }
+    it { expect(described_class.workers_registry).to be_a Hash }
+    it {
+      expect(described_class.workers_registry).to eq({
+        message_logger: MessageLogWorker,
+        initialize_project_storage: ProjectStorageProviderInitializationJob,
+        delete_children: ChildDeletionJob,
+        index_documents: ElasticsearchIndexJob
+      })
+    }
+  end
 end
