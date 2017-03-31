@@ -10,21 +10,21 @@ namespace :workers do
   namespace :initialize_project_storage do
     desc 'run a ProjectStorageProviderInitializationJob'
     task run: :environment do
-      JobsRunner.new(ProjectStorageProviderInitializationJob.job_wrapper).run
+      JobsRunner.new(ProjectStorageProviderInitializationJob).run
     end
   end
 
   namespace :delete_children do
     desc 'run a ChildDeletionJob'
     task run: :environment do
-      JobsRunner.new(ChildDeletionJob.job_wrapper).run
+      JobsRunner.new(ChildDeletionJob).run
     end
   end
 
   namespace :index_documents do
     desc 'run an ElasticsearchIndexJob'
     task run: :environment do
-      JobsRunner.new(ElasticsearchIndexJob.job_wrapper).run
+      JobsRunner.new(ElasticsearchIndexJob).run
     end
   end
 end
