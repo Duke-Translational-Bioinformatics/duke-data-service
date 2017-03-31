@@ -19,8 +19,10 @@ class JobsRunner
     }
   end
 
-  def self.all
-    self.new(self.workers_registry.values)
+  def self.all(except: [])
+    raise ArgumentError.new("keyword :except must be an array") unless except.is_a? Array
+    pruned_registry = self.workers_registry.reject {|k,v| except.include?(k)}
+    self.new(pruned_registry.values)
   end
 
   private

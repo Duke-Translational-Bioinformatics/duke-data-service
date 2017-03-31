@@ -32,6 +32,22 @@ RSpec.describe JobsRunner do
         .with(registered_worker_classes)
       expect{described_class.all}.not_to raise_error
     end
+
+    context 'with :except keyword' do
+      let(:except_worker_key) { workers_registry_hash.keys.sample }
+      let(:except_worker_class) { workers_registry_hash[except_worker_key] }
+      let(:permitted_worker_classes) { registered_worker_classes - [except_worker_class] }
+
+      it 'raises an ArgumentError when except is not an array' do
+        expect{described_class.all(except: except_worker_key)}.to raise_error(ArgumentError, 'keyword :except must be an array')
+      end
+
+      it 'omit registered worker associated to sym in :execpt array' do
+        expect(described_class).to receive(:new)
+          .with(permitted_worker_classes)
+        expect{described_class.all(except: [except_worker_key])}.not_to raise_error
+      end
+    end
   end
 
   describe '#run' do
