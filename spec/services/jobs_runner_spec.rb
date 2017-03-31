@@ -6,12 +6,13 @@ RSpec.describe JobsRunner do
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
   let(:application_job_class) { Class.new(ApplicationJob) }
-  let(:registered_worker_classes) {[
-    MessageLogWorker,
-    ProjectStorageProviderInitializationJob,
-    ChildDeletionJob,
-    ElasticsearchIndexJob
-  ]}
+  let(:workers_registry_hash) { {
+    message_logger: MessageLogWorker,
+    initialize_project_storage: ProjectStorageProviderInitializationJob,
+    delete_children: ChildDeletionJob,
+    index_documents: ElasticsearchIndexJob
+  } }
+  let(:registered_worker_classes) { workers_registry_hash.values }
 
   shared_context 'with job_wrapper' do
     let(:job_wrapper) { application_job_class.job_wrapper }
@@ -76,12 +77,7 @@ RSpec.describe JobsRunner do
     it { expect(described_class).to respond_to(:workers_registry) }
     it { expect(described_class.workers_registry).to be_a Hash }
     it {
-      expect(described_class.workers_registry).to eq({
-        message_logger: MessageLogWorker,
-        initialize_project_storage: ProjectStorageProviderInitializationJob,
-        delete_children: ChildDeletionJob,
-        index_documents: ElasticsearchIndexJob
-      })
+      expect(described_class.workers_registry).to eq(workers_registry_hash)
     }
   end
 end
