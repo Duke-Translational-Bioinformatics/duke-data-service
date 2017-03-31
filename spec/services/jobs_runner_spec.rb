@@ -6,6 +6,8 @@ RSpec.describe JobsRunner do
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
 
+  include_context 'with sneakers'
+
   describe '#run' do
     it { is_expected.to respond_to(:run) }
 
