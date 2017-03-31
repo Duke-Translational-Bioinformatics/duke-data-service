@@ -51,5 +51,27 @@ describe "workers" do
       expect(mocked_jobs_runner).to receive(:run).and_return(true)
       invoke_task
     }
+
+    context "with ENV['WORKERS_ALL_RUN_EXCEPT'] set" do
+      let(:except_workers_array) {['index_documents', 'message_logger']}
+
+      before do
+        stub_const('ENV', {'WORKERS_ALL_RUN_EXCEPT' => except_workers_string})
+        expect(JobsRunner).to receive(:all)
+          .with(except: except_workers_array)
+          .and_return(mocked_jobs_runner)
+        expect(mocked_jobs_runner).to receive(:run).and_return(true)
+      end
+
+      context 'comma separated without spaces' do
+        let(:except_workers_string) { "%s,%s" % except_workers_array }
+        it { invoke_task }
+      end
+
+      context 'comma separated with spaces' do
+        let(:except_workers_string) { " %s,  %s " % except_workers_array }
+        it { invoke_task }
+      end
+    end
   end
 end

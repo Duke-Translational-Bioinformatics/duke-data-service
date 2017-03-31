@@ -31,7 +31,8 @@ namespace :workers do
   namespace :all do
     desc 'run all jobs'
     task run: :environment do
-      JobsRunner.all.run
+      skip_workers = (ENV['WORKERS_ALL_RUN_EXCEPT']||'').gsub(' ','').split(',')
+      JobsRunner.all(except: skip_workers).run
     end
   end
 end
