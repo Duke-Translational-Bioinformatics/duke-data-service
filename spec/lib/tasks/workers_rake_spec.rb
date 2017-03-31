@@ -38,4 +38,18 @@ describe "workers" do
     it { expect(subject.prerequisites).to  include("environment") }
     it_behaves_like 'a queued job worker', :expected_job_class
   end
+
+  describe 'workers:all:run' do
+    include_context "rake"
+    let(:task_name) { "workers:all:run" }
+    let(:mocked_jobs_runner) { instance_double(JobsRunner) }
+
+    it { expect(subject.prerequisites).to  include("environment") }
+    it {
+      expect(JobsRunner).to receive(:all)
+        .and_return(mocked_jobs_runner)
+      expect(mocked_jobs_runner).to receive(:run).and_return(true)
+      invoke_task
+    }
+  end
 end

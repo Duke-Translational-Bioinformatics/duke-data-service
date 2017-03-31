@@ -27,4 +27,11 @@ namespace :workers do
       JobsRunner.new(ElasticsearchIndexJob).run
     end
   end
+
+  namespace :all do
+    desc 'run all jobs'
+    task run: :environment do
+      JobsRunner.all.run
+    end
+  end
 end
