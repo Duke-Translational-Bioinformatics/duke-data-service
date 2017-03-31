@@ -19,6 +19,10 @@ class JobsRunner
     }
   end
 
+  def self.all
+    self.new(self.workers_registry.values)
+  end
+
   private
 
   def normalize_job(job)

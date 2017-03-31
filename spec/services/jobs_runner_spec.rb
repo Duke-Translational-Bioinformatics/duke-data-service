@@ -6,6 +6,12 @@ RSpec.describe JobsRunner do
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
   let(:application_job_class) { Class.new(ApplicationJob) }
+  let(:registered_worker_classes) {[
+    MessageLogWorker,
+    ProjectStorageProviderInitializationJob,
+    ChildDeletionJob,
+    ElasticsearchIndexJob
+  ]}
 
   shared_context 'with job_wrapper' do
     let(:job_wrapper) { application_job_class.job_wrapper }
@@ -16,6 +22,16 @@ RSpec.describe JobsRunner do
   end
 
   include_context 'with sneakers'
+
+  describe '::all' do
+    it { expect(described_class).to respond_to(:all) }
+    it { expect(described_class.all).to be_a described_class }
+    it 'calls ::new with Array of registered worker classes' do
+      expect(described_class).to receive(:new)
+        .with(registered_worker_classes)
+      expect{described_class.all}.not_to raise_error
+    end
+  end
 
   describe '#run' do
     it { is_expected.to respond_to(:run) }
