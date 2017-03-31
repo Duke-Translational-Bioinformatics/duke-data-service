@@ -37,11 +37,13 @@ RSpec.describe JobsRunner do
 
     context 'when initialized with an Array' do
       let(:another_sneakers_worker) { Class.new { include Sneakers::Worker } }
-      let(:initialized_with) { [sneakers_worker, another_sneakers_worker] }
+      let(:initialized_with) { [sneakers_worker, another_sneakers_worker, application_job_class] }
 
       it 'runs both jobs with Sneakers::Runner' do
+        expect(application_job_class).to receive(:job_wrapper)
+          .and_return(job_wrapper)
         expect(Sneakers::Runner).to receive(:new)
-          .with([sneakers_worker, another_sneakers_worker])
+          .with([sneakers_worker, another_sneakers_worker, job_wrapper])
           .and_return(mocked_sneakers_runner)
         expect(mocked_sneakers_runner).to receive(:run).and_return(true)
         expect{subject.run}.not_to raise_error
