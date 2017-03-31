@@ -3,6 +3,13 @@ require 'sneakers/runner'
 class JobsRunner
   def initialize(job_class_or_array)
     @jobs = [job_class_or_array].flatten
+    @jobs = @jobs.collect do |job|
+      if job < ApplicationJob
+        job.job_wrapper
+      else
+        job
+      end
+    end
   end
 
   def run

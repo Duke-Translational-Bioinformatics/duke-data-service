@@ -5,6 +5,8 @@ RSpec.describe JobsRunner do
   let(:initialized_with) { sneakers_worker }
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
+  let(:application_job_class) { Class.new(ApplicationJob) }
+  let(:job_wrapper) { application_job_class.job_wrapper }
 
   include_context 'with sneakers'
 
@@ -17,6 +19,20 @@ RSpec.describe JobsRunner do
         .and_return(mocked_sneakers_runner)
       expect(mocked_sneakers_runner).to receive(:run).and_return(true)
       expect{subject.run}.not_to raise_error
+    end
+
+    context 'when initialized with an ApplicationJob' do
+      let(:initialized_with) { application_job_class }
+
+      it 'runs the ApplicationJob::job_wrapper with Sneakers::Runner' do
+        expect(application_job_class).to receive(:job_wrapper)
+          .and_return(job_wrapper)
+        expect(Sneakers::Runner).to receive(:new)
+          .with([job_wrapper])
+          .and_return(mocked_sneakers_runner)
+        expect(mocked_sneakers_runner).to receive(:run).and_return(true)
+        expect{subject.run}.not_to raise_error
+      end
     end
 
     context 'when initialized with an Array' do
