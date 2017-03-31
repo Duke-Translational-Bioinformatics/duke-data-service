@@ -47,6 +47,12 @@ RSpec.describe JobsRunner do
           .with(permitted_worker_classes)
         expect{described_class.all(except: [except_worker_key])}.not_to raise_error
       end
+
+      it 'omit registered worker associated to string in :execpt array' do
+        expect(described_class).to receive(:new)
+          .with(permitted_worker_classes)
+        expect{described_class.all(except: [except_worker_key.to_s])}.not_to raise_error
+      end
     end
   end
 

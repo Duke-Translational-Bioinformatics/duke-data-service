@@ -21,11 +21,15 @@ class JobsRunner
 
   def self.all(except: [])
     raise ArgumentError.new("keyword :except must be an array") unless except.is_a? Array
-    pruned_registry = self.workers_registry.reject {|k,v| except.include?(k)}
-    self.new(pruned_registry.values)
+    self.new(self.pruned_registry(except).values)
   end
 
   private
+
+  def self.pruned_registry(except)
+    except = except.collect &:to_s
+    self.workers_registry.reject {|k,v| except.include?(k.to_s)}
+  end
 
   def normalize_job(job)
     if job < ApplicationJob
