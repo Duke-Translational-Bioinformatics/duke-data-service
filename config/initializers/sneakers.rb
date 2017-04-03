@@ -12,7 +12,6 @@ Sneakers.configure(
 )
 Sneakers.configure(
   connection: Bunny.new( ENV['CLOUDAMQP_URL'],
-    :vhost => Sneakers::CONFIG[:vhost],
     :heartbeat => Sneakers::CONFIG[:heartbeat],
     :logger => Sneakers::logger
   )

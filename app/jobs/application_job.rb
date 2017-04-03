@@ -58,7 +58,7 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def self.conn
-    conn = opts[:connection] || Bunny.new(opts[:amqp], :vhost => opts[:vhost], :heartbeat => opts[:heartbeat], :logger => Sneakers::logger)
+    conn = opts[:connection]
     conn.start
   end
 end
