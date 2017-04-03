@@ -39,6 +39,24 @@ describe "workers" do
     it_behaves_like 'a queued job worker', :expected_job_class
   end
 
+  JobsRunner.workers_registry.each do |worker_key, worker_class|
+    describe "workers:#{worker_key}:run" do
+      include_context "rake"
+      let(:task_name) { "workers:#{worker_key}:run" }
+      let(:expected_job_class) { worker_class }
+
+      it { expect(subject.prerequisites).to  include("environment") }
+      it "calls JobsRunner#run with #{worker_class}" do
+        mocked_jobs_runner = instance_double(JobsRunner)
+        expect(JobsRunner).to receive(:new)
+          .with(worker_class)
+          .and_return(mocked_jobs_runner)
+        expect(mocked_jobs_runner).to receive(:run).and_return(true)
+        invoke_task
+      end
+    end
+  end
+
   describe 'workers:all:run' do
     include_context "rake"
     let(:task_name) { "workers:all:run" }
