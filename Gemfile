@@ -7,9 +7,10 @@ gem 'rails', '4.2.1' # Remove in rails 5
 gem 'pg'
 
 # Use neo4j for PROV graph relationships
-gem 'neo4j'
+gem 'neo4j', '~> 7.0'
 
 # Use elasticsearch for search
+gem 'elasticsearch', '~> 2.0.0'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
 
@@ -28,6 +29,7 @@ gem "rack-timeout"
 
 gem 'grape-swagger'
 gem 'kaminari'
+gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
 
 # Auditing
@@ -39,7 +41,7 @@ gem "audited-activerecord"
 gem 'active_record_union'
 
 gem 'jwt'
-gem 'grape'
+gem 'grape', '0.16.2'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
@@ -90,4 +92,4 @@ end
 group :docker, :development, :ua_test, :production do
   gem 'rails_12factor'
 end
-ruby "2.2.2"
+ruby "2.3.3"
