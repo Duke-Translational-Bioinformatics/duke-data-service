@@ -1,8 +1,7 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.1' # Remove in rails 5
-#gem 'rails', '~> 5.0' # Needed in rails 5
+gem 'rails', '~> 5.0'
 # Use postgresql as the database for Active Record
 gem 'pg'
 
@@ -22,7 +21,6 @@ gem 'net-ldap'
 
 # Use puma as the webserver in development
 gem 'puma'
-gem 'rack', '1.6.4' # Remove in rails 5
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-middleware-lograge'
 gem "rack-timeout"
@@ -33,9 +31,7 @@ gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
 
 # Auditing
-gem "audited-activerecord"
-#gem "rails-observers", github: 'rails/rails-observers' # Needed in rails 5
-#gem 'audited', github: 'collectiveidea/audited' # Needed in rails 5
+gem 'audited', github: 'collectiveidea/audited', tag: 'v4.4.1'
 
 # Unions in policy scopes
 gem 'active_record_union'
@@ -77,7 +73,7 @@ group :development, :docker, :test do
 end
 
 group :test do
-  #gem 'rails-controller-testing' # Needed in rails 5
+  gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false
   gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
@@ -85,7 +81,6 @@ group :test do
   gem 'webmock'
   gem 'pry-byebug'
   gem 'bunny-mock'
-  gem 'test_after_commit'
 end
 
 #heroku requires this
