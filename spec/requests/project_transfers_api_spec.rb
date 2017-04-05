@@ -370,7 +370,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'GET' do
       let(:payload) {nil}
-      subject { get(url, payload, headers) }
+      subject { get(url, params: payload, headers: headers) }
       let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
       let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 

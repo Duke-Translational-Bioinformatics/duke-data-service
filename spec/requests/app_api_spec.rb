@@ -30,7 +30,7 @@ describe DDS::V1::AppAPI do
       include_context 'expected bunny exchanges and queues'
 
       it {
-        get '/api/v1/app/status', json_headers
+        get '/api/v1/app/status', params: json_headers
         expect(response.status).to eq(200)
         expect(response.body).to be
         expect(response.body).not_to eq('null')

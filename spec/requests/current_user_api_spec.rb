@@ -92,7 +92,7 @@ describe DDS::V1::CurrentUserAPI do
     let(:resource_serializer) { ApiKeySerializer }
 
     describe 'PUT' do
-      subject { put(url, nil, headers) }
+      subject { put(url, headers: headers) }
 
       context 'without an existing token' do
         it_behaves_like 'a creatable resource' do

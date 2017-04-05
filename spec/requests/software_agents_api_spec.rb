@@ -142,7 +142,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       let(:resource_serializer) { ApiKeySerializer }
 
       describe 'PUT' do
-        subject { put(url, nil, headers) }
+        subject { put(url, headers: headers) }
         it_behaves_like 'a regeneratable resource' do
           let(:new_resource) { ApiKey.where(software_agent_id: software_agent.id).take }
           let(:changed_key) { :key }
@@ -186,7 +186,7 @@ describe DDS::V1::SoftwareAgentsAPI do
   describe 'Software Agent Access Token' do
     include_context 'without authentication'
     let(:url) { "/api/v1/software_agents/api_token" }
-    subject{ post(url, body.to_json, headers) }
+    subject{ post(url, params: body.to_json, headers: headers) }
 
     context 'with valid agent_key and user_key' do
       let(:body) {

@@ -163,7 +163,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:url) { "/api/v1/file_versions/#{resource_id}/current" }
 
     describe 'POST' do
-      subject { post(url, nil, headers) }
+      subject { post(url, headers: headers) }
       let(:called_action) { 'POST' }
       before { expect(current_file_version).to be_persisted }
 
