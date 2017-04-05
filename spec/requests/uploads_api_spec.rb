@@ -133,7 +133,7 @@ describe DDS::V1::UploadsAPI do
     let(:upload_id) { upload.id }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "PUT" }
       let!(:payload) {{
         number: payload_chunk_number,
@@ -229,7 +229,7 @@ describe DDS::V1::UploadsAPI do
     let(:url) { "/api/v1/uploads/#{resource_id}/complete" }
     let(:resource_id) { resource.id }
     let(:called_action) { "PUT" }
-    subject { put(url, payload.to_json, headers) }
+    subject { put(url, params: payload.to_json, headers: headers) }
     let!(:payload) {{
       hash: {
         value: fingerprint_stub.value,
@@ -320,7 +320,7 @@ describe DDS::V1::UploadsAPI do
   end
 
   describe 'Report upload hash' do
-    subject { put(url, payload.to_json, headers) }
+    subject { put(url, params: payload.to_json, headers: headers) }
     let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
     let!(:parent_id) { completed_upload.id }
     let(:called_action) { "PUT" }

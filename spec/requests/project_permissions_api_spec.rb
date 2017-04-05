@@ -55,7 +55,7 @@ describe DDS::V1::ProjectPermissionsAPI do
     let(:user_id) { resource_user.id }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         auth_role: {id: auth_role.id}

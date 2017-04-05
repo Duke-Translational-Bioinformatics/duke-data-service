@@ -152,7 +152,7 @@ describe DDS::V1::FilesAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload_upload) {{ id: completed_upload.id }}
       let(:payload) {{
@@ -352,7 +352,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}/move" }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:new_parent) { FactoryGirl.create(:folder, project: project) }
       let(:payload) {{
@@ -426,7 +426,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}/rename" }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: new_name

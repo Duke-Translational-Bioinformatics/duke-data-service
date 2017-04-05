@@ -146,7 +146,7 @@ describe DDS::V1::ProjectsAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         name: project_stub.name,

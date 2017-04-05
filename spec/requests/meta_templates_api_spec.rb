@@ -208,7 +208,7 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'PUT' do
       include_context 'elasticsearch prep', [:template, :property], [:data_file]
 
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         properties: [

@@ -228,7 +228,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:new_parent) { folder_at_root }
       let(:payload) {{
@@ -298,7 +298,7 @@ describe DDS::V1::FoldersAPI do
   describe 'Rename folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/rename" }
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: folder_stub.name

@@ -33,7 +33,7 @@ describe DDS::V1::SystemPermissionsAPI do
     let(:resource_user_id) { resource_user.id }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let!(:payload) {{
         auth_role: {id: auth_role.id}
       }}

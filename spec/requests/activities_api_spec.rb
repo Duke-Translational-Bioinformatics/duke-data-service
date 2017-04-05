@@ -103,7 +103,7 @@ describe DDS::V1::ActivitiesAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         name: resource_stub.name,

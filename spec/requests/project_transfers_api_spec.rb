@@ -170,7 +170,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
@@ -224,7 +224,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
@@ -279,7 +279,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
