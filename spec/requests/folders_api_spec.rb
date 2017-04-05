@@ -26,7 +26,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         parent: { kind: parent.kind, id: parent.id },

@@ -30,7 +30,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let(:payload_parent) {{ kind: parent.kind, id: parent.id }}
       let(:payload_upload) {{ id: upload.id }}

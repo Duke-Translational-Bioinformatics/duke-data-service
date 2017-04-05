@@ -29,7 +29,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name

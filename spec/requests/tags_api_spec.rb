@@ -28,7 +28,7 @@ describe DDS::V1::TagsAPI do
     let(:resource_kind) { data_file.kind }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         label: payload_label
@@ -103,7 +103,7 @@ describe DDS::V1::TagsAPI do
     let(:file_id) { data_file.id }
     let(:resource_kind) { data_file.kind }
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         tags: [

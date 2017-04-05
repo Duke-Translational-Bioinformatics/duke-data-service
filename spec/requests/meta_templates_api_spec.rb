@@ -90,7 +90,7 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'POST' do
       include_context 'elasticsearch prep', [:template, :property], [:data_file]
 
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
       let!(:payload) {{

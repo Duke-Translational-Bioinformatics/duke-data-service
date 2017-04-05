@@ -23,7 +23,7 @@ describe DDS::V1::PropertiesAPI do
     let(:template_id) { template.id }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         key: payload_key,

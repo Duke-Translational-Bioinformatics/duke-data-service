@@ -54,7 +54,7 @@ describe DDS::V1::UploadsAPI do
 
     #Initiate a chunked file upload for a project
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "POST" }
       let!(:payload) {{
         name: upload_stub.name,

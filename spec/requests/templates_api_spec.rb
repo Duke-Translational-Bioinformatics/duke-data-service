@@ -20,7 +20,7 @@ describe DDS::V1::TemplatesAPI do
     let(:url) { "/api/v1/templates#{query_params}" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         name: payload_name,
