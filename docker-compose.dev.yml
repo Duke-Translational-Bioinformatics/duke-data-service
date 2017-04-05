@@ -28,6 +28,7 @@ services:
       - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
+      - s3.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env
@@ -49,6 +50,7 @@ services:
       - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
+      - s3.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env
@@ -85,6 +87,7 @@ services:
       - rabbitmq:rabbitmq.host
     env_file:
       - webapp.env
+      - s3.env
       - swift.env
       - neo4j.client.env
       - elastic.client.env

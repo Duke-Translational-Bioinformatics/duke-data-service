@@ -12,4 +12,4 @@ docker-compose run rake db:seed
 docker-compose run authservice
 docker-compose run rake storage_provider:create
 docker-compose run rake elasticsearch:index:create
-docker-compose up -d server
+docker-compose up server
