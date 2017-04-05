@@ -177,7 +177,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
   end
 
@@ -200,7 +200,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
   end
 end
