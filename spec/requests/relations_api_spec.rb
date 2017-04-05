@@ -678,7 +678,7 @@ describe DDS::V1::RelationsAPI do
         let(:resource_serializer) { AssociatedWithSoftwareAgentProvRelationSerializer }
 
         describe 'View relation' do
-          subject { get(url, nil, headers) }
+          subject { get(url, headers: headers) }
 
           it_behaves_like 'a viewable resource'
 
@@ -740,7 +740,7 @@ describe DDS::V1::RelationsAPI do
         let(:resource_permission) { view_project_permission }
 
         describe 'View relation' do
-          subject { get(url, nil, headers) }
+          subject { get(url, headers: headers) }
           it_behaves_like 'a viewable resource'
 
           it_behaves_like 'an authenticated resource'
@@ -799,7 +799,7 @@ describe DDS::V1::RelationsAPI do
         let(:resource_permission) { view_project_permission }
 
         describe 'View relation' do
-          subject { get(url, nil, headers) }
+          subject { get(url, headers: headers) }
           it_behaves_like 'a viewable resource'
 
           it_behaves_like 'an authenticated resource'
@@ -859,7 +859,7 @@ describe DDS::V1::RelationsAPI do
       let(:resource_permission) { view_project_permission }
 
       describe 'View relation' do
-        subject { get(url, nil, headers) }
+        subject { get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
 
         it_behaves_like 'an authenticated resource'
@@ -918,7 +918,7 @@ describe DDS::V1::RelationsAPI do
       let(:resource_permission) { view_project_permission }
 
       describe 'View relation' do
-        subject { get(url, nil, headers) }
+        subject { get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
 
         it_behaves_like 'an authenticated resource'
@@ -981,7 +981,7 @@ describe DDS::V1::RelationsAPI do
       let(:resource_permission) { view_project_permission }
 
       describe 'View relation' do
-        subject { get(url, nil, headers) }
+        subject { get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
 
         it_behaves_like 'an authenticated resource'
@@ -1040,7 +1040,7 @@ describe DDS::V1::RelationsAPI do
       let(:resource_permission) { view_project_permission }
 
       describe 'View relation' do
-        subject { get(url, nil, headers) }
+        subject { get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
 
         it_behaves_like 'an authenticated resource'

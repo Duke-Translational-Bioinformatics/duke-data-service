@@ -32,7 +32,7 @@ describe DDS::V1::ProjectPermissionsAPI do
 
       it 'should only include permissions for this project' do
         expect(other_permission).to be_persisted
-        get url, nil, headers
+        get(url, headers: headers)
         expect(response.body).not_to include(resource_serializer.new(other_permission).to_json)
       end
 
