@@ -97,7 +97,7 @@ describe DDS::V1::FileVersionsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
 
       before { expect(current_file_version).to be_persisted }

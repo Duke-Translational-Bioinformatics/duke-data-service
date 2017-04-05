@@ -151,7 +151,7 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let!(:resource) {
         FactoryGirl.create(:api_key, user_id: current_user.id)
       }

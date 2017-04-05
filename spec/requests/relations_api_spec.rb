@@ -632,7 +632,7 @@ describe DDS::V1::RelationsAPI do
         end
 
         describe 'Delete relation' do
-          subject { delete(url, nil, headers) }
+          subject { delete(url, headers: headers) }
           let(:called_action) { 'DELETE' }
           before do
             expect(resource).to be_persisted
@@ -691,7 +691,7 @@ describe DDS::V1::RelationsAPI do
         end
 
         describe 'Delete relation' do
-          subject { delete(url, nil, headers) }
+          subject { delete(url, headers: headers) }
           let(:called_action) { 'DELETE' }
           before do
             expect(resource).to be_persisted
@@ -752,7 +752,7 @@ describe DDS::V1::RelationsAPI do
         end
 
         describe 'Delete relation' do
-          subject { delete(url, nil, headers) }
+          subject { delete(url, headers: headers) }
           let(:called_action) { 'DELETE' }
           before do
             expect(resource).to be_persisted
@@ -811,7 +811,7 @@ describe DDS::V1::RelationsAPI do
         end
 
         describe 'Delete relation' do
-          subject { delete(url, nil, headers) }
+          subject { delete(url, headers: headers) }
           let(:called_action) { 'DELETE' }
           before do
             expect(resource).to be_persisted
@@ -872,7 +872,7 @@ describe DDS::V1::RelationsAPI do
       end
 
       describe 'Delete relation' do
-        subject { delete(url, nil, headers) }
+        subject { delete(url, headers: headers) }
         let(:called_action) { 'DELETE' }
         before do
           expect(resource).to be_persisted
@@ -931,7 +931,7 @@ describe DDS::V1::RelationsAPI do
       end
 
       describe 'Delete relation' do
-        subject { delete(url, nil, headers) }
+        subject { delete(url, headers: headers) }
         let(:called_action) { 'DELETE' }
         before do
           expect(resource).to be_persisted
@@ -994,7 +994,7 @@ describe DDS::V1::RelationsAPI do
       end
 
       describe 'Delete relation' do
-        subject { delete(url, nil, headers) }
+        subject { delete(url, headers: headers) }
         let(:called_action) { 'DELETE' }
         before do
           expect(resource).to be_persisted
@@ -1053,7 +1053,7 @@ describe DDS::V1::RelationsAPI do
       end
 
       describe 'Delete relation' do
-        subject { delete(url, nil, headers) }
+        subject { delete(url, headers: headers) }
         let(:called_action) { 'DELETE' }
 
         before do

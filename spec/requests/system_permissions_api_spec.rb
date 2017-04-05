@@ -94,7 +94,7 @@ describe DDS::V1::SystemPermissionsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
 
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'

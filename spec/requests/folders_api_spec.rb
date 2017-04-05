@@ -126,7 +126,7 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       include_context 'with job runner', ChildDeletionJob
 
