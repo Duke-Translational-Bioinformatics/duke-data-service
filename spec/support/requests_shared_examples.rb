@@ -146,7 +146,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   it 'should return pagination response headers' do
      expect(extras.count).to be > per_page
      is_expected.to eq(expected_response_status)
-     expect(response.headers).to include(expected_response_headers)
+     expect(response.headers.to_h).to include(expected_response_headers)
   end
 
   it 'should return only per_page results' do
