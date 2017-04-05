@@ -134,7 +134,7 @@ describe DDS::V1::ProjectsAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 

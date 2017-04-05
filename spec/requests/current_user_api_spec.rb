@@ -10,7 +10,7 @@ describe DDS::V1::CurrentUserAPI do
 
   describe 'get /current_user' do
     let(:url) { '/api/v1/current_user' }
-    subject { get(url, nil, headers) }
+    subject { get(url, headers: headers) }
 
     context 'with valid api_token' do
       it_behaves_like 'a viewable resource'
@@ -79,7 +79,7 @@ describe DDS::V1::CurrentUserAPI do
 
   describe 'get /current_user/usage' do
     let(:url) { '/api/v1/current_user/usage' }
-    subject { get(url, nil, headers) }
+    subject { get(url, headers: headers) }
     let(:resource_serializer) { UserUsageSerializer }
 
     it_behaves_like 'a viewable resource'
@@ -132,7 +132,7 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       context 'without api_key' do
         it_behaves_like 'an identified resource' do

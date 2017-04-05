@@ -21,7 +21,7 @@ describe DDS::V1::ProjectPermissionsAPI do
     let(:project_id) { resource_project.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
@@ -118,7 +118,7 @@ describe DDS::V1::ProjectPermissionsAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

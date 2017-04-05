@@ -16,7 +16,7 @@ describe DDS::V1::ActivitiesAPI do
   describe 'Activities collection' do
     let(:url) { "/api/v1/activities" }
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           deleted_activity
@@ -94,7 +94,7 @@ describe DDS::V1::ActivitiesAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an identified resource' do

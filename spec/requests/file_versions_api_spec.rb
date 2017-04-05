@@ -28,7 +28,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:file_id) { data_file.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -62,7 +62,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:url) { "/api/v1/file_versions/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -144,7 +144,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:resource_serializer) { FileVersionUrlSerializer }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

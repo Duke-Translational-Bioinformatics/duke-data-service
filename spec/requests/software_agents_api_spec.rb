@@ -18,7 +18,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     let(:url) { "/api/v1/software_agents" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           deleted_software_agent
@@ -74,7 +74,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent restricted resource'
@@ -160,7 +160,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
 
       describe 'GET' do
-        subject{ get(url, nil, headers) }
+        subject{ get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent restricted resource'

@@ -69,7 +69,7 @@ describe DDS::V1::TagsAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -180,7 +180,7 @@ describe DDS::V1::TagsAPI do
     let!(:resource_tag_label) { Tag.where(label: resource.label).tag_labels.first }
     let!(:not_allowed_tag_label) { Tag.where(label: not_allowed_tag.label).tag_labels.first }
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -243,7 +243,7 @@ describe DDS::V1::TagsAPI do
     let(:url) { "/api/v1/tags/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

@@ -52,7 +52,7 @@ describe DDS::V1::TemplatesAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       context 'with name_contains query parameter' do
         let(:query_params) { "?name_contains=#{name_contains}" }
@@ -128,7 +128,7 @@ describe DDS::V1::TemplatesAPI do
     let(:url) { "/api/v1/templates/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an identified resource' do

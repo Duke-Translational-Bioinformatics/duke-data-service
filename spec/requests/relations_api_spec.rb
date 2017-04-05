@@ -376,7 +376,7 @@ describe DDS::V1::RelationsAPI do
 
     describe 'List provenance relations' do
       let(:url) { "/api/v1/relations/#{resource_kind}/#{resource_id}" }
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       let(:associated_with_user_prov_relation) {
         FactoryGirl.create(:associated_with_user_prov_relation,
@@ -619,7 +619,7 @@ describe DDS::V1::RelationsAPI do
         let(:resource_serializer) { AssociatedWithUserProvRelationSerializer }
 
         describe 'View relation' do
-          subject { get(url, nil, headers) }
+          subject { get(url, headers: headers) }
 
           it_behaves_like 'a viewable resource'
 

@@ -57,7 +57,7 @@ describe DDS::V1::PropertiesAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a listable resource' do
@@ -129,7 +129,7 @@ describe DDS::V1::PropertiesAPI do
     let(:url) { "/api/v1/template_properties/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an identified resource' do

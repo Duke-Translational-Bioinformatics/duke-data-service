@@ -99,7 +99,7 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it 'returns a method not allowed error' do
         is_expected.to eq 405
@@ -111,7 +111,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 

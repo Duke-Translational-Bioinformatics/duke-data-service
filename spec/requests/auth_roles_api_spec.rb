@@ -57,7 +57,7 @@ describe DDS::V1::AuthRolesAPI do
     end
 
     describe 'without a context' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource'
 
@@ -70,7 +70,7 @@ describe DDS::V1::AuthRolesAPI do
     let(:url) {"/api/v1/auth_roles/#{resource_id}"}
     let(:resource_id) { resource.id }
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 

@@ -138,7 +138,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 
@@ -333,7 +333,7 @@ describe DDS::V1::FilesAPI do
     let(:resource_serializer) { DataFileUrlSerializer }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

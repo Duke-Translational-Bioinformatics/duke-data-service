@@ -19,7 +19,7 @@ describe DDS::V1::SystemPermissionsAPI do
     let(:url) { "/api/v1/system/permissions" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource'
       it_behaves_like 'an authenticated resource'
@@ -70,7 +70,7 @@ describe DDS::V1::SystemPermissionsAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

@@ -112,7 +112,7 @@ describe DDS::V1::UploadsAPI do
 
     #View upload details/status
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 

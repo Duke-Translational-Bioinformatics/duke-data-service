@@ -20,7 +20,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     let(:project_id) { project.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
@@ -46,7 +46,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     let(:user_id) { user.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
