@@ -24,7 +24,7 @@ RSpec.describe MetaTemplate, type: :model do
       is_expected.to allow_value(file).for(:templatable)
       is_expected.not_to allow_value(meta_template).for(:templatable)
     end
-    it { is_expected.to validate_uniqueness_of(:template).scoped_to(:templatable_id, :templatable_type).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:template).scoped_to(:templatable_id).case_insensitive }
   end
 
   describe '#project_permissions' do
