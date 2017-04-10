@@ -1,6 +1,15 @@
 require 'sneakers/handlers/maxretry'
 
+sneakers_workers = ENV['SNEAKER_WORKERS'] || 1
+sneakers_worker_delay = ENV['SNEAKER_WORKER_DELAY'] || 10
+sneakers_prefetch = ENV['SNEAKERS_PREFECTH'] || 1
+sneakers_threads = ENV['SNEAKERS_THREADS'] || 1
+
 Sneakers.configure(
+  :workers => sneakers_workers,
+  :start_worker_delay => sneakers_worker_delay,
+  :prefetch => sneakers_prefetch,
+  :threads => sneakers_threads,
   :exchange => 'message_gateway',
   :log => Rails.logger,
   :handler => Sneakers::Handlers::Maxretry,

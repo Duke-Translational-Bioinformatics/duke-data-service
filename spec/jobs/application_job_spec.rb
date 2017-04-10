@@ -12,7 +12,7 @@ RSpec.describe ApplicationJob, type: :job do
 
   include_context 'with sneakers'
   before do
-    Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 1, retry_timeout: 60000, retry_max_times: 1, threads: 1)
+    Sneakers.configure(exchange: gateway_exchange_name, timeout_job_after: 1, retry_timeout: 60000, retry_max_times: 1)
   end
   after do
     bunny_session.with_channel do |channel|
@@ -32,6 +32,16 @@ RSpec.describe ApplicationJob, type: :job do
   it { expect(described_class).to respond_to(:create_bindings) }
 
   it_behaves_like 'a JobTracking resource'
+
+  describe 'default configuration' do
+    subject { Sneakers::CONFIG }
+    it {
+      expect(subject[:workers]).to eq 1
+      expect(subject[:start_worker_delay]).to eq 10
+      expect(subject[:prefetch]).to eq 1
+      expect(subject[:threads]).to eq 1
+    }
+  end
 
   describe '::create_bindings' do
     let(:create_bindings) { described_class.create_bindings }
