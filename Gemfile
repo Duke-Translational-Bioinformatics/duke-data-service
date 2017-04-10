@@ -51,7 +51,7 @@ gem 'platform-api'
 gem 'netrc'
 
 # circle-ci metadata formatter
-gem 'rspec_junit_formatter', '0.2.2'
+gem 'rspec_junit_formatter'
 
 # newrelic agent
 # https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
