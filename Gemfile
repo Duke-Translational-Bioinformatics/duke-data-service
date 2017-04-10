@@ -31,7 +31,7 @@ gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
 
 # Auditing
-gem 'audited', github: 'collectiveidea/audited', tag: 'v4.4.1'
+gem 'audited'
 
 # Unions in policy scopes
 gem 'active_record_union'
