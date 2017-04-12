@@ -5,6 +5,11 @@ FORMAT: 1A
 ## Group << API Summary
 
 ## Group API Change Log
+12-Apr-2017
+-------------
++ Added new endpoint for seaching folders and files `POST /search/folders_files` - this is a simpler search model that does not place the burden of constructing Elastic DSL on client apps.  Plan is to evolve this endpoint and eventually deprecate `POST /search`.
++ Changed NOT_IMPL_NEW and NOT_IMPL_CHANGE labels/prefix to \_NEW\_ and \_CHANGE\_ for brevity in the rendered docs.
+
 08-Mar-2017
 -------------
 + Removed NOT_IMPL labels from implemented endpoints.
@@ -22,36 +27,6 @@ FORMAT: 1A
 + Added `login_initiation_url`, `is_deprecated`, `is_default` properties to *Auth Providers* resource.
 + Changed `NOT_IMPLEMENTED_*` labels for endpoints to `NOT_IMPL_*` to improve readablility of rendered docs.
 + Changed HTTP verb from `GET` to `POST` for endpoint `/auth_providers/{id}/affiliates/{uid}/dds_user`.  Added endpoint `GET /auth_providers/{id}/affiliates/{uid}` to get a specific auth provider (i.e. Duke) affiliate.
-
-19-Dec-2016
---------------
-+ Added Home links to each of the sub-directories
-+ Added links to each of the Web Portal instances (dev, ua_test and prod)
-+ Added links to each of the API Explorer instances (dev, ua_test and prod)
-+ Added user/get api_token endpoint documentation
-
-14-Dec-2016
---------------
-+ Changed format of overall Apiary document to incorporate links to endpoint groupings
-+ Moved apiary apib files to their own folder rather than have them scattered throughout root
-+ Created a bash script to loop through and then generate the apiary html files.
-+ Changed all endpoints to include typical response codes (this will align more so with the swagger documentation)
-
-30-Nov-2016
---------------
-+ Fixed example request payload for *Search Objects* endpoint.
-+ For *Search Provenance Origin* endpoint, removed validation of file versions query param; if file version does not exist, then no provenance nodes/relations are returned.
-
-17-Oct-2016
---------------
-+ For *Search Provenance* - changed `/search/provenance/was_generated_by` to `/search/provenance/origin`; this search action now includes `wasDerivedFrom` file versions in the results.
-+ For *Metadata* - changed `/templates{?name}` to `/templates{?name_contains}` - facilitates contains search vs. exact match.
-+ Changed `/templates/{id}/properties{?key}` to `/templates/{id}/properties` - if we need `key` based lookup we will extend API to return the instance by `key`, not an array of 1.
-+ Changed `/meta/{object_kind}/{object_id}{?meta_template_name}` to `/meta/{object_kind}/{object_id}` - if we need `template_name` based lookup we will extend API to return the instance by `template_name`, not an array of 1.
-
-23-Sep-2016
---------------
-+ Added *Authentication Providers* actions - formalizes metadata for supported auth providers and provides endpoint to search for affiliates (potential DDS users) in context of the provider.  In addition, supports getting a DDS user identity for a valid affiliate - this endpoint introduces a proposed change to user payload.
 
 ## Group API Basics
 
