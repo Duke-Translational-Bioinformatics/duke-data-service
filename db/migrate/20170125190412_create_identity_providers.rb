@@ -1,4 +1,4 @@
-class CreateIdentityProviders < ActiveRecord::Migration
+class CreateIdentityProviders < ActiveRecord::Migration[4.2]
   def change
     create_table :identity_providers do |t|
       t.string :host

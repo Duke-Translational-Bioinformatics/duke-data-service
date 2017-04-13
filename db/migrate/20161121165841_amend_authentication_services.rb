@@ -1,4 +1,4 @@
-class AmendAuthenticationServices < ActiveRecord::Migration
+class AmendAuthenticationServices < ActiveRecord::Migration[4.2]
   def change
     add_column :authentication_services, :login_initiation_uri, :string
     add_column :authentication_services, :login_response_type, :string

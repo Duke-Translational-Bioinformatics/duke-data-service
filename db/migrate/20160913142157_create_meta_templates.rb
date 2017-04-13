@@ -1,4 +1,4 @@
-class CreateMetaTemplates < ActiveRecord::Migration
+class CreateMetaTemplates < ActiveRecord::Migration[4.2]
   def change
     create_table :meta_templates do |t|
       t.uuid :templatable_id
