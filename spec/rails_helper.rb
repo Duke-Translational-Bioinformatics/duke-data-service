@@ -57,6 +57,9 @@ RSpec.configure do |config|
   config.before(:context) do
     ActiveJob::Base.queue_adapter = :test
   end
+  config.after(:each) do
+    ActiveJob::Base.queue_adapter = :test
+  end
   config.before(:suite) do
     Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
   end
