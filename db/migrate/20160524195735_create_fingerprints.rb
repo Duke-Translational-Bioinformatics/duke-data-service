@@ -1,4 +1,4 @@
-class CreateFingerprints < ActiveRecord::Migration
+class CreateFingerprints < ActiveRecord::Migration[4.2]
   def change
     create_table :fingerprints, id: :uuid do |t|
       t.uuid :upload_id

@@ -1,4 +1,4 @@
-class CreateStorageProviders < ActiveRecord::Migration
+class CreateStorageProviders < ActiveRecord::Migration[4.2]
   def change
     create_table :storage_providers, id: :uuid do |t|
       t.string :display_name

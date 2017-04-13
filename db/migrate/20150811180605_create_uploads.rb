@@ -1,4 +1,4 @@
-class CreateUploads < ActiveRecord::Migration
+class CreateUploads < ActiveRecord::Migration[4.2]
   def change
     create_table :uploads, id: :uuid do |t|
       t.uuid :project_id
