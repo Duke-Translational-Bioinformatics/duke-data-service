@@ -114,7 +114,7 @@ shared_examples 'a logically deleted model' do
 end
 
 shared_context 'with concurrent calls' do |object_list:, method:|
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
   let(:objects) { send(object_list) }
   after do
     ActiveRecord::Base.subclasses.each(&:delete_all)

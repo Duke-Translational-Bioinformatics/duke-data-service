@@ -99,7 +99,6 @@ namespace :db do
       create_current_file_versions
       create_missing_fingerprints
       type_untyped_authentication_services
-      fill_new_authentication_service_attributes
     end
   end
 end

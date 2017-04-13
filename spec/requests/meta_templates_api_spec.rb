@@ -35,7 +35,7 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:url) { "/api/v1/meta/#{resource_kind}/#{file_id}" }
 
     describe 'GET' do
-      subject { get(url, query_params, headers) }
+      subject { get(url, params: query_params, headers: headers) }
       let(:query_params) {{}}
       let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
       let(:meta_template_diff_file) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
@@ -90,7 +90,7 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'POST' do
       include_context 'elasticsearch prep', [:template, :property], [:data_file]
 
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
@@ -175,7 +175,7 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -208,7 +208,7 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'PUT' do
       include_context 'elasticsearch prep', [:template, :property], [:data_file]
 
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         properties: [
@@ -286,7 +286,7 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
 
       it_behaves_like 'a removable resource'
