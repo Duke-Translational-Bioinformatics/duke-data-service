@@ -29,13 +29,31 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
     let(:job_transaction) { described_class.initialize_job(existing_container) }
     context 'perform_now' do
       include_context 'tracking job', :job_transaction
-      it {
-        expect(existing_container).to be_persisted
-        mocked_proxy = double()
-        expect(mocked_proxy).to receive(:update_document)
-        expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
-        ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
-      }
+
+      context 'index exists' do
+        it {
+          expect(existing_container).to be_persisted
+          mocked_proxy = double()
+          expect(mocked_proxy).to receive(:update_document)
+            .with(ignore: 404).and_return(true)
+          expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
+          ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
+        }
+      end
+
+      context 'index does not exist' do
+        it {
+          expect(existing_container).to be_persisted
+          mocked_proxy = double()
+          expect(mocked_proxy).to receive(:update_document)
+            .with(ignore: 404).and_return(false)
+          expect(mocked_proxy).to receive(:index_document)
+          expect(existing_container).to receive(:__elasticsearch__)
+            .exactly(2).times
+            .and_return(mocked_proxy)
+          ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
+        }
+      end
     end
   end
 
