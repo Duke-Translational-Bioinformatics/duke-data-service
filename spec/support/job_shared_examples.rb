@@ -27,31 +27,40 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
   context 'update' do
     let(:existing_container) { FactoryGirl.create(container_sym) }
     let(:job_transaction) { described_class.initialize_job(existing_container) }
+    let(:original_name) { existing_container.name }
+    let(:changed_name) { 'changed name' }
+
     context 'perform_now' do
       include_context 'tracking job', :job_transaction
 
       context 'index exists' do
         it {
           expect(existing_container).to be_persisted
-          mocked_proxy = double()
-          expect(mocked_proxy).to receive(:update_document)
-            .with(ignore: 404).and_return(true)
-          expect(existing_container).to receive(:__elasticsearch__).and_return(mocked_proxy)
+          existing_container.__elasticsearch__.index_document
+          Elasticsearch::Model.client.indices.flush
+          expect(
+            existing_container.class.search(existing_container.id).first._source["name"]
+          ).to eq(original_name)
+          existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
+          Elasticsearch::Model.client.indices.flush
+          expect(
+            existing_container.class.search(existing_container.id).first._source["name"]
+          ).to eq(changed_name)
         }
       end
 
       context 'index does not exist' do
         it {
           expect(existing_container).to be_persisted
-          mocked_proxy = double()
-          expect(mocked_proxy).to receive(:update_document)
-            .with(ignore: 404).and_return(false)
-          expect(mocked_proxy).to receive(:index_document)
-          expect(existing_container).to receive(:__elasticsearch__)
-            .exactly(2).times
-            .and_return(mocked_proxy)
+          expect(existing_container.class.search(existing_container.id).count).to eq(0)
+          existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
+          Elasticsearch::Model.client.indices.flush
+          expect(existing_container.class.search(existing_container.id).count).to eq(1)
+          expect(
+            existing_container.class.search(existing_container.id).first._source["name"]
+          ).to eq(changed_name)
         }
       end
     end
