@@ -73,8 +73,8 @@ This section provides a walk-through of the API for a concrete use case.  The ex
     "query": "digital coll"
   }
   "filters": [
-    {"kinds": ["dds-file"]},
-    {"project_ids": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
+    {"kind": ["dds-file"]},
+    {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
   ],
   },
   "facets": [
