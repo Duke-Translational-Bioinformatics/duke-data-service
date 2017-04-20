@@ -146,60 +146,54 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
 {
    "results" : [ 
       {
-	      "name" : "road_all.csv",
-	      "project" : {
-             "name" : "20161115 test",
-             "id" : "2cdafa6b-66ce-491c-8c58-bb6430a3e969"
+         "name" : "road_all.csv",
+         "project": {
+            "name": "20161115 test",
+            "id": "2cdafa6b-66ce-491c-8c58-bb6430a3e969"
           },
-          "tags" : [ 
-	          {
-	            "label" : "tripod2"
-	          }, 
-	          {
-	            "label" : "digital collections"
-	          }, 
-	          {
-	            "label" : "migration"
-	          } 
+          "tags": [ 
+             {"label" : "tripod2"},
+             {"label" : "digital collections"},
+             {"label" : "migration"}
           ]
       },
       ..................
    ],
-   "facets" : {
-        "project_names": {
-            "buckets": [ 
-		         {
-		           "key": "gcb_royallab",
-		           "doc_count": 11
-			      }, 
-			      {
-			        "key": "20161115",
-			        "doc_count": 10
-			      }, 
-			      {
-			        "key": "test",
-			        "doc_count": 10
-			      }, 
-			      {
-			        "key": "gcb_garmanlab2",
-			        "doc_count" : 6
-			      } 
-	      ]
+   "facets": {
+      "project_names": {
+         "buckets": [ 
+	         {
+	           "key": "gcb_royallab",
+	           "doc_count": 11
+		      }, 
+		      {
+		        "key": "20161115",
+		        "doc_count": 10
+		      }, 
+		      {
+		        "key": "test",
+		        "doc_count": 10
+		      }, 
+		      {
+		        "key": "gcb_garmanlab2",
+		        "doc_count" : 6
+		      }
+		   ]
 	   },
 	   "tags": {
-	       "buckets": [ 
-		       {
-		         "key": "digital collections",
-		         "doc_count": 10
-		       }, 
-		       {
-		         "key": "migration",
-		         "doc_count": 10
-		       }, 
-		       {
-		         "key": "tripod2",
-		         "doc_count": 10
-		       } 
+	      "buckets": [ 
+	          {
+	            "key": "digital collections",
+	            "doc_count": 10
+	          }, 
+	          {
+	            "key": "migration",
+	            "doc_count": 10
+	          }, 
+	          {
+	            "key": "tripod2",
+	            "doc_count": 10
+	          } 
           ]
       }
    }
