@@ -138,7 +138,7 @@ When the above query request is submitted to the DDS search endpoint, the reques
 
 * For the `"aggs"` (facets), the raw non-analyzed `tags` field is specified as so: `"field": "tags.label.raw"` - this prevents the `tags` aggregate from getting represented as separate tokens.  This is not specified for `project.name` because at the time of this analysis we had not generated an associated `raw` index. 
 
-####The DDS Response (Search Results)
+#### The DDS Response (Search Results)
 
 The transformed Elastic DSL is passed-through to the Elastic engine and the following response payload is rendered.  For brevity, we only include specific fields (i.e. `"_source": ["name", "project", "tags"]`) and the number of results have been truncated.
 
