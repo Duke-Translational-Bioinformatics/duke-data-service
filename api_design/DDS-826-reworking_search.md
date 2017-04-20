@@ -166,39 +166,39 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
       ..................
    ],
    "facets" : {
-      "project_names" : {
-         "buckets" : [ 
-	         {
-	           "key" : "gcb_royallab",
-	           "doc_count" : 11
-		      }, 
-		      {
-		        "key" : "20161115",
-		        "doc_count" : 10
-		      }, 
-		      {
-		        "key" : "test",
-		        "doc_count" : 10
-		      }, 
-		      {
-		        "key" : "gcb_garmanlab2",
-		        "doc_count" : 6
-		      } 
+        "project_names": {
+            "buckets": [ 
+		         {
+		           "key": "gcb_royallab",
+		           "doc_count": 11
+			      }, 
+			      {
+			        "key": "20161115",
+			        "doc_count": 10
+			      }, 
+			      {
+			        "key": "test",
+			        "doc_count": 10
+			      }, 
+			      {
+			        "key": "gcb_garmanlab2",
+			        "doc_count" : 6
+			      } 
 	      ]
 	   },
-	   "tags" : {
-	       "buckets" : [ 
+	   "tags": {
+	       "buckets": [ 
 		       {
-		         "key" : "digital collections",
-		         "doc_count" : 10
+		         "key": "digital collections",
+		         "doc_count": 10
 		       }, 
 		       {
-		         "key" : "migration",
-		         "doc_count" : 10
+		         "key": "migration",
+		         "doc_count": 10
 		       }, 
 		       {
-		         "key" : "tripod2",
-		         "doc_count" : 10
+		         "key": "tripod2",
+		         "doc_count": 10
 		       } 
           ]
       }
