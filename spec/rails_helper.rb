@@ -95,6 +95,7 @@ VCR.configure do |c|
 end
 
 # Mocking Bunny for Sneakers ActiveJob testing
+BunnyMock.use_bunny_queue_pop_api = true
 module BunnyMock
   class Queue
     def durable?
