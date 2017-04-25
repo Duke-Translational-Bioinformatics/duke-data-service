@@ -1,6 +1,84 @@
 require 'rails_helper'
 
 RSpec.describe ErrorQueueHandler do
+  include_context 'with sneakers'
+  let(:bunny_session) { Sneakers::CONFIG[:connection] }
+  let(:channel) { bunny_session.channel }
+  let(:error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
+  let(:error_exchange) { channel.exchange(error_queue_name, type: :topic, durable: true) }
+  let(:error_queue) { channel.queue(error_queue_name, durable: true) }
+  let(:routing_key) { Faker::Internet.slug(nil, '_') }
+  let(:sneakers_worker) {
+    worker_queue_name = routing_key
+    Class.new {
+      include Sneakers::Worker
+      from_queue worker_queue_name
+
+      def work(msg)
+        raise 'boom!'
+      end
+    }
+  }
+
+  before do
+    Sneakers.configure(retry_max_times: 0)
+    expect{sneakers_worker.new.run}.not_to raise_error
+    expect(bunny_session.queue_exists?(error_queue_name)).to be_truthy
+    expect{error_queue}.not_to raise_error
+  end
+  after do
+    if channel.respond_to?(:queue_delete)
+      channel.queue_delete(error_queue_name)
+      channel.queue_delete(routing_key)
+      channel.queue_delete(routing_key + '-retry')
+    end
+  end
+
+  shared_examples 'expected error message format' do
+    let(:message) { error_queue.pop }
+    let(:payload) { JSON.parse(message.last) }
+    let(:decoded_payload) { Base64.decode64(payload['payload']) }
+
+    it { expect(error_queue.message_count).to be 1 }
+    it { expect(message).to be_an Array }
+    it { expect(message.first[:routing_key]).to eq routing_key }
+    it { expect(decoded_payload).to eq original_payload }
+  end
+
+  def enqueue_mocked_message(msg)
+    data = {
+      payload: Base64.encode64(msg)
+    }.to_json
+    error_exchange.publish(data, {routing_key: routing_key})
+    begin
+      sleep 0.1
+    end while Thread.list.count {|t| t.status == "run"} > 1
+    msg
+  end
+
+  context 'Maxretry Handler generated message' do
+    let(:original_payload) { Faker::Lorem.sentence }
+    before(:each) do
+      sneakers_worker.enqueue(original_payload)
+      begin
+        sleep 0.1
+      end while Thread.list.count {|t| t.status == "run"} > 1
+    end
+
+    it_behaves_like 'expected error message format'
+  end
+
+  context 'enqueue_mocked_message generated message' do
+    let(:original_payload) { Faker::Lorem.sentence }
+    before(:each) do
+      expect(enqueue_mocked_message(original_payload)).to eq original_payload
+    end
+
+    it_behaves_like 'expected error message format'
+  end
+
+  it { expect(error_queue.message_count).to be 0 }
+
   # Provide access to message count
   describe '#message_count' do
     it { is_expected.to respond_to(:message_count) }
