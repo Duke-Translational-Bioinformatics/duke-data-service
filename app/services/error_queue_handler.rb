@@ -1,8 +1,7 @@
 class ErrorQueueHandler
   def message_count
     count = 0
-    bunny_session.with_channel do |channel|
-      error_queue = channel.queue(Sneakers::CONFIG[:retry_error_exchange], durable: true)
+    with_error_queue do |error_queue|
       count = error_queue.message_count
     end
     count
@@ -21,6 +20,13 @@ class ErrorQueueHandler
   end
 
   private
+
+  def with_error_queue
+    bunny_session.with_channel do |channel|
+      error_queue = channel.queue(Sneakers::CONFIG[:retry_error_exchange], durable: true)
+      yield error_queue
+    end
+  end
 
   def bunny_session
     Sneakers::CONFIG[:connection].start
