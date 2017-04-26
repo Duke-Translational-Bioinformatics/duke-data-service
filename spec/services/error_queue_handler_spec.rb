@@ -82,6 +82,12 @@ RSpec.describe ErrorQueueHandler do
   # Provide access to message count
   describe '#message_count' do
     it { is_expected.to respond_to(:message_count) }
+    context 'with messages in error queue' do
+      let(:expected_count) { Faker::Number.between(1, 10) }
+      before { expected_count.times { enqueue_mocked_message(Faker::Lorem.sentence) } }
+      it { expect(error_queue.message_count).to be expected_count }
+      it { expect(subject.message_count).to be expected_count }
+    end
   end
 
   # List decoded payloads
