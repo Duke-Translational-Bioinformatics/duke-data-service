@@ -45,11 +45,11 @@ RSpec.describe ErrorQueueHandler do
     it { expect(decoded_payload).to eq original_payload }
   end
 
-  def enqueue_mocked_message(msg)
+  def enqueue_mocked_message(msg, original_routing_key = routing_key)
     data = {
       payload: Base64.encode64(msg)
     }.to_json
-    error_exchange.publish(data, {routing_key: routing_key})
+    error_exchange.publish(data, {routing_key: original_routing_key})
     begin
       sleep 0.1
     end while Thread.list.count {|t| t.status == "run"} > 1
@@ -70,11 +70,17 @@ RSpec.describe ErrorQueueHandler do
 
   context 'enqueue_mocked_message generated message' do
     let(:original_payload) { Faker::Lorem.sentence }
+    let(:original_routing_key) { routing_key }
     before(:each) do
-      expect(enqueue_mocked_message(original_payload)).to eq original_payload
+      expect(enqueue_mocked_message(original_payload, original_routing_key)).to eq original_payload
     end
 
     it_behaves_like 'expected error message format'
+
+    context 'with routing_key overridden' do
+      let(:original_routing_key) { Faker::Internet.slug(nil, '_') }
+      it { expect(error_queue.pop.first[:routing_key]).to eq original_routing_key }
+    end
   end
 
   it { expect(error_queue.message_count).to be 0 }
