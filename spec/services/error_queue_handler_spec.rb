@@ -93,7 +93,13 @@ RSpec.describe ErrorQueueHandler do
       before { expected_count.times { enqueue_mocked_message(Faker::Lorem.sentence) } }
       it { expect(error_queue.message_count).to be expected_count }
       it { expect(subject.message_count).to be expected_count }
+      it { expect{subject.message_count}.not_to change {error_queue.message_count} }
     end
+  end
+
+  def stub_message_response(payload, routing_key)
+    id = Digest::SHA256.hexdigest(payload)
+    {id: id, payload: payload, routing_key: routing_key}
   end
 
   # List decoded payloads
@@ -111,6 +117,24 @@ RSpec.describe ErrorQueueHandler do
     it { is_expected.to respond_to(:messages).with(0).arguments }
     it { is_expected.to respond_to(:messages).with_keywords(:routing_key) }
     it { is_expected.to respond_to(:messages).with_keywords(:limit) }
+
+    context 'with messages in error queue' do
+      let(:queued_messages) {
+        [
+          stub_message_response(Faker::Lorem.sentence, routing_key),
+          stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+          stub_message_response(Faker::Lorem.sentence, routing_key)
+        ]
+      }
+      before(:each) do
+        queued_messages.each {|m| enqueue_mocked_message(m[:payload], m[:routing_key])}
+      end
+      it { expect(error_queue.message_count).to be queued_messages.length }
+      it { expect{subject.messages}.not_to change {error_queue.message_count} }
+      it { expect(subject.messages).to be_a Array }
+      it { expect(subject.messages.count).to eq queued_messages.count }
+      it { expect(subject.messages).to eq queued_messages }
+    end
   end
 
   # Requeue single message to message_gateway

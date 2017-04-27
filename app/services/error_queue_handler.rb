@@ -8,6 +8,21 @@ class ErrorQueueHandler
   end
 
   def messages(routing_key: nil, limit: nil)
+    msgs = []
+    with_error_queue do |error_queue|
+      error_queue.message_count.times do |i|
+        msgs << error_queue.pop(manual_ack: true)
+      end
+      error_queue.channel.nack(msgs.last[0].delivery_tag, true, true)
+    end
+    msgs.collect do |m|
+      payload = Base64.decode64(JSON.parse(m.last)['payload'])
+      {
+        id: Digest::SHA256.hexdigest(payload),
+        payload: payload,
+        routing_key: m.first[:routing_key]
+      }
+    end
   end
 
   def requeue_message(id)
