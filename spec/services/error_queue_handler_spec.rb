@@ -7,30 +7,41 @@ RSpec.describe ErrorQueueHandler do
   let(:error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
   let(:error_exchange) { channel.exchange(error_queue_name, type: :topic, durable: true) }
   let(:error_queue) { channel.queue(error_queue_name, durable: true) }
-  let(:routing_key) { Faker::Internet.slug(nil, '_') }
-  let(:sneakers_worker) {
-    worker_queue_name = routing_key
-    Class.new {
-      include Sneakers::Worker
-      from_queue worker_queue_name
+  let(:queue_name) { Faker::Internet.slug(nil, '_') }
+  let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
+  let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
+  let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{queue_name}"}
+  let(:routing_key) { prefixed_queue_name }
+  let(:worker_queue) { channel.queue(
+    prefixed_queue_name,
+    durable: true,
+    arguments: {'x-dead-letter-exchange': "#{prefixed_queue_name}-retry"}
+  ) }
+  let(:application_job) {
+    job_queue_name = queue_name
+    Class.new(ApplicationJob) do
+      queue_as job_queue_name
 
-      def work(msg)
+      def perform
         raise 'boom!'
       end
-    }
+    end
   }
+  let(:sneakers_worker_class) { application_job.job_wrapper }
+  let(:sneakers_worker) { sneakers_worker_class.new }
 
   before do
     Sneakers.configure(retry_max_times: 0)
-    expect{sneakers_worker.new.run}.not_to raise_error
+    expect{sneakers_worker.run}.not_to raise_error
     expect(bunny_session.queue_exists?(error_queue_name)).to be_truthy
+    expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_truthy
     expect{error_queue}.not_to raise_error
   end
   after do
     if channel.respond_to?(:queue_delete)
       channel.queue_delete(error_queue_name)
-      channel.queue_delete(routing_key)
-      channel.queue_delete(routing_key + '-retry')
+      channel.queue_delete(prefixed_queue_name)
+      channel.queue_delete(prefixed_queue_name + '-retry')
     end
   end
 
@@ -39,7 +50,7 @@ RSpec.describe ErrorQueueHandler do
     let(:payload) { JSON.parse(message.last) }
     let(:decoded_payload) { Base64.decode64(payload['payload']) }
 
-    it { expect(error_queue.message_count).to be 1 }
+    it { expect(error_queue.message_count).to eq 1 }
     it { expect(message).to be_an Array }
     it { expect(message.first[:routing_key]).to eq routing_key }
     it { expect(decoded_payload).to eq original_payload }
@@ -59,7 +70,7 @@ RSpec.describe ErrorQueueHandler do
   context 'Maxretry Handler generated message' do
     let(:original_payload) { Faker::Lorem.sentence }
     before(:each) do
-      sneakers_worker.enqueue(original_payload)
+      sneakers_worker_class.enqueue(original_payload)
       begin
         sleep 0.1
       end while Thread.list.count {|t| t.status == "run"} > 1
@@ -176,6 +187,27 @@ RSpec.describe ErrorQueueHandler do
   #   - message removed from error queue on success
   describe '#requeue_message' do
     it { is_expected.to respond_to(:requeue_message).with(1).argument }
+    it { expect{subject.requeue_message('does_not_exist')}.not_to raise_error }
+
+    context 'with messages in error queue' do
+      let(:queued_messages) {
+        [
+          stub_message_response(Faker::Lorem.sentence, routing_key),
+          stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+          stub_message_response(Faker::Lorem.sentence, routing_key)
+        ]
+      }
+      before(:each) do
+        expect{sneakers_worker.stop}.not_to raise_error
+        queued_messages.each {|m| enqueue_mocked_message(m[:payload], m[:routing_key])}
+      end
+      it { expect(subject.requeue_message(queued_messages.first[:id])).to eq queued_messages.first }
+      it { expect{subject.requeue_message(queued_messages.first[:id])}.to change {error_queue.message_count}.by(-1) }
+      it { expect{subject.requeue_message(queued_messages.first[:id])}.to change {worker_queue.message_count}.by(1) }
+      it { expect(subject.requeue_message('does_not_exist')).to be_nil }
+      it { expect{subject.requeue_message('does_not_exist')}.not_to change {error_queue.message_count} }
+      it { expect{subject.requeue_message('does_not_exist')}.not_to change {worker_queue.message_count} }
+    end
   end
 
   # Requeue all messages to message_gateway
