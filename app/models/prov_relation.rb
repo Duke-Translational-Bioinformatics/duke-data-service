@@ -5,9 +5,6 @@ class ProvRelation < ActiveRecord::Base
   include Kinded
   include Graphed::Relation
   include RequestAudited
-  after_create :create_graph_relation
-  after_destroy :delete_graph_relation
-
   audited
 
   validates :creator_id, presence: true
@@ -23,6 +20,7 @@ class ProvRelation < ActiveRecord::Base
   belongs_to :relatable_from, polymorphic: true
   belongs_to :relatable_to, polymorphic: true
 
+  #Overrides Graphed::Relation::create_graph_relation
   def create_graph_relation
     super(
       relationship_type.split('-').map{|part| part.capitalize}.join(''),
@@ -31,6 +29,7 @@ class ProvRelation < ActiveRecord::Base
     )
   end
 
+  #Overrides Graphed::Relation::graph_relation
   def graph_relation
     super(
       relationship_type.split('-').map{|part| part.capitalize}.join(''),

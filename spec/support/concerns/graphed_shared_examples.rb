@@ -3,17 +3,9 @@ shared_examples 'a graphed node' do |auto_create: false, logically_deleted: fals
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
 
-  context 'create_graph_node' do
-    it 'should support create_graph_node method' do
-      is_expected.to respond_to 'create_graph_node'
-    end
-  end
-
-  context 'graph_node' do
-    it 'should support graph_node method' do
-      is_expected.to respond_to 'graph_node'
-    end
-  end
+  it { expect(described_class).to include(Graphed::Node) }
+  it { is_expected.to respond_to 'create_graph_node' }
+  it { is_expected.to respond_to 'graph_node' }
 
   if auto_create
     before do
@@ -93,17 +85,14 @@ shared_examples 'a graphed relation' do |auto_create: false|
   let(:to_node) { to_model.graph_node }
   let(:graphed_relation) { from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
 
-  context 'create_graph_relation' do
-    it 'should support create_graph_relation method' do
-      is_expected.to respond_to 'create_graph_relation'
-    end
-  end
-
-  context 'graph_relation' do
-    it 'should support graph_relation method' do
-      is_expected.to respond_to 'graph_relation'
-    end
-  end
+  it { expect(described_class).to include(Graphed::Relation) }
+  it { is_expected.to respond_to :graph_relation }
+  it { is_expected.to respond_to :create_graph_relation }
+  it { is_expected.to respond_to :delete_graph_relation }
+  it { is_expected.to respond_to :manage_graph_relation }
+  it { is_expected.to respond_to :delete_graph_relation }
+  it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
+  it { is_expected.to callback(:manage_graph_relation).around(:update) }
 
   if auto_create
     it 'should auto_create' do
@@ -153,13 +142,46 @@ shared_examples 'a graphed relation' do |auto_create: false|
       end
     end
 
-    it { is_expected.to respond_to :delete_graph_relation }
-    it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
     it 'should destroy graph_relation with the model' do
-      expect(subject).to be
+      is_expected.to be_persisted
       expect(graphed_relation).to be
       subject.destroy
       expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first).not_to be
+    end
+
+    it 'should destroy graph_relation when model is logically_deleted deleted' do
+      is_expected.to be_persisted
+      expect(subject.is_deleted?).to be_falsey
+      expect(graphed_relation).to be
+      subject.update(is_deleted: true)
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first).not_to be
+    end
+  end
+
+  describe 'manage_graph_relation' do
+    context 'when is_deleted not changed' do
+      it {
+        expect(subject.is_deleted_changed?).to be_falsey
+        yield_called = false
+        is_expected.not_to receive(:delete_graph_relation)
+        subject.manage_graph_relation do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
+    end
+
+    context 'when is_deleted changed from false to true' do
+      it {
+        expect(subject.is_deleted?).to be_falsey
+        yield_called = false
+        subject.is_deleted = true
+        is_expected.to receive(:delete_graph_relation)
+        subject.manage_graph_relation do
+          yield_called = true
+        end
+        expect(yield_called).to be_truthy
+      }
     end
   end
 end #a graphed relation
