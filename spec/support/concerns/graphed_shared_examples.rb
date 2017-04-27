@@ -4,8 +4,9 @@ shared_examples 'a graphed node' do |auto_create: false, logically_deleted: fals
   let(:graph_node_name) { "Graph::#{kind_name}" }
 
   it { expect(described_class).to include(Graphed::Node) }
-  it { is_expected.to respond_to 'create_graph_node' }
-  it { is_expected.to respond_to 'graph_node' }
+  it { is_expected.to respond_to :graph_node }
+  it { is_expected.to respond_to :create_graph_node }
+  it { is_expected.to respond_to :delete_graph_node }
 
   if auto_create
     before do
@@ -188,7 +189,9 @@ end #a graphed relation
 
 # These are Graph::* Neo4j graph objects
 shared_examples 'a graphed model' do
+  it { expect(described_class).to include(Graphed::Model) }
   it { is_expected.to respond_to('graphed_model') }
+
   context 'graphed_model'do
     it 'should return the Model that is graphed based on its model_kind and model_id' do
       graphed_model = subject.graphed_model

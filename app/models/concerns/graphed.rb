@@ -1,6 +1,13 @@
 module Graphed
   module Node
+    extend ActiveSupport::Concern
+    
     # These are models that get turned into Graph::* Neo4j::ActiveNode objects
+    included do
+      after_create :create_graph_node
+      after_destroy :delete_graph_node
+    end
+
     def create_graph_node(node_name=nil)
       node_name ||= self.class.name
       node_class = "Graph::#{node_name}"
