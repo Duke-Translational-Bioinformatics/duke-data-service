@@ -105,5 +105,11 @@ module BunnyMock
     def cancel
       @consumers = []
     end
+
+    def pop(opts = { manual_ack: false }, &block)
+      r = bunny_pop(opts, &block)
+      store_acknowledgement(r, [opts])
+      r
+    end
   end
 end
