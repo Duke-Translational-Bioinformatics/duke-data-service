@@ -117,6 +117,7 @@ RSpec.describe ErrorQueueHandler do
     it { is_expected.to respond_to(:messages).with(0).arguments }
     it { is_expected.to respond_to(:messages).with_keywords(:routing_key) }
     it { is_expected.to respond_to(:messages).with_keywords(:limit) }
+    it { expect{subject.messages}.not_to raise_error }
 
     context 'with messages in error queue' do
       let(:queued_messages) {
@@ -141,6 +142,7 @@ RSpec.describe ErrorQueueHandler do
         }
         it { expect(expected_messages.length).to eq 2 }
         it { expect(subject.messages(limit: 2)).to eq expected_messages }
+        it { expect{subject.messages(limit: 2)}.not_to change {error_queue.message_count} }
       end
 
       context 'when routing_key keyword is set' do
@@ -150,6 +152,20 @@ RSpec.describe ErrorQueueHandler do
         it { expect(expected_messages).not_to be_empty }
         it { expect(expected_messages.length).to be < queued_messages.length }
         it { expect(subject.messages(routing_key: routing_key)).to eq expected_messages }
+        it { expect{subject.messages(routing_key: routing_key)}.not_to change {error_queue.message_count} }
+        it { expect(subject.messages(routing_key: 'does_not_exist')).to eq [] }
+        it { expect{subject.messages(routing_key: 'does_not_exist')}.not_to change {error_queue.message_count} }
+      end
+
+      context 'when routing_key and limit is set' do
+        let(:expected_messages) {
+          (queued_messages.select {|m| m[:routing_key] == routing_key}).take(2)
+        }
+        it { expect(expected_messages.length).to eq 2 }
+        it { expect(subject.messages(routing_key: routing_key, limit: 2)).to eq expected_messages }
+        it { expect{subject.messages(routing_key: routing_key, limit: 2)}.not_to change {error_queue.message_count} }
+        it { expect(subject.messages(routing_key: 'does_not_exist', limit: 2)).to eq [] }
+        it { expect{subject.messages(routing_key: 'does_not_exist', limit: 2)}.not_to change {error_queue.message_count} }
       end
     end
   end

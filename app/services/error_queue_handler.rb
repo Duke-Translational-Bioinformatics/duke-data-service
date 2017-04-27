@@ -10,13 +10,15 @@ class ErrorQueueHandler
   def messages(routing_key: nil, limit: nil)
     msgs = []
     with_error_queue do |error_queue|
-      number_to_pop = limit || error_queue.message_count
-      number_to_pop.times do |i|
-        msgs << error_queue.pop(manual_ack: true)
+      last_message = nil
+      error_queue.message_count.times do |i|
+        last_message = error_queue.pop(manual_ack: true)
+        msgs << last_message unless routing_key && 
+          last_message.first[:routing_key] != routing_key
+        break if limit && msgs.length == limit
       end
-      error_queue.channel.nack(msgs.last[0].delivery_tag, true, true)
+      error_queue.channel.nack(last_message[0].delivery_tag, true, true) if last_message
     end
-    msgs.keep_if {|m| m.first[:routing_key] == routing_key} if routing_key
     msgs.collect do |m|
       payload = Base64.decode64(JSON.parse(m.last)['payload'])
       {
