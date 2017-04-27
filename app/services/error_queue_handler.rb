@@ -13,20 +13,13 @@ class ErrorQueueHandler
       last_message = nil
       error_queue.message_count.times do |i|
         last_message = error_queue.pop(manual_ack: true)
-        msgs << last_message unless routing_key && 
+        msgs << serialize_message(last_message) unless routing_key && 
           last_message.first[:routing_key] != routing_key
         break if limit && msgs.length == limit
       end
       error_queue.channel.nack(last_message[0].delivery_tag, true, true) if last_message
     end
-    msgs.collect do |m|
-      payload = Base64.decode64(JSON.parse(m.last)['payload'])
-      {
-        id: Digest::SHA256.hexdigest(payload),
-        payload: payload,
-        routing_key: m.first[:routing_key]
-      }
-    end
+    msgs
   end
 
   def requeue_message(id)
@@ -39,6 +32,15 @@ class ErrorQueueHandler
   end
 
   private
+
+  def serialize_message(msg)
+    payload = Base64.decode64(JSON.parse(msg.last)['payload'])
+    {
+      id: Digest::SHA256.hexdigest(payload),
+      payload: payload,
+      routing_key: msg.first[:routing_key]
+    }
+  end
 
   def with_error_queue
     bunny_session.with_channel do |channel|
