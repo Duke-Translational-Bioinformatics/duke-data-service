@@ -134,6 +134,15 @@ RSpec.describe ErrorQueueHandler do
       it { expect(subject.messages).to be_a Array }
       it { expect(subject.messages.count).to eq queued_messages.count }
       it { expect(subject.messages).to eq queued_messages }
+
+      context 'when routing_key keyword is set' do
+        let(:expected_messages) {
+          queued_messages.select {|m| m[:routing_key] == routing_key}
+        }
+        it { expect(expected_messages).not_to be_empty }
+        it { expect(expected_messages.length).to be < queued_messages.length }
+        it { expect(subject.messages(routing_key: routing_key)).to eq expected_messages }
+      end
     end
   end
 

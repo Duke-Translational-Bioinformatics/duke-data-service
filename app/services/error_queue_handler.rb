@@ -15,6 +15,7 @@ class ErrorQueueHandler
       end
       error_queue.channel.nack(msgs.last[0].delivery_tag, true, true)
     end
+    msgs.keep_if {|m| m.first[:routing_key] == routing_key} if routing_key
     msgs.collect do |m|
       payload = Base64.decode64(JSON.parse(m.last)['payload'])
       {
