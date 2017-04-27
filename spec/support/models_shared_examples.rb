@@ -69,8 +69,8 @@ shared_examples 'a ProvRelation' do
   end
 
   it 'should allow is_deleted to be set' do
-    should allow_value(true).for(:is_deleted)
-    should allow_value(false).for(:is_deleted)
+    is_expected.to allow_value(true).for(:is_deleted)
+    is_expected.to allow_value(false).for(:is_deleted)
   end
 
   it_behaves_like 'an audited model'

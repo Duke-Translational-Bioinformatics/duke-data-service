@@ -1,6 +1,13 @@
 module Graphed
   module Node
+    extend ActiveSupport::Concern
+    
     # These are models that get turned into Graph::* Neo4j::ActiveNode objects
+    included do
+      after_create :create_graph_node
+      after_destroy :delete_graph_node
+    end
+
     def create_graph_node(node_name=nil)
       node_name ||= self.class.name
       node_class = "Graph::#{node_name}"
@@ -32,6 +39,20 @@ module Graphed
   end
 
   module Relation
+    extend ActiveSupport::Concern
+
+    included do
+      after_create :create_graph_relation
+      after_destroy :delete_graph_relation
+      around_update :manage_graph_relation
+    end
+
+    def manage_graph_relation
+      newly_deleted = is_deleted_changed? && is_deleted?
+      yield
+      delete_graph_relation if newly_deleted
+    end
+
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
     def create_graph_relation(rel_type, from_model, to_model)
@@ -60,9 +81,9 @@ module Graphed
     end
 
     def delete_graph_relation
-      graph_relation = self.graph_relation
-      if graph_relation
-        graph_relation.destroy
+      this_relation = self.graph_relation
+      if this_relation
+        this_relation.destroy
       end
     end
   end #Graphed::Relation
