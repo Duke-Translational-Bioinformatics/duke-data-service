@@ -135,6 +135,14 @@ RSpec.describe ErrorQueueHandler do
       it { expect(subject.messages.count).to eq queued_messages.count }
       it { expect(subject.messages).to eq queued_messages }
 
+      context 'when limit keyword is set' do
+        let(:expected_messages) {
+          queued_messages.take(2)
+        }
+        it { expect(expected_messages.length).to eq 2 }
+        it { expect(subject.messages(limit: 2)).to eq expected_messages }
+      end
+
       context 'when routing_key keyword is set' do
         let(:expected_messages) {
           queued_messages.select {|m| m[:routing_key] == routing_key}

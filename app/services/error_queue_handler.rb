@@ -10,7 +10,8 @@ class ErrorQueueHandler
   def messages(routing_key: nil, limit: nil)
     msgs = []
     with_error_queue do |error_queue|
-      error_queue.message_count.times do |i|
+      number_to_pop = limit || error_queue.message_count
+      number_to_pop.times do |i|
         msgs << error_queue.pop(manual_ack: true)
       end
       error_queue.channel.nack(msgs.last[0].delivery_tag, true, true)
