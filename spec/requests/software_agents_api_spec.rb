@@ -18,7 +18,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     let(:url) { "/api/v1/software_agents" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           deleted_software_agent
@@ -29,7 +29,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name
@@ -74,7 +74,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent restricted resource'
@@ -84,7 +84,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         name: resource_stub.name,
@@ -109,7 +109,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
@@ -142,7 +142,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       let(:resource_serializer) { ApiKeySerializer }
 
       describe 'PUT' do
-        subject { put(url, nil, headers) }
+        subject { put(url, headers: headers) }
         it_behaves_like 'a regeneratable resource' do
           let(:new_resource) { ApiKey.where(software_agent_id: software_agent.id).take }
           let(:changed_key) { :key }
@@ -160,7 +160,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
 
       describe 'GET' do
-        subject{ get(url, nil, headers) }
+        subject{ get(url, headers: headers) }
         it_behaves_like 'a viewable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent restricted resource'
@@ -171,7 +171,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       end
 
       describe 'DELETE' do
-        subject { delete(url, nil, headers) }
+        subject { delete(url, headers: headers) }
         it_behaves_like 'a removable resource'
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent restricted resource'
@@ -186,7 +186,7 @@ describe DDS::V1::SoftwareAgentsAPI do
   describe 'Software Agent Access Token' do
     include_context 'without authentication'
     let(:url) { "/api/v1/software_agents/api_token" }
-    subject{ post(url, body.to_json, headers) }
+    subject{ post(url, params: body.to_json, headers: headers) }
 
     context 'with valid agent_key and user_key' do
       let(:body) {

@@ -85,7 +85,7 @@ describe DDS::V1::SearchAPI do
 
     describe 'POST /api/v1/search/provenance' do
       let(:url) { "/api/v1/search/provenance" }
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
 
       let!(:other_file) { FactoryGirl.create(:data_file, project: project) }
@@ -198,7 +198,7 @@ describe DDS::V1::SearchAPI do
 
     describe 'POST /api/v1/search/provenance/origin' do
       let(:url) { "/api/v1/search/provenance/origin" }
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
 
       let(:payload) {{
@@ -250,7 +250,7 @@ describe DDS::V1::SearchAPI do
 
     describe 'POST /api/v1/search' do
       let(:url) { "/api/v1/search" }
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let(:include_kinds) { ['dds-file'] }
       let(:elastic_query) {

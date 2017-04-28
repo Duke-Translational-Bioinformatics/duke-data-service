@@ -26,7 +26,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         parent: { kind: parent.kind, id: parent.id },
@@ -99,7 +99,7 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it 'returns a method not allowed error' do
         is_expected.to eq 405
@@ -111,7 +111,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 
@@ -126,7 +126,7 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       include_context 'with job runner', ChildDeletionJob
 
@@ -228,7 +228,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:new_parent) { folder_at_root }
       let(:payload) {{
@@ -298,7 +298,7 @@ describe DDS::V1::FoldersAPI do
   describe 'Rename folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/rename" }
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: folder_stub.name

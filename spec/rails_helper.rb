@@ -54,7 +54,10 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
-  config.before(:each) do
+  config.before(:context) do
+    ActiveJob::Base.queue_adapter = :test
+  end
+  config.after(:each) do
     ActiveJob::Base.queue_adapter = :test
   end
   config.before(:suite) do

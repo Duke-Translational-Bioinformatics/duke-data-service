@@ -1,4 +1,4 @@
-class CreateTemplates < ActiveRecord::Migration
+class CreateTemplates < ActiveRecord::Migration[4.2]
   def change
     create_table :templates, id: :uuid do |t|
       t.string :name

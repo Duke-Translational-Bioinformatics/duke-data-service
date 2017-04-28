@@ -1,4 +1,4 @@
-class RecreateMetaTemplates < ActiveRecord::Migration
+class RecreateMetaTemplates < ActiveRecord::Migration[4.2]
   def change
     drop_table :meta_templates
     create_table :meta_templates, id: :uuid do |t|

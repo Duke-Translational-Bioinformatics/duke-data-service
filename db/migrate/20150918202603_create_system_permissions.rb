@@ -1,4 +1,4 @@
-class CreateSystemPermissions < ActiveRecord::Migration
+class CreateSystemPermissions < ActiveRecord::Migration[4.2]
   def change
     create_table :system_permissions, id: :uuid do |t|
       t.uuid :user_id

@@ -3,9 +3,7 @@ class Activity < ActiveRecord::Base
   include Graphed::Node
   include RequestAudited
   before_create :set_default_started_on
-  after_create :create_graph_node
   after_save :logically_delete_graph_node
-  after_destroy :delete_graph_node
 
   audited
 

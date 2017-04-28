@@ -30,7 +30,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let(:payload_parent) {{ kind: parent.kind, id: parent.id }}
       let(:payload_upload) {{ id: upload.id }}
@@ -138,7 +138,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 
@@ -152,7 +152,7 @@ describe DDS::V1::FilesAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload_upload) {{ id: completed_upload.id }}
       let(:payload) {{
@@ -267,7 +267,7 @@ describe DDS::V1::FilesAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
@@ -333,7 +333,7 @@ describe DDS::V1::FilesAPI do
     let(:resource_serializer) { DataFileUrlSerializer }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -352,7 +352,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}/move" }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:new_parent) { FactoryGirl.create(:folder, project: project) }
       let(:payload) {{
@@ -426,7 +426,7 @@ describe DDS::V1::FilesAPI do
     let(:url) { "/api/v1/files/#{resource_id}/rename" }
     let(:new_name) { Faker::Team.name } #New name can be anything
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: new_name

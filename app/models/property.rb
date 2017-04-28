@@ -22,7 +22,7 @@ class Property < ActiveRecord::Base
   def validate_removability
     if has_meta_properties?
       self.errors[:base] << "The property cannot be deleted if it has been associated to one or more DDS objects."
-      return false   
+      throw :abort
     end
   end
 
