@@ -59,9 +59,8 @@ class ErrorQueueHandler
           republish_message(channel, msgs.last)
           channel.ack(last_delivery_tag)
         end
-      rescue => e
+      ensure
         channel.nack(last_delivery_tag, true, true) if last_delivery_tag
-        raise e
       end
     end
     msgs
