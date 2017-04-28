@@ -243,5 +243,47 @@ RSpec.describe ErrorQueueHandler do
     it { is_expected.not_to respond_to(:requeue_messages).with(0).arguments }
     it { is_expected.to respond_to(:requeue_messages).with_keywords(:routing_key) }
     it { is_expected.to respond_to(:requeue_messages).with_keywords(:routing_key, :limit) }
+    it { expect{subject.requeue_messages(routing_key: 'does_not_exist')}.not_to raise_error }
+
+    context 'with messages in error queue' do
+      let(:queued_messages) {
+        [
+          stub_message_response(Faker::Lorem.sentence, routing_key),
+          stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+          stub_message_response(Faker::Lorem.sentence, routing_key)
+        ]
+      }
+      let(:expected_messages) {
+        queued_messages.select {|m| m[:routing_key] == routing_key}
+      }
+      before(:each) do
+        expect{sneakers_worker.stop}.not_to raise_error
+        queued_messages.each {|m| enqueue_mocked_message(m[:payload], m[:routing_key])}
+      end
+      it { expect(expected_messages).not_to be_empty }
+      it { expect(expected_messages.length).to be < queued_messages.length }
+      it { expect(subject.requeue_messages(routing_key: routing_key)).to eq expected_messages }
+      it { expect{subject.requeue_messages(routing_key: routing_key)}.to change {error_queue.message_count}.by(-expected_messages.length) }
+      it { expect{subject.requeue_messages(routing_key: routing_key)}.to change {worker_queue.message_count}.by(expected_messages.length) }
+
+      it { expect(subject.requeue_messages(routing_key: 'does_not_exist')).to eq [] }
+      it { expect{subject.requeue_messages(routing_key: 'does_not_exist')}.not_to change {error_queue.message_count} }
+      it { expect{subject.requeue_messages(routing_key: 'does_not_exist')}.not_to change {worker_queue.message_count} }
+
+      context 'when limit is set' do
+        let(:limit) { 1 }
+        let(:expected_messages) {
+          (queued_messages.select {|m| m[:routing_key] == routing_key}).take(limit)
+        }
+        it { expect(expected_messages.length).to eq limit }
+        it { expect(subject.requeue_messages(routing_key: routing_key, limit: limit)).to eq expected_messages }
+        it { expect{subject.requeue_messages(routing_key: routing_key, limit: limit)}.to change {error_queue.message_count}.by(-limit) }
+        it { expect{subject.requeue_messages(routing_key: routing_key, limit: limit)}.to change {worker_queue.message_count}.by(limit) }
+
+        it { expect(subject.requeue_messages(routing_key: 'does_not_exist', limit: limit)).to eq [] }
+        it { expect{subject.requeue_messages(routing_key: 'does_not_exist', limit: limit)}.not_to change {error_queue.message_count} }
+        it { expect{subject.requeue_messages(routing_key: 'does_not_exist', limit: limit)}.not_to change {worker_queue.message_count} }
+      end
+    end
   end
 end
