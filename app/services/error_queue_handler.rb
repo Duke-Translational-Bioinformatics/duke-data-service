@@ -50,17 +50,17 @@ class ErrorQueueHandler
     msgs = []
     with_error_queue do |error_queue|
       channel = error_queue.channel
-      last_delivery_tag = nil
+      delivery_tags = []
       begin
         error_queue.message_count.times do |i|
           msg = error_queue.pop(manual_ack: true)
-          last_delivery_tag = msg[0].delivery_tag
+          delivery_tags << msg[0].delivery_tag
           msgs << serialize_message(msg)
           republish_message(channel, msgs.last)
-          channel.ack(last_delivery_tag)
+          channel.ack(delivery_tags.pop)
         end
       ensure
-        channel.nack(last_delivery_tag, true, true) if last_delivery_tag
+        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
       end
     end
     msgs
