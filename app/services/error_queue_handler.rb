@@ -26,22 +26,22 @@ class ErrorQueueHandler
     message = nil
     with_error_queue do |error_queue|
       channel = error_queue.channel
-      ack_tag = nil
-      nack_tag = nil
-      error_queue.message_count.times do |i|
-        msg = error_queue.pop(manual_ack: true)
-        last_message = serialize_message(msg)
-        if last_message[:id] == id
-          republish_message(channel, last_message)
-          ack_tag = msg[0].delivery_tag
-          message = last_message
-          break
-        else
-          nack_tag = msg[0].delivery_tag
+      delivery_tags = []
+      begin
+        error_queue.message_count.times do |i|
+          msg = error_queue.pop(manual_ack: true)
+          delivery_tags << msg[0].delivery_tag
+          last_message = serialize_message(msg)
+          if last_message[:id] == id
+            republish_message(channel, last_message)
+            channel.ack(delivery_tags.pop)
+            message = last_message
+            break
+          end
         end
+      ensure
+        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
       end
-      channel.ack(ack_tag) if ack_tag
-      channel.nack(nack_tag, true, true) if nack_tag
     end
     message
   end

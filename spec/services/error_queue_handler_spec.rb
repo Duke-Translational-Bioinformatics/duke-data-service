@@ -207,6 +207,32 @@ RSpec.describe ErrorQueueHandler do
       it { expect(subject.requeue_message('does_not_exist')).to be_nil }
       it { expect{subject.requeue_message('does_not_exist')}.not_to change {error_queue.message_count} }
       it { expect{subject.requeue_message('does_not_exist')}.not_to change {worker_queue.message_count} }
+
+      context 'when Bunny::Exception raised' do
+        let(:problem_message) { queued_messages.first }
+        before(:each) do
+          allow(subject).to receive(:republish_message).and_call_original
+          expect(subject).to receive(:republish_message).with(
+            anything,
+            problem_message
+          ).and_raise(Bunny::Exception)
+        end
+        let(:call_method) { expect{subject.requeue_message(problem_message[:id])}.to raise_error(Bunny::Exception) }
+        it { expect{call_method}.not_to change {error_queue.message_count} }
+        it { expect{call_method}.not_to change {worker_queue.message_count} }
+
+        context 'problem message #2' do
+          let(:problem_message) { queued_messages.second }
+          it { expect{call_method}.not_to change {error_queue.message_count} }
+          it { expect{call_method}.not_to change {worker_queue.message_count} }
+        end
+
+        context 'problem message #3' do
+          let(:problem_message) { queued_messages.third }
+          it { expect{call_method}.not_to change {error_queue.message_count} }
+          it { expect{call_method}.not_to change {worker_queue.message_count} }
+        end
+      end
     end
   end
 
