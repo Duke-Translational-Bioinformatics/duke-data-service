@@ -32,10 +32,7 @@ class ErrorQueueHandler
         msg = error_queue.pop(manual_ack: true)
         last_message = serialize_message(msg)
         if last_message[:id] == id
-          gateway_exchange(channel).publish(
-            last_message[:payload], 
-            {routing_key: last_message[:routing_key]}
-          )
+          republish_message(channel, last_message)
           ack_tag = msg[0].delivery_tag
           message = last_message
           break
@@ -79,10 +76,7 @@ class ErrorQueueHandler
         msg = error_queue.pop(manual_ack: true)
         if routing_key && msg.first[:routing_key] == routing_key
           msgs << serialize_message(msg)
-          gateway_exchange(channel).publish(
-            msgs.last[:payload],
-            {routing_key: msgs.last[:routing_key]}
-          )
+          republish_message(channel, msgs.last)
           channel.ack(msg.first.delivery_tag)
         else
           nack_tag = msg.first.delivery_tag
