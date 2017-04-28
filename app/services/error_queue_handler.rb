@@ -53,17 +53,19 @@ class ErrorQueueHandler
     msgs = []
     with_error_queue do |error_queue|
       channel = error_queue.channel
-      ack_tag = nil
-      error_queue.message_count.times do |i|
-        msg = error_queue.pop(manual_ack: true)
-        ack_tag = msg[0].delivery_tag
-        msgs << serialize_message(msg)
-        gateway_exchange(channel).publish(
-          msgs.last[:payload],
-          {routing_key: msgs.last[:routing_key]}
-        )
+      last_delivery_tag = nil
+      begin
+        error_queue.message_count.times do |i|
+          msg = error_queue.pop(manual_ack: true)
+          last_delivery_tag = msg[0].delivery_tag
+          msgs << serialize_message(msg)
+          republish_message(channel, msgs.last)
+          channel.ack(last_delivery_tag)
+        end
+      rescue => e
+        channel.nack(last_delivery_tag, true, true) if last_delivery_tag
+        raise e
       end
-      channel.ack(ack_tag, true) if ack_tag
     end
     msgs
   end
@@ -105,6 +107,13 @@ class ErrorQueueHandler
 
   def gateway_exchange(channel)
     channel.exchange(Sneakers::CONFIG[:exchange], Sneakers::CONFIG[:exchange_options])
+  end
+
+  def republish_message(channel, msg)
+    gateway_exchange(channel).publish(
+      msg[:payload],
+      {routing_key: msg[:routing_key]}
+    )
   end
 
   def with_error_queue
