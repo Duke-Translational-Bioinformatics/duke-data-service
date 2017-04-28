@@ -214,6 +214,24 @@ RSpec.describe ErrorQueueHandler do
   #   - messages removed from error queue on success
   describe '#requeue_all' do
     it { is_expected.to respond_to(:requeue_all) }
+    it { expect{subject.requeue_all}.not_to raise_error }
+
+    context 'with messages in error queue' do
+      let(:queued_messages) {
+        [
+          stub_message_response(Faker::Lorem.sentence, routing_key),
+          stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+          stub_message_response(Faker::Lorem.sentence, routing_key)
+        ]
+      }
+      before(:each) do
+        expect{sneakers_worker.stop}.not_to raise_error
+        queued_messages.each {|m| enqueue_mocked_message(m[:payload], m[:routing_key])}
+      end
+      it { expect(subject.requeue_all).to eq queued_messages }
+      it { expect{subject.requeue_all}.to change {error_queue.message_count}.by(-queued_messages.length) }
+      it { expect{subject.requeue_all}.to change {worker_queue.message_count}.by(2) }
+    end
   end
 
   # Requeue all messages for routing_key to message_gateway

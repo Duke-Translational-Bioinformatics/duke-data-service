@@ -50,6 +50,22 @@ class ErrorQueueHandler
   end
 
   def requeue_all
+    msgs = []
+    with_error_queue do |error_queue|
+      channel = error_queue.channel
+      ack_tag = nil
+      error_queue.message_count.times do |i|
+        msg = error_queue.pop(manual_ack: true)
+        ack_tag = msg[0].delivery_tag
+        msgs << serialize_message(msg)
+        gateway_exchange(channel).publish(
+          msgs.last[:payload],
+          {routing_key: msgs.last[:routing_key]}
+        )
+      end
+      channel.ack(ack_tag, true) if ack_tag
+    end
+    msgs
   end
 
   def requeue_messages(routing_key:, limit: nil)
