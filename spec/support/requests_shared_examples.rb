@@ -48,7 +48,7 @@ shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, header
   include_context 'request parameters', url_sym: url_sym, payload_sym: payload_sym, headers_sym: headers_sym
   let(:expected_response_status) { response_status }
   let(:called_action) { "GET" }
-  subject { get(request_url, request_payload, request_headers) }
+  subject { get(request_url, params: request_payload, headers: request_headers) }
 end
 
 shared_examples 'a listable resource' do |persisted_resource: true|
@@ -146,7 +146,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   it 'should return pagination response headers' do
      expect(extras.count).to be > per_page
      is_expected.to eq(expected_response_status)
-     expect(response.headers).to include(expected_response_headers)
+     expect(response.headers.to_h).to include(expected_response_headers)
   end
 
   it 'should return only per_page results' do
@@ -177,7 +177,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
   end
 
@@ -200,7 +200,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
   end
 end
@@ -490,7 +490,7 @@ shared_examples 'a status error' do |expected_error_sym|
   let(:expected_error) { send(expected_error_sym) }
   it {
     expect(Rails.logger).to receive(:error).with(expected_error)
-    get '/api/v1/app/status', json_headers
+    get '/api/v1/app/status', params: json_headers
     expect(response.status).to eq(503)
     expect(response.body).to be
     expect(response.body).not_to eq('null')

@@ -38,7 +38,7 @@ describe DDS::V1::ProjectsAPI do
     end
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name,
@@ -134,7 +134,7 @@ describe DDS::V1::ProjectsAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 
@@ -146,7 +146,7 @@ describe DDS::V1::ProjectsAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         name: project_stub.name,
@@ -174,7 +174,7 @@ describe DDS::V1::ProjectsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
 
       it_behaves_like 'a removable resource' do

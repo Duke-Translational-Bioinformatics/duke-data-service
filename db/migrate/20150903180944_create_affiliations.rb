@@ -1,4 +1,4 @@
-class CreateAffiliations < ActiveRecord::Migration
+class CreateAffiliations < ActiveRecord::Migration[4.2]
   def change
     create_table :affiliations, id: :uuid do |t|
       t.uuid :project_id

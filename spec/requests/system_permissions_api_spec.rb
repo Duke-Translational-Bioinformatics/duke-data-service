@@ -19,7 +19,7 @@ describe DDS::V1::SystemPermissionsAPI do
     let(:url) { "/api/v1/system/permissions" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource'
       it_behaves_like 'an authenticated resource'
@@ -33,7 +33,7 @@ describe DDS::V1::SystemPermissionsAPI do
     let(:resource_user_id) { resource_user.id }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let!(:payload) {{
         auth_role: {id: auth_role.id}
       }}
@@ -70,7 +70,7 @@ describe DDS::V1::SystemPermissionsAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -94,7 +94,7 @@ describe DDS::V1::SystemPermissionsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
 
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'

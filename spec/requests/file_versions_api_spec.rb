@@ -28,7 +28,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:file_id) { data_file.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -62,7 +62,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:url) { "/api/v1/file_versions/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -75,7 +75,7 @@ describe DDS::V1::FileVersionsAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         label: resource_stub.label
@@ -97,7 +97,7 @@ describe DDS::V1::FileVersionsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
 
       before { expect(current_file_version).to be_persisted }
@@ -144,7 +144,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:resource_serializer) { FileVersionUrlSerializer }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -163,7 +163,7 @@ describe DDS::V1::FileVersionsAPI do
     let(:url) { "/api/v1/file_versions/#{resource_id}/current" }
 
     describe 'POST' do
-      subject { post(url, nil, headers) }
+      subject { post(url, headers: headers) }
       let(:called_action) { 'POST' }
       before { expect(current_file_version).to be_persisted }
 

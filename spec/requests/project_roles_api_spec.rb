@@ -10,7 +10,7 @@ describe DDS::V1::ProjectRolesAPI do
 
   describe 'List project roles' do
     let(:url) {"/api/v1/project_roles"}
-    subject { get(url, nil, headers) }
+    subject { get(url, headers: headers) }
 
     it_behaves_like 'a listable resource' do
       it 'should only return false or true for is_deprecated' do
@@ -30,7 +30,7 @@ describe DDS::V1::ProjectRolesAPI do
     let(:url) {"/api/v1/project_roles/#{resource_id}"}
     let(:resource_id) { resource.id }
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 

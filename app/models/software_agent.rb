@@ -3,8 +3,6 @@ class SoftwareAgent < ActiveRecord::Base
   audited
   include Kinded
   include Graphed::Node
-  after_create :create_graph_node
-  after_destroy :delete_graph_node
 
   belongs_to :creator, class_name: "User"
   has_one :api_key

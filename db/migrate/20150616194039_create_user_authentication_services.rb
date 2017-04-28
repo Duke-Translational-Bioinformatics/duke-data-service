@@ -1,4 +1,4 @@
-class CreateUserAuthenticationServices < ActiveRecord::Migration
+class CreateUserAuthenticationServices < ActiveRecord::Migration[4.2]
   def change
     create_table :user_authentication_services, id: :uuid do |t|
       t.uuid :user_id

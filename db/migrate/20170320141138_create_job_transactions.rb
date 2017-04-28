@@ -1,4 +1,4 @@
-class CreateJobTransactions < ActiveRecord::Migration
+class CreateJobTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :job_transactions do |t|
       t.string :transactionable_type
