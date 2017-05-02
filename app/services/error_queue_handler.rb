@@ -71,18 +71,21 @@ class ErrorQueueHandler
     with_error_queue do |error_queue|
       channel = error_queue.channel
       nack_tag = nil
-      error_queue.message_count.times do |i|
-        msg = error_queue.pop(manual_ack: true)
-        if routing_key && msg.first[:routing_key] == routing_key
-          msgs << serialize_message(msg)
-          republish_message(channel, msgs.last)
-          channel.ack(msg.first.delivery_tag)
-        else
-          nack_tag = msg.first.delivery_tag
+      delivery_tags = []
+      begin
+        error_queue.message_count.times do |i|
+          msg = error_queue.pop(manual_ack: true)
+          delivery_tags << msg[0].delivery_tag
+          if routing_key && msg.first[:routing_key] == routing_key
+            msgs << serialize_message(msg)
+            republish_message(channel, msgs.last)
+            channel.ack(delivery_tags.pop)
+          end
+          break if limit && msgs.length == limit
         end
-        break if limit && msgs.length == limit
+      ensure
+        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
       end
-      error_queue.channel.nack(nack_tag, true, true) if nack_tag
     end
     msgs
   end

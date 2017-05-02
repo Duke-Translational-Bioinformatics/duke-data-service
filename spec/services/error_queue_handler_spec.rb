@@ -333,6 +333,19 @@ RSpec.describe ErrorQueueHandler do
         it { expect{subject.requeue_messages(routing_key: 'does_not_exist', limit: limit)}.not_to change {error_queue.message_count} }
         it { expect{subject.requeue_messages(routing_key: 'does_not_exist', limit: limit)}.not_to change {worker_queue.message_count} }
       end
+
+      context 'when Bunny::Exception raised' do
+        include_context 'with a problem message'
+        let(:call_method) { expect{subject.requeue_messages(routing_key: routing_key)}.to raise_error(Bunny::Exception) }
+        it { expect{call_method}.not_to change {error_queue.message_count} }
+        it { expect{call_method}.not_to change {worker_queue.message_count} }
+
+        context 'problem message #2' do
+          let(:problem_message) { queued_messages.third }
+          it { expect{call_method}.to change {error_queue.message_count}.by(-1) }
+          it { expect{call_method}.to change {worker_queue.message_count}.by(1) }
+        end
+      end
     end
   end
 end
