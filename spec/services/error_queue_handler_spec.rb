@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ErrorQueueHandler do
   include_context 'with sneakers'
+  include_context 'error queue message utilities'
+
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
   let(:error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
@@ -117,11 +119,6 @@ RSpec.describe ErrorQueueHandler do
       it { expect(subject.message_count).to be expected_count }
       it { expect{subject.message_count}.not_to change {error_queue.message_count} }
     end
-  end
-
-  def stub_message_response(payload, routing_key)
-    id = Digest::SHA256.hexdigest(payload)
-    {id: id, payload: payload, routing_key: routing_key}
   end
 
   # List decoded payloads
