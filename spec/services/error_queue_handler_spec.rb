@@ -215,6 +215,9 @@ RSpec.describe ErrorQueueHandler do
       it { expect(subject.requeue_message(queued_messages.first[:id])).to eq queued_messages.first }
       it { expect{subject.requeue_message(queued_messages.first[:id])}.to change {error_queue.message_count}.by(-1) }
       it { expect{subject.requeue_message(queued_messages.first[:id])}.to change {worker_queue.message_count}.by(1) }
+      it { expect(subject.requeue_message(queued_messages.last[:id])).to eq queued_messages.last }
+      it { expect{subject.requeue_message(queued_messages.last[:id])}.to change {error_queue.message_count}.by(-1) }
+      it { expect{subject.requeue_message(queued_messages.last[:id])}.to change {worker_queue.message_count}.by(1) }
       it { expect(subject.requeue_message('does_not_exist')).to be_nil }
       it { expect{subject.requeue_message('does_not_exist')}.not_to change {error_queue.message_count} }
       it { expect{subject.requeue_message('does_not_exist')}.not_to change {worker_queue.message_count} }
