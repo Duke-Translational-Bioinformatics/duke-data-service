@@ -9,17 +9,10 @@ class ErrorQueueHandler
 
   def messages(routing_key: nil, limit: nil)
     msgs = []
-    with_error_queue do |error_queue|
-      channel = error_queue.channel
-      delivery_tags = []
-      error_queue.message_count.times do |i|
-        msg = error_queue.pop(manual_ack: true)
-        delivery_tags << msg[0].delivery_tag
-        msgs << serialize_message(msg) unless routing_key &&
-          msg.first[:routing_key] != routing_key
-        break if limit && msgs.length == limit
-      end
-      channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
+    each_error_queue_message do |msg|
+      msgs << serialize_message(msg) unless routing_key &&
+        msg.first[:routing_key] != routing_key
+      break if limit && msgs.length == limit
     end
     msgs
   end
@@ -27,23 +20,13 @@ class ErrorQueueHandler
   def requeue_message(id)
     message = nil
     msgs = []
-    with_error_queue do |error_queue|
-      channel = error_queue.channel
-      delivery_tags = []
-      begin
-        error_queue.message_count.times do |i|
-          msg = error_queue.pop(manual_ack: true)
-          delivery_tags << msg[0].delivery_tag
-          msgs << serialize_message(msg)
-          if msgs.last[:id] == id
-            republish_message(channel, msgs.last)
-            channel.ack(delivery_tags.pop)
-            message = msgs.last
-            break
-          end
-        end
-      ensure
-        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
+    each_error_queue_message do |msg, channel, delivery_tags|
+      msgs << serialize_message(msg)
+      if msgs.last[:id] == id
+        republish_message(channel, msgs.last)
+        channel.ack(delivery_tags.pop)
+        message = msgs.last
+        break
       end
     end
     message
@@ -51,49 +34,46 @@ class ErrorQueueHandler
 
   def requeue_all
     msgs = []
-    with_error_queue do |error_queue|
-      channel = error_queue.channel
-      delivery_tags = []
-      begin
-        error_queue.message_count.times do |i|
-          msg = error_queue.pop(manual_ack: true)
-          delivery_tags << msg[0].delivery_tag
-          msgs << serialize_message(msg)
-          republish_message(channel, msgs.last)
-          channel.ack(delivery_tags.pop)
-        end
-      ensure
-        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
-      end
+    each_error_queue_message do |msg, channel, delivery_tags|
+      msgs << serialize_message(msg)
+      republish_message(channel, msgs.last)
+      channel.ack(delivery_tags.pop)
     end
     msgs
   end
 
   def requeue_messages(routing_key:, limit: nil)
     msgs = []
-    with_error_queue do |error_queue|
-      channel = error_queue.channel
-      nack_tag = nil
-      delivery_tags = []
-      begin
-        error_queue.message_count.times do |i|
-          msg = error_queue.pop(manual_ack: true)
-          delivery_tags << msg[0].delivery_tag
-          if routing_key && msg.first[:routing_key] == routing_key
-            msgs << serialize_message(msg)
-            republish_message(channel, msgs.last)
-            channel.ack(delivery_tags.pop)
-          end
-          break if limit && msgs.length == limit
-        end
-      ensure
-        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
+    each_error_queue_message do |msg, channel, delivery_tags|
+      if routing_key && msg.first[:routing_key] == routing_key
+        msgs << serialize_message(msg)
+        republish_message(channel, msgs.last)
+        channel.ack(delivery_tags.pop)
       end
+      break if limit && msgs.length == limit
     end
     msgs
   end
 
   private
+
+  def each_error_queue_message
+    with_error_queue do |error_queue|
+      channel = error_queue.channel
+      delivery_tags = []
+      begin
+        error_queue.message_count.times do |i|
+          msg = error_queue.pop(manual_ack: true)
+          delivery_tags << msg[0].delivery_tag
+
+          yield msg, channel, delivery_tags
+
+        end
+      ensure
+        channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
+      end
+    end
+  end
 
   def serialize_message(msg)
     payload = Base64.decode64(JSON.parse(msg.last)['payload'])
