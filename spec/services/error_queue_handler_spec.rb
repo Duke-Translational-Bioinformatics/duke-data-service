@@ -45,6 +45,17 @@ RSpec.describe ErrorQueueHandler do
     end
   end
 
+  shared_context 'with a problem message' do
+    let(:problem_message) { queued_messages.first }
+    before(:each) do
+      allow(subject).to receive(:republish_message).and_call_original
+      expect(subject).to receive(:republish_message).with(
+        anything,
+        problem_message
+      ).and_raise(Bunny::Exception)
+    end
+  end
+
   shared_examples 'expected error message format' do
     let(:message) { error_queue.pop }
     let(:payload) { JSON.parse(message.last) }
@@ -209,14 +220,7 @@ RSpec.describe ErrorQueueHandler do
       it { expect{subject.requeue_message('does_not_exist')}.not_to change {worker_queue.message_count} }
 
       context 'when Bunny::Exception raised' do
-        let(:problem_message) { queued_messages.first }
-        before(:each) do
-          allow(subject).to receive(:republish_message).and_call_original
-          expect(subject).to receive(:republish_message).with(
-            anything,
-            problem_message
-          ).and_raise(Bunny::Exception)
-        end
+        include_context 'with a problem message'
         let(:call_method) { expect{subject.requeue_message(problem_message[:id])}.to raise_error(Bunny::Exception) }
         it { expect{call_method}.not_to change {error_queue.message_count} }
         it { expect{call_method}.not_to change {worker_queue.message_count} }
@@ -259,14 +263,7 @@ RSpec.describe ErrorQueueHandler do
       it { expect{subject.requeue_all}.to change {worker_queue.message_count}.by(2) }
 
       context 'when Bunny::Exception raised' do
-        let(:problem_message) { queued_messages.first }
-        before(:each) do
-          allow(subject).to receive(:republish_message).and_call_original
-          expect(subject).to receive(:republish_message).with(
-            anything,
-            problem_message
-          ).and_raise(Bunny::Exception)
-        end
+        include_context 'with a problem message'
         let(:call_method) { expect{subject.requeue_all}.to raise_error(Bunny::Exception) }
         it { expect{call_method}.not_to change {error_queue.message_count} }
         it { expect{call_method}.not_to change {worker_queue.message_count} }
