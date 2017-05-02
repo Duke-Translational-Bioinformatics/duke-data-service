@@ -10,20 +10,23 @@ class ErrorQueueHandler
   def messages(routing_key: nil, limit: nil)
     msgs = []
     with_error_queue do |error_queue|
-      last_message = nil
+      channel = error_queue.channel
+      delivery_tags = []
       error_queue.message_count.times do |i|
-        last_message = error_queue.pop(manual_ack: true)
-        msgs << serialize_message(last_message) unless routing_key && 
-          last_message.first[:routing_key] != routing_key
+        msg = error_queue.pop(manual_ack: true)
+        delivery_tags << msg[0].delivery_tag
+        msgs << serialize_message(msg) unless routing_key &&
+          msg.first[:routing_key] != routing_key
         break if limit && msgs.length == limit
       end
-      error_queue.channel.nack(last_message[0].delivery_tag, true, true) if last_message
+      channel.nack(delivery_tags.last, true, true) if delivery_tags.any?
     end
     msgs
   end
 
   def requeue_message(id)
     message = nil
+    msgs = []
     with_error_queue do |error_queue|
       channel = error_queue.channel
       delivery_tags = []
@@ -31,11 +34,11 @@ class ErrorQueueHandler
         error_queue.message_count.times do |i|
           msg = error_queue.pop(manual_ack: true)
           delivery_tags << msg[0].delivery_tag
-          last_message = serialize_message(msg)
-          if last_message[:id] == id
-            republish_message(channel, last_message)
+          msgs << serialize_message(msg)
+          if msgs.last[:id] == id
+            republish_message(channel, msgs.last)
             channel.ack(delivery_tags.pop)
-            message = last_message
+            message = msgs.last
             break
           end
         end
