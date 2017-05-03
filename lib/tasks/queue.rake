@@ -32,5 +32,19 @@ namespace :queue do
         $stderr.puts "MESSAGE_ID required; set to hex id of message to requeue."
       end
     end
+
+    desc 'Requeues all the messages in the error queue to the gateway exchange'
+    task requeue_all: :environment do
+      begin
+        msgs = ErrorQueueHandler.new.requeue_all
+        msgs.each do |msg|
+          puts "#{msg[:id]} [#{msg[:routing_key]}] \"#{msg[:payload]}\""
+        end
+        puts "#{msgs.length} messages requeued."
+      rescue => e
+        $stderr.puts "An error occurred while requeueing messages:"
+        $stderr.puts e.to_s
+      end
+    end
   end
 end

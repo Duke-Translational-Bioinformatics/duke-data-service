@@ -133,3 +133,46 @@ describe 'queue:errors:requeue_message' do
     end
   end
 end
+
+describe 'queue:errors:requeue_all' do
+  include_context "rake"
+  include_context 'error queue message utilities'
+  let(:error_queue_handler) { instance_double(ErrorQueueHandler) }
+  let(:serialized_messages) {[
+    stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+    stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
+    stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_'))
+  ]}
+  def output_format(msg)
+    /#{msg[:id]} \[#{msg[:routing_key]}\] "#{msg[:payload]}"/
+  end
+
+  before(:each) do
+    expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
+  end
+
+  context 'when #requeue_all returns messages' do
+    before(:each) do
+      expect(error_queue_handler).to receive(:requeue_all).and_return(serialized_messages)
+    end
+    it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+    it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+    it { invoke_task(expected_stdout: output_format(serialized_messages.third)) }
+    it { invoke_task(expected_stdout: /#{serialized_messages.length} messages requeued./) }
+  end
+
+  context 'when #requeue_all returns an empty array' do
+    before(:each) do
+      expect(error_queue_handler).to receive(:requeue_all).and_return([])
+    end
+    it { invoke_task(expected_stdout: /0 messages requeued./) }
+  end
+
+  context 'when #requeue_all raises Bunny::Exception' do
+    before(:each) do
+      expect(error_queue_handler).to receive(:requeue_all).and_raise(Bunny::Exception)
+    end
+    it { invoke_task(expected_stderr: /An error occurred while requeueing messages:/) }
+    it { invoke_task(expected_stderr: /Bunny::Exception/) }
+  end
+end
