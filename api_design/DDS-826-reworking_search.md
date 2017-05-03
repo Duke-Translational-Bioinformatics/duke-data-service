@@ -1,5 +1,18 @@
-Background (Existing Search API)
------
+# DDS-826 Proposed Redesign of Search Interface
+
+## Deployment View
+
+status: proposed
+
+###### Deployment Requirements
+
+We must drop and rebuild the elasticsearch indices for each environment
+immediately after we deploy to that environment (possibly as part of the circle build).
+
+## Logical View
+
+#### Background (Existing Search API)
+
 The initial implementation of the DDS search API has exposed several usage issues.  These issues, which stem from the fact that consumers can pass-through native Elactic DSL, are as follows:
 
 * Elastic DSL is complex and requires a deep-dive by consumers to understand how to construct valid queries.  In addtion, knowledge of the underlying indexing (analyzer) strategy used for the Elastic documents is essential.
@@ -8,17 +21,17 @@ The initial implementation of the DDS search API has exposed several usage issue
 
 * The endpoint is fragile when upgrading Elastic version, modifying index strategies, and modifying document schemas (mappings).
 
-Moving Forward (New Search API)
-----
+#### Moving Forward (New Search API)
+
 The following is a proposed design to replace the exisiting API, which will no longer allow native Elastic DSL pass-through.  The intent is to design a consumer interface that is simple out of the gate, but can grow with increased demand for search capabilites.
 
-## API Specification
+##### API Specification
 This section defines the proposed API interface.
 
-#### Endpoint URL
+###### Endpoint URL
 `POST /search/folders_files`
 
-#### Response Messages
+###### Response Messages
 * 201: Success
 * 400: Invalid value specified for query_string.fields
 * 400: Invalid "{key: value}" specified for filters[].object
@@ -28,7 +41,7 @@ This section defines the proposed API interface.
 * 400: Invalid "{key: value}" specified for post_filters[].object
 * 401: Unauthorized
 
-#### Query Parameters
+###### Query Parameters
 **query_string.query (string, optional)** - The string fragment (phrase) to search for in `query_string.fields`.  If specified, must be at least 3 characters to invoke search operation.
 
 **query_string.fields (string[ ], optional)** - List of text fields to search; valid options are `name` and `tags.label`.  If not specified, defaults to all options.
@@ -61,11 +74,11 @@ This section defines the proposed API interface.
 
 **tags.label** - List of tags; requires a set of comma-delimited tag labels like so: `{"tags.label": ["sequencing", "DNA"]}`.  
 
-API Usage Example
-----
+##### API Usage Example
+
 This section provides a walk-through of the API for a concrete use case.  The examples herein were run against DDS production using the Bonsai interactive console.  The Elastic search endpoint used for the examples is: `POST /data_files/_search?pretty`.
 
-#### The DDS Query Request
+###### The DDS Query Request
 
 ```
 {
@@ -84,7 +97,7 @@ This section provides a walk-through of the API for a concrete use case.  The ex
 }
 ```
 
-#### The DDS Query Request transformed to Elastic DSL
+###### The DDS Query Request transformed to Elastic DSL
 When the above query request is submitted to the DDS search endpoint, the request payload is transformed by the DDS application into the following Elastic DSL:
 
 ```
@@ -125,7 +138,7 @@ When the above query request is submitted to the DDS search endpoint, the reques
 }
 ```
 
-#### Key points about the transformation
+###### Key points about the transformation
 * The `"_source": ["name", "project", "tags"]` directive is only included here for demonstration purposes - less noise when viewing search results.
 
 * The `query": "*digital coll* *digital* *coll*"` represents the result of a *low fidelity* tokenizer (based on *white space*) to support partial (or contains matching).  For the query string, each token is wrapped with the `*` wildcard.  Only tokens of length 3 or greater will be processed - others are discarded.
@@ -138,7 +151,7 @@ When the above query request is submitted to the DDS search endpoint, the reques
 
 * For the `"aggs"` (facets), the raw non-analyzed `tags` field is specified as so: `"field": "tags.label.raw"` - this prevents the `tags` aggregate from getting represented as separate tokens.  This is not specified for `project.name` because at the time of this analysis we had not generated an associated `raw` index.
 
-#### The DDS Response (Search Results)
+###### The DDS Response (Search Results)
 
 The transformed Elastic DSL is passed-through to the Elastic engine and the following response payload is rendered.  For brevity, we only include specific fields (i.e. `"_source": ["name", "project", "tags"]`) and the number of results have been truncated.
 
@@ -202,7 +215,7 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
 
 Keep in mind the `"project_names"` facet returned here is a bit skewed - the project name **"20161115 test"** has been split into multiple tokens, which can be resolved with the addtion of a raw not-analyzed index.
 
-#### Applying Post Filters to DDS Query Request
+###### Applying Post Filters to DDS Query Request
 The following shows how a post filter can be applied.  The main query payload is exteneded to include a `"post_filters"` directive.  This is executed after the main query executes - facets generated by main query are not affected.
 
 ```
@@ -274,11 +287,16 @@ The post-filter is transfomed to Elastic compliant DSL and amended to the query 
 
 Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure an exact match is perfomed, not a token based match. In this case it is not relevant because the tags are single terms, but for muti-term tags, the `raw` index produces the desired results.
 
-Proposed Elastic Indexing Strategy
-----
+## Implementation View
+
+#### Proposed Elastic Indexing Strategy
 
 * `query_string.field`: these must be standard analyzed strings.
 
 * `filter and post_filter`: these must be indexed with a 'field' of name '.raw', not_analyzed. These '.raw' fields are used in the Elasticsearch DSL `filter.terms` and `aggs.field`.
 
 * `results`: these do not need to be analyzed in any specific way, unless they are query_string.field, filter, or post_filter. Elasticsearch documents should be serialized with the exact same information that is returned by the standard object serializer (not the preview), extended to include the missing elements required for filters, such as tags and meta_data, required for searches. This will ensure that the search responses can be returned from elasticsearch without a second RDBMS call for the models, in a format compatible with the format clients expect from the API call to get the resource by id.
+
+## Process View
+
+Add notes about performance, scalability, throughput, etc. here. These can inform future proposals to change the implementation.
