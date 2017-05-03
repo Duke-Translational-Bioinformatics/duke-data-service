@@ -87,3 +87,30 @@ describe 'queue:errors:messages' do
     it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
   end
 end
+
+describe 'queue:errors:requeue_message' do
+  include_context "rake"
+  include_context 'error queue message utilities'
+  let(:error_queue_handler) { instance_double(ErrorQueueHandler) }
+  let(:serialized_message) {
+    stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_'))
+  }
+  def output_format(msg)
+    /#{msg[:id]} \[#{msg[:routing_key]}\] "#{msg[:payload]}"\nMessage requeue successful!/
+  end
+
+  it { invoke_task(expected_stderr: /MESSAGE_ID required; set to hex id of message to requeue./) }
+
+  context 'with MESSAGE_ID' do
+    include_context 'with env_override'
+    let(:env_override) { {
+      'MESSAGE_ID' => serialized_message[:id]
+    } }
+    before(:each) do
+      expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
+      expect(error_queue_handler).to receive(:requeue_message).with(serialized_message[:id]).and_return(serialized_message)
+    end
+
+    it { invoke_task(expected_stdout: output_format(serialized_message)) }
+  end
+end
