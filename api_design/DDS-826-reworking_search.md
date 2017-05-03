@@ -13,7 +13,7 @@ immediately after we deploy to that environment (possibly as part of the circle 
 
 #### Background (Existing Search API)
 
-The initial implementation of the DDS search API has exposed several usage issues.  These issues, which stem from the fact that consumers can pass-through native Elactic DSL, are as follows:
+The initial implementation of the DDS search API has exposed several usage issues.  These issues, which stem from the fact that consumers can pass-through native Elastic DSL, are as follows:
 
 * Elastic DSL is complex and requires a deep-dive by consumers to understand how to construct valid queries.  In addtion, knowledge of the underlying indexing (analyzer) strategy used for the Elastic documents is essential.
 
