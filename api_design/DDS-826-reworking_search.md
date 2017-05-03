@@ -238,7 +238,7 @@ The following shows how a post filter can be applied.  The main query payload is
 }
 ```
 
-The post-filter is transfomed to Elastic compliant DSL and amended to the query request payload.  The resulting payload that passed-through to Elastic is as follows:
+The post-filter is transformed to Elastic compliant DSL and amended to the query request payload.  The resulting payload that passed-through to Elastic is as follows:
 
 ```
 {
@@ -296,6 +296,80 @@ Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure a
 * `filter and post_filter`: these must be indexed with a 'field' of name '.raw', not_analyzed. These '.raw' fields are used in the Elasticsearch DSL `filter.terms` and `aggs.field`.
 
 * `results`: these do not need to be analyzed in any specific way, unless they are query_string.field, filter, or post_filter. Elasticsearch documents should be serialized with the exact same information that is returned by the standard object serializer (not the preview), extended to include the missing elements required for filters, such as tags and meta_data, required for searches. This will ensure that the search responses can be returned from elasticsearch without a second RDBMS call for the models, in a format compatible with the format clients expect from the API call to get the resource by id.
+
+##### Index Definitions
+
+###### DataFile
+
+**query_string.fields** - name, tags.label
+
+**filters** - kind.raw, project.id.raw
+
+**facets** - project.name.raw, tags.label.raw
+
+**Removed** many index definitions for fields from DataFile settings index
+which are not part of the new query, filter, facet interface.  Refer to
+[v1.3.8 DataFile](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/models/data_file.rb) for these definitions if they need to be revived.
+
+###### Folder
+
+**query_string.fields** - name
+
+**filters** - kind.raw, project.id.raw
+
+**facets** - project.name.raw
+
+**Removed** many index definitions for fields from Folder settings index
+which are not part of the new query, filter, facet interface.  Refer to
+[v1.3.8 Folder](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/models/folder.rb) for these definitions if they need to be revived.
+
+##### Search Serializers
+
+Serializers must serialize at least the following elements to elasticsearch.
+
+###### DataFile
+
+```
+  {
+    name: ...,
+    kind: ...,
+    tags: {
+      label: ...
+    },
+    project: {
+      name: ...,
+      id: ...
+    }
+  }
+```
+
+The v1.3.8 Search::DataFileSerializer meets these requirements, and the
+requirement that the serialized object is a DataFileSerializer + meta and tags.
+**REMOVE** created_at, updated_at, label, creator from the Search::DataFileSerializer
+because these are not currently required for search, filter, and are not returned
+by DataFileSerializer. Refer to [v1.3.8 Search::DataFileSerializer](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/serializers/search/data_file_serializer.rb)
+to revive them if necessary.
+
+###### Folder
+
+```
+  {
+    name: ...,
+    kind: ...,
+    project: {
+      name: ...,
+      id: ...
+    }
+  }
+```
+
+The v1.3.8 Search::FolderSerializer meets these requirements, except that Folders
+are not tagged. The requirement that the serialized object is a FolderSerializer
++ meta and tags is also met.
+**Remove** created_at, updated_at, label, creator from the Search::FolderSerializer
+because these are not currently required for search, filter, and are not returned
+by FolderSerializer. Refer to [v1.3.8 Search::FolderSerializer](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/serializers/search/folder_serializer.rb)
+to revive them if necessary.
 
 ## Process View
 
