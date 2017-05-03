@@ -28,11 +28,62 @@ describe 'queue:errors:messages' do
     /#{msg[:id]} \[#{msg[:routing_key]}\] "#{msg[:payload]}"/
   end
 
-  before do
+  before(:each) do
     expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
-    expect(error_queue_handler).to receive(:messages).and_return(serialized_messages)
+    allow(error_queue_handler).to receive(:messages).and_return(serialized_messages)
   end
   it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
   it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
   it { invoke_task(expected_stdout: output_format(serialized_messages.third)) }
+
+  context 'with ROUTING_KEY' do
+    include_context 'with env_override'
+    let(:env_override) { {
+      'ROUTING_KEY' => routing_key
+    } }
+    let(:serialized_messages) {[
+      stub_message_response(Faker::Lorem.sentence, routing_key),
+      stub_message_response(Faker::Lorem.sentence, routing_key)
+    ]}
+    before(:each) do
+      expect(error_queue_handler).to receive(:messages).with(routing_key: routing_key, limit: nil).and_return(serialized_messages)
+    end
+    it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+    it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+  end
+
+  context 'with LIMIT' do
+    include_context 'with env_override'
+    let(:limit) { serialized_messages.length }
+    let(:env_override) { {
+      'LIMIT' => limit
+    } }
+    let(:serialized_messages) {[
+      stub_message_response(Faker::Lorem.sentence, routing_key),
+      stub_message_response(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_'))
+    ]}
+    before(:each) do
+      expect(error_queue_handler).to receive(:messages).with(routing_key: nil, limit: limit).and_return(serialized_messages)
+    end
+    it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+    it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+  end
+
+  context 'with ROUTING_KEY and LIMIT' do
+    include_context 'with env_override'
+    let(:limit) { serialized_messages.length }
+    let(:env_override) { {
+      'ROUTING_KEY' => routing_key,
+      'LIMIT' => limit
+    } }
+    let(:serialized_messages) {[
+      stub_message_response(Faker::Lorem.sentence, routing_key),
+      stub_message_response(Faker::Lorem.sentence, routing_key)
+    ]}
+    before(:each) do
+      expect(error_queue_handler).to receive(:messages).with(routing_key: routing_key, limit: limit).and_return(serialized_messages)
+    end
+    it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+    it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+  end
 end
