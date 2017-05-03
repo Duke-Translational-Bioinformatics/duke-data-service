@@ -108,9 +108,28 @@ describe 'queue:errors:requeue_message' do
     } }
     before(:each) do
       expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
-      expect(error_queue_handler).to receive(:requeue_message).with(serialized_message[:id]).and_return(serialized_message)
     end
 
-    it { invoke_task(expected_stdout: output_format(serialized_message)) }
+    context 'when #requeue_message returns message' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_message).with(serialized_message[:id]).and_return(serialized_message)
+      end
+      it { invoke_task(expected_stdout: output_format(serialized_message)) }
+    end
+
+    context 'when #requeue_message returns nil' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_message).with(serialized_message[:id])
+      end
+      it { invoke_task(expected_stdout: /Message #{serialized_message[:id]} not found./) }
+    end
+
+    context 'when #requeue_message raises Bunny::Exception' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_message).with(serialized_message[:id]).and_raise(Bunny::Exception)
+      end
+      it { invoke_task(expected_stderr: /An error occurred while requeueing message #{serialized_message[:id]}:/) }
+      it { invoke_task(expected_stderr: /Bunny::Exception/) }
+    end
   end
 end
