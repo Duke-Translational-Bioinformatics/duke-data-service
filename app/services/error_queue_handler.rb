@@ -45,7 +45,7 @@ class ErrorQueueHandler
   def requeue_messages(routing_key:, limit: nil)
     msgs = []
     each_error_queue_message do |msg, channel, delivery_tags|
-      if routing_key && msg.first[:routing_key] == routing_key
+      if msg.first[:routing_key] == routing_key
         msgs << serialize_message(msg)
         republish_message(channel, msgs.last)
         channel.ack(delivery_tags.pop)
