@@ -176,3 +176,77 @@ describe 'queue:errors:requeue_all' do
     it { invoke_task(expected_stderr: /Bunny::Exception/) }
   end
 end
+
+describe 'queue:errors:requeue_messages' do
+  include_context "rake"
+  include_context 'error queue message utilities'
+  let(:error_queue_handler) { instance_double(ErrorQueueHandler) }
+  let(:routing_key) { Faker::Internet.slug(nil, '_') }
+  let(:serialized_messages) {[
+    stub_message_response(Faker::Lorem.sentence, routing_key),
+    stub_message_response(Faker::Lorem.sentence, routing_key),
+    stub_message_response(Faker::Lorem.sentence, routing_key)
+  ]}
+  def output_format(msg)
+    /#{msg[:id]} \[#{msg[:routing_key]}\] "#{msg[:payload]}"/
+  end
+
+  it { invoke_task(expected_stderr: /ROUTING_KEY required; set to routing key of messages to requeue./) }
+
+  context 'with ROUTING_KEY' do
+    include_context 'with env_override'
+    let(:env_override) { {
+      'ROUTING_KEY' => routing_key
+    } }
+    before(:each) do
+      expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
+    end
+
+    context 'when #requeue_messages returns messages' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_messages).with(routing_key: routing_key, limit: nil).and_return(serialized_messages)
+      end
+      it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+      it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+      it { invoke_task(expected_stdout: output_format(serialized_messages.third)) }
+      it { invoke_task(expected_stdout: /#{serialized_messages.length} messages requeued./) }
+    end
+
+    context 'when #requeue_messages returns an empty array' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_messages).with(routing_key: routing_key, limit: nil).and_return([])
+      end
+      it { invoke_task(expected_stdout: /0 messages requeued./) }
+    end
+
+    context 'when #requeue_messages raises Bunny::Exception' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_messages).with(routing_key: routing_key, limit: nil).and_raise(Bunny::Exception)
+      end
+      it { invoke_task(expected_stderr: /An error occurred while requeueing messages:/) }
+      it { invoke_task(expected_stderr: /Bunny::Exception/) }
+    end
+  end
+
+  context 'with ROUTING_KEY and LIMIT' do
+    include_context 'with env_override'
+    let(:limit) { serialized_messages.length }
+    let(:env_override) { {
+      'ROUTING_KEY' => routing_key,
+      'LIMIT' => limit
+    } }
+    before(:each) do
+      expect(ErrorQueueHandler).to receive(:new).and_return(error_queue_handler)
+    end
+
+    context 'when #requeue_messages returns messages' do
+      before(:each) do
+        expect(error_queue_handler).to receive(:requeue_messages).with(routing_key: routing_key, limit: limit).and_return(serialized_messages)
+      end
+      it { invoke_task(expected_stdout: output_format(serialized_messages.first)) }
+      it { invoke_task(expected_stdout: output_format(serialized_messages.second)) }
+      it { invoke_task(expected_stdout: output_format(serialized_messages.third)) }
+      it { invoke_task(expected_stdout: /#{limit} messages requeued./) }
+    end
+  end
+end

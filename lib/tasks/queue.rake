@@ -46,5 +46,24 @@ namespace :queue do
         $stderr.puts e.to_s
       end
     end
+
+    desc 'Requeues messages in the error queue with ROUTING_KEY to the gateway exchange. Reduce scope with LIMIT=###'
+    task requeue_messages: :environment do
+      if routing_key = ENV['ROUTING_KEY']
+        limit = ENV['LIMIT'].to_i if ENV['LIMIT']
+        begin
+          msgs = ErrorQueueHandler.new.requeue_messages(routing_key: routing_key, limit: limit)
+          msgs.each do |msg|
+            puts "#{msg[:id]} [#{msg[:routing_key]}] \"#{msg[:payload]}\""
+          end
+          puts "#{msgs.length} messages requeued."
+        rescue => e
+          $stderr.puts "An error occurred while requeueing messages:"
+          $stderr.puts e.to_s
+        end
+      else
+        $stderr.puts "ROUTING_KEY required; set to routing key of messages to requeue."
+      end
+    end
   end
 end
