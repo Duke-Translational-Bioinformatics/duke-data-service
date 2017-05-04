@@ -365,7 +365,7 @@ to revive them if necessary.
 
 The v1.3.8 Search::FolderSerializer meets these requirements, except that Folders
 are not tagged. The requirement that the serialized object is a FolderSerializer
-+ meta and tags is also met.
+with meta and tags is also met.
 **Remove** created_at, updated_at, label, creator from the Search::FolderSerializer
 because these are not currently required for search, filter, and are not returned
 by FolderSerializer. Refer to [v1.3.8 Search::FolderSerializer](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/serializers/search/folder_serializer.rb)
