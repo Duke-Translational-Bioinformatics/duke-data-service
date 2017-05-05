@@ -20,7 +20,7 @@ class UsedProvRelation < ProvRelation
     if GeneratedByActivityProvRelation.where(
       relatable_from_id: relatable_to_id,
       relatable_to_id: relatable_from_id
-      ).exists?
+      ).where.not(is_deleted: true).exists?
       errors.add(:relatable_from_id, "UsedProvRelation cannot be made from an Activity that has a GeneratedByActivityProvRelation to the used FileVersion")
     end
   end
