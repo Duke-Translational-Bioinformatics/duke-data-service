@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
-
   let(:folder) { FactoryGirl.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
@@ -27,7 +26,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders" }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         parent: { kind: parent.kind, id: parent.id },
@@ -100,7 +99,7 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it 'returns a method not allowed error' do
         is_expected.to eq 405
@@ -112,7 +111,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
 
@@ -127,8 +126,9 @@ describe DDS::V1::FoldersAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
+      include_context 'with job runner', ChildDeletionJob
 
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
@@ -156,33 +156,51 @@ describe DDS::V1::FoldersAPI do
             expect(resource.is_deleted?).to be_truthy
           end
         end
-
-        it_behaves_like 'a removable resource' do
-          let(:resource_counter) { DataFile.where(is_deleted: false) }
-        end
       end
 
       context 'with children' do
         let(:resource) { parent }
         let!(:child) { folder }
+        let!(:file_child) { FactoryGirl.create(:data_file, parent: parent) }
         let!(:grand_child) { child_file }
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
-          let(:expected_count_change) { -3 }
 
-          it 'should be marked as deleted' do
-            is_expected.to eq(204)
-            expect(resource.reload).to be_truthy
-            expect(resource.is_deleted?).to be_truthy
+          context 'with inline ActiveJob' do
+            before do
+              ActiveJob::Base.queue_adapter = :inline
+            end
+
+            it 'should be marked as deleted' do
+              is_expected.to eq(204)
+              expect(resource.reload).to be_truthy
+              expect(resource.is_deleted?).to be_truthy
+            end
+
+            it 'should mark children as deleted' do
+              is_expected.to eq(204)
+              expect(folder.reload).to be_truthy
+              expect(folder.is_deleted?).to be_truthy
+              expect(file_child.reload).to be_truthy
+              expect(file_child.is_deleted?).to be_truthy
+              expect(child_file.reload).to be_truthy
+              expect(child_file.is_deleted?).to be_truthy
+            end
           end
 
-          it 'should be mark children as deleted' do
-            is_expected.to eq(204)
-            expect(folder.reload).to be_truthy
-            expect(folder.is_deleted?).to be_truthy
-            expect(child_file.reload).to be_truthy
-            expect(child_file.is_deleted?).to be_truthy
+          context 'with queued ActiveJob' do
+            it 'should be marked as deleted' do
+              is_expected.to eq(204)
+              expect(resource.reload).to be_truthy
+              expect(resource.is_deleted?).to be_truthy
+            end
+
+            it 'should create ChildDeletionJob entries for child folders and their files' do
+              expect {
+                is_expected.to eq(204)
+              }.to have_enqueued_job(ChildDeletionJob)
+            end
           end
         end
       end
@@ -210,7 +228,7 @@ describe DDS::V1::FoldersAPI do
     let(:url) { "/api/v1/folders/#{resource_id}/move" }
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:new_parent) { folder_at_root }
       let(:payload) {{
@@ -280,7 +298,7 @@ describe DDS::V1::FoldersAPI do
   describe 'Rename folder' do
     let(:url) { "/api/v1/folders/#{resource_id}/rename" }
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         name: folder_stub.name

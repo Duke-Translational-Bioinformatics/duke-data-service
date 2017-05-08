@@ -27,7 +27,7 @@ describe DDS::V1::ProjectTransfersAPI do
     let(:project_id) { project.id }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let(:payload) {{
         to_users: [
@@ -82,7 +82,7 @@ describe DDS::V1::ProjectTransfersAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
       let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 
@@ -146,7 +146,7 @@ describe DDS::V1::ProjectTransfersAPI do
     let(:url) { "/api/v1/project_transfers/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'a viewable resource'
@@ -170,7 +170,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
@@ -224,7 +224,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
@@ -279,7 +279,7 @@ describe DDS::V1::ProjectTransfersAPI do
       let(:payload) {{}}
 
       describe 'PUT' do
-        subject { put(url, payload.to_json, headers) }
+        subject { put(url, params: payload.to_json, headers: headers) }
         let(:called_action) { 'PUT' }
 
         it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
@@ -370,7 +370,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'GET' do
       let(:payload) {nil}
-      subject { get(url, payload, headers) }
+      subject { get(url, params: payload, headers: headers) }
       let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
       let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
 

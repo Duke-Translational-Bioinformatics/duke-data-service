@@ -2,9 +2,7 @@ class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
-  after_create :create_graph_node
   after_save :logically_delete_graph_node
-  after_destroy :delete_graph_node
 
   audited
   belongs_to :data_file

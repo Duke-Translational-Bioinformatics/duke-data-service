@@ -1,4 +1,4 @@
-class CreateProvRelations < ActiveRecord::Migration
+class CreateProvRelations < ActiveRecord::Migration[4.2]
   def change
     create_table :prov_relations, id: :uuid do |t|
       t.string :type #sti

@@ -1,4 +1,4 @@
-class CreateChunks < ActiveRecord::Migration
+class CreateChunks < ActiveRecord::Migration[4.2]
   def change
     create_table :chunks, id: :uuid do |t|
       t.uuid :upload_id

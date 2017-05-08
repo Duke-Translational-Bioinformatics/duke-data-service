@@ -1,4 +1,4 @@
-class AddTypeToAuthenticationService < ActiveRecord::Migration
+class AddTypeToAuthenticationService < ActiveRecord::Migration[4.2]
   def change
     add_column :authentication_services, :type, :string
     add_column :authentication_services, :client_id, :string

@@ -69,8 +69,8 @@ shared_examples 'a ProvRelation' do
   end
 
   it 'should allow is_deleted to be set' do
-    should allow_value(true).for(:is_deleted)
-    should allow_value(false).for(:is_deleted)
+    is_expected.to allow_value(true).for(:is_deleted)
+    is_expected.to allow_value(false).for(:is_deleted)
   end
 
   it_behaves_like 'an audited model'
@@ -114,7 +114,7 @@ shared_examples 'a logically deleted model' do
 end
 
 shared_context 'with concurrent calls' do |object_list:, method:|
-  self.use_transactional_fixtures = false
+  self.use_transactional_tests = false
   let(:objects) { send(object_list) }
   after do
     ActiveRecord::Base.subclasses.each(&:delete_all)

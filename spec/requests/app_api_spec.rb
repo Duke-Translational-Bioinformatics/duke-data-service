@@ -3,251 +3,34 @@ require 'rails_helper'
 describe DDS::V1::AppAPI do
   let(:json_headers) { { 'Accept' => 'application/json', 'Content-Type' => 'application/json'} }
 
+  include_context 'with sneakers'
+  shared_context 'seeded rdbms' do
+    let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
+  end
+  shared_context 'authentication_service created' do
+    let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
+    before { expect(authentication_service).to be_persisted }
+  end
+  shared_context 'storage_provider setup' do
+    let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+
+    before do
+      swift_storage_provider.register_keys
+    end
+  end
+  before do
+    ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
+  end
+
   describe 'app status', :vcr do
-    context 'when rdbms is not seeded' do
-      it 'should return response.status 503' do
-        #AuthRoles are seeded
-        expect(AuthRole.count).to be < 1
-        get '/api/v1/app/status', json_headers
-        expect(response.status).to eq(503)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-        returned_configs = JSON.parse(response.body)
-        expect(returned_configs).to be_a Hash
-        expect(returned_configs).to have_key('status')
-        expect(returned_configs['status']).to eq('error')
-        expect(returned_configs).to have_key('rdbms')
-        expect(returned_configs['rdbms']).to eq('is not seeded')
-      end
-    end #when rdbms not seeded
-
-    context 'authentication_service' do
-      context 'environment is not set' do
-        before do
-          ENV['AUTH_SERVICE_ID'] = nil
-          ENV['AUTH_SERVICE_BASE_URI'] = nil
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        end
-
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('authentication_service')
-          expect(returned_configs['authentication_service']).to eq('environment is not set')
-        end
-      end
-
-      context 'is not created' do
-        before do
-          ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        end
-
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('authentication_service')
-          expect(returned_configs['authentication_service']).to eq('has not been created')
-        end
-      end
-    end #authentication_service
-
-    context 'storage_provider' do
-      context 'environment is not set' do
-        before do
-          ENV['SWIFT_DISPLAY_NAME'] = nil
-          ENV['SWIFT_DESCRIPTION'] = nil
-          ENV['SWIFT_ACCT'] = nil
-          ENV['SWIFT_URL_ROOT'] = nil
-          ENV['SWIFT_VERSION'] = nil
-          ENV['SWIFT_AUTH_URI'] = nil
-          ENV['SWIFT_USER'] = nil
-          ENV['SWIFT_PASS'] = nil
-          ENV['SWIFT_PRIMARY_KEY'] = nil
-          ENV['SWIFT_SECONDARY_KEY'] = nil
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = nil
-        end
-
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('storage_provider')
-          expect(returned_configs['storage_provider']).to eq('environment is not set')
-        end
-      end
-
-      context 'has not been created' do
-        before do
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-        end
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('storage_provider')
-          expect(returned_configs['storage_provider']).to eq('has not been created')
-        end
-      end
-
-      context 'has not registered its keys' do
-        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-        before do
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-          resp = HTTParty.post(
-            swift_storage_provider.storage_url,
-            headers: swift_storage_provider.auth_header.merge({
-              'X-Remove-Account-Meta-Temp-URL-Key' => 'yes',
-              'X-Remove-Account-Meta-Temp-URL-Key-2' => 'yes'
-            })
-          )
-        end
-        it 'should return response.status 503' do
-          expect(swift_storage_provider).to be_persisted
-          #vcr records storage_provider.get_account_info with keys not registered
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('storage_provider')
-          expect(returned_configs['storage_provider']).to eq('has not registered its keys')
-        end
-      end
-
-      context 'is not connected' do
-        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-        let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
-        before do
-          ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-          ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-          ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-          ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-          ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-          ENV['SWIFT_ACCT'] = 'AUTH_test'
-          ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-          ENV['SWIFT_VERSION'] = 'v1'
-          ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-          ENV['SWIFT_USER'] = 'test:tester'
-          ENV['SWIFT_PASS'] = 'testing'
-          ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-          ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-          ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-          stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
-        end
-        it 'should return response.status 503' do
-          expect(swift_storage_provider).to be_persisted
-          expect(authentication_service).to be_persisted
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('storage_provider')
-          expect(returned_configs['storage_provider']).to eq('is not connected')
-        end
-      end
-    end #storage_provider
-
-    context 'graphdb' do
-      context 'environment is not set' do
-        before do
-          ENV["GRAPHSTORY_URL"] = nil
-        end
-        it 'should return response.status 503' do
-          get '/api/v1/app/status', json_headers
-          expect(response.status).to eq(503)
-          expect(response.body).to be
-          expect(response.body).not_to eq('null')
-          returned_configs = JSON.parse(response.body)
-          expect(returned_configs).to be_a Hash
-          expect(returned_configs).to have_key('status')
-          expect(returned_configs['status']).to eq('error')
-          expect(returned_configs).to have_key('graphdb')
-          expect(returned_configs['graphdb']).to eq('environment is not set')
-        end
-      end
-      # cannot test is not connected because vcr ignores all requests to neo4j
-    end #graphdb
-
     context 'when properly integrated' do
-      let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
-      let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
 
-      before do
-        WebMock.reset!
-        ENV['AUTH_SERVICE_ID'] = '342c075a-7aca-4c35-b3f5-29f043884b5b'
-        ENV['AUTH_SERVICE_BASE_URI'] = 'https://localhost:3000'
-        ENV['AUTH_SERVICE_NAME'] = 'Duke Authentication Service'
-        ENV['SWIFT_DISPLAY_NAME'] = 'OIT Swift'
-        ENV['SWIFT_DESCRIPTION'] = 'Duke OIT Swift Service'
-        ENV['SWIFT_ACCT'] = 'AUTH_test'
-        ENV['SWIFT_URL_ROOT'] = 'http://swift.local:12345'
-        ENV['SWIFT_VERSION'] = 'v1'
-        ENV['SWIFT_AUTH_URI'] = '/auth/v1.0'
-        ENV['SWIFT_USER'] = 'test:tester'
-        ENV['SWIFT_PASS'] = 'testing'
-        ENV['SWIFT_PRIMARY_KEY'] = '5ea5d3ec4111586633e58b60ac1f542c96778ee51bce23602368ab5303df63db52239993cef8881fb78e0b39346d2ac11aac833b899aa4283dc3bb0659c2ef05'
-        ENV['SWIFT_SECONDARY_KEY'] = '1e8de2158d75b148f96d563e332b450fb7210b57f4bd76b8588d6dbc5cf445f47dc71bd4cf50d2693f144ba423ef4389a83757f4fdcecb35943ee67d2be81c0f'
-        ENV['SWIFT_CHUNK_HASH_ALGORITHM'] = 'md5'
-        ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
-        swift_storage_provider.register_keys
-      end
-
-      it 'should return {status: ok}' do
-        expect(authentication_service).to be_persisted
-        get '/api/v1/app/status', json_headers
+      it {
+        get '/api/v1/app/status', params: json_headers
         expect(response.status).to eq(200)
         expect(response.body).to be
         expect(response.body).not_to eq('null')
@@ -259,19 +42,144 @@ describe DDS::V1::AppAPI do
 
         expect(returned_configs).to have_key('environment')
         expect(returned_configs['environment']).to eq("#{Rails.env}")
-
-        expect(returned_configs).to have_key('rdbms')
-        expect(returned_configs['rdbms']).to eq('ok')
-
-        expect(returned_configs).to have_key('authentication_service')
-        expect(returned_configs['authentication_service']).to eq('ok')
-
-        expect(returned_configs).to have_key('storage_provider')
-        expect(returned_configs['storage_provider']).to eq('ok')
-
-        expect(returned_configs).to have_key('graphdb')
-        expect(returned_configs['graphdb']).to eq('ok')
-      end
+      }
     end #when properly integrated
+
+    context 'when rdbms is not seeded' do
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
+      let(:status_error) { 'rdbms is not seeded' }
+      before do
+        #AuthRoles are seeded
+        expect(AuthRole.count).to be < 1
+      end
+      it_behaves_like 'a status error', :status_error
+    end #when rdbms not seeded
+
+    context 'authentication_service' do
+      include_context 'seeded rdbms'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
+      context 'is not created' do
+        let(:status_error) { 'authentication_service has not been created' }
+        it_behaves_like 'a status error', :status_error
+      end
+    end #authentication_service
+
+    context 'storage_provider' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'expected bunny exchanges and queues'
+
+      context 'has not been created' do
+        let(:status_error) { 'storage_provider has not been created' }
+        it_behaves_like 'a status error', :status_error
+      end
+
+      context 'has not registered its keys' do
+        let(:status_error) { 'storage_provider has not registered its keys' }
+        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+        before do
+          expect(swift_storage_provider).to be_persisted
+          #vcr records storage_provider.get_account_info with keys not registered
+          resp = HTTParty.post(
+            swift_storage_provider.storage_url,
+            headers: swift_storage_provider.auth_header.merge({
+              'X-Remove-Account-Meta-Temp-URL-Key' => 'yes',
+              'X-Remove-Account-Meta-Temp-URL-Key-2' => 'yes'
+            })
+          )
+        end
+        it_behaves_like 'a status error', :status_error
+      end
+
+      context 'is not connected' do
+        let(:status_error) { 'storage_provider is not connected' }
+        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+        let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
+        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
+        before do
+          stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
+          expect(swift_storage_provider).to be_persisted
+          expect(authentication_service).to be_persisted
+          allow(Rails.logger).to receive(:error).with(/^StorageProvider error/)
+        end
+        after do
+          WebMock.reset!
+        end
+        it_behaves_like 'a status error', :status_error
+      end
+    end #storage_provider
+
+    context 'graphdb' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+      include_context 'expected bunny exchanges and queues'
+
+      context 'environment is not set' do
+        let(:status_error) { 'graphdb environment is not set' }
+        before do
+          ENV["GRAPHSTORY_URL"] = nil
+        end
+        it_behaves_like 'a status error', :status_error
+      end
+      # cannot test is not connected because vcr ignores all requests to neo4j
+    end #graphdb
+
+    context 'queue' do
+      include_context 'seeded rdbms'
+      include_context 'authentication_service created'
+      include_context 'storage_provider setup'
+
+      let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
+      let(:retry_error_exchange_name) { Sneakers::CONFIG[:retry_error_exchange] }
+      let(:distributor_exchange_name) { ApplicationJob.distributor_exchange_name }
+      let(:message_log_worker_queue_name) { MessageLogWorker.new.queue.name }
+      let(:message_log_worker_retry_queue_name) { "#{MessageLogWorker.new.queue.name}-retry" }
+      let(:retry_error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
+
+      context 'environment is not set' do
+        let(:status_error) { 'queue environment is not set' }
+        before do
+          ENV["CLOUDAMQP_URL"] = nil
+        end
+
+        it_behaves_like 'a status error', :status_error
+      end
+
+      context 'is not connected' do
+        let(:status_error) { 'queue is not connected' }
+        let(:bunny_session) { Sneakers::CONFIG[:connection] }
+        before do
+          ENV['CLOUDAMQP_URL'] = 'amqp://rabbit.host'
+          expect(bunny_session).to receive(:exchange_exists?).and_raise(
+            Bunny::TCPConnectionFailedForAllHosts
+          )
+          allow(Rails.logger).to receive(:error).with(/^RabbitMQ Connection error/)
+        end
+        it_behaves_like 'a status error', :status_error
+      end
+
+      it_behaves_like 'it requires exchange', :gateway_exchange_name
+      it_behaves_like 'it requires exchange', :retry_error_exchange_name
+      it_behaves_like 'it requires exchange', :distributor_exchange_name
+
+      it_behaves_like 'it requires queue', :message_log_worker_queue_name
+      it_behaves_like 'it requires queue', :message_log_worker_retry_queue_name
+      it_behaves_like 'it requires queue', :retry_error_queue_name
+
+      (ApplicationJob.descendants.collect {|d|
+        [d.queue_name, "#{d.queue_name}-retry"]
+      }).flatten.uniq.each do |this_queue|
+        let(:job_queue) { this_queue }
+        it_behaves_like 'it requires queue', :job_queue
+      end
+    end
+
+    it { expect(ApplicationJob.descendants).not_to be_empty }
   end #app status
 end

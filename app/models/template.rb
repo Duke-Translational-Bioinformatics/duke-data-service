@@ -18,7 +18,7 @@ class Template < ActiveRecord::Base
   def validate_removability
     if has_meta_templates?
       self.errors[:base] << "The template cannot be deleted if it has been associated to one or more DDS objects."
-      return false   
+      throw :abort
     end
   end
 

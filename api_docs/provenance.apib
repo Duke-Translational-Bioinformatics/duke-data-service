@@ -887,7 +887,47 @@ Given a starting node, returns a graph structure for the provenance chain.  This
                         "properties": {
                             "kind": "dds-relation-used",
                             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                            "audit": { }
+                            "from": {
+                                "kind": "dds-activity",
+                                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                                "name": "RF PI3-Kinase",
+                                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                                "started_on": "2015-01-01T12:00:00Z",
+                                "ended_on": "2015-01-01T14:30:00Z",
+                                "is_deleted": false,
+                                "audit": { }
+                            },
+                            "to": {
+                                "kind": "dds-file-version",
+                                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                                "file": {
+                                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                                    "project": {
+                                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                                    }
+                                },
+                                "version": 1,
+                                "label": "Post pairwise sequence alignment (piecewise)",
+                                "is_deleted": false,
+                                "upload": {
+                                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                                    "size": 30024000,
+                                    "hashes": [
+                                        {
+                                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                            "algorithm": "md5",
+                                            "audit": { }
+                                        }
+                                    ],
+                                    "storage_provider": {
+                                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                        "name": "duke_oit_swift",
+                                        "description": "Duke OIT Storage"
+                                    }
+                                },
+                                "audit": { }
+                            }
                         }
                     },
                     {
@@ -898,7 +938,47 @@ Given a starting node, returns a graph structure for the provenance chain.  This
                         "properties": {
                             "kind": "dds-relation-was-generated-by",
                             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-                            "audit": { }
+                            "from": {
+                                "kind": "dds-file-version",
+                                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                                "file": {
+                                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                                    "project": {
+                                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                                    }
+                                },
+                                "version": 2,
+                                "label": "Alignment performed on raw data",
+                                "is_deleted": false,
+                                "upload": {
+                                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                                    "size": 30024000,
+                                    "hashes": [
+                                        {
+                                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                            "algorithm": "md5",
+                                            "audit": { }
+                                        }
+                                    ],
+                                    "storage_provider": {
+                                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                        "name": "duke_oit_swift",
+                                        "description": "Duke OIT Storage"
+                                    }
+                                },
+                                "audit": { }
+                            },
+                            "to": {
+                                "kind": "dds-activity",
+                                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                                "name": "RF PI3-Kinase",
+                                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                                "started_on": "2015-01-01T12:00:00Z",
+                                "ended_on": "2015-01-01T14:30:00Z",
+                                "is_deleted": false,
+                                "audit": { }
+                            }
                         }
                     }
                 ]
@@ -998,7 +1078,47 @@ A graph structure of the unique nodes and relationships is returned.
                         "properties": {
                             "kind": "dds-relation-used",
                             "id": "ac242faf-fba0-4293-a949-0b82ae7ba810",
-                            "audit": { }
+                            "from": {
+                                "kind": "dds-activity",
+                                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                                "name": "RF PI3-Kinase",
+                                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                                "started_on": "2015-01-01T12:00:00Z",
+                                "ended_on": "2015-01-01T14:30:00Z",
+                                "is_deleted": false,
+                                "audit": { }
+                            },
+                            "to": {
+                                "kind": "dds-file-version",
+                                "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                                "file": {
+                                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                                    "project": {
+                                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                                    }
+                                },
+                                "version": 1,
+                                "label": "Post pairwise sequence alignment (piecewise)",
+                                "is_deleted": false,
+                                "upload": {
+                                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                                    "size": 30024000,
+                                    "hashes": [
+                                        {
+                                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                            "algorithm": "md5",
+                                            "audit": { }
+                                        }
+                                    ],
+                                    "storage_provider": {
+                                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                        "name": "duke_oit_swift",
+                                        "description": "Duke OIT Storage"
+                                    }
+                                },
+                                "audit": { }
+                            }
                         }
                     },
                     {
@@ -1009,7 +1129,47 @@ A graph structure of the unique nodes and relationships is returned.
                         "properties": {
                             "kind": "dds-relation-was-generated-by",
                             "id": "372f25e1-01b0-4b8d-9524-e26dd573cc95",
-                            "audit": { }
+                            "from": {
+                                "kind": "dds-file-version",
+                                "id": "1b80a313-97cf-482d-8d17-9b911bf815b3",
+                                "file": {
+                                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                                    "project": {
+                                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                                    }
+                                },
+                                "version": 2,
+                                "label": "Alignment performed on raw data",
+                                "is_deleted": false,
+                                "upload": {
+                                    "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                                    "size": 30024000,
+                                    "hashes": [
+                                        {
+                                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                            "algorithm": "md5",
+                                            "audit": { }
+                                        }
+                                    ],
+                                    "storage_provider": {
+                                        "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                        "name": "duke_oit_swift",
+                                        "description": "Duke OIT Storage"
+                                    }
+                                },
+                                "audit": { }
+                            },
+                            "to": {
+                                "kind": "dds-activity",
+                                "id": "a1ff02a4-b7e9-999d-87x1-66f4c881jka1",
+                                "name": "RF PI3-Kinase",
+                                "description": "Building a Random Forest as a heuristic for PI3-Kinase pathway activity",
+                                "started_on": "2015-01-01T12:00:00Z",
+                                "ended_on": "2015-01-01T14:30:00Z",
+                                "is_deleted": false,
+                                "audit": { }
+                            }
                         }
                     }
                 ]

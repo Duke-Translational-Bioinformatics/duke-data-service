@@ -1,4 +1,4 @@
-class CreateMetaProperties < ActiveRecord::Migration
+class CreateMetaProperties < ActiveRecord::Migration[4.2]
   def change
     create_table :meta_properties do |t|
       t.uuid :meta_template_id

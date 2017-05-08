@@ -1,12 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
-  subject { child_folder }
-  let(:child_folder) { FactoryGirl.create(:folder, :with_parent) }
-  let(:root_folder) { FactoryGirl.create(:folder, :root) }
-  let(:grand_child_folder) { FactoryGirl.create(:folder, parent: child_folder) }
-  let(:grand_child_file) { FactoryGirl.create(:data_file, parent: child_folder) }
-  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, parent: child_folder) }
+  subject { FactoryGirl.create(:folder, :with_parent) }
+  let(:immediate_child_folder) { FactoryGirl.create(:folder, parent: subject) }
+  let(:immediate_child_file) { FactoryGirl.create(:data_file, parent: subject) }
+  let(:invalid_immediate_child_file) { FactoryGirl.create(:data_file, :invalid, parent: subject) }
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
@@ -18,6 +16,7 @@ RSpec.describe Folder, type: :model do
     let(:serialized_kind) { true }
   end
   it_behaves_like 'a logically deleted model'
+  it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -39,13 +38,13 @@ RSpec.describe Folder, type: :model do
 
     it 'should not allow project_id to be changed' do
       should allow_value(project).for(:project)
-      expect(subject).to be_valid
+      is_expected.to be_valid
       should allow_value(project.id).for(:project_id)
       should_not allow_value(other_project.id).for(:project_id)
       should allow_value(project.id).for(:project_id)
-      expect(subject).to be_valid
+      is_expected.to be_valid
       should allow_value(other_project).for(:project)
-      expect(subject).not_to be_valid
+      is_expected.not_to be_valid
     end
 
     it 'should allow is_deleted to be set' do
@@ -55,38 +54,34 @@ RSpec.describe Folder, type: :model do
 
     it 'should not be its own parent' do
       should_not allow_value(subject).for(:parent)
-      expect(child_folder.reload).to be_truthy
+      expect(subject.reload).to be_truthy
       should_not allow_value(subject.id).for(:parent_id)
     end
 
     context 'with children' do
-      subject { child_folder.parent }
-
       it 'should allow is_deleted to be set to true' do
-        should allow_value(true).for(:is_deleted)
+        is_expected.to allow_value(true).for(:is_deleted)
         expect(subject.is_deleted?).to be_truthy
-        should allow_value(false).for(:is_deleted)
+        is_expected.to allow_value(false).for(:is_deleted)
       end
 
       it 'should not allow child as parent' do
-        should_not allow_value(child_folder).for(:parent)
-        expect(child_folder.reload).to be_truthy
-        should_not allow_value(child_folder.id).for(:parent_id)
+        is_expected.not_to allow_value(subject).for(:parent)
+        expect(subject.reload).to be_truthy
+        is_expected.not_to allow_value(subject.id).for(:parent_id)
       end
     end
 
     context 'with invalid child file' do
-      subject { invalid_file.parent }
-
       it 'should allow is_deleted to be set to true' do
-        should allow_value(true).for(:is_deleted)
+        is_expected.to allow_value(true).for(:is_deleted)
         expect(subject.is_deleted?).to be_truthy
-        should allow_value(false).for(:is_deleted)
+        is_expected.to allow_value(false).for(:is_deleted)
       end
     end
   end
 
-  describe '.parent=' do
+  describe '#parent=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
       expect(subject.project).not_to eq other_folder.project
@@ -98,7 +93,9 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.parent_id=' do
+  it_behaves_like 'a ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
+
+  describe '#parent_id=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
       expect(subject.project).not_to eq other_folder.project
@@ -110,42 +107,7 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.is_deleted= on parent' do
-    subject { child_folder.parent }
-
-    it 'should set is_deleted on children' do
-      expect(child_folder.is_deleted?).to be_falsey
-      should allow_value(true).for(:is_deleted)
-      expect(subject.save).to be_truthy
-      expect(child_folder.reload).to be_truthy
-      expect(child_folder.is_deleted?).to be_truthy
-    end
-
-    it 'should set is_deleted on grand-children' do
-      expect(grand_child_folder.is_deleted?).to be_falsey
-      expect(grand_child_file.is_deleted?).to be_falsey
-      should allow_value(true).for(:is_deleted)
-      expect(subject.save).to be_truthy
-      expect(grand_child_folder.reload).to be_truthy
-      expect(grand_child_file.reload).to be_truthy
-      expect(grand_child_folder.is_deleted?).to be_truthy
-      expect(grand_child_file.is_deleted?).to be_truthy
-    end
-
-    context 'with invalid child file' do
-      subject { invalid_file.parent }
-
-      it 'should set is_deleted on children' do
-        expect(invalid_file.is_deleted?).to be_falsey
-        should allow_value(true).for(:is_deleted)
-        expect(subject.save).to be_truthy
-        expect(invalid_file.reload).to be_truthy
-        expect(invalid_file.is_deleted?).to be_truthy
-      end
-    end
-  end
-
-  describe '#creator' do
+  describe '.creator' do
     let(:creator) { FactoryGirl.create(:user) }
     it { is_expected.to respond_to :creator }
 
@@ -196,6 +158,7 @@ RSpec.describe Folder, type: :model do
       updated_at: {type: "date"},
       creator: {type: "object"}
     }}
+    include_context 'with job runner', ElasticsearchIndexJob
 
     it_behaves_like 'an Elasticsearch::Model'
     it_behaves_like 'an Elasticsearch index mapping model' do

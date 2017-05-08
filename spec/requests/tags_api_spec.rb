@@ -28,7 +28,7 @@ describe DDS::V1::TagsAPI do
     let(:resource_kind) { data_file.kind }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         label: payload_label
@@ -69,7 +69,7 @@ describe DDS::V1::TagsAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -103,7 +103,7 @@ describe DDS::V1::TagsAPI do
     let(:file_id) { data_file.id }
     let(:resource_kind) { data_file.kind }
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         tags: [
@@ -180,7 +180,7 @@ describe DDS::V1::TagsAPI do
     let!(:resource_tag_label) { Tag.where(label: resource.label).tag_labels.first }
     let!(:not_allowed_tag_label) { Tag.where(label: not_allowed_tag.label).tag_labels.first }
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -243,7 +243,7 @@ describe DDS::V1::TagsAPI do
     let(:url) { "/api/v1/tags/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -256,7 +256,7 @@ describe DDS::V1::TagsAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
 

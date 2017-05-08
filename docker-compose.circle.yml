@@ -28,6 +28,18 @@ services:
     image: elasticsearch:2.4
     ports:
       - '9200:9200'
+  worker:
+    image: dukedataservice_server
+    entrypoint: ['rake', 'workers:run']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+    env_file:
+      - circle/webapp.circle.env
+      - swift.local.env
+      - neo4j.client.local.env
+      - elastic.client.local.env
   rails:
     image: dukedataservice_server
     entrypoint: ['rails']

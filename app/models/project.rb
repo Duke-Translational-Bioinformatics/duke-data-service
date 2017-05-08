@@ -1,7 +1,9 @@
 class Project < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
+  include ChildMinder
   include RequestAudited
+  include JobTransactionable
   audited
 
   belongs_to :creator, class_name: "User"
@@ -17,6 +19,9 @@ class Project < ActiveRecord::Base
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
 
+  after_create :set_project_admin
+  after_commit :initialize_storage, on: :create
+
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
     if project_admin_role
@@ -30,12 +35,12 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def is_deleted=(val)
-    if val
-      children.each do |child|
-        child.is_deleted = true
-      end
-    end
-    super(val)
+  def initialize_storage
+    storage_provider = StorageProvider.first
+    ProjectStorageProviderInitializationJob.perform_later(
+      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      project: self
+    )
   end
 end

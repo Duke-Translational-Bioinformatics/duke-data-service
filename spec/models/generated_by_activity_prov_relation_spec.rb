@@ -33,16 +33,32 @@ RSpec.describe GeneratedByActivityProvRelation, type: :model do
         relatable_to: used_and_generated_by,
         relatable_from: used_and_generated)
       }
-      let(:already_used) { FactoryGirl.build(:used_prov_relation,
-        relatable_from: used_and_generated_by,
-        relatable_to: used_and_generated
-        )
-      }
-      it {
-        is_expected.to be_valid
-        already_used.save
-        is_expected.not_to be_valid
-      }
+      context 'not deleted' do
+        let(:already_used) { FactoryGirl.build(:used_prov_relation,
+          relatable_from: used_and_generated_by,
+          relatable_to: used_and_generated
+          )
+        }
+        it {
+          is_expected.to be_valid
+          already_used.save
+          is_expected.not_to be_valid
+        }
+      end
+
+      context 'deleted' do
+        let(:already_used) { FactoryGirl.build(:used_prov_relation,
+          relatable_from: used_and_generated_by,
+          relatable_to: used_and_generated,
+          is_deleted: true
+          )
+        }
+        it {
+          is_expected.to be_valid
+          already_used.save
+          is_expected.to be_valid
+        }
+      end
     end
   end
 end

@@ -1,4 +1,4 @@
-class CreateTags < ActiveRecord::Migration
+class CreateTags < ActiveRecord::Migration[4.2]
   def change
     create_table :tags, id: :uuid do |t|
       t.string :label
