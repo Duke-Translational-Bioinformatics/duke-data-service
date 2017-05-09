@@ -97,10 +97,10 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
   it { is_expected.to respond_to(:update_elasticsearch_index) }
 
   it {
-    is_expected.to callback(:create_elasticsearch_index).after(:commit).on(:create)
+    is_expected.to callback(:create_elasticsearch_index).after(:create)
   }
   it {
-    is_expected.to callback(:update_elasticsearch_index).after(:commit).on(:update)
+    is_expected.to callback(:update_elasticsearch_index).after(:update)
   }
 
   it { is_expected.to respond_to 'as_indexed_json' }
