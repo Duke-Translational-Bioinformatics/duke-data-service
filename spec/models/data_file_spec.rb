@@ -316,7 +316,30 @@ RSpec.describe DataFile, type: :model do
     }}
     include_context 'with job runner', ElasticsearchIndexJob
 
-    it_behaves_like 'an Elasticsearch::Model'
+    it_behaves_like 'an Elasticsearch::Model' do
+      context 'when ElasticsearchIndexJob::perform_later raises an error' do
+        context 'with new data_file' do
+          subject { FactoryGirl.build(:data_file, :root) }
+          before(:each) do
+            expect(ElasticsearchIndexJob).to receive(:perform_later).with(anything, anything).and_raise("boom!")
+          end
+          it { expect{
+            expect{subject.save}.to raise_error("boom!")
+          }.not_to change{described_class.count} }
+        end
+        context 'with existing data_file' do
+          subject { root_file }
+          before(:each) do
+            is_expected.to be_persisted
+            subject.name += 'x'
+            expect(ElasticsearchIndexJob).to receive(:perform_later).with(anything, anything, update: true).and_raise("boom!")
+          end
+          it { expect{
+            expect{subject.save}.to raise_error("boom!")
+          }.not_to change{described_class.find(subject.id).name} }
+        end
+      end
+    end
     it_behaves_like 'an Elasticsearch index mapping model' do
       it {
         #tags
