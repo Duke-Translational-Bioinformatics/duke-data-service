@@ -26,6 +26,20 @@ shared_context "rake" do
   end
 end
 
+shared_context 'with env_override' do
+  let(:env_override) { {} }
+  before(:each) do
+    env_override.each do |env_key, env_val|
+      ENV[env_key] = env_val.to_s
+    end
+  end
+  after(:each) do
+    env_override.keys.each do |env_key|
+      ENV.delete(env_key)
+    end
+  end
+end
+
 shared_examples 'a queued job worker' do |job_class_sym|
   let(:job_class) { send(job_class_sym) }
   it {
