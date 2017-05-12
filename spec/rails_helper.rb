@@ -95,6 +95,7 @@ VCR.configure do |c|
 end
 
 # Mocking Bunny for Sneakers ActiveJob testing
+BunnyMock.use_bunny_queue_pop_api = true
 module BunnyMock
   class Queue
     def durable?
@@ -103,6 +104,12 @@ module BunnyMock
 
     def cancel
       @consumers = []
+    end
+
+    def pop(opts = { manual_ack: false }, &block)
+      r = bunny_pop(opts, &block)
+      store_acknowledgement(r, [opts])
+      r
     end
   end
 end
