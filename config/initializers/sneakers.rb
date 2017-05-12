@@ -24,31 +24,31 @@ Sneakers.configure(
   #:runner_config_file => nil,
   #:metrics => nil,
   :daemonize => sneakers_daemonize,
-  :start_worker_delay => sneakers_worker_delay,
-  :workers => sneakers_workers,
+  :start_worker_delay => Integer(sneakers_worker_delay),
+  :workers => Integer(sneakers_workers),
   :log => Rails.logger,
   #:pid_path => 'sneakers.pid',
-  :amqp_heartbeat => sneakers_runner_heartbeat,
+  :amqp_heartbeat => Integer(sneakers_runner_heartbeat),
 
   # workers
-  :timeout_job_after => sneakers_timeout_job_after,
-  :prefetch => sneakers_prefetch,
-  :threads => sneakers_threads,
+  :timeout_job_after => Integer(sneakers_timeout_job_after),
+  :prefetch => Integer(sneakers_prefetch),
+  :threads => Integer(sneakers_threads),
   :share_threads => sneakers_share_threads,
   :ack => true,
-  :heartbeat => sneakers_workers_heartbeat,
+  :heartbeat => Integer(sneakers_workers_heartbeat),
   :hooks => {}
 )
 Sneakers.configure(
   connection: Bunny.new( ENV['CLOUDAMQP_URL'],
-    :heartbeat => sneakers_workers_heartbeat,
+    :heartbeat => Integer(sneakers_workers_heartbeat),
     :logger => Sneakers::logger,
     #:log_level => Logger::WARN,
     #:log_file => STDOUT,
     :automatically_recover => true, # false, will disable automatic network failure recovery
     :network_recovery_interval => '', # interval between reconnection attempts
     :threaded => sneakers_connection_threaded, # switches to single-threaded connections when set to false. Only recommended for apps that only publish messages.
-    :continuation_timeout => sneakers_connection_continuation_timeout # timeout for client operations that expect a response (e.g. Bunny::Queue#get), in milliseconds. Default is 4000 ms.
+    :continuation_timeout => Integer(sneakers_connection_continuation_timeout) # timeout for client operations that expect a response (e.g. Bunny::Queue#get), in milliseconds. Default is 4000 ms.
   )
 )
 
