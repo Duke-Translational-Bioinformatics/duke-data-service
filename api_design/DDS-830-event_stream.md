@@ -23,6 +23,8 @@ OR
 
 ###### Folder Deleted (dds-folder-deleted)
 
+###### Folder Moved (dds-folder-moved)
+
 ###### File Upload Initiated (dds-file-upload-initiated)
 
 ###### File Upload Completed (dds-file-upload-completed)
@@ -30,6 +32,8 @@ OR
 ###### File Renamed (dds-file-renamed)
 
 ###### File Deleted (dds-file-deleted)
+
+###### File Moved (dds-file-moved)
 
 ??????
  
