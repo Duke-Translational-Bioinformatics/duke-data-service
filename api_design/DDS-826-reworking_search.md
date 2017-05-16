@@ -13,9 +13,9 @@ immediately after we deploy to that environment (possibly as part of the circle 
 
 #### Background (Existing Search API)
 
-The initial implementation of the DDS search API has exposed several usage issues.  These issues, which stem from the fact that consumers can pass-through native Elactic DSL, are as follows:
+The initial implementation of the DDS search API has exposed several usage issues.  These issues, which stem from the fact that consumers can pass-through native Elastic DSL, are as follows:
 
-* Elastic DSL is complex and requires a deep-dive by consumers to understand how to construct valid queries.  In addtion, knowledge of the underlying indexing (analyzer) strategy used for the Elastic documents is essential.
+* Elastic DSL is complex and requires a deep-dive by consumers to understand how to construct valid queries.  In addition, knowledge of the underlying indexing (analyzer) strategy used for the Elastic documents is essential.
 
 * Test coverage of the endpoint is problematic - the query options to consumers are only constrained by the broad scope of Elastic DSL.
 
@@ -23,7 +23,7 @@ The initial implementation of the DDS search API has exposed several usage issue
 
 #### Moving Forward (New Search API)
 
-The following is a proposed design to replace the exisiting API, which will no longer allow native Elastic DSL pass-through.  The intent is to design a consumer interface that is simple out of the gate, but can grow with increased demand for search capabilites.
+The following is a proposed design to replace the existing API, which will no longer allow native Elastic DSL pass-through.  The intent is to design a consumer interface that is simple out of the gate, but can grow with increased demand for search capabilities.
 
 ##### API Specification
 This section defines the proposed API interface.
@@ -35,9 +35,9 @@ This section defines the proposed API interface.
 * 201: Success
 * 400: Invalid value specified for query_string.fields
 * 400: Invalid "{key: value}" specified for filters[].object
-* 400: Required fields - facets[].field, facets[].name must be specified
-* 400: Invalid value specified for facets[].field
-* 400: Invalid size specified for facets[].size - out of range
+* 400: Required fields - aggs[].field, aggs[].name must be specified
+* 400: Invalid value specified for aggs[].field
+* 400: Invalid size specified for aggs[].size - out of range
 * 400: Invalid "{key: value}" specified for post_filters[].object
 * 401: Unauthorized
 
@@ -52,21 +52,21 @@ This section defines the proposed API interface.
 
 **kind** - Limit search context to list of kinds; valid options are `dds-folder` and `dds-file` - requires a set of comma-delimited kinds like so: `{"kind": ["dds-file"]}`. If not specified, defaults to all options.
 
-**project.id** - Limit search context to list of projects; requires a set of comma-delimited ids like so: `{"project.id": ["345e...", "2e45..."]}`. If not specified, defaults to projects in which the current user has view permission.
+**project.id** - Limit search context to list of projects; requires a set of comma-delimited ids like so: `{"project.id": ["345e...", "2e45..."]}`. Filters out projects to which the user is not allowed access. If not specified, defaults to projects in which the current user has view permission.
 
-**facets (object[ ], optional)** - List of facets (aggregates) that should be computed.
+**aggs (object[ ], optional)** - List of aggs (aggregates) that should be computed.
 
-***If specified, each facet object has the following properties:***
+***If specified, each agg object has the following properties:***
 
-**facets[ ].field (string, required)** - The field for which you want to compute facet; valid options are `project.name` and `tags.label`.
+**aggs[ ].field (string, required)** - The field for which you want to compute agg; valid options are `project.name` and `tags.label`.
 
-**facets[ ].name (string, required)** - The name to give the group of computed facet buckets for the field; for example: `project_names` and `tags`.
+**aggs[ ].name (string, required)** - The name to give the group of computed agg buckets for the field; for example: `project_names` and `tags`.
 
-**facets[ ].size (number, optional)** - The number of facet buckets to return with the results; defaults to the top 20 and cannot be greater than 50.
+**aggs[ ].size (number, optional)** - The number of agg buckets to return with the results; defaults to the top 20 and cannot be greater than 50.
 
 **post_filters (object[ ], optional)** - List of boolean search objects (predicates) that are joined together by the *AND* operator - they are represented as `key: value` pairs.  
 
-*Note: Post filters are applied after the main query has executed and do not impact facets computed by main query.  This is used for the common UX use case that allows filtering by facet buckets (liken to retail shopping Web portal)*. (see [Elastic Post Filter](https://www.elastic.co/guide/en/elasticsearch/guide/current/_post_filter.html))
+*Note: Post filters are applied after the main query has executed and do not impact aggs computed by main query.  This is used for the common UX use case that allows filtering by agg buckets (liken to retail shopping Web portal)*. (see [Elastic Post Filter](https://www.elastic.co/guide/en/elasticsearch/guide/current/_post_filter.html))
 
 ***The following post-filter objects are currently supported:***
 
@@ -90,7 +90,7 @@ This section provides a walk-through of the API for a concrete use case.  The ex
     {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
   ],
   },
-  "facets": [
+  "aggs": [
      {"field": "project.name", "name": "project_names", "size": 20},
      {"field": "tags.label", "name": "tags", "size": 20},
   ]
@@ -115,7 +115,14 @@ When the above query request is submitted to the DDS search endpoint, the reques
             "bool" : {
                "must" : [
                  {"terms": {"kind": ["dds-file"]}},
-                 {"terms": {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa" ]}}
+                 {"terms":
+                   {"project.id": [
+                      "319e7e82-037b-4e64-af6f-5620b45e7b06",
+                      "2cdafa6b-66ce-491c-8c58-bb6430a3e969",
+                      "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"
+                     ]
+                   }
+                 }
                ]
             }
          }
@@ -149,7 +156,7 @@ When the above query request is submitted to the DDS search endpoint, the reques
 
 *Note: We will eventually push project ACLs into the Elastic data store, and permissions filtering will be done at search engine level.*
 
-* For the `"aggs"` (facets), the raw non-analyzed `tags` field is specified as so: `"field": "tags.label.raw"` - this prevents the `tags` aggregate from getting represented as separate tokens.  This is not specified for `project.name` because at the time of this analysis we had not generated an associated `raw` index.
+* For the `"aggs"`, the raw non-analyzed `tags` field is specified as so: `"field": "tags.label.raw"` - this prevents the `tags` aggregate from getting represented as separate tokens.  This is not specified for `project.name` because at the time of this analysis we had not generated an associated `raw` index.
 
 ###### The DDS Response (Search Results)
 
@@ -172,7 +179,7 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
       },
       ..................
    ],
-   "facets": {
+   "aggs": {
       "project_names": {
          "buckets": [
 	         {
@@ -213,10 +220,10 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
 }  
 ```
 
-Keep in mind the `"project_names"` facet returned here is a bit skewed - the project name **"20161115 test"** has been split into multiple tokens, which can be resolved with the addtion of a raw not-analyzed index.
+Keep in mind the `"project_names"` agg returned here is a bit skewed - the project name **"20161115 test"** has been split into multiple tokens, which can be resolved with the addition of a raw not-analyzed index.
 
 ###### Applying Post Filters to DDS Query Request
-The following shows how a post filter can be applied.  The main query payload is exteneded to include a `"post_filters"` directive.  This is executed after the main query executes - facets generated by main query are not affected.
+The following shows how a post filter can be applied.  The main query payload is exteneded to include a `"post_filters"` directive.  This is executed after the main query executes - aggs generated by main query are not affected.
 
 ```
 {
@@ -228,7 +235,7 @@ The following shows how a post filter can be applied.  The main query payload is
     {"project_ids": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
   ],
   },
-  "facets": [
+  "aggs": [
      {"field": "project.name", "name": "project_names", "size": 20},
      {"field": "tags.label", "name": "tags", "size": 20},
   ],
@@ -285,7 +292,7 @@ The post-filter is transformed to Elastic compliant DSL and amended to the query
 }
 ```
 
-Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure an exact match is perfomed, not a token based match. In this case it is not relevant because the tags are single terms, but for muti-term tags, the `raw` index produces the desired results.
+Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure an exact match is performed, not a token based match. In this case it is not relevant because the tags are single terms, but for muti-term tags, the `raw` index produces the desired results.
 
 ## Implementation View
 
@@ -305,10 +312,10 @@ Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure a
 
 **filters** - kind.raw, project.id.raw
 
-**facets** - project.name.raw, tags.label.raw
+**aggs** & **post_filters** - project.name.raw, tags.label.raw
 
 **Removed** many index definitions for fields from DataFile settings index
-which are not part of the new query, filter, facet interface.  Refer to
+which are not part of the new query, filter, agg interface.  Refer to
 [v1.3.8 DataFile](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/models/data_file.rb) for these definitions if they need to be revived.
 
 ###### Folder
@@ -317,10 +324,10 @@ which are not part of the new query, filter, facet interface.  Refer to
 
 **filters** - kind.raw, project.id.raw
 
-**facets** - project.name.raw
+**aggs** & **post_filters** - project.name.raw
 
 **Removed** many index definitions for fields from Folder settings index
-which are not part of the new query, filter, facet interface.  Refer to
+which are not part of the new query, filter, agg interface.  Refer to
 [v1.3.8 Folder](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/models/folder.rb) for these definitions if they need to be revived.
 
 ##### Search Serializers
