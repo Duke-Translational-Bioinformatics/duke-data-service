@@ -20,7 +20,7 @@ class Project < ActiveRecord::Base
   validates :creator_id, presence: true, unless: :is_deleted
 
   after_create :set_project_admin
-  after_commit :initialize_storage, on: :create
+  after_create :initialize_storage
 
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
