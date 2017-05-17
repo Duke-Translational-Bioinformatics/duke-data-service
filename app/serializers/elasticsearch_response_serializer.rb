@@ -1,3 +1,8 @@
 class ElasticsearchResponseSerializer < ActiveModel::Serializer
-  has_many :results
+  attributes :results, :aggs
+
+  def filter(keys)
+    keys.delete(:aggs) if object.aggs.nil?
+    keys
+  end
 end
