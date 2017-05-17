@@ -4,7 +4,8 @@ class ApplicationJob < ActiveJob::Base
   class QueueNotFound < ::StandardError
   end
   before_enqueue do |job|
-    if self.class.queue_adapter.is_a?(ActiveJob::QueueAdapters::SneakersAdapter) &&
+    if ENV['SNEAKERS_SKIP_QUEUE_EXISTS_TEST'].nil? &&
+        self.class.queue_adapter.is_a?(ActiveJob::QueueAdapters::SneakersAdapter) &&
         !ApplicationJob.conn.queue_exists?(queue_name)
 
       raise QueueNotFound.new("Queue #{queue_name} does not exist")
