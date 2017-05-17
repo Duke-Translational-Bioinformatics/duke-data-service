@@ -43,6 +43,8 @@ Endpoints impacted by eventual consistency will be extended to include a respons
 
 This design introduces a `code` property into the standadard DDS error response that allows clients to differentiate responses that have the same HTTP response status code/number.
 
+For responses in which a code is not relevant or has not been implemented yet, the following will be returned for the `code` property:`"code": "not_provided"`.
+
 ## Process View
 
 Add notes about performance, scalability, throughput, etc. here. These can inform future proposals to change the implementation.
