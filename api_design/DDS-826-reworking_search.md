@@ -42,7 +42,7 @@ This section defines the proposed API interface.
 * 401: Unauthorized
 
 ###### Query Parameters
-**query_string.query (string, optional)** - The string fragment (phrase) to search for in `query_string.fields`.  If specified, must be at least 3 characters to invoke search operation.
+**query_string.query (string, optional)** - The string fragment (phrase) to search for in `query_string.fields`.
 
 **query_string.fields (string[ ], optional)** - List of text fields to search; valid options are `name` and `tags.label`.  If not specified, defaults to all options.
 
@@ -56,7 +56,7 @@ This section defines the proposed API interface.
 
 **aggs (object[ ], optional)** - List of aggs (aggregates) that should be computed.
 
-***If specified, each agg object has the following properties:***
+***If specified, each aggs object has the following properties:***
 
 **aggs[ ].field (string, required)** - The field for which you want to compute agg; valid options are `project.name` and `tags.label`.
 
@@ -74,6 +74,9 @@ This section defines the proposed API interface.
 
 **tags.label** - List of tags; requires a set of comma-delimited tag labels like so: `{"tags.label": ["sequencing", "DNA"]}`.  
 
+##### Query Parameters - Valid Combinations
+The query directives `query_string`, `filters`, `aggs` may be specified in any combination with each other, stand-alone, or not at all.  In the case in which none of these are provided, the endpoint will return all folders/files for projects in which current user has read access permissions.  The `post_filters` directive is only relevant if `aggs` has been specified as well.
+
 ##### API Usage Example
 
 This section provides a walk-through of the API for a concrete use case.  The examples herein were run against DDS production using the Bonsai interactive console.  The Elastic search endpoint used for the examples is: `POST /data_files/_search?pretty`.
@@ -84,15 +87,14 @@ This section provides a walk-through of the API for a concrete use case.  The ex
 {
   "query_string": {
     "query": "digital coll"
-  }
+  },
   "filters": [
     {"kind": ["dds-file"]},
     {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
   ],
-  },
   "aggs": [
      {"field": "project.name", "name": "project_names", "size": 20},
-     {"field": "tags.label", "name": "tags", "size": 20},
+     {"field": "tags.label", "name": "tags", "size": 20}
   ]
 }
 ```
@@ -114,15 +116,8 @@ When the above query request is submitted to the DDS search endpoint, the reques
          "filter": {
             "bool" : {
                "must" : [
-                 {"terms": {"kind": ["dds-file"]}},
-                 {"terms":
-                   {"project.id": [
-                      "319e7e82-037b-4e64-af6f-5620b45e7b06",
-                      "2cdafa6b-66ce-491c-8c58-bb6430a3e969",
-                      "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"
-                     ]
-                   }
-                 }
+                 {"terms": {"kind.raw": ["dds-file"]}},
+                 {"terms": {"project.id.raw": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa" ]}}
                ]
             }
          }
@@ -131,7 +126,7 @@ When the above query request is submitted to the DDS search endpoint, the reques
   "aggs": {
      "project_names": {
         "terms": {
-            "field": "project.name",
+            "field": "project.name.raw",
             "size": 20
          }
      },
@@ -181,6 +176,8 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
    ],
    "aggs": {
       "project_names": {
+         "doc_count_error_upper_bound": 0,
+         "sum_other_doc_count": 0,
          "buckets": [
 	         {
 	           "key": "gcb_royallab",
@@ -201,6 +198,8 @@ The transformed Elastic DSL is passed-through to the Elastic engine and the foll
 		   ]
 	   },
 	   "tags": {
+	      "doc_count_error_upper_bound": 0,
+	      "sum_other_doc_count": 0,
 	      "buckets": [
 	          {
 	            "key": "digital collections",
@@ -229,12 +228,11 @@ The following shows how a post filter can be applied.  The main query payload is
 {
   "query_string": {
     "query": "digital coll"
-  }
-  "filters": [
-    {"kinds": ["dds-file"]},
-    {"project_ids": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
-  ],
   },
+  "filters": [
+    {"kind": ["dds-file"]},
+    {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa"]}
+  ],
   "aggs": [
      {"field": "project.name", "name": "project_names", "size": 20},
      {"field": "tags.label", "name": "tags", "size": 20},
@@ -261,8 +259,8 @@ The post-filter is transformed to Elastic compliant DSL and amended to the query
          "filter": {
             "bool" : {
                "must" : [
-                 {"terms": {"kind": ["dds-file"]}},
-                 {"terms": {"project.id": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa" ]}}
+                 {"terms": {"kind.raw": ["dds-file"]}},
+                 {"terms": {"project.id.raw": ["319e7e82-037b-4e64-af6f-5620b45e7b06", "2cdafa6b-66ce-491c-8c58-bb6430a3e969", "fea9a9f9-3428-4ee5-8a55-d5b43c19d0fa" ]}}
                ]
             }
          }
@@ -271,7 +269,7 @@ The post-filter is transformed to Elastic compliant DSL and amended to the query
   "aggs": {
      "project_names": {
         "terms": {
-            "field": "project.name",
+            "field": "project.name.raw",
             "size": 20
          }
      },
