@@ -8,11 +8,6 @@ gem 'pg'
 # Use neo4j for PROV graph relationships
 gem 'neo4j', '~> 7.0'
 
-# Use elasticsearch for search
-gem 'elasticsearch', '~> 2.0.0'
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
-
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers'
 
@@ -29,6 +24,12 @@ gem 'grape-swagger'
 gem 'kaminari'
 gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
+
+# Use elasticsearch for search
+# must be included after kaminari according to elasticsearch-model documentation
+gem 'elasticsearch', '~> 2.0.0'
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
 
 # Auditing
 gem 'audited'
