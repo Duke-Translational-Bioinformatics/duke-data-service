@@ -131,6 +131,14 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
       it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{prefixed_queue_name} does not exist") }
 
+      context "when ENV[''] is set" do
+        include_context 'with env_override'
+        let(:env_override) { {
+          'SNEAKERS_SKIP_QUEUE_EXISTS_TEST' => 'yes'
+        } }
+        it { expect{child_class.perform_later}.not_to raise_error }
+      end
+
       context 'when not using sneakers' do
         before { expect{ActiveJob::Base.queue_adapter = :inline}.not_to raise_error }
         it { expect{child_class.perform_later}.not_to raise_error }
