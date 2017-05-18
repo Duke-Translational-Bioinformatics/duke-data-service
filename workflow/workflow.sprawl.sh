@@ -17,6 +17,9 @@ usage: workflow.sprawl.sh [-hvp] [-d seconds] folder_name ...
   -p pretend mode, do not hit the server
   -f force script to run when more than ${max_folder_name_count} folder_names are provided
   -d delay (in seconds) between server calls. (default: 1)
+
+Requires DDSTOKEN to be set to a valid api token and DDSURL to be
+set to the appropriate api url.
 USAGE
   if [ -n "$1" ] && [ $1 -gt 0 ]
   then
