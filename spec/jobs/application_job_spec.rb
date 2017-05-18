@@ -190,7 +190,7 @@ RSpec.describe ApplicationJob, type: :job do
         context 'when stopped' do
           before { job_wrapper_instance.stop }
           it { expect{child_class.perform_later}.to change{child_class_queue.message_count}.by(1) }
-          context 'creates a one Sneakers::Publisher' do
+          context 'creates one Sneakers::Publisher' do
             before { expect(Sneakers::Publisher).to receive(:new).and_call_original }
             it 'when called once' do
               expect{child_class.perform_later}.not_to raise_error
