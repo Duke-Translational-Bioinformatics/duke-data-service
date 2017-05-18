@@ -78,7 +78,12 @@ RSpec.describe ApplicationJob, type: :job do
     let(:error_exchange_name) { 'active_jobs-error' }
     let(:retry_queue_name) { retry_exchange_name }
     let(:error_queue_name) { error_exchange_name }
-    let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
+    let(:child_class_queue) {
+      channel.queue(prefixed_queue_name,
+        durable: true,
+        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
+      )
+    }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
