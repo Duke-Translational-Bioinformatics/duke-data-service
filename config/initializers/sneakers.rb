@@ -58,7 +58,8 @@ module ActiveJob
     class SneakersAdapter
       class JobWrapper #:nodoc:
         def self.publisher
-          Sneakers::Publisher.new(queue_opts)
+          @publisher ||= {}
+          @publisher[queue_name] ||= Sneakers::Publisher.new(queue_opts)
         end
       end
     end
