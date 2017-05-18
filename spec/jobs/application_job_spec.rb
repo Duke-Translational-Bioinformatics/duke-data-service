@@ -78,7 +78,12 @@ RSpec.describe ApplicationJob, type: :job do
     let(:error_exchange_name) { 'active_jobs-error' }
     let(:retry_queue_name) { retry_exchange_name }
     let(:error_queue_name) { error_exchange_name }
-    let(:child_class_queue) { channel.queue(prefixed_queue_name, durable: true) }
+    let(:child_class_queue) {
+      channel.queue(prefixed_queue_name,
+        durable: true,
+        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
+      )
+    }
     let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
@@ -131,6 +136,14 @@ RSpec.describe ApplicationJob, type: :job do
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
       it { expect{child_class.perform_later}.to raise_error(described_class::QueueNotFound, "Queue #{prefixed_queue_name} does not exist") }
 
+      context "when ENV[''] is set" do
+        include_context 'with env_override'
+        let(:env_override) { {
+          'SNEAKERS_SKIP_QUEUE_EXISTS_TEST' => 'yes'
+        } }
+        it { expect{child_class.perform_later}.not_to raise_error }
+      end
+
       context 'when not using sneakers' do
         before { expect{ActiveJob::Base.queue_adapter = :inline}.not_to raise_error }
         it { expect{child_class.perform_later}.not_to raise_error }
@@ -177,6 +190,16 @@ RSpec.describe ApplicationJob, type: :job do
         context 'when stopped' do
           before { job_wrapper_instance.stop }
           it { expect{child_class.perform_later}.to change{child_class_queue.message_count}.by(1) }
+          context 'creates one Sneakers::Publisher' do
+            before { expect(Sneakers::Publisher).to receive(:new).and_call_original }
+            it 'when called once' do
+              expect{child_class.perform_later}.not_to raise_error
+            end
+            it 'when called twice' do
+              expect{child_class.perform_later}.not_to raise_error
+              expect{child_class.perform_later}.not_to raise_error
+            end
+          end
         end
       end
     end
