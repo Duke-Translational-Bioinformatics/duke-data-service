@@ -22,6 +22,7 @@ RSpec.describe MessageLogWorker do
       id: Faker::Number.digit
     } }
     let(:metadata) { :baz }
+    let(:index_name) { 'queue_messages' }
     let(:method) { subject.work_with_params(message, delivery_info, metadata) }
     let(:ack) { subject.ack! }
     it { expect(ack).not_to be_nil }
@@ -30,6 +31,7 @@ RSpec.describe MessageLogWorker do
       include_context 'with a single document indexed'
 
       it { expect(method).to eq ack }
+      it { expect(document["_index"]).to eq(index_name) }
       it { expect(document["_type"]).to eq(routing_key) }
     end
   end

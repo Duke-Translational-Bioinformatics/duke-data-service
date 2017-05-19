@@ -4,7 +4,7 @@ class MessageLogWorker
 
   def work_with_params(msg, delivery_info, metadata)
     Elasticsearch::Model.client.index({
-      index: 'foobie',
+      index: 'queue_messages',
       type: delivery_info[:routing_key],
       body: {
         message: 'blah blah blah'
