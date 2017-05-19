@@ -15,7 +15,12 @@ RSpec.describe MessageLogWorker do
 
   describe '#work_with_params' do
     let(:message) { Faker::Lorem.words(5) }
-    let(:delivery_info) { {exchange: Faker::Internet.slug, id: Faker::Number.digit} }
+    let(:routing_key) { Faker::Internet.slug }
+    let(:delivery_info) { {
+      exchange: Faker::Internet.slug,
+      routing_key: routing_key,
+      id: Faker::Number.digit
+    } }
     let(:metadata) { :baz }
     let(:method) { subject.work_with_params(message, delivery_info, metadata) }
     let(:ack) { subject.ack! }
@@ -25,6 +30,7 @@ RSpec.describe MessageLogWorker do
       include_context 'with a single document indexed'
 
       it { expect(method).to eq ack }
+      it { expect(document["_type"]).to eq(routing_key) }
     end
   end
 end
