@@ -3,13 +3,13 @@ class MessageLogWorker
   from_queue 'message_log'
 
   def work_with_params(msg, delivery_info, metadata)
-    Rails.logger.info({
-      MESSAGE_LOG: {
-        message: msg,
-        delivery_info: delivery_info,
-        metadata: metadata
+    Elasticsearch::Model.client.index({
+      index: 'foobie',
+      type: 'barbaz',
+      body: {
+        message: 'blah blah blah'
       }
-    }.to_json)
+    })
     ack!
   end
 end

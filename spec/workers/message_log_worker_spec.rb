@@ -17,21 +17,14 @@ RSpec.describe MessageLogWorker do
     let(:message) { Faker::Lorem.words(5) }
     let(:delivery_info) { {exchange: Faker::Internet.slug, id: Faker::Number.digit} }
     let(:metadata) { :baz }
-    let(:method_call) { subject.work_with_params(message, delivery_info, metadata) }
+    let(:method) { subject.work_with_params(message, delivery_info, metadata) }
     let(:ack) { subject.ack! }
     it { expect(ack).not_to be_nil }
-    it { expect(method_call).to eq ack }
 
-    let(:log_message) {{
-      MESSAGE_LOG: {
-        message: message,
-        delivery_info: delivery_info,
-        metadata: metadata
-      }
-    }.to_json}
-    it 'calls Rails.logger' do
-      expect(Rails.logger).to receive(:info).with(log_message)
-      expect{method_call}.not_to raise_error
+    it_behaves_like 'an elasticsearch indexer' do
+      include_context 'with a single document indexed'
+
+      it { expect(method).to eq ack }
     end
   end
 end
