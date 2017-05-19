@@ -14,15 +14,27 @@ RSpec.describe MessageLogWorker do
   it { is_expected.to respond_to(:work_with_params).with(3).arguments }
 
   describe '#work_with_params' do
-    let(:message) { Faker::Lorem.words(5) }
+    let(:message) { {job_info: Faker::Lorem.words(5)} }
     let(:routing_key) { Faker::Internet.slug }
-    let(:delivery_info) { {
+    let(:delivery_info) { expected_delivery_info }
+    let(:expected_delivery_info) { {
       exchange: Faker::Internet.slug,
       routing_key: routing_key,
-      id: Faker::Number.digit
+      delivery_tag: Faker::Number.digit
     } }
-    let(:metadata) { :baz }
+    let(:metadata) {{
+      content_type: Faker::File.mime_type,
+      delivery_mode: Faker::Number.digit,
+      priority: Faker::Number.digit
+    }}
     let(:index_name) { 'queue_messages' }
+    let(:log_message) {{
+      'message' => {
+        'payload' => message.to_json,
+        'delivery_info' => expected_delivery_info.to_json,
+        'properties' => metadata.to_json
+      }
+    }}
     let(:method) { subject.work_with_params(message, delivery_info, metadata) }
     let(:ack) { subject.ack! }
     it { expect(ack).not_to be_nil }
@@ -33,6 +45,13 @@ RSpec.describe MessageLogWorker do
       it { expect(method).to eq ack }
       it { expect(document["_index"]).to eq(index_name) }
       it { expect(document["_type"]).to eq(routing_key) }
+      it { expect(document["_source"]).to eq(log_message) }
+
+      context 'with extra delivery_info' do
+        let(:delivery_info) { expected_delivery_info.merge({connection: 'x'}) }
+
+        it { expect(document["_source"]).to eq(log_message) }
+      end
     end
   end
 end
