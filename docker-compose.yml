@@ -37,6 +37,7 @@ services:
     image: elasticsearch:2.4
     ports:
       - '9200:9200'
+    command: elasticsearch --action.auto_create_index=0
   rabbitmq:
     hostname: rabbitmq.host
     container_name: rabbitmq
