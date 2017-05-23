@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ElasticsearchResponseSerializer, type: :serializer do
+RSpec.describe DeprecatedElasticsearchResponseSerializer, type: :serializer do
   let(:policy_scope) { Proc.new {|scope| scope } }
   let(:elastic_query) {
     {
@@ -11,7 +11,7 @@ RSpec.describe ElasticsearchResponseSerializer, type: :serializer do
       }
     }
   }
-  let(:indices) { ElasticsearchResponse.indexed_models }
+  let(:indices) { DeprecatedElasticsearchResponse.indexed_models }
 
   let(:indexed_data_file) {
     FactoryGirl.create(:data_file, name: "foo")
@@ -21,7 +21,7 @@ RSpec.describe ElasticsearchResponseSerializer, type: :serializer do
   }
 
   let(:resource) {
-    ElasticsearchResponse.new(
+    DeprecatedElasticsearchResponse.new(
       query: elastic_query,
       indices: indices,
       policy_scope: policy_scope

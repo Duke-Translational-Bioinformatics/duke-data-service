@@ -1,6 +1,6 @@
 def create_indices
   current_indices = DataFile.__elasticsearch__.client.cat.indices
-  ElasticsearchResponse.indexed_models.each do |indexed_model|
+  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
     if current_indices.include? indexed_model.index_name
       indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
     end
@@ -20,7 +20,7 @@ end
 
 def index_documents
   batch_size = 500
-  ElasticsearchResponse.indexed_models.each do |indexed_model|
+  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
     indexed_model.paginates_per batch_size
     (1 .. indexed_model.page.total_pages).each do |page_num|
       current_batch = indexed_model
@@ -60,7 +60,7 @@ end
 
 def drop_indices
   current_indices = DataFile.__elasticsearch__.client.cat.indices
-  ElasticsearchResponse.indexed_models.each do |indexed_model|
+  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
     if current_indices.include? indexed_model.index_name
       indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
     end

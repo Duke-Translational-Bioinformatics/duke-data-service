@@ -8,7 +8,7 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
 
   around :each do |example|
     current_indices = DataFile.__elasticsearch__.client.cat.indices
-    ElasticsearchResponse.indexed_models.each do |indexed_model|
+    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
       if current_indices.include? indexed_model.index_name
         indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
       end
@@ -31,13 +31,13 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
       expect(persisted_record).to be_persisted
     end
 
-    ElasticsearchResponse.indexed_models.each do |indexed_model|
+    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
       indexed_model.__elasticsearch__.refresh_index!
     end
 
     example.run
 
-    ElasticsearchResponse.indexed_models.each do |indexed_model|
+    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
       indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
     end
   end
