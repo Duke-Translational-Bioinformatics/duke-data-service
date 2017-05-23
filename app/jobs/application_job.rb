@@ -12,6 +12,15 @@ class ApplicationJob < ActiveJob::Base
     end
   end
 
+  rescue_from(ActiveJob::DeserializationError) do |e|
+    if self.queue_name == 'deserialization_error_retry'
+      raise e
+    else
+      self.queue_name = 'deserialization_error_retry'
+      self.perform_now
+    end
+  end
+
   def self.distributor_exchange_name
     'active_jobs'
   end

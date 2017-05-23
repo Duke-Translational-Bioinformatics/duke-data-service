@@ -90,7 +90,7 @@ RSpec.describe ApplicationJob, type: :job do
       Object.const_set(child_class_name, Class.new(described_class) do
         queue_as klass_queue_name
         @run_count = 0
-        def perform
+        def perform(an_arg=nil)
           self.class.run_count = self.class.run_count.next
         end
         def self.run_count=(val)
@@ -129,6 +129,23 @@ RSpec.describe ApplicationJob, type: :job do
       context 'after perform_now call' do
         before { child_class.perform_now }
         it { expect(child_class.run_count).to eq 1 }
+      end
+      context 'when RecordNotFound raised' do
+        let(:user) { FactoryGirl.create(:user) }
+        let(:job) { child_class.new(user) }
+        it 'retries the first time' do
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
+          expect(User).to receive(:find).and_call_original.ordered
+
+          expect{child_class.execute(job.serialize)}.not_to raise_error
+          expect(child_class.run_count).to eq 1
+        end
+        it 'fails the second time' do
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).twice
+
+          expect{child_class.execute(job.serialize)}.to raise_error(ActiveJob::DeserializationError)
+          expect(child_class.run_count).to eq 0
+        end
       end
     end
 
