@@ -102,7 +102,7 @@ Results will be sorted by `created_on` in descending order.
 	      			"name": "GCB command line tool"
 	      		}
 	       }, 
-	       "object": {
+	       "source_object": {
 				"kind": "dds-file-version",
 	  			"id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
 	  			"file": {
