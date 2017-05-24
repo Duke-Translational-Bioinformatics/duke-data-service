@@ -148,13 +148,15 @@ RSpec.describe ApplicationJob, type: :job do
     describe '::execute' do
       let(:job) { child_class.new }
       let(:job_data) { job.serialize }
+      let(:retry_interval) { Faker::Number.between(1,10) }
       it { expect{child_class.execute(job_data)}.not_to raise_error }
       context 'when RecordNotFound raised' do
         let(:user) { FactoryGirl.create(:user) }
         let(:job) { child_class.new(user) }
         before(:each) do
+          described_class.deserialization_error_retry_interval = retry_interval
           expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
-          expect(child_class).to receive(:wait).with(1).ordered
+          expect(child_class).to receive(:wait).with(retry_interval).ordered
         end
 
         it 'retries the first time' do

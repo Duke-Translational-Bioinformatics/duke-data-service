@@ -17,7 +17,7 @@ class ApplicationJob < ActiveJob::Base
       raise e
     else
       @deserialization_error_retried = true
-      self.class.wait 1
+      self.class.wait ApplicationJob.deserialization_error_retry_interval
       self.perform_now
     end
   end
