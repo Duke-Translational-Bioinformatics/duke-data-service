@@ -13,10 +13,10 @@ class ApplicationJob < ActiveJob::Base
   end
 
   rescue_from(ActiveJob::DeserializationError) do |e|
-    if self.queue_name == 'deserialization_error_retry'
+    if @deserialization_error_retried
       raise e
     else
-      self.queue_name = 'deserialization_error_retry'
+      @deserialization_error_retried = true
       self.perform_now
     end
   end
