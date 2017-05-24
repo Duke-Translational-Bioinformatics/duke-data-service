@@ -124,6 +124,18 @@ RSpec.describe ApplicationJob, type: :job do
 
     it { expect{child_class.perform_now}.not_to raise_error }
 
+    describe '::deserialization_error_retry_interval' do
+      let(:interval) { Faker::Number.digit }
+      it { expect(described_class).to respond_to(:deserialization_error_retry_interval=).with(1).argument }
+      it { expect(described_class).to respond_to(:deserialization_error_retry_interval) }
+      it { expect(described_class.deserialization_error_retry_interval).to eq(1) }
+      it 'stores the interval string and returns integer' do
+        described_class.deserialization_error_retry_interval = interval
+        expect(interval).to be_a String
+        expect(described_class.deserialization_error_retry_interval).to eq(interval.to_i)
+      end
+    end
+
     describe '::wait' do
       it { expect(described_class).to respond_to(:wait).with(1).argument }
       it 'calls sleep with argument' do

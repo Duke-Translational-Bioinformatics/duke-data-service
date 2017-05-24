@@ -22,6 +22,14 @@ class ApplicationJob < ActiveJob::Base
     end
   end
 
+  def self.deserialization_error_retry_interval=(val)
+    @deserialization_error_retry_interval = Integer(val)
+  end
+
+  def self.deserialization_error_retry_interval
+    @deserialization_error_retry_interval || 1
+  end
+
   def self.wait(interval)
     sleep interval
   end
