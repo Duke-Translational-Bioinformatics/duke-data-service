@@ -123,29 +123,48 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(child_class.queue_name).to eq(prefixed_queue_name) }
 
     it { expect{child_class.perform_now}.not_to raise_error }
+
+    describe '::wait' do
+      it { expect(described_class).to respond_to(:wait).with(1).argument }
+      it 'calls sleep with argument' do
+        interval = 5
+        expect(described_class).to receive(:sleep).with(interval)
+        expect{described_class.wait(interval)}.not_to raise_error
+      end
+    end
+
+    describe '::execute' do
+      let(:job) { child_class.new }
+      let(:job_data) { job.serialize }
+      it { expect{child_class.execute(job_data)}.not_to raise_error }
+      context 'when RecordNotFound raised' do
+        let(:user) { FactoryGirl.create(:user) }
+        let(:job) { child_class.new(user) }
+        before(:each) do
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
+          expect(child_class).to receive(:wait).with(1).ordered
+        end
+
+        it 'retries the first time' do
+          expect(User).to receive(:find).and_call_original.ordered
+          expect(child_class).to receive(:run_count=).ordered
+
+          child_class.execute(job_data)
+        end
+        it 'fails the second time' do
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
+
+          expect{child_class.execute(job_data)}.to raise_error(ActiveJob::DeserializationError)
+        end
+      end
+    end
+
     it { expect(child_class).to respond_to :run_count }
     describe '::run_count' do
       it { expect(child_class.run_count).to eq 0 }
       context 'after perform_now call' do
         before { child_class.perform_now }
         it { expect(child_class.run_count).to eq 1 }
-      end
-      context 'when RecordNotFound raised' do
-        let(:user) { FactoryGirl.create(:user) }
-        let(:job) { child_class.new(user) }
-        it 'retries the first time' do
-          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
-          expect(User).to receive(:find).and_call_original.ordered
-
-          expect{child_class.execute(job.serialize)}.not_to raise_error
-          expect(child_class.run_count).to eq 1
-        end
-        it 'fails the second time' do
-          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).twice
-
-          expect{child_class.execute(job.serialize)}.to raise_error(ActiveJob::DeserializationError)
-          expect(child_class.run_count).to eq 0
-        end
       end
     end
 
