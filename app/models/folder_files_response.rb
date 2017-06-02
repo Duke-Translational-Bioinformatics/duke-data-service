@@ -76,6 +76,7 @@ class FolderFilesResponse
   #pagination
   delegate :total_count, to: :elastic_response
   delegate :total_pages, to: :elastic_response
+  delegate :total, to: :elastic_response
   delegate :limit_value, to: :elastic_response
   delegate :current_page, to: :elastic_response
   delegate :next_page, to: :elastic_response
@@ -106,12 +107,12 @@ class FolderFilesResponse
     project_id_filter_seen = false
     @filters.each do |filter|
       filter.each do |key, filter_terms|
-        raise ArgumentError.new("filters[#{key}]is not supported") unless @@supported_filter_keys.include?(key)
+        raise ArgumentError.new("filters must be one of #{@@supported_filter_keys.join(', ')}") unless @@supported_filter_keys.include?(key)
         raise ArgumentError.new("filters[] value must be a list") unless filter_terms.is_a? Array
 
         if key == 'kind'
           filter_terms.each do |filter_term|
-            raise ArgumentError.new("filters[] kind #{filter_term} is not supported") unless @@supported_filter_kinds.include?(filter_term)
+            raise ArgumentError.new("filters[] kind must be one of #{@@supported_filter_kinds.join(', ')}") unless @@supported_filter_kinds.include?(filter_term)
           end
         end
         project_id_filter_seen = true if (key == 'project.id')
@@ -126,10 +127,10 @@ class FolderFilesResponse
       raise ArgumentError.new('aggs must be a list') unless @aggs.is_a? Array
       @aggs.each do |agg|
         raise ArgumentError.new("aggs[].field is required") unless agg.has_key?(:field)
-        raise ArgumentError.new("aggs[].field #{agg[:field]} is not supported") unless @@supported_agg_fields.include?(agg[:field])
+        raise ArgumentError.new("aggs[].field must be one of #{@@supported_agg_fields.join(', ')}") unless @@supported_agg_fields.include?(agg[:field])
         raise ArgumentError.new("aggs[].name is required") unless agg.has_key?(:name)
         raise ArgumentError.new('aggs[].size must be at least 20 and at most 50') if agg.has_key?(:size) && agg[:size].to_i < 20
-        raise ArgumentError.new('agg[].size must be at least 20 and at most 50') if agg.has_key?(:size) && agg[:size].to_i > 50
+        raise ArgumentError.new('aggs[].size must be at least 20 and at most 50') if agg.has_key?(:size) && agg[:size].to_i > 50
         @aggs_fields << agg[:field]
       end
     end
@@ -140,9 +141,7 @@ class FolderFilesResponse
       raise ArgumentError.new("query_string.fields is not allowed without query_string.query") unless @query_string.has_key?(:query)
 
       @query_string[:fields].each do |qf|
-        if !@@supported_query_string_fields.include?(qf)
-          raise ArgumentError.new("query_string.field #{qf} is not supported")
-        end
+        raise ArgumentError.new("query_string.field must be one of #{@@supported_query_string_fields.join(', ')}") unless @@supported_query_string_fields.include?(qf)
       end
     end
   end
@@ -153,7 +152,7 @@ class FolderFilesResponse
       raise ArgumentError.new("post_filters must be a list") unless @post_filters.is_a? Array
       @post_filters.each do |post_filter|
         key = post_filter.keys.first
-        raise ArgumentError.new("post_filters[#{key}] is not supported") unless @@supported_agg_fields.include?(key)
+        raise ArgumentError.new("post_filters key must be one of #{@@supported_agg_fields.join(', ')}") unless @@supported_agg_fields.include?(key)
         raise ArgumentError.new("post_filters[#{key}] must be accompanied by aggs[].field #{key}") unless @aggs_fields.include?(key)
       end
     end
