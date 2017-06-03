@@ -12,6 +12,7 @@ describe DDS::V1::AuthProvidersAPI do
 
   describe 'authentication providers collection' do
     let(:url) { "/api/v1/auth_providers" }
+    let(:payload) {{}}
 
     it_behaves_like 'a GET request' do
       let(:expected_resources) { auth_providers }
@@ -46,6 +47,7 @@ describe DDS::V1::AuthProvidersAPI do
 
   describe 'authentication provider instance' do
     let(:url) { "/api/v1/auth_providers/#{resource_id}" }
+    let(:payload) {{}}
     let(:resource_id) { resource.id }
 
     context 'duke_authentication_service' do
