@@ -7,9 +7,8 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
   }
 
   around :each do |example|
-    current_indices = DataFile.__elasticsearch__.client.cat.indices
     DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-      if current_indices.include? indexed_model.index_name
+      if Elasticsearch::Model.client.indices.exists? index: indexed_model.index_name
         indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
       end
       indexed_model.__elasticsearch__.client.indices.create(
@@ -38,7 +37,9 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
     example.run
 
     DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-      indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+      if Elasticsearch::Model.client.indices.exists? index: indexed_model.index_name
+        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
+      end
     end
   end
 end
