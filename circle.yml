@@ -46,6 +46,7 @@ deployment:
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-dev'
+    - heroku run config:unset RECREATE_SEARCH_MAPPINGS
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -59,6 +60,7 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-uatest'
+    - heroku run config:unset RECREATE_SEARCH_MAPPINGS
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -71,3 +73,4 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'
+    - heroku run config:unset RECREATE_SEARCH_MAPPINGS
