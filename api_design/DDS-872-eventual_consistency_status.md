@@ -57,9 +57,13 @@ This design introduces a `code` property into the standadard DDS error response 
 
 For responses in which a code is not relevant or has not been implemented yet, the following will be returned for the `code` property:`"code": "not_provided"`.
 
-We need to remove the following potential exception from the apidocs/swagger for PUST /uploads
+We need to remove the following potential exception from the apidocs/swagger for `PUT /uploads/:id/complete`
 [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
 [500, 'Unexpected StorageProviderException experienced']
+
+We should change the success response to [`202: Accepted`](https://httpstatuses.com/202) for the following endpoints:
+`PUT /uploads/:id/complete`
+`POST /projects`
 
 ## Process View
 
