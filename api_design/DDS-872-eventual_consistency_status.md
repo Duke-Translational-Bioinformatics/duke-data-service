@@ -12,7 +12,7 @@ N/A
 
 #### Background
 
-The DDS API will transition to an eventual consistencey model, due to the distributed nature of the data systems supporting the API. This means that the result of an API command that modifies a resource may not be immediately visible to all subsequent API commands.
+The DDS API will transition to an eventual consistency model, due to the distributed nature of the data systems supporting the API. This means that the result of an API command that modifies a resource may not be immediately visible to all subsequent API commands, and some actions may not be possible until an object has achieved consistency.
 
 #### Clients and Eventual Consistency
 
@@ -24,6 +24,13 @@ Endpoints impacted by eventual consistency will be extended to include a respons
  `GET /files/{id}/url`
 
  `GET /file_versions/{id)/url`
+
+In addition, requests to complete uploads for files and file_versions will no longer
+immediately return a Resource Integrity Exception when the reported chunk hash/size does
+not match that computed by the external StorageProvider. This status for an upload will
+now be made eventually consistent, such that the exception can now only occur on attempts
+to access the url endpoints above for a resource that is consistent and has a reported
+integrity exception.
 
 ###### New Response Messages
 * 404: Resource not consistent
@@ -61,7 +68,7 @@ We need to remove the following potential exception from the apidocs/swagger for
 [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
 [500, 'Unexpected StorageProviderException experienced']
 
-We should change the success response to [`202: Accepted`](https://httpstatuses.com/202) for the following endpoints:
+We will change the success response to [`202: Accepted`](https://httpstatuses.com/202) for the following endpoints:
 `PUT /uploads/:id/complete`
 `POST /projects`
 
