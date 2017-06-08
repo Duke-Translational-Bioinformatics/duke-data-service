@@ -31,7 +31,7 @@ class FolderFilesResponse
   def self.default_agg_size
     @@default_agg_size
   end
-  
+
   def initialize
     @filters = []
     @query_string = nil
@@ -110,17 +110,23 @@ class FolderFilesResponse
       raise ArgumentError.new("project.id filter is required")
     end
     project_id_filter_seen = false
+    kind_filter_seen = false
     @filters.each do |filter|
       filter.each do |key, filter_terms|
         raise ArgumentError.new("filters must be one of #{@@supported_filter_keys.join(', ')}") unless @@supported_filter_keys.include?(key)
         raise ArgumentError.new("filters[] value must be a list") unless filter_terms.is_a? Array
 
         if key == 'kind'
+          raise ArgumentError.new('filters[] can have at most one project.id or kind entry') if kind_filter_seen
           filter_terms.each do |filter_term|
             raise ArgumentError.new("filters[] kind must be one of #{@@supported_filter_kinds.join(', ')}") unless @@supported_filter_kinds.include?(filter_term)
           end
+          kind_filter_seen = true
         end
-        project_id_filter_seen = true if (key == 'project.id')
+        if (key == 'project.id')
+          raise ArgumentError.new('filters[] can have at most one project.id or kind entry') if project_id_filter_seen
+          project_id_filter_seen = true
+        end
       end
     end
     raise ArgumentError.new("filters[project.id] is required") unless project_id_filter_seen
@@ -155,10 +161,13 @@ class FolderFilesResponse
     if @post_filters
       raise ArgumentError.new("post_filters must be used with aggs") unless @aggs && !@aggs.empty?
       raise ArgumentError.new("post_filters must be a list") unless @post_filters.is_a? Array
+      field_seen = {}
       @post_filters.each do |post_filter|
         key = post_filter.keys.first
+        raise ArgumentError.new('post_filters[] can have at most one #{key} entry') if field_seen[key]
         raise ArgumentError.new("post_filters key must be one of #{@@supported_agg_fields.join(', ')}") unless @@supported_agg_fields.include?(key)
         raise ArgumentError.new("post_filters[#{key}] must be accompanied by aggs[].field #{key}") unless @aggs_fields.include?(key)
+        field_seen[key] = true
       end
     end
   end

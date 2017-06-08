@@ -197,7 +197,6 @@ RSpec.describe FolderFilesResponse do
         response = subject.search
         chained = response.page(1).per(1).padding(1)
         expect(chained).to eq(response)
-        expect(chained).to eq(response)
         expect(chained.total_count).to eq(chained.elastic_response.total_count)
         expect(chained.total_pages).to eq(chained.elastic_response.total_pages)
         expect(chained.limit_value).to eq(chained.elastic_response.limit_value)
@@ -227,6 +226,23 @@ RSpec.describe FolderFilesResponse do
       }
     end
 
+    context 'duplicate \'project.id\'' do
+      let(:duplicate_project_filter) {
+        [
+          all_projects,
+          all_projects
+        ]
+      }
+
+      it {
+        subject.filter(duplicate_project_filter)
+        is_expected.not_to receive(:search_definition)
+        expect{
+          subject.search
+        }.to raise_error(ArgumentError)
+      }
+    end
+
     describe 'kind' do
       context 'unsupported kind' do
         let(:kind_filter) {
@@ -238,6 +254,24 @@ RSpec.describe FolderFilesResponse do
 
         it {
           subject.filter(kind_filter)
+          is_expected.not_to receive(:search_definition)
+          expect {
+            subject.search
+          }.to raise_error(ArgumentError)
+        }
+      end
+
+      context 'duplicate kind' do
+        let(:duplicate_kind_filter) {
+          [
+            all_projects,
+            {"kind" => ["dds-folder"]},
+            {"kind" => ["dds-fille"]}
+          ]
+        }
+
+        it {
+          subject.filter(duplicate_kind_filter)
           is_expected.not_to receive(:search_definition)
           expect {
             subject.search
@@ -772,6 +806,54 @@ RSpec.describe FolderFilesResponse do
       }
       let(:post_filters) {
         [
+          {"tags.label" => [Faker::Beer.hop] }
+        ]
+      }
+
+      before do
+        subject.filter([all_projects])
+        subject.aggregate(aggs)
+        subject.post_filter(post_filters)
+      end
+      it {
+        is_expected.not_to receive(:search_definition)
+        expect {
+          subject.search
+        }.to raise_error(ArgumentError)
+      }
+    end
+
+    context 'duplicate project.name' do
+      let(:aggs) {
+        [{field: 'project.name', name: 'project_names'}]
+      }
+      let(:post_filters) {
+        [
+          {"project.name" => [indexed_folder.project.name] },
+          {"project.name" => [indexed_folder.project.name] }
+        ]
+      }
+
+      before do
+        subject.filter([all_projects])
+        subject.aggregate(aggs)
+        subject.post_filter(post_filters)
+      end
+      it {
+        is_expected.not_to receive(:search_definition)
+        expect {
+          subject.search
+        }.to raise_error(ArgumentError)
+      }
+    end
+
+    context 'duplicate tags.label' do
+      let(:aggs) {
+        [{field: 'tags.label', name: 'tag_names'}]
+      }
+      let(:post_filters) {
+        [
+          {"tags.label" => [Faker::Beer.hop] },
           {"tags.label" => [Faker::Beer.hop] }
         ]
       }
