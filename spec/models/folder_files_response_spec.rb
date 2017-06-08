@@ -78,6 +78,12 @@ RSpec.describe FolderFilesResponse do
     }
   end
 
+  describe '::default_agg_size' do
+    let (:expected_default_agg_size) { 20 }
+    it { expect(described_class).to respond_to(:default_agg_size) }
+    it { expect(described_class.default_agg_size).to eq(expected_default_agg_size) }
+  end
+
   describe '#filter' do
     it { is_expected.to respond_to(:filter).with(0).arguments }
     it {
@@ -522,7 +528,7 @@ RSpec.describe FolderFilesResponse do
                 field_name => {
                   terms: {
                     field: "#{supported_agg_field}.raw",
-                    size: 20
+                    size: described_class.default_agg_size
                   }
                 }
               }
@@ -587,7 +593,7 @@ RSpec.describe FolderFilesResponse do
             field_name => {
               terms: {
                 field: "#{field}.raw",
-                size: 20
+                size: described_class.default_agg_size
               }
             }
           }
@@ -608,7 +614,6 @@ RSpec.describe FolderFilesResponse do
     end
 
     context 'size' do
-      let(:default_size) { 20 }
       let(:field_name) { Faker::Beer.hop }
       let(:field) { described_class.supported_agg_fields.first }
 
@@ -634,7 +639,7 @@ RSpec.describe FolderFilesResponse do
             field_name => {
               terms: {
                 field: "#{field}.raw",
-                size: default_size
+                size: described_class.default_agg_size
               }
             }
           }
@@ -789,7 +794,7 @@ RSpec.describe FolderFilesResponse do
         "project.name" => {
           agg_name: 'project_name',
           value: [indexed_folder.project.name],
-          size: 20
+          size: described_class.default_agg_size
         },
         "tags.label" => {
           agg_name: 'tags',

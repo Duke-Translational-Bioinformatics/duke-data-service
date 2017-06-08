@@ -27,6 +27,11 @@ class FolderFilesResponse
     @@supported_agg_fields
   end
 
+  @@default_agg_size = 20
+  def self.default_agg_size
+    @@default_agg_size
+  end
+  
   def initialize
     @filters = []
     @query_string = nil
