@@ -10,9 +10,9 @@ N/A
 
 ## Logical View
 
-#### Background 
+#### Background
 
-The DDS API will transition to an eventual consistencey model, due to the distributed nature of the data systems supporting the API. This means that the result of an API command that modifies a resource may not be immediately visible to all subsequent API commands. 
+The DDS API will transition to an eventual consistencey model, due to the distributed nature of the data systems supporting the API. This means that the result of an API command that modifies a resource may not be immediately visible to all subsequent API commands.
 
 #### Clients and Eventual Consistency
 
@@ -20,9 +20,9 @@ Endpoints impacted by eventual consistency will be extended to include a respons
 
 ###### Extended Endpoint URLs
  `POST /projects/{id}/uploads`
- 
+
  `GET /files/{id}/url`
- 
+
  `GET /file_versions/{id)/url`
 
 ###### New Response Messages
@@ -31,19 +31,39 @@ Endpoints impacted by eventual consistency will be extended to include a respons
 ###### Example `404: Resource not consistent` payload:
 
 ```
-{ 
+{
 	"error": 404,
 	"code": "resource_not_consistent",
 	"reason": "resource changes are still being processed by system"
 	"suggestion": "this is a temporary state that will eventually be resolved by the system; please retry request"
 }
 ```
- 
+
+* 400: Resource Integrity Exception
+
+###### Example `400: Resource Integrity Exception` payload:
+
+```
+{
+  "error": 400,
+  "reason": "reported chunk hash/size does not match that computed by StorageProvider",
+  "suggestion": "You must begin a new upload process"
+}
+```
+
 ## Implementation View
 
 This design introduces a `code` property into the standadard DDS error response that allows clients to differentiate responses that have the same HTTP response status code/number.
 
 For responses in which a code is not relevant or has not been implemented yet, the following will be returned for the `code` property:`"code": "not_provided"`.
+
+We need to remove the following potential exception from the apidocs/swagger for `PUT /uploads/:id/complete`
+[400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
+[500, 'Unexpected StorageProviderException experienced']
+
+We should change the success response to [`202: Accepted`](https://httpstatuses.com/202) for the following endpoints:
+`PUT /uploads/:id/complete`
+`POST /projects`
 
 ## Process View
 
