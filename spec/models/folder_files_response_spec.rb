@@ -266,7 +266,7 @@ RSpec.describe FolderFilesResponse do
           [
             all_projects,
             {"kind" => ["dds-folder"]},
-            {"kind" => ["dds-fille"]}
+            {"kind" => ["dds-file"]}
           ]
         }
 
