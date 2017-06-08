@@ -20,6 +20,7 @@ describe DDS::V1::ProjectsAPI do
 
   describe 'Project collection' do
     let(:url) { "/api/v1/projects" }
+    let(:payload) {{}}
 
     it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
@@ -38,8 +39,8 @@ describe DDS::V1::ProjectsAPI do
     end
 
     describe 'POST' do
-      subject { post(url, params: payload.to_json, headers: headers) }
-      let(:called_action) { "POST" }
+      # subject { post(url, params: payload.to_json, headers: headers) }
+      # let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name,
         description: resource.description
@@ -47,54 +48,38 @@ describe DDS::V1::ProjectsAPI do
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
-        it_behaves_like 'a creatable resource' do
-          let(:resource) { project_stub }
-          it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
-            expect {
-              is_expected.to eq(201)
-            }.to change{ ProjectPermission.count }.by(1)
-            response_json = JSON.parse(response.body)
-            expect(response_json).to have_key('id')
-            new_object = resource_class.find(response_json['id'])
-            expect(new_object.creator_id).to eq(current_user.id)
-            project_admin_role = AuthRole.where(id: 'project_admin').first
-            project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
-            expect(project_admin_permission).to be
+        it_behaves_like 'a POST request' do
+          it_behaves_like 'a creatable resource' do
+            let(:resource) { project_stub }
+            it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
+              expect {
+                is_expected.to eq(201)
+              }.to change{ ProjectPermission.count }.by(1)
+              response_json = JSON.parse(response.body)
+              expect(response_json).to have_key('id')
+              new_object = resource_class.find(response_json['id'])
+              expect(new_object.creator_id).to eq(current_user.id)
+              project_admin_role = AuthRole.where(id: 'project_admin').first
+              project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
+              expect(project_admin_permission).to be
+            end
           end
-        end
 
-        it_behaves_like 'an authenticated resource'
+          it_behaves_like 'an authenticated resource'
 
-        it_behaves_like 'a validated resource' do
-          let!(:payload) {{
-            name: resource.name,
-            description: nil
-          }}
-          it 'should not persist changes' do
-            expect(resource).to be_persisted
-            expect {
-              is_expected.to eq(400)
-            }.not_to change{resource_class.count}
+          it_behaves_like 'a validated resource' do
+            let!(:payload) {{
+              name: resource.name,
+              description: nil
+            }}
+            it 'should not persist changes' do
+              expect(resource).to be_persisted
+              expect {
+                is_expected.to eq(400)
+              }.not_to change{resource_class.count}
+            end
           end
-        end
 
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:resource) { project_stub }
-          let(:expected_response_status) { 201 }
-          let(:expected_audits) { 2 }
-        end
-
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:resource) { project_stub }
-          let(:expected_auditable_type) { ProjectPermission }
-          let(:expected_response_status) { 201 }
-          let(:audit_should_include) {
-            {user: current_user, audited_parent: 'Project'}
-          }
-        end
-        it_behaves_like 'a software_agent accessible resource' do
-          let(:resource) { project_stub }
-          let(:expected_response_status) { 201 }
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource) { project_stub }
             let(:expected_response_status) { 201 }
@@ -106,26 +91,29 @@ describe DDS::V1::ProjectsAPI do
             let(:expected_auditable_type) { ProjectPermission }
             let(:expected_response_status) { 201 }
             let(:audit_should_include) {
-              {user: current_user, audited_parent: 'Project', software_agent: software_agent}
+              {user: current_user, audited_parent: 'Project'}
             }
+          end
+          it_behaves_like 'a software_agent accessible resource' do
+            let(:resource) { project_stub }
+            let(:expected_response_status) { 201 }
+            it_behaves_like 'an annotate_audits endpoint' do
+              let(:resource) { project_stub }
+              let(:expected_response_status) { 201 }
+              let(:expected_audits) { 2 }
+            end
+
+            it_behaves_like 'an annotate_audits endpoint' do
+              let(:resource) { project_stub }
+              let(:expected_auditable_type) { ProjectPermission }
+              let(:expected_response_status) { 201 }
+              let(:audit_should_include) {
+                {user: current_user, audited_parent: 'Project', software_agent: software_agent}
+              }
+            end
           end
         end
       end
-
-      # this test does not work because the after_commit on: :create
-      # callback does not play well with transactional fixtures
-      # http://apidock.com/rails/ActiveRecord/Transactions/ClassMethods/after_commit
-      # context 'with inline ActiveJob', :vcr do
-      #   before do
-      #     ActiveJob::Base.queue_adapter = :inline
-      #   end
-      #
-      #   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-      #   it_behaves_like 'a creatable resource' do
-      #     let(:resource) { project_stub }
-      #     it_behaves_like 'a storage_provider backed resource'
-      #   end
-      # end
     end
   end
 
@@ -134,42 +122,45 @@ describe DDS::V1::ProjectsAPI do
     let(:resource_id) { resource.id }
 
     describe 'GET' do
-      subject { get(url, headers: headers) }
+      let(:payload) {{}}
 
-      it_behaves_like 'a viewable resource'
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a viewable resource'
 
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
-      it_behaves_like 'an identified resource' do
-        let(:resource_id) { "doesNotExist" }
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { "doesNotExist" }
+        end
       end
     end
 
     describe 'PUT' do
-      subject { put(url, params: payload.to_json, headers: headers) }
-      let(:called_action) { 'PUT' }
       let(:payload) {{
         name: project_stub.name,
         description: project_stub.description
       }}
-      it_behaves_like 'an updatable resource'
 
-      it_behaves_like 'a validated resource' do
-        let(:payload) {{
-            name: nil,
-            description: nil,
-        }}
-      end
+      it_behaves_like 'a PUT request' do
+        it_behaves_like 'an updatable resource'
 
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
-      it_behaves_like 'an annotate_audits endpoint'
-      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'a validated resource' do
+          let(:payload) {{
+              name: nil,
+              description: nil,
+          }}
+        end
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
         it_behaves_like 'an annotate_audits endpoint'
-      end
-      it_behaves_like 'a logically deleted resource'
-      it_behaves_like 'an identified resource' do
-        let(:resource_id) { "doesNotExist" }
+        it_behaves_like 'a software_agent accessible resource' do
+          it_behaves_like 'an annotate_audits endpoint'
+        end
+        it_behaves_like 'a logically deleted resource'
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { "doesNotExist" }
+        end
       end
     end
 

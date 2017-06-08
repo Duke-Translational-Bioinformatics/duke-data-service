@@ -24,6 +24,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project_id}/uploads" }
     let(:project_id) { project.id }
+    let(:payload) {{}}
 
     #List file uploads for a project
     it_behaves_like 'a GET request' do
@@ -54,54 +55,54 @@ describe DDS::V1::UploadsAPI do
 
     #Initiate a chunked file upload for a project
     describe 'POST' do
-      subject { post(url, params: payload.to_json, headers: headers) }
-      let(:called_action) { "POST" }
       let!(:payload) {{
         name: upload_stub.name,
         content_type: upload_stub.content_type,
         size: upload_stub.size
       }}
 
-      it_behaves_like 'a creatable resource' do
-        it 'should set creator' do
-          is_expected.to eq(expected_response_status)
-          expect(new_object.creator_id).to eq(current_user.id)
+      it_behaves_like 'a POST request' do
+        it_behaves_like 'a creatable resource' do
+          it 'should set creator' do
+            is_expected.to eq(expected_response_status)
+            expect(new_object.creator_id).to eq(current_user.id)
+          end
         end
-      end
 
-      it_behaves_like 'a validated resource' do
-        let(:payload) {{
-          name: nil,
-          content_type: nil,
-          size: nil
-        }}
-        it 'should not persist changes' do
-          expect(resource).to be_persisted
-          expect {
-            is_expected.to eq(400)
-          }.not_to change{resource_class.count}
+        it_behaves_like 'a validated resource' do
+          let(:payload) {{
+            name: nil,
+            content_type: nil,
+            size: nil
+          }}
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
+          end
         end
-      end
 
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
 
-      it_behaves_like 'an identified resource' do
-        let(:project_id) { "doesNotExist" }
-        let(:resource_class) { Project }
-      end
+        it_behaves_like 'an identified resource' do
+          let(:project_id) { "doesNotExist" }
+          let(:resource_class) { Project }
+        end
 
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:expected_response_status) { 201 }
-      end
-      it_behaves_like 'a software_agent accessible resource' do
-        let(:expected_response_status) { 201 }
         it_behaves_like 'an annotate_audits endpoint' do
           let(:expected_response_status) { 201 }
         end
-      end
-      it_behaves_like 'a logically deleted resource' do
-        let(:deleted_resource) { project }
+        it_behaves_like 'a software_agent accessible resource' do
+          let(:expected_response_status) { 201 }
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:expected_response_status) { 201 }
+          end
+        end
+        it_behaves_like 'a logically deleted resource' do
+          let(:deleted_resource) { project }
+        end
       end
     end
   end
@@ -109,11 +110,10 @@ describe DDS::V1::UploadsAPI do
   describe 'Upload instance' do
     let(:url) { "/api/v1/uploads/#{resource_id}" }
     let(:resource_id) { resource.id }
+    let(:payload) {{}}
 
     #View upload details/status
-    describe 'GET' do
-      subject { get(url, headers: headers) }
-
+    it_behaves_like 'a GET request' do
       it_behaves_like 'a viewable resource'
 
       it_behaves_like 'an authenticated resource'
@@ -133,9 +133,7 @@ describe DDS::V1::UploadsAPI do
     let(:upload_id) { upload.id }
 
     describe 'PUT' do
-      subject { put(url, params: payload.to_json, headers: headers) }
-      let(:called_action) { "PUT" }
-      let!(:payload) {{
+      let(:payload) {{
         number: payload_chunk_number,
         size: chunk_stub.size,
         hash: {
@@ -144,82 +142,85 @@ describe DDS::V1::UploadsAPI do
         }
       }}
       let(:payload_chunk_number) { chunk_stub.number }
-      it_behaves_like 'a creatable resource' do
-        let(:expected_response_status) {200}
-        let(:new_object) {
-          resource_class.where(
-            upload_id: upload.id,
-            number: payload[:number],
-            size: payload[:size],
-            fingerprint_value: payload[:hash][:value],
-            fingerprint_algorithm: payload[:hash][:algorithm]
-          ).last
-        }
-      end
 
-      context 'retry' do
-        let(:resource) {
-          chunk_stub.save
-          chunk_stub
-        }
-        it_behaves_like 'an updatable resource' do
-          it 'updates the expiration on the signed url' do
-            expect(resource.updated_at).to eq(resource.created_at)
-            sleep 1
-            orig_obj = resource_serializer.new(resource).as_json
-            orig_temp_url_expires = URI.decode_www_form(URI.parse(orig_obj[:url]).query).assoc('temp_url_expires')[1]
-            is_expected.to eq(expected_response_status)
-            resource.reload
-            expect(resource.updated_at).not_to eq(resource.created_at)
-            new_obj = resource_serializer.new(resource).as_json
-            new_temp_url_expires = URI.decode_www_form(URI.parse(new_obj[:url]).query).assoc('temp_url_expires')[1]
-            expect(new_temp_url_expires).not_to eq(orig_temp_url_expires)
+      it_behaves_like 'a PUT request' do
+        it_behaves_like 'a creatable resource' do
+          let(:expected_response_status) {200}
+          let(:new_object) {
+            resource_class.where(
+              upload_id: upload.id,
+              number: payload[:number],
+              size: payload[:size],
+              fingerprint_value: payload[:hash][:value],
+              fingerprint_algorithm: payload[:hash][:algorithm]
+            ).last
+          }
+        end
+
+        context 'retry' do
+          let(:resource) {
+            chunk_stub.save
+            chunk_stub
+          }
+          it_behaves_like 'an updatable resource' do
+            it 'updates the expiration on the signed url' do
+              expect(resource.updated_at).to eq(resource.created_at)
+              sleep 1
+              orig_obj = resource_serializer.new(resource).as_json
+              orig_temp_url_expires = URI.decode_www_form(URI.parse(orig_obj[:url]).query).assoc('temp_url_expires')[1]
+              is_expected.to eq(expected_response_status)
+              resource.reload
+              expect(resource.updated_at).not_to eq(resource.created_at)
+              new_obj = resource_serializer.new(resource).as_json
+              new_temp_url_expires = URI.decode_www_form(URI.parse(new_obj[:url]).query).assoc('temp_url_expires')[1]
+              expect(new_temp_url_expires).not_to eq(orig_temp_url_expires)
+            end
           end
         end
-      end
 
-      context 'when chunk.number exists' do
-        let(:payload_chunk_number) { chunk.number }
-        it_behaves_like 'an updatable resource'
-      end
-
-      it_behaves_like 'a validated resource' do
-        let(:payload) {{
-          number: nil,
-          size: nil,
-          hash: {
-            value: nil,
-            algorithm: nil
-          }
-        }}
-        it 'should not persist changes' do
-          expect(resource).to be_persisted
-          expect {
-            is_expected.to eq(400)
-          }.not_to change{resource_class.count}
+        context 'when chunk.number exists' do
+          let(:payload_chunk_number) { chunk.number }
+          it_behaves_like 'an updatable resource'
         end
-      end
 
-      it_behaves_like 'an authenticated resource'
-      it_behaves_like 'an authorized resource'
+        it_behaves_like 'a validated resource' do
+          let(:payload) {{
+            number: nil,
+            size: nil,
+            hash: {
+              value: nil,
+              algorithm: nil
+            }
+          }}
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
+          end
+        end
 
-      it_behaves_like 'an identified resource' do
-        let(:upload_id) { "doesNotExist" }
-        let(:resource_class) {"Upload"}
-      end
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
 
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:audit_should_include) { {user: current_user, audited_parent: 'Upload'} }
-      end
-      it_behaves_like 'an annotate_audits endpoint' do
-        let(:resource_class) { Chunk }
-      end
-      it_behaves_like 'a software_agent accessible resource' do
+        it_behaves_like 'an identified resource' do
+          let(:upload_id) { "doesNotExist" }
+          let(:resource_class) {"Upload"}
+        end
+
         it_behaves_like 'an annotate_audits endpoint' do
-          let(:audit_should_include) { {user: current_user, audited_parent: 'Upload', software_agent: software_agent} }
+          let(:audit_should_include) { {user: current_user, audited_parent: 'Upload'} }
         end
         it_behaves_like 'an annotate_audits endpoint' do
           let(:resource_class) { Chunk }
+        end
+        it_behaves_like 'a software_agent accessible resource' do
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:audit_should_include) { {user: current_user, audited_parent: 'Upload', software_agent: software_agent} }
+          end
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:resource_class) { Chunk }
+          end
         end
       end
     end
