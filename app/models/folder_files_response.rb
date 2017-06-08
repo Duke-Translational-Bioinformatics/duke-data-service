@@ -217,7 +217,7 @@ class FolderFilesResponse
     if @aggs
       query[:aggs] = {}
       @aggs.each do |agg|
-        size = agg[:size] || 20
+        size = agg[:size] || @@default_agg_size
         query[:aggs][agg[:name]] = {
           terms: {
               field: "#{agg[:field]}.raw",
