@@ -28,15 +28,26 @@ RSpec.describe MessageLogQueueHandler do
   end
 
   def enqueue_message(msg, original_routing_key = routing_key)
-    gateway_exchange.publish(msg, {routing_key: original_routing_key})
+    gateway_exchange.publish(msg, {routing_key: original_routing_key, content_type: 'application/octet-stream'})
     begin
       sleep 0.1
     end while Thread.list.count {|t| t.status == "run"} > 1
     msg
   end
 
+  RSpec::Matchers.define :delivery_info_with_routing_key do |routing_key|
+      match do |actual|
+        actual && actual[:delivery_tag] && actual[:routing_key] == routing_key
+      end
+  end
+  RSpec::Matchers.define :message_meta_data_with_content_type do |content_type|
+      match do |actual|
+        actual && actual[:content_type] == content_type
+      end
+  end
+
   describe '#index_messages' do
-    before(:each) { expect(message_log_queue.message_count).to be 0 }
+    before(:each) { expect(message_log_queue.message_count).to eq 0 }
 
     it { is_expected.to respond_to(:index_messages).with(0).arguments }
 
@@ -53,7 +64,11 @@ RSpec.describe MessageLogQueueHandler do
         expect(message_log_queue.message_count).to eq queued_messages.length
         expect(MessageLogWorker).to receive(:new).and_return(message_log_worker)
         queued_messages.each do |msg|
-          expect(message_log_worker).to receive(:work_with_params).with(msg[:payload], any_args)
+          expect(message_log_worker).to receive(:work_with_params).with(
+            msg[:payload],
+            delivery_info_with_routing_key(msg[:routing_key]),
+            message_meta_data_with_content_type('application/octet-stream')
+          ).and_call_original
         end
       end
       it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }

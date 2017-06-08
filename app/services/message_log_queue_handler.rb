@@ -2,7 +2,7 @@ class MessageLogQueueHandler
   def index_messages
     worker = MessageLogWorker.new
     each_message do |msg, channel, delivery_tags|
-      worker.work_with_params(msg.last, nil, nil)
+      worker.work_with_params(msg[2], msg[0], msg[1])
       channel.ack(delivery_tags.pop)
     end
   end
