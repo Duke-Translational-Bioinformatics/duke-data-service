@@ -7,6 +7,8 @@ FactoryGirl.define do
     etag { SecureRandom.hex }
     storage_provider
     association :creator, factory: :user
+    is_consistent { true }
+    has_integrity_exception { false }
 
     trait :with_chunks do
       chunks { [ build(:chunk, number: 1) ] }
@@ -24,9 +26,20 @@ FactoryGirl.define do
       completed_at { DateTime.now }
     end
 
+    trait :inconsistent do
+      is_consistent { false }
+    end
+
     trait :with_error do
       error_at { DateTime.now }
       error_message { Faker::Lorem.sentence }
+    end
+
+    trait :with_integrity_exception do
+      is_consistent { true }
+      error_at { DateTime.now }
+      error_message { Faker::Lorem.sentence }
+      has_integrity_exception { true }
     end
 
     trait :skip_validation do

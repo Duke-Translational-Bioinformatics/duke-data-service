@@ -36,6 +36,7 @@ class Upload < ActiveRecord::Base
   end
 
   def temporary_url(filename=nil)
+    raise IntegrityException.new(error_message) if has_integrity_exception?
     expiry = Time.now.to_i + storage_provider.signed_url_duration
     filename ||= name
     storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
@@ -52,18 +53,24 @@ class Upload < ActiveRecord::Base
   end
 
   def complete
-    begin
-      transaction do
-        self.completed_at = DateTime.now
-        if save
-          response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
-          meta = storage_provider.get_object_metadata(project_id, id)
-          unless meta["content-length"].to_i == size
-            raise IntegrityException, "reported size does not match size computed by StorageProvider"
-          end
-          self
-        end
+    transaction do
+      self.completed_at = DateTime.now
+      if save
+        self
       end
+    end
+  end
+
+  def make_consistent
+    begin
+      response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
+      meta = storage_provider.get_object_metadata(project_id, id)
+      unless meta["content-length"].to_i == size
+        raise IntegrityException, "reported size does not match size computed by StorageProvider"
+      end
+      update_attributes({
+        is_consistent: true
+      })
     rescue StorageProviderException => e
       if e.message.match(/.*Etag.*Mismatch.*/)
         integrity_exception("reported chunk hash does not match that computed by StorageProvider")
@@ -81,8 +88,8 @@ class Upload < ActiveRecord::Base
     fingerprints.reload
     update_attributes({
       error_at: exactly_now,
-      error_message: message
+      error_message: message,
+      is_consistent: true
     })
-    raise IntegrityException, message
   end
 end
