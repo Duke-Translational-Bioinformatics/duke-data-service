@@ -24,11 +24,11 @@ RSpec.describe MessageLogQueueHandler do
   end
 
   def stubbed_message(payload, routing_key)
-    {payload: {'job_info' => payload}.to_json, routing_key: routing_key}
+    {payload: {'job_info' => payload}.to_json, routing_key: routing_key, content_type: Faker::File.mime_type}
   end
 
-  def enqueue_message(msg, original_routing_key = routing_key)
-    gateway_exchange.publish(msg, {routing_key: original_routing_key, content_type: 'application/octet-stream'})
+  def enqueue_message(msg, original_routing_key = routing_key, content_type = 'application/octet-stream')
+    gateway_exchange.publish(msg, {routing_key: original_routing_key, content_type: content_type})
     begin
       sleep 0.1
     end while Thread.list.count {|t| t.status == "run"} > 1
@@ -60,14 +60,14 @@ RSpec.describe MessageLogQueueHandler do
         ]
       }
       before(:each) do
-        queued_messages.each {|m| enqueue_message(m[:payload], m[:routing_key])}
+        queued_messages.each {|m| enqueue_message(m[:payload], m[:routing_key], m[:content_type])}
         expect(message_log_queue.message_count).to eq queued_messages.length
         expect(MessageLogWorker).to receive(:new).and_return(message_log_worker)
         queued_messages.each do |msg|
           expect(message_log_worker).to receive(:work_with_params).with(
             msg[:payload],
             delivery_info_with_routing_key(msg[:routing_key]),
-            message_meta_data_with_content_type('application/octet-stream')
+            message_meta_data_with_content_type(msg[:content_type])
           ).and_call_original
         end
       end
