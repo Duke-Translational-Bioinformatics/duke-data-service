@@ -7,7 +7,8 @@ RSpec.describe ProjectSerializer, type: :serializer do
     'id' => resource.id,
     'name' => resource.name,
     'description' => resource.description,
-    'is_deleted' => resource.is_deleted
+    'is_deleted' => resource.is_deleted,
+    'is_consistent' => resource.is_consistent
   }}
 
   before do
