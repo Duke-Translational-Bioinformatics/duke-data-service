@@ -2,7 +2,7 @@
 
 ## Deployment View
 
-status: proposed
+status: in progress
 
 ###### Deployment Requirements
 
@@ -53,6 +53,7 @@ integrity exception.
 ```
 {
   "error": 400,
+  "code": "not_provided",
   "reason": "reported chunk hash/size does not match that computed by StorageProvider",
   "suggestion": "You must begin a new upload process"
 }
