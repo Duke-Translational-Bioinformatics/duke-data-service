@@ -1,5 +1,6 @@
 class Upload < ActiveRecord::Base
   include RequestAudited
+  include JobTransactionable
   default_scope { order('created_at DESC') }
   audited
   belongs_to :project
@@ -37,6 +38,7 @@ class Upload < ActiveRecord::Base
 
   def temporary_url(filename=nil)
     raise IntegrityException.new(error_message) if has_integrity_exception?
+    raise ConsistencyException.new unless is_consistent?
     expiry = Time.now.to_i + storage_provider.signed_url_duration
     filename ||= name
     storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
@@ -56,6 +58,10 @@ class Upload < ActiveRecord::Base
     transaction do
       self.completed_at = DateTime.now
       if save
+        UploadCompletionJob.perform_later(
+          UploadCompletionJob.initialize_job(self),
+          self.id
+        )
         self
       end
     end

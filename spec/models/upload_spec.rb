@@ -9,6 +9,7 @@ RSpec.describe Upload, type: :model do
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
+  it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -94,6 +95,18 @@ RSpec.describe Upload, type: :model do
           }.to raise_error(IntegrityException)
         }
       end
+
+      context 'when not consistent' do
+        before do
+          expect(subject.update(is_consistent: false)).to be_truthy
+        end
+        it {
+          expect(subject.is_consistent?).to be_falsey
+          expect {
+            subject.temporary_url
+          }.to raise_error(ConsistencyException)
+        }
+      end
     end
 
     it 'should have a completed_at attribute' do
@@ -124,9 +137,9 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to respond_to :complete }
     it {
       expect(subject.completed_at).to be_nil
-      # expect {
+      expect {
         expect(subject.complete).to be_truthy
-      # }.to have_enqueued_job(UploadCompletionJob)
+      }.to have_enqueued_job(UploadCompletionJob)
       subject.reload
       expect(subject.completed_at).not_to be_nil
     }
