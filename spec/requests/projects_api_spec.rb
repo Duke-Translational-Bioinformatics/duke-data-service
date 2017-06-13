@@ -49,9 +49,10 @@ describe DDS::V1::ProjectsAPI do
       context 'with queued ActiveJob' do
         it_behaves_like 'a creatable resource' do
           let(:resource) { project_stub }
+          let(:expected_response_status) { 202 }
           it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
             expect {
-              is_expected.to eq(201)
+              is_expected.to eq(expected_response_status)
             }.to change{ ProjectPermission.count }.by(1)
             response_json = JSON.parse(response.body)
             expect(response_json).to have_key('id')
@@ -80,31 +81,31 @@ describe DDS::V1::ProjectsAPI do
 
         it_behaves_like 'an annotate_audits endpoint' do
           let(:resource) { project_stub }
-          let(:expected_response_status) { 201 }
+          let(:expected_response_status) { 202 }
           let(:expected_audits) { 2 }
         end
 
         it_behaves_like 'an annotate_audits endpoint' do
           let(:resource) { project_stub }
           let(:expected_auditable_type) { ProjectPermission }
-          let(:expected_response_status) { 201 }
+          let(:expected_response_status) { 202 }
           let(:audit_should_include) {
             {user: current_user, audited_parent: 'Project'}
           }
         end
         it_behaves_like 'a software_agent accessible resource' do
           let(:resource) { project_stub }
-          let(:expected_response_status) { 201 }
+          let(:expected_response_status) { 202 }
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource) { project_stub }
-            let(:expected_response_status) { 201 }
+            let(:expected_response_status) { 202 }
             let(:expected_audits) { 2 }
           end
 
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource) { project_stub }
             let(:expected_auditable_type) { ProjectPermission }
-            let(:expected_response_status) { 201 }
+            let(:expected_response_status) { 202 }
             let(:audit_should_include) {
               {user: current_user, audited_parent: 'Project', software_agent: software_agent}
             }
