@@ -149,16 +149,17 @@ shared_examples 'an Elasticsearch index mapping model' do |expected_property_map
   }
 end
 
-shared_examples 'an elasticsearch indexer' do |method_sym: :method|
+shared_examples 'an elasticsearch indexer' do
+  def all_elasticsearch_documents
+    expect{ elasticsearch_client.indices.flush }.not_to raise_error
+    elasticsearch_client.search["hits"]["hits"]
+  end
+
   let(:elasticsearch_client) { Elasticsearch::Model.client }
   let(:existing_documents) { elasticsearch_client.search["hits"]["hits"] }
-  let(:new_documents) { elasticsearch_client.search["hits"]["hits"] - existing_documents }
+  let(:new_documents) { all_elasticsearch_documents - existing_documents }
   before do
     expect{ existing_documents }.not_to raise_error
-    expect{ send(method_sym) }.not_to raise_error
-    expect{ elasticsearch_client.indices.flush }.not_to raise_error
-    expect{ new_documents }.not_to raise_error
-    expect(new_documents).not_to be_empty
   end
   after do
     new_documents.each do |d|
@@ -172,9 +173,9 @@ shared_examples 'an elasticsearch indexer' do |method_sym: :method|
 end
 
 shared_context 'with a single document indexed' do
-  let(:document) { new_documents.first }
-  before do
+  let(:document) do
     expect(new_documents.length).to eq(1)
-    expect(document).not_to be_nil
+    expect(new_documents.first).not_to be_nil
+    new_documents.first
   end
 end
