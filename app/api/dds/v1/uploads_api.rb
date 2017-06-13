@@ -25,7 +25,7 @@ module DDS
             authenticate!
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
-            consistent? project
+            check_consistency! project
             storage_provider = StorageProvider.first
             upload = project.uploads.build({
               name: upload_params[:name],

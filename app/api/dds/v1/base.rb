@@ -167,8 +167,12 @@ module DDS
           end
         end
 
-        def consistent?(object)
+        def check_consistency!(object)
           raise ConsistencyException.new unless object.is_consistent?
+        end
+
+        def check_integrity!(upload)
+          raise IntegrityException.new(upload.error_message) if upload.has_integrity_exception?
         end
       end
 

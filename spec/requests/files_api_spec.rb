@@ -4,7 +4,7 @@ describe DDS::V1::FilesAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
+  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
