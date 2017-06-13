@@ -134,10 +134,8 @@ module DDS
             named 'complete upload'
             failure [
               [202, 'Accepted, subject to further processing'],
-              [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
               [401, 'Unauthorized'],
               [404, 'Upload Does not Exist'],
-              [500, 'Unexpected StorageProviderException experienced']
             ]
           end
           params do
