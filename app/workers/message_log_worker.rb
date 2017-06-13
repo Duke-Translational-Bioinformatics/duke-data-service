@@ -2,6 +2,7 @@ class MessageLogWorker
   include Sneakers::Worker
   from_queue 'message_log',
     :retry_error_exchange => 'message_log-error'
+  attr_accessor :work_message_limit
 
   def work_with_params(msg, delivery_info, metadata)
     begin
