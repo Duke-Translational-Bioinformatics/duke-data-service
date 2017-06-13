@@ -504,3 +504,33 @@ shared_examples 'an eventually consistent resource' do |eventually_consistent_re
     expect(response_json['suggestion']).to eq("this is a temporary state that will eventually be resolved by the system; please retry request")
   end
 end
+
+shared_examples 'an eventually consistent upload integrity exception' do |eventually_consistent_upload_sym|
+  let(:inconsistent_upload) { send(eventually_consistent_upload_sym) }
+  let(:expected_error_message) { "reported size does not match size computed by StorageProvider" }
+  before do
+    expect(inconsistent_upload).to be_persisted
+    expect(
+      inconsistent_upload.update(
+        has_integrity_exception: true,
+        error_message: expected_error_message,
+        is_consistent: true
+      )
+    ).to be_truthy
+  end
+
+  it {
+    is_expected.to eq(400)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('400')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("not_provided")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq(expected_error_message)
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("You must begin a new upload process")
+  }
+end

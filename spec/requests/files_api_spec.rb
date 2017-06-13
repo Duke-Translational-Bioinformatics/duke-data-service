@@ -339,6 +339,8 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an eventually consistent resource', :upload
+      it_behaves_like 'an eventually consistent upload integrity exception', :upload
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}

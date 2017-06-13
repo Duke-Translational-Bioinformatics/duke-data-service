@@ -265,6 +265,16 @@ module DDS
         error!(error_json, 404)
       end
 
+      rescue_from IntegrityException do |e|
+        error_json = {
+          "error" => "400",
+          "code" => "not_provided",
+          "reason" => e.message,
+          "suggestion" => "You must begin a new upload process"
+        }
+        error!(error_json, 400)
+      end
+
       mount DDS::V1::UsersAPI
       mount DDS::V1::SystemPermissionsAPI
       mount DDS::V1::AppAPI
