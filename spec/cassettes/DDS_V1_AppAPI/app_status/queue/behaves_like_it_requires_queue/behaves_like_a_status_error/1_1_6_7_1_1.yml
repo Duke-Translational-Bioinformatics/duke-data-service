@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txba3cff5670de43ae96ed6-0058c9a1b5
+      - tx3e4f199d7b84429387b72-00593fe8a4
       Date:
-      - Wed, 15 Mar 2017 20:19:01 GMT
+      - Tue, 13 Jun 2017 13:29:08 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 15 Mar 2017 20:19:01 GMT
+  recorded_at: Tue, 13 Jun 2017 13:29:08 GMT
 - request:
     method: post
     uri: http://swift.local:12345/v1/AUTH_test
@@ -43,11 +43,11 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
       X-Account-Meta-Temp-Url-Key:
-      - 6c2bb7e9580f9565c7bff0208388ed24
+      - e0819026c1e1ff81bb2df3a744ae2d8e
       X-Account-Meta-Temp-Url-Key-2:
-      - 2fe02c75a3e29806f394ab3fda546ddd
+      - 470a29a88efc932cb607434a95795594
   response:
     status:
       code: 204
@@ -58,14 +58,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx71868ceda22c46a5b74f8-0058c9a1b5
+      - tx2b39a74bc9e040b29a440-00593fe8a4
       Date:
-      - Wed, 15 Mar 2017 20:19:01 GMT
+      - Tue, 13 Jun 2017 13:29:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 15 Mar 2017 20:19:01 GMT
+  recorded_at: Tue, 13 Jun 2017 13:29:09 GMT
 - request:
     method: get
     uri: http://swift.local:12345/auth/v1.0
@@ -85,22 +85,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txdca4ed0e8a5a4ca7a404b-0058c9a1b5
+      - txb085095274cd4e5a9eb35-00593fe8a5
       Date:
-      - Wed, 15 Mar 2017 20:19:01 GMT
+      - Tue, 13 Jun 2017 13:29:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 15 Mar 2017 20:19:01 GMT
+  recorded_at: Tue, 13 Jun 2017 13:29:09 GMT
 - request:
     method: get
     uri: http://swift.local:12345/v1/AUTH_test
@@ -109,7 +109,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkc53ab08d2f1f46e0964bc0f455709a00
+      - AUTH_tk68230041fc4e461e835e4f25f78852a9
   response:
     status:
       code: 204
@@ -120,11 +120,11 @@ http_interactions:
       X-Account-Object-Count:
       - '0'
       X-Account-Meta-Temp-Url-Key-2:
-      - 2fe02c75a3e29806f394ab3fda546ddd
+      - 470a29a88efc932cb607434a95795594
       X-Timestamp:
-      - '1489588696.99804'
+      - '1497360511.10352'
       X-Account-Meta-Temp-Url-Key:
-      - 6c2bb7e9580f9565c7bff0208388ed24
+      - e0819026c1e1ff81bb2df3a744ae2d8e
       X-Account-Bytes-Used:
       - '0'
       X-Account-Container-Count:
@@ -134,12 +134,12 @@ http_interactions:
       Accept-Ranges:
       - bytes
       X-Trans-Id:
-      - tx40e69b7cdb9941fdb91f5-0058c9a1b5
+      - tx9c1751a9f9b749bd8ee10-00593fe8a5
       Date:
-      - Wed, 15 Mar 2017 20:19:01 GMT
+      - Tue, 13 Jun 2017 13:29:09 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Wed, 15 Mar 2017 20:19:01 GMT
+  recorded_at: Tue, 13 Jun 2017 13:29:09 GMT
 recorded_with: VCR 3.0.3
