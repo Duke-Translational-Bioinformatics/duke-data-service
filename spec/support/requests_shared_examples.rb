@@ -473,6 +473,7 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
   let(:response_json) { JSON.parse(response.body) }
   let(:expected_response) {{
     'error' => 405,
+    'code' => 'not_provided',
     'reason' => 'not implemented',
     'suggestion' => 'this is not the endpoint you are looking for'
   }}

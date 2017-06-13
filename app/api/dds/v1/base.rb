@@ -60,18 +60,21 @@ module DDS
             rescue JWT::ExpiredSignature
               @current_user = nil
               @auth_error = {
+                code: "not_provided",
                 reason: 'expired api_token',
                 suggestion: 'you need to login with your authenticaton service'
               }
             rescue JWT::VerificationError
               @current_user = nil
               @auth_error = {
+                code: "not_provided",
                 reason: 'invalid api_token',
                 suggestion: 'token not properly signed'
               }
             rescue JWT::DecodeError
               @current_user = nil
               @auth_error = {
+                code: "not_provided",
                 reason: 'invalid api_token',
                 suggestion: 'token not properly signed'
               }
@@ -79,6 +82,7 @@ module DDS
           else
             @auth_error = {
               error: 401,
+              code: "not_provided",
               reason: 'no api_token',
               suggestion: 'you might need to login through an authenticaton service'
             }
@@ -98,6 +102,7 @@ module DDS
         def validation_error!(object)
           error_payload = {
             error: '400',
+            code: "not_provided",
             reason: 'validation failed',
             suggestion: 'Fix the following invalid fields and resubmit',
             errors: []
@@ -147,6 +152,7 @@ module DDS
         def not_implemented_error!
           error_body = {
             error: 405,
+            code: "not_provided",
             reason: 'not implemented',
             suggestion: 'this is not the endpoint you are looking for'
           }
@@ -170,6 +176,7 @@ module DDS
         end
         error_json = {
           "error" => "404",
+          "code" => "not_provided",
           "reason" => "#{missing_object} Not Found",
           "suggestion" => "you may have mistyped the #{missing_object} id"
         }
@@ -179,6 +186,7 @@ module DDS
       rescue_from NameError do |e|
         error_json = {
           "error" => "404",
+          "code" => "not_provided",
           "reason" => e.message,
           "suggestion" => "Please supply a supported object_kind"
         }
@@ -188,6 +196,7 @@ module DDS
       rescue_from Pundit::NotAuthorizedError do |e|
         error_json = {
           "error" => "403",
+          "code" => "not_provided",
           "reason" => "Unauthorized",
           "suggestion" => "request permission to access this resource"
         }
@@ -197,6 +206,7 @@ module DDS
       rescue_from StorageProviderException do |e|
         error_json = {
           "error" => "500",
+          "code" => "not_provided",
           "reason" => 'The storage provider is unavailable',
           "suggestion" => 'try again in a few minutes, or contact the systems administrators'
         }
@@ -206,6 +216,7 @@ module DDS
       rescue_from InvalidAccessTokenException do
         error!({
           error: 401,
+          code: "not_provided",
           reason: 'invalid access_token',
           suggestion: 'token not properly signed'
         },401)
@@ -214,6 +225,7 @@ module DDS
       rescue_from InvalidAuthenticationServiceIDException do
         error!({
           error: 401,
+          code: "not_provided",
           reason: 'invalid access_token',
           suggestion: 'authentication service not registered'
         },401)
@@ -222,6 +234,7 @@ module DDS
       rescue_from Net::LDAP::Error do |e|
         error_json = {
           "error" => "503",
+          "code" => "not_provided",
           "reason" => "identity provider communication failure",
           "suggestion" => "please try again in a few minutes, or report an issue"
         }
@@ -231,6 +244,7 @@ module DDS
       rescue_from Rack::Timeout::RequestTimeoutError do |e|
         error_json = {
           "error" => "503",
+          "code" => "not_provided",
           "reason" => 'Request Timeout',
           "suggestion" => 'try again in a few minutes, or contact the systems administrators'
         }

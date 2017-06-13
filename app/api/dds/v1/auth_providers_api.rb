@@ -7,6 +7,7 @@ module DDS
         def affiliate_not_found_error!
           error_json = {
             "error" => "404",
+            "code" => "not_provided",
             "reason" => "Affiliate Not Found",
             "suggestion" => "you may have mistyped the uid"
           }
@@ -16,6 +17,7 @@ module DDS
         def affiliate_exists_error!
           error_json = {
             "error" => "409",
+            "code" => "not_provided",
             "reason" => "Affiliate already registered",
             "suggestion" => "nothing else needs to be done"
           }
@@ -25,6 +27,7 @@ module DDS
         def unsupported_affiliate_search_error!
           error_payload = {
             error: '400',
+            code: "not_provided",
             reason: 'authentication provider does not support affilate searches',
             suggestion: 'perhaps you are using the wrong authentication provider'
           }

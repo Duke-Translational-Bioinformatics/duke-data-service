@@ -111,21 +111,6 @@ describe DDS::V1::ProjectsAPI do
           end
         end
       end
-
-      # this test does not work because the after_commit on: :create
-      # callback does not play well with transactional fixtures
-      # http://apidock.com/rails/ActiveRecord/Transactions/ClassMethods/after_commit
-      # context 'with inline ActiveJob', :vcr do
-      #   before do
-      #     ActiveJob::Base.queue_adapter = :inline
-      #   end
-      #
-      #   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-      #   it_behaves_like 'a creatable resource' do
-      #     let(:resource) { project_stub }
-      #     it_behaves_like 'a storage_provider backed resource'
-      #   end
-      # end
     end
   end
 
