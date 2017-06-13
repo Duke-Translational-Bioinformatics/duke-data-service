@@ -103,6 +103,7 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a logically deleted resource' do
         let(:deleted_resource) { project }
       end
+      it_behaves_like 'an eventually consistent resource', :project
     end
   end
 

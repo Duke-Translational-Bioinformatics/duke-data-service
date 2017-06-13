@@ -12,7 +12,7 @@ module DDS
               [200, 'This will never happen'],
               [201, 'Created Successfully'],
               [401, 'Unauthorized'],
-              [404, 'Project Does not Exist']
+              [404, 'Project Does not Exist, or is not yet consistent']
             ]
           end
           params do
@@ -25,6 +25,7 @@ module DDS
             authenticate!
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
+            consistent? project
             storage_provider = StorageProvider.first
             upload = project.uploads.build({
               name: upload_params[:name],

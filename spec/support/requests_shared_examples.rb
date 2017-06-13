@@ -483,3 +483,24 @@ shared_examples 'a status error' do |expected_error_sym|
     expect(returned_configs['status']).to eq('error')
   }
 end
+
+shared_examples 'an eventually consistent resource' do |eventually_consistent_resource_sym|
+  let(:inconsistent_resource) { send(eventually_consistent_resource_sym) }
+  it 'should return 404 with error when resource found is not consistent' do
+    expect(inconsistent_resource).to be_persisted
+    expect(inconsistent_resource).to respond_to 'is_consistent'
+    expect(inconsistent_resource.update_column(:is_consistent, false)).to be_truthy
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("resource_not_consistent")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("resource changes are still being processed by system")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("this is a temporary state that will eventually be resolved by the system; please retry request")
+  end
+end

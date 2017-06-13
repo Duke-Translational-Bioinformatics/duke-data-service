@@ -166,6 +166,10 @@ module DDS
             AuthenticationService.where(is_default: true).take!
           end
         end
+
+        def consistent?(object)
+          raise ConsistencyException.new unless object.is_consistent?
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
@@ -249,6 +253,16 @@ module DDS
           "suggestion" => 'try again in a few minutes, or contact the systems administrators'
         }
         error!(error_json, 503)
+      end
+
+      rescue_from ConsistencyException do
+        error_json = {
+          "error" => "404",
+          "code" => "resource_not_consistent",
+          "reason" => "resource changes are still being processed by system",
+          "suggestion" => "this is a temporary state that will eventually be resolved by the system; please retry request"
+        }
+        error!(error_json, 404)
       end
 
       mount DDS::V1::UsersAPI
