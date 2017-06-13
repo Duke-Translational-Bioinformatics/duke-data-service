@@ -133,21 +133,12 @@ module DDS
             detail 'Complete the chunked file upload'
             named 'complete upload'
             failure [
-              [200, 'Success'],
+              [202, 'Accepted, subject to further processing'],
               [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
               [401, 'Unauthorized'],
               [404, 'Upload Does not Exist'],
               [500, 'Unexpected StorageProviderException experienced']
             ]
-          end
-          rescue_from IntegrityException do |e|
-            error_json = {
-              "error" => "400",
-              "code" => "not_provided",
-              "reason" => "IntegrityException",
-              "suggestion" => e.message
-            }
-            error!(error_json, 400)
           end
           params do
             requires :hash, type: Hash do
@@ -163,6 +154,7 @@ module DDS
             upload.fingerprints_attributes = [fingerprint_params[:hash]]
             upload.etag = SecureRandom.hex
             if upload.complete
+              status 202
               upload
             else
               validation_error!(upload)

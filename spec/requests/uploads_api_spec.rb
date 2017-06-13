@@ -239,7 +239,9 @@ describe DDS::V1::UploadsAPI do
     }}
     let(:fingerprint_algorithm) { fingerprint_stub.algorithm }
 
-    it_behaves_like 'an updatable resource'
+    it_behaves_like 'an updatable resource' do
+      let(:expected_response_status) { 202 }
+    end
     it_behaves_like 'an authenticated resource'
     it_behaves_like 'an authorized resource'
 
@@ -257,9 +259,14 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a validated resource'
     end
 
-    it_behaves_like 'an annotate_audits endpoint'
+    it_behaves_like 'an annotate_audits endpoint' do
+      let(:expected_response_status) { 202 }
+    end
     it_behaves_like 'a software_agent accessible resource' do
-      it_behaves_like 'an annotate_audits endpoint'
+      let(:expected_response_status) { 202 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 202 }
+      end
     end
   end
 
