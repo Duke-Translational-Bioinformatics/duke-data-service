@@ -205,24 +205,6 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   end
 end
 
-shared_examples 'a storage_provider backed resource' do
-
-  it 'should return a 500 error and JSON error when a StorageProviderException is experienced' do
-    storage_provider.update_attribute(:url_root, "http://257.1.1.1")
-    stub_request(:any, "#{storage_provider.url_root}#{storage_provider.auth_uri}").to_timeout
-    is_expected.to eq(500)
-    expect(response.body).to be
-    expect(response.body).not_to eq('null')
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key('error')
-    expect(response_json['error']).to eq('500')
-    expect(response_json).to have_key('reason')
-    expect(response_json['reason']).to eq('The storage provider is unavailable')
-    expect(response_json).to have_key('suggestion')
-    expect(response_json['suggestion']).to eq('try again in a few minutes, or contact the systems administrators')
-  end
-end
-
 shared_examples 'a creatable resource' do
   let(:expected_response_status) {201}
   let(:new_object) {

@@ -142,6 +142,7 @@ module DDS
           rescue_from IntegrityException do |e|
             error_json = {
               "error" => "400",
+              "code" => "not_provided",
               "reason" => "IntegrityException",
               "suggestion" => e.message
             }
