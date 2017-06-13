@@ -71,7 +71,9 @@ RSpec.describe MessageLogQueueHandler do
           ).and_call_original
         end
       end
-      it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+      it_behaves_like 'an elasticsearch indexer' do
+        it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+      end
     end
   end
 end
