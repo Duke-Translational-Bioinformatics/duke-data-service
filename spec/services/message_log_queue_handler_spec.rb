@@ -3,6 +3,21 @@ require 'rails_helper'
 RSpec.describe MessageLogQueueHandler do
   include_context 'with sneakers'
 
+  describe '::DEFAULT_WORK_DURATION' do
+    it { expect(described_class).to be_const_defined(:DEFAULT_WORK_DURATION) }
+    it { expect(described_class::DEFAULT_WORK_DURATION).to eq(300) }
+  end
+  describe '#work_duration attr_accessor' do
+    it { is_expected.to respond_to(:work_duration).with(0).argument }
+    it { is_expected.to respond_to(:work_duration=).with(1).argument }
+    it { expect(subject.work_duration).to eq(described_class::DEFAULT_WORK_DURATION) }
+    context 'once set' do
+      let(:limit_value) { Faker::Number.between(1, 10) }
+      before { subject.work_duration = limit_value }
+      it { expect(subject.work_duration).to eq limit_value }
+    end
+  end
+
   let(:bunny_session) { Sneakers::CONFIG[:connection] }
   let(:channel) { bunny_session.channel }
   let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
