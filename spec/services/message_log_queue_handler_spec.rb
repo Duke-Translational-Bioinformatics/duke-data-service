@@ -62,16 +62,17 @@ RSpec.describe MessageLogQueueHandler do
       before(:each) do
         queued_messages.each {|m| enqueue_message(m[:payload], m[:routing_key], m[:content_type])}
         expect(message_log_queue.message_count).to eq queued_messages.length
-        expect(MessageLogWorker).to receive(:new).and_return(message_log_worker)
-        queued_messages.each do |msg|
-          expect(message_log_worker).to receive(:work_with_params).with(
-            msg[:payload],
-            delivery_info_with_routing_key(msg[:routing_key]),
-            message_meta_data_with_content_type(msg[:content_type])
-          ).and_call_original
-        end
       end
       it_behaves_like 'an elasticsearch indexer' do
+        before(:each) do
+          queued_messages.each do |msg|
+            expect_any_instance_of(MessageLogWorker).to receive(:work_with_params).with(
+              msg[:payload],
+              delivery_info_with_routing_key(msg[:routing_key]),
+              message_meta_data_with_content_type(msg[:content_type])
+            ).and_call_original
+          end
+        end
         it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
       end
     end
