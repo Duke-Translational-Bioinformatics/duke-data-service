@@ -74,7 +74,7 @@ class Upload < ActiveRecord::Base
       unless meta["content-length"].to_i == size
         raise IntegrityException, "reported size does not match size computed by StorageProvider"
       end
-      update_attributes({
+      update!({
         is_consistent: true
       })
     rescue StorageProviderException => e
