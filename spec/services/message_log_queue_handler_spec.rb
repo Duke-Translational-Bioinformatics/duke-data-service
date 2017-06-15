@@ -102,6 +102,10 @@ RSpec.describe MessageLogQueueHandler do
             is_expected.to receive(:sleep).with(custom_duration) { sleep(1) }
           end
           it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+          it 'indexes queued messages' do
+            expect{subject.index_messages}.not_to raise_error
+            expect(new_documents.length).to eq(queued_messages.length)
+          end
         end
       end
     end
