@@ -67,7 +67,7 @@ class Upload < ActiveRecord::Base
     end
   end
 
-  def make_consistent
+  def create_and_validate_storage_manifest
     begin
       response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
       meta = storage_provider.get_object_metadata(project_id, id)

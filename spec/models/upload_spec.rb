@@ -148,8 +148,8 @@ RSpec.describe Upload, type: :model do
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
-    describe '#make_consistent' do
-      it { is_expected.to respond_to :make_consistent }
+    describe '#create_and_validate_storage_manifest' do
+      it { is_expected.to respond_to :create_and_validate_storage_manifest }
 
       describe 'calls' do
         before do
@@ -181,7 +181,7 @@ RSpec.describe Upload, type: :model do
 
         describe 'with valid reported size and chunk hashes' do
           it 'should set is_consistent to true, leave error_at and error_message null' do
-            subject.make_consistent
+            subject.create_and_validate_storage_manifest
             subject.reload
             expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).to be_nil
@@ -192,7 +192,7 @@ RSpec.describe Upload, type: :model do
         describe 'with reported size not equal to swift computed size' do
           it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
             subject.update_attribute(:size, subject.size - 1)
-            subject.make_consistent
+            subject.create_and_validate_storage_manifest
             subject.reload
             expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).not_to be_nil
@@ -204,7 +204,7 @@ RSpec.describe Upload, type: :model do
           it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
             bad_chunk = subject.chunks.first
             bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-            subject.make_consistent
+            subject.create_and_validate_storage_manifest
             subject.reload
             expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).not_to be_nil
