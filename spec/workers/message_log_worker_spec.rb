@@ -57,15 +57,4 @@ RSpec.describe MessageLogWorker do
       end
     end
   end
-
-  describe '#work_message_limit attr_accessor' do
-    it { is_expected.to respond_to(:work_message_limit).with(0).argument }
-    it { is_expected.to respond_to(:work_message_limit=).with(1).argument }
-    it { expect(subject.work_message_limit).to be_nil }
-    context 'once set' do
-      let(:limit_value) { Faker::Number.between(1, 10) }
-      before { subject.work_message_limit = limit_value }
-      it { expect(subject.work_message_limit).to eq limit_value }
-    end
-  end
 end
