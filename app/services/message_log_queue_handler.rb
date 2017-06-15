@@ -7,7 +7,7 @@ class MessageLogQueueHandler
   def index_messages
     worker = MessageLogWorker.new
     worker.run
-    sleep 300
+    sleep work_duration
     worker.stop
   end
 end

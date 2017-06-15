@@ -88,9 +88,21 @@ RSpec.describe MessageLogQueueHandler do
               message_meta_data_with_content_type(msg[:content_type])
             ).and_call_original
           end
-          is_expected.to receive(:sleep).with(default_duration) { sleep(1) }
         end
-        it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+        context 'with default work_duration' do
+          before(:each) do
+            is_expected.to receive(:sleep).with(default_duration) { sleep(1) }
+          end
+          it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+        end
+        context 'with custom work_duration' do
+          let(:custom_duration) { Faker::Number.between(1, 10) }
+          before(:each) do
+            subject.work_duration = custom_duration
+            is_expected.to receive(:sleep).with(custom_duration) { sleep(1) }
+          end
+          it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
+        end
       end
     end
   end
