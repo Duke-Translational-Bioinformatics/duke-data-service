@@ -509,9 +509,11 @@ shared_examples 'an eventually consistent upload integrity exception' do |eventu
   let(:inconsistent_upload) { send(eventually_consistent_upload_sym) }
   let(:expected_error_message) { "reported size does not match size computed by StorageProvider" }
   before do
+    exactly_now = DateTime.now
     expect(inconsistent_upload).to be_persisted
     expect(
       inconsistent_upload.update(
+        error_at: exactly_now,
         error_message: expected_error_message,
         is_consistent: true
       )
@@ -519,7 +521,7 @@ shared_examples 'an eventually consistent upload integrity exception' do |eventu
   end
 
   it {
-    expect(inconsistent_upload).to receive(:has_integrity_exception?).and_return(true)
+    expect(inconsistent_upload.has_integrity_exception?).to be_truthy
     is_expected.to eq(400)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
