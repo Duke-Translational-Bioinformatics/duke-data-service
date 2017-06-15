@@ -304,11 +304,10 @@ ActiveRecord::Schema.define(version: 20170608184211) do
     t.string   "error_message"
     t.datetime "completed_at"
     t.string   "etag"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
     t.uuid     "creator_id"
     t.boolean  "is_consistent"
-    t.boolean  "has_integrity_exception"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

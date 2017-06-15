@@ -512,7 +512,6 @@ shared_examples 'an eventually consistent upload integrity exception' do |eventu
     expect(inconsistent_upload).to be_persisted
     expect(
       inconsistent_upload.update(
-        has_integrity_exception: true,
         error_message: expected_error_message,
         is_consistent: true
       )
@@ -520,6 +519,7 @@ shared_examples 'an eventually consistent upload integrity exception' do |eventu
   end
 
   it {
+    expect(inconsistent_upload).to receive(:has_integrity_exception?).and_return(true)
     is_expected.to eq(400)
     expect(response.body).to be
     expect(response.body).not_to eq('null')

@@ -85,11 +85,8 @@ RSpec.describe Upload, type: :model do
       end
 
       context 'when has_integrity_exception? true' do
-        before do
-          expect(subject.update(has_integrity_exception: true)).to be_truthy
-        end
         it {
-          expect(subject.has_integrity_exception?).to be_truthy
+          expect(subject).to receive(:has_integrity_exception?).and_return(true)
           expect {
             subject.temporary_url
           }.to raise_error(IntegrityException)
@@ -143,6 +140,36 @@ RSpec.describe Upload, type: :model do
       subject.reload
       expect(subject.completed_at).not_to be_nil
     }
+  end
+
+  describe '#has_integrity_exception?' do
+    it { is_expected.to respond_to :has_integrity_exception? }
+
+    context 'when upload is_consistent and has an error' do
+      it {
+        exactly_now = DateTime.now
+        expect(
+          subject.update({
+            error_at: exactly_now,
+            error_message: 'integrity exception',
+            is_consistent: true
+          })
+        ).to be_truthy
+        expect(subject.has_integrity_exception?).to be_truthy
+      }
+    end
+
+    context 'when upload is_consistent and does not have an error' do
+      it {
+        exactly_now = DateTime.now
+        expect(
+          subject.update({
+            is_consistent: true
+          })
+        ).to be_truthy
+        expect(subject.has_integrity_exception?).to be_falsey
+      }
+    end
   end
 
   describe 'swift methods', :vcr do

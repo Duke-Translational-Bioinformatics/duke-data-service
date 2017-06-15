@@ -67,6 +67,11 @@ class Upload < ActiveRecord::Base
     end
   end
 
+  def has_integrity_exception?
+    # this is currently the only use of the error attributes
+    !error_at.nil?
+  end
+
   def create_and_validate_storage_manifest
     begin
       response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)

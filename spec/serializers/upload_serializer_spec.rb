@@ -13,7 +13,6 @@ RSpec.describe UploadSerializer, type: :serializer do
     'status' => {
       'initiated_on' => resource.created_at.as_json,
       'completed_on' => resource.completed_at.as_json,
-      'has_integrity_exception' => resource.has_integrity_exception,
       'error_on' => resource.error_at.as_json,
       'error_message' => resource.error_message
     }
