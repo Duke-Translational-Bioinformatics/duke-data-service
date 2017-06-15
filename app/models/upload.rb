@@ -92,7 +92,7 @@ class Upload < ActiveRecord::Base
   def integrity_exception(message)
     exactly_now = DateTime.now
     fingerprints.reload
-    update_attributes({
+    update!({
       error_at: exactly_now,
       error_message: message,
       is_consistent: true
