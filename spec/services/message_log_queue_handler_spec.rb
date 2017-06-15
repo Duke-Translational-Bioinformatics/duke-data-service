@@ -3,14 +3,15 @@ require 'rails_helper'
 RSpec.describe MessageLogQueueHandler do
   include_context 'with sneakers'
 
+  let(:default_duration) { 300 }
   describe '::DEFAULT_WORK_DURATION' do
     it { expect(described_class).to be_const_defined(:DEFAULT_WORK_DURATION) }
-    it { expect(described_class::DEFAULT_WORK_DURATION).to eq(300) }
+    it { expect(described_class::DEFAULT_WORK_DURATION).to eq(default_duration) }
   end
   describe '#work_duration attr_accessor' do
     it { is_expected.to respond_to(:work_duration).with(0).argument }
     it { is_expected.to respond_to(:work_duration=).with(1).argument }
-    it { expect(subject.work_duration).to eq(described_class::DEFAULT_WORK_DURATION) }
+    it { expect(subject.work_duration).to eq(default_duration) }
     context 'once set' do
       let(:limit_value) { Faker::Number.between(1, 10) }
       before { subject.work_duration = limit_value }
@@ -87,6 +88,7 @@ RSpec.describe MessageLogQueueHandler do
               message_meta_data_with_content_type(msg[:content_type])
             ).and_call_original
           end
+          is_expected.to receive(:sleep).with(default_duration) { sleep(1) }
         end
         it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
       end
