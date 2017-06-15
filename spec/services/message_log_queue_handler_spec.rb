@@ -80,6 +80,7 @@ RSpec.describe MessageLogQueueHandler do
         expect(message_log_queue.message_count).to eq queued_messages.length
       end
       it_behaves_like 'an elasticsearch indexer' do
+        let(:mocked_duration) { 0.25 }
         before(:each) do
           queued_messages.each do |msg|
             expect_any_instance_of(MessageLogWorker).to receive(:work_with_params).with(
@@ -87,11 +88,15 @@ RSpec.describe MessageLogQueueHandler do
               delivery_info_with_routing_key(msg[:routing_key]),
               message_meta_data_with_content_type(msg[:content_type])
             ).and_call_original
+            allow(subject).to receive(:sleep) { sleep(mocked_duration) }
           end
+        end
+        it 'stops threads before returning' do
+          expect{subject.index_messages}.not_to change{Thread.list.count}
         end
         context 'with default work_duration' do
           before(:each) do
-            is_expected.to receive(:sleep).with(default_duration) { sleep(1) }
+            is_expected.to receive(:sleep).with(default_duration) { sleep(mocked_duration) }
           end
           it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
         end
@@ -99,9 +104,8 @@ RSpec.describe MessageLogQueueHandler do
           let(:custom_duration) { Faker::Number.between(1, 10) }
           before(:each) do
             subject.work_duration = custom_duration
-            is_expected.to receive(:sleep).with(custom_duration) { sleep(1) }
+            is_expected.to receive(:sleep).with(custom_duration) { sleep(mocked_duration) }
           end
-          it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
           it 'indexes queued messages' do
             expect{subject.index_messages}.not_to raise_error
             expect(new_documents.length).to eq(queued_messages.length)
