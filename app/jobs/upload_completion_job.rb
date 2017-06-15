@@ -4,7 +4,7 @@ class UploadCompletionJob < ApplicationJob
   def perform(job_transaction, upload_id)
     self.class.start_job(job_transaction)
     upload = Upload.find(upload_id)
-    upload.make_consistent
+    upload.create_and_validate_storage_manifest
     self.class.complete_job(job_transaction)
   end
 end

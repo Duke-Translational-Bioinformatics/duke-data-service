@@ -27,7 +27,7 @@ RSpec.describe UploadCompletionJob, type: :job do
     include_context 'tracking job', :job_transaction
     it 'should complete the upload' do
       expect(Upload).to receive(:find).with(upload.id).and_return(upload)
-      expect(upload).to receive(:make_consistent).and_return(true)
+      expect(upload).to receive(:create_and_validate_storage_manifest).and_return(true)
       described_class.perform_now(job_transaction, upload.id)
     end
   end
