@@ -93,35 +93,40 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
 
-  it { is_expected.to respond_to(:create_elasticsearch_index) }
-  it { is_expected.to respond_to(:update_elasticsearch_index) }
+  describe '#create_elasticsearch_index' do
+    it { is_expected.to respond_to(:create_elasticsearch_index) }
+    it {
+      is_expected.to callback(:create_elasticsearch_index).after(:create)
+    }
+    it {
+      expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
+        subject
+      ).and_return(job_transaction)
+      expect {
+        subject.create_elasticsearch_index
+      }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject)
+    }
+  end
 
-  it {
-    is_expected.to callback(:create_elasticsearch_index).after(:commit).on(:create)
-  }
-  it {
-    is_expected.to callback(:update_elasticsearch_index).after(:commit).on(:update)
-  }
+  describe '#update_elasticsearch_index' do
+    it { is_expected.to respond_to(:update_elasticsearch_index) }
+    it {
+      is_expected.to callback(:update_elasticsearch_index).after(:update)
+    }
+    it {
+      expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
+        subject
+      ).and_return(job_transaction)
+      expect {
+        subject.update_elasticsearch_index
+      }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject, update: true)
+    }
+  end
 
-  it { is_expected.to respond_to 'as_indexed_json' }
-  it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
-
-  it {
-    expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
-      subject
-    ).and_return(job_transaction)
-    expect {
-      subject.create_elasticsearch_index
-    }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject)
-  }
-  it {
-    expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
-      subject
-    ).and_return(job_transaction)
-    expect {
-      subject.update_elasticsearch_index
-    }.to have_enqueued_job(ElasticsearchIndexJob).with(job_transaction, subject, update: true)
-  }
+  describe '#as_indexed_json' do
+    it { is_expected.to respond_to 'as_indexed_json' }
+    it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
+  end
 end
 
 shared_examples 'an Elasticsearch index mapping model' do |expected_property_mappings_sym: :property_mappings|
@@ -142,4 +147,35 @@ shared_examples 'an Elasticsearch index mapping model' do |expected_property_map
       end
     end
   }
+end
+
+shared_examples 'an elasticsearch indexer' do
+  def all_elasticsearch_documents
+    expect{ elasticsearch_client.indices.flush }.not_to raise_error
+    elasticsearch_client.search["hits"]["hits"]
+  end
+
+  let(:elasticsearch_client) { Elasticsearch::Model.client }
+  let(:existing_documents) { elasticsearch_client.search["hits"]["hits"] }
+  let(:new_documents) { all_elasticsearch_documents - existing_documents }
+  before do
+    expect{ existing_documents }.not_to raise_error
+  end
+  after do
+    new_documents.each do |d|
+      elasticsearch_client.delete(
+        id: d["_id"],
+        index: d["_index"],
+        type: d["_type"]
+      )
+    end
+  end
+end
+
+shared_context 'with a single document indexed' do
+  let(:document) do
+    expect(new_documents.length).to eq(1)
+    expect(new_documents.first).not_to be_nil
+    new_documents.first
+  end
 end

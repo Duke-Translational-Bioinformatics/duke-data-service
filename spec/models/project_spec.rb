@@ -94,23 +94,32 @@ RSpec.describe Project, type: :model do
   end
 
   describe '#initialize_storage' do
+    subject { FactoryGirl.build(:project) }
     let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
     let(:default_storage_provider) { FactoryGirl.create(:storage_provider) }
-    it { is_expected.to callback(:initialize_storage).after(:commit).on(:create) }
+    it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
       expect(default_storage_provider).to be_persisted
       expect(auth_role).to be_persisted
-      expect(subject).to be_persisted
+      expect(subject).not_to be_persisted
     end
 
     it 'should enqueue a ProjectStorageProviderInitializationJob with the default StorageProvider' do
       #TODO change this when storage_providers become configurable
       expect(StorageProvider.count).to eq 1
       expect(StorageProvider.first.id).to eq(default_storage_provider.id)
+      expect(subject).to receive(:initialize_storage).and_call_original
       expect {
-        subject.initialize_storage
+        subject.save
       }.to have_enqueued_job(ProjectStorageProviderInitializationJob)
+    end
+
+    it 'rollsback when ProjectStorageProviderInitializationJob::perform_later raises an error' do
+      allow(ProjectStorageProviderInitializationJob).to receive(:perform_later).and_raise("boom!")
+      expect{
+        expect{subject.save}.to raise_error("boom!")
+      }.not_to change{described_class.count}
     end
   end
 end

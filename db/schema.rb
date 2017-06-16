@@ -144,7 +144,7 @@ ActiveRecord::Schema.define(version: 20170608184211) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "job_transactions", force: :cascade do |t|
+  create_table "job_transactions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "transactionable_type"
     t.uuid     "transactionable_id"
     t.string   "request_id"
