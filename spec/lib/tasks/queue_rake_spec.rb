@@ -250,3 +250,17 @@ describe 'queue:errors:requeue_messages' do
     end
   end
 end
+
+describe 'queue:message_log:index_messages' do
+  include_context "rake"
+  let(:message_log_queue_handler) { instance_double(MessageLogQueueHandler) }
+  let(:routing_key) { Faker::Internet.slug(nil, '_') }
+  let(:duration) { Faker::Number.between(1,300) }
+
+  before(:each) do
+    expect(MessageLogQueueHandler).to receive(:new).and_return(message_log_queue_handler)
+    expect(message_log_queue_handler).to receive(:index_messages)
+    allow(message_log_queue_handler).to receive(:work_duration).and_return(duration)
+  end
+  it { invoke_task(expected_stdout: /Indexing messages for #{duration} seconds/) }
+end

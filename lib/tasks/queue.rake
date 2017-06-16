@@ -66,4 +66,13 @@ namespace :queue do
       end
     end
   end
+
+  namespace :message_log do
+    desc 'Index messages for a duration. Set duration with MESSAGE_LOG_WORK_DURATION=###'
+    task index_messages: :environment do
+      handler = MessageLogQueueHandler.new
+      puts "Indexing messages for #{handler.work_duration} seconds"
+      handler.index_messages
+    end
+  end
 end
