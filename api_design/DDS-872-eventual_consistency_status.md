@@ -2,7 +2,7 @@
 
 ## Deployment View
 
-status: proposed
+status: in progress
 
 ###### Deployment Requirements
 
@@ -53,6 +53,7 @@ integrity exception.
 ```
 {
   "error": 400,
+  "code": "not_provided",
   "reason": "reported chunk hash/size does not match that computed by StorageProvider",
   "suggestion": "You must begin a new upload process"
 }
@@ -60,7 +61,7 @@ integrity exception.
 
 ## Implementation View
 
-This design introduces a `code` property into the standadard DDS error response that allows clients to differentiate responses that have the same HTTP response status code/number.
+This design introduces a `code` property into the standard DDS error response that allows clients to differentiate responses that have the same HTTP response status code/number.
 
 For responses in which a code is not relevant or has not been implemented yet, the following will be returned for the `code` property:`"code": "not_provided"`.
 

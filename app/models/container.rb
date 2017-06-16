@@ -15,8 +15,8 @@ class Container < ActiveRecord::Base
   define_model_callbacks :set_parent_attribute
   validates :name, presence: true, unless: :is_deleted
 
-  after_commit :create_elasticsearch_index, on: [:create]
-  after_commit :update_elasticsearch_index, on: [:update]
+  after_create :create_elasticsearch_index
+  after_update :update_elasticsearch_index
 
   def ancestors
     if parent

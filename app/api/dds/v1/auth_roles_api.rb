@@ -17,6 +17,7 @@ module DDS
         rescue_from Grape::Exceptions::ValidationErrors do |e|
           error_json = {
             "error" => "404",
+            "code" => "not_provided",
             "reason" => "Unknown Context",
             "suggestion" => "Context should be either project or system",
           }

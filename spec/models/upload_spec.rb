@@ -9,6 +9,7 @@ RSpec.describe Upload, type: :model do
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
+  it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -82,6 +83,27 @@ RSpec.describe Upload, type: :model do
         let(:filename) { 'different-file-name.txt' }
         it { expect(subject.temporary_url(filename)).to include filename }
       end
+
+      context 'when has_integrity_exception? true' do
+        it {
+          expect(subject).to receive(:has_integrity_exception?).and_return(true)
+          expect {
+            subject.temporary_url
+          }.to raise_error(IntegrityException)
+        }
+      end
+
+      context 'when not consistent' do
+        before do
+          expect(subject.update(is_consistent: false)).to be_truthy
+        end
+        it {
+          expect(subject.is_consistent?).to be_falsey
+          expect {
+            subject.temporary_url
+          }.to raise_error(ConsistencyException)
+        }
+      end
     end
 
     it 'should have a completed_at attribute' do
@@ -105,16 +127,56 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  describe '#complete' do
+    let(:fingerprint_attributes) { FactoryGirl.attributes_for(:fingerprint) }
+    before { subject.fingerprints_attributes = [fingerprint_attributes] }
+
+    it { is_expected.to respond_to :complete }
+    it {
+      expect(subject.completed_at).to be_nil
+      expect {
+        expect(subject.complete).to be_truthy
+      }.to have_enqueued_job(UploadCompletionJob)
+      subject.reload
+      expect(subject.completed_at).not_to be_nil
+    }
+  end
+
+  describe '#has_integrity_exception?' do
+    it { is_expected.to respond_to :has_integrity_exception? }
+
+    context 'when upload is_consistent and has an error' do
+      it {
+        exactly_now = DateTime.now
+        expect(
+          subject.update({
+            error_at: exactly_now,
+            error_message: 'integrity exception',
+            is_consistent: true
+          })
+        ).to be_truthy
+        expect(subject.has_integrity_exception?).to be_truthy
+      }
+    end
+
+    context 'when upload is_consistent and does not have an error' do
+      it {
+        exactly_now = DateTime.now
+        expect(
+          subject.update({
+            is_consistent: true
+          })
+        ).to be_truthy
+        expect(subject.has_integrity_exception?).to be_falsey
+      }
+    end
+  end
+
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
-    describe 'complete' do
-      let(:fingerprint_attributes) { FactoryGirl.attributes_for(:fingerprint) }
-      before { subject.fingerprints_attributes = [fingerprint_attributes] }
-
-      it 'should be implemented' do
-        is_expected.to respond_to 'complete'
-      end
+    describe '#create_and_validate_storage_manifest' do
+      it { is_expected.to respond_to :create_and_validate_storage_manifest }
 
       describe 'calls' do
         before do
@@ -145,24 +207,21 @@ RSpec.describe Upload, type: :model do
         end
 
         describe 'with valid reported size and chunk hashes' do
-          it 'should update completed_at, leave error_at and error_message null and return true' do
-            expect {
-              is_complete = subject.complete
-              expect(is_complete).to be_truthy
-            }.not_to raise_error
+          it 'should set is_consistent to true, leave error_at and error_message null' do
+            subject.create_and_validate_storage_manifest
             subject.reload
-            expect(subject.completed_at).not_to be_nil
+            expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).to be_nil
             expect(subject.error_message).to be_nil
           end
         end #with valid
 
         describe 'with reported size not equal to swift computed size' do
-          it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+          it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
             subject.update_attribute(:size, subject.size - 1)
-            expect { subject.complete }.to raise_error(IntegrityException)
+            subject.create_and_validate_storage_manifest
             subject.reload
-            expect(subject.completed_at).to be_nil
+            expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).not_to be_nil
             expect(subject.error_message).not_to be_nil
           end
@@ -172,16 +231,13 @@ RSpec.describe Upload, type: :model do
           it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
             bad_chunk = subject.chunks.first
             bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-            expect {
-              subject.complete
-            }.to raise_error(IntegrityException)
+            subject.create_and_validate_storage_manifest
             subject.reload
-            expect(subject.completed_at).to be_nil
+            expect(subject.is_consistent).to be_truthy
             expect(subject.error_at).not_to be_nil
             expect(subject.error_message).not_to be_nil
           end
         end #with reported chunk
-
       end #calls
     end #complete
   end #swift methods

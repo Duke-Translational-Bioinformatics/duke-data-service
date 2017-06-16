@@ -167,6 +167,7 @@ describe DDS::V1::MetaTemplatesAPI do
           is_expected.to eq(409)
           expect(response_json).to include({
             'error' => '409',
+            'code' => 'not_provided',
             'reason' => 'unique conflict',
             'suggestion' => 'Resubmit as an update request'
           })

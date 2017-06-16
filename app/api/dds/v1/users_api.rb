@@ -18,6 +18,7 @@ module DDS
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error_json = {
           "error" => 400,
+          "code" => "not_provided",
           "reason" => "no access_token",
           "suggestion" => "you might need to login through an authentication service"#,
         }

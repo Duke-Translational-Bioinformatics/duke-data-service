@@ -239,6 +239,8 @@ describe DDS::V1::SoftwareAgentsAPI do
         %w(error reason suggestion).each do |expected_key|
           expect(error_response).to have_key expected_key
         end
+        expect(error_response).to have_key('code')
+        expect(error_response['code']).to eq('not_provided')
         expect(error_response['error']).to eq(400)
         expect(error_response['reason']).to eq('missing key or keys')
         expect(error_response['suggestion']).to eq('api_key and user_key are required')
@@ -259,6 +261,8 @@ describe DDS::V1::SoftwareAgentsAPI do
         %w(error reason suggestion).each do |expected_key|
           expect(error_response).to have_key expected_key
         end
+        expect(error_response).to have_key('code')
+        expect(error_response['code']).to eq('not_provided')
         expect(error_response['error']).to eq(400)
         expect(error_response['reason']).to eq('missing key or keys')
         expect(error_response['suggestion']).to eq('api_key and user_key are required')
@@ -280,6 +284,8 @@ describe DDS::V1::SoftwareAgentsAPI do
         %w(error reason suggestion).each do |expected_key|
           expect(error_response).to have_key expected_key
         end
+        expect(error_response).to have_key('code')
+        expect(error_response['code']).to eq('not_provided')
         expect(error_response['error']).to eq(404)
         expect(error_response['reason']).to eq('invalid key')
         expect(error_response['suggestion']).to eq('ensure both keys are valid')
@@ -301,6 +307,8 @@ describe DDS::V1::SoftwareAgentsAPI do
         %w(error reason suggestion).each do |expected_key|
           expect(error_response).to have_key expected_key
         end
+        expect(error_response).to have_key('code')
+        expect(error_response['code']).to eq('not_provided')
         expect(error_response['error']).to eq(404)
         expect(error_response['reason']).to eq('invalid key')
         expect(error_response['suggestion']).to eq('ensure both keys are valid')

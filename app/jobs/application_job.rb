@@ -4,11 +4,34 @@ class ApplicationJob < ActiveJob::Base
   class QueueNotFound < ::StandardError
   end
   before_enqueue do |job|
-    if self.class.queue_adapter.is_a?(ActiveJob::QueueAdapters::SneakersAdapter) &&
+    if ENV['SNEAKERS_SKIP_QUEUE_EXISTS_TEST'].nil? &&
+        self.class.queue_adapter.is_a?(ActiveJob::QueueAdapters::SneakersAdapter) &&
         !ApplicationJob.conn.queue_exists?(queue_name)
 
       raise QueueNotFound.new("Queue #{queue_name} does not exist")
     end
+  end
+
+  rescue_from(ActiveJob::DeserializationError) do |e|
+    if @deserialization_error_retried
+      raise e
+    else
+      @deserialization_error_retried = true
+      self.class.wait ApplicationJob.deserialization_error_retry_interval
+      self.perform_now
+    end
+  end
+
+  def self.deserialization_error_retry_interval=(val)
+    @deserialization_error_retry_interval = Integer(val)
+  end
+
+  def self.deserialization_error_retry_interval
+    @deserialization_error_retry_interval || 1
+  end
+
+  def self.wait(interval)
+    sleep interval
   end
 
   def self.distributor_exchange_name
