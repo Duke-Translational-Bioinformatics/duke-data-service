@@ -48,7 +48,6 @@ module DDS
           if ENV["GRAPHSTORY_URL"]
             #graphdb must be accessible with configured authentication or this will throw a Faraday::ConnectionFailed exception
             count = Neo4j::Session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
-            status[:graphdb] = 'ok'
           else
             status[:status] = 'error'
             logger.error 'graphdb environment is not set'
@@ -60,7 +59,7 @@ module DDS
               Sneakers::CONFIG[:retry_error_exchange],
               ApplicationJob.distributor_exchange_name
             ].each do |expected_exchange|
-              unless Sneakers::CONFIG[:connection].exchange_exists? expected_exchange
+              unless ApplicationJob.conn.exchange_exists? expected_exchange
                 status[:status] = 'error'
                 logger.error "queue is missing expected exchange #{expected_exchange}"
               end
@@ -76,7 +75,7 @@ module DDS
               Sneakers::CONFIG[:retry_error_exchange]
             ].concat(application_job_workers)
             .each do |expected_queue|
-              unless Sneakers::CONFIG[:connection].queue_exists? expected_queue
+              unless ApplicationJob.conn.queue_exists? expected_queue
                 status[:status] = 'error'
                 logger.error "queue is missing expected queue #{expected_queue}"
               end
