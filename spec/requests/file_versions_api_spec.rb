@@ -7,6 +7,7 @@ describe DDS::V1::FileVersionsAPI do
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
   let(:file_version) { data_file.file_versions.first }
+  let(:upload) { file_version.upload }
   let(:current_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
   let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
@@ -150,6 +151,8 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an eventually consistent resource', :upload
+      it_behaves_like 'an eventually consistent upload integrity exception', :upload
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
