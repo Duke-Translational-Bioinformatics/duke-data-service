@@ -10,7 +10,8 @@ RSpec.describe JobsRunner do
     message_logger: MessageLogWorker,
     initialize_project_storage: ProjectStorageProviderInitializationJob,
     delete_children: ChildDeletionJob,
-    index_documents: ElasticsearchIndexJob
+    index_documents: ElasticsearchIndexJob,
+    complete_upload: UploadCompletionJob
   } }
   let(:registered_worker_classes) { workers_registry_hash.values }
 

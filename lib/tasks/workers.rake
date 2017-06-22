@@ -28,6 +28,13 @@ namespace :workers do
     end
   end
 
+  namespace :complete_upload do
+    desc 'run an UploadCompletionJob'
+    task run: :environment do
+      JobsRunner.new(UploadCompletionJob).run
+    end
+  end
+
   namespace :all do
     desc 'run all jobs'
     task run: :environment do
