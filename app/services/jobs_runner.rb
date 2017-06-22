@@ -15,7 +15,8 @@ class JobsRunner
       message_logger: MessageLogWorker,
       initialize_project_storage: ProjectStorageProviderInitializationJob,
       delete_children: ChildDeletionJob,
-      index_documents: ElasticsearchIndexJob
+      index_documents: ElasticsearchIndexJob,
+      complete_upload: UploadCompletionJob
     }
   end
 

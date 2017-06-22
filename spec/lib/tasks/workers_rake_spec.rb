@@ -39,6 +39,15 @@ describe "workers" do
     it_behaves_like 'a queued job worker', :expected_job_class
   end
 
+  describe 'workers:complete_upload:run' do
+    include_context "rake"
+    let(:task_name) { "workers:complete_upload:run" }
+    let(:expected_job_class) { UploadCompletionJob }
+
+    it { expect(subject.prerequisites).to  include("environment") }
+    it_behaves_like 'a queued job worker', :expected_job_class
+  end
+
   JobsRunner.workers_registry.each do |worker_key, worker_class|
     describe "workers:#{worker_key}:run" do
       include_context "rake"
