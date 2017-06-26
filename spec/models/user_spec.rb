@@ -68,11 +68,13 @@ RSpec.describe User, type: :model do
     end
 
     it 'should have many created_files' do
-      should have_many(:created_files).class_name('DataFile').through(:permitted_projects).source(:data_files).with_foreign_key(:creator_id).conditions(is_deleted: false)
+      should have_many(:created_files).class_name('DataFile').through(:permitted_projects).source(:data_files).conditions(is_deleted: false)
     end
 
+    it { is_expected.to have_many(:file_versions).through(:created_files) }
+
     it 'should have many uploads through created_files' do
-      should have_many(:uploads).through(:created_files)
+      should have_many(:uploads).through(:file_versions)
     end
 
     it 'should have one system_permission' do
