@@ -187,6 +187,7 @@ describe DDS::V1::FileVersionsAPI do
         expect(data_file.upload).to eq(current_file_version.upload)
         expect(data_file.upload).not_to eq(resource.upload)
         is_expected.to eq(201)
+        data_file.upload = nil
         expect(data_file.reload).to be_truthy
         expect(data_file.current_file_version).not_to eq(current_file_version)
         expect(data_file.current_file_version.upload).to eq(resource.upload)
