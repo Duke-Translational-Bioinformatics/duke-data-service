@@ -187,13 +187,12 @@ describe DDS::V1::FileVersionsAPI do
         expect(data_file.upload).to eq(current_file_version.upload)
         expect(data_file.upload).not_to eq(resource.upload)
         is_expected.to eq(201)
-        data_file.upload = nil
-        expect(data_file.reload).to be_truthy
-        expect(data_file.current_file_version).not_to eq(current_file_version)
-        expect(data_file.current_file_version.upload).to eq(resource.upload)
-        expect(data_file.current_file_version.label).to eq(resource.label)
-        expect(data_file.current_file_version.version_number).to be > resource.version_number
-        expect(data_file.upload).to eq(resource.upload)
+        reloaded_data_file = DataFile.find(data_file.id)
+        expect(reloaded_data_file.current_file_version).not_to eq(current_file_version)
+        expect(reloaded_data_file.current_file_version.upload).to eq(resource.upload)
+        expect(reloaded_data_file.current_file_version.label).to eq(resource.label)
+        expect(reloaded_data_file.current_file_version.version_number).to be > resource.version_number
+        expect(reloaded_data_file.upload).to eq(resource.upload)
       end
 
       it_behaves_like 'a software_agent accessible resource' do
