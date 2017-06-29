@@ -91,6 +91,31 @@ def create_missing_fingerprints
   puts "Fin!"
 end
 
+def migrate_nil_consistency_status
+  storage_provider = StorageProvider.first
+  Project.where(is_consistent: nil).each do |p|
+    unless p.is_deleted
+      if storage_provider.get_container_meta(p.id)
+        p.update(is_consistent: true)
+      else
+        p.update(is_consistent: false)
+      end
+      print 'p'
+    end
+  end
+
+  Upload.where(is_consistent: nil).each do |u|
+    begin
+      if storage_provider.get_object_metadata(u.project.id, u.id)
+        u.update(is_consistent: true)
+      end
+    rescue StorageProviderException
+      u.update(is_consistent: false)
+    end
+    $stderr.print 'u'
+  end
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -99,6 +124,7 @@ namespace :db do
       create_current_file_versions
       create_missing_fingerprints
       type_untyped_authentication_services
+      migrate_nil_consistency_status
     end
   end
 end
