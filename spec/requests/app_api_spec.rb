@@ -30,6 +30,8 @@ describe DDS::V1::AppAPI do
       include_context 'expected bunny exchanges and queues'
 
       it {
+        expect(Sneakers::CONFIG[:connection]).to receive(:start)
+         .and_call_original
         get '/api/v1/app/status', params: json_headers
         expect(response.status).to eq(200)
         expect(response.body).to be
