@@ -102,13 +102,13 @@ shared_context 'expected bunny exchanges and queues' do |
   before do
     ENV['CLOUDAMQP_URL'] = Faker::Internet.slug
     unless reject_exchange.empty?
-      allow_any_instance_of(BunnyMock::Session).to receive(:exchange_exists?)
+      allow(Sneakers::CONFIG[:connection]).to receive(:exchange_exists?)
         .with(reject_exchange)
         .and_return(false)
     end
 
     unless reject_queue.empty?
-      allow_any_instance_of(BunnyMock::Session).to receive(:queue_exists?)
+      allow(Sneakers::CONFIG[:connection]).to receive(:queue_exists?)
         .with(reject_queue)
         .and_return(false)
     end
@@ -117,7 +117,7 @@ shared_context 'expected bunny exchanges and queues' do |
       Sneakers::CONFIG[:retry_error_exchange],
       ApplicationJob.distributor_exchange_name
     ].reject{|q| q == reject_exchange }.each do |this_exchange|
-      allow_any_instance_of(BunnyMock::Session).to receive(:exchange_exists?)
+      allow(Sneakers::CONFIG[:connection]).to receive(:exchange_exists?)
         .with(this_exchange)
         .and_return(true)
     end
@@ -133,7 +133,7 @@ shared_context 'expected bunny exchanges and queues' do |
     ].concat(application_job_workers)
     .reject{|q| q == reject_queue }
     .each do |this_queue|
-      allow_any_instance_of(BunnyMock::Session).to receive(:queue_exists?)
+      allow(Sneakers::CONFIG[:connection]).to receive(:queue_exists?)
         .with(this_queue)
         .and_return(true)
     end
