@@ -72,6 +72,10 @@ group :development, :docker, :test do
   gem 'rspec-rails'
 end
 
+group :docker, :test do
+  gem 'pry-byebug'
+end
+  
 group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false
@@ -79,7 +83,6 @@ group :test do
   gem 'spring-commands-rspec'
   gem 'vcr'
   gem 'webmock'
-  gem 'pry-byebug'
   gem 'bunny-mock'
 end
 
