@@ -150,7 +150,7 @@ describe "db:data:migrate" do
       context 'record is consistent' do
         let(:prep_method) { send(prep_method_sym) }
         before do
-          prep_method.call
+          expect { prep_method }.not_to raise_error
         end
         it 'should update is_consistent to true' do
           expect(record_class.where(is_consistent: nil)).to exist
@@ -180,10 +180,8 @@ describe "db:data:migrate" do
       context 'for project' do
         let(:record) { FactoryGirl.create(:project, is_consistent: nil) }
         let(:init_project_storage) {
-          Proc.new do
-            storage_provider.put_container(record.id)
-            expect(storage_provider.get_container_meta(record.id)).to be
-          end
+          storage_provider.put_container(record.id)
+          expect(storage_provider.get_container_meta(record.id)).to be
         }
         it_behaves_like 'a consistency migration', :init_project_storage
       end
@@ -191,13 +189,11 @@ describe "db:data:migrate" do
       context 'for upload' do
         let(:record) { FactoryGirl.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
         let(:init_upload) {
-          Proc.new do
-            storage_provider.put_container(record.project.id)
-            expect(storage_provider.get_container_meta(record.project.id)).to be
-            record.create_and_validate_storage_manifest
-            record.update(is_consistent: nil)
-            expect(storage_provider.get_object_metadata(record.project.id, record.id)).to be
-          end
+          storage_provider.put_container(record.project.id)
+          expect(storage_provider.get_container_meta(record.project.id)).to be
+          record.create_and_validate_storage_manifest
+          record.update(is_consistent: nil)
+          expect(storage_provider.get_object_metadata(record.project.id, record.id)).to be
         }
         it_behaves_like 'a consistency migration', :init_upload
       end
