@@ -93,6 +93,8 @@ end
 
 def migrate_nil_consistency_status
   storage_provider = StorageProvider.first
+  updated_projects = 0
+  updated_uploads = 0
   Project.where(is_consistent: nil).each do |p|
     unless p.is_deleted
       if storage_provider.get_container_meta(p.id)
@@ -100,7 +102,7 @@ def migrate_nil_consistency_status
       else
         p.update(is_consistent: false)
       end
-      print 'p'
+      updated_projects += 1
     end
   end
 
@@ -112,8 +114,9 @@ def migrate_nil_consistency_status
     rescue StorageProviderException
       u.update(is_consistent: false)
     end
-    $stderr.print 'u'
+    updated_uploads += 1
   end
+  $stderr.print "#{updated_projects} projects and #{updated_uploads} uploads updated consistency"
 end
 
 namespace :db do
