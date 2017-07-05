@@ -13,7 +13,7 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 ###### API Summary
 
 |Endpoint |Description |
-|---|---|---|
+|---|---|
 | `GET /projects/trashbin` | Get a listing of projects in the trash bin. |
 | `GET /projects/{id}/trashbin{?name_contains}` | Get a recursive listing of objects in the trash bin that are descendants of the specified project. |
 | `GET /folders/{id}/trashbin{?name_contains}` | Get a recursive listing of objects in the trash bin that are descendants of the specified folder. |
