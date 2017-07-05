@@ -98,9 +98,9 @@ def migrate_nil_consistency_status
   Project.where(is_consistent: nil).each do |p|
     unless p.is_deleted
       if storage_provider.get_container_meta(p.id)
-        p.update(is_consistent: true)
+        p.update_columns(is_consistent: true)
       else
-        p.update(is_consistent: false)
+        p.update_columns(is_consistent: false)
       end
       updated_projects += 1
     end
@@ -109,10 +109,10 @@ def migrate_nil_consistency_status
   Upload.where(is_consistent: nil).each do |u|
     begin
       if storage_provider.get_object_metadata(u.project.id, u.id)
-        u.update(is_consistent: true)
+        u.update_columns(is_consistent: true)
       end
     rescue StorageProviderException
-      u.update(is_consistent: false)
+      u.update_columns(is_consistent: false)
     end
     updated_uploads += 1
   end
