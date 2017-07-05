@@ -6,11 +6,11 @@ class DataFile < Container
   has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
-  before_save :build_file_version, if: :new_file_version_needed?
   before_save :set_current_file_version_attributes
   before_save :set_file_versions_is_deleted, if: :is_deleted?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
+  validates :upload, presence: true, unless: :is_deleted
 
   validates_each :upload, unless: :is_deleted do |record, attr, value|
     if record.upload
@@ -25,11 +25,14 @@ class DataFile < Container
   delegate :http_verb, to: :upload
 
   def upload=(val)
-    @upload=val
+    if file_versions.empty? || (current_file_version.persisted? && upload != val)
+      build_file_version
+    end
+    current_file_version.upload = val
   end
 
   def upload
-    @upload || current_file_version&.upload
+    current_file_version&.upload
   end
 
   def host
@@ -55,22 +58,14 @@ class DataFile < Container
   end
 
   def build_file_version
-    file_versions.build
+    file_versions.build(data_file: self)
   end
 
   def set_current_file_version_attributes
     current_file_version.attributes = {
-      upload: upload,
       label: label
     }
-    upload = nil #clear instance variable
     current_file_version
-  end
-
-  def new_file_version_needed?
-    file_versions.empty? ||
-      current_file_version.upload != upload &&
-      current_file_version.persisted?
   end
 
   def as_indexed_json(options={})
