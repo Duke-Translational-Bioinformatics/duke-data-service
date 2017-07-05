@@ -165,6 +165,7 @@ describe "db:data:migrate" do
         it 'should update is_consistent to false' do
           expect(record_class.where(is_consistent: nil)).to exist
           invoke_task
+          expect(record_class.where(is_consistent: nil)).not_to exist
           record.reload
           expect(record.is_consistent).to eq false
         end
