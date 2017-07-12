@@ -88,5 +88,64 @@ describe "db:data:migrate" do
         expect(openid_authentication_service).to be_a OpenidAuthenticationService
       }
     end
+
+    shared_examples 'a consistency migration' do |prep_method_sym|
+      let(:record_class) { record.class }
+      before do
+        expect(record).to be_persisted
+      end
+      context 'record is consistent' do
+        let(:prep_method) { send(prep_method_sym) }
+        before do
+          expect { prep_method }.not_to raise_error
+        end
+        it 'should update is_consistent to true' do
+          expect(record_class.where(is_consistent: nil)).to exist
+          invoke_task
+          expect(record_class.where(is_consistent: nil)).not_to exist
+          record.reload
+          expect(record.is_consistent).to eq true
+        end
+      end
+
+      context 'record is not consistent' do
+        it 'should update is_consistent to false' do
+          expect(record_class.where(is_consistent: nil)).to exist
+          invoke_task
+          expect(record_class.where(is_consistent: nil)).not_to exist
+          record.reload
+          expect(record.is_consistent).to eq false
+        end
+      end
+    end
+
+    describe 'consistency migration', :vcr do
+      let(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+
+      before do
+        expect(storage_provider).to be_persisted
+      end
+
+      context 'for project' do
+        let(:record) { FactoryGirl.create(:project, is_consistent: nil) }
+        let(:init_project_storage) {
+          storage_provider.put_container(record.id)
+          expect(storage_provider.get_container_meta(record.id)).not_to be_nil
+        }
+        it_behaves_like 'a consistency migration', :init_project_storage
+      end
+
+      context 'for upload' do
+        let(:record) { FactoryGirl.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
+        let(:init_upload) {
+          storage_provider.put_container(record.project.id)
+          expect(storage_provider.get_container_meta(record.project.id)).not_to be_nil
+          record.create_and_validate_storage_manifest
+          record.update_columns(is_consistent: nil)
+          expect(storage_provider.get_object_metadata(record.project.id, record.id)).not_to be_nil
+        }
+        it_behaves_like 'a consistency migration', :init_upload
+      end
+    end
   end
 end

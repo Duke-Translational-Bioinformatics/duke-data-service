@@ -75,6 +75,34 @@ def create_missing_fingerprints
   puts "Fin!"
 end
 
+def migrate_nil_consistency_status
+  storage_provider = StorageProvider.first
+  updated_projects = 0
+  updated_uploads = 0
+  Project.where(is_consistent: nil).each do |p|
+    unless p.is_deleted
+      if storage_provider.get_container_meta(p.id)
+        p.update_columns(is_consistent: true)
+      else
+        p.update_columns(is_consistent: false)
+      end
+      updated_projects += 1
+    end
+  end
+
+  Upload.where(is_consistent: nil).each do |u|
+    begin
+      if storage_provider.get_object_metadata(u.project.id, u.id)
+        u.update_columns(is_consistent: true)
+      end
+    rescue StorageProviderException
+      u.update_columns(is_consistent: false)
+    end
+    updated_uploads += 1
+  end
+  $stderr.print "#{updated_projects} projects and #{updated_uploads} uploads updated consistency"
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -82,6 +110,7 @@ namespace :db do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_missing_fingerprints
       type_untyped_authentication_services
+      migrate_nil_consistency_status
     end
   end
 end
