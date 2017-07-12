@@ -152,6 +152,15 @@ RSpec.describe User, type: :model do
         expect(expected_size).to be > 0
         expect(subject.storage_bytes).to eq(expected_size)
       end
+
+      context 'when another user has uploaded a new version' do
+        let(:another_user_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: files.last.project) }
+        before(:each) do
+          files.last.upload = another_user_upload
+          expect(files.last.save).to be_truthy
+        end
+        it { expect(subject.storage_bytes).to eq(expected_size) }
+      end
     end
   end
 end
