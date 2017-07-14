@@ -37,6 +37,11 @@ services:
     volumes_from:
       - localdev
     entrypoint: ['bundle']
+  erd:
+    image: dukedataservice_server
+    volumes_from:
+      - localdev
+    entrypoint: ['erd']
     links:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
