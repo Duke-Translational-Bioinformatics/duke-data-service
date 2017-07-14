@@ -86,7 +86,7 @@ group :test do
   gem 'bunny-mock'
 end
 
-group :development do
+group :docker do
   gem "rails-erd"
 end
 
