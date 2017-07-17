@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170608184211) do
+ActiveRecord::Schema.define(version: 20170622204323) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -110,7 +110,6 @@ ActiveRecord::Schema.define(version: 20170608184211) do
     t.string   "type"
     t.uuid     "parent_id"
     t.uuid     "project_id"
-    t.uuid     "upload_id"
     t.boolean  "is_deleted", default: false
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false

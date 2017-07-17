@@ -41,22 +41,6 @@ def fill_new_authentication_service_attributes
   end
 end
 
-def create_current_file_versions
-  files = DataFile.eager_load(:file_versions).unscope(:order).joins('LEFT OUTER JOIN file_versions B ON B.data_file_id = containers.id AND B.version_number > file_versions.version_number').where('B.data_file_id IS NULL').where('file_versions.data_file_id IS NULL OR containers.upload_id != file_versions.upload_id')
-  version_count = FileVersion.count
-  puts "Updating current_file_version for #{files.count} files"
-  files.each do |f|
-    ActiveRecord::Base.transaction do
-      Audited.audit_class.as_user(f.audits.last.user) do
-        f.save!
-      end
-      print "."
-    end
-  end
-  puts "#{FileVersion.count - version_count} versions created."
-  puts "Fin!"
-end
-
 def create_missing_fingerprints
   #uploads = Upload.where.not(fingerprint_value: nil)
   uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
@@ -124,7 +108,6 @@ namespace :db do
     desc "Migrate existing data to fit current business rules"
     task migrate: :environment do
       Rails.logger.level = 3 unless Rails.env == 'test'
-      create_current_file_versions
       create_missing_fingerprints
       type_untyped_authentication_services
       migrate_nil_consistency_status
