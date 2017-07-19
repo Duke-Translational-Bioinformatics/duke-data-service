@@ -25,6 +25,8 @@ describe DDS::V1::CurrentUserAPI do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(401)
           expect(error_response['reason']).to eq('no api_token')
           expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')

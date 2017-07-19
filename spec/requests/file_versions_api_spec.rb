@@ -7,7 +7,12 @@ describe DDS::V1::FileVersionsAPI do
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
   let(:file_version) { data_file.file_versions.first }
-  let(:current_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
+  let(:upload) { file_version.upload }
+  let(:new_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
+  let(:current_file_version) do
+    expect(data_file.update(upload: new_upload)).to be_truthy
+    data_file.current_file_version
+  end
   let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
   let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
   let(:deleted_data_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
@@ -150,6 +155,8 @@ describe DDS::V1::FileVersionsAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an eventually consistent resource', :upload
+      it_behaves_like 'an eventually consistent upload integrity exception', :upload
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
@@ -177,12 +184,15 @@ describe DDS::V1::FileVersionsAPI do
       it 'promotes the file_version to the current_file_version' do
         expect(data_file.reload).to be_truthy
         expect(data_file.current_file_version).to eq(current_file_version)
+        expect(data_file.upload).to eq(current_file_version.upload)
+        expect(data_file.upload).not_to eq(resource.upload)
         is_expected.to eq(201)
-        expect(data_file.reload).to be_truthy
-        expect(data_file.current_file_version).not_to eq(current_file_version)
-        expect(data_file.current_file_version.upload).to eq(resource.upload)
-        expect(data_file.current_file_version.label).to eq(resource.label)
-        expect(data_file.current_file_version.version_number).to be > resource.version_number
+        reloaded_data_file = DataFile.find(data_file.id)
+        expect(reloaded_data_file.current_file_version).not_to eq(current_file_version)
+        expect(reloaded_data_file.current_file_version.upload).to eq(resource.upload)
+        expect(reloaded_data_file.current_file_version.label).to eq(resource.label)
+        expect(reloaded_data_file.current_file_version.version_number).to be > resource.version_number
+        expect(reloaded_data_file.upload).to eq(resource.upload)
       end
 
       it_behaves_like 'a software_agent accessible resource' do

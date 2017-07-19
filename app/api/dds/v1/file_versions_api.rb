@@ -85,15 +85,16 @@ module DDS
         named 'download file_version'
         failure [
           [200, "Success"],
-          [301, 'Redirect to file version'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File version does not exist']
+          [404, 'File version does not exist, or Upload is not consistent']
         ]
       end
       get '/file_versions/:id/url', root: false, serializer: FileVersionUrlSerializer do
         authenticate!
         file_version = hide_logically_deleted(FileVersion.find(params[:id]))
         authorize file_version, :download?
+        check_consistency! file_version.upload
+        check_integrity! file_version.upload
         file_version
       end
 
