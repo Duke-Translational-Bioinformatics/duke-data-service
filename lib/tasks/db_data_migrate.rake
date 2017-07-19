@@ -79,18 +79,22 @@ def migrate_nil_consistency_status
   storage_provider = StorageProvider.first
   updated_projects = 0
   updated_uploads = 0
-  Project.where(is_consistent: nil).each do |p|
-    unless p.is_deleted
-      if storage_provider.get_container_meta(p.id)
-        p.update_columns(is_consistent: true)
-      else
-        p.update_columns(is_consistent: false)
-      end
-      updated_projects += 1
+  projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
+  puts "#{projects.count} projects with nil consistency_status."
+  projects.each do |p|
+    if storage_provider.get_container_meta(p.id)
+      p.update_columns(is_consistent: true)
+    else
+      p.update_columns(is_consistent: false)
     end
+    print '.'
+    updated_projects += 1
   end
+  puts "#{updated_projects} projects updated."
 
-  Upload.where(is_consistent: nil).each do |u|
+  uploads = Upload.where(is_consistent: nil)
+  puts "#{uploads.count} uploads with nil consistency_status."
+  uploads.each do |u|
     begin
       if storage_provider.get_object_metadata(u.project.id, u.id)
         u.update_columns(is_consistent: true)
@@ -99,8 +103,9 @@ def migrate_nil_consistency_status
       u.update_columns(is_consistent: false)
     end
     updated_uploads += 1
+    print '.'
   end
-  $stderr.print "#{updated_projects} projects and #{updated_uploads} uploads updated consistency"
+  puts "#{updated_uploads} uploads updated."
 end
 
 namespace :db do

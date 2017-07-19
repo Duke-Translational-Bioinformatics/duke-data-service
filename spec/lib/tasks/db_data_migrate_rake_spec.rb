@@ -133,6 +133,11 @@ describe "db:data:migrate" do
           expect(storage_provider.get_container_meta(record.id)).not_to be_nil
         }
         it_behaves_like 'a consistency migration', :init_project_storage
+
+        context 'with deleted project' do
+          before(:each) { FactoryGirl.create(:project, :deleted, is_consistent: nil) }
+          it { expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count} }
+        end
       end
 
       context 'for upload' do
