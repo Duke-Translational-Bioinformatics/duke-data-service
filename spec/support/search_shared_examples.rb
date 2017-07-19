@@ -152,11 +152,13 @@ end
 shared_examples 'an elasticsearch indexer' do
   def all_elasticsearch_documents
     expect{ elasticsearch_client.indices.flush }.not_to raise_error
-    elasticsearch_client.search["hits"]["hits"]
+    hits = elasticsearch_client.search(size: 1000)["hits"]
+    expect(hits["hits"].length).to eq(hits["total"])
+    hits["hits"]
   end
 
   let(:elasticsearch_client) { Elasticsearch::Model.client }
-  let(:existing_documents) { elasticsearch_client.search["hits"]["hits"] }
+  let(:existing_documents) { all_elasticsearch_documents }
   let(:new_documents) { all_elasticsearch_documents - existing_documents }
   before do
     expect{ existing_documents }.not_to raise_error
