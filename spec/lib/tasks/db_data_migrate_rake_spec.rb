@@ -10,59 +10,6 @@ describe "db:data:migrate" do
   it { expect(subject.prerequisites).to  include("environment") }
 
   describe "#invoke" do
-
-    context 'with correct current_versions' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          f = FactoryGirl.create(:data_file)
-          f.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint)
-          f.save
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(0) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
-    end
-    context 'without file_versions' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          FileVersion.last.destroy
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
-
-      context 'once called' do
-        before { invoke_task }
-        it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
-      end
-    end
-    context 'with current_file_version upload mismatch' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed, :with_fingerprint))
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
-
-      context 'once called' do
-        before { invoke_task }
-        it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
-      end
-    end
-
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
       let(:incomplete_upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
