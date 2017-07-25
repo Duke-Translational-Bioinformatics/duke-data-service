@@ -1,9 +1,6 @@
 class TagPolicy < ApplicationPolicy
   def show?
-    system_permission ||
-      (record&.taggable&.respond_to?(:project_permissions) &&
-                          project_permission(:view_project)) ||
-      record&.taggable&.creator == user
+    Pundit::PolicyFinder.new(record.taggable).policy&.new(user, record.taggable)&.show?
   end
 
   def create?

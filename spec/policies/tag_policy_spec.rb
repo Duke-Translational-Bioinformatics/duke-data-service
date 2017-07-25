@@ -43,6 +43,19 @@ describe TagPolicy do
     let(:other_activity) { FactoryGirl.create(:activity) }
     let(:creator) { taggable_object.creator }
 
+    let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [:view_project]) }
+    let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
+    let(:project_viewer) { project_permission.user }
+    let(:visible_file_version) {
+      FactoryGirl.create(:data_file,
+                         project: project_permission.project).current_file_version
+    }
+    let(:visible_related_activity) {
+      FactoryGirl.create(:used_prov_relation,
+                         relatable_to: visible_file_version).relatable_from
+    }
+    let(:related_tag) { FactoryGirl.create(:tag, taggable: visible_related_activity) }
+
     it_behaves_like 'system_permission can access', :tag
     it_behaves_like 'system_permission can access', :other_tag
 
@@ -50,12 +63,14 @@ describe TagPolicy do
       context "#{permission} permission" do
         it { expect( TagPolicy.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).show?)}
         it { expect( TagPolicy.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).show?)}
+        it { expect( TagPolicy.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).show?)}
       end
     end
     [:create?, :update?, :destroy?].each do |permission|
       context "#{permission} permission" do
         it { expect( TagPolicy.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).update?)}
         it { expect( TagPolicy.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).update?)}
+        it { expect( TagPolicy.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).update?)}
       end
     end
   end
