@@ -36,4 +36,29 @@ describe TagPolicy do
       end
     end
   end
+
+  context 'with taggable Activity' do
+    let(:taggable_object) { FactoryGirl.create(:activity) }
+    let(:other_tag) { FactoryGirl.create(:tag, taggable: other_activity) }
+    let(:other_activity) { FactoryGirl.create(:activity) }
+    let(:user) { taggable_object.creator }
+    let(:tag_policy) { TagPolicy.new(user, tag) }
+    let(:activity_policy) { ActivityPolicy.new(user, tag) }
+
+    it_behaves_like 'system_permission can access', :tag
+    it_behaves_like 'system_permission can access', :other_tag
+
+    [:index?, :show?].each do |permission|
+      context "#{permission} permission" do
+        it { expect( TagPolicy.new(user, tag).send(permission) ).to eq(ActivityPolicy.new(user, taggable_object).show?)}
+        it { expect( TagPolicy.new(user, other_tag).send(permission) ).to eq(ActivityPolicy.new(user, other_activity).show?)}
+      end
+    end
+    [:create?, :update?, :destroy?].each do |permission|
+      context "#{permission} permission" do
+        it { expect( TagPolicy.new(user, tag).send(permission) ).to eq(ActivityPolicy.new(user, taggable_object).update?)}
+        it { expect( TagPolicy.new(user, other_tag).send(permission) ).to eq(ActivityPolicy.new(user, other_activity).update?)}
+      end
+    end
+  end
 end
