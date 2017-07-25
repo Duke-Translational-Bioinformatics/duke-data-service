@@ -6,12 +6,13 @@ describe DDS::V1::TagsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
-  let(:tag_stub) { FactoryGirl.build(:tag, taggable: data_file) }
+  let(:taggable) { data_file }
+  let(:tag) { FactoryGirl.create(:tag, taggable: taggable) }
+  let(:tag_stub) { FactoryGirl.build(:tag, taggable: taggable) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_tag) { FactoryGirl.create(:tag, taggable: other_data_file) }
+  let(:other_taggable) { FactoryGirl.create(:data_file, project: other_permission.project) }
+  let(:other_tag) { FactoryGirl.create(:tag, taggable: other_taggable) }
 
   let(:not_allowed_tag) { FactoryGirl.create(:tag) }
 
@@ -23,9 +24,9 @@ describe DDS::V1::TagsAPI do
   let(:resource_stub) { tag_stub }
 
   describe 'Tags collection' do
-    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}" }
-    let(:file_id) { data_file.id }
-    let(:resource_kind) { data_file.kind }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{taggable_id}" }
+    let(:taggable_id) { taggable.id }
+    let(:resource_kind) { taggable.kind }
 
     describe 'POST' do
       subject { post(url, params: payload.to_json, headers: headers) }
@@ -48,7 +49,7 @@ describe DDS::V1::TagsAPI do
       end
 
       it_behaves_like 'an identified resource' do
-        let(:file_id) { 'notfoundid' }
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
       end
 
@@ -85,8 +86,8 @@ describe DDS::V1::TagsAPI do
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
 
-      context 'with invalid file_id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with invalid taggable_id' do
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) { DataFile }
         it_behaves_like 'an identified resource'
       end
@@ -99,9 +100,9 @@ describe DDS::V1::TagsAPI do
   end
 
   describe 'Append a list of object tags'  do
-    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}/append" }
-    let(:file_id) { data_file.id }
-    let(:resource_kind) { data_file.kind }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{taggable_id}/append" }
+    let(:taggable_id) { taggable.id }
+    let(:resource_kind) { taggable.kind }
     describe 'POST' do
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
@@ -159,8 +160,8 @@ describe DDS::V1::TagsAPI do
         let(:expected_response_status) { 201 }
       end
 
-      context 'with invalid file_id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with invalid taggable_id' do
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) { DataFile }
         it_behaves_like 'an identified resource'
       end
@@ -219,8 +220,8 @@ describe DDS::V1::TagsAPI do
 
       context 'with label_contains parameter' do
         let(:label_query) { SecureRandom.hex }
-        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: data_file) }
-        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: data_file) }
+        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: taggable) }
+        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: taggable) }
         let!(:diff_tag_label) { Tag.where(label: diff_tag.label).tag_labels.first }
         let(:query_params) { "?label_contains=#{label_query}" }
 
