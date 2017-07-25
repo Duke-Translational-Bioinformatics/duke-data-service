@@ -88,8 +88,6 @@ describe DDS::V1::MetaTemplatesAPI do
     let(:template_id) { template.id }
 
     describe 'POST' do
-      include_context 'elasticsearch prep', [:template, :property], [:templatable]
-
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:template) { FactoryGirl.create(:template) }
       let(:called_action) { 'POST' }
@@ -207,8 +205,6 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'PUT' do
-      include_context 'elasticsearch prep', [:template, :property], [:templatable]
-
       subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
@@ -292,7 +288,6 @@ describe DDS::V1::MetaTemplatesAPI do
 
       it_behaves_like 'a removable resource'
       context 'with associated meta_property' do
-        include_context 'elasticsearch prep', [:template, :property], [:templatable]
         before { expect(meta_property).to be_persisted }
         it 'should destroy meta_property' do
           expect {
