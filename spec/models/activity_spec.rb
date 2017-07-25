@@ -41,6 +41,7 @@ RSpec.describe Activity, type: :model do
     it { is_expected.to have_many(:generated_by_activity_prov_relations) }
     it { is_expected.to have_many(:invalidated_by_activity_prov_relations) }
     it { is_expected.to have_many(:used_prov_relations) }
+    it { is_expected.to have_many(:tags) }
   end
 
   describe 'validations' do
