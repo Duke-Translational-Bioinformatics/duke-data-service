@@ -42,6 +42,7 @@ RSpec.describe Activity, type: :model do
     it { is_expected.to have_many(:invalidated_by_activity_prov_relations) }
     it { is_expected.to have_many(:used_prov_relations) }
     it { is_expected.to have_many(:tags) }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do

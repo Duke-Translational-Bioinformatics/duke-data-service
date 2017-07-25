@@ -12,6 +12,7 @@ class Activity < ActiveRecord::Base
   has_many :invalidated_by_activity_prov_relations, as: :relatable_to
   has_many :used_prov_relations, as: :relatable_from
   has_many :tags, as: :taggable
+  has_many :meta_templates, as: :templatable
 
   validates :name, presence: true
   validates :creator_id, presence: true
