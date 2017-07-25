@@ -61,16 +61,16 @@ describe TagPolicy do
 
     [:index?, :show?].each do |permission|
       context "#{permission} permission" do
-        it { expect( TagPolicy.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).show?)}
-        it { expect( TagPolicy.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).show?)}
-        it { expect( TagPolicy.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).show?)}
+        it { expect( described_class.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).show?)}
+        it { expect( described_class.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).show?)}
+        it { expect( described_class.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).show?)}
       end
     end
     [:create?, :update?, :destroy?].each do |permission|
       context "#{permission} permission" do
-        it { expect( TagPolicy.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).update?)}
-        it { expect( TagPolicy.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).update?)}
-        it { expect( TagPolicy.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).update?)}
+        it { expect( described_class.new(creator, tag).send(permission) ).to eq(ActivityPolicy.new(creator, taggable_object).update?)}
+        it { expect( described_class.new(creator, other_tag).send(permission) ).to eq(ActivityPolicy.new(creator, other_activity).update?)}
+        it { expect( described_class.new(project_viewer, related_tag).send(permission) ).to eq(ActivityPolicy.new(project_viewer, visible_related_activity).update?)}
       end
     end
   end
