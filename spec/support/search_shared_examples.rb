@@ -124,7 +124,8 @@ shared_examples 'an Elasticsearch::Model' do |resource_search_serializer_sym: :s
   end
 
   describe '#as_indexed_json' do
-    it { is_expected.to respond_to 'as_indexed_json' }
+    it { is_expected.to respond_to('as_indexed_json').with(0).arguments }
+    it { is_expected.to respond_to('as_indexed_json').with(1).argument }
     it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
   end
 end
