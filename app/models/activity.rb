@@ -2,8 +2,12 @@ class Activity < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
+  include JobTransactionable
+  include Elasticsearch::Model
   before_create :set_default_started_on
   after_save :logically_delete_graph_node
+  after_create :create_elasticsearch_index
+  after_update :update_elasticsearch_index
 
   audited
 
@@ -26,5 +30,24 @@ class Activity < ActiveRecord::Base
 
   def set_default_started_on
     self.started_on = DateTime.now unless self.started_on
+  end
+
+  def create_elasticsearch_index
+    ElasticsearchIndexJob.perform_later(
+      ElasticsearchIndexJob.initialize_job(self),
+      self
+    )
+  end
+
+  def update_elasticsearch_index
+    ElasticsearchIndexJob.perform_later(
+      ElasticsearchIndexJob.initialize_job(self),
+      self,
+      update: true
+    )
+  end
+
+  def as_indexed_json(options={})
+    ActivitySerializer.new(self).as_json
   end
 end

@@ -66,4 +66,11 @@ RSpec.describe Activity, type: :model do
       expect(subject).not_to be_valid
     end
   end
+
+  describe 'elasticsearch' do
+    let(:search_serializer) { ActivitySerializer }
+    include_context 'with job runner', ElasticsearchIndexJob
+
+    it_behaves_like 'an Elasticsearch::Model'
+  end
 end
