@@ -1,5 +1,5 @@
 class ElasticsearchResponse
-  @@indexed_models = [DataFile, Folder]
+  @@indexed_models = [DataFile, Folder, Activity]
   include ActiveModel::Serialization
   attr_reader :results
 
