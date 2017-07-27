@@ -131,25 +131,4 @@ shared_examples 'a ChildMinder' do |resource_factory,
       }
     end
   end
-
-  describe '#delete_children' do
-    it {
-      is_expected.to respond_to(:delete_children)
-    }
-    it {
-      expect(child_folder).to be_persisted
-      expect(child_folder.is_deleted?).to be_falsey
-      expect(valid_child_file).to be_persisted
-      expect(valid_child_file.is_deleted?).to be_falsey
-      expect(invalid_child_file).to be_persisted
-      expect(invalid_child_file.is_deleted?).to be_falsey
-      subject.delete_children
-      expect(child_folder.reload).to be_truthy
-      expect(child_folder.is_deleted?).to be_truthy
-      valid_child_file.reload
-      expect(valid_child_file.is_deleted?).to be_truthy
-      invalid_child_file.reload
-      expect(invalid_child_file.is_deleted?).to be_truthy
-    }
-  end
-end
+ end
