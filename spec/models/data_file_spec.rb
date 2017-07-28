@@ -335,7 +335,7 @@ RSpec.describe DataFile, type: :model do
     }}
     include_context 'with job runner', ElasticsearchIndexJob
 
-    it_behaves_like 'an Elasticsearch::Model' do
+    it_behaves_like 'a SearchableModel' do
       context 'when ElasticsearchIndexJob::perform_later raises an error' do
         context 'with new data_file' do
           subject { FactoryGirl.build(:data_file, :root) }

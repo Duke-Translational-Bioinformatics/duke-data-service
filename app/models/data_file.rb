@@ -1,6 +1,8 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class DataFile < Container
+  include SearchableModel
+
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
