@@ -9,20 +9,21 @@ module ChildMinder
     newly_deleted = is_deleted_changed? && is_deleted?
     yield
     if has_children? && newly_deleted
-      ChildDeletionJob.perform_later(
-        ChildDeletionJob.initialize_job(self),
-        self
-      )
-    end
-  end
-
-  def delete_children
-    children.each do |child|
-      child.update(is_deleted: true)
+      (1..paginated_children.total_pages).each do |page|
+        ChildDeletionJob.perform_later(
+          ChildDeletionJob.initialize_job(self),
+          self,
+          page
+        )
+      end
     end
   end
 
   def has_children?
     children.count > 0
+  end
+
+  def paginated_children(page=1)
+    children.page(page).per(Rails.application.config.max_children_per_job)
   end
 end

@@ -65,6 +65,8 @@ shared_examples 'a ChildMinder' do |resource_factory,
           ChildDeletionJob.initialize_job(subject)
         }
         before do
+          @old_max = Rails.application.config.max_children_per_job
+          Rails.application.config.max_children_per_job = 1
           expect(child_folder).to be_persisted
           expect(child_folder.is_deleted?).to be_falsey
           expect(valid_child_file).to be_persisted
@@ -73,13 +75,19 @@ shared_examples 'a ChildMinder' do |resource_factory,
           expect(invalid_child_file.is_deleted?).to be_falsey
         end
 
+        after do
+          Rails.application.config.max_children_per_job = @old_max
+        end
+
         it {
           expect(subject).to be_has_children
           subject.is_deleted = true
           yield_called = false
-          expect(ChildDeletionJob).to receive(:initialize_job)
-            .with(subject).and_return(job_transaction)
-          expect(ChildDeletionJob).to receive(:perform_later).with(job_transaction, subject)
+          expect(ChildDeletionJob).to receive(:initialize_job).exactly(subject.children.count)
+            .with(subject).times.and_return(job_transaction)
+          (1..subject.children.count).each do |page|
+            expect(ChildDeletionJob).to receive(:perform_later).with(job_transaction, subject, page)
+          end
           subject.manage_children do
             yield_called = true
           end
@@ -130,5 +138,25 @@ shared_examples 'a ChildMinder' do |resource_factory,
         expect(yield_called).to be_truthy
       }
     end
+  end
+
+  describe '#paginated_children' do
+    it { is_expected.to respond_to(:paginated_children).with(0).arguments }
+    it { is_expected.to respond_to(:paginated_children).with(1).argument }
+    it {
+      page_relation = subject.children.page(1)
+      per_relation = page_relation.per(Rails.application.config.max_children_per_job)
+      expect(subject.children).to receive(:page).with(1).and_return(page_relation)
+      expect(page_relation).to receive(:per).with(Rails.application.config.max_children_per_job).and_return(per_relation)
+      expect(subject.paginated_children).to eq(per_relation)
+    }
+
+    it {
+      page_relation = subject.children.page(3)
+      per_relation = page_relation.per(Rails.application.config.max_children_per_job)
+      expect(subject.children).to receive(:page).with(3).and_return(page_relation)
+      expect(page_relation).to receive(:per).with(Rails.application.config.max_children_per_job).and_return(per_relation)
+      expect(subject.paginated_children(3)).to eq(per_relation)
+    }
   end
  end
