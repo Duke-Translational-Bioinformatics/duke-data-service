@@ -186,13 +186,26 @@ shared_examples 'a ChildDeletionJob' do |
       described_class.perform_now
     }.to raise_error(ArgumentError)
     expect {
-      described_class.perform_now(parent)
+      described_class.perform_now(job_transaction)
+    }.to raise_error(ArgumentError)
+    expect {
+      described_class.perform_now(job_transaction, parent)
     }.to raise_error(ArgumentError)
   }
 
   context 'perform_now', :vcr do
     let(:child_job_transaction) { described_class.initialize_job(child_folder) }
+    let(:page) { 1 }
     include_context 'tracking job', :job_transaction
+
+    before do
+      @old_max = Rails.application.config.max_children_per_job
+      Rails.application.config.max_children_per_job = parent.children.count + child_folder.children.count
+    end
+
+    after do
+      Rails.application.config.max_children_per_job = @old_max
+    end
 
     it {
       expect(child_folder).to be_persisted
@@ -202,9 +215,9 @@ shared_examples 'a ChildDeletionJob' do |
         .with(child_folder)
         .and_return(child_job_transaction)
       expect(described_class).to receive(:perform_later)
-        .with(child_job_transaction, child_folder).and_call_original
+        .with(child_job_transaction, child_folder, page).and_call_original
 
-      described_class.perform_now(job_transaction, parent)
+      described_class.perform_now(job_transaction, parent, page)
       expect(child_folder.reload).to be_truthy
       expect(child_folder.is_deleted?).to be_truthy
       expect(child_file.reload).to be_truthy
