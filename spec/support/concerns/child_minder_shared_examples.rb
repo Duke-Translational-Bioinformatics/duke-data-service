@@ -159,4 +159,43 @@ shared_examples 'a ChildMinder' do |resource_factory,
       expect(subject.paginated_children(3)).to eq(per_relation)
     }
   end
+
+  describe '#delete_children' do
+    it { is_expected.not_to respond_to(:delete_children).with(0).arguments }
+    it { is_expected.to respond_to(:delete_children).with(1).argument }
+
+    context 'called', :vcr do
+      let(:job_transaction) { ChildDeletionJob.initialize_job(subject) }
+      let(:child_job_transaction) { ChildDeletionJob.initialize_job(child_folder) }
+      let(:child_folder_file) { FactoryGirl.create(:data_file, parent: child_folder)}
+      let(:page) { 1 }
+
+      before do
+        expect(child_folder).to be_persisted
+        expect(child_folder_file).to be_persisted
+        expect(valid_child_file.is_deleted?).to be_falsey
+        @old_max = Rails.application.config.max_children_per_job
+        Rails.application.config.max_children_per_job = subject.children.count + child_folder.children.count
+      end
+
+      after do
+        Rails.application.config.max_children_per_job = @old_max
+      end
+
+      it {
+        subject.current_transaction = job_transaction
+        expect(ChildDeletionJob).to receive(:initialize_job)
+          .with(child_folder)
+          .and_return(child_job_transaction)
+        expect(ChildDeletionJob).to receive(:perform_later)
+          .with(child_job_transaction, child_folder, page).and_call_original
+        subject.delete_children(page)
+        expect(child_folder.reload).to be_truthy
+        expect(child_folder.is_deleted?).to be_truthy
+        expect(valid_child_file.reload).to be_truthy
+        expect(valid_child_file.is_deleted?).to be_truthy
+      }
+    end
+
+  end
  end

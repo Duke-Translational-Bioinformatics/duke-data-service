@@ -26,4 +26,11 @@ module ChildMinder
   def paginated_children(page=1)
     children.page(page).per(Rails.application.config.max_children_per_job)
   end
+
+  def delete_children(page)
+    paginated_children(page).each do |child|
+      child.current_transaction = current_transaction if child.class.include? ChildMinder
+      child.update(is_deleted: true)
+    end
+  end
 end

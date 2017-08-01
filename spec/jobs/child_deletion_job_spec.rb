@@ -31,35 +31,14 @@ RSpec.describe ChildDeletionJob, type: :job do
       }.to raise_error(ArgumentError)
     }
 
-    context 'perform_now', :vcr do
-      let(:child_job_transaction) { described_class.initialize_job(child_folder) }
+    context 'perform_now' do
       let(:page) { 1 }
-      include_context 'tracking job', :job_transaction
-
-      before do
-        @old_max = Rails.application.config.max_children_per_job
-        Rails.application.config.max_children_per_job = parent.children.count + child_folder.children.count
-      end
-
-      after do
-        Rails.application.config.max_children_per_job = @old_max
-      end
 
       it {
         expect(child_folder).to be_persisted
-        expect(child_file.is_deleted?).to be_falsey
-
-        expect(described_class).to receive(:initialize_job)
-          .with(child_folder)
-          .and_return(child_job_transaction)
-        expect(described_class).to receive(:perform_later)
-          .with(child_job_transaction, child_folder, page).and_call_original
-
+        expect(child_file).to be_persisted
+        expect(parent).to receive(:delete_children).with(page)
         described_class.perform_now(job_transaction, parent, page)
-        expect(child_folder.reload).to be_truthy
-        expect(child_folder.is_deleted?).to be_truthy
-        expect(child_file.reload).to be_truthy
-        expect(child_file.is_deleted?).to be_truthy
       }
     end
   end
