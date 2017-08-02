@@ -140,26 +140,6 @@ shared_examples 'a ChildMinder' do |resource_factory,
     end
   end
 
-  describe '#paginated_children' do
-    it { is_expected.to respond_to(:paginated_children).with(0).arguments }
-    it { is_expected.to respond_to(:paginated_children).with(1).argument }
-    it {
-      page_relation = subject.children.page(1)
-      per_relation = page_relation.per(Rails.application.config.max_children_per_job)
-      expect(subject.children).to receive(:page).with(1).and_return(page_relation)
-      expect(page_relation).to receive(:per).with(Rails.application.config.max_children_per_job).and_return(per_relation)
-      expect(subject.paginated_children).to eq(per_relation)
-    }
-
-    it {
-      page_relation = subject.children.page(3)
-      per_relation = page_relation.per(Rails.application.config.max_children_per_job)
-      expect(subject.children).to receive(:page).with(3).and_return(page_relation)
-      expect(page_relation).to receive(:per).with(Rails.application.config.max_children_per_job).and_return(per_relation)
-      expect(subject.paginated_children(3)).to eq(per_relation)
-    }
-  end
-
   describe '#delete_children' do
     it { is_expected.not_to respond_to(:delete_children).with(0).arguments }
     it { is_expected.to respond_to(:delete_children).with(1).argument }
