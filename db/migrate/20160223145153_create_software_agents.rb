@@ -1,4 +1,4 @@
-class CreateSoftwareAgents < ActiveRecord::Migration
+class CreateSoftwareAgents < ActiveRecord::Migration[4.2]
   def change
     create_table :software_agents, id: :uuid do |t|
       t.string :name

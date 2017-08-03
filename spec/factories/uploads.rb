@@ -1,12 +1,13 @@
 FactoryGirl.define do
   factory :upload do
     project
-    name { Faker::Internet.slug }
+    sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
     content_type "text/plain"
     size { Faker::Number.number(2) }
     etag { SecureRandom.hex }
     storage_provider
     association :creator, factory: :user
+    is_consistent { true }
 
     trait :with_chunks do
       chunks { [ build(:chunk, number: 1) ] }
@@ -22,6 +23,10 @@ FactoryGirl.define do
 
     trait :completed do
       completed_at { DateTime.now }
+    end
+
+    trait :inconsistent do
+      is_consistent { false }
     end
 
     trait :with_error do

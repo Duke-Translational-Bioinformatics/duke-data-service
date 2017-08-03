@@ -1,4 +1,4 @@
-class CreateProjectTransferUsers < ActiveRecord::Migration
+class CreateProjectTransferUsers < ActiveRecord::Migration[4.2]
   def change
     create_table :project_transfer_users, id: :uuid do |t|
       t.uuid :project_transfer_id

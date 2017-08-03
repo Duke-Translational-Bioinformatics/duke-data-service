@@ -251,6 +251,8 @@ shared_examples 'an authentication request endpoint' do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(400)
           expect(error_response['reason']).to eq('no access_token')
           expect(error_response['suggestion']).to eq('you might need to login through an authentication service')
@@ -272,6 +274,8 @@ shared_examples 'an authentication request endpoint' do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(401)
           expect(error_response['reason']).to eq('invalid access_token')
           expect(error_response['suggestion']).to eq('token not properly signed')
@@ -295,6 +299,8 @@ shared_examples 'an authentication request endpoint' do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(401)
           expect(error_response['reason']).to eq('invalid access_token')
           expect(error_response['suggestion']).to eq('authentication service not registered')
@@ -320,6 +326,8 @@ shared_examples 'an authentication request endpoint' do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(401)
           expect(error_response['reason']).to eq('invalid access_token')
           expect(error_response['suggestion']).to eq('token not properly signed')

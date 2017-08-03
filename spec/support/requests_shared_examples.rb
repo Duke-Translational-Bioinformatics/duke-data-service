@@ -48,7 +48,7 @@ shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, header
   include_context 'request parameters', url_sym: url_sym, payload_sym: payload_sym, headers_sym: headers_sym
   let(:expected_response_status) { response_status }
   let(:called_action) { "GET" }
-  subject { get(request_url, request_payload, request_headers) }
+  subject { get(request_url, params: request_payload, headers: request_headers) }
 end
 
 shared_examples 'a listable resource' do |persisted_resource: true|
@@ -146,7 +146,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   it 'should return pagination response headers' do
      expect(extras.count).to be > per_page
      is_expected.to eq(expected_response_status)
-     expect(response.headers).to include(expected_response_headers)
+     expect(response.headers.to_h).to include(expected_response_headers)
   end
 
   it 'should return only per_page results' do
@@ -177,7 +177,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
   end
 
@@ -200,26 +200,8 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     it 'should return default per_page' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers).to include(expected_response_headers)
+       expect(response.headers.to_h).to include(expected_response_headers)
     end
-  end
-end
-
-shared_examples 'a storage_provider backed resource' do
-
-  it 'should return a 500 error and JSON error when a StorageProviderException is experienced' do
-    storage_provider.update_attribute(:url_root, "http://257.1.1.1")
-    stub_request(:any, "#{storage_provider.url_root}#{storage_provider.auth_uri}").to_timeout
-    is_expected.to eq(500)
-    expect(response.body).to be
-    expect(response.body).not_to eq('null')
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key('error')
-    expect(response_json['error']).to eq('500')
-    expect(response_json).to have_key('reason')
-    expect(response_json['reason']).to eq('The storage provider is unavailable')
-    expect(response_json).to have_key('suggestion')
-    expect(response_json['suggestion']).to eq('try again in a few minutes, or contact the systems administrators')
   end
 end
 
@@ -438,7 +420,7 @@ shared_examples 'a logically deleted resource' do
   it 'should return 404 with error when resource found is logically deleted' do
     expect(deleted_resource).to be_persisted
     expect(deleted_resource).to respond_to 'is_deleted'
-    expect(deleted_resource.update_attribute(:is_deleted, true)).to be_truthy
+    expect(deleted_resource.update_column(:is_deleted, true)).to be_truthy
     is_expected.to eq(404)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
@@ -473,6 +455,7 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
   let(:response_json) { JSON.parse(response.body) }
   let(:expected_response) {{
     'error' => 405,
+    'code' => 'not_provided',
     'reason' => 'not implemented',
     'suggestion' => 'this is not the endpoint you are looking for'
   }}
@@ -484,4 +467,72 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
     ENV.delete(env_key)
   end
   it { expect(response_json).to eq(expected_response) }
+end
+
+shared_examples 'a status error' do |expected_error_sym|
+  let(:expected_error) { send(expected_error_sym) }
+  it {
+    expect(Rails.logger).to receive(:error).with(expected_error)
+    get '/api/v1/app/status', params: json_headers
+    expect(response.status).to eq(503)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    returned_configs = JSON.parse(response.body)
+    expect(returned_configs).to be_a Hash
+    expect(returned_configs).to have_key('status')
+    expect(returned_configs['status']).to eq('error')
+  }
+end
+
+shared_examples 'an eventually consistent resource' do |eventually_consistent_resource_sym|
+  let(:inconsistent_resource) { send(eventually_consistent_resource_sym) }
+  it 'should return 404 with error when resource found is not consistent' do
+    expect(inconsistent_resource).to be_persisted
+    expect(inconsistent_resource).to respond_to 'is_consistent'
+    expect(inconsistent_resource.update_column(:is_consistent, false)).to be_truthy
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("resource_not_consistent")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("resource changes are still being processed by system")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("this is a temporary state that will eventually be resolved by the system; please retry request")
+  end
+end
+
+shared_examples 'an eventually consistent upload integrity exception' do |eventually_consistent_upload_sym|
+  let(:inconsistent_upload) { send(eventually_consistent_upload_sym) }
+  let(:expected_error_message) { "reported size does not match size computed by StorageProvider" }
+  before do
+    exactly_now = DateTime.now
+    expect(inconsistent_upload).to be_persisted
+    expect(
+      inconsistent_upload.update(
+        error_at: exactly_now,
+        error_message: expected_error_message,
+        is_consistent: true
+      )
+    ).to be_truthy
+  end
+
+  it {
+    expect(inconsistent_upload.has_integrity_exception?).to be_truthy
+    is_expected.to eq(400)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('400')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("not_provided")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq(expected_error_message)
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("You must begin a new upload process")
+  }
 end

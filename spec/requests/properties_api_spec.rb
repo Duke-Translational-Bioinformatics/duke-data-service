@@ -23,7 +23,7 @@ describe DDS::V1::PropertiesAPI do
     let(:template_id) { template.id }
 
     describe 'POST' do
-      subject { post(url, payload.to_json, headers) }
+      subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         key: payload_key,
@@ -57,7 +57,7 @@ describe DDS::V1::PropertiesAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a listable resource' do
@@ -129,7 +129,7 @@ describe DDS::V1::PropertiesAPI do
     let(:url) { "/api/v1/template_properties/#{resource_id}" }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an identified resource' do
@@ -139,7 +139,7 @@ describe DDS::V1::PropertiesAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let(:payload) {{
         key: payload_key,
@@ -171,7 +171,7 @@ describe DDS::V1::PropertiesAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
 

@@ -2,7 +2,7 @@ version: '2'
 services:
   localdev:
     #make sure image matches what the root Dockerfile is FROM
-    image: ruby:2.2.2
+    image: ruby:2.3.3
     command: ['echo','setting up localdev']
     volumes:
       - .:/var/www/app
@@ -13,6 +13,7 @@ services:
       - webapp.env
       - neo4j.client.env
       - elastic.client.env
+      - rabbitmq.client.env
     ports:
       - 3001:3000
     volumes_from:
@@ -21,6 +22,7 @@ services:
       - db:postgres.db.host
       - neo4j:neo4j.db.host
       - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
   db:
     build: ./docker/builds/db
     env_file:
@@ -35,3 +37,11 @@ services:
     image: elasticsearch:2.4
     ports:
       - '9200:9200'
+    command: elasticsearch --action.auto_create_index=0
+  rabbitmq:
+    hostname: rabbitmq.host
+    container_name: rabbitmq
+    image: rabbitmq:3.5-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"

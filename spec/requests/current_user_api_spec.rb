@@ -10,7 +10,7 @@ describe DDS::V1::CurrentUserAPI do
 
   describe 'get /current_user' do
     let(:url) { '/api/v1/current_user' }
-    subject { get(url, nil, headers) }
+    subject { get(url, headers: headers) }
 
     context 'with valid api_token' do
       it_behaves_like 'a viewable resource'
@@ -25,6 +25,8 @@ describe DDS::V1::CurrentUserAPI do
           %w(error reason suggestion).each do |expected_key|
             expect(error_response).to have_key expected_key
           end
+          expect(error_response).to have_key('code')
+          expect(error_response['code']).to eq('not_provided')
           expect(error_response['error']).to eq(401)
           expect(error_response['reason']).to eq('no api_token')
           expect(error_response['suggestion']).to eq('you might need to login through an authenticaton service')
@@ -79,7 +81,7 @@ describe DDS::V1::CurrentUserAPI do
 
   describe 'get /current_user/usage' do
     let(:url) { '/api/v1/current_user/usage' }
-    subject { get(url, nil, headers) }
+    subject { get(url, headers: headers) }
     let(:resource_serializer) { UserUsageSerializer }
 
     it_behaves_like 'a viewable resource'
@@ -92,7 +94,7 @@ describe DDS::V1::CurrentUserAPI do
     let(:resource_serializer) { ApiKeySerializer }
 
     describe 'PUT' do
-      subject { put(url, nil, headers) }
+      subject { put(url, headers: headers) }
 
       context 'without an existing token' do
         it_behaves_like 'a creatable resource' do
@@ -132,7 +134,7 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       context 'without api_key' do
         it_behaves_like 'an identified resource' do
@@ -151,7 +153,7 @@ describe DDS::V1::CurrentUserAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let!(:resource) {
         FactoryGirl.create(:api_key, user_id: current_user.id)
       }

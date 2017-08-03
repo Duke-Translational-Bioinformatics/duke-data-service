@@ -1,4 +1,4 @@
-class ChangeProjectTransferStatusToInteger < ActiveRecord::Migration
+class ChangeProjectTransferStatusToInteger < ActiveRecord::Migration[4.2]
   def change
     drop_table :project_transfers
     create_table :project_transfers, id: :uuid do |t|

@@ -4,8 +4,6 @@ class User < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
-  after_create :create_graph_node
-  after_destroy :delete_graph_node
 
   default_scope { order('created_at DESC') }
   audited except: :last_login_at
@@ -24,9 +22,11 @@ class User < ActiveRecord::Base
     -> { where(is_deleted: false) },
     class_name: 'DataFile',
     through: :permitted_projects,
-    source: :data_files,
-    foreign_key: "creator_id"
-  has_many :uploads, through: :created_files
+    source: :data_files
+  has_many :file_versions, through: :created_files
+  has_many :uploads,
+    ->(user) { where(creator: user) },
+    through: :file_versions
   has_many :affiliations
   has_one :system_permission
   has_one :api_key

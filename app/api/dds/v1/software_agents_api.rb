@@ -201,6 +201,7 @@ module DDS
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error_json = {
           "error" => 400,
+          "code" => "not_provided",
           "reason" => 'missing key or keys',
           "suggestion" => 'api_key and user_key are required'
         }
@@ -209,6 +210,7 @@ module DDS
       rescue_from ActiveRecord::RecordNotFound do |e|
         error_json = {
           "error" => 404,
+          "code" => "not_provided",
           "reason" => "invalid key",
           "suggestion" => "ensure both keys are valid"
         }

@@ -6,7 +6,7 @@ class MetaTemplate < ActiveRecord::Base
   has_many :meta_properties, autosave: true, dependent: :destroy
 
   validates :template, presence: true,
-    uniqueness: {scope: [:templatable_id, :templatable_type], case_sensitive: false}
+    uniqueness: {scope: [:templatable_id], case_sensitive: false}
   validates :templatable, presence: true
   validates :template, presence: true
 

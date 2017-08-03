@@ -24,7 +24,7 @@ RSpec.describe MetaTemplate, type: :model do
       is_expected.to allow_value(file).for(:templatable)
       is_expected.not_to allow_value(meta_template).for(:templatable)
     end
-    it { is_expected.to validate_uniqueness_of(:template).scoped_to(:templatable_id, :templatable_type).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:template).scoped_to(:templatable_id).case_insensitive }
   end
 
   describe '#project_permissions' do
@@ -41,8 +41,8 @@ RSpec.describe MetaTemplate, type: :model do
     let(:template) { FactoryGirl.create(:template) }
     let(:templatable) { FactoryGirl.create(:data_file) }
     let(:meta_templates) { FactoryGirl.build_list(:meta_template, 4, template: template, templatable: templatable) }
+    include_context 'with job runner', ProjectStorageProviderInitializationJob
     include_context 'with concurrent calls', object_list: :meta_templates, method: :save
-
     it { expect(MetaTemplate.count).to eq(1) }
   end
 end

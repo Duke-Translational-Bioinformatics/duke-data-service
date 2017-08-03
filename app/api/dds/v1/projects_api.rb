@@ -8,7 +8,7 @@ module DDS
         named 'create project'
         failure [
           [200, 'This will never actually happen'],
-          [201, 'Created Successfully'],
+          [202, 'Accepted, subject to further processing'],
           [400, 'Project Name Already Exists'],
           [401, 'Unauthorized'],
           [404, 'Project Does not Exist']
@@ -27,13 +27,8 @@ module DDS
           description: project_params[:description],
           creator_id: current_user.id,
         })
-        storage_provider = StorageProvider.first
         if project.save
-          project.set_project_admin
-          ProjectStorageProviderInitializationJob.perform_later(
-            storage_provider: storage_provider,
-            project: project
-          )
+          status 202
           project
         else
           validation_error!(project)

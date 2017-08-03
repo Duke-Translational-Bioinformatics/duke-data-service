@@ -133,7 +133,7 @@ describe DDS::V1::AuthProvidersAPI do
         uid: resource_uid
       }}
       let(:expected_response_status) { 200 }
-      subject { get(url, payload, headers) }
+      subject { get(url, params: payload, headers: headers) }
 
       it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
       it_behaves_like 'an identity provider', returns: :returned_users do
@@ -153,7 +153,7 @@ describe DDS::V1::AuthProvidersAPI do
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates/#{resource_uid}/dds_user" }
       let(:resource_serializer) { UserSerializer }
       let(:expected_response_status) { 201 }
-      subject { post(url, nil, headers) }
+      subject { post(url, headers: headers) }
 
       before do
         expect(current_user).to be
@@ -211,6 +211,8 @@ describe DDS::V1::AuthProvidersAPI do
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('error')
           expect(response_json['error']).to eq('409')
+          expect(response_json).to have_key('code')
+          expect(response_json['code']).to eq('not_provided')
           expect(response_json).to have_key('reason')
           expect(response_json['reason']).to eq("Affiliate already registered")
           expect(response_json).to have_key('suggestion')

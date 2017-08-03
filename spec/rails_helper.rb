@@ -8,6 +8,7 @@ require 'shoulda-matchers'
 require 'vcr'
 require 'pundit/rspec'
 require 'uri'
+require 'bunny-mock'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -51,6 +52,29 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
+  config.before(:context) do
+    ActiveJob::Base.queue_adapter = :test
+
+    # Ensure indexes exist in elasticsearch for indexed_models
+    ElasticsearchResponse.indexed_models.each do |indexed_model|
+      Elasticsearch::Model.client.indices.create(
+        index: indexed_model.index_name,
+        update_all_types: true,
+        body: {
+          settings: indexed_model.settings.to_hash,
+          mappings: indexed_model.mappings.to_hash
+        }
+      ) unless Elasticsearch::Model.client.indices.exists?(index: indexed_model.index_name)
+    end
+  end
+  config.after(:each) do
+    ActiveJob::Base.queue_adapter = :test
+  end
+  config.before(:suite) do
+    Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
+  end
   config.after(:each) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
@@ -80,4 +104,24 @@ VCR.configure do |c|
   c.default_cassette_options = {
     match_requests_on: [:method, :uri_ignoring_uuids, :header_keys ]
   }
+end
+
+# Mocking Bunny for Sneakers ActiveJob testing
+BunnyMock.use_bunny_queue_pop_api = true
+module BunnyMock
+  class Queue
+    def durable?
+      opts[:durable]
+    end
+
+    def cancel
+      @consumers = []
+    end
+
+    def pop(opts = { manual_ack: false }, &block)
+      r = bunny_pop(opts, &block)
+      store_acknowledgement(r, [opts])
+      r
+    end
+  end
 end

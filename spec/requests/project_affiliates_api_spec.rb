@@ -20,7 +20,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     let(:project_id) { project.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
@@ -46,7 +46,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     let(:user_id) { user.id }
 
     describe 'GET' do
-      subject { get(url, nil, headers) }
+      subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
@@ -65,7 +65,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     end
 
     describe 'PUT' do
-      subject { put(url, payload.to_json, headers) }
+      subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
       let!(:payload) {{
         project_role: {id: project_role.id}
@@ -116,7 +116,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
     end
 
     describe 'DELETE' do
-      subject { delete(url, nil, headers) }
+      subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
       it_behaves_like 'an authenticated resource'

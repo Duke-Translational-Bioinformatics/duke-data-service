@@ -280,7 +280,7 @@ Get profile for the currently authenticated user.
             "audit": { }
         }
 
-## NOT_IMPL_NEW Get current user access token [POST /current_user/api_token]
+## _NEW_ Get current user access token [POST /current_user/api_token]
 This allows a Web or native UX client to present an access token (i.e. OAuth token) from a registered authentication service and get an API token.
 
 >**Permission:** authenticated
@@ -570,20 +570,17 @@ Get a list of affiliates (potential users), for a supported authentication provi
             "email": "mrgardner01@duke.edu"
         }
 
-### Create or Get user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
+### Create user account for affiliate [POST /auth_providers/{id}/affiliates/{uid}/dds_user]
 Transform an institutional affiliates UID, such as a Duke NetID, to a DDS specific user identity; can be used by clients prior to calling DDS APIs that require a DDS user in the request payload.
 >**Permission:** authenticated
 - - - - -
 
 **Response messages:**
 * 200: This will never happen
-* 201: Created Successfully (or user already registered)
+* 201: Created Successfully
 * 401: Unauthorized
 * 404: Auth provider or affiliate does not exist
-
->**Rules**
-- - - - -
-+ If the affiliate has already been registered in DDS, the exisitng DDS user is not modified, and a `201` response is returned.
+* 409: Affiliate already registered
 
 + Parameters
     + id (string, required, `duke`) ... The `id` of an authentication provider (service) supported by the DDS application.

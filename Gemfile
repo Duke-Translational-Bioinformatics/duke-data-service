@@ -1,42 +1,43 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.1' # Remove in rails 5
-#gem 'rails', '~> 5.0' # Needed in rails 5
+gem 'rails', '~> 5.0'
 # Use postgresql as the database for Active Record
 gem 'pg'
 
 # Use neo4j for PROV graph relationships
-gem 'neo4j'
+gem 'neo4j', '~> 7.0'
 
 # Use elasticsearch for search
+gem 'elasticsearch', '~> 2.0.0'
 gem 'elasticsearch-model'
 gem 'elasticsearch-rails'
+
+# Use sneakers(RabbitMQ) for background jobs
+gem 'sneakers'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
 
 # Use puma as the webserver in development
 gem 'puma'
-gem 'rack', '1.6.4' # Remove in rails 5
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-middleware-lograge'
 gem "rack-timeout"
 
 gem 'grape-swagger'
 gem 'kaminari'
+gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
 
 # Auditing
-gem "audited-activerecord"
-#gem "rails-observers", github: 'rails/rails-observers' # Needed in rails 5
-#gem 'audited', github: 'collectiveidea/audited' # Needed in rails 5
+gem 'audited'
 
 # Unions in policy scopes
 gem 'active_record_union'
 
 gem 'jwt'
-gem 'grape'
+gem 'grape', '0.16.2'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
@@ -50,7 +51,7 @@ gem 'platform-api'
 gem 'netrc'
 
 # circle-ci metadata formatter
-gem 'rspec_junit_formatter', '0.2.2'
+gem 'rspec_junit_formatter'
 
 # newrelic agent
 # https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
@@ -71,18 +72,22 @@ group :development, :docker, :test do
   gem 'rspec-rails'
 end
 
+group :docker, :test do
+  gem 'pry-byebug'
+end
+  
 group :test do
-  #gem 'rails-controller-testing' # Needed in rails 5
+  gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false
   gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
   gem 'vcr'
   gem 'webmock'
-  gem 'pry-byebug'
+  gem 'bunny-mock'
 end
 
 #heroku requires this
 group :docker, :development, :ua_test, :production do
   gem 'rails_12factor'
 end
-ruby "2.2.2"
+ruby "2.3.3"

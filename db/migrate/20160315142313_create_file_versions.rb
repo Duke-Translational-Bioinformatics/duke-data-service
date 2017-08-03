@@ -1,4 +1,4 @@
-class CreateFileVersions < ActiveRecord::Migration
+class CreateFileVersions < ActiveRecord::Migration[4.2]
   def change
     create_table :file_versions, id: :uuid do |t|
       t.uuid :data_file_id

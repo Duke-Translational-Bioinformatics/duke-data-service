@@ -10,59 +10,6 @@ describe "db:data:migrate" do
   it { expect(subject.prerequisites).to  include("environment") }
 
   describe "#invoke" do
-
-    context 'with correct current_versions' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          f = FactoryGirl.create(:data_file)
-          f.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint)
-          f.save
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(0) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
-    end
-    context 'without file_versions' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          FileVersion.last.destroy
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
-
-      context 'once called' do
-        before { invoke_task }
-        it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
-      end
-    end
-    context 'with current_file_version upload mismatch' do
-      before do
-        Audited.audit_class.as_user(current_user) do
-          FactoryGirl.create(:data_file)
-          FileVersion.last.update_attribute(:upload, FactoryGirl.create(:upload, :completed, :with_fingerprint))
-        end
-      end
-
-      it { expect(file_version_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect(data_file_audits).to all(satisfy('have user set') {|v| v.user }) }
-      it { expect {invoke_task}.to change{FileVersion.count}.by(1) }
-      it { expect {invoke_task}.to change{Audited.audit_class.count}.by(1) }
-
-      context 'once called' do
-        before { invoke_task }
-        it { expect(file_version_audits).to all(satisfy('have user set to current_user') {|v| v.user == current_user }) }
-      end
-    end
-
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
       let(:incomplete_upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
@@ -141,78 +88,69 @@ describe "db:data:migrate" do
         expect(openid_authentication_service).to be_a OpenidAuthenticationService
       }
     end
-  end
 
-  context 'authentication_service required attributes' do
-    let(:authentication_service) { FactoryGirl.create(:duke_authentication_service) }
-    let(:missing_attributes) { %w(
-      login_initiation_uri
-      login_response_type
-      client_id
-    )}
-
-    before do
-      ENV["AUTH_SERVICE_SERVICE_ID"] = authentication_service.service_id
-    end
-
-    context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
+    shared_examples 'a consistency migration' do |prep_method_sym|
+      let(:record_class) { record.class }
       before do
-        ENV['AUTH_SERVICE_SERVICE_ID'] = nil
+        expect(record).to be_persisted
       end
-
-      it {
-        expect {
+      context 'record is consistent' do
+        let(:prep_method) { send(prep_method_sym) }
+        before do
+          expect { prep_method }.not_to raise_error
+        end
+        it 'should update is_consistent to true' do
+          expect(record_class.where(is_consistent: nil)).to exist
           invoke_task
-        }.not_to raise_error
-      }
-    end
-
-    context 'specified service does not exist' do
-      before do
-        ENV['AUTH_SERVICE_SERVICE_ID'] = SecureRandom.uuid
-      end
-      it {
-        expect {
-          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
-        }.to raise_error(StandardError)
-      }
-    end
-
-    context 'new attrbutes already populated' do
-      before do
-        missing_attributes.each do |invalid_attribute|
-          ENV["AUTH_SERVICE_#{invalid_attribute.upcase}"] = authentication_service.send(invalid_attribute)
-        end
-      end
-      it {
-        invoke_task expected_stderr: Regexp.new("authentication_service #{ENV["AUTH_SERVICE_SERVICE_ID"]} attributes do not need to be updated")
-      }
-    end
-
-    context 'one or more new attributes not populated' do
-      before do
-        missing_attributes.each do |invalid_attribute|
-          ENV["AUTH_SERVICE_#{invalid_attribute.upcase}"] = authentication_service.send(invalid_attribute)
-          authentication_service.update_attribute(invalid_attribute, nil)
+          expect(record_class.where(is_consistent: nil)).not_to exist
+          record.reload
+          expect(record.is_consistent).to eq true
         end
       end
 
-      it {
-        expect {
-          invoke_task expected_stderr: Regexp.new("authentication_service #{ENV["AUTH_SERVICE_SERVICE_ID"]} missing_attributes updated")
-        }.to change{
-          AuthenticationService.where(
-            AuthenticationService.unscoped.where(
-              Hash[missing_attributes.map{ |a| [a, nil] }]
-            ).where_values.reduce(:or)
-          ).count
-        }.by(-1)
-        authentication_service.reload
-        missing_attributes.each do |invalid_attribute|
-          expect(authentication_service.send(invalid_attribute)).not_to be_nil
-          expect(authentication_service.send(invalid_attribute)).to eq(ENV["AUTH_SERVICE_#{invalid_attribute.to_s.upcase}"])
+      context 'record is not consistent' do
+        it 'should update is_consistent to false' do
+          expect(record_class.where(is_consistent: nil)).to exist
+          invoke_task
+          expect(record_class.where(is_consistent: nil)).not_to exist
+          record.reload
+          expect(record.is_consistent).to eq false
         end
-      }
+      end
+    end
+
+    describe 'consistency migration', :vcr do
+      let(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+
+      before do
+        expect(storage_provider).to be_persisted
+      end
+
+      context 'for project' do
+        let(:record) { FactoryGirl.create(:project, is_consistent: nil) }
+        let(:init_project_storage) {
+          storage_provider.put_container(record.id)
+          expect(storage_provider.get_container_meta(record.id)).not_to be_nil
+        }
+        it_behaves_like 'a consistency migration', :init_project_storage
+
+        context 'with deleted project' do
+          before(:each) { FactoryGirl.create(:project, :deleted, is_consistent: nil) }
+          it { expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count} }
+        end
+      end
+
+      context 'for upload' do
+        let(:record) { FactoryGirl.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
+        let(:init_upload) {
+          storage_provider.put_container(record.project.id)
+          expect(storage_provider.get_container_meta(record.project.id)).not_to be_nil
+          record.create_and_validate_storage_manifest
+          record.update_columns(is_consistent: nil)
+          expect(storage_provider.get_object_metadata(record.project.id, record.id)).not_to be_nil
+        }
+        it_behaves_like 'a consistency migration', :init_upload
+      end
     end
   end
 end
