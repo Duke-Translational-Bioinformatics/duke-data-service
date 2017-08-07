@@ -80,7 +80,7 @@ Add notes about performance, scalability, throughput, etc. here. These can infor
 #### Deployment
 
 Environment Variable | Default | Description
---- | ---
+--- | --- | ---
 **ACTIVE_JOB_QUEUE_ADAPTER** | sneakers | this sets how activejob runs jobs. Jobs can be `inline` (jobs run immediately instead of in the background), or `sneakers` (jobs run in the background using rabbitmq)
 **CLOUDAMQP_URL** |  | this is the base url to the rabbitmq server. For heroku managed applications, this is set automatically when you provision the Cloud AMQP service. You can change this to point to another rabbitmq server. This is set in rabbitmq.client.env for the local docker-compose managed instance.
 **WORKERS_ALL_RUN_EXCEPT** |  |  comma-separated list of workers that are not meant to run. This is used by the `rake workers:all:run` task.
