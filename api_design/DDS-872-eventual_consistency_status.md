@@ -76,3 +76,16 @@ We will change the success response to [`202: Accepted`](https://httpstatuses.co
 ## Process View
 
 Add notes about performance, scalability, throughput, etc. here. These can inform future proposals to change the implementation.
+
+#### Deployment
+
+Environment Variable | Default | Description
+--- | ---
+**ACTIVE_JOB_QUEUE_ADAPTER** | sneakers | this sets how activejob runs jobs. Jobs can be `inline` (jobs run immediately instead of in the background), or `sneakers` (jobs run in the background using rabbitmq)
+**CLOUDAMQP_URL** |  | this is the base url to the rabbitmq server. For heroku managed applications, this is set automatically when you provision the Cloud AMQP service. You can change this to point to another rabbitmq server. This is set in rabbitmq.client.env for the local docker-compose managed instance.
+**WORKERS_ALL_RUN_EXCEPT** |  |  comma-separated list of workers that are not meant to run. This is used by the `rake workers:all:run` task.
+
+**Notes**:
+When using the CloudAMQP plans that are not dedicated (little-lemur, tough-tiger), queues that are not accessed by workers for *Max idle queue time* (this setting can be viewed in the the CloudAMQP dashboard, accessed from heroku application dashboard using the browser) are deleted. Going forward we should consider the use of dedicated plans, and/or monitoring and alerts on job workers to notify us when jobs stop running.
+
+We use the heroku scheduler to run `rake queue:message_log:index_messages MESSAGE_LOG_WORK_DURATION=300` to drain the events in the message_log queue into an elasticsearch index. MESSAGE_LOG_WORK_DUR sets the length of time that this job runs. We may want to watch the message_log queue to ensure that it is being drained during each run of this task. If it is not, we can increase the work duration.
