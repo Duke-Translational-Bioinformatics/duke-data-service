@@ -1,4 +1,4 @@
-# DDS-829 Trash Bin 
+# DDS-829 Trash Bin
 
 ## Deployment View
 
@@ -18,7 +18,7 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 | `GET /projects/{id}/trashbin{?name_contains}` | Get a recursive listing of objects in the trash bin that are descendants of the specified project. |
 | `GET /folders/{id}/trashbin{?name_contains}` | Get a recursive listing of objects in the trash bin that are descendants of the specified folder. |
 | `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist. |
-| `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purging is done, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (i.e. Duke OIT Swift). | 
+| `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purging is done, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (i.e. Duke OIT Swift). |
 
 **Note:** *An object is considered to be in the trash bin if it has been deleted (`"is_deleted": true`), but not purged (`"is_purged": false`); a purged object is immutable.*
 
@@ -26,47 +26,47 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 This section defines the proposed API interfaces.
 
 ###### Endpoint URL - List projects in trash bin
-`GET /projects/trashbin` 
- 
+`GET /projects/trashbin`
+
 ###### Endpoint permissions
-authenticated [scope: view_project] 
+authenticated [scope: view_project]
 
 ###### Response Messages
 * 200: Success
 * 401: Unauthorized
 
-###### Response 
+###### Response
 This will return a collection of project resources in trash bin.
 
 ###### Endpoint URL - List objects in trash bin that are project descendants
 `GET /projects/{id}/trashbin{?name_contains}`
- 
+
 ###### Endpoint permissions
-authenticated [scope: view_project] 
+authenticated [scope: view_project]
 
 ###### Response Messages
 * 200: Success
 * 401: Unauthorized
 
-###### Response 
+###### Response
 This will return a collection of descendant resources for the project; this includes: folders, files, and file versions.
 
 ###### Endpoint URL - List objects in trash bin that are folder descendants
 `GET /folders/{id}/trashbin{?name_contains}`
- 
+
 ###### Endpoint permissions
-authenticated [scope: view_project] 
+authenticated [scope: view_project]
 
 ###### Response Messages
 * 200: Success
 * 401: Unauthorized
 
-###### Response 
+###### Response
 This will return a collection of descendant resources for the folder; this includes: folders, files, and file versions.
 
 ###### Endpoint URL - Restore object from the trash bin
 `PUT /trashbin/{object_kind}/{object_id}/restore`
- 
+
 ###### Endpoint permissions
 create\_file for project context of parent object OR  
 system_admin
@@ -103,7 +103,7 @@ None
 
 ###### Endpoint URL - Purge object from the trash bin
 `PUT /trashbin/{object_kind}/{object_id}/purge`
- 
+
 ###### Endpoint permissions
 project\_admin OR system\_admin
 
@@ -115,7 +115,7 @@ None
 
 ## Implementation View
 
-+ The audit trail will record restore and purge events for objects.  The sample below shows what this may look like if we returned with object payload.  Returning with payload is contingent upon optimizing serialization of audit details and perhaps making them optional for list operations. 
++ The audit trail will record restore and purge events for objects.  The sample below shows what this may look like if we returned with object payload.  Returning with payload is contingent upon optimizing serialization of audit details and perhaps making them optional for list operations.
 
 ```
 "audit": {
@@ -124,7 +124,7 @@ None
           "id": "ce245d81-bae1-452b-8589-24f736ca7735",
           .... etc ....
       }
-      .... updated and deleted history here .... 
+      .... updated and deleted history here ....
       "restored_on": null,
       "restored_by": null,
       "purged_on": null,
@@ -132,7 +132,7 @@ None
   }
 ```
 
-+ A new property `is_purged` will be added to the payload for project, folder, file, and file version resources.  
++ A new property `is_purged` will be added to the payload for project, folder, file, and file version resources.
 
 + Should purged objects still be visible in the context of provenance?
 
@@ -149,6 +149,13 @@ None
 }
 ```
 This would give project owners insight to projects storage utilization.  Perhaps we should deprecate `GET /current_user/useage` - not sure value of this and if it is clear to user what it implies when this information is viewed via the Web portal.  Seems like project level view is more relevant - especially for project in which I am the owner.
+
+FileVersion will have a manage_upload method that submits a UploadStoragePurgeJob for its upload when
+is_purged is set to true (after_save).
+
+###### Background Workers
+
+upload_storage_purge_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
 
 ## Process View
 
