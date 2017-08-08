@@ -90,7 +90,7 @@ RSpec.describe ApplicationJob, type: :job do
       Object.const_set(child_class_name, Class.new(described_class) do
         queue_as klass_queue_name
         @run_count = 0
-        def perform
+        def perform(an_arg=nil)
           self.class.run_count = self.class.run_count.next
         end
         def self.run_count=(val)
@@ -123,6 +123,56 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(child_class.queue_name).to eq(prefixed_queue_name) }
 
     it { expect{child_class.perform_now}.not_to raise_error }
+
+    describe '::deserialization_error_retry_interval' do
+      let(:interval) { Faker::Number.digit }
+      it { expect(described_class).to respond_to(:deserialization_error_retry_interval=).with(1).argument }
+      it { expect(described_class).to respond_to(:deserialization_error_retry_interval) }
+      it { expect(described_class.deserialization_error_retry_interval).to eq(1) }
+      it 'stores the interval string and returns integer' do
+        described_class.deserialization_error_retry_interval = interval
+        expect(interval).to be_a String
+        expect(described_class.deserialization_error_retry_interval).to eq(interval.to_i)
+      end
+    end
+
+    describe '::wait' do
+      it { expect(described_class).to respond_to(:wait).with(1).argument }
+      it 'calls sleep with argument' do
+        interval = 5
+        expect(described_class).to receive(:sleep).with(interval)
+        expect{described_class.wait(interval)}.not_to raise_error
+      end
+    end
+
+    describe '::execute' do
+      let(:job) { child_class.new }
+      let(:job_data) { job.serialize }
+      let(:retry_interval) { Faker::Number.between(1,10) }
+      it { expect{child_class.execute(job_data)}.not_to raise_error }
+      context 'when RecordNotFound raised' do
+        let(:user) { FactoryGirl.create(:user) }
+        let(:job) { child_class.new(user) }
+        before(:each) do
+          described_class.deserialization_error_retry_interval = retry_interval
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
+          expect(child_class).to receive(:wait).with(retry_interval).ordered
+        end
+
+        it 'retries the first time' do
+          expect(User).to receive(:find).and_call_original.ordered
+          expect(child_class).to receive(:run_count=).ordered
+
+          child_class.execute(job_data)
+        end
+        it 'fails the second time' do
+          expect(User).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
+
+          expect{child_class.execute(job_data)}.to raise_error(ActiveJob::DeserializationError)
+        end
+      end
+    end
+
     it { expect(child_class).to respond_to :run_count }
     describe '::run_count' do
       it { expect(child_class.run_count).to eq 0 }

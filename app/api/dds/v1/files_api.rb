@@ -115,15 +115,16 @@ module DDS
         named 'download file'
         failure [
           [200, "Success"],
-          [301, 'Redirect to file'],
           [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          [404, 'File does not exist, or Upload is not consistent']
         ]
       end
       get '/files/:id/url', root: false, serializer: DataFileUrlSerializer do
         authenticate!
         file = hide_logically_deleted(DataFile.find(params[:id]))
         authorize file, :download?
+        check_consistency! file.upload
+        check_integrity! file.upload
         file
       end
 

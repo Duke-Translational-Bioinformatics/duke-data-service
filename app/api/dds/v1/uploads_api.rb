@@ -12,7 +12,7 @@ module DDS
               [200, 'This will never happen'],
               [201, 'Created Successfully'],
               [401, 'Unauthorized'],
-              [404, 'Project Does not Exist']
+              [404, 'Project Does not Exist, or is not yet consistent']
             ]
           end
           params do
@@ -25,6 +25,7 @@ module DDS
             authenticate!
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
+            check_consistency! project
             storage_provider = StorageProvider.first
             upload = project.uploads.build({
               name: upload_params[:name],
@@ -132,20 +133,10 @@ module DDS
             detail 'Complete the chunked file upload'
             named 'complete upload'
             failure [
-              [200, 'Success'],
-              [400, 'IntegrityException: reported file size or chunk hashes do not match that computed by StorageProvider'],
+              [202, 'Accepted, subject to further processing'],
               [401, 'Unauthorized'],
               [404, 'Upload Does not Exist'],
-              [500, 'Unexpected StorageProviderException experienced']
             ]
-          end
-          rescue_from IntegrityException do |e|
-            error_json = {
-              "error" => "400",
-              "reason" => "IntegrityException",
-              "suggestion" => e.message
-            }
-            error!(error_json, 400)
           end
           params do
             requires :hash, type: Hash do
@@ -161,6 +152,7 @@ module DDS
             upload.fingerprints_attributes = [fingerprint_params[:hash]]
             upload.etag = SecureRandom.hex
             if upload.complete
+              status 202
               upload
             else
               validation_error!(upload)

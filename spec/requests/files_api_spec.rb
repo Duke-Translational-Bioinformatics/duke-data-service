@@ -4,7 +4,7 @@ describe DDS::V1::FilesAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryGirl.create(:project) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
+  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
@@ -339,6 +339,8 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
+      it_behaves_like 'an eventually consistent resource', :upload
+      it_behaves_like 'an eventually consistent upload integrity exception', :upload
 
       it_behaves_like 'an identified resource' do
         let(:resource_id) {'notfoundid'}
