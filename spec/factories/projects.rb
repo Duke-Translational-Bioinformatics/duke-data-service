@@ -4,6 +4,7 @@ FactoryGirl.define do
     description { Faker::Hacker.say_something_smart }
     association :creator, factory: :user
     etag { SecureRandom.hex }
+    is_consistent { true }
 
     trait :deleted do
       is_deleted true
@@ -12,6 +13,10 @@ FactoryGirl.define do
     trait :invalid do
       to_create {|instance| instance.save(validate: false) }
       description { nil }
+    end
+
+    trait :inconsistent do
+      is_consistent { false }
     end
   end
 end

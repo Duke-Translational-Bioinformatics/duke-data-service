@@ -15,7 +15,7 @@ class FileVersion < ActiveRecord::Base
     unless: :deletion_allowed?
   validates_each :upload_id, on: :create do |record, attr, value|
     if record.upload_id
-      if record.upload_id == record.data_file.current_file_version.upload_id
+      if record.upload_id == record.data_file.file_versions.order(:version_number).last&.upload_id
         record.errors.add(attr, 'match current file version.')
       end
     end
