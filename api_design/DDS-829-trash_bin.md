@@ -10,7 +10,7 @@ N/A
 
 The trash bin API will allow users to manage deleted objects.  The API allows users to view, restore, and purge (i.e. permanently remove) deleted objects.  Objects that are moved to the "trash bin" when deleted are as follows: **folders, files, and file versions**.
 
-*The deletion of an entire project is a permanent (destructive) operation.  The project and all of its contents are immedialately considered "purged" and are not moved to the trash bin, therefore projects cannot be restored.  Client apps should implement delete (purge) confirmation workflow, such as a requiring users to enter the project name.*
+*The deletion of an entire project is a permanent (destructive) operation.  The project and all of its contents are immediately considered "purged" and are not moved to the trash bin, therefore projects cannot be restored.  Client apps should implement delete confirmation workflow, such as requiring users to enter the project name.*
 
 #### API Summary
 
@@ -128,7 +128,7 @@ authenticated [scope: view_project]
 ###### Response Example
 ```
 {
-   "admin_owner_stats": {
+   "project_admin_stats": {
    		"projects_count": 2,
    		"total_bytes": 102046000,
    		"in_trash_bytes": 50240000
@@ -157,7 +157,7 @@ authenticated [scope: view_project]
 		
 ## Implementation View
 
-+ The audit trail will record restore and purge events for objects.  The sample below shows what this may look like if we returned with object payload.  Returning with payload is contingent upon optimizing serialization of audit details and perhaps making them optional for list operations. 
++ The audit trail will track restore and purge events for objects.  The sample below shows what this may look like if returned with object payload.  Returning with payload is contingent upon optimizing serialization of audit details and perhaps making them optional for list operations. 
 
 ```
 "audit": {
@@ -178,10 +178,10 @@ authenticated [scope: view_project]
 
 + In the context of provenance queries, purged objects (i.e. graph nodes) should still be returned.
 
-+ Because this proposed design supports restoring file versions (and associated upload object) to a different project - we need to refactor the data model.  Currently the `project.id` is used as the container (bucket) identifier in the storage system (OIT Swift).  The following refactoring will de-couple this dependency:
-	+ Add a `container_id` (UUID) to the `projects` model/table - this will be used as the storage systems container/bucket that houses file uploads (i.e. storage objects) for the project.
-	+ Add `container_id` to the `uploads` model/table - this will be assigned to the `projects.container_id` when an upload for a project is initiated - the `uploads.container_id + uploads.id` will be used to locate the indexed object in the storage system (i.e. OIT Swift) - these are immutable attributes. 
-	+ Update `uploads.project_id` to reference the new project number when a file version (and associated upload) is restored to the project.  
++ Because this proposed design supports restoring file versions (and associated file upload object) to a different project - we need to refactor the data model.  Currently the `project.id` is used as the container (bucket) ID in the storage subsystem (OIT Swift).  This tightly couples a file upload with a project.  The following refactoring will de-couple this dependency:
+	+ Add a `container_id` (UUID) to the `projects` model/table - this will be used as the storage subsystems container/bucket that houses file uploads (i.e. storage objects) for the project.
+	+ Add `container_id` to the `uploads` model/table - this will be assigned the `projects.container_id` when an upload for a project is initiated - the `uploads.container_id + uploads.id` will be used to locate the indexed object in the storage system (i.e. OIT Swift) - these are immutable attributes. 
+	+ When a file version is restored to a different project, the `uploads.project_id` will be updated to reference the new project.  
 	+ These changes will also allow us to extend the `/move` endpoints to support cross project moves.
 
 + Deprecate `GET /current_user/usage` - leverage new endpoints `GET /current_user/stats` and `GET /projects/{id}/stats`
