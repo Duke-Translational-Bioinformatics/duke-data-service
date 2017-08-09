@@ -44,8 +44,8 @@ RSpec.describe MessageLogWorker do
 
     it_behaves_like 'an elasticsearch indexer' do
       include_context 'with a single document indexed'
+      before(:each) { expect(method).to eq ack }
 
-      it { expect(method).to eq ack }
       it { expect(document["_index"]).to eq(index_name) }
       it { expect(document["_type"]).to eq(routing_key) }
       it { expect(document["_source"]).to eq(log_message) }

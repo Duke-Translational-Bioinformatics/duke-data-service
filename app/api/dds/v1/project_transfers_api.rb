@@ -179,6 +179,7 @@ module DDS
       rescue_from Grape::Exceptions::ValidationErrors do |e|
         error_json = {
           "error" => "404",
+          "code" => "not_provided",
           "reason" => "Unknown Status",
           "suggestion" => "Status should be one of the following: #{ProjectTransfer.statuses.keys}",
         }

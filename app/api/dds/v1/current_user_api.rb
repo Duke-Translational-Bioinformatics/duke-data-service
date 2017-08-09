@@ -69,6 +69,7 @@ module DDS
         else
           error_json = {
             "error" => "404",
+            "code" => "not_provided",
             "reason" => "ApiKey Not Found",
             "suggestion" => "you must create an ApiKey"
           }

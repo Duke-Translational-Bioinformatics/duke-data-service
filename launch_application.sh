@@ -5,7 +5,7 @@ then
   export COMPOSE_FILE='docker-compose.yml:docker-compose.dev.yml:docker-compose.swift.yml'
   docker-compose up -d swift
 fi
-docker-compose up -d db neo4j elasticsearch
+docker-compose up -d db neo4j elasticsearch rabbitmq
 sleep 5
 docker-compose run rake db:migrate
 docker-compose run rake db:seed

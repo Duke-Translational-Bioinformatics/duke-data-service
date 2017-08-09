@@ -422,6 +422,8 @@ describe DDS::V1::ProjectTransfersAPI do
           response_json = JSON.parse(response.body)
           expect(response_json).to have_key('error')
           expect(response_json['error']).to eq('404')
+          expect(response_json).to have_key('code')
+          expect(response_json['code']).to eq('not_provided')
           expect(response_json).to have_key('reason')
           expect(response_json['reason']).to eq("Unknown Status")
           expect(response_json).to have_key('suggestion')

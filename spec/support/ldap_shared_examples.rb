@@ -31,6 +31,8 @@ shared_examples 'an identity_provider dependant authentication_provider resource
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('code')
+      expect(response_json['code']).to eq('not_provided')
       expect(response_json).to have_key('error')
       expect(response_json['error']).to eq("#{expected_response_status}")
       expect(response_json).to have_key('reason')
@@ -56,6 +58,8 @@ shared_examples 'an identity_provider dependant authentication_provider resource
       expect(response.body).to be
       expect(response.body).not_to eq('null')
       response_json = JSON.parse(response.body)
+      expect(response_json).to have_key('code')
+      expect(response_json['code']).to eq('not_provided')
       expect(response_json).to have_key('error')
       expect(response_json['error']).to eq("#{expected_response_status}")
       expect(response_json).to have_key('reason')
@@ -83,6 +87,8 @@ shared_examples 'an identified affiliate' do
     expect(response.body).to be
     expect(response.body).not_to eq('null')
     response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq('not_provided')
     expect(response_json).to have_key('error')
     expect(response_json['error']).to eq('404')
     expect(response_json).to have_key('reason')
