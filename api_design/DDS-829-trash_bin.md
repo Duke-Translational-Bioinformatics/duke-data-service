@@ -178,11 +178,12 @@ authenticated [scope: view_project]
 
 + In the context of provenance queries, purged objects (i.e. graph nodes) should still be returned.
 
-+ Because this proposed design supports restoring file versions (and associated file upload object) to a different project - we need to refactor the data model.  Currently the `project.id` is used as the container (bucket) ID in the storage subsystem (OIT Swift).  This tightly couples a file upload with a project.  The following refactoring will de-couple this dependency:
-	+ Add a `container_id` (UUID) to the `projects` model/table - this will be used as the storage subsystems container/bucket that houses file uploads (i.e. storage objects) for the project.
-	+ Add `container_id` to the `uploads` model/table - this will be assigned the `projects.container_id` when an upload for a project is initiated - the `uploads.container_id + uploads.id` will be used to locate the indexed object in the storage system (i.e. OIT Swift) - these are immutable attributes.
++ Because this proposed design supports restoring file versions (and associated file upload object) to a different project - we need to refactor the data model.  Currently the `project.id` is used as the container (bucket) ID in the storage subsystem (OIT Swift), and our software resolves the location
+of the upload using the project.id and upload.id at request time.  This tightly couples a file upload with a project.  The following refactoring will de-couple this dependency:
+	+ Add `container_id` to the `uploads` model/table - this will be assigned the `projects.id` when an upload for a project is initiated - the `uploads.container_id + uploads.id` will be used to locate the indexed object in the storage system (i.e. OIT Swift) - these are immutable attributes.
 	+ When a file version is restored to a different project, the `uploads.project_id` will be updated to reference the new project.  
 	+ These changes will also allow us to extend the `/move` endpoints to support cross project moves.
+  + **IMPORTANT** we will need a data migration upon initial deployment to each heroku environment which sets the container_id to the current project.id for all existing (completed, consistent) uploads.
 
 + Deprecate `GET /current_user/usage` - leverage new endpoints `GET /current_user/stats` and `GET /projects/{id}/stats`
 
