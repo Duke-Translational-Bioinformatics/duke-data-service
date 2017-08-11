@@ -16,8 +16,6 @@ The transition to an eventual consistency model for chunked uploads has exposed 
 
 ## Implementation View
 
-The state model will be refactored as follows the for `uploads` resource:
-
 #### Design Option A
 
 + **status.initiated_on** - When client initiated chunked upload via `POST /projects/{id}/uploads` 
