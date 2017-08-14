@@ -27,6 +27,7 @@ class MetaTemplate < ActiveRecord::Base
 
   def self.templatable_classes
     [
+      Activity,
       DataFile
     ]
   end

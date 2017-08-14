@@ -1,18 +1,27 @@
 class MetaTemplatePolicy < ApplicationPolicy
   def show?
-    permission :view_project
+    Pundit::PolicyFinder.new(record.templatable).policy&.new(user, record.templatable)&.show?
   end
 
   def create?
-    permission :update_file
+    system_permission ||
+      (record&.templatable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.templatable&.creator == user
   end
 
   def update?
-    permission :update_file
+    system_permission ||
+      (record&.templatable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.templatable&.creator == user
   end
 
   def destroy?
-    permission :update_file
+    system_permission ||
+      (record&.templatable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.templatable&.creator == user
   end
 
   class Scope < Scope
