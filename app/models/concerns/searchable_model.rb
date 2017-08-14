@@ -25,6 +25,6 @@ module SearchableModel
   end
 
   def as_indexed_json(options={})
-    ActivitySerializer.new(self).as_json
+    ActiveModel::Serializer.serializer_for(self).new(self).as_json
   end
 end
