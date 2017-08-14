@@ -6,8 +6,10 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
-  let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: data_file) }
+  let(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+  let(:templatable) { data_file }
+  let(:meta_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
+  let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: templatable) }
 
   let(:template) { meta_template.template }
   let(:property_data_type) { 'string' }
@@ -16,8 +18,8 @@ describe DDS::V1::MetaTemplatesAPI do
   let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin) }
-  let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_meta_template) { FactoryGirl.create(:meta_template, templatable: other_data_file) }
+  let(:other_templatable) { FactoryGirl.create(:data_file, project: other_permission.project) }
+  let(:other_meta_template) { FactoryGirl.create(:meta_template, templatable: other_templatable) }
 
   let(:not_allowed_meta_template) { FactoryGirl.create(:meta_template) }
 
@@ -28,18 +30,18 @@ describe DDS::V1::MetaTemplatesAPI do
   let!(:resource_permission) { project_permission }
   let(:resource_stub) { meta_template_stub }
 
-  let(:file_id) { data_file.id }
-  let(:resource_kind) { data_file.kind }
+  let(:templatable_id) { templatable.id }
+  let(:resource_kind) { templatable.kind }
 
   describe 'MetaTemplates collection' do
-    let(:url) { "/api/v1/meta/#{resource_kind}/#{file_id}" }
+    let(:url) { "/api/v1/meta/#{resource_kind}/#{templatable_id}" }
 
     describe 'GET' do
       subject { get(url, params: query_params, headers: headers) }
       let(:query_params) {{}}
-      let(:different_data_file) { FactoryGirl.create(:data_file, project: project) }
-      let(:meta_template_diff_file) { FactoryGirl.create(:meta_template, templatable: different_data_file) }
-      let(:meta_template_diff_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
+      let(:different_templatable) { FactoryGirl.create(:data_file, project: project) }
+      let(:meta_template_diff_templatable) { FactoryGirl.create(:meta_template, templatable: different_templatable) }
+      let(:meta_template_diff_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -49,7 +51,7 @@ describe DDS::V1::MetaTemplatesAPI do
         ]}
         let!(:unexpected_resources) { [
           other_meta_template,
-          meta_template_diff_file
+          meta_template_diff_templatable
         ] }
       end
       context 'with meta_template_name parameter' do
@@ -61,8 +63,22 @@ describe DDS::V1::MetaTemplatesAPI do
           ]}
           let!(:unexpected_resources) { [
             other_meta_template,
-            meta_template_diff_file,
+            meta_template_diff_templatable,
             meta_template_diff_template
+          ] }
+        end
+      end
+      context 'with a templatable Activity' do
+        let(:templatable) { activity }
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [
+            resource,
+            meta_template_diff_template
+          ]}
+          let!(:unexpected_resources) { [
+            other_meta_template,
+            meta_template_diff_templatable
           ] }
         end
       end
@@ -70,8 +86,8 @@ describe DDS::V1::MetaTemplatesAPI do
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
 
-      context 'with a nonexistent file id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with a nonexistent templatable id' do
+        let(:templatable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
         it_behaves_like 'an identified resource'
       end
@@ -84,11 +100,11 @@ describe DDS::V1::MetaTemplatesAPI do
   end
 
   describe 'Object Metadata Instance' do
-    let(:url) { "/api/v1/meta/#{resource_kind}/#{file_id}/#{template_id}" }
+    let(:url) { "/api/v1/meta/#{resource_kind}/#{templatable_id}/#{template_id}" }
     let(:template_id) { template.id }
 
     describe 'POST' do
-      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+      include_context 'elasticsearch prep', [:template, :property], [:templatable]
 
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:template) { FactoryGirl.create(:template) }
@@ -105,11 +121,17 @@ describe DDS::V1::MetaTemplatesAPI do
       let(:payload_property_value) { meta_property_stub.value }
 
       it_behaves_like 'a creatable resource' do
-        let(:new_object) { MetaTemplate.where(template: template, templatable_id: file_id).first }
+        let(:new_object) { MetaTemplate.where(template: template, templatable_id: templatable_id).first }
         it 'should create a property' do
           expect{
             is_expected.to eq(expected_response_status)
           }.to change{MetaProperty.count}.by(1)
+        end
+      end
+      context 'with a templatable Activity' do
+        let(:templatable) { activity }
+        it_behaves_like 'a creatable resource' do
+          let(:new_object) { MetaTemplate.where(template: template, templatable_id: templatable_id).first }
         end
       end
       it_behaves_like 'an authenticated resource'
@@ -118,8 +140,8 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:expected_response_status) { 201 }
       end
 
-      context 'with a nonexistent file id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with a nonexistent templatable id' do
+        let(:templatable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
         it_behaves_like 'an identified resource'
       end
@@ -167,6 +189,7 @@ describe DDS::V1::MetaTemplatesAPI do
           is_expected.to eq(409)
           expect(response_json).to include({
             'error' => '409',
+            'code' => 'not_provided',
             'reason' => 'unique conflict',
             'suggestion' => 'Resubmit as an update request'
           })
@@ -180,9 +203,13 @@ describe DDS::V1::MetaTemplatesAPI do
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
+      context 'with a templatable Activity' do
+        let(:templatable) { activity }
+        it_behaves_like 'a viewable resource'
+      end
 
-      context 'with a nonexistent file id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with a nonexistent templatable id' do
+        let(:templatable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
         it_behaves_like 'an identified resource'
       end
@@ -206,7 +233,7 @@ describe DDS::V1::MetaTemplatesAPI do
     end
 
     describe 'PUT' do
-      include_context 'elasticsearch prep', [:template, :property], [:data_file]
+      include_context 'elasticsearch prep', [:template, :property], [:templatable]
 
       subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
@@ -224,6 +251,10 @@ describe DDS::V1::MetaTemplatesAPI do
       it_behaves_like 'an updatable resource'
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
+      context 'with a templatable Activity' do
+        let(:templatable) { activity }
+        it_behaves_like 'an updatable resource'
+      end
 
       context 'with existing meta property key' do
         let(:payload_property_key) { meta_property.property.key }
@@ -236,8 +267,8 @@ describe DDS::V1::MetaTemplatesAPI do
         end
       end
 
-      context 'with a nonexistent file id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with a nonexistent templatable id' do
+        let(:templatable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
         it_behaves_like 'an identified resource'
       end
@@ -290,8 +321,13 @@ describe DDS::V1::MetaTemplatesAPI do
       let(:called_action) { 'DELETE' }
 
       it_behaves_like 'a removable resource'
+      context 'with a templatable Activity' do
+        let(:templatable) { activity }
+        it_behaves_like 'a removable resource'
+      end
       context 'with associated meta_property' do
-        include_context 'elasticsearch prep', [:template, :property], [:data_file]
+        include_context 'elasticsearch prep', [:template, :property], [:templatable]
+
         before { expect(meta_property).to be_persisted }
         it 'should destroy meta_property' do
           expect {
@@ -305,8 +341,8 @@ describe DDS::V1::MetaTemplatesAPI do
         let(:expected_response_status) {204}
       end
 
-      context 'with a nonexistent file id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with a nonexistent templatable id' do
+        let(:templatable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
         it_behaves_like 'an identified resource'
       end

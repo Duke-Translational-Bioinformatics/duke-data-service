@@ -1,0 +1,2 @@
+class ConsistencyException < StandardError
+end

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
-  let(:project) { FactoryGirl.create(:project) }
+  let(:project) { FactoryGirl.create(:project, :inconsistent) }
   let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
@@ -40,13 +40,14 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
     include_context 'tracking job', :job_transaction
     it 'should create the container for the project' do
       expect(storage_provider.get_container_meta(project.id)).to be_nil
-
       described_class.perform_now(
         job_transaction: job_transaction,
         storage_provider: storage_provider,
         project: project
       )
       expect(storage_provider.get_container_meta(project.id)).to be
+      project.reload
+      expect(project).to be_is_consistent
     end
   end
 end

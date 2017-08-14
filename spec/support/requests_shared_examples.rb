@@ -218,24 +218,6 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   end
 end
 
-shared_examples 'a storage_provider backed resource' do
-
-  it 'should return a 500 error and JSON error when a StorageProviderException is experienced' do
-    storage_provider.update_attribute(:url_root, "http://257.1.1.1")
-    stub_request(:any, "#{storage_provider.url_root}#{storage_provider.auth_uri}").to_timeout
-    is_expected.to eq(500)
-    expect(response.body).to be
-    expect(response.body).not_to eq('null')
-    response_json = JSON.parse(response.body)
-    expect(response_json).to have_key('error')
-    expect(response_json['error']).to eq('500')
-    expect(response_json).to have_key('reason')
-    expect(response_json['reason']).to eq('The storage provider is unavailable')
-    expect(response_json).to have_key('suggestion')
-    expect(response_json['suggestion']).to eq('try again in a few minutes, or contact the systems administrators')
-  end
-end
-
 shared_examples 'a creatable resource' do
   let(:expected_response_status) {201}
   let(:new_object) {
@@ -498,6 +480,7 @@ shared_examples 'a feature toggled resource' do |env_key:, env_value: 'true'|
   let(:response_json) { JSON.parse(response.body) }
   let(:expected_response) {{
     'error' => 405,
+    'code' => 'not_provided',
     'reason' => 'not implemented',
     'suggestion' => 'this is not the endpoint you are looking for'
   }}
@@ -523,5 +506,58 @@ shared_examples 'a status error' do |expected_error_sym|
     expect(returned_configs).to be_a Hash
     expect(returned_configs).to have_key('status')
     expect(returned_configs['status']).to eq('error')
+  }
+end
+
+shared_examples 'an eventually consistent resource' do |eventually_consistent_resource_sym|
+  let(:inconsistent_resource) { send(eventually_consistent_resource_sym) }
+  it 'should return 404 with error when resource found is not consistent' do
+    expect(inconsistent_resource).to be_persisted
+    expect(inconsistent_resource).to respond_to 'is_consistent'
+    expect(inconsistent_resource.update_column(:is_consistent, false)).to be_truthy
+    is_expected.to eq(404)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('404')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("resource_not_consistent")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq("resource changes are still being processed by system")
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("this is a temporary state that will eventually be resolved by the system; please retry request")
+  end
+end
+
+shared_examples 'an eventually consistent upload integrity exception' do |eventually_consistent_upload_sym|
+  let(:inconsistent_upload) { send(eventually_consistent_upload_sym) }
+  let(:expected_error_message) { "reported size does not match size computed by StorageProvider" }
+  before do
+    exactly_now = DateTime.now
+    expect(inconsistent_upload).to be_persisted
+    expect(
+      inconsistent_upload.update(
+        error_at: exactly_now,
+        error_message: expected_error_message,
+        is_consistent: true
+      )
+    ).to be_truthy
+  end
+
+  it {
+    expect(inconsistent_upload.has_integrity_exception?).to be_truthy
+    is_expected.to eq(400)
+    expect(response.body).to be
+    expect(response.body).not_to eq('null')
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('error')
+    expect(response_json['error']).to eq('400')
+    expect(response_json).to have_key('code')
+    expect(response_json['code']).to eq("not_provided")
+    expect(response_json).to have_key('reason')
+    expect(response_json['reason']).to eq(expected_error_message)
+    expect(response_json).to have_key('suggestion')
+    expect(response_json['suggestion']).to eq("You must begin a new upload process")
   }
 end

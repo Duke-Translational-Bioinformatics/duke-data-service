@@ -23,7 +23,6 @@ RSpec.describe DataFile, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
-    it { is_expected.to belong_to(:upload) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:file_versions).order('version_number ASC').autosave(true) }
     it { is_expected.to have_many(:tags) }
@@ -37,6 +36,7 @@ RSpec.describe DataFile, type: :model do
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:project_id) }
+    it { is_expected.to validate_presence_of(:upload) }
 
     it 'should not allow project_id to be changed' do
       should allow_value(project).for(:project)
@@ -49,13 +49,7 @@ RSpec.describe DataFile, type: :model do
       expect(subject).not_to be_valid
     end
 
-    it 'should have a upload_id' do
-      should validate_presence_of(:upload_id)
-    end
-
     it 'should require upload has no error' do
-      should allow_value(completed_upload.id).for(:upload_id)
-      should_not allow_value(upload_with_error.id).for(:upload_id)
       should allow_value(completed_upload).for(:upload)
       should_not allow_value(upload_with_error).for(:upload)
       should_not allow_value(upload_with_error).for(:upload)
@@ -65,8 +59,6 @@ RSpec.describe DataFile, type: :model do
     end
 
     it 'should require a completed upload' do
-      should allow_value(completed_upload.id).for(:upload_id)
-      should_not allow_value(incomplete_upload.id).for(:upload_id)
       should allow_value(completed_upload).for(:upload)
       should_not allow_value(incomplete_upload).for(:upload)
       expect(subject.valid?).to be_falsey
@@ -83,7 +75,7 @@ RSpec.describe DataFile, type: :model do
       subject { deleted_file }
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
-      it { is_expected.not_to validate_presence_of(:upload_id) }
+      it { is_expected.not_to validate_presence_of(:upload) }
       it { expect(deleted_file.file_versions).to all( be_is_deleted ) }
     end
   end
@@ -119,6 +111,82 @@ RSpec.describe DataFile, type: :model do
 
     describe '#url' do
       it { expect(subject.url).to include uri_encoded_name }
+    end
+
+    describe '#upload' do
+      subject { FactoryGirl.build(:data_file, without_upload: true) }
+      let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+      let(:different_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+
+      context 'before save' do
+        it { expect(subject.upload).to be_nil }
+        it { expect(subject.file_versions).to be_empty }
+
+        context 'set #upload to nil' do
+          before(:each) do
+            expect {
+              subject.upload = nil
+            }.to change { subject.file_versions.length }.by(1)
+          end
+
+          it { expect(subject.upload).to be_nil }
+          it { expect(subject.current_file_version.upload).to be_nil }
+        end
+
+        context 'set #upload to an upload' do
+          before(:each) do
+            expect {
+              subject.upload = completed_upload
+            }.to change { subject.file_versions.length }.by(1)
+          end
+
+          it { expect(subject.upload).to eq completed_upload }
+          it { expect(subject.current_file_version.upload).to eq completed_upload }
+        end
+      end
+
+      context 'after save' do
+        before(:each) do
+          subject.upload = completed_upload
+          expect(subject.save).to be_truthy
+        end
+        it { expect(subject.upload).to eq completed_upload }
+        it { expect(subject.file_versions.length).to eq(1) }
+        it { expect(subject.current_file_version.upload).to eq completed_upload }
+
+        context 'set #upload to nil' do
+          before(:each) do
+            expect {
+              subject.upload = nil
+            }.to change { subject.file_versions.length }.by(1)
+          end
+
+          it { expect(subject.upload).to be_nil }
+          it { expect(subject.current_file_version.upload).to be_nil }
+        end
+
+        context 'set #upload to a different upload' do
+          before(:each) do
+            expect {
+              subject.upload = different_upload
+            }.to change { subject.file_versions.length }.by(1)
+          end
+
+          it { expect(subject.upload).to eq different_upload }
+          it { expect(subject.current_file_version.upload).to eq different_upload }
+        end
+
+        context 'set #upload to the same upload' do
+          before(:each) do
+            expect {
+              subject.upload = completed_upload
+            }.not_to change { subject.file_versions.length }
+          end
+
+          it { expect(subject.upload).to eq completed_upload }
+          it { expect(subject.current_file_version.upload).to eq completed_upload }
+        end
+      end
     end
 
     describe 'ancestors' do
@@ -192,59 +260,10 @@ RSpec.describe DataFile, type: :model do
         it { expect(subject.set_current_file_version_attributes.label).to eq subject.label }
       end
     end
-
-    describe '#new_file_version_needed?' do
-      it { is_expected.to respond_to(:new_file_version_needed?) }
-      it { expect(subject.upload_id_changed?).to be_falsey }
-      it { expect(subject.new_file_version_needed?).to be_falsey }
-
-      context 'when upload changed' do
-        let!(:original_upload) { subject.upload }
-        let(:new_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
-        before { subject.upload = new_upload }
-        it { expect(subject.current_file_version).to be_persisted }
-        it { expect(subject.upload_id_changed?).to be_truthy }
-        it { expect(subject.new_file_version_needed?).to be_truthy }
-
-        context 'after call to build_file_version' do
-          before { subject.build_file_version }
-          it { expect(subject.current_file_version).not_to be_persisted }
-          it { expect(subject.upload_id_changed?).to be_truthy }
-          it { expect(subject.new_file_version_needed?).to be_falsey }
-        end
-      end
-
-      context 'when current_file_version.upload differs' do
-        let(:different_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
-        before do
-          subject.current_file_version.update_attribute(:upload, different_upload)
-          subject.reload
-        end
-        it { expect(subject.current_file_version).to be_persisted }
-        it { expect(subject.current_file_version.upload).not_to eq subject.upload }
-        it { expect(subject.new_file_version_needed?).to be_truthy }
-      end
-
-      context 'before subject is created' do
-        subject { FactoryGirl.build(:data_file) }
-
-        it { is_expected.not_to be_persisted }
-        context 'without file_versions' do
-          it { expect(subject.file_versions).to be_empty }
-          it { expect(subject.new_file_version_needed?).to be_truthy }
-        end
-        context 'with a file_version' do
-          before { subject.build_file_version }
-          it { expect(subject.file_versions).not_to be_empty }
-          it { expect(subject.new_file_version_needed?).to be_falsey }
-        end
-      end
-    end
   end
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
-    it { is_expected.to callback(:build_file_version).before(:save).if(:new_file_version_needed?) }
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
   end
 
@@ -306,7 +325,7 @@ RSpec.describe DataFile, type: :model do
     }}
     include_context 'with job runner', ElasticsearchIndexJob
 
-    it_behaves_like 'an Elasticsearch::Model' do
+    it_behaves_like 'a SearchableModel' do
       context 'when ElasticsearchIndexJob::perform_later raises an error' do
         context 'with new data_file' do
           subject { FactoryGirl.build(:data_file, :root) }

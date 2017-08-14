@@ -48,6 +48,7 @@ describe DDS::V1::ProjectsAPI do
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
+<<<<<<< HEAD
         it_behaves_like 'a POST request' do
           it_behaves_like 'a creatable resource' do
             let(:resource) { project_stub }
@@ -63,6 +64,36 @@ describe DDS::V1::ProjectsAPI do
               project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
               expect(project_admin_permission).to be
             end
+||||||| merged common ancestors
+        it_behaves_like 'a creatable resource' do
+          let(:resource) { project_stub }
+          it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
+            expect {
+              is_expected.to eq(201)
+            }.to change{ ProjectPermission.count }.by(1)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('id')
+            new_object = resource_class.find(response_json['id'])
+            expect(new_object.creator_id).to eq(current_user.id)
+            project_admin_role = AuthRole.where(id: 'project_admin').first
+            project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
+            expect(project_admin_permission).to be
+=======
+        it_behaves_like 'a creatable resource' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 202 }
+          it 'should set creator to current_user and make them a project_admin, and queue an ActiveJob' do
+            expect {
+              is_expected.to eq(expected_response_status)
+            }.to change{ ProjectPermission.count }.by(1)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('id')
+            new_object = resource_class.find(response_json['id'])
+            expect(new_object.creator_id).to eq(current_user.id)
+            project_admin_role = AuthRole.where(id: 'project_admin').first
+            project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
+            expect(project_admin_permission).to be
+>>>>>>> develop
           end
 
           it_behaves_like 'an authenticated resource'
@@ -80,16 +111,54 @@ describe DDS::V1::ProjectsAPI do
             end
           end
 
+<<<<<<< HEAD
+||||||| merged common ancestors
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 201 }
+          let(:expected_audits) { 2 }
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_auditable_type) { ProjectPermission }
+          let(:expected_response_status) { 201 }
+          let(:audit_should_include) {
+            {user: current_user, audited_parent: 'Project'}
+          }
+        end
+        it_behaves_like 'a software_agent accessible resource' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 201 }
+=======
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 202 }
+          let(:expected_audits) { 2 }
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:resource) { project_stub }
+          let(:expected_auditable_type) { ProjectPermission }
+          let(:expected_response_status) { 202 }
+          let(:audit_should_include) {
+            {user: current_user, audited_parent: 'Project'}
+          }
+        end
+        it_behaves_like 'a software_agent accessible resource' do
+          let(:resource) { project_stub }
+          let(:expected_response_status) { 202 }
+>>>>>>> develop
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource) { project_stub }
-            let(:expected_response_status) { 201 }
+            let(:expected_response_status) { 202 }
             let(:expected_audits) { 2 }
           end
 
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource) { project_stub }
             let(:expected_auditable_type) { ProjectPermission }
-            let(:expected_response_status) { 201 }
+            let(:expected_response_status) { 202 }
             let(:audit_should_include) {
               {user: current_user, audited_parent: 'Project'}
             }

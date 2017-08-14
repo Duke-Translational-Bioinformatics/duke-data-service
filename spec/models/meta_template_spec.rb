@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe MetaTemplate, type: :model do
   subject { FactoryGirl.create(:meta_template) }
   let(:templatable_classes) {[
+    Activity,
     DataFile
   ]}
   let(:file) { FactoryGirl.create(:data_file) }

@@ -1,5 +1,5 @@
-class DeprecatedElasticsearchResponse
-  @@indexed_models = [DataFile, Folder]
+class ElasticsearchResponse
+  @@indexed_models = [DataFile, Folder, Activity]
   include ActiveModel::Serialization
   attr_reader :results
 
@@ -10,7 +10,7 @@ class DeprecatedElasticsearchResponse
   def initialize(query:, indices:, policy_scope:)
     raise ArgumentError.new("indices must have at least one entry") unless indices && !indices.empty?
     indices.map {|focus_model|
-      raise NameError.new("object_kind #{focus_model} Not Indexed") unless [DataFile, Folder].include?(focus_model)
+      raise NameError.new("object_kind #{focus_model} Not Indexed") unless @@indexed_models.include?(focus_model)
     }
     @results = []
     @indices = indices

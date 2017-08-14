@@ -1,11 +1,20 @@
 FactoryGirl.define do
   factory :data_file do
+    transient do
+      without_upload false
+    end
+
     name { Faker::Team.name }
     label { Faker::Hacker.say_something_smart }
-    association :upload, :completed, :with_fingerprint
     parent_id { SecureRandom.uuid }
     project
     is_deleted false
+
+    after(:build) do |f, evaluator|
+      unless evaluator.without_upload
+        f.upload = evaluator.upload || create(:upload, :completed, :with_fingerprint)
+      end
+    end
 
     trait :with_parent do
       association :parent, factory: :folder

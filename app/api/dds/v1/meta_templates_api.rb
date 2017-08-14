@@ -68,6 +68,7 @@ module DDS
           if meta_template.errors.added? :template, :taken
             error!({
               error: '409',
+              code: "not_provided",
               reason: 'unique conflict',
               suggestion: 'Resubmit as an update request'
             }, 409)

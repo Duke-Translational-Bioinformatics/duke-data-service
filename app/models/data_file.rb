@@ -1,20 +1,20 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class DataFile < Container
-  belongs_to :upload
+  include SearchableModel
+
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
 
   after_set_parent_attribute :set_project_to_parent_project
-  before_save :build_file_version, if: :new_file_version_needed?
   before_save :set_current_file_version_attributes
   before_save :set_file_versions_is_deleted, if: :is_deleted?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
-  validates :upload_id, presence: true, unless: :is_deleted
+  validates :upload, presence: true, unless: :is_deleted
 
-  validates_each :upload, :upload_id, unless: :is_deleted do |record, attr, value|
+  validates_each :upload, unless: :is_deleted do |record, attr, value|
     if record.upload
       if record.upload.error_at
         record.errors.add(attr, 'cannot have an error')
@@ -25,6 +25,17 @@ class DataFile < Container
   end
 
   delegate :http_verb, to: :upload
+
+  def upload=(val)
+    if file_versions.empty? || (current_file_version.persisted? && upload != val)
+      build_file_version
+    end
+    current_file_version.upload = val
+  end
+
+  def upload
+    current_file_version&.upload
+  end
 
   def host
     upload.url_root
@@ -49,21 +60,14 @@ class DataFile < Container
   end
 
   def build_file_version
-    file_versions.build
+    file_versions.build(data_file: self)
   end
 
   def set_current_file_version_attributes
     current_file_version.attributes = {
-      upload: upload,
       label: label
     }
     current_file_version
-  end
-
-  def new_file_version_needed?
-    file_versions.empty? ||
-      current_file_version.upload != upload &&
-      current_file_version.persisted?
   end
 
   def as_indexed_json(options={})

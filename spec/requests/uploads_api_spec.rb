@@ -104,6 +104,7 @@ describe DDS::V1::UploadsAPI do
           let(:deleted_resource) { project }
         end
       end
+      it_behaves_like 'an eventually consistent resource', :project
     end
   end
 
@@ -226,7 +227,7 @@ describe DDS::V1::UploadsAPI do
     end
   end
 
-  describe 'Complete the chunked file upload', vcr: {record: :new_episodes} do #:vcr do
+  describe 'Complete the chunked file upload' do
     let(:url) { "/api/v1/uploads/#{resource_id}/complete" }
     let(:resource_id) { resource.id }
     let(:called_action) { "PUT" }
@@ -239,35 +240,9 @@ describe DDS::V1::UploadsAPI do
     }}
     let(:fingerprint_algorithm) { fingerprint_stub.algorithm }
 
-    before do
-      expect(chunk).to be_persisted
-      actual_size = 0
-      storage_provider.put_container(project.id)
-      resource.chunks.each do |chunk|
-        object = [resource.id, chunk.number].join('/')
-        body = 'this is a chunk'
-        storage_provider.put_object(
-          project.id,
-          object,
-          body
-        )
-        chunk.update_attributes({
-          fingerprint_value: Digest::MD5.hexdigest(body),
-          size: body.length
-        })
-        actual_size = body.length + actual_size
-      end
-      resource.update_attribute(:size, actual_size)
+    it_behaves_like 'an updatable resource' do
+      let(:expected_response_status) { 202 }
     end
-
-    after do
-      resource.chunks.each do |chunk|
-        object = [resource.id, chunk.number].join('/')
-        storage_provider.delete_object(resource.project.id, object)
-      end
-    end
-
-    it_behaves_like 'an updatable resource'
     it_behaves_like 'an authenticated resource'
     it_behaves_like 'an authorized resource'
 
@@ -285,37 +260,13 @@ describe DDS::V1::UploadsAPI do
       it_behaves_like 'a validated resource'
     end
 
-    it_behaves_like 'an annotate_audits endpoint'
-    it_behaves_like 'a software_agent accessible resource' do
-      it_behaves_like 'an annotate_audits endpoint'
+    it_behaves_like 'an annotate_audits endpoint' do
+      let(:expected_response_status) { 202 }
     end
-    it_behaves_like 'a storage_provider backed resource' do
-      it 'should return an error if the reported size does not match storage_provider computed size' do
-        resource.update_attribute(:size, resource.size - 1)
-        is_expected.to eq(400)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-        response_json = JSON.parse(response.body)
-        expect(response_json).to have_key('error')
-        expect(response_json['error']).to eq('400')
-        expect(response_json).to have_key('reason')
-        expect(response_json['reason']).to eq('IntegrityException')
-        expect(response_json).to have_key('suggestion')
-        expect(response_json['suggestion']).to eq('reported size does not match size computed by StorageProvider')
-      end
-
-      it 'should return an error if the reported chunk hash does not match storage_provider computed size' do
-        chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-        is_expected.to eq(400)
-        expect(response.body).to be
-        expect(response.body).not_to eq('null')
-        response_json = JSON.parse(response.body)
-        expect(response_json).to have_key('error')
-        expect(response_json['error']).to eq('400')
-        expect(response_json).to have_key('reason')
-        expect(response_json['reason']).to eq('IntegrityException')
-        expect(response_json).to have_key('suggestion')
-        expect(response_json['suggestion']).to eq('reported chunk hash does not match that computed by StorageProvider')
+    it_behaves_like 'a software_agent accessible resource' do
+      let(:expected_response_status) { 202 }
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 202 }
       end
     end
   end

@@ -2,6 +2,7 @@
 
 class Folder < Container
   include ChildMinder
+  include SearchableModel
 
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true
   has_many :folders, -> { readonly }, foreign_key: "parent_id"
