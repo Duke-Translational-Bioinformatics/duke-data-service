@@ -39,13 +39,25 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
           existing_container.__elasticsearch__.index_document
           Elasticsearch::Model.client.indices.flush
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(original_name)
           existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
           Elasticsearch::Model.client.indices.flush
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(changed_name)
         }
       end
@@ -53,13 +65,31 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
       context 'index does not exist' do
         it {
           expect(existing_container).to be_persisted
-          expect(existing_container.class.search(existing_container.id).count).to eq(0)
+          expect(existing_container.class.search({
+            query: {
+              match: {
+                _id: existing_container.id
+              }
+            }
+          }).count).to eq(0)
           existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
           Elasticsearch::Model.client.indices.flush
-          expect(existing_container.class.search(existing_container.id).count).to eq(1)
+          expect(existing_container.class.search({
+            query: {
+              match: {
+                _id: existing_container.id
+              }
+            }
+          }).count).to eq(1)
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(changed_name)
         }
       end
