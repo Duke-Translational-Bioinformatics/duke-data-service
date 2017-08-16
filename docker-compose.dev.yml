@@ -37,6 +37,22 @@ services:
     volumes_from:
       - localdev
     entrypoint: ['bundle']
+  erd:
+    image: dukedataservice_server
+    volumes_from:
+      - localdev
+    entrypoint: ['erd']
+    links:
+      - db:postgres.db.host
+      - neo4j:neo4j.db.host
+      - elasticsearch:elastic.local
+      - rabbitmq:rabbitmq.host
+    env_file:
+      - webapp.env
+      - swift.env
+      - neo4j.client.env
+      - elastic.client.env
+      - rabbitmq.client.env
   rake:
     image: dukedataservice_server
     volumes_from:

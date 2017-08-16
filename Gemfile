@@ -87,6 +87,10 @@ group :test do
   gem 'bunny-mock'
 end
 
+group :docker do
+  gem "rails-erd"
+end
+
 #heroku requires this
 group :docker, :development, :ua_test, :production do
   gem 'rails_12factor'
