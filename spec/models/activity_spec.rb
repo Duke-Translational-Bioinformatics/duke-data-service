@@ -41,6 +41,8 @@ RSpec.describe Activity, type: :model do
     it { is_expected.to have_many(:generated_by_activity_prov_relations) }
     it { is_expected.to have_many(:invalidated_by_activity_prov_relations) }
     it { is_expected.to have_many(:used_prov_relations) }
+    it { is_expected.to have_many(:tags) }
+    it { is_expected.to have_many(:meta_templates) }
   end
 
   describe 'validations' do
@@ -63,5 +65,12 @@ RSpec.describe Activity, type: :model do
       subject.ended_on = subject.started_on - 10.minutes
       expect(subject).not_to be_valid
     end
+  end
+
+  describe 'elasticsearch' do
+    let(:search_serializer) { ActivitySerializer }
+    include_context 'with job runner', ElasticsearchIndexJob
+
+    it_behaves_like 'a SearchableModel'
   end
 end

@@ -38,7 +38,6 @@ shared_context 'with software_agent authentication' do
 end
 
 shared_context 'request parameters' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers|
-  let(:payload) {{}}
   let(:request_url) { send(url_sym) }
   let(:request_payload) { send(payload_sym) }
   let(:request_headers) { send(headers_sym) }
@@ -49,6 +48,20 @@ shared_examples 'a GET request' do |url_sym: :url, payload_sym: :payload, header
   let(:expected_response_status) { response_status }
   let(:called_action) { "GET" }
   subject { get(request_url, params: request_payload, headers: request_headers) }
+end
+
+shared_examples 'a POST request' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers, response_status: 201|
+  include_context 'request parameters', url_sym: url_sym, payload_sym: payload_sym, headers_sym: headers_sym
+  let(:expected_response_status) { response_status }
+  let(:called_action) { "POST" }
+  subject { post(request_url, params: request_payload.to_json, headers: request_headers) }
+end
+
+shared_examples 'a PUT request' do |url_sym: :url, payload_sym: :payload, headers_sym: :headers, response_status: 201|
+  include_context 'request parameters', url_sym: url_sym, payload_sym: payload_sym, headers_sym: headers_sym
+  let(:expected_response_status) { response_status }
+  let(:called_action) { "PUT" }
+  subject { put(request_url, params: request_payload.to_json, headers: request_headers) }
 end
 
 shared_examples 'a listable resource' do |persisted_resource: true|
@@ -385,18 +398,30 @@ shared_examples 'an identified resource' do
   end
 end
 
-shared_examples 'a kinded resource' do
-  it 'should return 404 with error when kind is not supported' do
-    is_expected.to eq(404)
+shared_examples 'a client error' do
+  let(:expected_response) { 400 }
+  let(:expected_reason) { "client has submitted bad data" }
+  let(:expected_suggestion) { "Please resubmit with correct data" }
+
+  it 'should return expected error payload' do
+    is_expected.to eq(expected_response)
     expect(response.body).to be
     expect(response.body).not_to eq('null')
     response_json = JSON.parse(response.body)
     expect(response_json).to have_key('error')
-    expect(response_json['error']).to eq('404')
+    expect(response_json['error']).to eq(expected_response.to_s)
     expect(response_json).to have_key('reason')
-    expect(response_json['reason']).to eq("object_kind #{resource_kind} Not Supported")
+    expect(response_json['reason']).to eq(expected_reason)
     expect(response_json).to have_key('suggestion')
-    expect(response_json['suggestion']).to eq("Please supply a supported object_kind")
+    expect(response_json['suggestion']).to eq(expected_suggestion)
+  end
+end
+
+shared_examples 'a kinded resource' do
+  it_behaves_like 'a client error' do
+    let(:expected_response) { 404 }
+    let(:expected_reason) { "object_kind #{resource_kind} Not Supported" }
+    let(:expected_suggestion) { "Please supply a supported object_kind" }
   end
 end
 
