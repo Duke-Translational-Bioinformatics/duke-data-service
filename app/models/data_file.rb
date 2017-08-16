@@ -76,54 +76,11 @@ class DataFile < Container
 
   settings index: { number_of_shards: 1 } do
     mappings dynamic: 'false' do
-      indexes :kind, type: "string", index: "not_analyzed"
-      indexes :id, type: "string", index: "not_analyzed"
-      indexes :label
-
-      indexes :parent do
-        indexes :kind, type: "string", index: "not_analyzed"
-        indexes :id, type: "string", index: "not_analyzed"
-      end
+      indexes :kind, type: "string", fields: {
+        raw: {type: "string", index: "not_analyzed"}
+      }
 
       indexes :name
-      indexes :audit do
-        indexes :created_on, type: "date", format: "strict_date_optional_time||epoch_millis"
-        indexes :created_by do
-          indexes :id, type: "string", index: "not_analyzed"
-          indexes :username
-          indexes :full_name
-          indexes :agent do
-            indexes :id, type: "string", index: "not_analyzed"
-            indexes :name
-          end
-        end
-
-        indexes :last_updated_on, type: "date", format: "strict_date_optional_time||epoch_millis"
-        indexes :last_updated_by do
-          indexes :id, type: "string", index: "not_analyzed"
-          indexes :username
-          indexes :full_name
-          indexes :agent do
-            indexes :id, type: "string", index: "not_analyzed"
-            indexes :name
-          end
-        end
-
-        indexes :deleted_on, type: "date", format: "strict_date_optional_time||epoch_millis"
-        indexes :deleted_by do
-          indexes :id, type: "string", index: "not_analyzed"
-          indexes :username
-          indexes :full_name
-          indexes :agent do
-            indexes :id, type: "string", index: "not_analyzed"
-            indexes :name
-          end
-        end
-      end
-
-      indexes :is_deleted, type: "boolean"
-      indexes :created_at, type: "date", format: "strict_date_optional_time||epoch_millis"
-      indexes :updated_at, type: "date", format: "strict_date_optional_time||epoch_millis"
 
       indexes :tags do
         indexes :label, type: "string", fields: {
@@ -131,44 +88,13 @@ class DataFile < Container
         }
       end
 
-      indexes :current_version do
-        indexes :id, type: "string", index: "not_analyzed"
-        indexes :version, type: "integer"
-        indexes :label
-
-        indexes :upload do
-          indexes :id, type: "string", index: "not_analyzed"
-          indexes :size, type: "long" #https://github.com/karmi/retire/issues/474
-          indexes :storage_provider do
-            indexes :id, type: "string", index: "not_analyzed"
-            indexes :name
-            indexes :description
-          end
-
-          indexes :hashes do
-            indexes :algorithm, type: "string", index: "not_analyzed"
-            indexes :value, type: "string", index: "not_analyzed"
-          end
-        end
-      end
-
       indexes :project do
-        indexes :id, type: "string", index: "not_analyzed"
-        indexes :name, type: "string"
-      end
-
-      indexes :ancestors do
-        indexes :kind, type: "string", index: "not_analyzed"
-        indexes :id, type: "string", index: "not_analyzed"
-        indexes :name
-      end
-
-      indexes :creator do
-        indexes :id, type: "string", index: "not_analyzed"
-        indexes :username, type: "string"
-        indexes :first_name, type: "string"
-        indexes :last_name, type: "string"
-        indexes :email, type: "string"
+        indexes :id, type: "string", fields: {
+          raw: {type: "string", index: "not_analyzed"}
+        }
+        indexes :name, type: "string", fields: {
+          raw: {type: "string", index: "not_analyzed"}
+        }
       end
     end
   end
