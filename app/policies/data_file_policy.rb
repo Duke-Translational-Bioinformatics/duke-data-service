@@ -12,7 +12,7 @@ class DataFilePolicy < ApplicationPolicy
   end
 
   def rename?
-    permission :create_file
+    permission :update_file
   end
 
   def create?

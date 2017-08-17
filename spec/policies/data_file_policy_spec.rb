@@ -14,25 +14,25 @@ describe DataFilePolicy do
   it_behaves_like 'system_permission can access', :data_file_without_upload
   it_behaves_like 'system_permission can access', :other_data_file
 
-  it_behaves_like 'a user with project_permission', :create_file, allows: [:create?, :move?, :rename?], denies: [:download?], on: :data_file
+  it_behaves_like 'a user with project_permission', :create_file, allows: [:create?, :move?], denies: [:download?, :rename?], on: :data_file
   it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:download?, :move?, :rename?], on: :data_file
-  it_behaves_like 'a user with project_permission', :update_file, allows: [:update?], denies: [:download?, :move?, :rename?], on: :data_file
+  it_behaves_like 'a user with project_permission', :update_file, allows: [:update?, :rename?], denies: [:download?, :move?], on: :data_file
   it_behaves_like 'a user with project_permission', :delete_file, allows: [:destroy?], denies: [:download?, :move?, :rename?], on: :data_file
   it_behaves_like 'a user with project_permission', :download_file, allows: [:download?], denies: [:move?, :rename?], on: :data_file
 
   context 'when user is not upload creator' do
     let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project_permission.project) }
 
-    it_behaves_like 'a user with project_permission', :create_file, allows: [:move?, :rename?], denies: [:download?], on: :data_file
+    it_behaves_like 'a user with project_permission', :create_file, allows: [:move?], denies: [:download?, :rename?], on: :data_file
     it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:download?, :move?, :rename?], on: :data_file
-    it_behaves_like 'a user with project_permission', :update_file, allows: [:update?], denies: [:download?, :move?, :rename?], on: :data_file
+    it_behaves_like 'a user with project_permission', :update_file, allows: [:update?, :rename?], denies: [:download?, :move?], on: :data_file
     it_behaves_like 'a user with project_permission', :delete_file, allows: [:destroy?], denies: [:download?, :move?, :rename?], on: :data_file
     it_behaves_like 'a user with project_permission', :download_file, allows: [:download?], denies: [:move?, :rename?], on: :data_file
   end
 
-  it_behaves_like 'a user with project_permission', :create_file, allows: [:move?, :rename?], denies: [:download?], on: :data_file_without_upload
+  it_behaves_like 'a user with project_permission', :create_file, allows: [:move?], denies: [:download?, :rename?], on: :data_file_without_upload
   it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:download?, :move?, :rename?], on: :data_file_without_upload
-  it_behaves_like 'a user with project_permission', :update_file, allows: [:update?], denies: [:download?, :move?, :rename?], on: :data_file_without_upload
+  it_behaves_like 'a user with project_permission', :update_file, allows: [:update?, :rename?], denies: [:download?, :move?], on: :data_file_without_upload
   it_behaves_like 'a user with project_permission', :delete_file, allows: [:destroy?], denies: [:download?, :move?, :rename?], on: :data_file_without_upload
   it_behaves_like 'a user with project_permission', :download_file, allows: [:download?], denies: [:move?, :rename?], on: :data_file_without_upload
 
