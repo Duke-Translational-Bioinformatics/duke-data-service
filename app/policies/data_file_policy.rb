@@ -20,7 +20,7 @@ class DataFilePolicy < ApplicationPolicy
   end
 
   def update?
-    system_permission || (project_permission(:update_file) && record.upload.creator == user)
+    permission :update_file
   end
 
   def destroy?
