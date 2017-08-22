@@ -6,6 +6,34 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
 
+  describe '#settings' do
+    let(:expected_number_of_replicas) { 4 }
+    let(:expected_number_of_shards) { 4 }
+    let(:settings) { subject.class.settings.settings }
+    let(:expected_settings) { {
+      index: {
+        number_of_shards: expected_number_of_shards,
+        number_of_replicas: expected_number_of_replicas
+      }
+    }}
+
+    before do
+      @old_shards = Rails.application.config.elasticsearch_index_settings[:number_of_shards]
+      @old_replicas = Rails.application.config.elasticsearch_index_settings[:number_of_replicas]
+      Rails.application.config.elasticsearch_index_settings[:number_of_shards] = expected_number_of_shards
+      Rails.application.config.elasticsearch_index_settings[:number_of_replicas] = expected_number_of_replicas
+    end
+
+    after do
+      Rails.application.config.elasticsearch_index_settings[:number_of_shards] = @old_shards
+      Rails.application.config.elasticsearch_index_settings[:number_of_replicas] = @old_replicas
+    end
+
+    it {
+      expect(settings).to include(expected_settings)
+    }
+  end
+
   describe '#create_elasticsearch_index' do
     it { is_expected.to respond_to(:create_elasticsearch_index) }
     it {

@@ -30,7 +30,7 @@ class Folder < Container
     Search::FolderSerializer.new(self).as_json
   end
 
-  settings index: { number_of_shards: 1 } do
+  settings do
     mappings dynamic: 'false' do
       indexes :kind, type: "string", fields: {
         raw: {type: "string", index: "not_analyzed"}
