@@ -39,13 +39,25 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
           existing_container.__elasticsearch__.index_document
           Elasticsearch::Model.client.indices.flush
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(original_name)
           existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
           Elasticsearch::Model.client.indices.flush
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(changed_name)
         }
       end
@@ -53,13 +65,31 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
       context 'index does not exist' do
         it {
           expect(existing_container).to be_persisted
-          expect(existing_container.class.search(existing_container.id).count).to eq(0)
+          expect(existing_container.class.search({
+            query: {
+              match: {
+                _id: existing_container.id
+              }
+            }
+          }).count).to eq(0)
           existing_container.name = changed_name
           ElasticsearchIndexJob.perform_now(job_transaction, existing_container, update: true)
           Elasticsearch::Model.client.indices.flush
-          expect(existing_container.class.search(existing_container.id).count).to eq(1)
+          expect(existing_container.class.search({
+            query: {
+              match: {
+                _id: existing_container.id
+              }
+            }
+          }).count).to eq(1)
           expect(
-            existing_container.class.search(existing_container.id).first._source["name"]
+            existing_container.class.search({
+              query: {
+                match: {
+                  _id: existing_container.id
+                }
+              }
+            }).first._source["name"]
           ).to eq(changed_name)
         }
       end
@@ -161,54 +191,5 @@ shared_context 'tracking job' do |tracked_job_sym|
     expect(described_class).to receive(:complete_job)
       .with(tracked_job)
       .and_call_original
-  end
-end
-
-shared_examples 'a ChildDeletionJob' do |
-    parent_sym,
-    child_folder_sym,
-    child_file_sym
-  |
-  let(:parent) { send(parent_sym) }
-  let(:job_transaction) { described_class.initialize_job(parent) }
-  let(:child_folder) { send(child_folder_sym) }
-  let(:child_file) { send(child_file_sym) }
-  let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
-  let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
-  include_context 'with job runner', described_class
-
-  it { is_expected.to be_an ApplicationJob }
-  it { expect(prefix).not_to be_nil }
-  it { expect(prefix_delimiter).not_to be_nil }
-  it { expect(described_class.queue_name).to eq("#{prefix}#{prefix_delimiter}child_deletion") }
-  it {
-    expect {
-      described_class.perform_now
-    }.to raise_error(ArgumentError)
-    expect {
-      described_class.perform_now(parent)
-    }.to raise_error(ArgumentError)
-  }
-
-  context 'perform_now', :vcr do
-    let(:child_job_transaction) { described_class.initialize_job(child_folder) }
-    include_context 'tracking job', :job_transaction
-
-    it {
-      expect(child_folder).to be_persisted
-      expect(child_file.is_deleted?).to be_falsey
-
-      expect(described_class).to receive(:initialize_job)
-        .with(child_folder)
-        .and_return(child_job_transaction)
-      expect(described_class).to receive(:perform_later)
-        .with(child_job_transaction, child_folder).and_call_original
-
-      described_class.perform_now(job_transaction, parent)
-      expect(child_folder.reload).to be_truthy
-      expect(child_folder.is_deleted?).to be_truthy
-      expect(child_file.reload).to be_truthy
-      expect(child_file.is_deleted?).to be_truthy
-    }
   end
 end

@@ -58,6 +58,7 @@ GEM
     bunny-mock (1.6.0)
       bunny (>= 1.7)
     byebug (9.0.6)
+    choice (0.2.0)
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -247,6 +248,11 @@ GEM
     rails-dom-testing (2.0.2)
       activesupport (>= 4.2.0, < 6.0)
       nokogiri (~> 1.6)
+    rails-erd (1.5.2)
+      activerecord (>= 3.2)
+      activesupport (>= 3.2)
+      choice (~> 0.2.0)
+      ruby-graphviz (~> 1.2)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
     rails_12factor (0.0.3)
@@ -281,6 +287,7 @@ GEM
     rspec_junit_formatter (0.2.3)
       builder (< 4)
       rspec-core (>= 2, < 4, != 2.12.0)
+    ruby-graphviz (1.2.3)
     ruby-progressbar (1.8.1)
     rubyzip (1.2.1)
     safe_yaml (1.0.4)
@@ -368,6 +375,7 @@ DEPENDENCIES
   rack-timeout
   rails (~> 5.0)
   rails-controller-testing
+  rails-erd
   rails_12factor
   rspec-rails
   rspec_junit_formatter
