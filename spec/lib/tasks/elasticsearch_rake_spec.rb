@@ -61,7 +61,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     context 'with existing documents not already indexed' do
       around :each do |example|
         current_indices = DataFile.__elasticsearch__.client.cat.indices
-        ElasticsearchResponse.indexed_models.each do |indexed_model|
+        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
           if current_indices.include? indexed_model.index_name
             indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
           end
@@ -80,7 +80,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
 
         example.run
 
-        ElasticsearchResponse.indexed_models.each do |indexed_model|
+        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
           indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
         end
       end
@@ -97,7 +97,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       around :each do |example|
         # initialize mappings
         current_indices = DataFile.__elasticsearch__.client.cat.indices
-        ElasticsearchResponse.indexed_models.each do |indexed_model|
+        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
           if current_indices.include? indexed_model.index_name
             indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
           end
@@ -116,13 +116,13 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
         @folder = FactoryGirl.create(:folder)
         @folder.__elasticsearch__.index_document
 
-        ElasticsearchResponse.indexed_models.each do |indexed_model|
+        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
           indexed_model.__elasticsearch__.refresh_index!
         end
 
         example.run
 
-        ElasticsearchResponse.indexed_models.each do |indexed_model|
+        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
           indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
         end
       end
@@ -145,7 +145,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     around :each do |example|
       # initialize mappings
       current_indices = DataFile.__elasticsearch__.client.cat.indices
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         if current_indices.include? indexed_model.index_name
           indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
         end
@@ -162,14 +162,14 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       @data_file = FactoryGirl.create(:data_file)
       @folder = FactoryGirl.create(:folder)
 
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         indexed_model.__elasticsearch__.refresh_index!
       end
 
       example.run
 
       current_indices = DataFile.__elasticsearch__.client.cat.indices
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         if current_indices.include? indexed_model.index_name
           indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
         end
@@ -179,7 +179,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     it {
       invoke_task
       current_indices = DataFile.__elasticsearch__.client.cat.indices
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         expect(current_indices).not_to include indexed_model.index_name
       end
     }
@@ -192,7 +192,7 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
 
     around :each do |example|
       current_indices = DataFile.__elasticsearch__.client.cat.indices
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         if current_indices.include? indexed_model.index_name
           indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
         end
@@ -209,13 +209,13 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       @data_file = FactoryGirl.create(:data_file)
       @folder = FactoryGirl.create(:folder)
 
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         indexed_model.__elasticsearch__.refresh_index!
       end
 
       example.run
 
-      ElasticsearchResponse.indexed_models.each do |indexed_model|
+      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
         indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
       end
     end

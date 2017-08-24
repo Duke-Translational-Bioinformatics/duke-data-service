@@ -7,7 +7,16 @@ class MessageLogWorker
     begin
       index_queue_message(msg, delivery_info, metadata)
     rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
-      Elasticsearch::Model.client.indices.create(index: index_name)
+      Elasticsearch::Model.client.indices.create(
+        index: index_name,
+        body: {
+          settings: {
+            index: {
+              number_of_shards: 1,
+              number_of_replicas: 0
+            }
+          }
+        })
       index_queue_message(msg, delivery_info, metadata)
     end
     ack!

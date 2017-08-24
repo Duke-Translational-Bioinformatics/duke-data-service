@@ -1,18 +1,28 @@
 class TagPolicy < ApplicationPolicy
   def show?
-    permission :view_project
+    Pundit::PolicyFinder.new(record.taggable).policy&.new(user, record.taggable)&.show?
   end
 
   def create?
-    permission :update_file
+    system_permission ||
+      (record&.taggable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.taggable&.creator == user
   end
 
   def update?
-    permission :update_file
+    system_permission ||
+      (record&.taggable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.taggable&.creator == user
   end
 
   def destroy?
-    permission :update_file
+    #Pundit::PolicyFinder.new(record.taggable).policy&.new(user, record.taggable)&.update?
+    system_permission ||
+      (record&.taggable&.respond_to?(:project_permissions) &&
+                          project_permission(:update_file)) ||
+      record&.taggable&.creator == user
   end
 
   class Scope < Scope
