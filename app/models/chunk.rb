@@ -11,13 +11,14 @@ class Chunk < ActiveRecord::Base
   has_many :project_permissions, through: :upload
 
   validates :upload_id, presence: true
-  validates :number, presence: true, 
+  validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true
 
   delegate :project_id, to: :upload
+  delegate :storage_container, to: :upload
 
   def http_verb
     'PUT'
@@ -36,7 +37,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def sub_path
-    [project_id, object_path].join('/')
+    [storage_container, object_path].join('/')
   end
 
   def expiry

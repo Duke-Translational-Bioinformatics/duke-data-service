@@ -6,7 +6,7 @@ RSpec.describe Upload, type: :model do
   let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
   let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
-  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
+  let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
@@ -56,6 +56,10 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  describe 'callbacks' do
+    it { is_expected.to callback(:set_storage_container).before(:create) }
+  end
+
   describe 'instance methods' do
     it { should delegate_method(:url_root).to(:storage_provider) }
 
@@ -78,6 +82,7 @@ RSpec.describe Upload, type: :model do
       it { is_expected.to respond_to :temporary_url }
       it { expect(subject.temporary_url).to be_a String }
       it { expect(subject.temporary_url).to include subject.name }
+      it { expect(subject.temporary_url).to include subject.storage_container }
 
       context 'when filename is provided' do
         let(:filename) { 'different-file-name.txt' }
@@ -172,6 +177,34 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  describe '#set_storage_container' do
+    it { is_expected.to respond_to :set_storage_container }
+
+    context 'upload creation' do
+      subject { FactoryGirl.build(:upload) }
+      it {
+        expect(subject.storage_container).to be_nil
+        subject.save
+        expect(subject.storage_container).to eq(subject.project_id)
+      }
+    end
+
+    context 'upload update' do
+      subject { FactoryGirl.create(:upload) }
+      let(:original_storage_container) { subject.storage_container }
+      let(:other_project) { completed_upload.project }
+
+      it {
+        expect(subject.storage_container).to eq(subject.project_id)
+        expect(subject.storage_container).to eq(original_storage_container)
+        subject.project = other_project
+        subject.save
+        expect(subject.storage_container).not_to eq(other_project.id)
+        expect(subject.storage_container).to eq(original_storage_container)
+      }
+    end
+  end
+
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
@@ -181,12 +214,12 @@ RSpec.describe Upload, type: :model do
       describe 'calls' do
         before do
           actual_size = 0
-          subject.storage_provider.put_container(subject.project_id)
+          subject.storage_provider.put_container(subject.storage_container)
           subject.chunks.each do |chunk|
             object = [subject.id, chunk.number].join('/')
             body = 'this is a chunk'
             subject.storage_provider.put_object(
-              subject.project_id,
+              subject.storage_container,
               object,
               body
             )
@@ -202,7 +235,7 @@ RSpec.describe Upload, type: :model do
         after do
           subject.chunks.each do |chunk|
             object = [subject.id, chunk.number].join('/')
-            subject.storage_provider.delete_object(subject.project_id, object)
+            subject.storage_provider.delete_object(subject.storage_container, object)
           end
         end
 
