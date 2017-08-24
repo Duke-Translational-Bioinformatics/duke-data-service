@@ -54,6 +54,14 @@ RSpec.describe Upload, type: :model do
       subject { upload_with_error }
       it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
     end
+
+    it 'expects storage_container to be immutable' do
+      is_expected.to be_persisted
+      is_expected.to allow_value(subject.project_id).for(:storage_container)
+      is_expected.to allow_value(subject.storage_container).for(:storage_container)
+      is_expected.not_to allow_value('a-different-string').for(:storage_container)
+        .with_message("Cannot change storage_container.")
+    end
   end
 
   describe 'callbacks' do

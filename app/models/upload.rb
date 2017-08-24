@@ -15,6 +15,7 @@ class Upload < ActiveRecord::Base
   accepts_nested_attributes_for :fingerprints
 
   validates :project_id, presence: true
+  validates :storage_container, immutable: true
   validates :name, presence: true
   validates :size, presence: true
   validates :storage_provider_id, presence: true
