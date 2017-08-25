@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170823195852) do
+ActiveRecord::Schema.define(version: 20170825182638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -114,6 +114,7 @@ ActiveRecord::Schema.define(version: 20170823195852) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.string   "label"
+    t.boolean  "is_purged",  default: false
   end
 
   create_table "file_versions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -124,6 +125,7 @@ ActiveRecord::Schema.define(version: 20170823195852) do
     t.boolean  "is_deleted",     default: false
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.boolean  "is_purged",      default: false
   end
 
   create_table "fingerprints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
