@@ -2,6 +2,8 @@ class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
+  include TrashableModel
+  
   after_save :logically_delete_graph_node
 
   audited

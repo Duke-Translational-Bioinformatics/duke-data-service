@@ -19,6 +19,7 @@ RSpec.describe DataFile, type: :model do
   end
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a job_transactionable model'
+  it_behaves_like 'a TrashableModel'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }

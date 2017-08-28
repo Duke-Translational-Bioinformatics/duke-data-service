@@ -18,6 +18,14 @@ RSpec.describe FileVersion, type: :model do
 
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  context 'previous data_file version' do
+    before do
+      data_file.upload = other_upload
+      expect(data_file.save).to be_truthy
+      expect(subject.deletion_allowed?).to be_truthy
+    end
+    it_behaves_like 'a TrashableModel'
+  end
 
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }
