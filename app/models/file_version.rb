@@ -3,7 +3,7 @@ class FileVersion < ActiveRecord::Base
   include Graphed::Node
   include RequestAudited
   include TrashableModel
-  
+
   after_save :logically_delete_graph_node
 
   audited
@@ -15,6 +15,10 @@ class FileVersion < ActiveRecord::Base
   validates :is_deleted,
     absence: { message: 'The current file version cannot be deleted.' },
     unless: :deletion_allowed?
+  validates :is_purged,
+    absence: { message: 'The current file version cannot be purged.' },
+    unless: :purge_allowed?
+
   validates_each :upload_id, on: :create do |record, attr, value|
     if record.upload_id
       if record.upload_id == record.data_file.file_versions.order(:version_number).last&.upload_id
@@ -48,6 +52,11 @@ class FileVersion < ActiveRecord::Base
   def deletion_allowed?
     self.version_number != current_version_number ||
       data_file.is_deleted?
+  end
+
+  def purge_allowed?
+    self.version_number != current_version_number ||
+      data_file.is_purged?
   end
 
   def kind

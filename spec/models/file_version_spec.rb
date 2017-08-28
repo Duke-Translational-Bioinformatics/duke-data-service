@@ -48,6 +48,24 @@ RSpec.describe FileVersion, type: :model do
       it { is_expected.to allow_value(false).for(:is_deleted) }
     end
 
+    context 'when purge_allowed? is true' do
+      before {
+        subject.update_column(:is_deleted, true)
+        allow(subject).to receive(:purge_allowed?).and_return(true)
+      }
+      it { is_expected.to allow_value(true).for(:is_purged) }
+      it { is_expected.to allow_value(false).for(:is_purged) }
+    end
+
+    context 'when purge_allowed? is false' do
+      before {
+        subject.update_column(:is_deleted, true)
+        allow(subject).to receive(:purge_allowed?).and_return(false)
+      }
+      it { is_expected.not_to allow_value(true).for(:is_purged).with_message('The current file version cannot be purged.') }
+      it { is_expected.to allow_value(false).for(:is_purged) }
+    end
+
     context 'when #is_deleted=true' do
       subject { deleted_file_version }
       it { is_expected.not_to validate_presence_of(:upload_id) }
@@ -138,6 +156,29 @@ RSpec.describe FileVersion, type: :model do
         context 'with data_file.is_deleted true' do
           before { data_file.is_deleted = true }
           it { expect(subject.deletion_allowed?).to be_truthy }
+        end
+      end
+    end
+
+
+    describe '#purge_allowed?' do
+      it { is_expected.to respond_to(:purge_allowed?) }
+
+      context 'when not current_file_version' do
+        subject { data_file.file_versions.first }
+        before { data_file.reload }
+        it { is_expected.not_to eq data_file.current_file_version }
+        it { expect(subject.purge_allowed?).to be_truthy }
+      end
+
+      context 'when current_file_version' do
+        before { data_file.reload }
+        it { is_expected.to eq data_file.current_file_version }
+        it { expect(subject.purge_allowed?).to be_falsey }
+
+        context 'with data_file.is_purged true' do
+          before { data_file.is_purged = true }
+          it { expect(subject.purge_allowed?).to be_truthy }
         end
       end
     end
