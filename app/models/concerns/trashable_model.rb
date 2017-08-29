@@ -2,7 +2,7 @@ module TrashableModel
   extend ActiveSupport::Concern
 
   included do
-    validate :can_be_purged#, if: :is_purged_changed?
+    validate :can_be_purged
   end
 
   private
