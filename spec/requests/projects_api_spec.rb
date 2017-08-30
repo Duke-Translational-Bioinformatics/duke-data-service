@@ -230,7 +230,7 @@ describe DDS::V1::ProjectsAPI do
                 expect(root_folder.is_deleted?).to be_falsey
                 expect(root_file.is_deleted?).to be_falsey
                 is_expected.to eq(204)
-              }.to have_enqueued_job(ChildDeletionJob)
+              }.to have_enqueued_job(ChildPurgationJob)
             }
           end
         end
