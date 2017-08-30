@@ -15,33 +15,45 @@ module ChildMinder
     end
     yield
     if has_children?
-      if newly_deleted
-        (1..paginated_children.total_pages).each do |page|
-          ChildDeletionJob.perform_later(
-            ChildDeletionJob.initialize_job(self),
-            self,
-            page
-          )
+      if self.class.include? TrashableModel
+        if newly_deleted
+          (1..paginated_children.total_pages).each do |page|
+            ChildDeletionJob.perform_later(
+              ChildDeletionJob.initialize_job(self),
+              self,
+              page
+            )
+          end
         end
-      end
 
-      if newly_restored
-        (1..paginated_children.total_pages).each do |page|
-          ChildRestorationJob.perform_later(
-            ChildRestorationJob.initialize_job(self),
-            self,
-            page
-          )
+        if newly_restored
+          (1..paginated_children.total_pages).each do |page|
+            ChildRestorationJob.perform_later(
+              ChildRestorationJob.initialize_job(self),
+              self,
+              page
+            )
+          end
         end
-      end
 
-      if newly_purged
-        (1..paginated_children.total_pages).each do |page|
-          ChildPurgationJob.perform_later(
-            ChildPurgationJob.initialize_job(self),
-            self,
-            page
-          )
+        if newly_purged
+          (1..paginated_children.total_pages).each do |page|
+            ChildPurgationJob.perform_later(
+              ChildPurgationJob.initialize_job(self),
+              self,
+              page
+            )
+          end
+        end
+      else
+        if newly_deleted
+          (1..paginated_children.total_pages).each do |page|
+            ChildPurgationJob.perform_later(
+              ChildPurgationJob.initialize_job(self),
+              self,
+              page
+            )
+          end
         end
       end
     end
@@ -52,9 +64,11 @@ module ChildMinder
   end
 
   def delete_children(page)
-    paginated_children(page).each do |child|
-      child.current_transaction = current_transaction if child.class.include? ChildMinder
-      child.update(is_deleted: true)
+    if self.class.include? TrashableModel
+      paginated_children(page).each do |child|
+        child.current_transaction = current_transaction if child.class.include? ChildMinder
+        child.update(is_deleted: true)
+      end
     end
   end
 
@@ -68,11 +82,9 @@ module ChildMinder
   end
 
   def purge_children(page)
-    if self.class.include? TrashableModel
-      paginated_children(page).each do |child|
-        child.current_transaction = current_transaction if child.class.include? ChildMinder
-        child.update(is_purged: true)
-      end
+    paginated_children(page).each do |child|
+      child.current_transaction = current_transaction if child.class.include? ChildMinder
+      child.update(is_deleted: true, is_purged: true)
     end
   end
 

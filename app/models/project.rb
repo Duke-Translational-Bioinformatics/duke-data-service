@@ -18,6 +18,7 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
+  validates :is_deleted, immutable: true, if: :is_deleted_was
 
   after_create :set_project_admin
   after_create :initialize_storage

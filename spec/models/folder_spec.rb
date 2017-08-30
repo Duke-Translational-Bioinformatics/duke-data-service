@@ -94,7 +94,7 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  it_behaves_like 'a ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder, is_trashable: true
+  it_behaves_like 'a Trashable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
 
   describe '#parent_id=' do
     it 'should set project to parent.project' do
