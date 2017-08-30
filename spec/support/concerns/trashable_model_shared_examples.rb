@@ -5,8 +5,7 @@ shared_examples 'a TrashableModel' do
     context 'when is_deleted? false' do
       it {
         expect(subject.is_deleted).to be false
-        subject.is_purged = true
-        is_expected.not_to be_valid
+        is_expected.not_to allow_value(true).for(:is_purged)
       }
     end
 
@@ -16,8 +15,7 @@ shared_examples 'a TrashableModel' do
       end
       it {
         expect(subject.is_deleted).to be true
-        subject.is_purged = true
-        is_expected.to be_valid
+        is_expected.to allow_value(true).for(:is_purged)
       }
     end
   end
