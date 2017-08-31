@@ -2,6 +2,8 @@ module TrashableModel
   extend ActiveSupport::Concern
 
   included do
+    validates :is_deleted, immutable: true, if: :is_purged_was
+    validates :is_purged, immutable: true, if: :is_purged_was
     validate :can_be_purged
   end
 
