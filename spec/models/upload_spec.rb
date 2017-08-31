@@ -216,37 +216,41 @@ RSpec.describe Upload, type: :model do
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
 
+    before do
+      actual_size = 0
+      subject.storage_provider.put_container(subject.storage_container)
+      subject.chunks.each do |chunk|
+        body = 'this is a chunk'
+        subject.storage_provider.put_object(
+          subject.storage_container,
+          chunk.object_path,
+          body
+        )
+        chunk.update_attributes({
+          fingerprint_value: Digest::MD5.hexdigest(body),
+          size: body.length
+        })
+        actual_size = body.length + actual_size
+      end
+      subject.update_attribute(:size, actual_size)
+    end
+
+    after do
+      begin
+        subject.chunks.each do |chunk|
+          object = [subject.id, chunk.number].join('/')
+          subject.storage_provider.delete_object(subject.storage_container, object)
+        end
+        subject.storage_provider.delete_object_manifest(subject.storage_provider, subject.id)
+      rescue
+        # ignore
+      end
+    end
+
     describe '#create_and_validate_storage_manifest' do
       it { is_expected.to respond_to :create_and_validate_storage_manifest }
 
       describe 'calls' do
-        before do
-          actual_size = 0
-          subject.storage_provider.put_container(subject.storage_container)
-          subject.chunks.each do |chunk|
-            object = [subject.id, chunk.number].join('/')
-            body = 'this is a chunk'
-            subject.storage_provider.put_object(
-              subject.storage_container,
-              object,
-              body
-            )
-            chunk.update_attributes({
-              fingerprint_value: Digest::MD5.hexdigest(body),
-              size: body.length
-            })
-            actual_size = body.length + actual_size
-          end
-          subject.update_attribute(:size, actual_size)
-        end
-
-        after do
-          subject.chunks.each do |chunk|
-            object = [subject.id, chunk.number].join('/')
-            subject.storage_provider.delete_object(subject.storage_container, object)
-          end
-        end
-
         describe 'with valid reported size and chunk hashes' do
           it 'should set is_consistent to true, leave error_at and error_message null' do
             subject.create_and_validate_storage_manifest
@@ -281,5 +285,42 @@ RSpec.describe Upload, type: :model do
         end #with reported chunk
       end #calls
     end #complete
+
+    context '#purge_storage' do
+      it { is_expected.to respond_to :purge_storage }
+
+      context 'calls' do
+        before do
+          subject.create_and_validate_storage_manifest
+        end
+        it {
+          resp = HTTParty.head(
+            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
+            headers: subject.storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(200)
+          subject.chunks.each do |chunk|
+            resp = HTTParty.head(
+              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              headers: subject.storage_provider.auth_header
+            )
+            expect(resp.response.code.to_i).to eq(200)
+          end
+          subject.purge_storage
+          resp = HTTParty.head(
+            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
+            headers: subject.storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(404)
+          subject.chunks.each do |chunk|
+            resp = HTTParty.head(
+              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              headers: subject.storage_provider.auth_header
+            )
+            expect(resp.response.code.to_i).to eq(404)
+          end
+        }
+      end #calls
+    end #purge_storage
   end #swift methods
 end

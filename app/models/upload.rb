@@ -101,6 +101,13 @@ class Upload < ActiveRecord::Base
     storage_container
   end
 
+  def purge_storage
+    chunks.each do |chunk|
+      chunk.purge_storage
+    end
+    storage_provider.delete_object_manifest(storage_container, id)
+  end
+
   private
   def integrity_exception(message)
     exactly_now = DateTime.now
