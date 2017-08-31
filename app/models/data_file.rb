@@ -9,7 +9,7 @@ class DataFile < Container
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :set_current_file_version_attributes
-  before_save :set_file_versions_is_deleted, if: :is_deleted?
+  before_save :set_file_versions_is_deleted, if: :is_deleted_changed?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
@@ -47,7 +47,9 @@ class DataFile < Container
 
   def set_file_versions_is_deleted
     file_versions.each do |fv|
-      fv.is_deleted = true
+      unless fv.is_purged?
+        fv.is_deleted = is_deleted
+      end
     end
   end
 
