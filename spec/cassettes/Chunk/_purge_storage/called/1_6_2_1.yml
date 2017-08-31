@@ -1,0 +1,245 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txb49e73b5be454d7999a79-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: post
+    uri: http://swift.local:12345/v1/AUTH_test
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+      X-Account-Meta-Temp-Url-Key:
+      - 96e8b4599737baf95cc6fb5d53b9b19b
+      X-Account-Meta-Temp-Url-Key-2:
+      - 59d504299a0e86aa96d98e3602e7010a
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx28e3d94c6eb34c088a612-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txf654797c33234d8c8c8db-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6/18c2ac10-d128-4000-af4a-53f3fb84f9d2/1019
+    body:
+      encoding: UTF-8
+      string: some random chunk
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Thu, 31 Aug 2017 17:54:19 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - 8a8d11f83f5846788f3ee8aab1fc90e9
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx52505dee27644ebeab9cf-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: get
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6/18c2ac10-d128-4000-af4a-53f3fb84f9d2/1019
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '17'
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Thu, 31 Aug 2017 17:54:19 GMT
+      Etag:
+      - 8a8d11f83f5846788f3ee8aab1fc90e9
+      X-Timestamp:
+      - '1504202058.50871'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      X-Trans-Id:
+      - tx6586092a10d84810b4a9b-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: some random chunk
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: delete
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6/18c2ac10-d128-4000-af4a-53f3fb84f9d2/1019
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx75d39a452993405388cc7-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: get
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6/18c2ac10-d128-4000-af4a-53f3fb84f9d2/1019
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Length:
+      - '70'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx75ac3c73c6a24b6785668-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Not Found</h1><p>The resource could not be found.</p></html>"
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+- request:
+    method: delete
+    uri: http://swift.local:12345/v1/AUTH_test/463ab190-9ca2-4073-9bc4-6decc8f153d6/18c2ac10-d128-4000-af4a-53f3fb84f9d2/1019
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk98ed4eaf62e4400f9c669cf600bf698d
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Length:
+      - '70'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txda629513ef0c423bbf76d-0059a84d4a
+      Date:
+      - Thu, 31 Aug 2017 17:54:18 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Not Found</h1><p>The resource could not be found.</p></html>"
+    http_version: 
+  recorded_at: Thu, 31 Aug 2017 17:54:18 GMT
+recorded_with: VCR 3.0.3

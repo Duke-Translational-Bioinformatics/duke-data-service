@@ -48,6 +48,10 @@ class Chunk < ActiveRecord::Base
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 
+  def purge_storage
+    storage_provider.delete_object(storage_container, object_path)
+  end
+
   private
 
   def update_upload_etag
