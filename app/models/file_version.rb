@@ -2,9 +2,11 @@ class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
+  include JobTransactionable
   include TrashableModel
 
   after_save :logically_delete_graph_node
+  around_update :manage_purge_and_restore
 
   audited
   belongs_to :data_file
@@ -61,6 +63,24 @@ class FileVersion < ActiveRecord::Base
 
   def kind
     super('file-version')
+  end
+
+  def manage_purge_and_restore
+    newly_restored = is_deleted_changed? && is_deleted_was && !is_deleted?
+    newly_purged = is_purged_changed? && is_purged
+    yield
+
+    if newly_restored
+      if data_file.is_deleted?
+        data_file.update(is_deleted: false)
+      end
+    elsif newly_purged
+      UploadStorageRemovalJob.perform_later(
+        UploadStorageRemovalJob.initialize_job(self),
+        upload.id
+      )
+    #else not needed
+    end
   end
 
   private

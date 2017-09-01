@@ -10,7 +10,7 @@ module ChildMinder
     newly_restored = false
     newly_purged = false
     if self.class.include? TrashableModel
-      newly_restored = is_deleted_changed? && !is_deleted?
+      newly_restored = is_deleted_changed? && is_deleted_was && !is_deleted?
       newly_purged = is_purged_changed? && is_purged
     end
     yield

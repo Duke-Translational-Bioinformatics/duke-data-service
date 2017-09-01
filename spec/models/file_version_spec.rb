@@ -18,6 +18,8 @@ RSpec.describe FileVersion, type: :model do
 
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a job_transactionable model'
+
   context 'previous data_file version' do
     before do
       data_file.upload = other_upload
@@ -182,9 +184,90 @@ RSpec.describe FileVersion, type: :model do
         end
       end
     end
+
+    describe '#manage_purge_and_restore' do
+      it { is_expected.to respond_to :manage_purge_and_restore }
+
+      context 'recently_purged' do
+        let(:job_transaction) {
+          subject.create_transaction('testing')
+          UploadStorageRemovalJob.initialize_job(subject)
+        }
+
+        before do
+          @old_max = Rails.application.config.max_children_per_job
+          Rails.application.config.max_children_per_job = 1
+          subject.update_column(:is_deleted, true)
+        end
+
+        after do
+          Rails.application.config.max_children_per_job = @old_max
+        end
+
+        it {
+          expect(subject.is_deleted?).to be_truthy
+          subject.is_purged = true
+          yield_called = false
+          expect(UploadStorageRemovalJob).to receive(:initialize_job)
+            .with(subject).and_return(job_transaction)
+          expect(UploadStorageRemovalJob).to receive(:perform_later).with(job_transaction, subject.upload.id)
+          subject.manage_purge_and_restore do
+            yield_called = true
+          end
+          expect(yield_called).to be_truthy
+        }
+      end
+
+      context 'recently_restored' do
+        context 'with deleted data_file' do
+          before do
+            FileVersion.skip_callback(:update, :around, :manage_purge_and_restore)
+            subject.update_column(:is_deleted, true)
+            subject.data_file.update_column(:is_deleted, true)
+          end
+
+          after do
+            FileVersion.set_callback(:update, :around, :manage_purge_and_restore)
+          end
+          it {
+            expect(subject.is_deleted?).to be_truthy
+            expect(subject.is_purged?).to be_falsey
+            expect(subject.data_file.is_deleted?).to be_truthy
+            expect(subject.data_file).to receive(:update).with(is_deleted: false)
+            subject.is_deleted = false
+            yield_called = false
+            subject.manage_purge_and_restore do
+              yield_called = true
+            end
+            expect(yield_called).to be_truthy
+          }
+        end
+
+        context 'with non-deleted data_file' do
+          before do
+            subject.update_column(:is_deleted, true)
+          end
+          it {
+            expect(subject.is_deleted?).to be_truthy
+            expect(subject.is_purged?).to be_falsey
+            expect(subject.data_file.is_deleted?).to be_falsey
+            expect(subject.data_file).not_to receive(:update)
+            subject.is_deleted = false
+            yield_called = false
+            subject.manage_purge_and_restore do
+              yield_called = true
+            end
+            expect(yield_called).to be_truthy
+          }
+        end
+      end
+    end
   end
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_version_number).before(:create) }
+    it {
+      is_expected.to callback(:manage_purge_and_restore).around(:update)
+    }
   end
 end
