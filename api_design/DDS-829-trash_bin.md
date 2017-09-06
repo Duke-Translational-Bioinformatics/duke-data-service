@@ -16,30 +16,17 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 
 |Endpoint |Description |
 |---|---|
-| `GET /trashbin{?name_contains}` | Get a list of all objects in the trash bin and optionally filter list by `name_contains`.  The results are sorted in most recently deleted order. |
 | `GET /trashbin/projects/{id}/children{?name_contains}` | Get a list of immediate descendants of the project that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
 | `GET /trashbin/folders/{id}/children{?name_contains}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
 | `GET /trashbin/{object_id}/{object_kind}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
 | `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist. |
 | `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purged, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (e.g. Duke OIT Swift). |
-| `GET /current_user/stats` | Get utilization stats for the current user. |
-| `GET /projects/{id}/stats` | Get utilization stats for the project. |
 
 
 **Note:** *An object is considered to be in the trash bin if it has been deleted (`"is_deleted": true`), but not purged (`"is_purged": false`); a purged object is immutable.*
 
 #### API Specification
 This section defines the proposed API interfaces.
-
-##### List objects in the trash bin
-`GET /trashbin{?name_contains}`
-
-###### Permissions
-authenticated [scope: view_project]
-
-###### Response Messages
-* 200: Success
-* 401: Unauthorized
 
 ##### List objects in trash bin that are project descendants
 `GET /trashbin/projects/{id}/children{?name_contains}`
@@ -119,42 +106,6 @@ project\_admin or system\_admin
 ###### Request Example
 `PUT /trashbin/dds-file/888be35a-98e0-4c2e-9a17-7bc009f9b222/purge`  
 
-##### Get utilization stats for the current user
-`GET /current_user/stats`
-
-###### Permissions
-authenticated [scope: view_project]
-
-###### Response Example
-```
-{
-   "project_admin_stats": {
-   		"projects_count": 2,
-   		"total_bytes": 102046000,
-   		"in_trash_bytes": 50240000
-   },
-   "collaborator_stats": {
-   		"projects_count": 20
-   }
-}
-```
-
-##### Get utilization stats for a project
-`GET /projects/{id}/stats`
-
-###### Permissions
-authenticated [scope: view_project]
-
-###### Response Example
-```
-{
-   "stats": {
-   		"total_bytes": 102046000,
-   		"in_trash_bytes": 50240000
-   	}
-}
-```
-
 ## Implementation View
 
 + The audit trail will track restore and purge events for objects.  The sample below shows what this may look like if returned with object payload.  Returning with payload is contingent upon optimizing serialization of audit details and perhaps making them optional for list operations.
@@ -185,14 +136,12 @@ of the upload using the project.id and upload.id at request time.  This tightly 
 	+ These changes will also allow us to extend the `/move` endpoints to support cross project moves.
   + **IMPORTANT** we will need a data migration upon initial deployment to each heroku environment which sets the container_id to the current project.id for all existing (completed, consistent) uploads.
 
-+ Deprecate `GET /current_user/usage` - leverage new endpoints `GET /current_user/stats` and `GET /projects/{id}/stats`
-
-FileVersion will have a manage_upload method that submits a UploadStoragePurgeJob for its upload when
++ FileVersion will have a manage_upload method that submits a UploadStoragePurgeJob for its upload when
 is_purged is set to true (after_save).
 
 ###### Background Workers
 
-upload_storage_purge_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
+upload\_storage\_purge_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
 
 ## Process View
 
