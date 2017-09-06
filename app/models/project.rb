@@ -4,6 +4,7 @@ class Project < ActiveRecord::Base
   include ChildMinder
   include RequestAudited
   include JobTransactionable
+  include UnRestorable
   audited
 
   belongs_to :creator, class_name: "User"

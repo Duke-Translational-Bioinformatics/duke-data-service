@@ -26,7 +26,8 @@ RSpec.describe FileVersion, type: :model do
       expect(data_file.save).to be_truthy
       expect(subject.deletion_allowed?).to be_truthy
     end
-    it_behaves_like 'a TrashableModel'
+    it_behaves_like 'a Restorable'
+    it_behaves_like 'a Purgable'
   end
 
   describe 'associations' do

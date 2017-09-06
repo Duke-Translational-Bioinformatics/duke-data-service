@@ -1,0 +1,218 @@
+shared_examples 'a Restorable' do
+  it { expect(described_class).to include(Restorable) }
+  it { is_expected.to respond_to :manage_deletion_and_restoration }
+  describe 'callbacks' do
+    it { is_expected.to callback(:manage_deletion_and_restoration).before(:update) }
+  end
+end
+
+shared_examples 'a Restorable ChildMinder' do |resource_factory,
+  valid_child_file_sym,
+  invalid_child_file_sym,
+  child_folder_sym|
+  let(:valid_child_file) { send(valid_child_file_sym) }
+  let(:invalid_child_file) { send(invalid_child_file_sym) }
+  let(:child_folder) { send(child_folder_sym) }
+
+  it_behaves_like 'a Restorable'
+  it_behaves_like 'a ChildMinder', resource_factory, valid_child_file_sym, invalid_child_file_sym, child_folder_sym
+
+  describe '#manage_children' do
+    context 'when is_deleted not changed' do
+      it {
+        expect(subject.is_deleted_changed?).to be_falsey
+        subject.manage_deletion_and_restoration
+        expect(ChildDeletionJob).not_to receive(:perform_later)
+        expect(ChildRestorationJob).not_to receive(:perform_later)
+        subject.manage_children
+      }
+    end
+
+    context 'when is_deleted changed from false to true' do
+      include_context 'with job runner', ChildDeletionJob
+      context 'has_children? true' do
+        let(:job_transaction) {
+          subject.create_transaction('testing')
+          ChildDeletionJob.initialize_job(subject)
+        }
+        before do
+          @old_max = Rails.application.config.max_children_per_job
+          Rails.application.config.max_children_per_job = 1
+          expect(child_folder).to be_persisted
+          child_folder.update_column(:is_deleted, true)
+          expect(child_folder.is_deleted?).to be_truthy
+          expect(valid_child_file).to be_persisted
+          valid_child_file.update_column(:is_deleted, true)
+          expect(valid_child_file.is_deleted?).to be_truthy
+          expect(invalid_child_file).to be_persisted
+          invalid_child_file.update_column(:is_deleted, true)
+          expect(invalid_child_file.is_deleted?).to be_truthy
+        end
+
+        after do
+          Rails.application.config.max_children_per_job = @old_max
+        end
+
+        it {
+          expect(subject.has_children?).to be_truthy
+          subject.is_deleted = true
+          subject.manage_deletion_and_restoration
+          expect(ChildDeletionJob).to receive(:initialize_job)
+            .with(subject)
+            .exactly(subject.children.count).times
+            .and_return(job_transaction)
+          (1..subject.children.count).each do |page|
+            expect(ChildDeletionJob).to receive(:perform_later).with(job_transaction, subject, page)
+          end
+          subject.manage_children
+        }
+      end
+
+      context 'has_children? false' do
+        subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+        it {
+          expect(subject.has_children?).to be_falsey
+          subject.is_deleted = true
+          subject.manage_deletion_and_restoration
+          expect(ChildDeletionJob).not_to receive(:perform_later)
+          subject.manage_children
+        }
+      end
+    end
+
+    context 'when is_deleted changed from true to false' do
+      context 'has_children? true' do
+        include_context 'with job runner', ChildRestorationJob
+        let(:job_transaction) {
+          subject.create_transaction('testing')
+          ChildRestorationJob.initialize_job(subject)
+        }
+        before do
+          @old_max = Rails.application.config.max_children_per_job
+          Rails.application.config.max_children_per_job = 1
+          subject.update_column(:is_deleted, true)
+          expect(child_folder).to be_persisted
+          child_folder.update_column(:is_deleted, true)
+          expect(child_folder.is_deleted?).to be_truthy
+          expect(valid_child_file).to be_persisted
+          valid_child_file.update_column(:is_deleted, true)
+          expect(valid_child_file.is_deleted?).to be_truthy
+          expect(invalid_child_file).to be_persisted
+          invalid_child_file.update_column(:is_deleted, true)
+          expect(invalid_child_file.is_deleted?).to be_truthy
+        end
+
+        after do
+          Rails.application.config.max_children_per_job = @old_max
+        end
+
+        it {
+          expect(subject).to be_has_children
+          subject.is_deleted = false
+          subject.manage_deletion_and_restoration
+          expect(ChildRestorationJob).to receive(:initialize_job)
+            .with(subject)
+            .exactly(subject.children.count).times
+            .and_return(job_transaction)
+          (1..subject.children.count).each do |page|
+            expect(ChildRestorationJob).to receive(:perform_later).with(job_transaction, subject, page)
+          end
+          subject.manage_children
+        }
+      end
+
+      context 'has_children? false' do
+        subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+        it {
+          expect(subject).not_to be_has_children
+          subject.is_deleted = false
+          subject.manage_deletion_and_restoration
+          expect(ChildRestorationJob).not_to receive(:perform_later)
+          subject.manage_children
+        }
+      end
+    end
+  end #manage_children
+
+  describe '#restore_children' do
+    it { is_expected.not_to respond_to(:restore_children).with(0).arguments }
+    it { is_expected.to respond_to(:restore_children).with(1).argument }
+
+    context 'called', :vcr do
+      include_context 'with job runner', ChildRestorationJob
+      let(:job_transaction) { ChildRestorationJob.initialize_job(subject) }
+      let(:child_job_transaction) { ChildRestorationJob.initialize_job(child_folder) }
+      let(:child_folder_file) { FactoryGirl.create(:data_file, parent: child_folder)}
+      let(:page) { 1 }
+
+      before do
+        expect(child_folder).to be_persisted
+        child_folder.update_column(:is_deleted, true)
+        expect(child_folder_file).to be_persisted
+        child_folder_file.update_column(:is_deleted, true)
+        valid_child_file.update_column(:is_deleted, true)
+        expect(valid_child_file.is_deleted?).to be_truthy
+
+        @old_max = Rails.application.config.max_children_per_job
+        Rails.application.config.max_children_per_job = subject.children.count + child_folder.children.count
+      end
+
+      after do
+        Rails.application.config.max_children_per_job = @old_max
+      end
+
+      it {
+        subject.current_transaction = job_transaction
+        expect(ChildRestorationJob).to receive(:initialize_job)
+          .with(child_folder)
+          .and_return(child_job_transaction)
+        expect(ChildRestorationJob).to receive(:perform_later)
+          .with(child_job_transaction, child_folder, page).and_call_original
+        subject.restore_children(page)
+        expect(child_folder.reload).to be_truthy
+        expect(child_folder.is_deleted?).to be_falsey
+        expect(valid_child_file.reload).to be_truthy
+        expect(valid_child_file.is_deleted?).to be_falsey
+      }
+    end
+  end
+
+  describe '#delete_children' do
+    it { is_expected.not_to respond_to(:delete_children).with(0).arguments }
+    it { is_expected.to respond_to(:delete_children).with(1).argument }
+
+    context 'called', :vcr do
+      include_context 'with job runner', ChildDeletionJob
+      let(:job_transaction) { ChildDeletionJob.initialize_job(subject) }
+      let(:child_job_transaction) { ChildDeletionJob.initialize_job(child_folder) }
+      let(:child_folder_file) { FactoryGirl.create(:data_file, parent: child_folder)}
+      let(:page) { 1 }
+
+      before do
+        expect(child_folder).to be_persisted
+        expect(child_folder_file).to be_persisted
+        expect(valid_child_file.is_deleted?).to be_falsey
+        @old_max = Rails.application.config.max_children_per_job
+        Rails.application.config.max_children_per_job = subject.children.count + child_folder.children.count
+      end
+
+      after do
+        Rails.application.config.max_children_per_job = @old_max
+      end
+
+      it {
+        subject.current_transaction = job_transaction
+        expect(ChildDeletionJob).to receive(:initialize_job)
+          .with(child_folder)
+          .and_return(child_job_transaction)
+        expect(ChildDeletionJob).to receive(:perform_later)
+          .with(child_job_transaction, child_folder, page).and_call_original
+        subject.delete_children(page)
+        expect(child_folder.reload).to be_truthy
+        expect(child_folder.is_deleted?).to be_truthy
+        expect(valid_child_file.reload).to be_truthy
+        expect(valid_child_file.is_deleted?).to be_truthy
+      }
+    end
+  end
+end

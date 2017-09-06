@@ -2,7 +2,8 @@ class Container < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
   include RequestAudited
-  include TrashableModel
+  include Restorable
+  include Purgable
 
   audited
   belongs_to :project
