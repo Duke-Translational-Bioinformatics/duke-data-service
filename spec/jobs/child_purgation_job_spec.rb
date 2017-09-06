@@ -45,15 +45,31 @@ RSpec.describe ChildPurgationJob, type: :job do
     end
   end
 
-  let(:folder) { FactoryGirl.create(:folder, is_deleted: true) }
-  let(:sub_folder) { FactoryGirl.create(:folder, parent: folder, is_deleted: true) }
-  let(:folder_child) { FactoryGirl.create(:data_file, parent: sub_folder, is_deleted: true) }
-  let(:sub_file) { FactoryGirl.create(:data_file, parent: folder, is_deleted: true) }
+  context 'project' do
+    let(:project) { FactoryGirl.create(:project, is_deleted: true) }
+    let(:root_folder) { FactoryGirl.create(:folder, :root, project: project, is_deleted: true) }
+    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, is_deleted: true) }
+    let(:root_file) { FactoryGirl.create(:data_file, :root, project: project, is_deleted: true) }
 
-  before do
-    expect(folder_child).to be_persisted
-    expect(folder_child.is_deleted?).to be_truthy
+    before do
+      expect(folder_child).to be_persisted
+      expect(folder_child.is_deleted?).to be_truthy
+    end
+
+    it_behaves_like 'a ChildPurgationJob', :project, :root_folder, :root_file
   end
 
-  it_behaves_like 'a ChildPurgationJob', :folder, :sub_folder, :sub_file
+  context 'folder' do
+    let(:folder) { FactoryGirl.create(:folder, is_deleted: true) }
+    let(:sub_folder) { FactoryGirl.create(:folder, parent: folder, is_deleted: true) }
+    let(:folder_child) { FactoryGirl.create(:data_file, parent: sub_folder, is_deleted: true) }
+    let(:sub_file) { FactoryGirl.create(:data_file, parent: folder, is_deleted: true) }
+
+    before do
+      expect(folder_child).to be_persisted
+      expect(folder_child.is_deleted?).to be_truthy
+    end
+
+    it_behaves_like 'a ChildPurgationJob', :folder, :sub_folder, :sub_file
+  end
 end

@@ -17,7 +17,6 @@ RSpec.describe Folder, type: :model do
   end
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a job_transactionable model'
-  it_behaves_like 'a TrashableModel'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -94,7 +93,8 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  it_behaves_like 'a Trashable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
+  it_behaves_like 'a Restorable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
+  it_behaves_like 'a Purgable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
 
   describe '#parent_id=' do
     it 'should set project to parent.project' do
