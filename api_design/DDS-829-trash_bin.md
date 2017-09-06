@@ -187,12 +187,22 @@ of the upload using the project.id and upload.id at request time.  This tightly 
 
 + Deprecate `GET /current_user/usage` - leverage new endpoints `GET /current_user/stats` and `GET /projects/{id}/stats`
 
-FileVersion will have a manage_upload method that submits a UploadStoragePurgeJob for its upload when
-is_purged is set to true (after_save).
+ChildMinder
+  + manage_children: if newly_purged, launch ChildPurgationJobs for all children. If newly_restored, launch ChildRestorationJobs for all children.
+  + purge_children: similar to delete_children sets is_purged: true
+  + restore_children: similar to delete_children, sets is_deleted: false
+
+FileVersion will have a manage_upload method that submits a UploadStorageRemovalJob for its upload when
+is_purged is set to true (after_update).
 
 ###### Background Workers
 
-upload_storage_purge_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
+child_purgation_job: almost identical to child_deletion_job, calls purge_children instead of delete_children.
+
+child_restoration_job: almost identical to child_purgation_job, calls
+restore_children instead of purge_children.
+
+upload_storage_removal_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
 
 ## Process View
 
