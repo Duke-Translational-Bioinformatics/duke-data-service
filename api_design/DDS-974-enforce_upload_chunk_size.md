@@ -6,7 +6,7 @@ N/A
 
 ## Logical View
 
-A critical issue was recently exposed with the chunked upload capability.  The underlying storage system (Swift), can only coalesce a large file that is <= 1000 segments (i.e. referred to as chunks in the DDS API).  To remedy this situation, the API will be extended to enforce a minumum chunk size for chunked file uploads.
+A critical issue was recently exposed with the chunked upload capability.  The  storage provider (Swift), is configured with a set maximum number of segments (i.e. Data Service chunks), beyond which it cannot coalesce a large file.  To remedy this situation, the API will be extended to enforce a minumum chunk size, based on the overall file size and max segments setting.
 
 #### Summary of impacted APIs
 
@@ -47,7 +47,7 @@ The following custom response headers will be added to inform clients of the min
 
 + The offcial GCB python client and DDS Web portal client will need to be modifed to interface with these chunked upload API extensions.
 
-+ A migration will be needed to remedy any existing uploads that have been marked as completed by the client (i.e. `status.completed_on != null`) and have greater that 1000 chunks (i.e. Swift segments).
++ A migration will be needed to remedy any existing uploads that have been marked as completed by the client (i.e. `status.completed_on != null`) and have greater that 1000 chunks (i.e. Swift segments).  This may be accomplished by increasing the `max_manifest_segements` on the Swift instance.
 
 ## Process View
 
