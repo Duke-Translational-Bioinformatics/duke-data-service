@@ -27,5 +27,9 @@ FactoryGirl.define do
       chunk_max_number { ENV['SWIFT_CHUNK_MAX_NUMBER'] || Faker::Number.number(3) }
       chunk_max_size_bytes { ENV['SWIFT_CHUNK_MAX_SIZE_BYTES'] || Faker::Number.number(5) }
     end
+
+    trait :skip_validation do
+      to_create {|instance| instance.save(validate: false) }
+    end
   end
 end
