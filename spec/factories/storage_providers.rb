@@ -11,8 +11,8 @@ FactoryGirl.define do
     primary_key { SecureRandom.hex }
     secondary_key { SecureRandom.hex }
     chunk_hash_algorithm { Faker::Hacker.abbreviation }
-    chunk_max_number { Faker::Number.number(3) }
-    chunk_max_size_bytes { Faker::Number.number(5) }
+    chunk_max_number { Faker::Number.between(100,1000) }
+    chunk_max_size_bytes { Faker::Number.between(4368709122, 6368709122) }
 
     trait :swift do
       name { ENV['SWIFT_ACCT'] || Faker::Name.name }
@@ -24,8 +24,8 @@ FactoryGirl.define do
       service_user { ENV["SWIFT_USER"] || Faker::Internet.user_name }
       service_pass { ENV['SWIFT_PASS'] || Faker::Internet.password }
       chunk_hash_algorithm { ENV['SWIFT_CHUNK_HASH_ALGORITHM'] || Faker::Hacker.abbreviation }
-      chunk_max_number { ENV['SWIFT_CHUNK_MAX_NUMBER'] || Faker::Number.number(3) }
-      chunk_max_size_bytes { ENV['SWIFT_CHUNK_MAX_SIZE_BYTES'] || Faker::Number.number(5) }
+      chunk_max_number { ENV['SWIFT_CHUNK_MAX_NUMBER'] || Faker::Number.between(100,1000) }
+      chunk_max_size_bytes { ENV['SWIFT_CHUNK_MAX_SIZE_BYTES'] || Faker::Number.between(4368709122, 6368709122) }
     end
 
     trait :skip_validation do
