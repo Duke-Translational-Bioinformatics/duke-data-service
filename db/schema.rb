@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170911204850) do
+ActiveRecord::Schema.define(version: 20170912182841) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,7 +98,7 @@ ActiveRecord::Schema.define(version: 20170911204850) do
   create_table "chunks", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid     "upload_id"
     t.integer  "number"
-    t.integer  "size"
+    t.bigint   "size"
     t.string   "fingerprint_value"
     t.string   "fingerprint_algorithm"
     t.datetime "created_at",            null: false
