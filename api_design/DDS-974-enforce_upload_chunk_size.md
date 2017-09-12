@@ -2,7 +2,12 @@
 
 ## Deployment View
 
-N/A
+The following ENV must be set in all heroku applications:
+  - heroku config:set SWIFT_CHUNK_MAX_NUMBER=1000
+  - heroku config:set SWIFT_CHUNK_MAX_SIZE_BYTES=5368709122
+
+This must be done before the circle build, in order for rake db:data:migrate
+to work.
 
 ## Logical View
 
@@ -27,7 +32,7 @@ This section defines the proposed API interface extensions.
 The following properties will be added to the storage providers resource:
 
 + **chunk\_max\_size\_bytes** - The maximum size of a chunk that can be upload.
-+ **chunk\_max\_number** - The maximum number of chunks that can be uploaded for a single file. 
++ **chunk\_max\_number** - The maximum number of chunks that can be uploaded for a single file.
 + **file\_max\_size\_bytes** - Maximum supported file size that can be uploaded. (`chunk_max_size_bytes * chunk_max_number`)
 
 ```
@@ -59,7 +64,7 @@ The following custom response headers will be added to inform clients of the min
 + 400 - Invalid chunk size specified - must be in range {min}-{max}
 + 400 - File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}
 
-###### Response Example 
+###### Response Example
 ```
 {
 	"error": 400,
