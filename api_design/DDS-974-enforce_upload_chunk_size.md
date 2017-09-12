@@ -2,12 +2,14 @@
 
 ## Deployment View
 
-The following ENV must be set in all heroku applications:
+**NOTE** The following must be done **before** the circle build
+
+In order for rake db:data:migrate to work, the following ENV must be set in all heroku applications:
   - heroku config:set SWIFT_CHUNK_MAX_NUMBER=1000
   - heroku config:set SWIFT_CHUNK_MAX_SIZE_BYTES=5368709122
 
-This must be done before the circle build, in order for rake db:data:migrate
-to work.
+We must back up the Postgresql database! This is because we had to change the
+size fields in uploads/chunks from int to bigint to allow for large files.
 
 ## Logical View
 
@@ -54,15 +56,27 @@ The following properties will be added to the storage providers resource:
 ###### Response Headers (Extensions)
 The following custom response headers will be added to inform clients of the minimum chunk size that may be utlized to ensure chunks can be coalesced, as well as the maximum chunk size the storage provider can accommodate.
 
-+ **x-min-chunk-upload-size** - The minimum chunk size in bytes.
-+ **x-max-chunk-upload-size** - The maximum chunk size in bytes.
++ **X-MIN-CHUNK-UPLOAD-SIZE** - The minimum chunk size in bytes.
++ **X-MAX-CHUNK-UPLOAD-SIZE** - The maximum chunk size in bytes.
+
+###### Response Messages (Extensions)
++ 400 - File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}
+
+###### Response Example
+```
+{
+	"error": 400,
+	"code": "invalid_file_size",
+	"reason": "File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}",
+	"suggestion": ""
+}
+```
 
 ##### Generate and return a pre-signed upload URL for a chunk
 `PUT /uploads/{id}/chunks`
 
 ###### Response Messages (Extensions)
 + 400 - Invalid chunk size specified - must be in range {min}-{max}
-+ 400 - File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}
 
 ###### Response Example
 ```
@@ -71,15 +85,6 @@ The following custom response headers will be added to inform clients of the min
 	"code": "invalid_chunk_size",
 	"reason": "Invalid chunk size specified - must be in range {min}-{max}",
 	"suggestion": "Use valid chunk size"
-}
-```
-
-```
-{
-	"error": 400,
-	"code": "invalid_file_size",
-	"reason": "File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}",
-	"suggestion": ""
 }
 ```
 
