@@ -31,6 +31,26 @@ RSpec.describe Chunk, type: :model do
     it { is_expected.to validate_presence_of(:fingerprint_value) }
     it { is_expected.to validate_presence_of(:fingerprint_algorithm) }
     it { is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive }
+
+    describe 'upload_chunk_maximum' do
+      let(:storage_provider) { FactoryGirl.create(:storage_provider, chunk_max_number: 1) }
+      context '< storage_provider.chunk_max_number' do
+        let(:upload) { FactoryGirl.create(:upload, storage_provider: storage_provider) }
+        subject { FactoryGirl.build(:chunk, upload: upload) }
+        it { is_expected.to be_valid }
+      end
+
+      context '>= storage_provider.chunk_max_number' do
+        let(:upload) { FactoryGirl.create(:upload, :with_chunks, storage_provider: storage_provider) }
+        let(:expected_validation_message) { "maximum upload chunks exceeded." }
+        subject { FactoryGirl.build(:chunk, upload: upload, number: 2) }
+
+        it {
+          is_expected.not_to be_valid
+          expect(subject.errors.messages[:base]).to include expected_validation_message
+        }
+      end
+    end
   end
 
   describe 'instance methods' do
@@ -66,5 +86,10 @@ RSpec.describe Chunk, type: :model do
   it 'is_expected.to have a url method' do
     is_expected.to respond_to :url
     expect(subject.url).to eq expected_url
+  end
+
+  describe '#total_chunks' do
+    it { is_expected.to respond_to :total_chunks }
+    it { expect(subject.total_chunks).to eq(subject.upload.chunks.count ) }
   end
 end

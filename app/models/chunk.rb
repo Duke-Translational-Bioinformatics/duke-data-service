@@ -25,6 +25,8 @@ class Chunk < ActiveRecord::Base
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true
 
+  validate :upload_chunk_maximum, if: :storage_provider
+
   delegate :project_id, :minimum_chunk_size, to: :upload
   delegate :chunk_max_size_bytes, to: :storage_provider
 
@@ -56,7 +58,17 @@ class Chunk < ActiveRecord::Base
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
   end
 
+  def total_chunks
+    upload.chunks.count
+  end
+
   private
+
+  def upload_chunk_maximum
+    unless total_chunks < storage_provider.chunk_max_number
+      errors[:base] << 'maximum upload chunks exceeded.'
+    end
+  end
 
   def update_upload_etag
     last_audit = self.audits.last
