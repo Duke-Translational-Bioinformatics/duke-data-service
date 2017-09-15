@@ -146,7 +146,7 @@ describe DDS::V1::UploadsAPI do
     describe 'PUT' do
       subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { "PUT" }
-      let!(:payload) {{
+      let(:payload) {{
         number: payload_chunk_number,
         size: chunk_stub.size,
         hash: {
