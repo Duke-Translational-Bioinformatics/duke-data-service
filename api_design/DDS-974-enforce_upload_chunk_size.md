@@ -2,7 +2,14 @@
 
 ## Deployment View
 
-N/A
+**NOTE** The following must be done **before** the circle build
+
+In order for rake db:data:migrate to work, the following ENV must be set in all heroku applications:
+  - heroku config:set SWIFT_CHUNK_MAX_NUMBER=1000
+  - heroku config:set SWIFT_CHUNK_MAX_SIZE_BYTES=5368709122
+
+We must back up the Postgresql database! This is because we had to change the
+size fields in uploads/chunks from int to bigint to allow for large files.
 
 ## Logical View
 
@@ -27,7 +34,7 @@ This section defines the proposed API interface extensions.
 The following properties will be added to the storage providers resource:
 
 + **chunk\_max\_size\_bytes** - The maximum size of a chunk that can be upload.
-+ **chunk\_max\_number** - The maximum number of chunks that can be uploaded for a single file. 
++ **chunk\_max\_number** - The maximum number of chunks that can be uploaded for a single file.
 + **file\_max\_size\_bytes** - Maximum supported file size that can be uploaded. (`chunk_max_size_bytes * chunk_max_number`)
 
 ```
@@ -49,32 +56,57 @@ The following properties will be added to the storage providers resource:
 ###### Response Headers (Extensions)
 The following custom response headers will be added to inform clients of the minimum chunk size that may be utlized to ensure chunks can be coalesced, as well as the maximum chunk size the storage provider can accommodate.
 
-+ **x-min-chunk-upload-size** - The minimum chunk size in bytes.
-+ **x-max-chunk-upload-size** - The maximum chunk size in bytes.
++ **X-MIN-CHUNK-UPLOAD-SIZE** - The minimum chunk size in bytes.
++ **X-MAX-CHUNK-UPLOAD-SIZE** - The maximum chunk size in bytes.
+
+###### Response Messages (Extensions)
++ 400 - File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}
+
+###### Response Example
+```
+{
+  error: '400',
+  code: "not_provided",
+  reason: 'validation failed',
+  suggestion: 'Fix the following invalid fields and resubmit',
+  errors:
+  [
+	  {
+      "size": "File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}"
+    }
+  ]
+}
+```
 
 ##### Generate and return a pre-signed upload URL for a chunk
 `PUT /uploads/{id}/chunks`
 
 ###### Response Messages (Extensions)
 + 400 - Invalid chunk size specified - must be in range {min}-{max}
-+ 400 - File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}
++ 400 - Upload chunks exceeded, must be less than {max}
 
-###### Response Example 
+###### Response Example
 ```
 {
-	"error": 400,
-	"code": "invalid_chunk_size",
-	"reason": "Invalid chunk size specified - must be in range {min}-{max}",
-	"suggestion": "Use valid chunk size"
+  error: '400',
+  code: "not_provided",
+  reason: 'validation failed',
+  suggestion: 'Fix the following invalid fields and resubmit',
+  errors:
+  [
+	  {
+      "size": "Invalid chunk size specified - must be in range {min}-{max}"
+    }
+  ]
 }
 ```
-
+or
 ```
 {
-	"error": 400,
-	"code": "invalid_file_size",
-	"reason": "File size is currently not supported - maximum size is {max_segments * max_chunk_upload_size}",
-	"suggestion": ""
+  error: '400',
+  code: "not_provided",
+  reason: 'maximum upload chunks exceeded.',
+  suggestion: ''
 }
 ```
 
@@ -87,3 +119,56 @@ The following custom response headers will be added to inform clients of the min
 ## Process View
 
 Add notes about performance, scalability, throughput, etc. here. These can inform future proposals to change the implementation.
+
+This design introduces a change the the error response for validation errors.
+Most validation_error responses will remain unchanged, reporting a list of field
+errors that must be addressed:
+```
+{
+  error: '400',
+  code: "not_provided",
+  reason: 'validation failed',
+  suggestion: 'Fix the following invalid fields and resubmit',
+  errors:
+  [
+	  {
+      "field": "something is wrong with this"
+    }
+  ]
+}
+```
+
+Some validation errors happen for the entire object, and not for any specific
+field, such as when a user attempts to delete a property or template that is
+associated with an object, or create a chunk that exceeds the storage_provider
+maximum_chunk_number.
+
+In the past, these errors would have come in the list of 'errors', labeled
+`base`:
+```
+{
+  error: '400',
+  code: "not_provided",
+  reason: 'validation failed',
+  suggestion: 'Fix the following invalid fields and resubmit',
+  errors:
+  [
+	  {
+      "base": "something is wrong with this"
+    }
+  ]
+}
+```
+
+Going forward, these object errors will be placed into `reason`, and the response
+payload may or may not have other fields that are invalid as well. If there are
+no invalid fields, the suggestion will be a blank string, and there will not be
+an errors entry in the payload.
+```
+{
+  error: '400',
+  code: "not_provided",
+  reason: 'something is wrong with this.',
+  suggestion: ''
+}
+```

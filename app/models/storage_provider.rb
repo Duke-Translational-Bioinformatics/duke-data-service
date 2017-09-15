@@ -10,7 +10,9 @@ class StorageProvider < ActiveRecord::Base
   validates :service_pass, presence: true
   validates :primary_key, presence: true
   validates :secondary_key, presence: true
-
+  validates :chunk_max_number, presence: true
+  validates :chunk_max_size_bytes, presence: true
+  
   def auth_token
     call_auth_uri['x-auth-token']
   end
