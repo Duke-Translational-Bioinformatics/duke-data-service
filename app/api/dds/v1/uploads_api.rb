@@ -37,6 +37,8 @@ module DDS
             })
             authorize upload, :create?
             if upload.save
+              header 'X-MIN-CHUNK-UPLOAD-SIZE', upload.minimum_chunk_size
+              header 'X-MAX-CHUNK-UPLOAD-SIZE', upload.max_size_bytes
               upload
             else
               validation_error!(upload)

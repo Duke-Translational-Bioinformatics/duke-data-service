@@ -62,6 +62,16 @@ describe DDS::V1::UploadsAPI do
         size: upload_stub.size
       }}
 
+      let(:expected_response_headers) {{
+        'X-MIN-CHUNK-UPLOAD-SIZE' => upload_stub.minimum_chunk_size,
+        'X-MAX-CHUNK-UPLOAD-SIZE' => upload_stub.max_size_bytes
+      }}
+
+      it 'should return chunk-upload-size response headers' do
+         is_expected.to eq(expected_response_status)
+         expect(response.headers.to_h).to include(expected_response_headers)
+      end
+
       it_behaves_like 'a creatable resource' do
         it 'should set creator' do
           is_expected.to eq(expected_response_status)
