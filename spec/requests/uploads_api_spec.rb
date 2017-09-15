@@ -115,7 +115,6 @@ describe DDS::V1::UploadsAPI do
         end
         it_behaves_like 'an eventually consistent resource', :project
 
-
       end
     end
   end
@@ -233,6 +232,40 @@ describe DDS::V1::UploadsAPI do
           end
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource_class) { Chunk }
+          end
+        end
+
+        context 'chunk size too large' do
+          before do
+            chunk_stub.size = chunk_stub.chunk_max_size_bytes + 1
+          end
+          it_behaves_like 'a validated resource' do
+            it 'should not persist changes' do
+              expect(resource).to be_persisted
+              expect {
+                is_expected.to eq(400)
+              }.not_to change{resource_class.count}
+            end
+          end
+        end
+
+        context 'storage_provider.chunk_max_number exceeded' do
+          let(:other_chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 2) }
+          before do
+            storage_provider.update(chunk_max_number: 1)
+          end
+
+          it_behaves_like 'a validated resource' do
+            let(:expected_reason) { 'maximum upload chunks exceeded.' }
+            let(:expected_suggestion) { '' }
+            let(:expects_errors) { false }
+
+            it 'should not persist changes' do
+              expect(resource).to be_persisted
+              expect {
+                is_expected.to eq(400)
+              }.not_to change{resource_class.count}
+            end
           end
         end
       end
