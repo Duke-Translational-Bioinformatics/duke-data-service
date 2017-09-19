@@ -14,8 +14,14 @@ class Upload < ActiveRecord::Base
 
   validates :project_id, presence: true
   validates :name, presence: true
-  validates :size, presence: true
   validates :storage_provider_id, presence: true
+  validates :size, presence: true
+  validates :size, numericality:  {
+    less_than: :max_size_bytes,
+    message: ->(object, data) do
+      "File size is currently not supported - maximum size is #{object.max_size_bytes}"
+    end
+  }, if: :storage_provider
   validates :creator_id, presence: true
   validates :completed_at, immutable: true, if: :completed_at_was
   validates :completed_at, immutable: true, if: :error_at_was
@@ -91,6 +97,14 @@ class Upload < ActiveRecord::Base
     rescue IntegrityException => e
       integrity_exception(e.message)
     end
+  end
+
+  def max_size_bytes
+    storage_provider.chunk_max_number * storage_provider.chunk_max_size_bytes
+  end
+
+  def minimum_chunk_size
+    (size.to_f / storage_provider.chunk_max_number).ceil
   end
 
   private

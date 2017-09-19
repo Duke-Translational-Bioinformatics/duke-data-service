@@ -26,6 +26,11 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to validate_presence_of :project_id }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :size }
+    it {
+      is_expected.to validate_numericality_of(:size)
+      .is_less_than(subject.max_size_bytes)
+      .with_message("File size is currently not supported - maximum size is #{subject.max_size_bytes}")
+    }
     it { is_expected.to validate_presence_of :storage_provider_id }
     it { is_expected.to validate_presence_of :creator_id }
 
@@ -169,6 +174,38 @@ RSpec.describe Upload, type: :model do
         ).to be_truthy
         expect(subject.has_integrity_exception?).to be_falsey
       }
+    end
+  end
+
+  describe '#max_size_bytes' do
+    let(:expected_max_size_bytes) { subject.storage_provider.chunk_max_number * subject.storage_provider.chunk_max_size_bytes }
+    it { is_expected.to respond_to :max_size_bytes }
+    it { expect(subject.max_size_bytes).to eq(expected_max_size_bytes) }
+  end
+
+  describe '#minimum_chunk_size' do
+    let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+    let(:size) { storage_provider.chunk_max_number }
+    subject { FactoryGirl.create(:upload, storage_provider: storage_provider, size: size) }
+    let(:expected_minimum_chunk_size) {
+      (subject.size.to_f / subject.storage_provider.chunk_max_number).ceil
+    }
+
+    it { is_expected.to respond_to :minimum_chunk_size }
+
+    context 'size = 0' do
+      let(:size) { 0 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
+    end
+
+    context 'size < storage_provider.chunk_max_number' do
+      let(:size) { storage_provider.chunk_max_number - 1 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
+    end
+
+    context 'size > storage_provider.chunk_max_number' do
+      let(:size) { storage_provider.chunk_max_number + 1 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
     end
   end
 
