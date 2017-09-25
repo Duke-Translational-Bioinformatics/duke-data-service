@@ -62,10 +62,19 @@ describe DDS::V1::UploadsAPI do
       }}
 
       it_behaves_like 'a POST request' do
+        let(:expected_response_headers) {{
+          'X-MIN-CHUNK-UPLOAD-SIZE' => upload_stub.minimum_chunk_size,
+          'X-MAX-CHUNK-UPLOAD-SIZE' => upload_stub.max_size_bytes
+        }}
+
         it_behaves_like 'a creatable resource' do
           it 'should set creator' do
             is_expected.to eq(expected_response_status)
             expect(new_object.creator_id).to eq(current_user.id)
+          end
+          it 'should return chunk-upload-size response headers' do
+             is_expected.to eq(expected_response_status)
+             expect(response.headers.to_h).to include(expected_response_headers)
           end
         end
 
@@ -134,6 +143,8 @@ describe DDS::V1::UploadsAPI do
     let(:upload_id) { upload.id }
 
     describe 'PUT' do
+      subject { put(url, params: payload.to_json, headers: headers) }
+      let(:called_action) { "PUT" }
       let(:payload) {{
         number: payload_chunk_number,
         size: chunk_stub.size,
@@ -221,6 +232,40 @@ describe DDS::V1::UploadsAPI do
           end
           it_behaves_like 'an annotate_audits endpoint' do
             let(:resource_class) { Chunk }
+          end
+        end
+      end
+
+      context 'chunk size too large' do
+        before do
+          chunk_stub.size = chunk_stub.chunk_max_size_bytes + 1
+        end
+        it_behaves_like 'a validated resource' do
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
+          end
+        end
+      end
+
+      context 'storage_provider.chunk_max_number exceeded' do
+        let(:other_chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 2) }
+        before do
+          storage_provider.update(chunk_max_number: 1)
+        end
+
+        it_behaves_like 'a validated resource' do
+          let(:expected_reason) { 'maximum upload chunks exceeded.' }
+          let(:expected_suggestion) { '' }
+          let(:expects_errors) { false }
+
+          it 'should not persist changes' do
+            expect(resource).to be_persisted
+            expect {
+              is_expected.to eq(400)
+            }.not_to change{resource_class.count}
           end
         end
       end
