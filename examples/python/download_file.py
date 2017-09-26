@@ -61,9 +61,9 @@ else:
   out = open(sys.argv[2], 'w')
 
 api_token = None
-try:
+if os.environ.has_key('API_TOKEN'):
     api_token = os.environ['API_TOKEN']
-except KeyError:
+else:
     #exchange software_agent for api_token
     api_token = authenticate_agent()
 
