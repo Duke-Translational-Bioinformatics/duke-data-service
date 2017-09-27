@@ -52,7 +52,7 @@ module DDS
         else
           descendants = project.containers.where(Container.arel_table[:name].matches("%#{name_contains}%"))
         end
-        paginate(policy_scope(descendants).where(is_deleted: false))
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits)).where(is_deleted: false))
       end
     end
   end
