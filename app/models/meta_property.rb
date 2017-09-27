@@ -10,7 +10,6 @@ class MetaProperty < ActiveRecord::Base
 
   # callbacks
   before_validation :set_property_from_key
-  before_create :create_mapping
   after_save :update_templatable_document
   after_destroy :index_templatable_document
 
@@ -25,7 +24,7 @@ class MetaProperty < ActiveRecord::Base
       parsed_date = DateTime.parse(value)
     rescue
     end
-    record.errors.add(attr, message) unless parsed_date && 
+    record.errors.add(attr, message) unless parsed_date &&
       parsed_date.to_s(:iso8601).start_with?(value)
   end
 
@@ -40,59 +39,6 @@ class MetaProperty < ActiveRecord::Base
         self.property = meta_template.template.properties.where(key: key).first
       end
     end
-  end
-
-  def index_name
-    meta_template.templatable.class.index_name
-  end
-
-  def index_type
-    meta_template.templatable.class.name.underscore
-  end
-
-  def create_mapping
-    unless mapping_exists?
-      index_property = {
-        type: "#{property.data_type}"
-      }
-
-      if (property.data_type == "string")
-        index_property = {
-          type: "#{property.data_type}",
-          fields: {
-            raw: {
-              type: "#{property.data_type}",
-              index: "not_analyzed"
-            }
-          }
-        }
-      end
-
-      Elasticsearch::Model.client.indices.put_mapping index: index_name, type: index_type, body: {
-        index_type => {
-          properties: {
-            meta: {
-              properties: {
-                meta_template.template.name => {
-                  properties: {
-                    property.key => index_property
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    end
-  end
-
-  def mapping_exists?
-    current_mappings = Elasticsearch::Model.client.indices.get_mapping index: index_name
-    current_mappings[index_name].has_key?("mappings") &&
-      current_mappings[index_name]["mappings"].has_key?(index_type) &&
-      current_mappings[index_name]["mappings"][index_type]["properties"].has_key?("meta") &&
-      current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"].has_key?(meta_template.template.name) &&
-      current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"].has_key?(property.key)
   end
 
   def update_templatable_document
@@ -115,7 +61,7 @@ private
   end
 
   def numeric_data_types
-    [ 
+    [
       'long',
       'integer',
       'short',

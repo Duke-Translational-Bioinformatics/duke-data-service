@@ -22,7 +22,8 @@ RSpec.describe MetaProperty, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_property_from_key).before(:validation) }
-    it { is_expected.to callback(:create_mapping).before(:create) }
+    it { is_expected.to callback(:index_templatable_document).after(:destroy) }
+    it { is_expected.to callback(:update_templatable_document).after(:save) }
   end
 
   describe 'validations' do
@@ -144,76 +145,69 @@ RSpec.describe MetaProperty, type: :model do
     end
   end
 
-  describe 'search' do
-    include_context 'elasticsearch prep', [:meta_template, :property], [:templatable]
-    subject { FactoryGirl.build(:meta_property, meta_template: meta_template, key: property.key, value: property_value) }
-    let(:property_value) { 'tosearch' }
-    let(:index_name) { meta_template.templatable.class.index_name }
-    let(:index_type) { meta_template.templatable.class.name.underscore }
-    let(:query) {
-      {query: {
-        match: {
-          "meta.#{meta_template.template.name}.#{property.key}" => property_value
-        }
-      }}
-    }
+  describe '#update_templatable_document' do
+    it { is_expected.to respond_to(:update_templatable_document) }
 
-    context 'mapping_exists?' do
+    context 'called' do
+      subject { FactoryGirl.create(:meta_property, meta_template: meta_template, key: property.key) }
+      let(:elasticsearch) { templatable.__elasticsearch__ }
+      include_context 'elasticsearch prep', [
+          :meta_template,
+          :property
+        ],
+        [:templatable]
+
+      before do
+        is_expected.to be_persisted
+        expect(meta_template).to be_persisted
+        expect(templatable).to be_persisted
+      end
+      after do
+        RSpec::Mocks.space.proxy_for(subject).reset
+        RSpec::Mocks.space.proxy_for(templatable).reset
+        RSpec::Mocks.space.proxy_for(elasticsearch).reset
+      end
       it {
-        is_expected.to respond_to 'mapping_exists?'
+        is_expected.to receive(:meta_template).and_return(meta_template)
+        expect(meta_template).to receive(:templatable).and_return(templatable)
+        is_expected.to receive(:reload).and_return(true)
+        expect(templatable).to receive(:__elasticsearch__).and_return(elasticsearch)
+        expect(elasticsearch).to receive(:update_document)
+        subject.update_templatable_document
       }
     end
+  end
 
-    context 'create_mapping' do
+  describe '#index_templatable_document' do
+    it { is_expected.to respond_to(:index_templatable_document) }
+
+    context 'called' do
+      subject { FactoryGirl.create(:meta_property, meta_template: meta_template, key: property.key) }
+      let(:elasticsearch) { templatable.__elasticsearch__ }
+
+      include_context 'elasticsearch prep', [
+          :meta_template,
+          :property
+        ],
+        [:templatable]
+
+      before do
+        is_expected.to be_persisted
+        expect(meta_template).to be_persisted
+        expect(templatable).to be_persisted
+      end
+      after do
+        RSpec::Mocks.space.proxy_for(subject).reset
+        RSpec::Mocks.space.proxy_for(templatable).reset
+        RSpec::Mocks.space.proxy_for(elasticsearch).reset
+      end
       it {
-        current_mappings = Elasticsearch::Model.client.indices.get_mapping index: index_name
-        expect(current_mappings[index_name]["mappings"]).to have_key index_type
-        if current_mappings[index_name]["mappings"][index_type]["properties"].has_key? "meta"
-          if current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"].has_key meta_template.template.name
-            expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"]).not_to have_key property.key
-          end
-        end
-        expect(subject.mapping_exists?).not_to be true
-
-        is_expected.to be_valid
-        subject.create_mapping
-        current_mappings = Elasticsearch::Model.client.indices.get_mapping index: index_name
-        expect(current_mappings[index_name]["mappings"][index_type]["properties"]).to have_key "meta"
-        expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"]).to have_key meta_template.template.name
-        expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"]).to have_key property.key
-        expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"][property.key]["type"]).to eq property.data_type
-        if property.data_type == "string"
-          expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"][property.key]).to have_key "fields"
-          expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"][property.key]["fields"]).to have_key "raw"
-          expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"][property.key]["fields"]["raw"]["type"]).to eq "string"
-          expect(current_mappings[index_name]["mappings"][index_type]["properties"]["meta"]["properties"][meta_template.template.name]["properties"][property.key]["fields"]["raw"]["index"]).to eq "not_analyzed"
-        end
-        expect(subject.mapping_exists?).to be true
-      }
-    end
-
-    context 'after save' do
-      it {
-        expect(meta_template.templatable.class.__elasticsearch__.search(query).count).to eq 0
-        subject.save
-        meta_template.templatable.class.__elasticsearch__.client.indices.flush
-        search = meta_template.templatable.class.__elasticsearch__.search(query)
-        expect(search.count).to eq 1
-        expect(search.results.first.id).to eq(meta_template.templatable.id)
-      }
-    end
-
-    context 'after destroy' do
-      it {
-        subject.save
-        meta_template.templatable.class.__elasticsearch__.client.indices.flush
-        search = meta_template.templatable.class.__elasticsearch__.search(query)
-        expect(search.count).to eq 1
-        expect(search.results.first.id).to eq(meta_template.templatable.id)
-        subject.destroy
-        meta_template.templatable.class.__elasticsearch__.client.indices.flush
-        search = meta_template.templatable.class.__elasticsearch__.search(query)
-        expect(search.count).to eq 0
+        is_expected.to receive(:meta_template).and_return(meta_template)
+        expect(meta_template).to receive(:templatable).exactly(2).times.and_return(templatable)
+        expect(templatable).to receive(:reload).and_return(true)
+        expect(templatable).to receive(:__elasticsearch__).and_return(elasticsearch)
+        expect(elasticsearch).to receive(:index_document)
+        subject.index_templatable_document
       }
     end
   end
