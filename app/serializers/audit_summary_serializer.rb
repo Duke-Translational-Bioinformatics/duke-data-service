@@ -10,7 +10,7 @@ module AuditSummarySerializer
         audit_summary[:last_updated_on] = audit.created_at
         audit_summary[:last_updated_by] = audit_user_info_hash(audit)
 
-        if audit&.comment["action"] == 'DELETE' && 
+        if audit&.comment&.fetch('action', nil) == 'DELETE' && 
             object.respond_to?('is_deleted') && object.is_deleted
           audit_summary[:deleted_on] = audit.created_at
           audit_summary[:deleted_by] = audit_user_info_hash(audit)
