@@ -10,8 +10,6 @@ class MetaProperty < ActiveRecord::Base
 
   # callbacks
   before_validation :set_property_from_key
-  after_save :update_templatable_document
-  after_destroy :index_templatable_document
 
   validates :property, presence: true,
     uniqueness: {scope: [:meta_template_id], case_sensitive: false}
@@ -39,16 +37,6 @@ class MetaProperty < ActiveRecord::Base
         self.property = meta_template.template.properties.where(key: key).first
       end
     end
-  end
-
-  def update_templatable_document
-    reload
-    meta_template.templatable.__elasticsearch__.update_document
-  end
-
-  def index_templatable_document
-    meta_template.templatable.reload
-    meta_template.templatable.__elasticsearch__.index_document
   end
 
 private

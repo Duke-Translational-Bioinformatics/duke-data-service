@@ -22,8 +22,6 @@ RSpec.describe MetaProperty, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_property_from_key).before(:validation) }
-    it { is_expected.to callback(:index_templatable_document).after(:destroy) }
-    it { is_expected.to callback(:update_templatable_document).after(:save) }
   end
 
   describe 'validations' do
@@ -145,70 +143,12 @@ RSpec.describe MetaProperty, type: :model do
     end
   end
 
-  describe '#update_templatable_document' do
-    it { is_expected.to respond_to(:update_templatable_document) }
-
-    context 'called' do
-      subject { FactoryGirl.create(:meta_property, meta_template: meta_template, key: property.key) }
-      let(:elasticsearch) { templatable.__elasticsearch__ }
-      include_context 'elasticsearch prep', [
-          :meta_template,
-          :property
-        ],
-        [:templatable]
-
-      before do
-        is_expected.to be_persisted
-        expect(meta_template).to be_persisted
-        expect(templatable).to be_persisted
-      end
-      after do
-        RSpec::Mocks.space.proxy_for(subject).reset
-        RSpec::Mocks.space.proxy_for(templatable).reset
-        RSpec::Mocks.space.proxy_for(elasticsearch).reset
-      end
-      it {
-        is_expected.to receive(:meta_template).and_return(meta_template)
-        expect(meta_template).to receive(:templatable).and_return(templatable)
-        is_expected.to receive(:reload).and_return(true)
-        expect(templatable).to receive(:__elasticsearch__).and_return(elasticsearch)
-        expect(elasticsearch).to receive(:update_document)
-        subject.update_templatable_document
-      }
+  describe 'templatable indexing' do
+    let(:resource) { FactoryGirl.build(:meta_property, meta_template: meta_template, key: property.key) }
+    before do
+      expect(meta_template).to be_persisted
+      expect(property).to be_persisted
     end
-  end
-
-  describe '#index_templatable_document' do
-    it { is_expected.to respond_to(:index_templatable_document) }
-
-    context 'called' do
-      subject { FactoryGirl.create(:meta_property, meta_template: meta_template, key: property.key) }
-      let(:elasticsearch) { templatable.__elasticsearch__ }
-
-      include_context 'elasticsearch prep', [
-          :meta_template,
-          :property
-        ],
-        [:templatable]
-
-      before do
-        is_expected.to be_persisted
-        expect(meta_template).to be_persisted
-        expect(templatable).to be_persisted
-      end
-      after do
-        RSpec::Mocks.space.proxy_for(subject).reset
-        RSpec::Mocks.space.proxy_for(templatable).reset
-        RSpec::Mocks.space.proxy_for(elasticsearch).reset
-      end
-      it {
-        is_expected.to receive(:meta_template).and_return(meta_template)
-        expect(meta_template).to receive(:templatable).exactly(2).times.and_return(templatable)
-        expect(templatable).to receive(:reload).and_return(true)
-        expect(templatable).to receive(:__elasticsearch__).and_return(elasticsearch)
-        expect(elasticsearch).to receive(:index_document)
-        subject.index_templatable_document
-      }
-    end
+    it_behaves_like 'a SearchableModel observer'
   end
 end

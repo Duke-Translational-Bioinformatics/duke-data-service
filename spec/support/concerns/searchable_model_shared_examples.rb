@@ -53,6 +53,7 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
     it { is_expected.to respond_to(:update_elasticsearch_index) }
     it {
       is_expected.to callback(:update_elasticsearch_index).after(:update)
+      is_expected.to callback(:update_elasticsearch_index).after(:touch)
     }
     it {
       expect(ElasticsearchIndexJob).to receive(:initialize_job).with(
@@ -69,4 +70,12 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
     it { is_expected.to respond_to('as_indexed_json').with(1).argument }
     it { expect(subject.as_indexed_json).to eq(resource_search_serializer.new(subject).as_json) }
   end
+end
+
+shared_examples 'a SearchableModel observer' do
+  it {
+    expect {
+      resource.save
+    }.to have_enqueued_job(ElasticsearchIndexJob).at_least(:once)
+  }
 end
