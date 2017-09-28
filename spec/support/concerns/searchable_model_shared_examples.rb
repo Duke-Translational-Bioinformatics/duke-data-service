@@ -76,6 +76,6 @@ shared_examples 'a SearchableModel observer' do
   it {
     expect {
       resource.save
-    }.to have_enqueued_job(ElasticsearchIndexJob).at_least(:once)
+    }.to have_enqueued_job(ElasticsearchIndexJob)
   }
 end
