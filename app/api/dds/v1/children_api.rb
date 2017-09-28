@@ -14,6 +14,9 @@ module DDS
       end
       params do
         optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :exclude_response_fields, type: Array[String],
+          coerce_with: ->(val) { val.split(/\s+/) },
+          desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
       get '/folders/:id/children', root: 'results' do

@@ -44,6 +44,20 @@ describe DDS::V1::ChildrenAPI do
           deleted_folder,
           other_folder
         ] }
+
+        context 'with exclude_response_fields set' do
+          let(:excluded_fields) { [:id, :project] }
+          let(:query_params) { "?exclude_response_fields=#{excluded_fields.join(' ')}" }
+          let(:serialized_resource) {
+            resource_serializer.new(serializable_resource, except: excluded_fields)
+          }
+          it 'does not serialize excluded fields' do
+            expect(serialized_resource.attributes.keys).not_to include(excluded_fields)
+            expect(serialized_resource.associations.keys).not_to include(excluded_fields)
+            is_expected.to eq(expected_response_status)
+            expect(response.body).to include(serialized_resource.to_json)
+          end
+        end
       end
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { parent.children.count }
