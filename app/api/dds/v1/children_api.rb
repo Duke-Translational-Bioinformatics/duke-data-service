@@ -27,7 +27,8 @@ module DDS
         if name_contains.nil?
           descendants = policy_scope(folder.children)
         else
-          descendants = policy_scope(folder.descendants).where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          descendants = policy_scope(folder.descendants)
+          descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%")) unless name_contains.empty?
         end
         paginate(descendants.includes(:parent, :project, :audits).where(is_deleted: false))
       end
@@ -56,7 +57,8 @@ module DDS
         if name_contains.nil?
           descendants = project.children
         else
-          descendants = project.containers.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          descendants = project.containers
+          descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%")) unless name_contains.empty?
         end
         paginate(policy_scope(descendants.includes(:parent, :project, :audits)).where(is_deleted: false))
       end
