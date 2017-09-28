@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170622204323) do
+ActiveRecord::Schema.define(version: 20170926165229) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -103,6 +103,8 @@ ActiveRecord::Schema.define(version: 20170622204323) do
     t.string   "fingerprint_algorithm"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
+    t.index ["upload_id", "number"], name: "index_chunks_on_upload_id_and_number", using: :btree
+    t.index ["upload_id"], name: "index_chunks_on_upload_id", using: :btree
   end
 
   create_table "containers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -114,6 +116,10 @@ ActiveRecord::Schema.define(version: 20170622204323) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.string   "label"
+    t.index ["id", "type"], name: "index_containers_on_id_and_type", using: :btree
+    t.index ["parent_id"], name: "index_containers_on_parent_id", using: :btree
+    t.index ["project_id", "parent_id", "is_deleted"], name: "index_containers_on_project_id_and_parent_id_and_is_deleted", using: :btree
+    t.index ["project_id"], name: "index_containers_on_project_id", using: :btree
   end
 
   create_table "file_versions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -124,6 +130,7 @@ ActiveRecord::Schema.define(version: 20170622204323) do
     t.boolean  "is_deleted",     default: false
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.index ["data_file_id"], name: "index_file_versions_on_data_file_id", using: :btree
   end
 
   create_table "fingerprints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -132,6 +139,7 @@ ActiveRecord::Schema.define(version: 20170622204323) do
     t.string   "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["upload_id"], name: "index_fingerprints_on_upload_id", using: :btree
   end
 
   create_table "identity_providers", force: :cascade do |t|
@@ -175,6 +183,7 @@ ActiveRecord::Schema.define(version: 20170622204323) do
     t.string   "auth_role_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.index ["project_id", "auth_role_id", "user_id"], name: "index_project_permissions_on_project_and_auth_role_and_user", using: :btree
   end
 
   create_table "project_roles", id: false, force: :cascade do |t|
