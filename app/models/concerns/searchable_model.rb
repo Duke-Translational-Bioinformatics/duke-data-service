@@ -7,6 +7,7 @@ module SearchableModel
 
     after_create :create_elasticsearch_index
     after_update :update_elasticsearch_index
+    after_touch :update_elasticsearch_index
 
     settings index: Rails.application.config.elasticsearch_index_settings
   end
