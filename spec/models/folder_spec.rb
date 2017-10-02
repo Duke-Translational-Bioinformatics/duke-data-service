@@ -147,6 +147,7 @@ RSpec.describe Folder, type: :model do
     let(:property_mappings) {{
       kind: {type: "string"},
       name: {type: "string"}, #name
+      is_deleted: {type: "boolean"},
       project: {type: "object"}
     }}
     include_context 'with job runner', ElasticsearchIndexJob
