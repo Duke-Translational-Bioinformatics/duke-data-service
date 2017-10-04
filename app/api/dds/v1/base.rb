@@ -181,6 +181,10 @@ module DDS
         def check_integrity!(upload)
           raise IntegrityException.new(upload.error_message) if upload.has_integrity_exception?
         end
+
+        def default_serializer_options
+          { except: params[:exclude_response_fields]&.collect(&:to_sym) }
+        end
       end
 
       rescue_from ActiveRecord::RecordNotFound do |e|
