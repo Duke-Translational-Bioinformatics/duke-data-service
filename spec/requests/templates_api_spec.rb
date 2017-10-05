@@ -180,7 +180,11 @@ describe DDS::V1::TemplatesAPI do
       end
       context 'with associated meta_template' do
         before { FactoryGirl.create(:meta_template, template: resource) }
-        it_behaves_like 'a validated resource'
+        it_behaves_like 'a validated resource' do
+          let(:expected_reason) { 'The template cannot be deleted if it has been associated to one or more DDS objects.' }
+          let(:expected_suggestion) { '' }
+          let(:expects_errors) { false }
+        end
       end
       it_behaves_like 'an identified resource' do
         let(:resource_id) { "doesNotExist" }
