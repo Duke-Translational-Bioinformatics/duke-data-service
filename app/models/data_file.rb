@@ -81,6 +81,7 @@ class DataFile < Container
       }
 
       indexes :name
+      indexes :is_deleted, type: "boolean"
 
       indexes :tags do
         indexes :label, type: "string", fields: {
