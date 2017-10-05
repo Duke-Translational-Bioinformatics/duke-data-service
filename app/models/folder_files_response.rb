@@ -65,7 +65,7 @@ class FolderFilesResponse
     validate_aggs
     validate_post_filters
 
-    query = build_query
+    query = hide_logically_deleted build_query
     search_definition(query)
     self
   end
@@ -248,5 +248,15 @@ class FolderFilesResponse
 
   def search_definition(query)
     @elastic_response = Elasticsearch::Model.search(query, @@all_indices)
+  end
+
+  private
+
+  def hide_logically_deleted(query)
+    # this may be turned into a context on the object in the future
+    query[:query][:filtered][:filter][:bool][:must_not] = {
+      term: {"is_deleted" => {"value": "true"}}
+    }
+    query
   end
 end
