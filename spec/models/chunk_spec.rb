@@ -25,8 +25,6 @@ RSpec.describe Chunk, type: :model do
     it {
       is_expected.to validate_numericality_of(:size)
         .is_less_than(subject.chunk_max_size_bytes)
-        .is_greater_than_or_equal_to(subject.minimum_chunk_size)
-        .with_message("Invalid chunk size specified - must be in range #{subject.upload.minimum_chunk_size}-#{subject.chunk_max_size_bytes}")
     }
     it { is_expected.to validate_presence_of(:fingerprint_value) }
     it { is_expected.to validate_presence_of(:fingerprint_algorithm) }

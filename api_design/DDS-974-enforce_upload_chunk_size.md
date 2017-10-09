@@ -13,7 +13,7 @@ size fields in uploads/chunks from int to bigint to allow for large files.
 
 ## Logical View
 
-A critical issue was recently exposed with the chunked upload capability.  The  storage provider (Swift), is configured with a set maximum number of segments (i.e. Data Service chunks), beyond which it cannot coalesce a large file.  To remedy this situation, the API will be extended to enforce a minumum chunk size, based on the overall file size and max segments setting.
+A critical issue was recently exposed with the chunked upload capability.  The  storage provider (Swift), is configured with a set maximum number of segments (i.e. Data Service chunks), beyond which it cannot coalesce a large file.  To remedy this situation, the API will be extended to enforce the maximum number of chunks that can be uploaded for a single file.
 
 #### Summary of impacted APIs
 
@@ -54,7 +54,7 @@ The following properties will be added to the storage providers resource:
 `POST /projects/{id}/uploads`
 
 ###### Response Headers (Extensions)
-The following custom response headers will be added to inform clients of the minimum chunk size that may be utlized to ensure chunks can be coalesced, as well as the maximum chunk size the storage provider can accommodate.
+The following custom response headers will be added to inform clients of the minimum chunk size that may be utlized to ensure chunks can be coalesced when creating the maximum number of chunks, as well as the maximum chunk size the storage provider can accommodate.
 
 + **X-MIN-CHUNK-UPLOAD-SIZE** - The minimum chunk size in bytes.
 + **X-MAX-CHUNK-UPLOAD-SIZE** - The maximum chunk size in bytes.
@@ -82,7 +82,7 @@ The following custom response headers will be added to inform clients of the min
 `PUT /uploads/{id}/chunks`
 
 ###### Response Messages (Extensions)
-+ 400 - Invalid chunk size specified - must be in range {min}-{max}
++ 400 - Invalid chunk size specified - must be less than {max}
 + 400 - Upload chunks exceeded, must be less than {max}
 
 ###### Response Example
@@ -95,7 +95,7 @@ The following custom response headers will be added to inform clients of the min
   errors:
   [
 	  {
-      "size": "Invalid chunk size specified - must be in range {min}-{max}"
+      "size": "must be less than {max}"
     }
   ]
 }
