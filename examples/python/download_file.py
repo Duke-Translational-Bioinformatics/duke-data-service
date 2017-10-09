@@ -1,31 +1,49 @@
 #!/usr/bin/env python
+"""Connect to the Duke Data Service hosted in the url set in ENV['DDSHOST'];
+   Authenticate either with a DDS authentication_token (see authenticate_agent.py)
+   set in ENV['API_TOKEN'], or using the agent_key set in ENV['AGENT_KEY'], and
+   user_key set in ENV['USER_KEY'];
+   Download a file by its id into a specified output file, or STDOUT.
+
+   Exits with nonzero status if DDSHOST, AGENT_KEY, or USER_KEY environment
+   variables are not set.
+"""
 import httplib
 import os
 import json
 import sys
 
 def get_client(host=None):
+    """create an hhtps connection to the host specified in the DDSHOST environment variable.
+       Exits the program with nonzero status if the DDSHOST environment variable is not set.
+    """
     try:
-        if host == None:
+        if host is None:
             return httplib.HTTPSConnection(os.environ['DDSHOST'])
-        else:
-            return httplib.HTTPSConnection(host)
+        return httplib.HTTPSConnection(host)
     except KeyError as err:
         errout = "Please set ENV: {0}\n".format(err)
         sys.stderr.write(errout)
         exit(1)
 
 def authenticate_agent():
+    """authenticate the agent using the AGENT_KEY and USER_KEY environment variables.
+
+       Exits the program with a nonzero status if AGENT_KEY or USER_KEY environment
+       variables are not set.
+
+       Returns a string authentication_token.
+    """
     try:
         agent_key = os.environ['AGENT_KEY']
         user_key = os.environ['USER_KEY']
-        swbody = '{"agent_key":"%s","user_key":"%s"}' % (agent_key,user_key)
+        swbody = '{"agent_key":"%s","user_key":"%s"}' % (agent_key, user_key)
         swurl = '/api/v1/software_agents/api_token'
         headers = {"Accept": "application/json"}
         client = get_client()
         client.request("POST", swurl, swbody, headers)
         return get_object(client, 201)["api_token"]
-    except KeyError as err:
+    except KeyError:
         sys.stderr.write("Please set ENV['AGENT_KEY'] and ENV['USER_KEY']\n")
         exit(1)
     except:
@@ -33,52 +51,70 @@ def authenticate_agent():
         raise
 
 def get_response_data(client, expected_status):
+    """gets the response from the https connection, checks the status, and returns
+       the response.
+
+       :param client: https connection returned by get_client
+       :param expected_status: HTTP response status integer
+
+       Exits the program with nonzero status if the response status does not equal
+       the expected_status.
+
+       Returns the string response data.
+    """
     resp = client.getresponse()
     if resp.status != expected_status:
-      errout = "%s %s\n" % (resp.status,resp.reason)
-      sys.stderr.write(errout)
-      exit(1)
+        errout = "%s %s\n" % (resp.status, resp.reason)
+        sys.stderr.write(errout)
+        exit(1)
     return resp.read()
 
 def get_object(client, expected_status):
+    """calls get_response_data and serializes the response JSON into an object.
+       see get_response_data for params
+
+       If the serialized object contains a key "errror", the response string is
+       written to stderr and the program is exited with nonzero status.
+
+       returns object
+    """
     data = get_response_data(client, expected_status)
-    object = json.loads(data)
-    if "error" in object:
+    dds_object = json.loads(data)
+    if "error" in dds_object:
         sys.stderr.write(data)
         sys.stderr.write("\n")
         exit(1)
-    return object
+    return dds_object
 
+USAGE = "usage: %s file_id out\nout can be a path, or - for stdout\n" % (sys.argv[0])
 if len(sys.argv) < 3:
-    errout = "usage: %s file_id out\nout can be a path, or - for stdout\n" % (sys.argv[0])
-    sys.stderr.write(errout)
+    sys.stderr.write(USAGE)
     exit(1)
 
-file_id = sys.argv[1]
+FILE_ID = sys.argv[1]
 if sys.argv[2] == '-':
-  out = sys.stdout
+    OUTPUT = sys.stdout
 else:
-  out = open(sys.argv[2], 'w')
+    OUTPUT = open(sys.argv[2], 'w')
 
-api_token = None
+API_TOKEN = None
 if os.environ.has_key('API_TOKEN'):
-    api_token = os.environ['API_TOKEN']
+    API_TOKEN = os.environ['API_TOKEN']
 else:
-    #exchange software_agent for api_token
-    api_token = authenticate_agent()
+    #exchange software_agent for API_TOKEN
+    API_TOKEN = authenticate_agent()
 
-file_info_url = '/api/v1/files/%s/url' % (file_id)
+FILE_INFO_URL = '/api/v1/files/%s/url' % (FILE_ID)
 
-client = get_client()
-headers = {
-  "Authorization": api_token,
-  "Accept": "application/json"
+CLIENT = get_client()
+HEADERS = {
+    "Authorization": API_TOKEN,
+    "Accept": "application/json"
 }
-client.request("GET", file_info_url, None, headers)
-dds_file = get_object(client, 200)
+CLIENT.request("GET", FILE_INFO_URL, None, HEADERS)
+DDS_FILE = get_object(CLIENT, 200)
 
-client = get_client(dds_file['host'].replace("https://",""))
-client.request("GET", dds_file['url'])
-data  = get_response_data(client, 200)
-out.write(data)
-out.close
+CLIENT = get_client(DDS_FILE['host'].replace("https://", ""))
+CLIENT.request("GET", DDS_FILE['url'])
+DATA = get_response_data(CLIENT, 200)
+OUTPUT.write(DATA)
