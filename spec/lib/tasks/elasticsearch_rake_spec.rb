@@ -18,39 +18,6 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       current_indices = Elasticsearch::Model.client.cat.indices
       expect(current_indices).to include DataFile.index_name
     }
-
-    context 'with existing meta_properties' do
-      around :each do |example|
-        # initialize mappings
-        current_indices = DataFile.__elasticsearch__.client.cat.indices
-        if current_indices.include? DataFile.index_name
-          DataFile.__elasticsearch__.client.indices.delete index: DataFile.index_name
-        end
-        DataFile.__elasticsearch__.client.indices.create(
-          index: DataFile.index_name,
-          body: {
-            settings: DataFile.settings.to_hash,
-            mappings: DataFile.mappings.to_hash
-          }
-        )
-        Elasticsearch::Model.client.indices.flush
-
-        @meta_property = FactoryGirl.create(:meta_property)
-
-        DataFile.__elasticsearch__.client.indices.delete index: DataFile.index_name
-
-        example.run
-
-        DataFile.__elasticsearch__.client.indices.delete index: DataFile.index_name
-      end
-
-      it {
-        invoke_task
-        current_indices = Elasticsearch::Model.client.cat.indices
-        expect(current_indices).to include DataFile.index_name
-        expect(@meta_property.mapping_exists?).to be true
-      }
-    end
   end
 
   describe "elasticsearch:index:index_documents" do

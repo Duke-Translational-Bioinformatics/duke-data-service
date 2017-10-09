@@ -12,7 +12,7 @@ RSpec.describe MetaTemplate, type: :model do
   it_behaves_like 'an audited model'
 
   describe 'associations' do
-    it { is_expected.to belong_to(:templatable) }
+    it { is_expected.to belong_to(:templatable).touch(true) }
     it { is_expected.to belong_to(:template) }
     it { is_expected.to have_many(:meta_properties).autosave(true).dependent(:destroy) }
   end
