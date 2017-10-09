@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-"""Get an authentication_token to the Duke Data Service using an agent_key
-   set in ENV['AGENT_KEY'], and user_key set in ENV['USER_KEY']
+"""Connect to the Duke Data Service hosted in the url set in ENV['DDSHOST'],
+   and get an authentication_token to the Duke Data Service using an agent_key
+   set in ENV['AGENT_KEY'], and user_key set in ENV['USER_KEY'].
+
+   Exits with nonzero status if DDSHOST, AGENT_KEY, or USER_KEY environment
+   variables are not set.
 """
 import httplib
 import os
