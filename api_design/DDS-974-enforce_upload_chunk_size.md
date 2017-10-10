@@ -54,7 +54,7 @@ The following properties will be added to the storage providers resource:
 `POST /projects/{id}/uploads`
 
 ###### Response Headers (Extensions)
-The following custom response headers will be added to inform clients of the minimum chunk size that may be utlized to ensure chunks can be coalesced when creating the maximum number of chunks, as well as the maximum chunk size the storage provider can accommodate.
+The following custom response headers will be added to inform clients of a suggested minimum chunk size that can be utlized to ensure chunks will be coalesced when creating the maximum number of chunks, as well as the maximum chunk size the storage provider can accommodate.
 
 + **X-MIN-CHUNK-UPLOAD-SIZE** - The minimum chunk size in bytes.
 + **X-MAX-CHUNK-UPLOAD-SIZE** - The maximum chunk size in bytes.
