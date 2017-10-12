@@ -116,6 +116,11 @@ module BunnyMock
 
     def cancel
       @consumers = []
+      self
+    end
+
+    def consumer_tag
+      'the-consumer-tag'
     end
 
     def pop(opts = { manual_ack: false }, &block)
