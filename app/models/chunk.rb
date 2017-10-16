@@ -15,11 +15,7 @@ class Chunk < ActiveRecord::Base
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true
   validates :size, numericality:  {
-    less_than: :chunk_max_size_bytes,
-    greater_than_or_equal_to: :minimum_chunk_size,
-    message: ->(object, data) do
-      "Invalid chunk size specified - must be in range #{object.minimum_chunk_size}-#{object.chunk_max_size_bytes}"
-    end
+    less_than: :chunk_max_size_bytes
   }, if: :storage_provider
 
   validates :fingerprint_value, presence: true
