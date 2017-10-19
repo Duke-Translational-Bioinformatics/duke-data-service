@@ -14,6 +14,9 @@ module DDS
       end
       params do
         optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :exclude_response_fields, type: Array[String],
+          coerce_with: ->(val) { val.split(/\s+/) },
+          desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
       get '/folders/:id/children', root: 'results' do
@@ -24,9 +27,10 @@ module DDS
         if name_contains.nil?
           descendants = policy_scope(folder.children)
         else
-          descendants = policy_scope(folder.descendants).where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          descendants = policy_scope(folder.descendants)
+          descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%")) unless name_contains.empty?
         end
-        paginate(descendants.where(is_deleted: false))
+        paginate(descendants.includes(:parent, :project, :audits).where(is_deleted: false))
       end
 
       desc 'List project children' do
@@ -40,6 +44,9 @@ module DDS
       end
       params do
         optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :exclude_response_fields, type: Array[String],
+          coerce_with: ->(val) { val.split(/\s+/) },
+          desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
       get '/projects/:id/children', root: 'results' do
@@ -50,9 +57,10 @@ module DDS
         if name_contains.nil?
           descendants = project.children
         else
-          descendants = project.containers.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          descendants = project.containers
+          descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%")) unless name_contains.empty?
         end
-        paginate(policy_scope(descendants).where(is_deleted: false))
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits)).where(is_deleted: false))
       end
     end
   end
