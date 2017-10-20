@@ -55,8 +55,8 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       it {
         invoke_task
         Elasticsearch::Model.client.indices.flush
-        expect(DataFile.__elasticsearch__.search(@data_file.id).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.id).count).to eq 1
+        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
+        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
       }
     end
 
@@ -95,11 +95,11 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
       end
 
       it {
-        expect(DataFile.__elasticsearch__.search(@data_file.id).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.id).count).to eq 1
+        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
+        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
         invoke_task
-        expect(DataFile.__elasticsearch__.search(@data_file.id).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.id).count).to eq 1
+        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
+        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
       }
     end
   end
