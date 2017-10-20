@@ -14,6 +14,13 @@ namespace :workers do
     end
   end
 
+  namespace :update_project_container_elasticsearch do
+    desc 'run a ProjectContainerElasticsearchUpdateJob'
+    task run: :environment do
+      JobsRunner.new(ProjectContainerElasticsearchUpdateJob).run
+    end
+  end
+
   namespace :delete_children do
     desc 'run a ChildDeletionJob'
     task run: :environment do
