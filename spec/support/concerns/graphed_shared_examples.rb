@@ -1,5 +1,5 @@
 # These are Graphed::Node models
-shared_examples 'a graphed node' do |auto_create: false, logically_deleted: false|
+shared_examples 'a graphed node' do |logically_deleted: false|
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
 
@@ -59,7 +59,7 @@ shared_examples 'a graphed node' do |auto_create: false, logically_deleted: fals
 end # a graphed node
 
 # These are Graphed::Relation objects, which are all ProvRelations
-shared_examples 'a graphed relation' do |auto_create: false|
+shared_examples 'a graphed relation' do
   # these MUST be provided in the model spec
   #let(:rel_type) { 'SomeAssociation' }
   #let(:from_model) { activerecordmodel }
