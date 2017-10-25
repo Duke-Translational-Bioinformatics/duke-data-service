@@ -8,44 +8,26 @@ shared_examples 'a graphed node' do |auto_create: false, logically_deleted: fals
   it { is_expected.to respond_to :create_graph_node }
   it { is_expected.to respond_to :delete_graph_node }
 
-  if auto_create
-    before do
-      expect(subject).to be
-    end
+  before do
+    expect(subject).to be
+  end
 
-    it 'should auto_create' do
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
-    end
+  it 'should auto_create' do
+    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
+  end
 
-    it 'should return the graphed model' do
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-      expect(subject.graph_node).to be
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-      expect(subject.graph_node.model_id).to eq(subject.id)
-      expect(subject.graph_node.model_kind).to eq(subject.kind)
-    end
-  else
-    it 'should not auto_create' do
-      expect(subject).to be
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).not_to be
-    end
-
-    it 'should create_graph_node' do
-      expect(subject).to be
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).not_to be
-      subject.create_graph_node
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
-    end
+  it 'should return the graphed model' do
+    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+    expect(subject.graph_node).to be
+    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+    expect(subject.graph_node.model_id).to eq(subject.id)
+    expect(subject.graph_node.model_kind).to eq(subject.kind)
   end
 
   context 'when model is deleted' do
     before do
       expect(subject).to be
-      if auto_create
-        expect(subject.graph_node).to be
-      else
-        expect(subject.create_graph_node).to be
-      end
+      expect(subject.graph_node).to be
     end
 
     if logically_deleted
@@ -95,52 +77,26 @@ shared_examples 'a graphed relation' do |auto_create: false|
   it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
   it { is_expected.to callback(:manage_graph_relation).around(:update) }
 
-  if auto_create
-    it 'should auto_create' do
-      expect(subject).to be
-      expect(graphed_relation).to be
-    end
-    it 'should return the graphed relation of rel_type between from_model.graph_node and to_model.graph_node' do
-      expect(subject).to be
-      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
-      expect(subject.graph_relation).to be
-      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
-      graphed_relation = subject.graph_relation
-      expect(graphed_relation.model_id).to eq(subject.id)
-      expect(graphed_relation.model_kind).to eq(subject.kind)
-      expect(graphed_relation.from_node.model_id).to eq(from_model.id)
-      expect(graphed_relation.to_node.model_id).to eq(to_model.id)
-    end
-  else
-    it 'should not auto_create' do
-      expect(subject).to be
-      expect(graphed_relation).not_to be
-    end
-
-    it 'should create_graph_relation of rel_type between from_model.graph_node and to_model.graph_node' do
-      expect(subject).to be
-      expect(from_model.graph_node).to be
-      expect(to_model.graph_node).to be
-      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(0)
-      expect(subject.create_graph_relation).to be
-      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
-      expect(subject.graph_relation.from_node.model_id).to eq(from_model.id)
-      graphed_relation = subject.graph_relation
-      expect(graphed_relation.model_id).to eq(subject.id)
-      expect(graphed_relation.model_kind).to eq(subject.kind)
-      expect(graphed_relation.from_node.model_id).to eq(from_model.id)
-      expect(graphed_relation.to_node.model_id).to eq(to_model.id)
-    end
+  it 'should auto_create' do
+    expect(subject).to be
+    expect(graphed_relation).to be
+  end
+  it 'should return the graphed relation of rel_type between from_model.graph_node and to_model.graph_node' do
+    expect(subject).to be
+    expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+    expect(subject.graph_relation).to be
+    expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+    graphed_relation = subject.graph_relation
+    expect(graphed_relation.model_id).to eq(subject.id)
+    expect(graphed_relation.model_kind).to eq(subject.kind)
+    expect(graphed_relation.from_node.model_id).to eq(from_model.id)
+    expect(graphed_relation.to_node.model_id).to eq(to_model.id)
   end
 
   context 'when model is deleted' do
     before do
       expect(subject).to be
-      if auto_create
-        expect(subject.graph_relation).to be
-      else
-        expect(subject.create_graph_relation).to be
-      end
+      expect(subject.graph_relation).to be
     end
 
     it 'should destroy graph_relation with the model' do
