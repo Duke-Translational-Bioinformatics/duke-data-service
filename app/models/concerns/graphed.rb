@@ -8,16 +8,20 @@ module Graphed
       after_destroy :delete_graph_node
     end
 
-    def create_graph_node(node_name=nil)
-      node_name ||= self.class.name
-      node_class = "Graph::#{node_name}"
-      node_class.constantize.create(model_id: id, model_kind: kind)
+    def graph_node_name
+      self.class.name
     end
 
-    def graph_node(node_name=nil)
-      node_name ||= self.class.name
-      node_class = "Graph::#{node_name}"
-      node_class.constantize.find_by(model_id: id, model_kind: kind)
+    def graph_node_class
+      "Graph::#{graph_node_name}".constantize
+    end
+
+    def create_graph_node
+      graph_node_class.create(model_id: id, model_kind: kind)
+    end
+
+    def graph_node
+      graph_node_class.find_by(model_id: id, model_kind: kind)
     end
 
     def delete_graph_node

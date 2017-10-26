@@ -2,11 +2,47 @@
 shared_examples 'a graphed node' do |logically_deleted: false|
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
+  let(:graph_node_class) { graph_node_name.constantize }
 
   it { expect(described_class).to include(Graphed::Node) }
-  it { is_expected.to respond_to :graph_node }
-  it { is_expected.to respond_to :create_graph_node }
-  it { is_expected.to respond_to :delete_graph_node }
+
+  describe '#graph_node_name' do
+    it { is_expected.to respond_to :graph_node_name }
+    it { expect(subject.graph_node_name).to eq kind_name }
+  end
+
+  describe '#graph_node_class' do
+    it { is_expected.to respond_to :graph_node_class }
+    it { expect(subject.graph_node_class).to eq graph_node_class }
+  end
+
+  describe '#graph_node' do
+    let(:a_graph_node) { Object.new }
+    it { is_expected.to respond_to :graph_node }
+    it 'calls graph_node_class.find_by' do
+      expect(graph_node_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
+      expect(subject.graph_node).to eq a_graph_node
+    end
+  end
+
+  describe '#create_graph_node' do
+    it { is_expected.to respond_to :create_graph_node }
+    it 'calls graph_node_class.create' do
+      expect(graph_node_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
+      expect(subject.create_graph_node).to be_truthy
+    end
+  end
+
+  describe '#delete_graph_node' do
+    let(:a_graph_node) { double("graph_node") }
+    it { is_expected.to respond_to :delete_graph_node }
+    it 'calls graph_node.destroy' do
+      allow(a_graph_node).to receive(:destroy)
+      expect(graph_node_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).at_least(:once).and_return(a_graph_node)
+      expect(a_graph_node).to receive(:destroy).and_return(true)
+      expect(subject.delete_graph_node).to be_truthy
+    end
+  end
 
   before do
     expect(subject).to be
