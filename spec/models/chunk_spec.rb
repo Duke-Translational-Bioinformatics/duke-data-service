@@ -22,39 +22,68 @@ RSpec.describe Chunk, type: :model do
     it { is_expected.to validate_presence_of(:upload_id) }
     it { is_expected.to validate_presence_of(:number) }
     it { is_expected.to validate_presence_of(:size) }
+    it {
+      is_expected.to validate_numericality_of(:size)
+        .is_less_than(subject.chunk_max_size_bytes)
+    }
     it { is_expected.to validate_presence_of(:fingerprint_value) }
     it { is_expected.to validate_presence_of(:fingerprint_algorithm) }
     it { is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive }
+
+    describe 'upload_chunk_maximum' do
+      let(:storage_provider) { FactoryGirl.create(:storage_provider, chunk_max_number: 1) }
+      context '< storage_provider.chunk_max_number' do
+        let(:upload) { FactoryGirl.create(:upload, storage_provider: storage_provider) }
+        subject { FactoryGirl.build(:chunk, upload: upload) }
+        it { is_expected.to be_valid }
+      end
+
+      context '>= storage_provider.chunk_max_number' do
+        let(:upload) { FactoryGirl.create(:upload, :with_chunks, storage_provider: storage_provider) }
+        let(:expected_validation_message) { "maximum upload chunks exceeded." }
+        subject { FactoryGirl.build(:chunk, upload: upload, number: 2) }
+
+        it {
+          is_expected.not_to be_valid
+          expect(subject.errors.messages[:base]).to include expected_validation_message
+        }
+      end
+    end
   end
 
-  describe 'instances' do
-    it 'should delegate #storage_container to upload' do
+  describe 'instance methods' do
+    it 'should delegate #project_id and #storage_container to upload' do
+      is_expected.to delegate_method(:project_id).to(:upload)
+      expect(subject.project_id).to eq(subject.upload.project_id)
       is_expected.to delegate_method(:storage_container).to(:upload)
       expect(subject.storage_container).to eq(subject.upload.storage_container)
     end
 
-    it 'should implement #http_verb' do
+    it { is_expected.to delegate_method(:chunk_max_size_bytes).to(:storage_provider) }
+    it { is_expected.to delegate_method(:minimum_chunk_size).to(:upload) }
+
+    it 'is_expected.to have a http_verb method' do
       is_expected.to respond_to :http_verb
       expect(subject.http_verb).to eq 'PUT'
     end
 
-    it 'should implement #host' do
+    it 'is_expected.to have a host method' do
       is_expected.to respond_to :host
       expect(subject.host).to eq storage_provider.url_root
     end
 
-    it 'should implement #http_headers' do
+    it 'is_expected.to have a http_headers method' do
       is_expected.to respond_to :http_headers
       expect(subject.http_headers).to eq []
     end
 
-    it 'should implement #object_path' do
+    it 'is_expected.to have an object_path method' do
       is_expected.to respond_to :object_path
       expect(subject.object_path).to eq(expected_object_path)
     end
   end
 
-  it 'should implement #url' do
+  it 'is_expected.to have a url method' do
     is_expected.to respond_to :url
     expect(subject.url).to eq expected_url
   end
@@ -99,5 +128,10 @@ RSpec.describe Chunk, type: :model do
         expect(resp.response.code.to_i).to eq(404)
       }
     end
+  end
+
+  describe '#total_chunks' do
+    it { is_expected.to respond_to :total_chunks }
+    it { expect(subject.total_chunks).to eq(subject.upload.chunks.count ) }
   end
 end

@@ -323,6 +323,7 @@ RSpec.describe DataFile, type: :model do
     let(:property_mappings) {{
       kind: {type: "string"},
       name: {type: "string"}, #name
+      is_deleted: {type: "boolean"},
       tags: {type: "object"},
       project: {type: "object"}
     }}

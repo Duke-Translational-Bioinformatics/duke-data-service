@@ -14,11 +14,16 @@ class Chunk < ActiveRecord::Base
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true
+  validates :size, numericality:  {
+    less_than: :chunk_max_size_bytes
+  }, if: :storage_provider
+
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true
+  validate :upload_chunk_maximum, if: :storage_provider
 
-  delegate :project_id, to: :upload
-  delegate :storage_container, to: :upload
+  delegate :project_id, :minimum_chunk_size, :storage_container, to: :upload
+  delegate :chunk_max_size_bytes, to: :storage_provider
 
   def http_verb
     'PUT'
@@ -52,7 +57,17 @@ class Chunk < ActiveRecord::Base
     storage_provider.delete_object(storage_container, object_path)
   end
 
+  def total_chunks
+    upload.chunks.count
+  end
+
   private
+
+  def upload_chunk_maximum
+    unless total_chunks < storage_provider.chunk_max_number
+      errors[:base] << 'maximum upload chunks exceeded.'
+    end
+  end
 
   def update_upload_etag
     last_audit = self.audits.last

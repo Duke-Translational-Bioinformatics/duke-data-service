@@ -12,10 +12,6 @@ def create_indices
       }
     )
   end
-  # property mappings
-  MetaProperty.all.each do |mp|
-    mp.create_mapping
-  end
 end
 
 def index_documents

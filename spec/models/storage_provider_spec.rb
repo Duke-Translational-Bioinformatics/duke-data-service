@@ -299,17 +299,19 @@ RSpec.describe StorageProvider, type: :model do
 
   describe 'validations' do
     it 'should require attributes' do
-      should validate_presence_of :name
-      should validate_presence_of :display_name
-      should validate_uniqueness_of :display_name
-      should validate_presence_of :description
-      should validate_presence_of :url_root
-      should validate_presence_of :provider_version
-      should validate_presence_of :auth_uri
-      should validate_presence_of :service_user
-      should validate_presence_of :service_pass
-      should validate_presence_of :primary_key
-      should validate_presence_of :secondary_key
+      is_expected.to validate_presence_of :name
+      is_expected.to validate_presence_of :display_name
+      is_expected.to validate_uniqueness_of :display_name
+      is_expected.to validate_presence_of :description
+      is_expected.to validate_presence_of :url_root
+      is_expected.to validate_presence_of :provider_version
+      is_expected.to validate_presence_of :auth_uri
+      is_expected.to validate_presence_of :service_user
+      is_expected.to validate_presence_of :service_pass
+      is_expected.to validate_presence_of :primary_key
+      is_expected.to validate_presence_of :secondary_key
+      is_expected.to validate_presence_of :chunk_max_number
+      is_expected.to validate_presence_of :chunk_max_size_bytes
     end
   end
 end

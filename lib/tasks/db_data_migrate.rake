@@ -117,6 +117,26 @@ def migrate_nil_storage_container
   puts "#{updated_uploads} uploads updated"
 end
 
+def migrate_storage_provider_chunk_environment
+  bad_storage_providers = StorageProvider.where(
+    chunk_max_size_bytes: nil,
+    chunk_max_number: nil
+  )
+
+  if bad_storage_providers.count > 0
+    if (ENV['SWIFT_CHUNK_MAX_NUMBER'] && ENV['SWIFT_CHUNK_MAX_SIZE_BYTES'])
+      bad_storage_providers.each do |bad_storage_provider|
+        bad_storage_provider.update(
+          chunk_max_size_bytes: ENV['SWIFT_CHUNK_MAX_SIZE_BYTES'],
+          chunk_max_number: ENV['SWIFT_CHUNK_MAX_NUMBER']
+        )
+      end
+    else
+      $stderr.puts 'please set ENV[SWIFT_CHUNK_MAX_NUMBER] AND ENV[SWIFT_CHUNK_MAX_SIZE_BYTES]'
+    end
+  end
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -126,6 +146,7 @@ namespace :db do
       type_untyped_authentication_services
       migrate_nil_consistency_status
       migrate_nil_storage_container
+      migrate_storage_provider_chunk_environment
     end
   end
 end

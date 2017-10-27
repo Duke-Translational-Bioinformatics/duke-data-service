@@ -187,5 +187,92 @@ describe "db:data:migrate" do
         }
       end
     end
+
+    describe 'migrate_storage_provider_chunk_environment' do
+      let(:bad_storage_providers) {
+        StorageProvider.where(
+          chunk_max_size_bytes: nil,
+          chunk_max_number: nil
+        ).count
+      }
+
+      context 'a storage_provider has nil chunk_max_size_bytes, chunk_max_number' do
+        let(:storage_provider) {
+          FactoryGirl.create(:storage_provider, :skip_validation,
+            chunk_max_size_bytes: nil,
+            chunk_max_number: nil
+          )
+        }
+
+        context 'ENV includes SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          include_context 'with env_override'
+          let(:env_override) { {
+            'SWIFT_CHUNK_MAX_NUMBER' => 1,
+            'SWIFT_CHUNK_MAX_SIZE_BYTES' => 5
+          } }
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to be > 0
+            expect{invoke_task}.to change{
+              StorageProvider.where(
+                chunk_max_size_bytes: nil,
+                chunk_max_number: nil
+              ).count
+            }.by(-bad_storage_providers)
+          }
+        end
+
+        context 'ENV does not include SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          before do
+            expect(ENV['SWIFT_CHUNK_MAX_NUMBER']).to be_nil
+            expect(ENV['SWIFT_CHUNK_MAX_SIZE_BYTES']).to be_nil
+          end
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to be > 0
+            invoke_task expected_stderr: /please set ENV\[SWIFT_CHUNK_MAX_NUMBER\] AND ENV\[SWIFT_CHUNK_MAX_SIZE_BYTES\]/
+          }
+        end
+      end
+
+      context 'no storage_providers have nil chunk_max_size_bytes, chunk_max_number' do
+        let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+
+        context 'ENV includes SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          include_context 'with env_override'
+          let(:env_override) { {
+            'SWIFT_CHUNK_MAX_NUMBER' => 1,
+            'SWIFT_CHUNK_MAX_SIZE_BYTES' => 5
+          } }
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to eq 0
+            expect {invoke_task}.not_to change{ StorageProvider.where(
+              chunk_max_size_bytes: nil,
+              chunk_max_number: nil
+            ).count }
+          }
+        end
+
+        context 'ENV does not include SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          before do
+            expect(ENV['SWIFT_CHUNK_MAX_NUMBER']).to be_nil
+            expect(ENV['SWIFT_CHUNK_MAX_SIZE_BYTES']).to be_nil
+          end
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to eq 0
+            expect {invoke_task}.not_to change{ StorageProvider.where(
+              chunk_max_size_bytes: nil,
+              chunk_max_number: nil
+            ).count }
+          }
+        end
+      end
+    end
   end
 end
