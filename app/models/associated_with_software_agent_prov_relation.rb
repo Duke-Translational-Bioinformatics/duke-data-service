@@ -10,9 +10,4 @@ class AssociatedWithSoftwareAgentProvRelation < AssociatedWithProvRelation
     message: "AssociatedWithSoftwareAgentProvRelation must be from a SoftwareAgent" }
   validates :relatable_to_type, inclusion: { in: %w(Activity),
     message: "AssociatedWithSoftwareAgentProvRelation must be to an Activity" }
-
-  def set_relationship_type
-    self.relationship_type = 'was-associated-with'
-    true
-  end
 end

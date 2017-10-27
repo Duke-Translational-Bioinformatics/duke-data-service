@@ -53,6 +53,19 @@ module Graphed
       around_update :manage_graph_relation
     end
 
+    def graph_model_name
+      #relationship_type.split('-').map{|part| part.capitalize}.join('')
+      self.class.name
+    end
+
+    def graph_model_class
+      "Graph::#{graph_model_name}".constantize
+    end
+
+    def graph_model_type
+      graph_model_name.underscore.dasherize
+    end
+
     def manage_graph_relation
       newly_deleted = is_deleted_changed? && is_deleted?
       yield
@@ -61,10 +74,10 @@ module Graphed
 
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
-    def create_graph_relation(rel_type, from_model, to_model)
+    def create_graph_relation(from_model, to_model)
       from_node = from_model.graph_node
       to_node = to_model.graph_node
-      "Graph::#{rel_type}".constantize.create(
+      graph_model_class.create(
         model_id: id,
         model_kind: kind,
         from_node: from_node,
@@ -72,10 +85,10 @@ module Graphed
       )
     end
 
-    def graph_relation(rel_type, from_model, to_model)
+    def graph_relation(from_model, to_model)
       from_node = from_model.graph_node
       from_node.query_as(:from)
-        .match("(from)-[r:#{rel_type}]->(to)")
+        .match("(from)-[r:#{graph_model_name}]->(to)")
         .where('r.model_id = {r_id}')
         .where('r.model_kind = {r_kind}')
         .where('to.model_id = {m_id}')

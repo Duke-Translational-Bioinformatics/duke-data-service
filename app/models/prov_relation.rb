@@ -23,7 +23,6 @@ class ProvRelation < ActiveRecord::Base
   #Overrides Graphed::Relation::create_graph_relation
   def create_graph_relation
     super(
-      relationship_type.split('-').map{|part| part.capitalize}.join(''),
       relatable_from,
       relatable_to
     )
@@ -32,9 +31,13 @@ class ProvRelation < ActiveRecord::Base
   #Overrides Graphed::Relation::graph_relation
   def graph_relation
     super(
-      relationship_type.split('-').map{|part| part.capitalize}.join(''),
       relatable_from,
       relatable_to
     )
+  end
+
+  def set_relationship_type
+    self.relationship_type = graph_model_type
+    true
   end
 end

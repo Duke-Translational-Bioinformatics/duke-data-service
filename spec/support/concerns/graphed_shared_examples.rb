@@ -103,6 +103,7 @@ shared_examples 'a graphed relation' do
   let(:from_node) { from_model.graph_node }
   let(:to_node) { to_model.graph_node }
   let(:graphed_relation) { from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
+  let(:graph_model_class) { "Graph::#{rel_type}".constantize }
 
   it { expect(described_class).to include(Graphed::Relation) }
   it { is_expected.to respond_to :graph_relation }
@@ -112,6 +113,16 @@ shared_examples 'a graphed relation' do
   it { is_expected.to respond_to :delete_graph_relation }
   it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
   it { is_expected.to callback(:manage_graph_relation).around(:update) }
+
+  describe '#graph_model_name' do
+    it { is_expected.to respond_to :graph_model_name }
+    it { expect(subject.graph_model_name).to eq rel_type }
+  end
+
+  describe '#graph_model_class' do
+    it { is_expected.to respond_to :graph_model_class }
+    it { expect(subject.graph_model_class).to eq graph_model_class }
+  end
 
   it 'should auto_create' do
     expect(subject).to be
