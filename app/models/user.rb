@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
     }
   end
 
-  def graph_node_name
+  def graph_model_name
     'Agent'
   end
 end

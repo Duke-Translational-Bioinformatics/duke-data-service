@@ -4,24 +4,26 @@ module Graphed
     
     # These are models that get turned into Graph::* Neo4j::ActiveNode objects
     included do
+      include JobTransactionable
+
       after_create :create_graph_node
       after_destroy :delete_graph_node
     end
 
-    def graph_node_name
+    def graph_model_name
       self.class.name
     end
 
-    def graph_node_class
-      "Graph::#{graph_node_name}".constantize
+    def graph_model_class
+      "Graph::#{graph_model_name}".constantize
     end
 
     def create_graph_node
-      graph_node_class.create(model_id: id, model_kind: kind)
+      graph_model_class.create(model_id: id, model_kind: kind)
     end
 
     def graph_node
-      graph_node_class.find_by(model_id: id, model_kind: kind)
+      graph_model_class.find_by(model_id: id, model_kind: kind)
     end
 
     def delete_graph_node
