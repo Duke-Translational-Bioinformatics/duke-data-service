@@ -42,6 +42,27 @@ namespace :workers do
     end
   end
 
+  namespace :purge_upload do
+    desc 'run an UploadStorageRemovalJob'
+    task run: :environment do
+      JobsRunner.new(UploadStorageRemovalJob).run
+    end
+  end
+
+  namespace :purge_children do
+    desc 'run an ChildPurgationJob'
+    task run: :environment do
+      JobsRunner.new(ChildPurgationJob).run
+    end
+  end
+
+  namespace :restore_children do
+    desc 'run an ChildRestorationJob'
+    task run: :environment do
+      JobsRunner.new(ChildRestorationJob).run
+    end
+  end
+
   namespace :all do
     desc 'run all jobs'
     task run: :environment do
