@@ -61,7 +61,7 @@ end
 
 describe 'Heroku ProcFile Rake Tasks' do
   subject {
-    proc_file_path = Rails.root.join "ProcFile"
+    proc_file_path = Rails.root.join "Procfile"
     proc_file = YAML.load_file(proc_file_path)
     proc_file.values.map { |v| v.split("\s").last }.sort
   }
