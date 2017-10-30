@@ -91,20 +91,17 @@ module Graphed
 
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
-    def create_graph_relation(from_model, to_model)
-      from_node = from_model.graph_node
-      to_node = to_model.graph_node
+    def create_graph_relation
       graph_model_class.create(
         model_id: id,
         model_kind: kind,
-        from_node: from_node,
-        to_node: to_node
+        from_node: graph_from_node,
+        to_node: graph_to_node
       )
     end
 
-    def graph_relation(from_model, to_model)
-      from_node = from_model.graph_node
-      from_node.query_as(:from)
+    def graph_relation
+      graph_from_node.query_as(:from)
         .match("(from)-[r:#{graph_model_name}]->(to)")
         .where('r.model_id = {r_id}')
         .where('r.model_kind = {r_kind}')
@@ -112,7 +109,7 @@ module Graphed
         .params(
           r_id: id,
           r_kind: kind,
-          m_id: to_model.id
+          m_id: graph_to_model.id
         ).pluck(:r).first
     end
 
