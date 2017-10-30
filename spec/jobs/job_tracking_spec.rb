@@ -72,7 +72,7 @@ RSpec.describe JobTracking do
     }
 
     context 'argument not transactionable' do
-      let(:argument) { FactoryGirl.create(:user) }
+      let(:argument) { Object.new }
 
       it {
         expect(argument.class).not_to include(JobTransactionable)
