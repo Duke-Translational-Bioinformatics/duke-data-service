@@ -20,6 +20,14 @@ class ProvRelation < ActiveRecord::Base
   belongs_to :relatable_from, polymorphic: true
   belongs_to :relatable_to, polymorphic: true
 
+  def graph_from_model
+    relatable_from
+  end
+
+  def graph_to_model
+    relatable_to
+  end
+
   #Overrides Graphed::Relation::create_graph_relation
   def create_graph_relation
     super(

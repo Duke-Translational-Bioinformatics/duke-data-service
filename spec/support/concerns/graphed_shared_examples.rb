@@ -131,6 +131,26 @@ shared_examples 'a graphed relation' do
     it { expect(subject.graph_model_class).to eq graph_model_class }
   end
 
+  describe '#graph_from_model' do
+    it { is_expected.to respond_to :graph_from_model }
+    it { expect(subject.graph_from_model).to eq from_model }
+  end
+
+  describe '#graph_to_model' do
+    it { is_expected.to respond_to :graph_to_model }
+    it { expect(subject.graph_to_model).to eq to_model }
+  end
+
+  describe '#graph_from_node' do
+    it { is_expected.to respond_to :graph_from_node }
+    it { expect(subject.graph_from_node).to eq from_node }
+  end
+
+  describe '#graph_to_node' do
+    it { is_expected.to respond_to :graph_to_node }
+    it { expect(subject.graph_to_node).to eq to_node }
+  end
+
   it 'should auto_create' do
     expect(subject).to be
     expect(graphed_relation).to be

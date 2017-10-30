@@ -73,6 +73,22 @@ module Graphed
       delete_graph_relation if newly_deleted
     end
 
+    def graph_from_model
+      raise NotImplementedError
+    end
+
+    def graph_to_model
+      raise NotImplementedError
+    end
+
+    def graph_from_node
+      graph_from_model.graph_node
+    end
+
+    def graph_to_node
+      graph_to_model.graph_node
+    end
+
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
     def create_graph_relation(from_model, to_model)
