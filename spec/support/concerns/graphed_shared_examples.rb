@@ -1,5 +1,10 @@
+shared_context 'Graphed::Base' do
+  it { expect(described_class).to include(Graphed::Base) }
+  it { expect(described_class).to include(JobTransactionable) }
+end
 # These are Graphed::Node models
 shared_examples 'a graphed node' do |logically_deleted: false|
+  include_context 'Graphed::Base'
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
   let(:graph_model_class) { graph_node_name.constantize }
@@ -96,6 +101,8 @@ end # a graphed node
 
 # These are Graphed::Relation objects, which are all ProvRelations
 shared_examples 'a graphed relation' do
+  include_context 'Graphed::Base'
+
   # these MUST be provided in the model spec
   #let(:rel_type) { 'SomeAssociation' }
   #let(:from_model) { activerecordmodel }

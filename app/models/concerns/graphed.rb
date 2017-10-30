@@ -1,13 +1,9 @@
 module Graphed
-  module Node
+  module Base
     extend ActiveSupport::Concern
-    
-    # These are models that get turned into Graph::* Neo4j::ActiveNode objects
+
     included do
       include JobTransactionable
-
-      after_create :create_graph_node
-      after_destroy :delete_graph_node
     end
 
     def graph_model_name
@@ -16,6 +12,18 @@ module Graphed
 
     def graph_model_class
       "Graph::#{graph_model_name}".constantize
+    end
+  end
+
+  module Node
+    extend ActiveSupport::Concern
+
+    # These are models that get turned into Graph::* Neo4j::ActiveNode objects
+    included do
+      include Graphed::Base
+
+      after_create :create_graph_node
+      after_destroy :delete_graph_node
     end
 
     def create_graph_node
@@ -48,18 +56,11 @@ module Graphed
     extend ActiveSupport::Concern
 
     included do
+      include Graphed::Base
+
       after_create :create_graph_relation
       after_destroy :delete_graph_relation
       around_update :manage_graph_relation
-    end
-
-    def graph_model_name
-      #relationship_type.split('-').map{|part| part.capitalize}.join('')
-      self.class.name
-    end
-
-    def graph_model_class
-      "Graph::#{graph_model_name}".constantize
     end
 
     def graph_model_type
