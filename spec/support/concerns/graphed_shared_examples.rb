@@ -48,7 +48,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     it { is_expected.to respond_to :delete_graph_node }
     it 'calls graph_node.destroy' do
       allow(a_graph_node).to receive(:destroy)
-      expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).at_least(:once).and_return(a_graph_node)
+      expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
       expect(a_graph_node).to receive(:destroy).and_return(true)
       expect(subject.delete_graph_node).to be_truthy
     end

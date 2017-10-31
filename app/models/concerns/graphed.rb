@@ -41,7 +41,7 @@ module Graphed
     def delete_graph_node
       graph_node =  self.graph_model_object
       if graph_node
-        self.graph_model_object.destroy
+        graph_node.destroy
       end
     end
 
