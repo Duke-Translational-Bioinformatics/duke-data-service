@@ -4,7 +4,7 @@ class GraphPersistenceJob < ApplicationJob
   def perform(job_transaction, graphed_object, action:, params: {})
     self.class.start_job job_transaction
 
-    if action == :create
+    if action == 'create'
       graphed_object.graph_model_class.create(params)
     end
 

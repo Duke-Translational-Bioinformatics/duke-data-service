@@ -17,12 +17,18 @@ RSpec.describe GraphPersistenceJob, type: :job do
   let(:job_transaction) { described_class.initialize_job(agent) }
   let(:graphed_) { double('graph_model') }
 
-  context 'action is :create' do
+  context 'action is "create"' do
     include_context 'tracking job', :job_transaction
     let(:create_params) { {foo: 'bar'} }
     it 'calls .create on graphed_class' do
       expect(graphed_class).to receive(:create).with(create_params).and_return(true)
-      described_class.perform_now(job_transaction, agent, action: :create, params: create_params)
+      described_class.perform_now(job_transaction, agent, action: "create", params: create_params)
     end
+  end
+
+  context 'action is "save"' do
+  end
+
+  context 'action is "delete"' do
   end
 end
