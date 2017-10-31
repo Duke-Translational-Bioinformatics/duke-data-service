@@ -1,6 +1,11 @@
 shared_context 'Graphed::Base' do
   it { expect(described_class).to include(Graphed::Base) }
   it { expect(described_class).to include(JobTransactionable) }
+
+  describe '#graph_model_object' do
+    it { is_expected.to respond_to :graph_model_object }
+    it { expect{subject.graph_model_object}.not_to raise_error }
+  end
 end
 # These are Graphed::Node models
 shared_examples 'a graphed node' do |logically_deleted: false|

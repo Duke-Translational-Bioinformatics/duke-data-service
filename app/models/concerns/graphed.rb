@@ -34,16 +34,20 @@ module Graphed
       graph_model_class.find_by(model_id: id, model_kind: kind)
     end
 
+    def graph_model_object
+      graph_node
+    end
+
     def delete_graph_node
-      graph_node =  self.graph_node
+      graph_node =  self.graph_model_object
       if graph_node
-        self.graph_node.destroy
+        self.graph_model_object.destroy
       end
     end
 
     def logically_delete_graph_node
       if self.is_deleted
-        node = self.graph_node
+        node = self.graph_model_object
         if node && !node.is_deleted
           node.is_deleted = self.is_deleted
           node.save
@@ -113,8 +117,12 @@ module Graphed
         ).pluck(:r).first
     end
 
+    def graph_model_object
+      graph_relation
+    end
+
     def delete_graph_relation
-      this_relation = self.graph_relation
+      this_relation = self.graph_model_object
       if this_relation
         this_relation.destroy
       end
