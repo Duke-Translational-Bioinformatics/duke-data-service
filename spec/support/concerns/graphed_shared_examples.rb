@@ -36,10 +36,25 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   end
 
   describe '#create_graph_node' do
+    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
     it { is_expected.to respond_to :create_graph_node }
-    it 'calls graph_model_class.create' do
-      expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
-      expect(subject.create_graph_node).to be_truthy
+    it 'enqueues a GraphPersistenceJob' do
+      expect(GraphPersistenceJob).to receive(:initialize_job)
+        .with(subject)
+        .and_return(job_transaction)
+      expect(GraphPersistenceJob).to receive(:perform_later)
+        .with(job_transaction, subject, action: "create", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
+      expect {
+        expect(subject.create_graph_node).to be_truthy
+      }.to have_enqueued_job(GraphPersistenceJob)
+    end
+    context 'with inline queue adapter' do
+      before { ActiveJob::Base.queue_adapter = :inline }
+
+      it 'calls graph_model_class.create' do
+        expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
+        expect(subject.create_graph_node).to be_truthy
+      end
     end
   end
 
@@ -54,52 +69,55 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     end
   end
 
-  before do
-    expect(subject).to be
-  end
-
-  it 'should auto_create' do
-    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
-  end
-
-  it 'should return the graphed model' do
-    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-    expect(subject.graph_node).to be
-    expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-    expect(subject.graph_node.model_id).to eq(subject.id)
-    expect(subject.graph_node.model_kind).to eq(subject.kind)
-  end
-
-  context 'when model is deleted' do
+  context 'with inline queue adapter' do
     before do
+      ActiveJob::Base.queue_adapter = :inline
       expect(subject).to be
-      expect(subject.graph_node).to be
     end
 
-    if logically_deleted
-      it { is_expected.to respond_to :logically_delete_graph_node }
-      it { is_expected.to callback(:logically_delete_graph_node).after(:save) }
-      it 'should logicially delete graph_node with the model' do
-        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-        subject.update_attribute(:is_deleted, true)
-        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
-        expect(subject.graph_node).to be
-        expect(subject.graph_node.is_deleted).to be_truthy
-      end
-      context 'when graph_node does not exist' do
-        before do
-          subject.delete_graph_node
-          subject.is_deleted = true
-        end
-        it { expect{subject.logically_delete_graph_node}.not_to raise_error }
-      end
-    end
-    it { is_expected.to respond_to :delete_graph_node }
-    it { is_expected.to callback(:delete_graph_node).after(:destroy) }
-    it 'should destroy graph_node with the model' do
+    it 'should auto_create' do
       expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
-      subject.destroy
-      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).not_to be
+    end
+
+    it 'should return the graphed model' do
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+      expect(subject.graph_node).to be
+      expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+      expect(subject.graph_node.model_id).to eq(subject.id)
+      expect(subject.graph_node.model_kind).to eq(subject.kind)
+    end
+
+    context 'when model is deleted' do
+      before do
+        expect(subject).to be
+        expect(subject.graph_node).to be
+      end
+
+      if logically_deleted
+        it { is_expected.to respond_to :logically_delete_graph_node }
+        it { is_expected.to callback(:logically_delete_graph_node).after(:save) }
+        it 'should logicially delete graph_node with the model' do
+          expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+          subject.update_attribute(:is_deleted, true)
+          expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
+          expect(subject.graph_node).to be
+          expect(subject.graph_node.is_deleted).to be_truthy
+        end
+        context 'when graph_node does not exist' do
+          before do
+            subject.delete_graph_node
+            subject.is_deleted = true
+          end
+          it { expect{subject.logically_delete_graph_node}.not_to raise_error }
+        end
+      end
+      it { is_expected.to respond_to :delete_graph_node }
+      it { is_expected.to callback(:delete_graph_node).after(:destroy) }
+      it 'should destroy graph_node with the model' do
+        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).to be
+        subject.destroy
+        expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).first).not_to be
+      end
     end
   end
 end # a graphed node
