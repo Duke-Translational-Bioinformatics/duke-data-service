@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ProvenanceGraphSerializer, type: :serializer do
   shared_examples 'a ProvenanceGraphSerializer' do |expected_object_node_syms:, expected_object_relationship_syms:|
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     let(:expected_object_nodes) { expected_object_node_syms.map{|enodesym| send(enodesym) }.flatten }
     let(:expected_object_relationships) { expected_object_relationship_syms.map{|ersym| send(ersym) }.flatten }
 
