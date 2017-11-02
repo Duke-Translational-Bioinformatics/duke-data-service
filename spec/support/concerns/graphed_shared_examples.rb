@@ -35,6 +35,15 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     end
   end
 
+  describe '#graph_create' do
+    it { is_expected.to respond_to :graph_create }
+
+    it 'calls graph_model_class.create' do
+      expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
+      expect(subject.graph_create).to be_truthy
+    end
+  end
+
   describe '#create_graph_node' do
     let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
     it { is_expected.to respond_to :create_graph_node }
@@ -43,7 +52,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
         .with(subject)
         .and_return(job_transaction)
       expect(GraphPersistenceJob).to receive(:perform_later)
-        .with(job_transaction, subject, action: "create", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
+        .with(job_transaction, subject, action: "create").and_call_original
       expect(subject.create_graph_node).to be_truthy
     end
     it 'enqueues a GraphPersistenceJob' do

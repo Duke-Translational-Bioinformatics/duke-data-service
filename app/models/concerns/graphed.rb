@@ -31,9 +31,12 @@ module Graphed
       GraphPersistenceJob.perform_later(
         GraphPersistenceJob.initialize_job(self),
         self,
-        action: 'create',
-        params: { model_id: id, model_kind: kind }
+        action: 'create'
       )
+    end
+
+    def graph_create
+      graph_model_class.create(model_id: id, model_kind: kind)
     end
 
     def graph_node

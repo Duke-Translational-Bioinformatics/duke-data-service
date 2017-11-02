@@ -15,13 +15,12 @@ RSpec.describe GraphPersistenceJob, type: :job do
   let(:agent) { FactoryGirl.create(:user) }
   let(:graphed_class) { agent.graph_model_class }
   let(:job_transaction) { described_class.initialize_job(agent) }
-  let(:graphed_) { double('graph_model') }
 
   context 'action is "create"' do
     include_context 'tracking job', :job_transaction
     let(:create_params) { {foo: 'bar'} }
     it 'calls .create on graphed_class' do
-      expect(graphed_class).to receive(:create).with(create_params).and_return(true)
+      expect(agent).to receive(:graph_create).and_return(true)
       described_class.perform_now(job_transaction, agent, action: "create", params: create_params)
     end
   end
