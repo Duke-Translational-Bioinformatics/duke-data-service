@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::RelationsAPI do
   include_context 'with authentication'
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   let(:viewable_project) { FactoryGirl.create(:project) }
   let(:view_auth_role) { FactoryGirl.create(:auth_role,
