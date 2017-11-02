@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe InvalidatedByActivityProvRelation, type: :model do
   subject { FactoryGirl.create(:invalidated_by_activity_prov_relation) }
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-invalidated-by' }
 

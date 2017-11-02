@@ -38,18 +38,22 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   describe '#create_graph_node' do
     let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
     it { is_expected.to respond_to :create_graph_node }
-    it 'enqueues a GraphPersistenceJob' do
+    it 'calls GraphPersistenceJob.perform_later with arguments' do
       expect(GraphPersistenceJob).to receive(:initialize_job)
         .with(subject)
         .and_return(job_transaction)
       expect(GraphPersistenceJob).to receive(:perform_later)
         .with(job_transaction, subject, action: "create", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
+      expect(subject.create_graph_node).to be_truthy
+    end
+    it 'enqueues a GraphPersistenceJob' do
+      expect(subject).to be_persisted
       expect {
         expect(subject.create_graph_node).to be_truthy
       }.to have_enqueued_job(GraphPersistenceJob)
     end
     context 'with inline queue adapter' do
-      before { ActiveJob::Base.queue_adapter = :inline }
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
       it 'calls graph_model_class.create' do
         expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
@@ -70,8 +74,9 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   end
 
   context 'with inline queue adapter' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
     before do
-      ActiveJob::Base.queue_adapter = :inline
       expect(subject).to be
     end
 
@@ -125,6 +130,7 @@ end # a graphed node
 # These are Graphed::Relation objects, which are all ProvRelations
 shared_examples 'a graphed relation' do
   include_context 'Graphed::Base'
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   # these MUST be provided in the model spec
   #let(:rel_type) { 'SomeAssociation' }
@@ -242,6 +248,7 @@ end #a graphed relation
 
 # These are Graph::* Neo4j graph objects
 shared_examples 'a graphed model' do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   it { expect(described_class).to include(Graphed::Model) }
   it { is_expected.to respond_to('graphed_model') }
 

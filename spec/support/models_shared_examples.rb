@@ -27,6 +27,7 @@ shared_examples 'a kind' do
 end
 
 shared_examples 'a ProvRelation' do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:expected_kind) { ['dds', subject.class.name].join('-') }
   let(:serialized_kind) { true }
   let(:kinded_class) { subject.class }

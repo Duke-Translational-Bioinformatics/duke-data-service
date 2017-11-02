@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe GeneratedByActivityProvRelation, type: :model do
   subject { FactoryGirl.create(:generated_by_activity_prov_relation) }
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:resource_serializer) { GeneratedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-generated-by' }
 

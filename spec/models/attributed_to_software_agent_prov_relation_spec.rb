@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe AttributedToSoftwareAgentProvRelation, type: :model do
   subject { FactoryGirl.create(:attributed_to_software_agent_prov_relation) }
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:resource_serializer) { AttributedToSoftwareAgentProvRelationSerializer }
   let(:expected_relationship_type) { 'was-attributed-to' }
   it_behaves_like 'a ProvRelation' do

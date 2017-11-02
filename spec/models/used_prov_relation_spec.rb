@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe UsedProvRelation, type: :model do
   subject { FactoryGirl.create(:used_prov_relation) }
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:resource_serializer) { UsedProvRelationSerializer }
   let(:expected_relationship_type) { 'used' }
 
