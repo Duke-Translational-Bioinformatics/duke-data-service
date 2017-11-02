@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe UsedProvRelationPolicy do
   include_context 'policy declarations'
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   let(:auth_role) { FactoryGirl.create(:auth_role) }
   let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
