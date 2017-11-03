@@ -88,10 +88,10 @@ RSpec.describe Chunk, type: :model do
     expect(subject.url).to eq expected_url
   end
 
-  context '#purge_storage' do
+  context '#purge_storage', :vcr do
     it { is_expected.to respond_to :purge_storage }
 
-    context 'called', :vcr do
+    context 'called' do
       subject {
         FactoryGirl.create(:chunk, :swift, size: chunk_data.length)
       }
