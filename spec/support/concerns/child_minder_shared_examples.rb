@@ -1,10 +1,5 @@
-shared_context 'a ChildMinder' do |resource_factory,
-  valid_child_file_sym,
-  invalid_child_file_sym,
-  child_folder_sym|
-  let(:valid_child_file) { send(valid_child_file_sym) }
-  let(:invalid_child_file) { send(invalid_child_file_sym) }
-  let(:child_folder) { send(child_folder_sym) }
+shared_context 'a ChildMinder' do |resource_factory, expected_children_sym|
+  let(:expected_children) { send(expected_children_sym) }
 
   it {
     expect(described_class).to include(ChildMinder)
@@ -26,18 +21,19 @@ shared_context 'a ChildMinder' do |resource_factory,
 
     context 'without children' do
       subject { FactoryGirl.create(resource_factory) }
+      before do
+        subject.children.delete_all
+      end
       it { expect(subject.children.count).to eq(0) }
       it { expect(subject.has_children?).to be_falsey }
     end
 
     context 'with children' do
       before do
-        expect(child_folder).to be_persisted
-        expect(child_folder.is_deleted?).to be_falsey
-        expect(valid_child_file).to be_persisted
-        expect(valid_child_file.is_deleted?).to be_falsey
-        expect(invalid_child_file).to be_persisted
-        expect(invalid_child_file.is_deleted?).to be_falsey
+        expected_children.each do |child|
+          expect(child).to be_persisted
+          expect(child.is_deleted?).to be_falsey
+        end
       end
       it { expect(subject.children.count).to be > 0 }
       it { expect(subject.has_children?).to be_truthy }
