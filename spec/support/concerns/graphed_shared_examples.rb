@@ -37,15 +37,6 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     end
   end
 
-  describe '#graph_create' do
-    it { is_expected.to respond_to :graph_create }
-
-    it 'calls graph_model_class.create' do
-      expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind).and_return(true)
-      expect(subject.graph_create).to be_truthy
-    end
-  end
-
   describe '#create_graph_node' do
     let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
     it { is_expected.to respond_to :create_graph_node }

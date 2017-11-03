@@ -35,10 +35,6 @@ module Graphed
       )
     end
 
-    def graph_create
-      graph_model_class.create(model_id: id, model_kind: kind)
-    end
-
     def graph_node
       graph_model_class.find_by(model_id: id, model_kind: kind)
     end
