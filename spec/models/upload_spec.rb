@@ -6,7 +6,7 @@ RSpec.describe Upload, type: :model do
   let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
   let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
-  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
+  let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
@@ -26,6 +26,11 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to validate_presence_of :project_id }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :size }
+    it {
+      is_expected.to validate_numericality_of(:size)
+      .is_less_than(subject.max_size_bytes)
+      .with_message("File size is currently not supported - maximum size is #{subject.max_size_bytes}")
+    }
     it { is_expected.to validate_presence_of :storage_provider_id }
     it { is_expected.to validate_presence_of :creator_id }
 
@@ -54,6 +59,18 @@ RSpec.describe Upload, type: :model do
       subject { upload_with_error }
       it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
     end
+
+    it 'expects storage_container to be immutable' do
+      is_expected.to be_persisted
+      is_expected.to allow_value(subject.project_id).for(:storage_container)
+      is_expected.to allow_value(subject.storage_container).for(:storage_container)
+      is_expected.not_to allow_value('a-different-string').for(:storage_container)
+        .with_message("Cannot change storage_container.")
+    end
+  end
+
+  describe 'callbacks' do
+    it { is_expected.to callback(:set_storage_container).before(:create) }
   end
 
   describe 'instance methods' do
@@ -78,6 +95,7 @@ RSpec.describe Upload, type: :model do
       it { is_expected.to respond_to :temporary_url }
       it { expect(subject.temporary_url).to be_a String }
       it { expect(subject.temporary_url).to include subject.name }
+      it { expect(subject.temporary_url).to include subject.storage_container }
 
       context 'when filename is provided' do
         let(:filename) { 'different-file-name.txt' }
@@ -172,40 +190,104 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  describe '#set_storage_container' do
+    it { is_expected.to respond_to :set_storage_container }
+
+    context 'upload creation' do
+      subject { FactoryGirl.build(:upload) }
+      it {
+        expect(subject.storage_container).to be_nil
+        subject.save
+        expect(subject.storage_container).to eq(subject.project_id)
+      }
+    end
+
+    context 'upload update' do
+      subject { FactoryGirl.create(:upload) }
+      let(:original_storage_container) { subject.storage_container }
+      let(:other_project) { completed_upload.project }
+
+      it {
+        expect(subject.storage_container).to eq(subject.project_id)
+        expect(subject.storage_container).to eq(original_storage_container)
+        subject.project = other_project
+        subject.save
+        expect(subject.storage_container).not_to eq(other_project.id)
+        expect(subject.storage_container).to eq(original_storage_container)
+      }
+    end
+  end
+
+  describe '#max_size_bytes' do
+    let(:expected_max_size_bytes) { subject.storage_provider.chunk_max_number * subject.storage_provider.chunk_max_size_bytes }
+    it { is_expected.to respond_to :max_size_bytes }
+    it { expect(subject.max_size_bytes).to eq(expected_max_size_bytes) }
+  end
+
+  describe '#minimum_chunk_size' do
+    let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+    let(:size) { storage_provider.chunk_max_number }
+    subject { FactoryGirl.create(:upload, storage_provider: storage_provider, size: size) }
+    let(:expected_minimum_chunk_size) {
+      (subject.size.to_f / subject.storage_provider.chunk_max_number).ceil
+    }
+
+    it { is_expected.to respond_to :minimum_chunk_size }
+
+    context 'size = 0' do
+      let(:size) { 0 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
+    end
+
+    context 'size < storage_provider.chunk_max_number' do
+      let(:size) { storage_provider.chunk_max_number - 1 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
+    end
+
+    context 'size > storage_provider.chunk_max_number' do
+      let(:size) { storage_provider.chunk_max_number + 1 }
+      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
+    end
+  end
+
   describe 'swift methods', :vcr do
     subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
+
+    before do
+      actual_size = 0
+      subject.storage_provider.put_container(subject.storage_container)
+      subject.chunks.each do |chunk|
+        body = 'this is a chunk'
+        subject.storage_provider.put_object(
+          subject.storage_container,
+          chunk.object_path,
+          body
+        )
+        chunk.update_attributes({
+          fingerprint_value: Digest::MD5.hexdigest(body),
+          size: body.length
+        })
+        actual_size = body.length + actual_size
+      end
+      subject.update_attribute(:size, actual_size)
+    end
+
+    after do
+      begin
+        subject.chunks.each do |chunk|
+          object = [subject.id, chunk.number].join('/')
+          subject.storage_provider.delete_object(subject.storage_container, object)
+        end
+        subject.storage_provider.delete_object_manifest(subject.storage_provider, subject.id)
+      rescue
+        # ignore
+      end
+    end
 
     describe '#create_and_validate_storage_manifest' do
       it { is_expected.to respond_to :create_and_validate_storage_manifest }
 
       describe 'calls' do
-        before do
-          actual_size = 0
-          subject.storage_provider.put_container(subject.project_id)
-          subject.chunks.each do |chunk|
-            object = [subject.id, chunk.number].join('/')
-            body = 'this is a chunk'
-            subject.storage_provider.put_object(
-              subject.project_id,
-              object,
-              body
-            )
-            chunk.update_attributes({
-              fingerprint_value: Digest::MD5.hexdigest(body),
-              size: body.length
-            })
-            actual_size = body.length + actual_size
-          end
-          subject.update_attribute(:size, actual_size)
-        end
-
-        after do
-          subject.chunks.each do |chunk|
-            object = [subject.id, chunk.number].join('/')
-            subject.storage_provider.delete_object(subject.project_id, object)
-          end
-        end
-
         describe 'with valid reported size and chunk hashes' do
           it 'should set is_consistent to true, leave error_at and error_message null' do
             subject.create_and_validate_storage_manifest
@@ -240,5 +322,42 @@ RSpec.describe Upload, type: :model do
         end #with reported chunk
       end #calls
     end #complete
+
+    context '#purge_storage' do
+      it { is_expected.to respond_to :purge_storage }
+
+      context 'calls' do
+        before do
+          subject.create_and_validate_storage_manifest
+        end
+        it {
+          resp = HTTParty.head(
+            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
+            headers: subject.storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(200)
+          subject.chunks.each do |chunk|
+            resp = HTTParty.head(
+              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              headers: subject.storage_provider.auth_header
+            )
+            expect(resp.response.code.to_i).to eq(200)
+          end
+          subject.purge_storage
+          resp = HTTParty.head(
+            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
+            headers: subject.storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(404)
+          subject.chunks.each do |chunk|
+            resp = HTTParty.head(
+              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              headers: subject.storage_provider.auth_header
+            )
+            expect(resp.response.code.to_i).to eq(404)
+          end
+        }
+      end #calls
+    end #purge_storage
   end #swift methods
 end

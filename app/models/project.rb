@@ -4,6 +4,7 @@ class Project < ActiveRecord::Base
   include ChildMinder
   include RequestAudited
   include JobTransactionable
+  include UnRestorable
   audited
 
   belongs_to :creator, class_name: "User"
@@ -18,9 +19,11 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
+  validates :is_deleted, immutable: true, if: :is_deleted_was
 
   after_create :set_project_admin
   after_create :initialize_storage
+  after_update :manage_container_index_project
 
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
@@ -42,5 +45,57 @@ class Project < ActiveRecord::Base
       storage_provider: storage_provider,
       project: self
     )
+  end
+
+  def manage_container_index_project
+    if name_changed?
+      if containers.count > 0
+        (1..paginated_containers.total_pages).each do |page|
+          ProjectContainerElasticsearchUpdateJob.perform_later(
+            ProjectContainerElasticsearchUpdateJob.initialize_job(self),
+            self,
+            page
+          )
+        end
+      end
+    end
+  end
+
+  def update_container_elasticsearch_index_project(page)
+    bulk_request = paginated_containers(page).map {|container|
+      { update:
+        {
+          _index: container.__elasticsearch__.index_name,
+          _type: container.__elasticsearch__.document_type,
+          _id: container.__elasticsearch__.id,
+          data: {
+            doc: {
+              project: ProjectPreviewSerializer.new(self).as_json,
+              ancestors: container.ancestors.map{ |a|
+                AncestorSerializer.new(a).as_json
+              }
+            }
+          }
+        }
+      }
+    }
+    bulk_response = Elasticsearch::Model.client.bulk(
+      body: bulk_request
+    )
+    Elasticsearch::Model.client.indices.flush
+    if bulk_response["errors"]
+      logger.info "Page #{page} has errors:"
+      bulk_response["items"].select {|item|
+        item["update"]["status"] >= 400
+      }.map {|i|
+        logger.info "#{i["update"]["_id"]} #{i["update"]["status"]} #{i["update"]["response"]}"
+      }
+    end
+  end
+
+  private
+
+  def paginated_containers(page=1)
+    containers.page(page).per(Rails.application.config.max_children_per_job)
   end
 end

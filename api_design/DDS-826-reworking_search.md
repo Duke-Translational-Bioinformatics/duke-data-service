@@ -2,7 +2,7 @@
 
 ## Deployment View
 
-status: proposed
+status: in development
 
 ###### Deployment Requirements
 
@@ -314,6 +314,8 @@ Notice here that the raw non-analyzed index `tags.label.raw` is used to ensure a
 
 **aggs** & **post_filters** - project.name.raw, tags.label.raw
 
+is_deleted must be indexed for default search to filter out logically deleted objects. The interface will NOT provide the ability to use is_deleted in any queries.
+
 **Removed** many index definitions for fields from DataFile settings index
 which are not part of the new query, filter, agg interface.  Refer to
 [v1.3.8 DataFile](https://github.com/Duke-Translational-Bioinformatics/duke-data-service/blob/v1.3.8/app/models/data_file.rb) for these definitions if they need to be revived.
@@ -325,6 +327,8 @@ which are not part of the new query, filter, agg interface.  Refer to
 **filters** - kind.raw, project.id.raw
 
 **aggs** & **post_filters** - project.name.raw
+
+is_deleted must be indexed for default search to filter out logically deleted objects. The interface will NOT provide the ability to use is_deleted in any queries.
 
 **Removed** many index definitions for fields from Folder settings index
 which are not part of the new query, filter, agg interface.  Refer to
@@ -343,6 +347,7 @@ Serializers must serialize at least the following elements to elasticsearch.
     tags: {
       label: ...
     },
+    is_deleted: ...
     project: {
       name: ...,
       id: ...
@@ -363,6 +368,7 @@ to revive them if necessary.
   {
     name: ...,
     kind: ...,
+    is_deleted: ...
     project: {
       name: ...,
       id: ...

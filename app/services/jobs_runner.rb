@@ -16,7 +16,11 @@ class JobsRunner
       initialize_project_storage: ProjectStorageProviderInitializationJob,
       delete_children: ChildDeletionJob,
       index_documents: ElasticsearchIndexJob,
-      complete_upload: UploadCompletionJob
+      update_project_container_elasticsearch: ProjectContainerElasticsearchUpdateJob,
+      complete_upload: UploadCompletionJob,
+      purge_upload: UploadStorageRemovalJob,
+      purge_children: ChildPurgationJob,
+      restore_children: ChildRestorationJob
     }
   end
 

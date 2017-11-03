@@ -7,6 +7,7 @@ RSpec.describe UploadSerializer, type: :serializer do
     'id' => resource.id,
     'name' => resource.name,
     'content_type' => resource.content_type,
+    'storage_container' => resource.storage_container,
     'size' => resource.size,
     'etag' => resource.etag,
     'status' => {

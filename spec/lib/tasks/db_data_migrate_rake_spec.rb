@@ -152,5 +152,127 @@ describe "db:data:migrate" do
         it_behaves_like 'a consistency migration', :init_upload
       end
     end
+
+    describe 'upload storage_container migration' do
+      context 'when there are uploads with nil storage_provider' do
+        let(:expected_uploads_without_storage_container) { 3 }
+        before do
+          Upload.skip_callback(:create, :before, :set_storage_container)
+          expected_uploads_without_storage_container.times do
+            u = FactoryGirl.create(:upload)
+          end
+        end
+
+        after do
+          Upload.set_callback(:create, :before, :set_storage_container)
+        end
+
+        it {
+          expect(Upload.where(storage_container: nil).count).to eq(expected_uploads_without_storage_container)
+          expect {
+            invoke_task expected_stdout: Regexp.new("#{expected_uploads_without_storage_container} uploads updated")
+          }.to change{
+            Upload.where(storage_container: nil).count
+          }.by(-expected_uploads_without_storage_container)
+        }
+      end
+
+      context 'when there are no uploads with nil storage_provider' do
+        it {
+          expect {
+            invoke_task expected_stdout: Regexp.new("0 uploads updated")
+          }.not_to change{
+            Upload.where(storage_container: nil).count
+          }
+        }
+      end
+    end
+
+    describe 'migrate_storage_provider_chunk_environment' do
+      let(:bad_storage_providers) {
+        StorageProvider.where(
+          chunk_max_size_bytes: nil,
+          chunk_max_number: nil
+        ).count
+      }
+
+      context 'a storage_provider has nil chunk_max_size_bytes, chunk_max_number' do
+        let(:storage_provider) {
+          FactoryGirl.create(:storage_provider, :skip_validation,
+            chunk_max_size_bytes: nil,
+            chunk_max_number: nil
+          )
+        }
+
+        context 'ENV includes SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          include_context 'with env_override'
+          let(:env_override) { {
+            'SWIFT_CHUNK_MAX_NUMBER' => 1,
+            'SWIFT_CHUNK_MAX_SIZE_BYTES' => 5
+          } }
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to be > 0
+            expect{invoke_task}.to change{
+              StorageProvider.where(
+                chunk_max_size_bytes: nil,
+                chunk_max_number: nil
+              ).count
+            }.by(-bad_storage_providers)
+          }
+        end
+
+        context 'ENV does not include SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          before do
+            expect(ENV['SWIFT_CHUNK_MAX_NUMBER']).to be_nil
+            expect(ENV['SWIFT_CHUNK_MAX_SIZE_BYTES']).to be_nil
+          end
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to be > 0
+            invoke_task expected_stderr: /please set ENV\[SWIFT_CHUNK_MAX_NUMBER\] AND ENV\[SWIFT_CHUNK_MAX_SIZE_BYTES\]/
+          }
+        end
+      end
+
+      context 'no storage_providers have nil chunk_max_size_bytes, chunk_max_number' do
+        let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+
+        context 'ENV includes SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          include_context 'with env_override'
+          let(:env_override) { {
+            'SWIFT_CHUNK_MAX_NUMBER' => 1,
+            'SWIFT_CHUNK_MAX_SIZE_BYTES' => 5
+          } }
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to eq 0
+            expect {invoke_task}.not_to change{ StorageProvider.where(
+              chunk_max_size_bytes: nil,
+              chunk_max_number: nil
+            ).count }
+          }
+        end
+
+        context 'ENV does not include SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
+          before do
+            expect(ENV['SWIFT_CHUNK_MAX_NUMBER']).to be_nil
+            expect(ENV['SWIFT_CHUNK_MAX_SIZE_BYTES']).to be_nil
+          end
+
+          it {
+            expect(storage_provider).to be_persisted
+            expect(bad_storage_providers).to eq 0
+            expect {invoke_task}.not_to change{ StorageProvider.where(
+              chunk_max_size_bytes: nil,
+              chunk_max_number: nil
+            ).count }
+          }
+        end
+      end
+    end
   end
 end

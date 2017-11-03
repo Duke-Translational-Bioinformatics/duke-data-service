@@ -104,16 +104,23 @@ module DDS
             error: '400',
             code: "not_provided",
             reason: 'validation failed',
-            suggestion: 'Fix the following invalid fields and resubmit',
-            errors: []
+            suggestion: ''
           }
-          object.errors.messages.each do |field, errors|
+          unless object.errors.messages[:base].empty?
+            error_payload[:reason] = object.errors.messages[:base].join(' ')
+          end
+          field_errors = []
+          object.errors.messages.reject{|field| field == :base }.each do |field, errors|
             errors.each do |message|
-              error_payload[:errors] << {
+              field_errors << {
                 field: field,
                 message: message
               }
             end
+          end
+          unless field_errors.empty?
+            error_payload[:errors] = field_errors
+            error_payload[:suggestion] = 'Fix the following invalid fields and resubmit'
           end
           error!(error_payload, 400)
         end
@@ -173,6 +180,10 @@ module DDS
 
         def check_integrity!(upload)
           raise IntegrityException.new(upload.error_message) if upload.has_integrity_exception?
+        end
+
+        def default_serializer_options
+          { except: params[:exclude_response_fields]&.collect(&:to_sym) }
         end
       end
 

@@ -4,9 +4,15 @@ RSpec.describe FolderFilesResponse do
   let(:indexed_data_file) {
     FactoryGirl.create(:data_file, name: "foo bar")
   }
+  let(:deleted_data_file) {
+    FactoryGirl.create(:data_file, name: "foo bar", is_deleted: true)
+  }
   let(:tag) { FactoryGirl.create(:tag, taggable: indexed_data_file) }
   let(:indexed_folder) {
     FactoryGirl.create(:folder, name: "foo bar")
+  }
+  let(:deleted_folder) {
+    FactoryGirl.create(:folder, name: "foo bar", is_deleted: true)
   }
   let(:all_projects) {
     {'project.id' => [
@@ -169,13 +175,16 @@ RSpec.describe FolderFilesResponse do
             bool: {
               must: [
                 { terms: { "project.id.raw" => all_projects['project.id'] } }
-              ]
+              ],
+              must_not: {
+                term: { "is_deleted" => {:value => "true"} }
+              }
             }
           }
         }
       }
     }}
-    include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+    include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
     before do
       subject.filter([all_projects])
@@ -188,6 +197,7 @@ RSpec.describe FolderFilesResponse do
         expect(response.results).not_to be_empty
         response.results.each do |result|
           expect(all_projects['project.id']).to include result[:project][:id]
+          expect(result[:is_deleted]).to eq false
         end
       end
     end
@@ -291,7 +301,10 @@ RSpec.describe FolderFilesResponse do
                         must: [
                           { terms: { "project.id.raw" => all_projects['project.id'] } },
                           { terms: { "kind.raw" => [supported_kind] }  }
-                        ]
+                        ],
+                        must_not: {
+                          term: { "is_deleted" => {:value => "true"} }
+                        }
                       }
                     }
                   }
@@ -328,7 +341,10 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               },
               query: {
@@ -340,7 +356,7 @@ RSpec.describe FolderFilesResponse do
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         it {
           is_expected.to receive(:search_definition).with(expected_query)
@@ -359,7 +375,10 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               },
               query: {
@@ -371,7 +390,7 @@ RSpec.describe FolderFilesResponse do
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         it {
           is_expected.to receive(:search_definition).with(expected_query)
@@ -396,13 +415,16 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               }
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         it {
           is_expected.to receive(:search_definition).with(expected_query)
@@ -458,7 +480,10 @@ RSpec.describe FolderFilesResponse do
                     bool: {
                       must: [
                         { terms: { "project.id.raw" => all_projects['project.id'] } }
-                      ]
+                      ],
+                      must_not: {
+                        term: { "is_deleted" => {:value => "true"} }
+                      }
                     }
                   }
                 }
@@ -553,7 +578,10 @@ RSpec.describe FolderFilesResponse do
                     bool: {
                       must: [
                         { terms: { "project.id.raw" => all_projects['project.id'] } }
-                      ]
+                      ],
+                      must_not: {
+                        term: { "is_deleted" => {:value => "true"} }
+                      }
                     }
                   }
                 }
@@ -618,7 +646,10 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               }
             }
@@ -632,7 +663,7 @@ RSpec.describe FolderFilesResponse do
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         before do
           subject.filter([all_projects])
@@ -664,7 +695,10 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               }
             }
@@ -678,7 +712,7 @@ RSpec.describe FolderFilesResponse do
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         before do
           subject.filter([all_projects])
@@ -725,7 +759,10 @@ RSpec.describe FolderFilesResponse do
                 bool: {
                   must: [
                     { terms: { "project.id.raw" => all_projects['project.id'] } }
-                  ]
+                  ],
+                  must_not: {
+                    term: { "is_deleted" => {:value => "true"} }
+                  }
                 }
               }
             }
@@ -739,7 +776,7 @@ RSpec.describe FolderFilesResponse do
             }
           }
         }}
-        include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
+        include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
 
         before do
           subject.filter([all_projects])
@@ -896,7 +933,10 @@ RSpec.describe FolderFilesResponse do
                   bool: {
                     must: [
                       { terms: { "project.id.raw" => all_projects['project.id'] } }
-                    ]
+                    ],
+                    must_not: {
+                      term: { "is_deleted" => {:value => "true"} }
+                    }
                   }
                 }
               }
@@ -971,7 +1011,10 @@ RSpec.describe FolderFilesResponse do
                 must: [
                   { terms: { "project.id.raw" => all_projects['project.id'] } },
                   { terms: { "kind.raw" => [kind] }  }
-                ]
+                ],
+                must_not: {
+                  term: { "is_deleted" => {:value => "true"} }
+                }
               }
             },
             query: {
@@ -1006,8 +1049,7 @@ RSpec.describe FolderFilesResponse do
         }
       }
     }
-    include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], [:indexed_data_file, :indexed_folder]
-
+    include_context 'elasticsearch prep', [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder], [:indexed_data_file, :deleted_data_file, :indexed_folder, :deleted_folder]
     it {
       subject.query query_string
       subject.filter filters

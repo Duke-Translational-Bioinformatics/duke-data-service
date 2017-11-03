@@ -2,16 +2,14 @@ module ChildMinder
   extend ActiveSupport::Concern
 
   included do
-    around_update :manage_children
+    after_update :manage_children
   end
 
   def manage_children
-    newly_deleted = is_deleted_changed? && is_deleted?
-    yield
-    if has_children? && newly_deleted
+    if has_children? && @child_job
       (1..paginated_children.total_pages).each do |page|
-        ChildDeletionJob.perform_later(
-          ChildDeletionJob.initialize_job(self),
+        @child_job.perform_later(
+          @child_job.initialize_job(self),
           self,
           page
         )
@@ -21,13 +19,6 @@ module ChildMinder
 
   def has_children?
     children.count > 0
-  end
-
-  def delete_children(page)
-    paginated_children(page).each do |child|
-      child.current_transaction = current_transaction if child.class.include? ChildMinder
-      child.update(is_deleted: true)
-    end
   end
 
   private

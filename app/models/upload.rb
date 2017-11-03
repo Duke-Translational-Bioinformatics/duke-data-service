@@ -10,12 +10,21 @@ class Upload < ActiveRecord::Base
   belongs_to :creator, class_name: 'User'
   has_many :fingerprints
 
+  before_create :set_storage_container
+
   accepts_nested_attributes_for :fingerprints
 
   validates :project_id, presence: true
+  validates :storage_container, immutable: true
   validates :name, presence: true
-  validates :size, presence: true
   validates :storage_provider_id, presence: true
+  validates :size, presence: true
+  validates :size, numericality:  {
+    less_than: :max_size_bytes,
+    message: ->(object, data) do
+      "File size is currently not supported - maximum size is #{object.max_size_bytes}"
+    end
+  }, if: :storage_provider
   validates :creator_id, presence: true
   validates :completed_at, immutable: true, if: :completed_at_was
   validates :completed_at, immutable: true, if: :error_at_was
@@ -29,7 +38,7 @@ class Upload < ActiveRecord::Base
   end
 
   def sub_path
-    [project_id, id].join('/')
+    [storage_container, id].join('/')
   end
 
   def http_verb
@@ -74,8 +83,8 @@ class Upload < ActiveRecord::Base
 
   def create_and_validate_storage_manifest
     begin
-      response = storage_provider.put_object_manifest(project_id, id, manifest, content_type, name)
-      meta = storage_provider.get_object_metadata(project_id, id)
+      response = storage_provider.put_object_manifest(storage_container, id, manifest, content_type, name)
+      meta = storage_provider.get_object_metadata(storage_container, id)
       unless meta["content-length"].to_i == size
         raise IntegrityException, "reported size does not match size computed by StorageProvider"
       end
@@ -91,6 +100,26 @@ class Upload < ActiveRecord::Base
     rescue IntegrityException => e
       integrity_exception(e.message)
     end
+  end
+
+  def set_storage_container
+    self.storage_container = project_id
+    storage_container
+  end
+
+  def purge_storage
+    chunks.each do |chunk|
+      chunk.purge_storage
+    end
+    storage_provider.delete_object_manifest(storage_container, id)
+  end
+
+  def max_size_bytes
+    storage_provider.chunk_max_number * storage_provider.chunk_max_size_bytes
+  end
+
+  def minimum_chunk_size
+    (size.to_f / storage_provider.chunk_max_number).ceil
   end
 
   private

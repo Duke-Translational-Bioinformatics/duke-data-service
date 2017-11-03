@@ -14,6 +14,13 @@ namespace :workers do
     end
   end
 
+  namespace :update_project_container_elasticsearch do
+    desc 'run a ProjectContainerElasticsearchUpdateJob'
+    task run: :environment do
+      JobsRunner.new(ProjectContainerElasticsearchUpdateJob).run
+    end
+  end
+
   namespace :delete_children do
     desc 'run a ChildDeletionJob'
     task run: :environment do
@@ -32,6 +39,27 @@ namespace :workers do
     desc 'run an UploadCompletionJob'
     task run: :environment do
       JobsRunner.new(UploadCompletionJob).run
+    end
+  end
+
+  namespace :purge_upload do
+    desc 'run an UploadStorageRemovalJob'
+    task run: :environment do
+      JobsRunner.new(UploadStorageRemovalJob).run
+    end
+  end
+
+  namespace :purge_children do
+    desc 'run an ChildPurgationJob'
+    task run: :environment do
+      JobsRunner.new(ChildPurgationJob).run
+    end
+  end
+
+  namespace :restore_children do
+    desc 'run an ChildRestorationJob'
+    task run: :environment do
+      JobsRunner.new(ChildRestorationJob).run
     end
   end
 

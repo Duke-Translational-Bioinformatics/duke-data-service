@@ -193,7 +193,11 @@ describe DDS::V1::PropertiesAPI do
       context 'with associated meta_property' do
         include_context 'elasticsearch prep', [:resource], []
         before { FactoryGirl.create(:meta_property, property: resource) }
-        it_behaves_like 'a validated resource'
+        it_behaves_like 'a validated resource' do
+          let(:expected_reason) { 'The property cannot be deleted if it has been associated to one or more DDS objects.' }
+          let(:expected_suggestion) { '' }
+          let(:expects_errors) { false }
+        end
       end
     end
   end

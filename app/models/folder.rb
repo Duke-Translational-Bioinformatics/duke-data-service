@@ -37,6 +37,7 @@ class Folder < Container
       }
 
       indexes :name
+      indexes :is_deleted, type: "boolean"
 
       indexes :project do
         indexes :id, type: "string", fields: {
