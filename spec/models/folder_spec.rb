@@ -4,7 +4,9 @@ RSpec.describe Folder, type: :model do
   subject { FactoryGirl.create(:folder, :with_parent) }
   let(:immediate_child_folder) { FactoryGirl.create(:folder, parent: subject) }
   let(:immediate_child_file) { FactoryGirl.create(:data_file, parent: subject) }
-  let(:invalid_immediate_child_file) { FactoryGirl.create(:data_file, :invalid, parent: subject) }
+  let(:folder_children) {[ immediate_child_file, immediate_child_folder ]}
+  let(:folder_child_minder_children) { folder_children }
+
   let(:project) { subject.project }
   let(:other_project) { FactoryGirl.create(:project) }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
@@ -93,9 +95,6 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  it_behaves_like 'a Restorable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
-  it_behaves_like 'a Purgable ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
-
   describe '#parent_id=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
@@ -179,6 +178,21 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "string"
         expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq "not_analyzed"
       }
+    end
+  end
+
+  it_behaves_like 'a Restorable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
+    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    before do
+      expect(child_folder_file).to be_persisted
+      child_folder_file.update_column(:is_deleted, true)
+    end
+  end
+  it_behaves_like 'a Purgable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
+    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    before do
+      expect(child_folder_file).to be_persisted
+      child_folder_file.update_column(:is_deleted, true)
     end
   end
 end
