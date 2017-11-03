@@ -6,6 +6,8 @@ shared_context 'Graphed::Base' do
     it { is_expected.to respond_to :graph_model_object }
     it { expect{subject.graph_model_object}.not_to raise_error }
   end
+
+  it_behaves_like 'a job_transactionable model'
 end
 # These are Graphed::Node models
 shared_examples 'a graphed node' do |logically_deleted: false|
@@ -52,7 +54,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
         .with(subject)
         .and_return(job_transaction)
       expect(GraphPersistenceJob).to receive(:perform_later)
-        .with(job_transaction, subject, action: "create").and_call_original
+        .with(job_transaction, graph_node_name, action: "create", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
       expect(subject.create_graph_node).to be_truthy
     end
     it 'enqueues a GraphPersistenceJob' do
@@ -72,13 +74,35 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   end
 
   describe '#delete_graph_node' do
-    let(:a_graph_node) { double("graph_node") }
+    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
     it { is_expected.to respond_to :delete_graph_node }
-    it 'calls graph_node.destroy' do
-      allow(a_graph_node).to receive(:destroy)
-      expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
-      expect(a_graph_node).to receive(:destroy).and_return(true)
+
+    it 'calls GraphPersistenceJob.perform_later with arguments' do
+      expect(GraphPersistenceJob).to receive(:initialize_job)
+        .with(subject)
+        .and_return(job_transaction)
+      expect(GraphPersistenceJob).to receive(:perform_later)
+        .with(job_transaction, graph_node_name, action: "delete", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
       expect(subject.delete_graph_node).to be_truthy
+    end
+
+    it 'enqueues a GraphPersistenceJob' do
+      expect(subject).to be_persisted
+      expect {
+        expect(subject.delete_graph_node).to be_truthy
+      }.to have_enqueued_job(GraphPersistenceJob)
+    end
+
+    context 'with inline queue adapter' do
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+      let(:a_graph_node) { double("graph_node") }
+      it 'calls graph_node.destroy' do
+        allow(a_graph_node).to receive(:destroy)
+        expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
+        expect(a_graph_node).to receive(:destroy).and_return(true)
+        expect(subject.delete_graph_node).to be_truthy
+      end
     end
   end
 

@@ -27,11 +27,11 @@ module Graphed
     end
 
     def create_graph_node
-      #graph_model_class.create(model_id: id, model_kind: kind)
       GraphPersistenceJob.perform_later(
         GraphPersistenceJob.initialize_job(self),
-        self,
-        action: 'create'
+        graph_model_class.name,
+        action: 'create',
+        params: {model_id: id, model_kind: kind}
       )
     end
 
@@ -48,10 +48,12 @@ module Graphed
     end
 
     def delete_graph_node
-      graph_node =  self.graph_model_object
-      if graph_node
-        graph_node.destroy
-      end
+      GraphPersistenceJob.perform_later(
+        GraphPersistenceJob.initialize_job(self),
+        graph_model_class.name,
+        action: 'delete',
+        params: {model_id: id, model_kind: kind}
+      )
     end
 
     def logically_delete_graph_node

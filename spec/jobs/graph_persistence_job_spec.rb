@@ -20,8 +20,8 @@ RSpec.describe GraphPersistenceJob, type: :job do
     include_context 'tracking job', :job_transaction
     let(:create_params) { {foo: 'bar'} }
     it 'calls .create on graphed_class' do
-      expect(agent).to receive(:graph_create).and_return(true)
-      described_class.perform_now(job_transaction, agent, action: "create", params: create_params)
+      expect(graphed_class).to receive(:create).with(create_params).and_return(true)
+      described_class.perform_now(job_transaction, graphed_class.name, action: "create", params: create_params)
     end
   end
 
@@ -29,5 +29,13 @@ RSpec.describe GraphPersistenceJob, type: :job do
   end
 
   context 'action is "delete"' do
+    include_context 'tracking job', :job_transaction
+    let(:graphed_model_object) { double('graph_model') }
+    let(:delete_params) { {foo: 'bar'} }
+    it 'calls .delete on graphed_class' do
+      expect(graphed_class).to receive(:find_by).with(delete_params).and_return(graphed_model_object)
+      expect(graphed_model_object).to receive(:destroy).and_return(true)
+      described_class.perform_now(job_transaction, graphed_class.name, action: "delete", params: delete_params)
+    end
   end
 end
