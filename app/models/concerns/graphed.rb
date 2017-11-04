@@ -142,5 +142,23 @@ module Graphed
       scope ||= KindnessFactory.by_kind(model_kind)
       scope.where(id: model_id).take
     end
-  end
-end #Graphed::Model
+  end #Graphed::Model
+
+  module NodeModel
+    extend ActiveSupport::Concern
+
+    included do
+      include Neo4j::ActiveNode
+      include Graphed::Model
+    end
+  end #Graphed::NodeModel
+
+  module RelModel
+    extend ActiveSupport::Concern
+
+    included do
+      include Neo4j::ActiveRel
+      include Graphed::Model
+    end
+  end #Graphed::RelModel
+end
