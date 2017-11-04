@@ -274,6 +274,8 @@ end #a graphed relation
 shared_examples 'a graphed model' do
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   it { expect(described_class).to include(Graphed::Model) }
+  it { expect(described_class).to respond_to(:find_by_graph_hash) }
+  it { expect(described_class).to respond_to(:create_with_graph_hash) }
   it { is_expected.to respond_to('graphed_model') }
 
   context 'graphed_model'do

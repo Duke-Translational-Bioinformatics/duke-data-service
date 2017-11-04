@@ -26,17 +26,21 @@ module Graphed
       after_destroy :delete_graph_node
     end
 
+    def graph_hash
+      {model_id: id, model_kind: kind}
+    end
+
     def create_graph_node
       GraphPersistenceJob.perform_later(
         GraphPersistenceJob.initialize_job(self),
         graph_model_class.name,
         action: 'create',
-        params: {model_id: id, model_kind: kind}
+        params: graph_hash
       )
     end
 
     def graph_node
-      graph_model_class.find_by(model_id: id, model_kind: kind)
+      graph_model_class.find_by(graph_hash)
     end
 
     def graph_model_object
@@ -48,7 +52,7 @@ module Graphed
         GraphPersistenceJob.initialize_job(self),
         graph_model_class.name,
         action: 'delete',
-        params: {model_id: id, model_kind: kind}
+        params: graph_hash
       )
     end
 
@@ -100,6 +104,15 @@ module Graphed
       graph_to_model.graph_node
     end
 
+    def graph_hash
+      {
+        model_id: id,
+        model_kind: kind,
+        from_node: graph_from_model.graph_hash,
+        to_node: graph_to_model.graph_hash
+      }
+    end
+
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
     def create_graph_relation
@@ -112,16 +125,7 @@ module Graphed
     end
 
     def graph_relation
-      graph_from_node.query_as(:from)
-        .match("(from)-[r:#{graph_model_name}]->(to)")
-        .where('r.model_id = {r_id}')
-        .where('r.model_kind = {r_kind}')
-        .where('to.model_id = {m_id}')
-        .params(
-          r_id: id,
-          r_kind: kind,
-          m_id: graph_to_model.id
-        ).pluck(:r).first
+      graph_model_class.find_by_graph_hash(graph_hash)
     end
 
     def graph_model_object
@@ -151,6 +155,16 @@ module Graphed
       include Neo4j::ActiveNode
       include Graphed::Model
     end
+
+    class_methods do
+      def find_by_graph_hash(graph_hash)
+        find_by(graph_hash)
+      end
+
+      def create_with_graph_hash(graph_hash)
+        create(graph_hash)
+      end
+    end
   end #Graphed::NodeModel
 
   module RelModel
@@ -159,6 +173,40 @@ module Graphed
     included do
       include Neo4j::ActiveRel
       include Graphed::Model
+    end
+
+    class_methods do
+      def find_from_node(graph_hash)
+        from_class.constantize.find_by(graph_hash[:from_node])
+      end
+
+      def find_to_node(graph_hash)
+        to_class.constantize.find_by(graph_hash[:to_node])
+      end
+
+      def find_by_graph_hash(graph_hash)
+        from_node = find_from_node(graph_hash)
+        to_node = find_to_node(graph_hash)
+        from_node.query_as(:from)
+          .match("(from)-[r:#{type}]->(to)")
+          .where('r.model_id = {r_id}')
+          .where('r.model_kind = {r_kind}')
+          .where('to.model_id = {m_id}')
+          .params(
+            r_id: graph_hash[:model_id],
+            r_kind: graph_hash[:model_kind],
+            m_id: to_node.model_id
+          ).pluck(:r).first
+      end
+
+      def create_with_graph_hash(graph_hash)
+        create(
+          model_id: graph_hash[:model_id],
+          model_kind: graph_hash[:model_kind],
+          from_node: find_from_node(graph_hash),
+          to_node: find_to_node(graph_hash)
+        )
+      end
     end
   end #Graphed::RelModel
 end

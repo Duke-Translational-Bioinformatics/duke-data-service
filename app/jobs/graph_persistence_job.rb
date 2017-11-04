@@ -7,9 +7,9 @@ class GraphPersistenceJob < ApplicationJob
     graph_model_class = graph_model_class_name.constantize
 
     if action == 'create'
-      graph_model_class.create(params)
+      graph_model_class.create_with_graph_hash(params)
     elsif action == 'delete'
-      graph_model_object = graph_model_class.find_by(params)
+      graph_model_object = graph_model_class.find_by_graph_hash(params)
       graph_model_object.destroy
     end
 
