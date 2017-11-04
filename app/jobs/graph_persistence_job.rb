@@ -1,15 +1,15 @@
 class GraphPersistenceJob < ApplicationJob
   queue_as :graph_persistence
 
-  def perform(job_transaction, graph_model_class_name, action:, params: {})
+  def perform(job_transaction, graph_model_class_name, action:, graph_hash:)
     self.class.start_job job_transaction
 
     graph_model_class = graph_model_class_name.constantize
 
     if action == 'create'
-      graph_model_class.create_with_graph_hash(params)
+      graph_model_class.create_with_graph_hash(graph_hash)
     elsif action == 'delete'
-      graph_model_object = graph_model_class.find_by_graph_hash(params)
+      graph_model_object = graph_model_class.find_by_graph_hash(graph_hash)
       graph_model_object.destroy
     end
 

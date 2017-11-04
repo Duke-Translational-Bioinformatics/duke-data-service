@@ -35,7 +35,7 @@ module Graphed
         GraphPersistenceJob.initialize_job(self),
         graph_model_class.name,
         action: 'create',
-        params: graph_hash
+        graph_hash: graph_hash
       )
     end
 
@@ -52,7 +52,7 @@ module Graphed
         GraphPersistenceJob.initialize_job(self),
         graph_model_class.name,
         action: 'delete',
-        params: graph_hash
+        graph_hash: graph_hash
       )
     end
 

@@ -45,7 +45,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
         .with(subject)
         .and_return(job_transaction)
       expect(GraphPersistenceJob).to receive(:perform_later)
-        .with(job_transaction, graph_node_name, action: "create", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
+        .with(job_transaction, graph_node_name, action: "create", graph_hash: {model_id: subject.id, model_kind: subject.kind}).and_call_original
       expect(subject.create_graph_node).to be_truthy
     end
     it 'enqueues a GraphPersistenceJob' do
@@ -73,7 +73,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
         .with(subject)
         .and_return(job_transaction)
       expect(GraphPersistenceJob).to receive(:perform_later)
-        .with(job_transaction, graph_node_name, action: "delete", params: {model_id: subject.id, model_kind: subject.kind}).and_call_original
+        .with(job_transaction, graph_node_name, action: "delete", graph_hash: {model_id: subject.id, model_kind: subject.kind}).and_call_original
       expect(subject.delete_graph_node).to be_truthy
     end
 
