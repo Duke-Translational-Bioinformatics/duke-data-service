@@ -3,6 +3,7 @@ shared_context 'Graphed::Base' do
   it { expect(described_class).to include(JobTransactionable) }
 
   describe '#graph_model_object' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     it { is_expected.to respond_to :graph_model_object }
     it { expect{subject.graph_model_object}.not_to raise_error }
   end
@@ -154,7 +155,6 @@ end # a graphed node
 # These are Graphed::Relation objects, which are all ProvRelations
 shared_examples 'a graphed relation' do
   include_context 'Graphed::Base'
-  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   # these MUST be provided in the model spec
   #let(:rel_type) { 'SomeAssociation' }
@@ -163,16 +163,51 @@ shared_examples 'a graphed relation' do
   let(:from_node) { from_model.graph_node }
   let(:to_node) { to_model.graph_node }
   let(:graphed_relation) { from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
-  let(:graph_model_class) { "Graph::#{rel_type}".constantize }
+  let(:graph_relation_name) { "Graph::#{rel_type}" }
+  let(:graph_model_class) { graph_relation_name.constantize }
 
   it { expect(described_class).to include(Graphed::Relation) }
   it { is_expected.to respond_to :graph_relation }
-  it { is_expected.to respond_to :create_graph_relation }
   it { is_expected.to respond_to :delete_graph_relation }
   it { is_expected.to respond_to :manage_graph_relation }
   it { is_expected.to respond_to :delete_graph_relation }
   it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
   it { is_expected.to callback(:manage_graph_relation).around(:update) }
+
+  describe '#create_graph_relation' do
+    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
+    let(:graph_hash) {
+      {
+        model_id: subject.id,
+        model_kind: subject.kind,
+        from_node: {model_id: from_model.id, model_kind: from_model.kind},
+        to_node: {model_id: to_model.id, model_kind: to_model.kind}
+      }
+    }
+    it { is_expected.to respond_to :create_graph_relation }
+    it 'calls GraphPersistenceJob.perform_later with arguments' do
+      expect(GraphPersistenceJob).to receive(:initialize_job)
+        .with(subject)
+        .and_return(job_transaction)
+      expect(GraphPersistenceJob).to receive(:perform_later)
+        .with(job_transaction, graph_relation_name, action: "create", graph_hash: graph_hash).and_call_original
+      expect(subject.create_graph_relation).to be_truthy
+    end
+    it 'enqueues a GraphPersistenceJob' do
+      expect(subject).to be_persisted
+      expect {
+        expect(subject.create_graph_relation).to be_truthy
+      }.to have_enqueued_job(GraphPersistenceJob)
+    end
+    context 'with inline queue adapter' do
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+      it 'calls graph_model_class.create' do
+        expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind, from_node: from_node, to_node: to_node).and_return(true)
+        expect(subject.create_graph_relation).to be_truthy
+      end
+    end
+  end
 
   describe '#graph_model_name' do
     it { is_expected.to respond_to :graph_model_name }
@@ -204,23 +239,29 @@ shared_examples 'a graphed relation' do
     it { expect(subject.graph_to_node).to eq to_node }
   end
 
-  it 'should auto_create' do
-    expect(subject).to be
-    expect(graphed_relation).to be
-  end
-  it 'should return the graphed relation of rel_type between from_model.graph_node and to_model.graph_node' do
-    expect(subject).to be
-    expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
-    expect(subject.graph_relation).to be
-    expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
-    graphed_relation = subject.graph_relation
-    expect(graphed_relation.model_id).to eq(subject.id)
-    expect(graphed_relation.model_kind).to eq(subject.kind)
-    expect(graphed_relation.from_node.model_id).to eq(from_model.id)
-    expect(graphed_relation.to_node.model_id).to eq(to_model.id)
+  context 'with inline queue adapter' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+    it 'should auto_create' do
+      expect(subject).to be
+      expect(graphed_relation).to be
+    end
+    it 'should return the graphed relation of rel_type between from_model.graph_node and to_model.graph_node' do
+      expect(subject).to be
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+      expect(subject.graph_relation).to be
+      expect(from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).count).to eq(1)
+      graphed_relation = subject.graph_relation
+      expect(graphed_relation.model_id).to eq(subject.id)
+      expect(graphed_relation.model_kind).to eq(subject.kind)
+      expect(graphed_relation.from_node.model_id).to eq(from_model.id)
+      expect(graphed_relation.to_node.model_id).to eq(to_model.id)
+    end
   end
 
   context 'when model is deleted' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
     before do
       expect(subject).to be
       expect(subject.graph_relation).to be

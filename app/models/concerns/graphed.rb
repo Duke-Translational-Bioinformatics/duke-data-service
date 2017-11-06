@@ -116,11 +116,11 @@ module Graphed
     #These are ProvRelations that get turned into Graph::* Neo4j::ActiveRel relationships
     #between Graph::* Neo4j::ActiveNode objects
     def create_graph_relation
-      graph_model_class.create(
-        model_id: id,
-        model_kind: kind,
-        from_node: graph_from_node,
-        to_node: graph_to_node
+      GraphPersistenceJob.perform_later(
+        GraphPersistenceJob.initialize_job(self),
+        graph_model_class.name,
+        action: 'create',
+        graph_hash: graph_hash
       )
     end
 
