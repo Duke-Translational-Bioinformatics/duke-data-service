@@ -106,6 +106,9 @@ RSpec.describe ApplicationJob, type: :job do
         def self.should_be_registered_worker?
           false
         end
+        def self.is_fake_job_spec_job?
+          true
+        end
       end)
     }
     it { expect(child_class.transaction_key).to eq(child_class.queue_name) }
