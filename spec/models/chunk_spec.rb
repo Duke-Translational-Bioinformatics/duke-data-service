@@ -93,7 +93,7 @@ RSpec.describe Chunk, type: :model do
 
     context 'called' do
       subject {
-        FactoryGirl.create(:chunk, :swift, size: chunk_data.length)
+        FactoryGirl.create(:chunk, :swift, size: chunk_data.length, number: 1)
       }
       let(:storage_provider) { subject.storage_provider }
       let(:chunk_data) { 'some random chunk' }
