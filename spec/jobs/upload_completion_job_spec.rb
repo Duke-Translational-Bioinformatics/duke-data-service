@@ -10,6 +10,7 @@ RSpec.describe UploadCompletionJob, type: :job do
     expect(upload).to be_persisted
   end
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
   it { is_expected.to be_an ApplicationJob }
   it { expect(prefix).not_to be_nil }
   it { expect(prefix_delimiter).not_to be_nil }

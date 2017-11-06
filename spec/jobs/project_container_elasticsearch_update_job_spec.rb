@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ProjectContainerElasticsearchUpdateJob, type: :job do
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   shared_examples 'a ProjectContainerElasticsearchUpdateJob' do |
       parent_sym,
       child_folder_sym,
@@ -43,14 +45,15 @@ RSpec.describe ProjectContainerElasticsearchUpdateJob, type: :job do
     end
   end
 
-  before do
-    expect(folder_child).to be_persisted
-  end
   context 'project' do
     let(:project) { FactoryGirl.create(:project) }
     let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
     let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: project) }
     let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
+
+    before do
+      expect(folder_child).to be_persisted
+    end
 
     it_behaves_like 'a ProjectContainerElasticsearchUpdateJob', :project, :root_folder, :root_file
   end

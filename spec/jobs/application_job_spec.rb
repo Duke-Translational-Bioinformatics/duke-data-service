@@ -30,6 +30,10 @@ RSpec.describe ApplicationJob, type: :job do
   it { expect(ActiveJob::Base.queue_adapter).to be_a(ActiveJob::QueueAdapters::SneakersAdapter) }
 
   it { expect(described_class).to respond_to(:create_bindings) }
+  it {
+    expect(described_class).to respond_to(:should_be_registered_worker?)
+    expect(described_class.should_be_registered_worker?).to be_truthy
+  }
 
   it_behaves_like 'a JobTracking resource'
 
@@ -98,6 +102,9 @@ RSpec.describe ApplicationJob, type: :job do
         end
         def self.run_count
           @run_count
+        end
+        def self.should_be_registered_worker?
+          false
         end
       end)
     }

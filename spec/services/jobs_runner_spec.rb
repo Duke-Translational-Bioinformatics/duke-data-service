@@ -18,7 +18,7 @@ RSpec.describe JobsRunner do
     restore_children: ChildRestorationJob
   } }
   let(:registered_worker_classes) { workers_registry_hash.values }
-  let(:expected_jobs) { ApplicationJob.descendants.sort { |x,y| x.to_s <=> y.to_s } }
+  let(:expected_jobs) { ApplicationJob.descendants.select{|klass| klass.should_be_registered_worker? }.sort { |x,y| x.to_s <=> y.to_s } }
 
   it {
     expect(registered_worker_classes.sort { |x,y| x.to_s <=> y.to_s } ).to include(*expected_jobs)
