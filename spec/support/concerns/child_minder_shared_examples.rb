@@ -30,6 +30,7 @@ shared_context 'a ChildMinder' do |resource_factory, expected_children_sym|
 
     context 'with children' do
       before do
+        expect(expected_children).not_to be_empty
         expected_children.each do |child|
           expect(child).to be_persisted
           expect(child.is_deleted?).to be_falsey

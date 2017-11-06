@@ -77,6 +77,7 @@ shared_examples 'a Purgable ChildMinder' do |resource_factory,
         before do
           @old_max = Rails.application.config.max_children_per_job
           Rails.application.config.max_children_per_job = 1
+          expect(expected_children).not_to be_empty
           expected_children.each do |expected_child|
             expect(expected_child).to be_persisted
             expected_child.update_column(:is_deleted, true)
@@ -142,6 +143,7 @@ shared_examples 'a Purgable ChildMinder' do |resource_factory,
 
     before do
       subject.update_columns(is_deleted: true, is_purged: true)
+      expect(expected_children).not_to be_empty
       expected_children.each do |expected_child|
         expect(expected_child).to be_persisted
       end
