@@ -165,25 +165,23 @@ shared_examples 'a graphed relation' do
   let(:graphed_relation) { from_node.query_as(:from).match("(from)-[r:#{rel_type}]->(to)").where('to.model_id = {m_id}').params(m_id: to_model.id).pluck(:r).first }
   let(:graph_relation_name) { "Graph::#{rel_type}" }
   let(:graph_model_class) { graph_relation_name.constantize }
+  let(:graph_hash) {
+    {
+      model_id: subject.id,
+      model_kind: subject.kind,
+      from_node: {model_id: from_model.id, model_kind: from_model.kind},
+      to_node: {model_id: to_model.id, model_kind: to_model.kind}
+    }
+  }
 
   it { expect(described_class).to include(Graphed::Relation) }
   it { is_expected.to respond_to :graph_relation }
-  it { is_expected.to respond_to :delete_graph_relation }
   it { is_expected.to respond_to :manage_graph_relation }
-  it { is_expected.to respond_to :delete_graph_relation }
   it { is_expected.to callback(:delete_graph_relation).after(:destroy) }
   it { is_expected.to callback(:manage_graph_relation).around(:update) }
 
   describe '#create_graph_relation' do
     let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
-    let(:graph_hash) {
-      {
-        model_id: subject.id,
-        model_kind: subject.kind,
-        from_node: {model_id: from_model.id, model_kind: from_model.kind},
-        to_node: {model_id: to_model.id, model_kind: to_model.kind}
-      }
-    }
     it { is_expected.to respond_to :create_graph_relation }
     it 'calls GraphPersistenceJob.perform_later with arguments' do
       expect(GraphPersistenceJob).to receive(:initialize_job)
@@ -205,6 +203,39 @@ shared_examples 'a graphed relation' do
       it 'calls graph_model_class.create' do
         expect(graph_model_class).to receive(:create).with(model_id: subject.id, model_kind: subject.kind, from_node: from_node, to_node: to_node).and_return(true)
         expect(subject.create_graph_relation).to be_truthy
+      end
+    end
+  end
+
+  describe '#delete_graph_relation' do
+    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
+    it { is_expected.to respond_to :delete_graph_relation }
+
+    it 'calls GraphPersistenceJob.perform_later with arguments' do
+      expect(GraphPersistenceJob).to receive(:initialize_job)
+        .with(subject)
+        .and_return(job_transaction)
+      expect(GraphPersistenceJob).to receive(:perform_later)
+        .with(job_transaction, graph_relation_name, action: "delete", graph_hash: graph_hash).and_call_original
+      expect(subject.delete_graph_relation).to be_truthy
+    end
+
+    it 'enqueues a GraphPersistenceJob' do
+      expect(subject).to be_persisted
+      expect {
+        expect(subject.delete_graph_relation).to be_truthy
+      }.to have_enqueued_job(GraphPersistenceJob)
+    end
+
+    context 'with inline queue adapter' do
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+      let(:a_graph_relation) { double("graph_relation") }
+      it 'calls graph_relation.destroy' do
+        allow(a_graph_relation).to receive(:destroy)
+        expect(graph_model_class).to receive(:find_by_graph_hash).with(graph_hash).and_return(a_graph_relation)
+        expect(a_graph_relation).to receive(:destroy).and_return(true)
+        expect(subject.delete_graph_relation).to be_truthy
       end
     end
   end

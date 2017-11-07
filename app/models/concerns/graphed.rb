@@ -133,10 +133,12 @@ module Graphed
     end
 
     def delete_graph_relation
-      this_relation = self.graph_model_object
-      if this_relation
-        this_relation.destroy
-      end
+      GraphPersistenceJob.perform_later(
+        GraphPersistenceJob.initialize_job(self),
+        graph_model_class.name,
+        action: 'delete',
+        graph_hash: graph_hash
+      )
     end
   end #Graphed::Relation
 
