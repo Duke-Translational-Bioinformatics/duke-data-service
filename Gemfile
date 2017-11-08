@@ -14,7 +14,7 @@ gem 'elasticsearch-model', '~> 2.0.0'
 gem 'elasticsearch-rails', '~> 2.0.0'
 
 # Use sneakers(RabbitMQ) for background jobs
-gem 'sneakers'
+gem 'sneakers', '~> 2.5.0'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
