@@ -103,6 +103,10 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     describe '#logically_delete_graph_node' do
       let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
       let(:logical_delete_attributes) { {is_deleted: subject.is_deleted} }
+      before do
+        expect(subject).to be_persisted
+        subject.is_deleted = true
+      end
 
       it { is_expected.to respond_to :logically_delete_graph_node }
       it 'calls GraphPersistenceJob.perform_later with arguments' do
@@ -115,10 +119,20 @@ shared_examples 'a graphed node' do |logically_deleted: false|
       end
 
       it 'enqueues a GraphPersistenceJob' do
-        expect(subject).to be_persisted
         expect {
           expect(subject.logically_delete_graph_node).to be_truthy
         }.to have_enqueued_job(GraphPersistenceJob)
+      end
+
+      context 'without changing #is_deleted' do
+        before { expect(subject.reload).to be_truthy }
+
+        it 'enqueues a GraphPersistenceJob' do
+          expect(subject).to be_persisted
+          expect {
+            subject.logically_delete_graph_node
+          }.not_to have_enqueued_job(GraphPersistenceJob)
+        end
       end
 
       context 'with inline queue adapter' do

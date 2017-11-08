@@ -63,7 +63,7 @@ module Graphed
         action: 'update',
         graph_hash: graph_hash,
         attributes: {is_deleted: self.is_deleted}
-      )
+      ) if is_deleted_changed?
     end
   end
 
