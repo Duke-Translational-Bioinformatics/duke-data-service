@@ -99,36 +99,38 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     end
   end
 
-  describe '#logically_delete_graph_node' do
-    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
-    let(:logical_delete_attributes) { {is_deleted: subject.is_deleted} }
+  if logically_deleted
+    describe '#logically_delete_graph_node' do
+      let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
+      let(:logical_delete_attributes) { {is_deleted: subject.is_deleted} }
 
-    it { is_expected.to respond_to :logically_delete_graph_node }
-    it 'calls GraphPersistenceJob.perform_later with arguments' do
-      expect(GraphPersistenceJob).to receive(:initialize_job)
-        .with(subject)
-        .and_return(job_transaction)
-      expect(GraphPersistenceJob).to receive(:perform_later)
-        .with(job_transaction, graph_node_name, action: "update", graph_hash: graph_hash, attributes: logical_delete_attributes).and_call_original
-      expect(subject.logically_delete_graph_node).to be_truthy
-    end
-
-    it 'enqueues a GraphPersistenceJob' do
-      expect(subject).to be_persisted
-      expect {
+      it { is_expected.to respond_to :logically_delete_graph_node }
+      it 'calls GraphPersistenceJob.perform_later with arguments' do
+        expect(GraphPersistenceJob).to receive(:initialize_job)
+          .with(subject)
+          .and_return(job_transaction)
+        expect(GraphPersistenceJob).to receive(:perform_later)
+          .with(job_transaction, graph_node_name, action: "update", graph_hash: graph_hash, attributes: logical_delete_attributes).and_call_original
         expect(subject.logically_delete_graph_node).to be_truthy
-      }.to have_enqueued_job(GraphPersistenceJob)
-    end
+      end
 
-    context 'with inline queue adapter' do
-      include_context 'performs enqueued jobs', only: GraphPersistenceJob
+      it 'enqueues a GraphPersistenceJob' do
+        expect(subject).to be_persisted
+        expect {
+          expect(subject.logically_delete_graph_node).to be_truthy
+        }.to have_enqueued_job(GraphPersistenceJob)
+      end
 
-      let(:a_graph_node) { double("graph_node") }
-      it 'calls graph_node.destroy' do
-        allow(a_graph_node).to receive(:update)
-        expect(graph_model_class).to receive(:find_by).with(graph_hash).and_return(a_graph_node)
-        expect(a_graph_node).to receive(:update).with(logical_delete_attributes).and_return(true)
-        expect(subject.logically_delete_graph_node).to be_truthy
+      context 'with inline queue adapter' do
+        include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+        let(:a_graph_node) { double("graph_node") }
+        it 'calls graph_node.destroy' do
+          allow(a_graph_node).to receive(:update)
+          expect(graph_model_class).to receive(:find_by).with(graph_hash).and_return(a_graph_node)
+          expect(a_graph_node).to receive(:update).with(logical_delete_attributes).and_return(true)
+          expect(subject.logically_delete_graph_node).to be_truthy
+        end
       end
     end
   end
