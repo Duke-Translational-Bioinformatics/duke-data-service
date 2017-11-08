@@ -15,7 +15,6 @@ describe ActivityPolicy do
   it_behaves_like 'a policy for', :user, on: :other_activity, allows: [:index?, :create?]
 
   context 'authenticated user' do
-    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     let(:visible_used_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
     let(:visible_used_prov_relation) { FactoryGirl.create(:used_prov_relation,
       relatable_to: visible_used_file_version)

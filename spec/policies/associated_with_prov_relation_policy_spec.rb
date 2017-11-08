@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe AssociatedWithProvRelationPolicy do
   include_context 'policy declarations'
-  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   let(:users_activity) { FactoryGirl.create(:activity) }
   let(:other_users_activity) { FactoryGirl.create(:activity) }

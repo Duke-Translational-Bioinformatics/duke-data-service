@@ -126,7 +126,6 @@ describe DDS::V1::ActivitiesAPI do
       subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
-        include_context 'performs enqueued jobs', only: GraphPersistenceJob
         let(:resource_counter) { resource_class.where(is_deleted: false) }
         let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
 
@@ -148,7 +147,6 @@ describe DDS::V1::ActivitiesAPI do
       end
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a software_agent accessible resource' do
-        include_context 'performs enqueued jobs', only: GraphPersistenceJob
         let(:expected_response_status) { 204 }
         let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
         let(:associated_with_software_agent_prov_relation) { FactoryGirl.create(:associated_with_software_agent_prov_relation, relatable_from: software_agent, relatable_to: resource) }
