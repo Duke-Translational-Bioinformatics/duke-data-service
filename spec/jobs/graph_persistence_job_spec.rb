@@ -31,7 +31,7 @@ RSpec.describe GraphPersistenceJob, type: :job do
     let(:update_hash) { {foo: 'bar'} }
     let(:attributes) { {is_deleted: true} }
     it 'calls .update on graphed_class' do
-      expect(graphed_class).to receive(:find_by).with(update_hash).and_return(graphed_model_object)
+      expect(graphed_class).to receive(:find_by_graph_hash).with(update_hash).and_return(graphed_model_object)
       expect(graphed_model_object).to receive(:update).with(attributes).and_return(true)
       described_class.perform_now(job_transaction, graphed_class.name, action: "update", graph_hash: update_hash, attributes: attributes)
     end
@@ -42,7 +42,7 @@ RSpec.describe GraphPersistenceJob, type: :job do
     let(:graphed_model_object) { double('graph_model') }
     let(:delete_hash) { {foo: 'bar'} }
     it 'calls .delete on graphed_class' do
-      expect(graphed_class).to receive(:find_by).with(delete_hash).and_return(graphed_model_object)
+      expect(graphed_class).to receive(:find_by_graph_hash).with(delete_hash).and_return(graphed_model_object)
       expect(graphed_model_object).to receive(:destroy).and_return(true)
       described_class.perform_now(job_transaction, graphed_class.name, action: "delete", graph_hash: delete_hash)
     end

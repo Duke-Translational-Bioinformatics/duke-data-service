@@ -33,8 +33,8 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   describe '#graph_node' do
     let(:a_graph_node) { Object.new }
     it { is_expected.to respond_to :graph_node }
-    it 'calls graph_model_class.find_by' do
-      expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
+    it 'calls graph_model_class.find_by_graph_hash' do
+      expect(graph_model_class).to receive(:find_by_graph_hash).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
       expect(subject.graph_node).to eq a_graph_node
     end
   end
@@ -92,7 +92,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
       let(:a_graph_node) { double("graph_node") }
       it 'calls graph_node.destroy' do
         allow(a_graph_node).to receive(:destroy)
-        expect(graph_model_class).to receive(:find_by).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
+        expect(graph_model_class).to receive(:find_by_graph_hash).with(model_id: subject.id, model_kind: subject.kind).and_return(a_graph_node)
         expect(a_graph_node).to receive(:destroy).and_return(true)
         expect(subject.delete_graph_node).to be_truthy
       end
@@ -141,7 +141,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
         let(:a_graph_node) { double("graph_node") }
         it 'calls graph_node.destroy' do
           allow(a_graph_node).to receive(:update)
-          expect(graph_model_class).to receive(:find_by).with(graph_hash).and_return(a_graph_node)
+          expect(graph_model_class).to receive(:find_by_graph_hash).with(graph_hash).and_return(a_graph_node)
           expect(a_graph_node).to receive(:update).with(logical_delete_attributes).and_return(true)
           expect(subject.logically_delete_graph_node).to be_truthy
         end

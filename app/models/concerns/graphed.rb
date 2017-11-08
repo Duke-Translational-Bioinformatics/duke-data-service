@@ -40,7 +40,7 @@ module Graphed
     end
 
     def graph_node
-      graph_model_class.find_by(graph_hash)
+      graph_model_class.find_by_graph_hash(graph_hash)
     end
 
     def graph_model_object
@@ -179,11 +179,11 @@ module Graphed
 
     class_methods do
       def find_from_node(graph_hash)
-        from_class.constantize.find_by(graph_hash[:from_node])
+        from_class.constantize.find_by_graph_hash(graph_hash[:from_node])
       end
 
       def find_to_node(graph_hash)
-        to_class.constantize.find_by(graph_hash[:to_node])
+        to_class.constantize.find_by_graph_hash(graph_hash[:to_node])
       end
 
       def find_by_graph_hash(graph_hash)
