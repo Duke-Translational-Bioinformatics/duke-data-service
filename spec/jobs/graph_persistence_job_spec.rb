@@ -25,7 +25,16 @@ RSpec.describe GraphPersistenceJob, type: :job do
     end
   end
 
-  context 'action is "save"' do
+  context 'action is "update"' do
+    include_context 'tracking job', :job_transaction
+    let(:graphed_model_object) { double('graph_model') }
+    let(:update_hash) { {foo: 'bar'} }
+    let(:attributes) { {is_deleted: true} }
+    it 'calls .update on graphed_class' do
+      expect(graphed_class).to receive(:find_by).with(update_hash).and_return(graphed_model_object)
+      expect(graphed_model_object).to receive(:update).with(attributes).and_return(true)
+      described_class.perform_now(job_transaction, graphed_class.name, action: "update", graph_hash: update_hash, attributes: attributes)
+    end
   end
 
   context 'action is "delete"' do
