@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ChildRestorationJob, type: :job do
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   shared_examples 'a ChildRestorationJob' do |
       parent_sym,
       child_folder_sym,
