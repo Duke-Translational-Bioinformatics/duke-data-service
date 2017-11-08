@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ChildPurgationJob, type: :job do
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   shared_examples 'a ChildPurgationJob' do |
       parent_sym,
       child_folder_sym,

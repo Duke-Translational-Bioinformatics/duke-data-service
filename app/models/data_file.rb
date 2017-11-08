@@ -1,15 +1,18 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class DataFile < Container
+  include Restorable
+  include Purgable
+  include ChildMinder
   include SearchableModel
 
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
+  alias children file_versions
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :set_current_file_version_attributes
-  before_save :set_file_versions_is_deleted, if: :is_deleted_changed?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
@@ -43,14 +46,6 @@ class DataFile < Container
 
   def url
     upload.temporary_url(name)
-  end
-
-  def set_file_versions_is_deleted
-    file_versions.each do |fv|
-      unless fv.is_purged?
-        fv.is_deleted = is_deleted
-      end
-    end
   end
 
   def kind

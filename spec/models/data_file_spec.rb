@@ -4,6 +4,7 @@ RSpec.describe DataFile, type: :model do
   subject { child_file }
   let(:root_file) { FactoryGirl.create(:data_file, :root) }
   let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
+  let(:file_versions) { FactoryGirl.create_list(:file_version, 2, data_file: child_file) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid) }
   let(:deleted_file) { FactoryGirl.create(:data_file, :deleted) }
   let(:project) { subject.project }
@@ -19,8 +20,6 @@ RSpec.describe DataFile, type: :model do
   end
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a job_transactionable model'
-  it_behaves_like 'a Restorable'
-  it_behaves_like 'a Purgable'
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -78,7 +77,6 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
       it { is_expected.not_to validate_presence_of(:upload) }
-      it { expect(deleted_file.file_versions).to all( be_is_deleted ) }
     end
   end
 
@@ -267,7 +265,6 @@ RSpec.describe DataFile, type: :model do
   describe 'callbacks' do
     it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
-    it { is_expected.to  callback(:set_file_versions_is_deleted).before(:save).if(:is_deleted_changed?) }
   end
 
   describe '#creator' do
@@ -392,103 +389,6 @@ RSpec.describe DataFile, type: :model do
     end
   end
 
-  describe '#set_file_versions_is_deleted' do
-    it { is_expected.to respond_to(:set_file_versions_is_deleted) }
-
-    context 'deletion' do
-      subject { FactoryGirl.create(:data_file) }
-      context 'without purged file_version' do
-        before {
-          fv = subject.build_file_version
-          fv.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project)
-          fv.save
-        }
-        it {
-          expect(subject.is_deleted?).to be_falsey
-          expect(subject.file_versions.count).to be > 0
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_falsey
-          end
-          subject.is_deleted = true
-          subject.set_file_versions_is_deleted
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_truthy
-          end
-        }
-      end
-
-      context 'with purged file_version' do
-        before {
-          fv = subject.build_file_version
-          fv.is_deleted = true
-          fv.is_purged = true
-          fv.save
-        }
-        it {
-          expect(subject.is_deleted?).to be_falsey
-          expect(subject.file_versions.count).to be > 0
-          expect(subject.file_versions.where(is_purged: true).count).to eq(1)
-          subject.file_versions.where.not(is_purged: true).each do |fv|
-            expect(fv.is_deleted?).to be_falsey
-          end
-          subject.is_deleted = true
-          subject.set_file_versions_is_deleted
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_truthy
-          end
-        }
-      end
-    end
-
-    context 'restoration' do
-      subject { FactoryGirl.create(:data_file, :deleted) }
-      context 'without purged file_version' do
-        before {
-          fv = subject.build_file_version
-          fv.is_deleted = true
-          fv.upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project)
-          fv.save
-        }
-        it {
-          expect(subject.is_deleted?).to be_truthy
-          expect(subject.file_versions.count).to be > 0
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_truthy
-          end
-          subject.is_deleted = false
-          subject.set_file_versions_is_deleted
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_falsey
-          end
-        }
-      end
-
-      context 'with purged file_version' do
-        before {
-          fv = subject.build_file_version
-          fv.is_deleted = true
-          fv.is_purged = true
-          fv.save
-        }
-        it {
-          expect(subject.is_deleted?).to be_truthy
-          expect(subject.file_versions.count).to be > 0
-          expect(subject.file_versions.where(is_purged: true).count).to eq(1)
-          subject.file_versions.each do |fv|
-            expect(fv.is_deleted?).to be_truthy
-          end
-          subject.is_deleted = false
-          subject.set_file_versions_is_deleted
-          subject.file_versions.each do |fv|
-            if fv.is_purged?
-              expect(fv.is_deleted?).to be_truthy
-            else
-              expect(fv.is_deleted?).to be_falsey
-            end
-          end
-          expect(subject.file_versions.where(is_deleted: true, is_purged: true).count).to eq(1)
-        }
-      end
-    end
-  end
+  it_behaves_like 'a Restorable ChildMinder', :data_file, :file_versions
+  it_behaves_like 'a Purgable ChildMinder', :data_file, :file_versions
 end

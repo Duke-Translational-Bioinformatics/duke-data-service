@@ -211,6 +211,8 @@ describe DDS::V1::ProjectsAPI do
             before do
               ActiveJob::Base.queue_adapter = :inline
               allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object_manifest).and_return(true)
             end
 
             it {

@@ -6,6 +6,8 @@ RSpec.describe UploadStorageRemovalJob, type: :job do
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   before do
     expect(upload).to be_persisted
   end
