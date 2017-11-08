@@ -82,7 +82,7 @@ create\_file or system\_admin
 
 ###### Rules
 + If a file (`dds-file`) is restored, all deleted version history will be restored as well.
-+ If restore of a file version (`dds-file-version`) is requested and the "owning" file is in the trash bin, then an entire file restore will be performed - including all deleted version history.
++ If restore of a file version (`dds-file-version`) is requested, the "owning" file must not, itself, be in the trash bin.
 
 ###### Request Example
 `PUT /trashbin/dds-file-version/777be35a-98e0-4c2e-9a17-7bc009f9b111/restore`  
