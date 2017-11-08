@@ -5,5 +5,7 @@ RSpec.describe Graph::FileVersion do
   before(:example) { resource.create_graph_node }
   subject { resource.graph_model_object }
 
-  it_behaves_like 'a graphed model'
+  it_behaves_like 'a graphed model' do
+    it_behaves_like 'a Graphed::NodeModel'
+  end
 end

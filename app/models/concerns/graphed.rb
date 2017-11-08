@@ -160,7 +160,7 @@ module Graphed
 
     class_methods do
       def find_by_graph_hash(graph_hash)
-        find_by(graph_hash)
+        find_by!(graph_hash)
       end
 
       def create_with_graph_hash(graph_hash)

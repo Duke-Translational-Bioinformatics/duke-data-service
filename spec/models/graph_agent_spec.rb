@@ -6,11 +6,15 @@ RSpec.describe Graph::Agent do
 
   context 'User' do
     let(:resource) { FactoryGirl.create(:user) }
-    it_behaves_like 'a graphed model'
+    it_behaves_like 'a graphed model' do
+      it_behaves_like 'a Graphed::NodeModel'
+    end
   end
 
   context 'SoftwareAgent' do
     let(:resource) { FactoryGirl.create(:software_agent) }
-    it_behaves_like 'a graphed model'
+    it_behaves_like 'a graphed model' do
+      it_behaves_like 'a Graphed::NodeModel'
+    end
   end
 end

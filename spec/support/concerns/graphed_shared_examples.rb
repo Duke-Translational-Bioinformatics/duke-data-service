@@ -188,7 +188,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
             subject.delete_graph_node
             subject.is_deleted = true
           end
-          it { expect{subject.logically_delete_graph_node}.to raise_error }
+          it { expect{subject.logically_delete_graph_node}.to raise_error(Neo4j::ActiveNode::Labels::RecordNotFound) }
         end
       end
       it { is_expected.to respond_to :delete_graph_node }
@@ -310,18 +310,18 @@ shared_examples 'a graphed relation' do
     it { expect(subject.graph_to_model).to eq to_model }
   end
 
-  describe '#graph_from_node' do
-    it { is_expected.to respond_to :graph_from_node }
-    it { expect(subject.graph_from_node).to eq from_node }
-  end
-
-  describe '#graph_to_node' do
-    it { is_expected.to respond_to :graph_to_node }
-    it { expect(subject.graph_to_node).to eq to_node }
-  end
-
   context 'with inline queue adapter' do
     include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+    describe '#graph_from_node' do
+      it { is_expected.to respond_to :graph_from_node }
+      it { expect(subject.graph_from_node).to eq from_node }
+    end
+
+    describe '#graph_to_node' do
+      it { is_expected.to respond_to :graph_to_node }
+      it { expect(subject.graph_to_node).to eq to_node }
+    end
 
     it 'should auto_create' do
       expect(subject).to be
@@ -414,6 +414,20 @@ shared_examples 'a graphed model' do
       expect(subject.graphed_model(KindnessFactory.by_kind(subject.model_kind))).to be
       expect(subject.graphed_model(KindnessFactory.by_kind(subject.model_kind).none)).not_to be
     end
+  end
+end
+
+shared_examples 'a Graphed::NodeModel' do
+  describe '::find_by_graph_hash' do
+    let(:graph_hash) { {foo: 'bar'} }
+    let(:a_graph_node) { double("graph_node") }
+    it { expect(described_class).to respond_to(:find_by_graph_hash).with(1).argument }
+    it 'calls find_by! and returns a graph_node' do
+      expect(described_class).to receive(:find_by!).with(graph_hash).and_return(a_graph_node)
+      expect(described_class.find_by_graph_hash(graph_hash)).to eq(a_graph_node)
+    end
+
+    it { expect{described_class.find_by_graph_hash(graph_hash)}.to raise_error(Neo4j::ActiveNode::Labels::RecordNotFound) }
   end
 end
 
