@@ -10,8 +10,8 @@ gem 'neo4j', '~> 7.0'
 
 # Use elasticsearch for search
 gem 'elasticsearch', '~> 2.0.0'
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
+gem 'elasticsearch-model', '~> 2.0.0'
+gem 'elasticsearch-rails', '~> 2.0.0'
 
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers'

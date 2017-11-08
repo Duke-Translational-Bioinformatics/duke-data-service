@@ -10,6 +10,8 @@ shared_examples 'a job_transactionable model' do
       .before(:create)
     is_expected.to callback(:root_update_transaction)
       .before(:update)
+    is_expected.to callback(:root_destroy_transaction)
+      .before(:destroy)
     is_expected.to callback(:root_update_transaction)
       .after(:touch)
   }
@@ -56,11 +58,19 @@ shared_examples 'a job_transactionable model' do
     it { expect(subject.root_create_transaction).to be_a JobTransaction }
   end
 
-  describe '.root_update_transaction' do
+  describe '#root_update_transaction' do
     before do
       expect(subject).to receive(:create_transaction).with('updated').and_call_original
     end
     it { expect(subject.root_update_transaction).to be_a JobTransaction }
+  end
+
+  describe '#root_destroy_transaction' do
+    before do
+      expect(subject).to receive(:create_transaction).with('destroyed').and_call_original
+    end
+    it { expect(subject.root_destroy_transaction).to be_a JobTransaction }
+    it { expect(subject.root_destroy_transaction).to be_persisted }
   end
 
   describe '#touch' do
