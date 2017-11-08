@@ -57,13 +57,13 @@ module Graphed
     end
 
     def logically_delete_graph_node
-      if self.is_deleted
-        node = self.graph_model_object
-        if node && !node.is_deleted
-          node.is_deleted = self.is_deleted
-          node.save
-        end
-      end
+      GraphPersistenceJob.perform_later(
+        GraphPersistenceJob.initialize_job(self),
+        graph_model_class.name,
+        action: 'update',
+        graph_hash: graph_hash,
+        attributes: {is_deleted: self.is_deleted}
+      )
     end
   end
 

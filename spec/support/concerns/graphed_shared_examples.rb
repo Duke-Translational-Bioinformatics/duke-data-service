@@ -16,6 +16,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
   let(:kind_name) {subject.class.name}
   let(:graph_node_name) { "Graph::#{kind_name}" }
   let(:graph_model_class) { graph_node_name.constantize }
+  let(:graph_hash) { {model_id: subject.id, model_kind: subject.kind} }
 
   it { expect(described_class).to include(Graphed::Node) }
 
@@ -98,6 +99,40 @@ shared_examples 'a graphed node' do |logically_deleted: false|
     end
   end
 
+  describe '#logically_delete_graph_node' do
+    let(:job_transaction) { GraphPersistenceJob.initialize_job(subject) }
+    let(:logical_delete_attributes) { {is_deleted: subject.is_deleted} }
+
+    it { is_expected.to respond_to :logically_delete_graph_node }
+    it 'calls GraphPersistenceJob.perform_later with arguments' do
+      expect(GraphPersistenceJob).to receive(:initialize_job)
+        .with(subject)
+        .and_return(job_transaction)
+      expect(GraphPersistenceJob).to receive(:perform_later)
+        .with(job_transaction, graph_node_name, action: "update", graph_hash: graph_hash, attributes: logical_delete_attributes).and_call_original
+      expect(subject.logically_delete_graph_node).to be_truthy
+    end
+
+    it 'enqueues a GraphPersistenceJob' do
+      expect(subject).to be_persisted
+      expect {
+        expect(subject.logically_delete_graph_node).to be_truthy
+      }.to have_enqueued_job(GraphPersistenceJob)
+    end
+
+    context 'with inline queue adapter' do
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
+
+      let(:a_graph_node) { double("graph_node") }
+      it 'calls graph_node.destroy' do
+        allow(a_graph_node).to receive(:update)
+        expect(graph_model_class).to receive(:find_by).with(graph_hash).and_return(a_graph_node)
+        expect(a_graph_node).to receive(:update).with(logical_delete_attributes).and_return(true)
+        expect(subject.logically_delete_graph_node).to be_truthy
+      end
+    end
+  end
+
   context 'with inline queue adapter' do
     include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
@@ -124,7 +159,6 @@ shared_examples 'a graphed node' do |logically_deleted: false|
       end
 
       if logically_deleted
-        it { is_expected.to respond_to :logically_delete_graph_node }
         it { is_expected.to callback(:logically_delete_graph_node).after(:save) }
         it 'should logicially delete graph_node with the model' do
           expect(graph_node_name.constantize.where(model_id: subject.id, model_kind: subject.kind).count).to eq(1)
@@ -138,7 +172,7 @@ shared_examples 'a graphed node' do |logically_deleted: false|
             subject.delete_graph_node
             subject.is_deleted = true
           end
-          it { expect{subject.logically_delete_graph_node}.not_to raise_error }
+          it { expect{subject.logically_delete_graph_node}.to raise_error }
         end
       end
       it { is_expected.to respond_to :delete_graph_node }
