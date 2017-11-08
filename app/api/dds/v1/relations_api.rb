@@ -178,7 +178,7 @@ module DDS
         requires :object_kind, type: String, desc: 'Object kind'
         requires :object_id, type: String, desc: 'Object UUID'
       end
-      get '/relations/:object_kind/:object_id', root: 'results' do
+      get '/relations/:object_kind/:object_id', adapter: :json, root: 'results' do
         authenticate!
         object_params = declared(params, include_missing: false)
         root_node = KindnessFactory.by_kind(

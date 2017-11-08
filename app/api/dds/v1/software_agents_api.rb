@@ -10,7 +10,7 @@ module DDS
           [403, 'Forbidden']
         ]
       end
-      get '/software_agents', root: 'results' do
+      get '/software_agents', adapter: :json, root: 'results' do
         authenticate!
         authorize SoftwareAgent.new, :index?
         policy_scope(SoftwareAgent).where(is_deleted: false)

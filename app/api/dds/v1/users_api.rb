@@ -54,7 +54,7 @@ module DDS
         optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
         use :pagination
       end
-      get '/users', root: 'results' do
+      get '/users', adapter: :json, root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
         users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)

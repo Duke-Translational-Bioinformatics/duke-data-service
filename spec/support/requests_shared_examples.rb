@@ -190,17 +190,12 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     }
     let(:per_page) { max_per_page }
     let(:page) { 1 }
-    let(:expected_response_headers) {{
-       'X-Total' => expected_total_length.to_s,
-       'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
-       'X-Page' => page.to_s,
-       'X-Per-Page' => per_page.to_s,
-    }}
+    let(:expected_response_body) { {error: "per_page must be less than #{max_per_page}"}.to_json }
 
-    it 'should return default per_page' do
+    it 'should return a validation error' do
        expect(extras.count).to be > 0
-       is_expected.to eq(expected_response_status)
-       expect(response.headers.to_h).to include(expected_response_headers)
+       is_expected.to eq(400)
+       expect(response.body).to eq(expected_response_body)
     end
   end
 end

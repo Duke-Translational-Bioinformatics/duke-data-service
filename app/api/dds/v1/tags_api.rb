@@ -40,7 +40,7 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
-      get '/tags/:object_kind/:object_id', root: 'results' do
+      get '/tags/:object_kind/:object_id', adapter: :json, root: 'results' do
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         taggable_object = object_kind.find(params[:object_id])
@@ -64,7 +64,7 @@ module DDS
           requires :label, type: String, desc: "The textual tag content"
         end
       end
-      post '/tags/:object_kind/:object_id/append', root: 'results' do
+      post '/tags/:object_kind/:object_id/append', adapter: :json, root: 'results' do
         authenticate!
         append_params = declared(params, include_missing: false)
         object_kind = KindnessFactory.by_kind(params[:object_kind])
@@ -95,7 +95,7 @@ module DDS
         optional :object_kind, type: String, desc: "Restricts search scope to tags for this kind of object"
         optional :label_contains, type: String, desc: "Searches for tags that contain this text fragment"
       end
-      get '/tags/labels', root: 'results' do
+      get '/tags/labels', adapter: :json, root: 'results' do
         authenticate!
         tag_params = declared(params, include_missing: false)
         scoped_tags = policy_scope(Tag)
