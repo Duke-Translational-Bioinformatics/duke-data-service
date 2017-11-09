@@ -48,12 +48,12 @@ describe DDS::V1::ChildrenAPI do
         context 'with exclude_response_fields set' do
           let(:excluded_fields) { [:id, :project] }
           let(:query_params) { "?exclude_response_fields=#{excluded_fields.join(' ')}" }
-#          let(:serialized_resource) {
-#          }
+          let(:serialized_resource) {
+            resource_serializer.new(serializable_resource).as_json.reject{|k,v| excluded_fields.include? k}
+          }
           it 'does not serialize excluded fields' do
-            serialized_resource = resource_serializer.new(serializable_resource, {include: excluded_fields})
-            serialized_hash = serialized_resource.serializable_hash({}, {fields: excluded_fields})
-            expect(serialized_hash.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to be_empty
             is_expected.to eq(expected_response_status)
             expect(response.body).to include(serialized_resource.to_json)
           end
@@ -239,12 +239,22 @@ describe DDS::V1::ChildrenAPI do
           let(:excluded_fields) { [:id, :project] }
           let(:query_params) { "?exclude_response_fields=#{excluded_fields.join(' ')}" }
           let(:serialized_resource) {
-            resource_serializer.new(serializable_resource, except: excluded_fields)
+            resource_serializer.new(serializable_resource).as_json.reject{|k,v| excluded_fields.include? k}
+          }
+          let(:serialized_file) {
+            file_serializer.new(root_file).as_json.reject{|k,v| excluded_fields.include? k}
           }
           it 'does not serialize excluded fields' do
-            expect(serialized_resource.to_h.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to be_empty
             is_expected.to eq(expected_response_status)
             expect(response.body).to include(serialized_resource.to_json)
+          end
+          it 'does not serialize excluded fields for file' do
+            expect(serialized_file.keys).not_to include(*excluded_fields)
+            expect(serialized_file.keys).not_to be_empty
+            is_expected.to eq(expected_response_status)
+            expect(response.body).to include(serialized_file.to_json)
           end
         end
       end
