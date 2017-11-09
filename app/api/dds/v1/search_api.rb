@@ -18,7 +18,7 @@ module DDS
         end
         optional :max_hops, type: Integer, desc: "Maximum number of degrees of seperation from start node (default infinite)"
       end
-      post '/search/provenance', root: 'graph', serializer: ProvenanceGraphSerializer do
+      post '/search/provenance', adapter: :json, root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_tags = declared(params, include_missing: false)
         max_hops = prov_tags[:max_hops]
@@ -45,7 +45,7 @@ module DDS
           requires :id, type: String, desc: 'The unique file version id.'
         end
       end
-      post '/search/provenance/origin', root: 'graph', serializer: ProvenanceGraphSerializer do
+      post '/search/provenance/origin', adapter: :json, root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_params = declared(params, include_missing: false)
         OriginProvenanceGraph.new(
