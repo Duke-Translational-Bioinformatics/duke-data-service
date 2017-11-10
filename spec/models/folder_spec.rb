@@ -195,4 +195,92 @@ RSpec.describe Folder, type: :model do
       child_folder_file.update_column(:is_deleted, true)
     end
   end
+
+
+  describe '#restore' do
+    context 'is_deleted? true' do
+      before do
+        subject.update_columns(is_deleted: true)
+      end
+      it {
+        expect {
+          begin
+            subject.restore(immediate_child_file)
+          rescue TrashbinParentException => e
+            expect(e.message).to eq("#{subject.kind} #{subject.id} is deleted, and cannot restore children.::Restore #{subject.kind} #{subject.id}.")
+            raise e
+          end
+        }.to raise_error(TrashbinParentException)
+      }
+    end
+
+    context 'when child is not a Container' do
+      let(:incompatible_child) { FactoryGirl.create(:file_version) }
+      it {
+        expect {
+          begin
+            subject.restore(incompatible_child)
+          rescue IncompatibleParentException => e
+            expect(e.message).to eq("Folders can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.")
+            raise e
+          end
+        }.to raise_error(IncompatibleParentException)
+      }
+    end
+
+    context 'when child is a Container' do
+      context 'from another project' do
+        let(:child) { other_folder }
+        before do
+          child.update_columns(is_deleted: true)
+          child.reload
+        end
+        it {
+          expect {
+            expect(child.project_id).not_to eq(subject.id)
+            expect(child.is_deleted?).to be_truthy
+            subject.restore(child)
+            expect(child.is_deleted_changed?).to be_truthy
+            expect(child.project_id_changed?).to be_truthy
+            expect(child.parent_id_changed?).to be_truthy
+            expect(child.is_deleted?).to be_falsey
+            expect(child.project_id).to eq(subject.project_id)
+            expect(child.parent_id).to eq(subject.id)
+          }.not_to raise_error
+        }
+      end
+
+      context 'from this project' do
+        context 'from another folder' do
+          let(:child) { FactoryGirl.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.parent_id_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+              expect(child.parent_id).to eq(subject.id)
+            }.not_to raise_error
+          }
+        end
+
+        context 'from this folder' do
+          let(:child) { immediate_child_file }
+          before do
+            child.update_columns(is_deleted: true)
+            child.reload
+          end
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+            }.not_to raise_error
+          }
+        end
+      end
+    end
+  end
 end
