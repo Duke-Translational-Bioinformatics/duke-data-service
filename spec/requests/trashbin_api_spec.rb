@@ -78,8 +78,10 @@ describe DDS::V1::TrashbinAPI do
       let(:resource_class) { Folder }
     end
 
-    it_behaves_like 'an identified resource' do
-      let(:resource_class) { Folder }
+    it_behaves_like 'a client error' do
+      let(:expected_response) { 404 }
+      let(:expected_reason) { "dds-folder #{parent_folder.id} is deleted, and cannot restore children." }
+      let(:expected_suggestion) { "Restore #{parent_folder.kind} #{parent_folder.id}." }
       before do
         parent_folder.update_columns(is_deleted: true)
       end
@@ -155,9 +157,12 @@ describe DDS::V1::TrashbinAPI do
         }
         let(:resource_kind) { file_version.kind }
         let(:resource_id) { file_version.id }
+        let(:payload) {{}}
 
-        it_behaves_like 'an identified resource' do
-          let(:expected_suggestion) { "Restore #{file_version.data_file.kind} #{file_version.data_file_id}" }
+        it_behaves_like 'a client error' do
+          let(:expected_response) { 404 }
+          let(:expected_reason) { "#{trashed_resource.kind} #{trashed_resource.id} is deleted, and cannot restore its versions." }
+          let(:expected_suggestion) { "Restore #{file_version.data_file.kind} #{file_version.data_file_id}." }
         end
       end
     end
@@ -171,7 +176,9 @@ describe DDS::V1::TrashbinAPI do
       before do
         resource.update_columns(is_deleted: true)
       end
-      it_behaves_like 'an identified resource' do
+      it_behaves_like 'a client error' do
+        let(:expected_response) { 404 }
+        let(:expected_reason) { "#{project.kind} Not Restorable" }
         let(:expected_suggestion) { "#{project.kind} is not Restorable" }
       end
     end
