@@ -1,5 +1,8 @@
 shared_examples 'a Purgable' do
   it { expect(described_class).to include(Purgable) }
+  it {
+    is_expected.to respond_to :purge
+  }
 
   describe 'callbacks' do
     it { is_expected.to callback(:manage_purgation).before(:update) }

@@ -453,4 +453,33 @@ RSpec.describe DataFile, type: :model do
       end
     end
   end
+
+  describe '#purge' do
+    context 'undeleted' do
+      it {
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_truthy
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
+      }
+    end
+
+    context 'deleted' do
+      before do
+        subject.update_columns(is_deleted: true)
+        subject.reload
+      end
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_falsey
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
+      }
+    end
+  end
 end
