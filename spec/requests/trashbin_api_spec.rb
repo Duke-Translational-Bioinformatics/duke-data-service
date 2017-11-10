@@ -216,10 +216,11 @@ describe DDS::V1::TrashbinAPI do
       let(:resource_id) { untrashed_resource.id }
     end
 
-    it_behaves_like 'an identified resource' do
-      let(:resource_id) { trashed_file_version.id }
-      let(:resource_class) { trashed_file_version.class }
+    it_behaves_like 'a client error' do
       let(:resource_kind) { trashed_file_version.kind }
+      let(:resource_id) { trashed_file_version.id }
+      let(:expected_response) { 404 }
+      let(:expected_reason) { "#{trashed_file_version.kind} Not Purgable" }
       let(:expected_suggestion) { "#{trashed_file_version.kind} is not Purgable" }
     end
 
@@ -256,12 +257,13 @@ describe DDS::V1::TrashbinAPI do
       let(:resource) { project }
       let(:resource_id) { project.id }
       let(:resource_kind) { project.kind }
-      let(:resource_class) { Project }
 
       before do
         resource.update_columns(is_deleted: true)
       end
-      it_behaves_like 'an identified resource' do
+      it_behaves_like 'a client error' do
+        let(:expected_response) { 404 }
+        let(:expected_reason) { "#{project.kind} Not Purgable" }
         let(:expected_suggestion) { "#{project.kind} is not Purgable" }
       end
     end

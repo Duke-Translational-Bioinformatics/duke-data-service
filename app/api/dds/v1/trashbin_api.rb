@@ -108,31 +108,24 @@ module DDS
         requires :object_kind, type: String, desc: 'Object Kind'
         requires :object_id, type: String, desc: 'Object UUID'
       end
+      rescue_from UnPurgableException do |e|
+        error_json = {
+          "error" => "404",
+          "code" => "not_provided",
+          "reason" => "#{e.message} Not Purgable",
+          "suggestion" => "#{e.message} is not Purgable"
+        }
+        error!(error_json, 404)
+      end
       put '/trashbin/:object_kind/:object_id/purge', root: false do
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         purge_object = object_kind.find_by!(id: params[:object_id], is_deleted: true)
-        unless purge_object.class.include? Restorable
-          error_json = {
-            "error" => "404",
-            "code" => "not_provided",
-            "reason" => "#{purge_object.class.to_s} Not Found",
-            "suggestion" => "#{purge_object.kind} is not Purgable"
-          }
-          error!(error_json, 404)
-        end
-        if purge_object.is_a?(FileVersion)
-          error_json = {
-            "error" => "404",
-            "code" => "not_provided",
-            "reason" => "#{purge_object.class.to_s} Not Found",
-            "suggestion" => "#{purge_object.kind} is not Purgable"
-          }
-          error!(error_json, 404)
-        end
-        authorize purge_object, :destroy?
+        raise UnPurgableException.new(purge_object.kind) unless purge_object.class.include? Purgable
         unless purge_object.is_purged?
-          purge_object.update(is_deleted: true, is_purged: true)
+          purge_object.purge
+          authorize purge_object, :destroy?
+          purge_object.save
         end
         body false
       end
