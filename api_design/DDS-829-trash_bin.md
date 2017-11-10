@@ -16,11 +16,11 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 
 |Endpoint |Description |
 |---|---|
-| `GET /trashbin/projects/{id}/children{?name_contains}{?recurse}` | Get a list of immediate descendants of the project that are in the trash bin.  If `recurse=true` is specified, a recursive search is performed. If name_contains is specified, only objects whose name contains the provided value are returned (works with or without recurse mode). The results are sorted in most recently deleted order. |
-| `GET /trashbin/folders/{id}/children{?name_contains}{?recurse}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `recurse=true` is specified, a recursive search is performed. If name_contains is specified, only objects whose name contains the provided value are returned (works with or without recurse mode). The results are sorted in most recently deleted order. |
-| `GET /trashbin/{object_kind}/{object_id}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
-| `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to the specified parent; an exception is thrown if parent does not exist, is deleted, or is purged. |
-| `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purged, the object is no longer visible from the trash bin context. Any time a data_file is purged, all of its file_versions are purged, which permanently removes their file content from the storage provider (e.g. Duke OIT Swift). |
+| `GET /trashbin/projects/{id}/children{?name_contains}` | Get a list of immediate descendants of the project that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
+| `GET /trashbin/folders/{id}/children{?name_contains}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
+| `GET /trashbin/{object_id}/{object_kind}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
+| `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist or is itself deleted. |
+| `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purged, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (e.g. Duke OIT Swift). |
 
 
 **Note:** *An object is considered to be in the trash bin if it has been deleted (`"is_deleted": true`), but not purged (`"is_purged": false`); a purged object is immutable.*
@@ -29,7 +29,7 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 This section defines the proposed API interfaces.
 
 ##### List objects in trash bin that are project descendants
-`GET /trashbin/projects/{id}/children{?name_contains}{?recurse}`
+`GET /trashbin/projects/{id}/children{?name_contains}`
 
 ###### Permissions
 authenticated [scope: view_project]
@@ -39,7 +39,7 @@ authenticated [scope: view_project]
 * 401: Unauthorized
 
 ##### List objects in trash bin that are folder descendants
-`GET /trashbin/folders/{id}/children{?name_contains}{?recurse}`
+`GET /trashbin/folders/{id}/children{?name_contains}`
 
 ###### Permissions
 authenticated [scope: view_project]
@@ -58,7 +58,6 @@ view_project
 * 200: Success
 * 401: Unauthorized
 * 403: Forbidden
-* 404: Object kind not supported
 * 404: Object not found in trash bin
 
 ##### Restore object from the trash bin
@@ -68,21 +67,22 @@ view_project
 create\_file or system\_admin
 
 ###### Response Messages
-* 200: Success
-* 404: Parent object does not exist or is itself in the trashbin
+* 201: Success
+* 400: Parent object does not exist, has been purged, or is in the trash bin
 * 401: Unauthorized
 * 403: Forbidden
-* 404: Object or Parent kind not supported
 * 404: Object not found in trash bin
-* 404: Parent object does not exist or is itself in the trashbin
 
 ###### Request Parameters
-**parent.kind (string, required unless file_version is being restored for a dds-file that is not in the trashbin)** - The kind of parent object; this can be a project (`dds-project`) or folder (`dds-folder`).  
-**parent.id (string, required unless file_version is being restored for a dds-file that is not in the trashbin)** - The unique id of the parent.
+**parent.kind (string, optional)** - The kind of parent object; this can be a project (`dds-project`) or folder (`dds-folder`).
+**parent.id (string, optional)** - The unique id of the parent.
 
 ###### Rules
-+ If a file (`dds-file`) is restored, all deleted version history will be restored as well.
-+ If restore of a file version (`dds-file-version`) is requested, the "owning" file must not, itself, be in the trash bin.
++ If parent is not supplied in the payload, an attempt will be made to restore to the original parent.
++ An exception is returned if the parent is itself in the trash bin. You must restore the parent before you can restore a child to it.
++ `dds-file` and `dds-folder` objects can only be restored to a `dds-project` or `dds-folder` parent.
++ `dds-file-version` objects can only be restored to their original "owning" file.
++ If a `dds-file` is restored, all deleted version history will be restored as well.
 
 ###### Request Example
 `PUT /trashbin/dds-file-version/777be35a-98e0-4c2e-9a17-7bc009f9b111/restore`  
