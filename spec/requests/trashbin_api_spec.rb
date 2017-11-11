@@ -3,14 +3,30 @@ require 'rails_helper'
 describe DDS::V1::TrashbinAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
   let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
-  let(:parent_folder) { FactoryGirl.create(:folder, project: project) }
-  let(:trashed_resource) { FactoryGirl.create(:data_file, :deleted, project: project, upload: upload) }
-  let(:untrashed_resource) { FactoryGirl.create(:data_file, project: project, upload: upload) }
-  let(:purged_resource) { FactoryGirl.create(:data_file, :purged, project: project, upload: upload) }
+  let(:project) { FactoryGirl.create(:project) }
+    let(:parent_folder) { FactoryGirl.create(:folder, project: project) }
+      let(:named_trashed_child_folder) { FactoryGirl.create(:folder, :deleted, name: 'The XXXX trashed child folder', parent: parent_folder, project: project) }
+        let(:depth_trashed_resource) { FactoryGirl.create(:data_file, :deleted, parent: named_trashed_child_folder, project: project) }
+        let(:depth_named_trashed_resource) { FactoryGirl.create(:data_file, :deleted, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
+        let(:depth_purged_resource) { FactoryGirl.create(:data_file, :purged, parent: named_trashed_child_folder, project: project) }
+        let(:depth_named_purged_resource) { FactoryGirl.create(:data_file, :purged, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
+      let(:trashed_child_resource) { FactoryGirl.create(:data_file, :deleted, parent: parent_folder, project: project) }
+    let(:trashed_resource) { FactoryGirl.create(:data_file, :root, :deleted, project: project, upload: upload) }
+    let(:named_trashed_resource) { FactoryGirl.create(:data_file, :root, :deleted, name: 'The XXXX trashed resource', project: project, upload: upload) }
+    let(:named_untrashed_resource) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root resource', project: project, upload: upload) }
+    let(:untrashed_resource) { FactoryGirl.create(:data_file, :root, project: project, upload: upload) }
+    let(:purged_resource) { FactoryGirl.create(:data_file, :root, :purged, project: project, upload: upload) }
+    let(:named_purged_resource) { FactoryGirl.create(:data_file, :root, :purged, name: 'The XXXX purged resource', project: project, upload: upload) }
+    let(:named_trashed_folder) { FactoryGirl.create(:folder, :root, :deleted, name: 'The XXXX trashed root folder', project: project) }
+      let(:named_trashed_resource_in_trashed_folder) { FactoryGirl.create(:data_file, :deleted, name: 'The XXXX trashed resource in trashed folder', parent: named_trashed_folder, project: project, upload: upload) }
+      let(:trashed_resource_in_trashed_folder) { FactoryGirl.create(:data_file, :deleted, parent: named_trashed_folder, project: project, upload: upload) }
+
+  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_folder) { FactoryGirl.create(:folder, :deleted, project: other_permission.project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let!(:resource_permission) { project_permission }
+
 
   describe 'GET /trashbin/{object_kind}/{object_id}' do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}" }
@@ -270,6 +286,391 @@ describe DDS::V1::TrashbinAPI do
         expect(response.status).to eq(204)
         expect(response.body).not_to eq('null')
         expect(response.body).to be
+      end
+    end
+  end
+
+  describe 'GET /trashbin/projects/{id}/children{?name_contains}{?recurse}' do
+    let(:url) { "/api/v1/trashbin/projects/#{parent_id}/children#{query_params}" }
+    let(:parent_id) { project.id }
+    let(:payload) {{}}
+
+    context 'default' do
+      let(:query_params) { '' }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            trashed_resource,
+            named_trashed_resource,
+            named_trashed_folder
+          ] }
+          let(:unexpected_resources) { [
+            parent_folder,
+            named_trashed_child_folder,
+            depth_trashed_resource,
+            depth_named_trashed_resource,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            trashed_child_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource,
+            named_trashed_resource_in_trashed_folder,
+            trashed_resource_in_trashed_folder
+          ] }
+          it_behaves_like 'a paginated resource' do
+            let(:expected_total_length) { project.children.where(is_deleted: true, is_purged: false).count }
+            let(:extras) { FactoryGirl.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
+          end
+        end
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'a software_agent accessible resource'
+
+        it_behaves_like 'an authorized resource'
+        it_behaves_like 'an identified resource' do
+          let(:parent_id) { 'notfoundid' }
+          let(:resource_class) { Project }
+        end
+        it_behaves_like 'a logically deleted resource' do
+          let(:deleted_resource) { project }
+        end
+      end
+    end
+
+    context 'name_contains' do
+      let(:query_params) { "?name_contains=#{name_contains}" }
+
+      describe 'empty string' do
+        let(:name_contains) { '' }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [ ] }
+            let(:unexpected_resources) { [
+              parent_folder,
+              named_trashed_child_folder,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              trashed_child_resource,
+              trashed_resource,
+              named_trashed_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+              named_trashed_folder,
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ] }
+          end
+        end
+      end
+
+      describe 'string without matches' do
+        let(:name_contains) { 'name_without_matches' }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [ ] }
+            let(:unexpected_resources) { [
+              parent_folder,
+              named_trashed_child_folder,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              trashed_child_resource,
+              trashed_resource,
+              named_trashed_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+              named_trashed_folder,
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ] }
+          end
+        end
+      end
+
+      describe 'string with a match' do
+        let(:name_contains) { 'XXXX' }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_trashed_resource,
+              named_trashed_folder
+            ] }
+            let(:unexpected_resources) { [
+              parent_folder,
+              named_trashed_child_folder,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              trashed_child_resource,
+              trashed_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ] }
+          end
+        end
+      end
+
+      describe 'lowercase string with a match' do
+        let(:name_contains) { 'xxxx' }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) { [
+              named_trashed_resource,
+              named_trashed_folder
+            ] }
+            let(:unexpected_resources) { [
+              parent_folder,
+              named_trashed_child_folder,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              trashed_child_resource,
+              trashed_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ] }
+          end
+        end
+      end
+    end
+
+    context 'recurse' do
+      let(:query_params) { "?recurse=true" }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            named_trashed_child_folder,
+            depth_trashed_resource,
+            depth_named_trashed_resource,
+            trashed_child_resource,
+            trashed_resource,
+            named_trashed_resource,
+            named_trashed_folder,
+            named_trashed_resource_in_trashed_folder,
+            trashed_resource_in_trashed_folder
+          ] }
+          let(:unexpected_resources) { [
+            parent_folder,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource
+          ] }
+        end
+      end
+    end
+
+    context 'name_contains and resurse' do
+      let(:query_params) { '?recurse=true&name_contains=XXXX' }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            named_trashed_child_folder,
+            depth_named_trashed_resource,
+            named_trashed_resource,
+            named_trashed_folder,
+            named_trashed_resource_in_trashed_folder
+          ] }
+          let(:unexpected_resources) { [
+            depth_trashed_resource,
+            trashed_child_resource,
+            trashed_resource,
+            trashed_resource_in_trashed_folder,
+            parent_folder,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource
+          ] }
+        end
+      end
+    end
+  end
+
+  describe 'GET /trashbin/folders/{id}/children{?name_contains}{?recurse}' do
+    let(:url) { "/api/v1/trashbin/folders/#{parent_id}/children#{query_params}" }
+    let(:payload) {{}}
+
+    context 'default' do
+      let(:query_params) { '' }
+
+      context 'untrashed folder' do
+        let(:parent_id) { parent_folder.id }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) {[
+              named_trashed_child_folder,
+              trashed_child_resource
+            ]}
+            let(:unexpected_resources) { [
+              parent_folder,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              trashed_resource,
+              named_trashed_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+              named_trashed_folder,
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ] }
+          end
+          it_behaves_like 'a paginated resource' do
+            let(:expected_total_length) { parent_folder.children.count }
+            let(:extras) { FactoryGirl.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
+          end
+        end
+      end
+
+      context 'trashed folder' do
+        let(:parent_id) { named_trashed_folder.id }
+
+        it_behaves_like 'a GET request' do
+          it_behaves_like 'a searchable resource' do
+            let(:expected_resources) {[
+              named_trashed_resource_in_trashed_folder,
+              trashed_resource_in_trashed_folder
+            ]}
+            let(:unexpected_resources) { [
+              parent_folder,
+              named_trashed_child_folder,
+              trashed_child_resource,
+              depth_trashed_resource,
+              depth_named_trashed_resource,
+              depth_purged_resource,
+              depth_named_purged_resource,
+              named_untrashed_resource,
+              untrashed_resource,
+              purged_resource,
+              named_purged_resource,
+            ] }
+          end
+        end
+      end
+    end
+
+    context 'name_contains' do
+      let(:parent_id) { parent_folder.id }
+      let(:query_params) { '?name_contains=XXXX' }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            named_trashed_child_folder
+          ] }
+          let(:unexpected_resources) { [
+            parent_folder,
+            depth_trashed_resource,
+            depth_named_trashed_resource,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            trashed_child_resource,
+            trashed_resource,
+            named_trashed_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource,
+            named_trashed_folder,
+            named_trashed_resource_in_trashed_folder,
+            trashed_resource_in_trashed_folder
+          ] }
+        end
+      end
+    end
+
+    context 'recurse' do
+      let(:parent_id) { parent_folder.id }
+      let(:query_params) { '?recurse=true' }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            named_trashed_child_folder,
+            trashed_child_resource,
+            depth_trashed_resource,
+            depth_named_trashed_resource
+          ] }
+          let(:unexpected_resources) { [
+            parent_folder,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            trashed_resource,
+            named_trashed_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource,
+            named_trashed_folder,
+            named_trashed_resource_in_trashed_folder,
+            trashed_resource_in_trashed_folder
+          ] }
+        end
+      end
+    end
+
+    context 'name_contains and resurse' do
+      let(:parent_id) { parent_folder.id }
+      let(:query_params) { '?name_contains=XXXX&recurse=true' }
+
+      it_behaves_like 'a GET request' do
+        it_behaves_like 'a searchable resource' do
+          let(:expected_resources) { [
+            named_trashed_child_folder,
+            depth_named_trashed_resource
+          ] }
+          let(:unexpected_resources) { [
+            parent_folder,
+            trashed_child_resource,
+            depth_trashed_resource,
+            depth_purged_resource,
+            depth_named_purged_resource,
+            trashed_resource,
+            named_trashed_resource,
+            named_untrashed_resource,
+            untrashed_resource,
+            purged_resource,
+            named_purged_resource,
+            named_trashed_folder,
+            named_trashed_resource_in_trashed_folder,
+            trashed_resource_in_trashed_folder
+          ] }
+        end
       end
     end
   end

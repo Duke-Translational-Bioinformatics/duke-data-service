@@ -1,6 +1,8 @@
 module DDS
   module V1
     class TrashbinAPI < Grape::API
+      helpers PaginationParams
+
       desc 'View Trashbin Item details' do
         detail 'Show Details of a Trashbin Item.'
         named 'show trashbin item'
@@ -123,6 +125,68 @@ module DDS
           purge_object.update(is_deleted: true, is_purged: true)
         end
         body false
+      end
+
+      desc 'List folder children in trashbin' do
+        detail 'Returns the trashed children of the folder.'
+        named 'list folder children in the trashbin'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Folder does not exist or is purged']
+        ]
+      end
+      params do
+        optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
+        use :pagination
+      end
+      get '/trashbin/folders/:id/children', root: 'results' do
+        authenticate!
+        folder = Folder.find_by!(id: params[:id], is_purged: false)
+        authorize folder, :index?
+        name_contains = params[:name_contains]
+        descendants = params[:recurse] ? policy_scope(folder.descendants) : policy_scope(folder.children)
+        descendants = descendants.where(is_deleted: true, is_purged: false)
+        if name_contains
+          if name_contains.empty?
+            descendants = descendants.none
+          else
+            descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          end
+        end
+        paginate(descendants.includes(:parent, :project, :audits))
+      end
+
+      desc 'List project children in the trashbin' do
+        detail 'Returns the trashed children of the project.'
+        named 'list project children in the trashbin'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Project does not exist or has been deleted']
+        ]
+      end
+      params do
+        optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
+        use :pagination
+      end
+      get '/trashbin/projects/:id/children', root: 'results' do
+        authenticate!
+        project = hide_logically_deleted Project.find(params[:id])
+        authorize DataFile.new(project: project), :index?
+        name_contains = params[:name_contains]
+        descendants = params[:recurse] ? project.containers : project.children
+        descendants = descendants.where(is_deleted: true, is_purged: false)
+        if name_contains
+          if name_contains.empty?
+            descendants = descendants.none
+          else
+            descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          end
+        end
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits)))
       end
     end
   end
