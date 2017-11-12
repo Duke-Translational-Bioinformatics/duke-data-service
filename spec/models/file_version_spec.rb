@@ -271,4 +271,17 @@ RSpec.describe FileVersion, type: :model do
       is_expected.to callback(:manage_purge_and_restore).around(:update)
     }
   end
+
+  describe '#purge' do
+    it {
+      expect {
+        begin
+          subject.purge
+        rescue UnPurgableException => e
+          expect(e.message).to eq(subject.kind)
+          raise e
+        end
+      }.to raise_error(UnPurgableException)
+    }
+  end
 end

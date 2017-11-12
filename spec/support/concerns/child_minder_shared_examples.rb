@@ -1,13 +1,12 @@
 shared_context 'a ChildMinder' do |resource_factory, expected_children_sym|
   let(:expected_children) { send(expected_children_sym) }
 
+  it { expect(described_class).to include(ChildMinder) }
+  it { is_expected.to respond_to(:children)  }
+  it { is_expected.to respond_to(:manage_children) }
   it {
-    expect(described_class).to include(ChildMinder)
-    is_expected.to respond_to(:children)
-  }
-
-  it {
-    is_expected.to respond_to(:manage_children)
+    is_expected.not_to respond_to(:restore).with(0).arguments
+    is_expected.to respond_to(:restore).with(1).argument
   }
 
   describe 'callbacks' do
