@@ -16,5 +16,10 @@ FactoryGirl.define do
     trait :deleted do
       is_deleted true
     end
+
+    trait :purged do
+      is_deleted true
+      is_purged true
+    end
   end
 end

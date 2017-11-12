@@ -11,6 +11,8 @@ class FileVersion < ActiveRecord::Base
 
   audited
   belongs_to :data_file
+  alias parent data_file
+
   belongs_to :upload
   has_many :project_permissions, through: :data_file
 
@@ -82,6 +84,10 @@ class FileVersion < ActiveRecord::Base
       )
     #else not needed
     end
+  end
+
+  def purge
+    raise UnPurgableException.new(kind)
   end
 
   private

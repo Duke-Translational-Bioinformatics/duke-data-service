@@ -1,0 +1,2 @@
+class TrashbinParentException < StandardError
+end

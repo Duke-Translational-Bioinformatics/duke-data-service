@@ -93,6 +93,14 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def restore(child)
+    raise IncompatibleParentException.new("#{kind} #{id} is permenantly deleted, and cannot restore children.::Restore to a different project.") if is_deleted?
+    raise IncompatibleParentException.new("Projects can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.") unless child.is_a? Container
+    child.parent_id = nil
+    child.project_id = id
+    child.is_deleted = false
+  end
+
   private
 
   def paginated_containers(page=1)

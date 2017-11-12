@@ -22,6 +22,11 @@ module Purgable
     end
   end
 
+  def purge
+    self.is_deleted = true
+    self.is_purged = true
+  end
+
   private
   def can_be_purged
     if is_purged? && !is_deleted?

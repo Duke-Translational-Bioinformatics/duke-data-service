@@ -315,6 +315,7 @@ module DDS
       mount DDS::V1::MetaTemplatesAPI
       mount DDS::V1::ProjectTransfersAPI
       mount DDS::V1::AuthProvidersAPI
+      mount DDS::V1::TrashbinAPI
       add_swagger_documentation \
         doc_version: '0.0.2',
         hide_documentation_path: true,

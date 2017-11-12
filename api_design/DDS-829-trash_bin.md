@@ -19,7 +19,7 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 | `GET /trashbin/projects/{id}/children{?name_contains}` | Get a list of immediate descendants of the project that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
 | `GET /trashbin/folders/{id}/children{?name_contains}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
 | `GET /trashbin/{object_id}/{object_kind}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
-| `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist. |
+| `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist or is itself deleted. |
 | `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purged, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (e.g. Duke OIT Swift). |
 
 
@@ -68,19 +68,21 @@ create\_file or system\_admin
 
 ###### Response Messages
 * 201: Success
-* 400: Parent object does not exist
+* 400: Parent object does not exist, has been purged, or is in the trash bin
 * 401: Unauthorized
 * 403: Forbidden
 * 404: Object not found in trash bin
 
 ###### Request Parameters
-**parent.kind (string, optional)** - The kind of parent object; this can be a project (`dds-project`) or folder (`dds-folder`).  
+**parent.kind (string, optional)** - The kind of parent object; this can be a project (`dds-project`) or folder (`dds-folder`).
 **parent.id (string, optional)** - The unique id of the parent.
 
 ###### Rules
-+ If no request payload is provided, an attempt will be made to restore to original parent.  
-+ If a file (`dds-file`) is restored, all deleted version history will be restored as well.
-+ If restore of a file version (`dds-file-version`) is requested and the "owning" file is in the trash bin, then an entire file restore will be perfomed - including all deleted version history.
++ If parent is not supplied in the payload, an attempt will be made to restore to the original parent.
++ An exception is returned if the parent is itself in the trash bin. You must restore the parent before you can restore a child to it.
++ `dds-file` and `dds-folder` objects can only be restored to a `dds-project` or `dds-folder` parent.
++ `dds-file-version` objects can only be restored to their original "owning" file.
++ If a `dds-file` is restored, all deleted version history will be restored as well.
 
 ###### Request Example
 `PUT /trashbin/dds-file-version/777be35a-98e0-4c2e-9a17-7bc009f9b111/restore`  

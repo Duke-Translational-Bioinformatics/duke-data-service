@@ -103,4 +103,11 @@ class DataFile < Container
     return unless create_audit
     create_audit.user
   end
+
+  def restore(child)
+    raise TrashbinParentException.new("#{kind} #{id} is deleted, and cannot restore its versions.::Restore #{kind} #{id}.") if is_deleted?
+    raise IncompatibleParentException.new("Parent dds-file can only restore its own dds-file-version objects.::Perhaps you mistyped the object_kind or parent_kind.") unless child.is_a? FileVersion
+    raise IncompatibleParentException.new("dds-file-version objects can only be restored to their original dds-file.::Try not supplying a parent in the payload.") unless child.data_file_id == id
+    child.is_deleted = false
+  end
 end
