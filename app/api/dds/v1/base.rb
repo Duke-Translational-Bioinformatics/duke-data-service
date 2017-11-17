@@ -1,11 +1,19 @@
 require 'grape-swagger'
+require 'grape_logging'
 
 module DDS
   module V1
     class Base < Grape::API
       include Grape::Kaminari
       use AuditStoreCleanUp
-      # use Grape::Middleware::Lograge
+      use GrapeLogging::Middleware::RequestLogger,
+        logger: logger,
+        include: [
+                  # GrapeLogging::Loggers::Response.new,
+                  GrapeLogging::Loggers::FilterParameters.new,
+                  GrapeLogging::Loggers::ClientEnv.new#,
+                  # GrapeLogging::Loggers::RequestHeaders.new 
+                 ]
 
       version 'v1', using: :path
       content_type :json, 'application/json'
