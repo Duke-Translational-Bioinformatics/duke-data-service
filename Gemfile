@@ -22,10 +22,10 @@ gem 'net-ldap'
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack-cors', :require => 'rack/cors'
-gem 'grape-middleware-lograge'
 gem "rack-timeout"
 
 gem 'grape-swagger'
+gem 'grape_logging'
 gem 'kaminari'
 gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
@@ -75,7 +75,7 @@ end
 group :docker, :test do
   gem 'pry-byebug'
 end
-  
+
 group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false
