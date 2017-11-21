@@ -1,10 +1,7 @@
 #!/bin/bash
-which jq > /dev/null
-if [ $? -gt 0 ]
-then
-  echo "install jq https://stedolan.github.io/jq/"
-  exit 1
-fi
+workflow_dir=`dirname $0`
+declare -r DIR=$(cd "${workflow_dir}" && pwd)
+source $DIR/restlib.sh
 
 max_folder_name_count=6
 
@@ -29,51 +26,6 @@ USAGE
     echo "${usage}"
     exit 0
   fi
-}
-
-verbose_echo()
-{
-  $verbose && echo $1 >&2
-}
-
-post_command()
-{
-  local url=$1
-  local payload=$2
-  verbose_echo "post_command $url $payload"
-  if ! $pretend
-  then
-    sleep $delay
-    $verbose && set -o verbose
-    curl_progress="s"
-    $verbose && curl_progress="#"
-    response=$(curl --insecure -${curl_progress} -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: ${auth_token}" -d "${payload}" "${url}")
-    if [ $? -gt 0 ]
-    then
-      echo "Problem!"
-      exit 1
-    fi
-    $verbose && set +o verbose
-    $verbose && echo ${response} | jq
-    error=`echo ${response} | jq '.error'`
-    if [ "${error}" != null ]
-    then
-      echo "Problem!"
-      exit 1
-    fi
-  fi
-}
-
-get_id_from_response()
-{
-  local response_id=''
-  if $pretend
-  then
-    response_id="P-`uuidgen`"
-  else
-    response_id=`echo ${response} | jq -r '.id'`
-  fi
-  echo $response_id
 }
 
 build_folders()
