@@ -174,4 +174,4 @@ project_id=$(get_id_from_response) #`uuidgen` #`echo ${response} | jq -r '.id'`
 
 folder_total=0
 build_folders $project_id "dds-project" "${folders[@]}"
-echo "Created `echo $folder_total | bc` folders"
+echo "Created `echo $folder_total | bc` folders in project ${project_id}"
