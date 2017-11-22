@@ -8,13 +8,13 @@ max_file_count=6
 usage_and_exit()
 {
   read -d '' usage << USAGE
-usage: workflow.stress.sh -n files_per_folder [-hvp] [-d seconds]
-  -N number of folders to generate (default 3, see workflow.sprawl.sh for details)
-  -n required. number of files to put in project, and all child folders
+usage: workflow.stress.sh [-h] -n files_per_folder [-v] [-p] [-f] [-N folders] [-d seconds]
   -h display this message
-  -v verbose output
-  -p pretend mode, do not hit the server
+  -n required. number of files to put in project, and all child folders
+  -v verbose output. default false
+  -p pretend mode, do not hit the server. default false
   -f force script to run when more than ${max_file_count} files are provided. Also runs workflow.sprawl.command with -f.
+  -N number of folders to generate (default 3, see workflow.sprawl.sh for details)
   -d delay (in seconds) between server calls. (default: 1)
 
 Requires DDSTOKEN to be set to a valid api token and DDSURL to be
