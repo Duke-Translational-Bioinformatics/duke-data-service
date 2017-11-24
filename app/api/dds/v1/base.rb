@@ -6,15 +6,17 @@ module DDS
     class Base < Grape::API
       include Grape::Kaminari
       use AuditStoreCleanUp
-      use GrapeLogging::Middleware::RequestLogger,
-        logger: logger,
-        include: [
-                  # GrapeLogging::Loggers::Response.new,
-                  GrapeLogging::Loggers::FilterParameters.new,
-                  GrapeLogging::Loggers::ClientEnv.new#,
-                  # GrapeLogging::Loggers::RequestHeaders.new 
-                 ]
-
+      unless Rails.env.test?
+        use GrapeLogging::Middleware::RequestLogger,
+          logger: logger,
+          include: [
+                    # GrapeLogging::Loggers::Response.new,
+                    GrapeLogging::Loggers::FilterParameters.new,
+                    GrapeLogging::Loggers::ClientEnv.new#,
+                    # GrapeLogging::Loggers::RequestHeaders.new
+                   ]
+      end
+      
       version 'v1', using: :path
       content_type :json, 'application/json'
       format :json
