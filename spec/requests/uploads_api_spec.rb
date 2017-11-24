@@ -220,15 +220,9 @@ describe DDS::V1::UploadsAPI do
       end
 
       it_behaves_like 'an annotate_audits endpoint' do
-        let(:audit_should_include) { {user: current_user, audited_parent: 'Upload'} }
-      end
-      it_behaves_like 'an annotate_audits endpoint' do
         let(:resource_class) { Chunk }
       end
       it_behaves_like 'a software_agent accessible resource' do
-        it_behaves_like 'an annotate_audits endpoint' do
-          let(:audit_should_include) { {user: current_user, audited_parent: 'Upload', software_agent: software_agent} }
-        end
         it_behaves_like 'an annotate_audits endpoint' do
           let(:resource_class) { Chunk }
         end
