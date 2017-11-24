@@ -13,7 +13,7 @@ RSpec.describe Activity, type: :model do
   end
 
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', logically_deleted: true
 
   context 'started_on' do
     context 'default' do

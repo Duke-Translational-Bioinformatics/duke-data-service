@@ -12,6 +12,7 @@ RSpec.describe AssociatedWithSoftwareAgentProvRelation, type: :model do
   end
 
   describe 'validations' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     it { is_expected.to allow_value('SoftwareAgent').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('User').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('Project').for(:relatable_from_type) }

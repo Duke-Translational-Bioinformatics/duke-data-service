@@ -54,11 +54,7 @@ class User < ActiveRecord::Base
     }
   end
 
-  def create_graph_node
-    super('Agent')
-  end
-
-  def graph_node
-    super('Agent')
+  def graph_model_name
+    'Agent'
   end
 end

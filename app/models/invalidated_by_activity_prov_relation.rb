@@ -19,8 +19,8 @@ class InvalidatedByActivityProvRelation < ProvRelation
     end
   end
 
-  def set_relationship_type
-    self.relationship_type = 'was-invalidated-by'
+  def graph_model_name
+    'WasInvalidatedBy'
   end
 
   def kind

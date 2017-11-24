@@ -10,8 +10,4 @@ class AttributedToSoftwareAgentProvRelation < AttributedToProvRelation
     allow_nil: true
   validates :relatable_to_type, inclusion: { in: %w(SoftwareAgent),
     message: "AttributedToSoftwareAgentProvRelation must be to a SoftwareAgent" }
-
-  def set_relationship_type
-    self.relationship_type = 'was-attributed-to'
-  end
 end

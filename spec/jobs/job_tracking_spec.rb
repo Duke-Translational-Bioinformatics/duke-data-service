@@ -64,6 +64,47 @@ RSpec.describe JobTracking do
         expect(job_transaction.state).to eq(expected_state)
       }
     end
+
+    context 'with deleted trasactionable' do
+      before do
+        expect{transaction.transactionable.delete}.not_to raise_error
+        expect(transaction.reload).to be_truthy
+        expect(transaction.transactionable).to be_nil
+      end
+      context 'without key' do
+        it {
+          job_transaction = nil
+          expect {
+            expect {
+              job_transaction = subject.register_job_status(
+                transaction,
+                expected_state
+              )
+            }.not_to raise_error
+          }.to change{JobTransaction.count}.by(1)
+          expect(job_transaction.transactionable_id).to eq(transaction.transactionable_id)
+          expect(job_transaction.transactionable_type).to eq(transaction.transactionable_type)
+        }
+      end
+      context 'with key' do
+        let(:expected_key) { 'TestKey' }
+
+        it {
+          job_transaction = nil
+          expect {
+            expect {
+              job_transaction = subject.register_job_status(
+                transaction,
+                expected_state,
+                expected_key
+              )
+            }.not_to raise_error
+          }.to change{JobTransaction.count}.by(1)
+          expect(job_transaction.transactionable_id).to eq(transaction.transactionable_id)
+          expect(job_transaction.transactionable_type).to eq(transaction.transactionable_type)
+        }
+      end
+    end
   end
 
   context '::initialize_job' do
@@ -72,7 +113,7 @@ RSpec.describe JobTracking do
     }
 
     context 'argument not transactionable' do
-      let(:argument) { FactoryGirl.create(:user) }
+      let(:argument) { Object.new }
 
       it {
         expect(argument.class).not_to include(JobTransactionable)

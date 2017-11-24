@@ -28,6 +28,13 @@ namespace :workers do
     end
   end
 
+  namespace :graph_persistence do
+    desc 'run a GraphPersistenceJob'
+    task run: :environment do
+      JobsRunner.new(GraphPersistenceJob).run
+    end
+  end
+
   namespace :complete_upload do
     desc 'run an UploadCompletionJob'
     task run: :environment do
