@@ -2,7 +2,6 @@ class Chunk < ActiveRecord::Base
   include RequestAudited
   default_scope { order('created_at DESC') }
   audited
-  after_save :update_upload_etag
   after_destroy :update_upload_etag
 
   belongs_to :upload
