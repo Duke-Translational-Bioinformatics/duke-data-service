@@ -18,6 +18,14 @@ shared_context 'with job runner' do |runner_class|
   }
 end
 
+shared_context 'performs enqueued jobs' do |only: nil|
+  around(:example) do |example|
+    perform_enqueued_jobs(only: only) do
+      example.run
+    end
+  end
+end
+
 shared_examples 'an ElasticsearchIndexJob' do |container_sym|
   it {
     expect{described_class.perform_now}.to raise_error(ArgumentError)

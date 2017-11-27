@@ -17,6 +17,7 @@ class JobsRunner
       delete_children: ChildDeletionJob,
       index_documents: ElasticsearchIndexJob,
       update_project_container_elasticsearch: ProjectContainerElasticsearchUpdateJob,
+      graph_persistence: GraphPersistenceJob,
       complete_upload: UploadCompletionJob
     }
   end

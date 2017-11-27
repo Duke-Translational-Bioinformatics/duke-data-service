@@ -17,7 +17,7 @@ RSpec.describe FileVersion, type: :model do
   end
 
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', logically_deleted: true
 
   describe 'associations' do
     it { is_expected.to belong_to(:data_file) }

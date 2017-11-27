@@ -10,8 +10,4 @@ class AssociatedWithUserProvRelation < AssociatedWithProvRelation
     message: "AssociatedWithUserProvRelation must be from a User" }
   validates :relatable_to_type, inclusion: { in: %w(Activity),
     message: "AssociatedWithUserProvRelation must be to an Activity" }
-
-  def set_relationship_type
-    self.relationship_type = 'was-associated-with'
-  end
 end

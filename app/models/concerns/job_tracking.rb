@@ -31,10 +31,9 @@ module JobTracking
 
     def self.register_job_status(transaction, state, key=nil)
       key = transaction.key unless (key)
-      transaction
-      .transactionable
-      .job_transactions
-      .create(
+      JobTransaction.create(
+        transactionable_id: transaction.transactionable_id,
+        transactionable_type: transaction.transactionable_type,
         request_id: transaction.request_id,
         key: key,
         state: state
