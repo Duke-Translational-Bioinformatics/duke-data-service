@@ -1,6 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe Graph::Activity do
-  subject { FactoryGirl.create(:file_version).create_graph_node }
-  it_behaves_like 'a graphed model'
+RSpec.describe Graph::FileVersion do
+  let(:resource) { FactoryGirl.create(:file_version) }
+  before(:example) { resource.create_graph_node }
+  subject { resource.graph_model_object }
+
+  it_behaves_like 'a graphed model' do
+    it_behaves_like 'a Graphed::NodeModel'
+  end
 end

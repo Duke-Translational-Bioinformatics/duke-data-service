@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SearchProvenanceGraph do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:policy_scope) { Proc.new {|scope| scope } }
 
   # (activity)-(used)->(focus)

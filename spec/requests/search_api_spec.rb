@@ -87,6 +87,7 @@ describe DDS::V1::SearchAPI do
       let(:url) { "/api/v1/search/provenance" }
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
+      include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
       let!(:other_file) { FactoryGirl.create(:data_file, project: project) }
       let!(:other_file_version) { other_file.file_versions.first }
@@ -178,6 +179,7 @@ describe DDS::V1::SearchAPI do
   end
 
   describe 'Search Provenance wasGeneratedBy' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     let!(:project) { FactoryGirl.create(:project) }
     let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
     let!(:resource_permission) { project_permission }

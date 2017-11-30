@@ -9,7 +9,7 @@ gem 'pg'
 gem 'neo4j', '~> 7.0'
 
 # Use sneakers(RabbitMQ) for background jobs
-gem 'sneakers'
+gem 'sneakers', '~> 2.5.0'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
@@ -17,10 +17,10 @@ gem 'net-ldap'
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack-cors', :require => 'rack/cors'
-gem 'grape-middleware-lograge'
 gem "rack-timeout"
 
 gem 'grape-swagger'
+gem 'grape_logging'
 gem 'kaminari'
 gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
@@ -28,8 +28,9 @@ gem 'grape-kaminari'
 # Use elasticsearch for search
 # must be included after kaminari according to elasticsearch-model documentation
 gem 'elasticsearch', '~> 2.0.0'
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
+gem 'elasticsearch-model', '~> 2.0.0'
+gem 'elasticsearch-rails', '~> 2.0.0'
+
 
 # Auditing
 gem 'audited'
@@ -76,7 +77,7 @@ end
 group :docker, :test do
   gem 'pry-byebug'
 end
-  
+
 group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false

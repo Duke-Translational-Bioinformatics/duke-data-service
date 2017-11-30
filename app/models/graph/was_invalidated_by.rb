@@ -1,6 +1,5 @@
 class Graph::WasInvalidatedBy
-  include Neo4j::ActiveRel
-  include Graphed::Model
+  include Graphed::RelModel
 
   property :model_id
   property :model_kind
