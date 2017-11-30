@@ -122,4 +122,124 @@ RSpec.describe Project, type: :model do
       }.not_to change{described_class.count}
     end
   end
+
+  describe '#manage_container_index_project' do
+    it { is_expected.to respond_to(:manage_container_index_project) }
+    it { is_expected.to callback(:manage_container_index_project).after(:update) }
+
+    context 'when name is changed' do
+      let(:new_name) { "#{Faker::Team.name}_#{rand(10**3)}" }
+
+      context 'when project has containers' do
+        let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
+        let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
+        let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+
+        let(:job_transaction) {
+          subject.create_transaction('testing')
+          ProjectContainerElasticsearchUpdateJob.initialize_job(subject)
+        }
+        include_context 'with job runner', ProjectContainerElasticsearchUpdateJob
+        before do
+          @old_max = Rails.application.config.max_children_per_job
+          Rails.application.config.max_children_per_job = 1
+          expect(root_folder).to be_persisted
+          expect(root_folder.is_deleted?).to be_falsey
+          expect(folder_child).to be_persisted
+          expect(folder_child.is_deleted?).to be_falsey
+        end
+
+        after do
+          Rails.application.config.max_children_per_job = @old_max
+        end
+        it {
+          subject.name = new_name
+          num_containers = subject.containers.count
+          expect(num_containers).to be > 0
+          expect(subject.name_changed?).to be_truthy
+          expect(ProjectContainerElasticsearchUpdateJob).to receive(:initialize_job)
+            .exactly(num_containers).times
+            .with(subject).and_return(job_transaction)
+          (1..num_containers).each do |page|
+            expect(ProjectContainerElasticsearchUpdateJob).to receive(:perform_later)
+              .with(job_transaction, subject, page)
+          end
+          subject.manage_container_index_project
+        }
+      end
+
+      context 'when project does not have containers' do
+        it {
+          subject.name = new_name
+          expect(subject.containers.count).to eq 0
+          expect(subject.name_changed?).to be_truthy
+          expect(ProjectContainerElasticsearchUpdateJob).not_to receive(:perform_later)
+          subject.manage_container_index_project
+        }
+      end
+    end
+
+    context 'when name is not changed' do
+      let(:new_description) { Faker::Hacker.say_something_smart }
+
+      it {
+        subject.description = new_description
+        expect(subject.name_changed?).to be_falsey
+        expect(ProjectContainerElasticsearchUpdateJob).not_to receive(:perform_later)
+        subject.manage_container_index_project
+      }
+    end
+  end
+
+  describe '#update_container_elasticsearch_index_project' do
+    let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
+    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
+    let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+
+    it { is_expected.not_to respond_to(:update_container_elasticsearch_index_project).with(0).arguments }
+    it { is_expected.to respond_to(:update_container_elasticsearch_index_project).with(1).argument }
+
+    context 'called', :vcr do
+      let(:page) { 1 }
+      let(:new_name) { "#{Faker::Team.name}_#{rand(10**3)}" }
+      include_context 'elasticsearch prep', [:root_folder, :folder_child, :root_file], [:root_folder, :folder_child, :root_file]
+
+      before do
+        expect(root_folder).to be_persisted
+        expect(folder_child).to be_persisted
+        expect(root_file).to be_persisted
+      end
+
+      it {
+        project_container_count = subject.containers.page(page).count
+        expect(project_container_count).to be > 0
+
+        container_search = FolderFilesResponse.new
+        container_search.filter [{'project.id' => [subject.id]}]
+        response = container_search.search
+        results = response.results
+        expect(results.count).to eq(project_container_count)
+        subject.containers.page(page).each do |c|
+          c_index = c.as_indexed_json
+          expect(c_index[:project][:name]).to eq(subject.name)
+          expect(results).to include c_index.as_json
+        end
+
+        subject.update_column(:name, new_name)
+        subject.reload
+        subject.update_container_elasticsearch_index_project(page)
+
+        container_search = FolderFilesResponse.new
+        container_search.filter [{'project.id' => [subject.id]}]
+        response = container_search.search
+        results = response.results
+        expect(results.count).to eq(project_container_count)
+        subject.containers.page(page).each do |c|
+          c_index = c.as_indexed_json
+          expect(c_index[:project][:name]).to eq(new_name)
+          expect(results).to include c_index.as_json
+        end
+      }
+    end
+  end
 end

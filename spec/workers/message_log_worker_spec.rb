@@ -44,8 +44,15 @@ RSpec.describe MessageLogWorker do
 
     it_behaves_like 'an elasticsearch indexer' do
       include_context 'with a single document indexed'
-      before(:each) { expect(method).to eq ack }
+      before(:each) do
+        elasticsearch_client.indices.delete index: '_all'
+        expect(method).to eq ack
+      end
 
+      let(:expected_settings) {{"number_of_replicas" => "0"}}
+      let(:index_settings) { elasticsearch_client.indices.get_settings[index_name]["settings"]["index"] }
+
+      it { expect(index_settings).to include(expected_settings) }
       it { expect(document["_index"]).to eq(index_name) }
       it { expect(document["_type"]).to eq(routing_key) }
       it { expect(document["_source"]).to eq(log_message) }

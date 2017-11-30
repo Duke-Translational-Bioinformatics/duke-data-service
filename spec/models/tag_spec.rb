@@ -5,6 +5,7 @@ RSpec.describe Tag, type: :model do
   let!(:existing_tag_for_uniqueness_validation) { FactoryGirl.create(:tag, :skip_validation, taggable: project) }
   subject { FactoryGirl.create(:tag) }
   let(:taggable_classes) {[
+    Activity,
     DataFile
   ]}
   let(:file) { FactoryGirl.create(:data_file) }
@@ -55,5 +56,13 @@ RSpec.describe Tag, type: :model do
       it { expect(foo_tag_label.last_used_on).to eq(tags.last.created_at) }
       it { expect(foo_tag_label.last_used_on).not_to eq(tags.first.created_at) }
     end
+  end
+
+  describe 'taggable indexing' do
+    let(:resource) { FactoryGirl.build(:tag, taggable: file) }
+    before do
+      expect(file).to be_persisted
+    end
+    it_behaves_like 'a SearchableModel observer'
   end
 end

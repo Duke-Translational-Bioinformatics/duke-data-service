@@ -21,6 +21,9 @@ RUN ["/root/installs/install_ssl_cert.sh"]
 #Postgresql client
 RUN /usr/bin/apt-get update && /usr/bin/apt-get install -y postgresql libpq-dev
 
+#GraphViz for Rails ERD
+RUN /usr/bin/apt-get install -y graphviz
+
 #miscellaneous
 RUN ["mkdir","-p","/var/www"]
 WORKDIR /var/www
