@@ -22,14 +22,4 @@ Rails.application.configure do
 
   # :debug :info :warn :error :fatal :unknown (0-5)
   config.log_level = ENV['RAILS_LOG_LEVEL'] || :debug
-
-  # config.lograge.enabled = true
-  # config.lograge.formatter = Lograge::Formatters::Json.new
-  # config.lograge.custom_options = lambda do |event|
-  #   {
-  #     transaction_id: event.transaction_id,
-  #     request_time: event.time,
-  #     request_end: event.end
-  #   }.merge(event.payload)
-  # end
 end

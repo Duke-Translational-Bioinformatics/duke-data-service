@@ -30,6 +30,9 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
+  # Provides helper methods for testing Active Job
+  include ActiveJob::TestHelper
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
@@ -116,6 +119,11 @@ module BunnyMock
 
     def cancel
       @consumers = []
+      self
+    end
+
+    def consumer_tag
+      'the-consumer-tag'
     end
 
     def pop(opts = { manual_ack: false }, &block)

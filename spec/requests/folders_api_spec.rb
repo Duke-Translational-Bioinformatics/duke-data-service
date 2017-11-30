@@ -168,10 +168,7 @@ describe DDS::V1::FoldersAPI do
           let(:resource_counter) { resource_class.base_class.where(is_deleted: false) }
 
           context 'with inline ActiveJob' do
-            before do
-              ActiveJob::Base.queue_adapter = :inline
-            end
-
+            include_context 'performs enqueued jobs', only: ChildDeletionJob
             it 'should be marked as deleted' do
               is_expected.to eq(204)
               expect(resource.reload).to be_truthy

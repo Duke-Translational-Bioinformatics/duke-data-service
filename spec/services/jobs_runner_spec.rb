@@ -11,6 +11,7 @@ RSpec.describe JobsRunner do
     initialize_project_storage: ProjectStorageProviderInitializationJob,
     delete_children: ChildDeletionJob,
     index_documents: ElasticsearchIndexJob,
+    graph_persistence: GraphPersistenceJob,
     complete_upload: UploadCompletionJob
   } }
   let(:registered_worker_classes) { workers_registry_hash.values }

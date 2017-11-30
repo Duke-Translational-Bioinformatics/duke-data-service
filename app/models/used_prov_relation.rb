@@ -12,8 +12,8 @@ class UsedProvRelation < ProvRelation
 
   validate :using_activity, unless: :is_deleted
 
-  def set_relationship_type
-    self.relationship_type = 'used'
+  def graph_model_name
+    'Used'
   end
 
   def using_activity
