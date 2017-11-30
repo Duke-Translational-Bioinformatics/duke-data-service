@@ -5,7 +5,7 @@ machine:
     LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
     COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
-    GRAPHSTORY_URL: http://neo4j.db.host:7474
+    GRAPHENEDB_URL: http://neo4j.db.host:7474
     BONSAI_URL: elastic.local:9200
     OPENID_CLIENT_ID: test
     OPENID_CLIENT_SECRET: testpass
@@ -27,10 +27,10 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-    - ./docker/circle/cache_docker_image.sh neo4j 3.0.2
+    - ./docker/circle/cache_docker_image.sh neo4j 3.1.6
     - ./docker/circle/cache_docker_image.sh elasticsearch 2.4
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
-    - sudo pip install --upgrade docker-compose==1.8.0
+    - sudo pip install --upgrade docker-compose==1.16.1
     - docker-compose up -d neo4j elasticsearch
 
 deployment:
