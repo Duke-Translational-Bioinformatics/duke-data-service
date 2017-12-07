@@ -2,6 +2,7 @@ class Activity < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
+  include SearchableModel
   before_create :set_default_started_on
   after_save :logically_delete_graph_node
 
@@ -11,6 +12,8 @@ class Activity < ActiveRecord::Base
   has_many :generated_by_activity_prov_relations, as: :relatable_to
   has_many :invalidated_by_activity_prov_relations, as: :relatable_to
   has_many :used_prov_relations, as: :relatable_from
+  has_many :tags, as: :taggable
+  has_many :meta_templates, as: :templatable
 
   validates :name, presence: true
   validates :creator_id, presence: true

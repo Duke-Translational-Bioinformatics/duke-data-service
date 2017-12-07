@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ElasticsearchResponse do
+RSpec.describe DeprecatedElasticsearchResponse do
   it { expect(described_class).to respond_to 'indexed_models' }
 
   let(:policy_scope) { Proc.new {|scope| scope } }
@@ -25,7 +25,7 @@ RSpec.describe ElasticsearchResponse do
 
   context 'elasticsearch' do
     context 'initialization' do
-      let(:indices) { ElasticsearchResponse.indexed_models }
+      let(:indices) { DeprecatedElasticsearchResponse.indexed_models }
 
       context 'no arguments' do
         subject {
@@ -90,7 +90,7 @@ RSpec.describe ElasticsearchResponse do
         }
         it {
           current_indices = DataFile.__elasticsearch__.client.cat.indices
-          ElasticsearchResponse.indexed_models.each do |indexed_model|
+          DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
             if current_indices.include? indexed_model.index_name
               indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
             end
@@ -115,7 +115,7 @@ RSpec.describe ElasticsearchResponse do
             subject
           }.not_to raise_error
 
-          ElasticsearchResponse.indexed_models.each do |indexed_model|
+          DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
             indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
           end
         }
@@ -142,7 +142,7 @@ RSpec.describe ElasticsearchResponse do
       end
 
       context 'multi index' do
-        let(:indices) { ElasticsearchResponse.indexed_models }
+        let(:indices) { DeprecatedElasticsearchResponse.indexed_models }
         subject {
           described_class.new(
             query: elastic_query,
@@ -160,7 +160,7 @@ RSpec.describe ElasticsearchResponse do
       context 'restrictive policy_scope' do
         let(:indices) { [Folder] }
         let(:policy_scope) { Proc.new { |scope| scope.none } }
-        let(:indices) { ElasticsearchResponse.indexed_models }
+        let(:indices) { DeprecatedElasticsearchResponse.indexed_models }
         subject {
           described_class.new(
             query: elastic_query,

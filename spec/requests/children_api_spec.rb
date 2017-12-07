@@ -31,6 +31,7 @@ describe DDS::V1::ChildrenAPI do
   let!(:resource) { folder }
   let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent_id) { parent.id }
+  let(:payload) {{}}
 
   describe 'Folder children collection' do
     let(:query_params) { '' }

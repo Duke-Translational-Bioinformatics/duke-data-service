@@ -19,7 +19,7 @@ describe DDS::V1::AppAPI do
     end
   end
   before do
-    ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
+    ENV["GRAPHENEDB_URL"] = 'http://neo4j.db.host:7474'
   end
 
   describe 'app status', :vcr do
@@ -125,7 +125,7 @@ describe DDS::V1::AppAPI do
       context 'environment is not set' do
         let(:status_error) { 'graphdb environment is not set' }
         before do
-          ENV["GRAPHSTORY_URL"] = nil
+          ENV["GRAPHENEDB_URL"] = nil
         end
         it_behaves_like 'a status error', :status_error
       end

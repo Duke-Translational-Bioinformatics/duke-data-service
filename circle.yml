@@ -5,7 +5,7 @@ machine:
     LOCALDEV: true
     DDSURL: http://0.0.0.0:3001
     COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
-    GRAPHSTORY_URL: http://neo4j.db.host:7474
+    GRAPHENEDB_URL: http://neo4j.db.host:7474
     BONSAI_URL: elastic.local:9200
     OPENID_CLIENT_ID: test
     OPENID_CLIENT_SECRET: testpass
@@ -27,7 +27,7 @@ dependencies:
   cache_directories:
     - "docker/circle"
   pre:
-    - ./docker/circle/cache_docker_image.sh neo4j 3.0.2
+    - ./docker/circle/cache_docker_image.sh neo4j 3.1.6
     - ./docker/circle/cache_docker_image.sh elasticsearch 2.4
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.8.0
@@ -46,6 +46,7 @@ deployment:
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-dev'
+    - heroku config:unset RECREATE_SEARCH_MAPPINGS --app 'dukeds-dev'
     - heroku maintenance:off --app 'dukeds-dev'
  ua_test:
    branch: ua_test
@@ -59,6 +60,7 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-uatest'
+    - heroku config:unset RECREATE_SEARCH_MAPPINGS --app 'dukeds-uatest'
     - heroku maintenance:off --app 'dukeds-uatest'
  production:
    branch: production
@@ -71,3 +73,4 @@ deployment:
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'
+    - heroku config:unset RECREATE_SEARCH_MAPPINGS --app 'dukeds'

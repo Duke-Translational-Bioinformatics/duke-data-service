@@ -6,12 +6,14 @@ describe DDS::V1::TagsAPI do
   let(:project) { FactoryGirl.create(:project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
-  let(:tag_stub) { FactoryGirl.build(:tag, taggable: data_file) }
+  let(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+  let(:taggable) { data_file }
+  let(:tag) { FactoryGirl.create(:tag, taggable: taggable) }
+  let(:tag_stub) { FactoryGirl.build(:tag, taggable: taggable) }
 
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_tag) { FactoryGirl.create(:tag, taggable: other_data_file) }
+  let(:other_taggable) { FactoryGirl.create(:data_file, project: other_permission.project) }
+  let(:other_tag) { FactoryGirl.create(:tag, taggable: other_taggable) }
 
   let(:not_allowed_tag) { FactoryGirl.create(:tag) }
 
@@ -23,9 +25,9 @@ describe DDS::V1::TagsAPI do
   let(:resource_stub) { tag_stub }
 
   describe 'Tags collection' do
-    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}" }
-    let(:file_id) { data_file.id }
-    let(:resource_kind) { data_file.kind }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{taggable_id}" }
+    let(:taggable_id) { taggable.id }
+    let(:resource_kind) { taggable.kind }
 
     describe 'POST' do
       subject { post(url, params: payload.to_json, headers: headers) }
@@ -41,6 +43,10 @@ describe DDS::V1::TagsAPI do
           expect(new_object.label).to eq(payload[:label])
         end
       end
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a creatable resource'
+      end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource' do
@@ -48,7 +54,7 @@ describe DDS::V1::TagsAPI do
       end
 
       it_behaves_like 'an identified resource' do
-        let(:file_id) { 'notfoundid' }
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) {'DataFile'}
       end
 
@@ -81,12 +87,17 @@ describe DDS::V1::TagsAPI do
         ] }
       end
 
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a listable resource'
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
 
-      context 'with invalid file_id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with invalid taggable_id' do
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) { DataFile }
         it_behaves_like 'an identified resource'
       end
@@ -99,9 +110,9 @@ describe DDS::V1::TagsAPI do
   end
 
   describe 'Append a list of object tags'  do
-    let(:url) { "/api/v1/tags/#{resource_kind}/#{file_id}/append" }
-    let(:file_id) { data_file.id }
-    let(:resource_kind) { data_file.kind }
+    let(:url) { "/api/v1/tags/#{resource_kind}/#{taggable_id}/append" }
+    let(:taggable_id) { taggable.id }
+    let(:resource_kind) { taggable.kind }
     describe 'POST' do
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'POST' }
@@ -115,15 +126,17 @@ describe DDS::V1::TagsAPI do
       }}
       let(:payload_label) { resource_stub.label }
 
+      def find_last_object_in_results
+        response_json = JSON.parse(response.body)
+        expect(response_json).to have_key('results')
+        expect(response_json['results']).to be_a(Array)
+        expect(response_json['results']).not_to be_empty
+        expect(response_json['results'].last).to have_key('id')
+        resource_class.find(response_json['results'].last['id'])
+      end
+
       it_behaves_like 'a creatable resource' do
-        let(:new_object) {
-          response_json = JSON.parse(response.body)
-          expect(response_json).to have_key('results')
-          expect(response_json['results']).to be_a(Array)
-          expect(response_json['results']).not_to be_empty
-          expect(response_json['results'].last).to have_key('id')
-          resource_class.find(response_json['results'].last['id'])
-        }
+        let(:new_object) { find_last_object_in_results }
         it 'should set label' do
           is_expected.to eq(expected_response_status)
           expect(new_object.label).to eq(payload_label)
@@ -132,6 +145,12 @@ describe DDS::V1::TagsAPI do
           let(:expected_response_status) { 201 }
           let(:expected_resources) { [new_object] }
           let(:serializable_resource) { new_object }
+        end
+      end
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a creatable resource' do
+          let(:new_object) { find_last_object_in_results }
         end
       end
 
@@ -159,8 +178,8 @@ describe DDS::V1::TagsAPI do
         let(:expected_response_status) { 201 }
       end
 
-      context 'with invalid file_id' do
-        let(:file_id) { 'notfoundid' }
+      context 'with invalid taggable_id' do
+        let(:taggable_id) { 'notfoundid' }
         let(:resource_class) { DataFile }
         it_behaves_like 'an identified resource'
       end
@@ -192,6 +211,15 @@ describe DDS::V1::TagsAPI do
           not_allowed_tag_label
         ] }
       end
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { expected_resources.length }
+          let!(:expected_resources) { [ resource_tag_label ] }
+          let(:serializable_resource) { expected_resources.first }
+          let!(:unexpected_resources) { [ not_allowed_tag_label ] }
+        end
+      end
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
@@ -219,8 +247,8 @@ describe DDS::V1::TagsAPI do
 
       context 'with label_contains parameter' do
         let(:label_query) { SecureRandom.hex }
-        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: data_file) }
-        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: data_file) }
+        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: taggable) }
+        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: taggable) }
         let!(:diff_tag_label) { Tag.where(label: diff_tag.label).tag_labels.first }
         let(:query_params) { "?label_contains=#{label_query}" }
 
@@ -246,6 +274,10 @@ describe DDS::V1::TagsAPI do
       subject { get(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a viewable resource'
+      end
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'
       it_behaves_like 'a software_agent accessible resource'
@@ -259,6 +291,10 @@ describe DDS::V1::TagsAPI do
       subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'
+      context 'with a taggable Activity' do
+        let(:taggable) { activity }
+        it_behaves_like 'a removable resource'
+      end
 
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'an authorized resource'

@@ -61,7 +61,7 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :test
 
     # Ensure indexes exist in elasticsearch for indexed_models
-    ElasticsearchResponse.indexed_models.each do |indexed_model|
+    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
       Elasticsearch::Model.client.indices.create(
         index: indexed_model.index_name,
         update_all_types: true,

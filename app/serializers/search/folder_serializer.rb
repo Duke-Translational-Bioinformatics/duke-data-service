@@ -1,8 +1,6 @@
 class Search::FolderSerializer < FolderSerializer
   attributes :kind, :id, :parent, :name, :is_deleted, :audit,
-  :created_at, :updated_at, :label, :meta
-
-  has_one :creator, serializer: Search::UserSummarySerializer
+  :meta
 
   def meta
     object.meta_templates.each_with_object({}) do |meta_template, metadata|
