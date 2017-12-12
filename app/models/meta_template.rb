@@ -1,7 +1,7 @@
 class MetaTemplate < ActiveRecord::Base
   include RequestAudited
   audited
-  belongs_to :templatable, polymorphic: true
+  belongs_to :templatable, polymorphic: true, touch: true
   belongs_to :template
   has_many :meta_properties, autosave: true, dependent: :destroy
 
@@ -27,6 +27,7 @@ class MetaTemplate < ActiveRecord::Base
 
   def self.templatable_classes
     [
+      Activity,
       DataFile
     ]
   end

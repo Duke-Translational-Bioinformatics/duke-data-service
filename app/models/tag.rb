@@ -20,6 +20,7 @@ class Tag < ActiveRecord::Base
 
   def self.taggable_classes
     [
+      Activity,
       DataFile
     ]
   end

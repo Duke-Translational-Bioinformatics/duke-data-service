@@ -371,5 +371,646 @@ describe DDS::V1::SearchAPI do
         end
       end
     end
+
+    describe 'Search FolderFiles' do
+      describe 'POST /api/v1/search/folders_files' do
+        let(:url) { "/api/v1/search/folders_files" }
+        let!(:project) { FactoryGirl.create(:project) }
+        let!(:other_project) { FactoryGirl.create(:project) }
+        let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+        let!(:resource_permission) { project_permission }
+
+        let(:indexed_data_file) {
+          FactoryGirl.create(:data_file, name: "foofile", project: project)
+        }
+        let(:extra_file_one) {
+          FactoryGirl.create(:data_file, project: project)
+        }
+        let(:extra_file_two) {
+          FactoryGirl.create(:data_file, project: project)
+        }
+        let(:indexed_folder) {
+          FactoryGirl.create(:folder, :root, name: "foofolder", project: project)
+        }
+        let(:extra_folder_one) {
+          FactoryGirl.create(:folder, :root, project: project)
+        }
+        let(:extra_folder_two) {
+          FactoryGirl.create(:folder, :root, project: project)
+        }
+
+        let(:other_project_indexed_data_file) {
+          FactoryGirl.create(:data_file, name: "foobyfile", project: other_project)
+        }
+        let(:other_project_indexed_folder) {
+          FactoryGirl.create(:folder, :root, name: "foobyfolder", project: other_project)
+        }
+
+        context 'no parameters provided' do
+          let(:payload) {{}}
+
+          include_context 'elasticsearch prep', [],
+          [
+            :indexed_folder,
+            :indexed_data_file,
+            :other_project_indexed_data_file,
+            :other_project_indexed_folder,
+            :extra_file_one,
+            :extra_file_two,
+            :extra_folder_one,
+            :extra_folder_two
+          ]
+
+          it_behaves_like 'a POST request' do
+            it_behaves_like 'an authenticated resource'
+            it_behaves_like 'a software_agent accessible resource' do
+              let(:expected_response_status) { 201}
+            end
+
+            it_behaves_like 'a listable resource' do
+              let(:resource) { indexed_data_file }
+              let(:expected_list_length) { 6 }
+              let(:resource_serializer) { Search::DataFileSerializer }
+              let(:unexpected_resources) {[
+                other_project_indexed_data_file
+              ]}
+              let(:expected_resources) {[
+                indexed_data_file,
+                extra_file_one,
+                extra_file_two
+              ]}
+              let(:expected_response_status) { 201 }
+            end
+
+            it_behaves_like 'a listable resource' do
+              let(:resource) { indexed_folder }
+              let(:expected_list_length) { 6 }
+              let(:resource_serializer) { Search::FolderSerializer }
+              let(:unexpected_resources) {[
+                other_project_indexed_folder
+              ]}
+              let(:expected_resources) {[
+                indexed_folder,
+                extra_folder_one,
+                extra_folder_two
+              ]}
+              let(:expected_response_status) { 201 }
+            end
+
+            it_behaves_like 'a paginated resource' do
+              let(:expected_response_status) { 201 }
+              let(:expected_total_length) { 6 }
+              let(:extras) {[
+                extra_file_one,
+                extra_file_two,
+                extra_folder_one,
+                extra_folder_two
+              ]}
+            end
+          end
+        end
+
+        context 'filters' do
+          let(:payload) {{
+            filters: filters
+          }}
+
+          include_context 'elasticsearch prep', [],
+          [
+            :indexed_folder,
+            :indexed_data_file,
+            :other_project_indexed_data_file,
+            :other_project_indexed_folder,
+            :extra_file_one,
+            :extra_file_two,
+            :extra_folder_one,
+            :extra_folder_two
+          ]
+
+          context 'project.id' do
+            context 'all of which user has access' do
+              let(:filters) {[
+                {'project.id' => [project.id] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {[
+                    other_project_indexed_data_file
+                  ]}
+                  let(:expected_resources) {[
+                    indexed_data_file,
+                    extra_file_one,
+                    extra_file_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_folder }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::FolderSerializer }
+                  let(:unexpected_resources) {[
+                    other_project_indexed_folder
+                  ]}
+                  let(:expected_resources) {[
+                    indexed_folder,
+                    extra_folder_one,
+                    extra_folder_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+
+            context 'all of which user does not have access' do
+              let(:filters) {[
+                { 'project.id' => [other_project.id] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'an authorized resource' do
+                  let(:resource_permission) { project_permission }
+                end
+              end
+            end
+
+            context 'mix of projects to which user has and does not have access' do
+              let(:filters) {[
+                { 'project.id' => [project.id, other_project.id] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'an authorized resource' do
+                  let(:resource_permission) { project_permission }
+                end
+              end
+            end
+          end
+
+          context 'kind' do
+            context 'unsupported kind' do
+              let(:unsupported_kind) { 'unsupported-kind' }
+              let(:filters) {[
+                { kind: [unsupported_kind] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "filters[] kind must be one of #{FolderFilesResponse.supported_filter_kinds.join(', ')}" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'supported kind' do
+              let(:filters) {[
+                { kind: ['dds-file'] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 3 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_data_file
+                    ]
+                  }
+                  let(:expected_resources) {[
+                    indexed_data_file,
+                    extra_file_one,
+                    extra_file_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+          end
+        end
+
+        context 'query_string' do
+          let(:payload) {{
+            query_string: query_string
+          }}
+
+          include_context 'elasticsearch prep', [],
+          [
+            :indexed_folder,
+            :indexed_data_file,
+            :other_project_indexed_data_file,
+            :other_project_indexed_folder,
+            :extra_file_one,
+            :extra_file_two,
+            :extra_folder_one,
+            :extra_folder_two
+          ]
+
+          context 'query' do
+            let(:query_string) {{
+              query: 'foo'
+            }}
+
+            it_behaves_like 'a POST request' do
+              it_behaves_like 'a listable resource' do
+                let(:resource) { indexed_data_file }
+                let(:expected_list_length) { 2 }
+                let(:resource_serializer) { Search::DataFileSerializer }
+                let(:unexpected_resources) {[
+                  other_project_indexed_data_file,
+                  extra_file_one,
+                  extra_file_two
+                ]}
+                let(:expected_resources) {[
+                  indexed_data_file
+                ]}
+                let(:expected_response_status) { 201 }
+              end
+
+              it_behaves_like 'a listable resource' do
+                let(:resource) { indexed_folder }
+                let(:expected_list_length) { 2 }
+                let(:resource_serializer) { Search::FolderSerializer }
+                let(:unexpected_resources) {[
+                  other_project_indexed_folder,
+                  extra_folder_one,
+                  extra_folder_two
+                ]}
+                let(:expected_resources) {[
+                  indexed_folder
+                ]}
+                let(:expected_response_status) { 201 }
+              end
+            end
+          end
+
+          context 'fields' do
+            context 'unsupported' do
+              let(:unsupported_query_field) { 'unsupported-query-field' }
+              let(:query_string) {{
+                query: 'foo',
+                fields: [unsupported_query_field]
+              }}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "query_string.field must be one of #{FolderFilesResponse.supported_query_string_fields.join(', ')}" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'submitted without query' do
+              let(:query_string) {{
+                fields: ['name']
+              }}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "query_string.fields is not allowed without query_string.query" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'supported' do
+              let(:query_string) {{
+                query: 'foo',
+                fields: ['name']
+              }}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 2 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_data_file,
+                      extra_file_one,
+                      extra_file_two
+                    ]
+                  }
+                  let(:expected_resources) {[
+                      indexed_data_file
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_folder }
+                  let(:expected_list_length) { 2 }
+                  let(:resource_serializer) { Search::FolderSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_folder,
+                      extra_folder_one,
+                      extra_folder_two
+                    ]
+                  }
+                  let(:expected_resources) {[
+                      indexed_folder
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+          end
+        end
+
+        context 'aggs' do
+          let(:payload) {{
+            aggs: aggs
+          }}
+
+          include_context 'elasticsearch prep', [],
+          [
+            :indexed_folder,
+            :indexed_data_file,
+            :other_project_indexed_data_file,
+            :other_project_indexed_folder,
+            :extra_file_one,
+            :extra_file_two,
+            :extra_folder_one,
+            :extra_folder_two
+          ]
+
+          context 'field' do
+            context 'not provided in aggs object' do
+              let(:aggs) {[
+                {name: 'aggname'}
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "aggs[].field is required" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'unsupported' do
+              let(:unsupported_agg_field) { 'unsupported-agg' }
+              let(:aggs) {[
+                {
+                  name: 'aggname',
+                  field: unsupported_agg_field
+                }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "aggs[].field must be one of #{FolderFilesResponse.supported_agg_fields.join(', ')}" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'supported' do
+              let(:aggs) {[
+                {
+                  name: 'aggname',
+                  field: 'project.name'
+                }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_data_file
+                    ]
+                  }
+                  let(:expected_resources) {[
+                    indexed_data_file,
+                    extra_file_one,
+                    extra_file_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_folder }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::FolderSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_folder
+                    ]
+                  }
+                  let(:expected_resources) {[
+                    indexed_folder,
+                    extra_folder_one,
+                    extra_folder_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+          end
+
+          context 'name' do
+            context 'not provided in aggs object' do
+              let(:aggs) {[
+                {field: 'tags.label'}
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "aggs[].name is required" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+          end
+
+          context 'size' do
+            let(:aggs) {[
+              {
+                name: 'aggname',
+                field: 'project.name',
+                size: agg_size
+              }
+            ]}
+
+            context 'too large' do
+              let(:agg_size) { 51 }
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { 'aggs[].size must be at least 20 and at most 50' }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'too small' do
+              let(:agg_size) { 18 }
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { 'aggs[].size must be at least 20 and at most 50' }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'within supported range' do
+              let(:agg_size) { 30 }
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_data_file
+                    ]
+                  }
+                  let(:expected_resources) {[
+                    indexed_data_file,
+                    extra_file_one,
+                    extra_file_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_folder }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::FolderSerializer }
+                  let(:unexpected_resources) {
+                    [
+                      other_project_indexed_folder
+                    ]
+                  }
+                  let(:expected_resources) {[
+                    indexed_folder,
+                    extra_folder_one,
+                    extra_folder_two
+                  ]}
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+          end
+        end
+
+        context 'post_filters' do
+          include_context 'elasticsearch prep', [],
+          [
+            :indexed_folder,
+            :indexed_data_file,
+            :other_project_indexed_data_file,
+            :other_project_indexed_folder,
+            :extra_file_one,
+            :extra_file_two,
+            :extra_folder_one,
+            :extra_folder_two
+          ]
+
+          context 'without aggs' do
+            let(:payload) {{
+              post_filters: [{'project.name' => [project.name]}]
+            }}
+
+            it_behaves_like 'a POST request' do
+              it_behaves_like 'a client error' do
+                let(:expected_response) { 400 }
+                let(:expected_reason) { "post_filters must be used with aggs" }
+                let(:expected_suggestion) { "Please supply the correct argument" }
+              end
+            end
+          end
+
+          context 'with aggs' do
+            let(:payload) {{
+              aggs: [{
+                name: 'aggname',
+                field: 'project.name'
+              }],
+              post_filters: post_filters
+            }}
+
+            context 'unsupported' do
+              let(:unsupported_post_filter) { 'unsupported-post-filter' }
+              let(:post_filters) {[
+                { "#{unsupported_post_filter}" => [project.name] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "post_filters key must be one of #{FolderFilesResponse.supported_agg_fields.join(', ')}" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'not included in aggs[].field' do
+              let(:supported_post_filter) { 'tags.label' }
+              let(:post_filters) {[
+                { "#{supported_post_filter}" => [project.name] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a client error' do
+                  let(:expected_response) { 400 }
+                  let(:expected_reason) { "post_filters[#{supported_post_filter}] must be accompanied by aggs[].field #{supported_post_filter}" }
+                  let(:expected_suggestion) { "Please supply the correct argument" }
+                end
+              end
+            end
+
+            context 'supported' do
+              let(:supported_post_filter) { 'project.name' }
+              let(:post_filters) {[
+                { "#{supported_post_filter}" => [project.name] }
+              ]}
+
+              it_behaves_like 'a POST request' do
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_data_file }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::DataFileSerializer }
+                  let(:unexpected_resources) {
+                    [other_project_indexed_data_file]
+                  }
+                  let(:expected_resources) { [resource] }
+                  let(:expected_response_status) { 201 }
+                end
+
+                it_behaves_like 'a listable resource' do
+                  let(:resource) { indexed_folder }
+                  let(:expected_list_length) { 6 }
+                  let(:resource_serializer) { Search::FolderSerializer }
+                  let(:unexpected_resources) {
+                    [other_project_indexed_folder]
+                  }
+                  let(:expected_resources) { [resource] }
+                  let(:expected_response_status) { 201 }
+                end
+              end
+            end
+          end
+        end
+      end
+    end
   end
 end
