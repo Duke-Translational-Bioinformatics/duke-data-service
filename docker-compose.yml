@@ -34,7 +34,7 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:2.4
+    image: elasticsearch:5.4.3
     ports:
       - '9200:9200'
     command: elasticsearch --action.auto_create_index=0
