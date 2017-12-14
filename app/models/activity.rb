@@ -2,7 +2,25 @@ class Activity < ActiveRecord::Base
   include Kinded
   include Graphed::Node
   include RequestAudited
+
   include SearchableModel
+  # change this to a new uuid any time
+  #  - a migration is created to add/remove fields
+  #    and its serializers (standard and search)
+  #  - relationships are added to/removed from the serializers
+  @@migration_version = '429D08E4-622D-456A-A87D-84C288857320'
+
+  # change this variable to a new uuid any time the mappings below change
+  @@mapping_version = 'BAB2183A-5ED5-4CD3-B05E-916E20817DD7'
+
+  def self.mapping_version
+    @@mapping_version
+  end
+
+  def self.migration_version
+    @@migration_version
+  end
+
   before_create :set_default_started_on
   after_save :logically_delete_graph_node
 

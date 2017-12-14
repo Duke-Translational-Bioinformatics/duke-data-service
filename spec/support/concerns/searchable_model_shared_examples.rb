@@ -6,6 +6,19 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
 
+  describe 'elasticsearch migrations' do
+    it { expect(described_class).to respond_to(:index_name) }
+    it { expect(described_class).to respond_to(:mapping_version) }
+    it { expect(described_class).to respond_to(:migration_version) }
+    it {
+      expect(described_class).to respond_to(:versioned_index_name)
+      (current_index_name, current_mapping_version, current_migration_version) = described_class.versioned_index_name.split('.')
+      expect(current_index_name).to eq described_class.index_name
+      expect(current_mapping_version).to eq(described_class.mapping_version)
+      expect(current_migration_version).to eq(described_class.migration_version)
+    }
+  end
+
   describe '#settings' do
     let(:expected_number_of_replicas) { 4 }
     let(:expected_number_of_shards) { 4 }

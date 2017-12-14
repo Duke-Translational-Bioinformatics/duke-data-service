@@ -1,7 +1,24 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class DataFile < Container
+
   include SearchableModel
+  # change this to a new uuid any time
+  #  - a migration is created to add/remove fields
+  #    and its serializers (standard and search)
+  #  - relationships are added to/removed from the serializers
+  @@migration_version = '366F0FD9-5526-4479-B4F1-5C61E8C1EB53'
+
+  # change this variable to a new uuid any time the mappings below change
+  @@mapping_version = '6518BCEF-69D7-457D-9EE4-A74CB64B698D'
+
+  def self.mapping_version
+    @@mapping_version
+  end
+
+  def self.migration_version
+    @@migration_version
+  end
 
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
