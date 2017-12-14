@@ -170,7 +170,7 @@ RSpec.describe FolderFilesResponse do
 
     let(:expected_query) {{
       query: {
-        filtered: {
+        bool: {
           filter: {
             bool: {
               must: [
@@ -295,7 +295,7 @@ RSpec.describe FolderFilesResponse do
             expect {
               expected_query = {
                 query: {
-                  filtered: {
+                  bool: {
                     filter: {
                       bool: {
                         must: [
@@ -336,7 +336,7 @@ RSpec.describe FolderFilesResponse do
         let(:query) { indexed_folder.name.split(' ')[0] }
         let(:expected_query) {{
           query: {
-            filtered: {
+            bool: {
               filter: {
                 bool: {
                   must: [
@@ -347,7 +347,7 @@ RSpec.describe FolderFilesResponse do
                   }
                 }
               },
-              query: {
+              must: {
                 query_string: {
                   fields: described_class.supported_query_string_fields,
                   query: "*#{query}*"
@@ -370,7 +370,7 @@ RSpec.describe FolderFilesResponse do
         let(:query) { indexed_folder.name }
         let(:expected_query) {{
           query: {
-            filtered: {
+            bool: {
               filter: {
                 bool: {
                   must: [
@@ -381,7 +381,7 @@ RSpec.describe FolderFilesResponse do
                   }
                 }
               },
-              query: {
+              must: {
                 query_string: {
                   query: "*#{query}* *#{query.gsub(/\s/,'* *')}*",
                   fields: described_class.supported_query_string_fields
@@ -404,8 +404,8 @@ RSpec.describe FolderFilesResponse do
         let(:query) { indexed_folder.name[0,2] }
         let(:expected_query) {{
           query: {
-            filtered: {
-              query: {
+            bool: {
+              must: {
                 query_string: {
                   query: "*#{query}*",
                   fields: described_class.supported_query_string_fields
@@ -469,8 +469,8 @@ RSpec.describe FolderFilesResponse do
           described_class.supported_query_string_fields.each do |supported_field|
             expected_query = {
               query: {
-                filtered: {
-                  query: {
+                bool: {
+                  must: {
                     query_string: {
                       fields: [supported_field],
                       query: "*#{query_lookup[supported_field]}*"
@@ -573,7 +573,7 @@ RSpec.describe FolderFilesResponse do
             field_name = Faker::Beer.hop
             expected_query = {
               query: {
-                filtered: {
+                bool: {
                   filter: {
                     bool: {
                       must: [
@@ -641,7 +641,7 @@ RSpec.describe FolderFilesResponse do
         }
         let(:expected_query) {{
           query: {
-            filtered: {
+            bool: {
               filter: {
                 bool: {
                   must: [
@@ -690,7 +690,7 @@ RSpec.describe FolderFilesResponse do
         }
         let(:expected_query) {{
           query: {
-            filtered: {
+            bool: {
               filter: {
                 bool: {
                   must: [
@@ -754,7 +754,7 @@ RSpec.describe FolderFilesResponse do
         }
         let(:expected_query) {{
           query: {
-            filtered: {
+            bool: {
               filter: {
                 bool: {
                   must: [
@@ -928,7 +928,7 @@ RSpec.describe FolderFilesResponse do
           size = field_value_lookup[supported_post_filter_field][:size]
           expected_query = {
             query: {
-              filtered: {
+              bool: {
                 filter: {
                   bool: {
                     must: [
@@ -1005,7 +1005,7 @@ RSpec.describe FolderFilesResponse do
     let(:expected_query) {
       {
         query: {
-          filtered: {
+          bool: {
             filter: {
               bool: {
                 must: [
@@ -1017,7 +1017,7 @@ RSpec.describe FolderFilesResponse do
                 }
               }
             },
-            query: {
+            must: {
               query_string: {
                 query: "*#{query}*",
                 fields: [query_field]
