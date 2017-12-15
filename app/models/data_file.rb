@@ -76,25 +76,25 @@ class DataFile < Container
 
   settings do
     mappings dynamic: 'false' do
-      indexes :kind, type: "string", fields: {
-        raw: {type: "string", index: "not_analyzed"}
+      indexes :kind, type: "text", index: true, fields: {
+        raw: {type: "keyword", index: true}
       }
 
-      indexes :name
+      indexes :name, type: "text", index: true
       indexes :is_deleted, type: "boolean"
 
       indexes :tags do
-        indexes :label, type: "string", fields: {
-          raw: {type: "string", index: "not_analyzed"}
+        indexes :label, type: "text", index: true, fields: {
+          raw: {type: "keyword", index: true}
         }
       end
 
       indexes :project do
-        indexes :id, type: "string", fields: {
-          raw: {type: "string", index: "not_analyzed"}
+        indexes :id, type: "text", index: true, fields: {
+          raw: {type: "keyword", index: true}
         }
-        indexes :name, type: "string", fields: {
-          raw: {type: "string", index: "not_analyzed"}
+        indexes :name, type: "text", index: true, fields: {
+          raw: {type: "keyword", index: true}
         }
       end
     end

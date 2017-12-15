@@ -25,10 +25,14 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.0
     ports:
       - '9200:9200'
-    command: elasticsearch --action.auto_create_index=0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "transport.host=localhost"
+      - "bootstrap.system_call_filter=false"
+    command: elasticsearch -E 'action.auto_create_index=false'
   worker:
     image: dukedataservice_server
     entrypoint: ['rake', 'workers:run']

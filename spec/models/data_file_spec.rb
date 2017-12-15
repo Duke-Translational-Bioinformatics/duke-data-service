@@ -318,8 +318,8 @@ RSpec.describe DataFile, type: :model do
   describe 'elasticsearch' do
     let(:search_serializer) { Search::DataFileSerializer }
     let(:property_mappings) {{
-      kind: {type: "string"},
-      name: {type: "string"}, #name
+      kind: {type: "text"},
+      name: {type: "text"}, #name
       is_deleted: {type: "boolean"},
       tags: {type: "object"},
       project: {type: "object"}
@@ -355,36 +355,39 @@ RSpec.describe DataFile, type: :model do
         # kind.raw
         expect(subject[:data_file][:properties][:kind]).to have_key :fields
         expect(subject[:data_file][:properties][:kind][:fields]).to have_key :raw
-        expect(subject[:data_file][:properties][:kind][:fields][:raw][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:kind][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:kind][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:data_file][:properties][:kind][:fields][:raw][:index]).to eq true
 
         #tags.label
         expect(subject[:data_file][:properties][:tags]).to have_key :properties
         expect(subject[:data_file][:properties][:tags][:properties]).to have_key :label
-        expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:type]).to eq "text"
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:index]).to eq true
 
         #tags.label.raw
         expect(subject[:data_file][:properties][:tags][:properties][:label]).to have_key :fields
         expect(subject[:data_file][:properties][:tags][:properties][:label][:fields]).to have_key :raw
-        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:data_file][:properties][:tags][:properties][:label][:fields][:raw][:index]).to eq true
 
         #project.id.raw
         expect(subject[:data_file][:properties][:project]).to have_key :properties
         expect(subject[:data_file][:properties][:project][:properties]).to have_key :id
-        expect(subject[:data_file][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:project][:properties][:id][:type]).to eq "text"
+        expect(subject[:data_file][:properties][:project][:properties][:id][:index]).to eq true
         expect(subject[:data_file][:properties][:project][:properties][:id]).to have_key :fields
         expect(subject[:data_file][:properties][:project][:properties][:id][:fields]).to have_key :raw
-        expect(subject[:data_file][:properties][:project][:properties][:id][:fields][:raw][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:project][:properties][:id][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:project][:properties][:id][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:data_file][:properties][:project][:properties][:id][:fields][:raw][:index]).to eq true
 
         #project.name.raw
         expect(subject[:data_file][:properties][:project][:properties]).to have_key :name
-        expect(subject[:data_file][:properties][:project][:properties][:name][:type]).to eq "string"
+        expect(subject[:data_file][:properties][:project][:properties][:name][:type]).to eq "text"
+        expect(subject[:data_file][:properties][:project][:properties][:name][:index]).to eq true
         expect(subject[:data_file][:properties][:project][:properties][:name]).to have_key :fields
         expect(subject[:data_file][:properties][:project][:properties][:name][:fields]).to have_key :raw
-        expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "string"
-        expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq true
       }
     end
   end

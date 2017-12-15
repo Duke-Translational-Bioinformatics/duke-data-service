@@ -145,8 +145,8 @@ RSpec.describe Folder, type: :model do
   describe 'elasticsearch' do
     let(:search_serializer) { Search::FolderSerializer }
     let(:property_mappings) {{
-      kind: {type: "string"},
-      name: {type: "string"}, #name
+      kind: {type: "text"},
+      name: {type: "text"}, #name
       is_deleted: {type: "boolean"},
       project: {type: "object"}
     }}
@@ -158,25 +158,27 @@ RSpec.describe Folder, type: :model do
         #kind.raw
         expect(subject[:folder][:properties][:kind]).to have_key :fields
         expect(subject[:folder][:properties][:kind][:fields]).to have_key :raw
-        expect(subject[:folder][:properties][:kind][:fields][:raw][:type]).to eq "string"
-        expect(subject[:folder][:properties][:kind][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:folder][:properties][:kind][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:folder][:properties][:kind][:fields][:raw][:index]).to eq true
 
         #project.id.raw
         expect(subject[:folder][:properties][:project]).to have_key :properties
         expect(subject[:folder][:properties][:project][:properties]).to have_key :id
-        expect(subject[:folder][:properties][:project][:properties][:id][:type]).to eq "string"
+        expect(subject[:folder][:properties][:project][:properties][:id][:type]).to eq "text"
+        expect(subject[:folder][:properties][:project][:properties][:id][:index]).to eq true
         expect(subject[:folder][:properties][:project][:properties][:id]).to have_key :fields
         expect(subject[:folder][:properties][:project][:properties][:id][:fields]).to have_key :raw
-        expect(subject[:folder][:properties][:project][:properties][:id][:fields][:raw][:type]).to eq "string"
-        expect(subject[:folder][:properties][:project][:properties][:id][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:folder][:properties][:project][:properties][:id][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:folder][:properties][:project][:properties][:id][:fields][:raw][:index]).to eq true
 
         #project.name.raw
         expect(subject[:folder][:properties][:project][:properties]).to have_key :name
-        expect(subject[:folder][:properties][:project][:properties][:name][:type]).to eq "string"
+        expect(subject[:folder][:properties][:project][:properties][:name][:type]).to eq "text"
+        expect(subject[:folder][:properties][:project][:properties][:name][:index]).to eq true
         expect(subject[:folder][:properties][:project][:properties][:name]).to have_key :fields
         expect(subject[:folder][:properties][:project][:properties][:name][:fields]).to have_key :raw
-        expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "string"
-        expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq "not_analyzed"
+        expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "keyword"
+        expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq true
       }
     end
   end
