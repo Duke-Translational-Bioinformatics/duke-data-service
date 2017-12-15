@@ -4,14 +4,14 @@ class Activity < ActiveRecord::Base
   include RequestAudited
 
   include SearchableModel
-  # change this to a new uuid any time
+  # change this to a new uuid (lowercase letters!) any time
   #  - a migration is created to add/remove fields
   #    and its serializers (standard and search)
   #  - relationships are added to/removed from the serializers
-  @@migration_version = '429D08E4-622D-456A-A87D-84C288857320'
+  @@migration_version = '429d08e4-622d-456a-a87d-84c288857320'
 
-  # change this variable to a new uuid any time the mappings below change
-  @@mapping_version = 'BAB2183A-5ED5-4CD3-B05E-916E20817DD7'
+  # change this variable to a new uuid (lowercase letters!) any time the mappings below change
+  @@mapping_version = 'bab2183a-5ed5-4cd3-b05e-916e20817dd7'
 
   def self.mapping_version
     @@mapping_version

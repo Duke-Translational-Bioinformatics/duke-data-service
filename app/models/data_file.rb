@@ -3,14 +3,14 @@
 class DataFile < Container
 
   include SearchableModel
-  # change this to a new uuid any time
+  # change this to a new uuid (lowercase letters!) any time
   #  - a migration is created to add/remove fields
   #    and its serializers (standard and search)
   #  - relationships are added to/removed from the serializers
-  @@migration_version = '366F0FD9-5526-4479-B4F1-5C61E8C1EB53'
+  @@migration_version = '366f0fd9-5526-4479-b4f1-5c61e8c1eb53'
 
-  # change this variable to a new uuid any time the mappings below change
-  @@mapping_version = '6518BCEF-69D7-457D-9EE4-A74CB64B698D'
+  # change this variable to a new uuid (lowercase letters!) any time the mappings below change
+  @@mapping_version = '6518bcef-69d7-457d-9ee4-a74cb64b698d'
 
   def self.mapping_version
     @@mapping_version
