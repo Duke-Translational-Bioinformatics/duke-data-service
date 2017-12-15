@@ -12,7 +12,7 @@ module SearchableModel
     settings index: Rails.application.config.elasticsearch_index_settings
 
     def self.versioned_index_name
-      "#{self.index_name}.#{self.mapping_version}.#{self.migration_version}"
+      "#{self.index_name}_#{self.mapping_version}_#{self.migration_version}"
     end
 
     def self.mapping_version
