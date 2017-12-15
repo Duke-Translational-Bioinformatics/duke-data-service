@@ -28,7 +28,7 @@ dependencies:
     - "docker/circle"
   pre:
     - ./docker/circle/cache_docker_image.sh neo4j 3.1.6
-    - ./docker/circle/cache_docker_image.sh docker.elastic.co/elasticsearch/elasticsearch-oss 6.0.1
+    - ./docker/circle/cache_docker_image.sh docker.elastic.co/elasticsearch/elasticsearch-oss 6.1.0
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j elasticsearch
