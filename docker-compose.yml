@@ -34,12 +34,10 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:5.4.3
+    image: elasticsearch:2.4
     ports:
       - '9200:9200'
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    command: elasticsearch -E 'action.auto_create_index=false'
+    command: elasticsearch --action.auto_create_index=0
   rabbitmq:
     hostname: rabbitmq.host
     container_name: rabbitmq
