@@ -39,6 +39,7 @@ services:
       - '9200:9200'
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
     command: elasticsearch -E 'action.auto_create_index=false'
   rabbitmq:
     hostname: rabbitmq.host
