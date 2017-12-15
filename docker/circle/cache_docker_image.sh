@@ -10,6 +10,7 @@ then
   then
     echo "pulling and caching ${docker_image}" >&2
     docker pull ${docker_image}
+    mkdir -p `dirname "${docker_image_cache}"`
     docker save ${docker_image} | gzip > ${docker_image_cache}
   fi
   echo "loading cached ${docker_image}" >&2
