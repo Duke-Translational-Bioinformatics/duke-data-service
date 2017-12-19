@@ -39,6 +39,7 @@ shared_examples 'an ElasticsearchIndexJob' do |container_sym|
     let(:changed_name) { 'changed name' }
 
     context 'perform_now' do
+      include_context 'elasticsearch prep', [], []
       include_context 'tracking job', :job_transaction
 
       context 'index exists' do
