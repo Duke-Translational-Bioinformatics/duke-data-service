@@ -57,7 +57,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
-  config.before(:each) do
+  config.after(:each) do
     Elasticsearch::Model.client.indices.get_settings.keys.each do |index_name|
       Elasticsearch::Model.client.indices.delete index: index_name
     end
