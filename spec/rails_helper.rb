@@ -57,6 +57,11 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
+  config.before(:each) do
+    Elasticsearch::Model.client.indices.get_settings.keys.each do |index_name|
+      Elasticsearch::Model.client.indices.delete index: index_name
+    end
+  end
   config.before(:context) do
     ActiveJob::Base.queue_adapter = :test
   end
