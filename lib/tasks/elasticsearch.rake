@@ -1,9 +1,13 @@
 namespace :elasticsearch do
   namespace :index do
-    desc "creates indices for all indexed models"
+    desc "creates indices for all indexed models (in optional ENV[TARGET_URL])"
     task create: :environment do
       Rails.logger.level = 3
-      ElasticsearchHandler.new(verbose: true).create_indices
+      if ENV['TARGET_URL']
+        ElasticsearchHandler.new(verbose: true).create_indices(Elasticsearch::Client.new url: ENV['TARGET_URL'])
+      else
+        ElasticsearchHandler.new(verbose: true).create_indices
+      end
     end #create
 
     desc "indexes all documents"
@@ -12,10 +16,14 @@ namespace :elasticsearch do
       ElasticsearchHandler.new(verbose: true).index_documents
     end
 
-    desc "drops indices for all indexed models"
+    desc "drops indices for all indexed models (in optional ENV[TARGET_URL])"
     task drop: :environment do
       Rails.logger.level = 3
-      ElasticsearchHandler.new(verbose: true).drop_indices
+      if ENV['TARGET_URL']
+        ElasticsearchHandler.new(verbose: true).drop_indices(Elasticsearch::Client.new url: ENV['TARGET_URL'])
+      else
+        ElasticsearchHandler.new(verbose: true).drop_indices
+      end
     end #drop
 
     desc "drop create and index all documents for all indexed models if ENV[RECREATE_SEARCH_MAPPINGS] is true."

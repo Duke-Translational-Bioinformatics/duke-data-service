@@ -8,10 +8,28 @@ describe "elasticsearch" do
     let(:task_name) { "elasticsearch:index:create" }
     it { expect(subject.prerequisites).to  include("environment") }
 
-    context 'called' do
+    context 'ENV[TARGET_URL] not set' do
       before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
       it {
         expect(elasticsearch_handler).to receive(:create_indices)
+        invoke_task
+      }
+    end
+
+    context 'ENV[TARGET_URL] set' do
+      let(:expected_url) { Faker::Internet.url }
+      let(:expected_client) { instance_double(Elasticsearch::Transport::Client) }
+      include_context 'with env_override'
+      let(:env_override) { {
+        'TARGET_URL' => expected_url
+      } }
+
+      before {
+        expect(Elasticsearch::Client).to receive(:new).with(url: expected_url).and_return(expected_client)
+        expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler)
+      }
+      it {
+        expect(elasticsearch_handler).to receive(:create_indices).with(expected_client)
         invoke_task
       }
     end
@@ -36,10 +54,28 @@ describe "elasticsearch" do
     let(:task_name) { "elasticsearch:index:drop" }
     it { expect(subject.prerequisites).to  include("environment") }
 
-    context 'called' do
+    context 'ENV[TARGET_URL] not set' do
       before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
       it {
         expect(elasticsearch_handler).to receive(:drop_indices)
+        invoke_task
+      }
+    end
+
+    context 'ENV[TARGET_URL] set' do
+      let(:expected_url) { Faker::Internet.url }
+      let(:expected_client) { instance_double(Elasticsearch::Transport::Client) }
+      include_context 'with env_override'
+      let(:env_override) { {
+        'TARGET_URL' => expected_url
+      } }
+
+      before {
+        expect(Elasticsearch::Client).to receive(:new).with(url: expected_url).and_return(expected_client)
+        expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler)
+      }
+      it {
+        expect(elasticsearch_handler).to receive(:drop_indices).with(expected_client)
         invoke_task
       }
     end
