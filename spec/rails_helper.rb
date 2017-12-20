@@ -58,9 +58,7 @@ RSpec.configure do |config|
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
   config.before(:suite) do
-    Elasticsearch::Model.client.indices.get_settings.keys.each do |index_name|
-      Elasticsearch::Model.client.indices.delete index: index_name
-    end
+    ElasticsearchHandler.new.drop_indices
   end
   config.before(:context) do
     ActiveJob::Base.queue_adapter = :test
