@@ -7,24 +7,49 @@ RSpec.describe ElasticsearchHandler do
   }
 
   describe "#create_indices" do
-    it { is_expected.to respond_to :create_indices }
+    it { is_expected.to respond_to(:create_indices).with(0).arguments }
+    it { is_expected.to respond_to(:create_indices).with(1).arguments }
 
-    it {
-      client = Elasticsearch::Model.client
-      FolderFilesResponse.indexed_models.each do |indexed_model|
-        expect(client.indices.exists? index: indexed_model.versioned_index_name).to be_falsey
-        expect(client.indices.exists_alias? name: indexed_model.index_name).to be_falsey
-      end
+    context 'nil client' do
+      it {
+        client = Elasticsearch::Model.client
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(client.indices.exists? index: indexed_model.versioned_index_name).to be_falsey
+          expect(client.indices.exists_alias? name: indexed_model.index_name).to be_falsey
+        end
 
-      subject.create_indices
+        subject.create_indices
 
-      FolderFilesResponse.indexed_models.each do |indexed_model|
-        expect(client.indices.exists? index: indexed_model.versioned_index_name).to be_truthy
-        expect(client.indices.exists_alias? name: indexed_model.index_name).to be_truthy
-        alias_info = client.indices.get_alias index: indexed_model.versioned_index_name
-        expect(alias_info[indexed_model.versioned_index_name]["aliases"]).to have_key indexed_model.index_name
-      end
-    }
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(client.indices.exists? index: indexed_model.versioned_index_name).to be_truthy
+          expect(client.indices.exists_alias? name: indexed_model.index_name).to be_truthy
+          alias_info = client.indices.get_alias index: indexed_model.versioned_index_name
+          expect(alias_info[indexed_model.versioned_index_name]["aliases"]).to have_key indexed_model.index_name
+        end
+      }
+    end
+
+    context 'client not nil' do
+      let(:other_client) { Elasticsearch::Client.new url: ENV['BONSAI_URL'] }
+
+      it {
+        subject.drop_indices(other_client)
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(other_client.indices.exists? index: indexed_model.versioned_index_name).to be_falsey
+          expect(other_client.indices.exists_alias? name: indexed_model.index_name).to be_falsey
+        end
+
+        subject.create_indices(other_client)
+
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(other_client.indices.exists? index: indexed_model.versioned_index_name).to be_truthy
+          expect(other_client.indices.exists_alias? name: indexed_model.index_name).to be_truthy
+          alias_info = other_client.indices.get_alias index: indexed_model.versioned_index_name
+          expect(alias_info[indexed_model.versioned_index_name]["aliases"]).to have_key indexed_model.index_name
+        end
+        subject.drop_indices(other_client)
+      }
+    end
   end
 
   describe "#index_documents" do
@@ -62,9 +87,10 @@ RSpec.describe ElasticsearchHandler do
   end
 
   describe "#drop_indices" do
-    it { is_expected.to respond_to :drop_indices }
+    it { is_expected.to respond_to(:drop_indices).with(0).arguments }
+    it { is_expected.to respond_to(:drop_indices).with(1).arguments }
 
-    context 'called' do
+    context 'nil client' do
       let(:indexed_data_file) { FactoryGirl.create(:data_file) }
       let(:indexed_folder) { FactoryGirl.create(:folder) }
       include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], []
@@ -80,6 +106,27 @@ RSpec.describe ElasticsearchHandler do
         FolderFilesResponse.indexed_models.each do |indexed_model|
           expect(client.indices.exists? index: indexed_model.versioned_index_name).to be_falsey
           expect(client.indices.exists_alias? name: indexed_model.index_name).to be_falsey
+        end
+      }
+    end
+
+    context 'client not nil' do
+      let(:other_client) { Elasticsearch::Client.new url: ENV['BONSAI_URL'] }
+
+      it {
+        subject.create_indices(other_client)
+        other_client.indices.flush
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(other_client.indices.exists? index: indexed_model.versioned_index_name).to be_truthy
+          expect(other_client.indices.exists_alias? name: indexed_model.index_name).to be_truthy
+        end
+
+        subject.drop_indices(other_client)
+
+        other_client.indices.flush
+        FolderFilesResponse.indexed_models.each do |indexed_model|
+          expect(other_client.indices.exists? index: indexed_model.versioned_index_name).to be_falsey
+          expect(other_client.indices.exists_alias? name: indexed_model.index_name).to be_falsey
         end
       }
     end

@@ -4,9 +4,8 @@ class ElasticsearchHandler
     @verbose = verbose
   end
 
-  def create_indices
-    client = Elasticsearch::Model.client
-    drop_indices
+  def create_indices(client=Elasticsearch::Model.client)
+    drop_indices(client)
     FolderFilesResponse.indexed_models.each do |indexed_model|
       client.indices.create(
         index: indexed_model.versioned_index_name,
@@ -68,8 +67,7 @@ class ElasticsearchHandler
     end
   end
 
-  def drop_indices
-    client = Elasticsearch::Model.client
+  def drop_indices(client=Elasticsearch::Model.client)
     client.indices.delete index: '_all'
   end
 
