@@ -5,6 +5,7 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
   it { expect(described_class).to include(JobTransactionable) }
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
+  it { expect(FolderFilesResponse.indexed_models).to include described_class }
 
   describe 'elasticsearch migrations' do
     it { expect(described_class).to respond_to(:index_name) }
