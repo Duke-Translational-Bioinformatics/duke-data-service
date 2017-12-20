@@ -1,23 +1,20 @@
 require 'rails_helper'
 
-describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
+describe "elasticsearch" do
+  let(:elasticsearch_handler) { instance_double(ElasticsearchHandler) }
+
   describe "elasticsearch:index:create" do
     include_context "rake"
     let(:task_name) { "elasticsearch:index:create" }
     it { expect(subject.prerequisites).to  include("environment") }
 
-    before do
-      current_indices = Elasticsearch::Model.client.cat.indices
-      if current_indices.include? DataFile.index_name
-        DataFile.__elasticsearch__.client.indices.delete index: DataFile.index_name
-      end
+    context 'called' do
+      before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+      it {
+        expect(elasticsearch_handler).to receive(:create_indices)
+        invoke_task
+      }
     end
-
-    it {
-      invoke_task
-      current_indices = Elasticsearch::Model.client.cat.indices
-      expect(current_indices).to include DataFile.index_name
-    }
   end
 
   describe "elasticsearch:index:index_documents" do
@@ -25,81 +22,11 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     let(:task_name) { "elasticsearch:index:index_documents" }
     it { expect(subject.prerequisites).to  include("environment") }
 
-    context 'with existing documents not already indexed' do
-      around :each do |example|
-        current_indices = DataFile.__elasticsearch__.client.cat.indices
-        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-          if current_indices.include? indexed_model.index_name
-            indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-          end
-          indexed_model.__elasticsearch__.client.indices.create(
-            index: indexed_model.index_name,
-            body: {
-              settings: indexed_model.settings.to_hash,
-              mappings: indexed_model.mappings.to_hash
-            }
-          )
-        end
-        Elasticsearch::Model.client.indices.flush
-
-        @data_file = FactoryGirl.create(:data_file)
-        @folder = FactoryGirl.create(:folder)
-
-        example.run
-
-        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-      end
-
+    context 'called' do
+      before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
       it {
+        expect(elasticsearch_handler).to receive(:index_documents)
         invoke_task
-        Elasticsearch::Model.client.indices.flush
-        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
-      }
-    end
-
-    describe 'with existing documents indexed already' do
-      around :each do |example|
-        # initialize mappings
-        current_indices = DataFile.__elasticsearch__.client.cat.indices
-        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-          if current_indices.include? indexed_model.index_name
-            indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-          end
-          indexed_model.__elasticsearch__.client.indices.create(
-            index: indexed_model.index_name,
-            body: {
-              settings: indexed_model.settings.to_hash,
-              mappings: indexed_model.mappings.to_hash
-            }
-          )
-        end
-        Elasticsearch::Model.client.indices.flush
-
-        @data_file = FactoryGirl.create(:data_file)
-        @data_file.__elasticsearch__.index_document
-        @folder = FactoryGirl.create(:folder)
-        @folder.__elasticsearch__.index_document
-
-        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-          indexed_model.__elasticsearch__.refresh_index!
-        end
-
-        example.run
-
-        DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-      end
-
-      it {
-        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
-        invoke_task
-        expect(DataFile.__elasticsearch__.search(@data_file.name).count).to eq 1
-        expect(Folder.__elasticsearch__.search(@folder.name).count).to eq 1
       }
     end
   end
@@ -109,83 +36,19 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     let(:task_name) { "elasticsearch:index:drop" }
     it { expect(subject.prerequisites).to  include("environment") }
 
-    around :each do |example|
-      # initialize mappings
-      current_indices = DataFile.__elasticsearch__.client.cat.indices
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        if current_indices.include? indexed_model.index_name
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-        indexed_model.__elasticsearch__.client.indices.create(
-          index: indexed_model.index_name,
-          body: {
-            settings: indexed_model.settings.to_hash,
-            mappings: indexed_model.mappings.to_hash
-          }
-        )
-      end
-      Elasticsearch::Model.client.indices.flush
-
-      @data_file = FactoryGirl.create(:data_file)
-      @folder = FactoryGirl.create(:folder)
-
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        indexed_model.__elasticsearch__.refresh_index!
-      end
-
-      example.run
-
-      current_indices = DataFile.__elasticsearch__.client.cat.indices
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        if current_indices.include? indexed_model.index_name
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-      end
+    context 'called' do
+      before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+      it {
+        expect(elasticsearch_handler).to receive(:drop_indices)
+        invoke_task
+      }
     end
-
-    it {
-      invoke_task
-      current_indices = DataFile.__elasticsearch__.client.cat.indices
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        expect(current_indices).not_to include indexed_model.index_name
-      end
-    }
   end
 
   describe "elasticsearch:index:rebuild" do
     include_context "rake"
     let(:task_name) { "elasticsearch:index:rebuild" }
     it { expect(subject.prerequisites).to  include("environment") }
-
-    around :each do |example|
-      current_indices = DataFile.__elasticsearch__.client.cat.indices
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        if current_indices.include? indexed_model.index_name
-          indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-        end
-        indexed_model.__elasticsearch__.client.indices.create(
-          index: indexed_model.index_name,
-          body: {
-            settings: indexed_model.settings.to_hash,
-            mappings: indexed_model.mappings.to_hash
-          }
-        )
-      end
-      Elasticsearch::Model.client.indices.flush
-
-      @data_file = FactoryGirl.create(:data_file)
-      @folder = FactoryGirl.create(:folder)
-
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        indexed_model.__elasticsearch__.refresh_index!
-      end
-
-      example.run
-
-      DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-      end
-    end
 
     context 'ENV[RECREATE_SEARCH_MAPPINGS] not true' do
       it {
@@ -194,13 +57,207 @@ describe "elasticsearch", :if => ENV['TEST_RAKE_SEARCH'] do
     end
 
     context 'ENV[RECREATE_SEARCH_MAPPINGS] true' do
-      before do
-        ENV['RECREATE_SEARCH_MAPPINGS'] = "true"
+      context 'called' do
+        include_context 'with env_override'
+        let(:env_override) { {
+          'RECREATE_SEARCH_MAPPINGS' => "true"
+        } }
+
+        before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+        it {
+          expect(elasticsearch_handler).to receive(:drop_indices)
+          expect(elasticsearch_handler).to receive(:create_indices)
+          expect(elasticsearch_handler).to receive(:index_documents)
+          invoke_task expected_stdout: /mappings rebuilt/
+        }
+      end
+    end
+  end
+
+  describe 'elasticsearch:index:smart_reindex' do
+    include_context "rake"
+    let(:task_name) { "elasticsearch:index:smart_reindex" }
+    it { expect(subject.prerequisites).to  include("environment") }
+
+    context 'versioned_index_name exists' do
+      let(:skipped_index) { DataFile.versioned_index_name }
+      let(:expected_info) {
+        {
+          skipped: [skipped_index],
+          reindexed: {},
+          migration_version_mismatch: {},
+          missing_aliases: [],
+          has_errors: []
+        }
+      }
+      before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+      it {
+        expect(elasticsearch_handler).to receive(:smart_reindex_indices).and_return(expected_info)
+        invoke_task expected_stderr: /#{skipped_index} index exists, nothing more to do/
+      }
+    end
+
+    context 'versioned_index_name does not exist' do
+      context 'index_name alias does not exist' do
+        let(:missing_alias) { DataFile.index_name }
+        let(:expected_info) {
+          {
+            skipped: [],
+            reindexed: {},
+            migration_version_mismatch: {},
+            missing_aliases: [missing_alias],
+            has_errors: []
+          }
+        }
+        before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+        it {
+          expect(elasticsearch_handler).to receive(:smart_reindex_indices).and_return(expected_info)
+          invoke_task expected_stderr: /#{missing_alias} alias does not exist!/
+        }
       end
 
+      context 'index_name aliased to previous versioned_index_name with same migration_version' do
+        let(:indexed_model) { DataFile }
+        let(:previous_version) { "#{indexed_model.index_name}_#{SecureRandom.uuid}_#{indexed_model.migration_version}" }
+        let(:expected_info) {
+          {
+            skipped: [],
+            reindexed: {
+              "#{indexed_model}" => {from: previous_version, to: indexed_model.versioned_index_name}
+            },
+            migration_version_mismatch: {},
+            missing_aliases: [],
+            has_errors: []
+          }
+        }
+        before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+        it {
+          expect(elasticsearch_handler).to receive(:smart_reindex_indices).and_return(expected_info)
+          invoke_task expected_stderr: /index for #{indexed_model} reindexed from #{previous_version} to #{indexed_model.versioned_index_name}/
+        }
+      end
+
+      context 'index_name aliased to previous versioned_index_name with different migration_version' do
+        let(:indexed_model) { DataFile }
+        let(:previous_version) { "#{indexed_model.index_name}_#{indexed_model.mapping_version}_#{SecureRandom.uuid}" }
+        let(:expected_info) {
+          {
+            skipped: [],
+            reindexed: {},
+            migration_version_mismatch: {
+              "#{indexed_model}" => {from: previous_version, to: indexed_model.migration_version}
+            },
+            missing_aliases: [],
+            has_errors: []
+          }
+        }
+        before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+        it {
+          expect(elasticsearch_handler).to receive(:smart_reindex_indices).and_return(expected_info)
+          invoke_task expected_stderr: /#{indexed_model} #{previous_version} migration_version does not match #{indexed_model.migration_version}/
+        }
+      end
+    end
+  end
+
+  describe 'elasticsearch:index:fast_reindex' do
+    include_context "rake"
+    let(:task_name) { "elasticsearch:index:fast_reindex" }
+    it { expect(subject.prerequisites).to  include("environment") }
+
+    context 'ENV[SOURCE_INDEX] not set' do
       it {
-        invoke_task expected_stdout: /mappings rebuilt/
+        invoke_task expected_stderr: /ENV\[SOURCE_INDEX\] and ENV\[TARGET_INDEX\] are required/
       }
+    end
+
+    context 'ENV[TARGET_INDEX] not set' do
+      it {
+        invoke_task expected_stderr: /ENV\[SOURCE_INDEX\] and ENV\[TARGET_INDEX\] are required/
+      }
+    end
+
+    context 'ENV[TARGET_URL] is not set' do
+      let(:expected_source_client) { Elasticsearch::Model.client }
+      let(:expected_target_client) { Elasticsearch::Model.client }
+      let(:expected_source_index) { 'source_index' }
+      let(:expected_target_index) { 'target_index' }
+      include_context 'with env_override'
+      let(:env_override) { {
+        'SOURCE_INDEX' => expected_source_index,
+        'TARGET_INDEX' => expected_target_index
+      } }
+
+      before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
+      context 'without errors' do
+        let(:successful) { true }
+        it {
+          expect(elasticsearch_handler).to receive(:fast_reindex)
+            .with(expected_source_client,
+                  expected_source_index,
+                  expected_target_client,
+                  expected_target_index)
+            .and_return(true)
+          invoke_task expected_stderr: /reindex complete/
+        }
+      end
+
+      context 'with errors' do
+        let(:successful) { false }
+        it {
+          expect(elasticsearch_handler).to receive(:fast_reindex)
+            .with(expected_source_client,
+                  expected_source_index,
+                  expected_target_client,
+                  expected_target_index)
+            .and_return(successful)
+          invoke_task expected_stderr: /errors occurred/
+        }
+      end
+    end
+
+    context 'ENV[TARGET_URL] is set' do
+      let(:target_url) { Faker::Internet.url }
+      let(:expected_source_client) { Elasticsearch::Model.client }
+      let(:expected_target_client) { instance_double(Elasticsearch::Transport::Client)  }
+      let(:expected_source_index) { 'source_index' }
+      let(:expected_target_index) { 'target_index' }
+      include_context 'with env_override'
+      let(:env_override) { {
+        'SOURCE_INDEX' => expected_source_index,
+        'TARGET_INDEX' => expected_target_index,
+        'TARGET_URL' => target_url
+      } }
+
+      before {
+        expect(Elasticsearch::Client).to receive(:new).with(url: target_url).and_return(expected_target_client)
+        expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler)
+      }
+      context 'without errors' do
+        let(:expected_success) { true }
+        it {
+          expect(elasticsearch_handler).to receive(:fast_reindex)
+            .with(expected_source_client,
+                  expected_source_index,
+                  expected_target_client,
+                  expected_target_index)
+            .and_return(expected_success)
+          invoke_task expected_stderr: /reindex complete/
+        }
+      end
+
+      context 'with errors' do
+        let(:expected_success) { false }
+        it {
+          expect(elasticsearch_handler).to receive(:fast_reindex)
+            .with(expected_source_client,
+                  expected_source_index,
+                  expected_target_client,
+                  expected_target_index)
+            .and_return(expected_success)
+          invoke_task expected_stderr: /errors occurred/
+        }
+      end
     end
   end
 end
