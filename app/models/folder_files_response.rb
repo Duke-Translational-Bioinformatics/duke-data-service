@@ -2,7 +2,7 @@ class FolderFilesResponse
   include ActiveModel::Serialization
   attr_reader :elastic_response
 
-  @@all_indices = [DataFile,Folder]
+  @@all_indices = [DataFile,Folder,Activity]
   def self.indexed_models
     @@all_indices
   end
