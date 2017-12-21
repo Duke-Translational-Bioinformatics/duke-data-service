@@ -522,7 +522,12 @@ RSpec.describe ElasticsearchHandler do
       let(:first_scroll_id) { SecureRandom.hex }
       let(:second_scroll_id) { SecureRandom.hex }
       let(:expected_first_response) {{
-        '_scroll_id' => first_scroll_id
+        '_scroll_id' => first_scroll_id,
+        'hits' => {
+          'hits' => [
+            {'id' => SecureRandom.uuid }
+          ]
+        }
       }}
       let(:expected_first_batch) {{}}
       let(:first_batch_response) {{}}
@@ -579,7 +584,12 @@ RSpec.describe ElasticsearchHandler do
       let(:first_scroll_id) { SecureRandom.hex }
       let(:second_scroll_id) { SecureRandom.hex }
       let(:expected_first_response) {{
-        '_scroll_id' => first_scroll_id
+        '_scroll_id' => first_scroll_id,
+        'hits' => {
+          'hits' => [
+            {'id' => SecureRandom.uuid }
+          ]
+        }
       }}
       let(:expected_first_batch) {{}}
       let(:first_batch_response) {{

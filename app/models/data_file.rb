@@ -3,21 +3,18 @@
 class DataFile < Container
 
   include SearchableModel
+  # change this variable to a new uuid (lowercase letters!)
+  # any time the mappings below change
+  def self.mapping_version
+    '6518bcef-69d7-457d-9ee4-a74cb64b698d'
+  end
+
   # change this to a new uuid (lowercase letters!) any time
   #  - a migration is created to add/remove fields
   #    and its serializers (standard and search)
   #  - relationships are added to/removed from the serializers
-  @@migration_version = '366f0fd9-5526-4479-b4f1-5c61e8c1eb53'
-
-  # change this variable to a new uuid (lowercase letters!) any time the mappings below change
-  @@mapping_version = '6518bcef-69d7-457d-9ee4-a74cb64b698d'
-
-  def self.mapping_version
-    @@mapping_version
-  end
-
   def self.migration_version
-    @@migration_version
+    '366f0fd9-5526-4479-b4f1-5c61e8c1eb53'
   end
 
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true

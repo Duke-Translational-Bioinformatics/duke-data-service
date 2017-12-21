@@ -4,21 +4,19 @@ class Folder < Container
   include ChildMinder
 
   include SearchableModel
+
+  # change this variable to a new uuid (lowercase letters!)
+  # any time the mappings below change
+  def self.mapping_version
+    '8a9172f5-3b5e-4e1a-9de9-06c61d23a54d'
+  end
+
   # change this to a new uuid (lowercase letters!) any time
   #  - a migration is created to add/remove fields
   #    and its serializers (standard and search)
   #  - relationships are added to/removed from the serializers
-  @@migration_version = 'da463742-2d1d-4dac-9ab3-24d81754134f'
-
-  # change this variable to a new uuid (lowercase letters!) any time the mappings below change
-  @@mapping_version = '8a9172f5-3b5e-4e1a-9de9-06c61d23a54d'
-
-  def self.mapping_version
-    @@mapping_version
-  end
-
   def self.migration_version
-    @@migration_version
+    'da463742-2d1d-4dac-9ab3-24d81754134f'
   end
 
   has_many :children, class_name: "Container", foreign_key: "parent_id", autosave: true

@@ -1,20 +1,43 @@
+# ElasticsearchHandler
+#  Handler encapsulating many useful Elasticsearch Cluster activities
+#
+#  Usage:
+#  ElasticsearchHandler.new
+#    verbose is false, nothing will be printed to stderr
+#
+#  ElasticsearchHandler.new(true)
+#    verbose is true, some methods will print information to stderr
+#
 class ElasticsearchHandler
   attr_reader :verbose
   def initialize(verbose:false)
     @verbose = verbose
   end
 
+  # create_indices
+  #
+  # arguments:
+  #   client: optional. Must be an instance of
+  #           Elasticsearch::Transport::Client
+  #           default: Elasticsearch::Model.client
+  #
+  # For each SearchableModel:
+  #   - creates its versioned_index_name index if it doesnt already exist
+  #   - creates an alias from its index_name to the versioned_index_name index.
+  #     if the alias exists, and it is aliase to a previous versioned_index_name
+  #     it will delete the alias, but not the previous versioned_index_name,
+  #     and attach the alias to the new versioned_index_name
   def create_indices(client=Elasticsearch::Model.client)
-    drop_indices(client)
     FolderFilesResponse.indexed_models.each do |indexed_model|
-      client.indices.create(
-        index: indexed_model.versioned_index_name,
-        body: {
-          settings: indexed_model.settings.to_hash,
-          mappings: indexed_model.mappings.to_hash
-        }
-      )
-
+      unless client.indices.exists? index: indexed_model.versioned_index_name
+        client.indices.create(
+          index: indexed_model.versioned_index_name,
+          body: {
+            settings: indexed_model.settings.to_hash,
+            mappings: indexed_model.mappings.to_hash
+          }
+        )
+      end
       if client.indices.exists_alias? name: indexed_model.index_name
         client.indices.get_alias(name: indexed_model.index_name).keys.each do |aliased_index|
           $stderr.puts "consider deleting index #{aliased_index}" if @verbose
@@ -25,6 +48,10 @@ class ElasticsearchHandler
     end
   end
 
+  # index_documents
+  #   Very slow method of loading batches of 500 documents from ActiveRecord
+  #   to elasticsearch.
+  #  TODO refactor
   def index_documents
     batch_size = 500
     FolderFilesResponse.indexed_models.each do |indexed_model|
@@ -71,6 +98,18 @@ class ElasticsearchHandler
     client.indices.delete index: '_all'
   end
 
+  # smart_reindex_indices
+  #
+  # Assumes that indices have been created using ElasticsearchHandler #create_indices
+  # using the versioned_index_name indices.
+  # For each Searchable Model
+  #  - checks if the versioned_index_name exists. If so, skips this model
+  #  - checks if the alias exists. Reports missing aliases if missing
+  #  - checks index of alias, if its migration_version does not match the current
+  #    Model migration_version, reports migration_version_mismatch
+  #  - attempts fast_reindex if migration_version matches. If error occurrs, reports has_erros
+  #  - if errrors do not occur, drops old alias, creates alias index_name -> versioned_index_name
+  #    drops old version index, and reports reindexed inforamtion
   def smart_reindex_indices
     client = Elasticsearch::Model.client
     reindex_information = {
@@ -140,27 +179,19 @@ class ElasticsearchHandler
     }
   end
 
+  # fast_reindex
+  #
+  # takes a source elasticsearch client, and target elasticsearch client
+  #  (can be the same client), source_index, and target_index, and
+  #  uses the scroll method to transfer existing documents from the
+  #  source_client:source_index -> target_client:target_index
+  #  This can be used to:
+  #    - fast reindex of one index to another index on the same cluster
+  #    - transfer data from one elasticsearch cluster to another
   def fast_reindex(source_client, source_index, target_client, target_index)
     has_errors = false
     r = start_scroll(source_client, source_index)
-    bulk_response = send_batch(
-      target_client,
-      batch_from_search(target_index, r)
-    )
-    if bulk_response["errors"]
-      has_errors = true
-      if @verbose
-        $stderr.puts "errors:"
-        $stderr.puts bulk_response["items"].select {|item|
-          item["index"]["status"] >= 400
-        }.map {|i|
-          i["index"]["_id"]
-        }.to_json
-      end
-    end
-
-    while r = next_scroll(source_client, r['_scroll_id']) do
-      break if r['hits']['hits'].empty?
+    while !r['hits']['hits'].empty? do
       bulk_response = send_batch(
         target_client, batch_from_search(target_index, r)
       )
@@ -175,6 +206,7 @@ class ElasticsearchHandler
           }.to_json
         end
       end
+      r = next_scroll(source_client, r['_scroll_id'])
     end
     !has_errors
   end
