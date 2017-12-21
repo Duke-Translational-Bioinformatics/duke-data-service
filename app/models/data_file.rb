@@ -3,7 +3,7 @@
 class DataFile < Container
   include SearchableModel
 
-  has_many :file_versions, -> { order('version_number ASC') }, autosave: true
+  has_many :file_versions, -> { eager_load(upload: [:storage_provider, {fingerprints: [:audits]}]).order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
 
