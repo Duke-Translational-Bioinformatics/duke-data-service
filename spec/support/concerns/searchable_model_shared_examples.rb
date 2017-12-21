@@ -5,6 +5,19 @@ shared_examples 'a SearchableModel' do |resource_search_serializer_sym: :search_
   it { expect(described_class).to include(JobTransactionable) }
   it { expect(described_class).to include(Elasticsearch::Model) }
   it { expect(described_class).not_to include(Elasticsearch::Model::Callbacks) }
+  it { expect(FolderFilesResponse.indexed_models).to include described_class }
+
+  describe 'elasticsearch migrations' do
+    it { expect(described_class).to respond_to(:index_name) }
+    it { expect(described_class).to respond_to(:mapping_version) }
+    it { expect(described_class).to respond_to(:migration_version) }
+    it {
+      expect(described_class).to respond_to(:versioned_index_name)
+      expect(described_class.versioned_index_name).to match described_class.index_name
+      expect(described_class.versioned_index_name).to match described_class.mapping_version
+      expect(described_class.versioned_index_name).to match described_class.migration_version
+    }
+  end
 
   describe '#settings' do
     let(:expected_number_of_replicas) { 4 }

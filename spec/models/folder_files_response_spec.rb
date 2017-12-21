@@ -25,7 +25,7 @@ RSpec.describe FolderFilesResponse do
   it { expect(described_class).to include(ActiveModel::Serialization) }
 
   describe '::indexed_models' do
-    let(:expected_indexed_models) {[DataFile, Folder]}
+    let(:expected_indexed_models) {[DataFile, Folder, Activity]}
     it { expect(described_class).to respond_to(:indexed_models) }
     it { expect(described_class.indexed_models).to be_an Array   }
     it { expect(described_class.indexed_models.length).to eq(expected_indexed_models.length) }

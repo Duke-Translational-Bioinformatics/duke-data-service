@@ -10,6 +10,18 @@ module SearchableModel
     after_touch :update_elasticsearch_index
 
     settings index: Rails.application.config.elasticsearch_index_settings
+
+    def self.versioned_index_name
+      "#{self.index_name}_#{self.mapping_version}_#{self.migration_version}"
+    end
+
+    def self.mapping_version
+      raise NotImplementedError
+    end
+
+    def self.migration_version
+      raise NotImplementedError
+    end
   end
 
   def create_elasticsearch_index
