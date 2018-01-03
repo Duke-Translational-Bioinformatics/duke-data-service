@@ -18,6 +18,10 @@ class Folder < Container
       record.parent.reload.ancestors.include?(record)
   end
 
+  def file_versions
+    nil
+  end
+
   def folder_ids
     (folders.collect {|x| [x.id, x.folder_ids]}).flatten
   end

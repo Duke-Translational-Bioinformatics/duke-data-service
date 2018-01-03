@@ -8,6 +8,7 @@ class Container < ActiveRecord::Base
 	belongs_to :parent, class_name: "Folder"
   has_many :project_permissions, through: :project
   has_many :tags, as: :taggable
+  has_many :file_versions, -> { eager_load(upload: [:storage_provider, {fingerprints: [:audits]}]).order('version_number ASC') }, foreign_key: :data_file_id, autosave: true
 
   define_model_callbacks :set_parent_attribute
   validates :name, presence: true, unless: :is_deleted
