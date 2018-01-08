@@ -182,7 +182,7 @@ class FolderFilesResponse
 
     query = {
       query: {
-        filtered: {
+        bool: {
           filter: {
             bool: {
               must: filter_terms
@@ -194,13 +194,13 @@ class FolderFilesResponse
 
     if @query_string
       if @query_string[:query].match(/\s/)
-        query[:query][:filtered][:query] = {
+        query[:query][:bool][:must] = {
           query_string: {
             query: "*#{@query_string[:query]}* *#{@query_string[:query].gsub(/\s/,'* *')}*"
           }
         }
       else
-        query[:query][:filtered][:query] = {
+        query[:query][:bool][:must] = {
           query_string: {
             query: "*#{@query_string[:query]}*"
           }
@@ -208,9 +208,9 @@ class FolderFilesResponse
       end
 
       if @query_string[:fields]
-        query[:query][:filtered][:query][:query_string][:fields] = @query_string[:fields]
+        query[:query][:bool][:must][:query_string][:fields] = @query_string[:fields]
       else
-        query[:query][:filtered][:query][:query_string][:fields] = @@supported_query_string_fields
+        query[:query][:bool][:must][:query_string][:fields] = @@supported_query_string_fields
       end
     end
 
@@ -254,7 +254,7 @@ class FolderFilesResponse
 
   def hide_logically_deleted(query)
     # this may be turned into a context on the object in the future
-    query[:query][:filtered][:filter][:bool][:must_not] = {
+    query[:query][:bool][:filter][:bool][:must_not] = {
       term: {"is_deleted" => {"value": "true"}}
     }
     query

@@ -94,7 +94,7 @@ class DataFile < Container
         raw: {type: "string", index: "not_analyzed"}
       }
 
-      indexes :name
+      indexes :name, type: "string"
       indexes :is_deleted, type: "boolean"
 
       indexes :tags do
