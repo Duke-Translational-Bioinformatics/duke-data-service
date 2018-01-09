@@ -4,7 +4,8 @@ class ElasticsearchIndexJob < ApplicationJob
   def perform(job_transaction, container, update: false)
     self.class.start_job job_transaction
     if update
-      unless container.__elasticsearch__.update_document(ignore: 404)
+      resp = container.__elasticsearch__.update_document(ignore: 404)
+      unless resp && resp["result"] == "updated"
         container.__elasticsearch__.index_document
       end
     else
