@@ -7,18 +7,8 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
   }
 
   around :each do |example|
-    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-      if Elasticsearch::Model.client.indices.exists? index: indexed_model.index_name
-        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-      end
-      indexed_model.__elasticsearch__.client.indices.create(
-        index: indexed_model.index_name,
-        body: {
-          settings: indexed_model.settings.to_hash,
-          mappings: indexed_model.mappings.to_hash
-        }
-      )
-    end
+    handler = ElasticsearchHandler.new
+    handler.create_indices
     Elasticsearch::Model.client.indices.flush
 
     refresh_record_documents.each do |refresh_record_document|
@@ -30,17 +20,13 @@ shared_context 'elasticsearch prep' do |persisted_record_syms, refresh_record_do
       expect(persisted_record).to be_persisted
     end
 
-    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
+    FolderFilesResponse.indexed_models.each do |indexed_model|
       indexed_model.__elasticsearch__.refresh_index!
     end
 
     example.run
 
-    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-      if Elasticsearch::Model.client.indices.exists? index: indexed_model.index_name
-        indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-      end
-    end
+    handler.drop_indices
   end
 end
 
