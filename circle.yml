@@ -7,6 +7,7 @@ machine:
     COMPOSE_FILE: 'docker-compose.circle.yml:docker-compose.swift.yml'
     GRAPHENEDB_URL: http://neo4j.db.host:7474
     BONSAI_URL: elastic.local:9200
+    CLOUDAMQP_URL: rabbitmq.local:5672
     OPENID_CLIENT_ID: test
     OPENID_CLIENT_SECRET: testpass
     OPENID_URL: http://oit.oauth.edu
@@ -15,6 +16,7 @@ machine:
     swift.local: 0.0.0.0
     neo4j.db.host: 0.0.0.0
     elastic.local: 0.0.0.0
+    rabbitmq.local: 0.0.0.0
   services:
     - docker
 
@@ -29,10 +31,11 @@ dependencies:
   pre:
     - ./docker/circle/cache_docker_image.sh neo4j 3.1.6
     - ./docker/circle/cache_docker_image.sh elasticsearch 5.4.3
+    - ./docker/circle/cache_docker_image rabbitmq 3.5-management
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
     - sudo apt-get install python-dev
     - sudo pip install --upgrade docker-compose==1.8.0
-    - docker-compose up -d neo4j elasticsearch
+    - docker-compose up -d neo4j elasticsearch rabbitmq
 
 deployment:
  development:
