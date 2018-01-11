@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe ElasticsearchHandler do
   it {
     expect(ElasticsearchHandler.new.verbose).to be_falsey
+    expect(ElasticsearchHandler.new.has_errors).to be_falsey
     expect(ElasticsearchHandler.new(verbose: true).verbose).to be_truthy
   }
 
@@ -215,6 +216,7 @@ RSpec.describe ElasticsearchHandler do
             existing_alias_info = client.indices.get_alias name: test_model.index_name
             expect(existing_alias_info[test_model.versioned_index_name]["aliases"]).to have_key test_model.index_name
 
+            expect(subject.has_errors).to be_falsey
             expect(info[:reindexed]).to have_key "#{test_model}"
             expect(info[:reindexed]["#{test_model}"][:from]).to eq test_model_previous_version
             expect(info[:reindexed]["#{test_model}"][:to]).to eq test_model.versioned_index_name
@@ -222,6 +224,28 @@ RSpec.describe ElasticsearchHandler do
         end
 
         context 'with errors' do
+          let(:first_scroll_id) { SecureRandom.hex }
+          let(:expected_first_response) {{
+            '_scroll_id' => first_scroll_id,
+            'hits' => {
+              'hits' => [
+                {'id' => SecureRandom.uuid }
+              ]
+            }
+          }}
+          let(:expected_first_batch) {{}}
+          let(:first_batch_response) {{
+            "errors" => true,
+            "items" => [
+              {"index" => { "status" => 403, "_id" => SecureRandom.uuid }}
+            ]
+          }}
+          let(:empty_response) {{
+            'hits' => {
+              'hits' => []
+            }
+          }}
+
           it {
             client = Elasticsearch::Model.client
             expect(test_model_previous_version).to match test_model.migration_version
@@ -231,11 +255,29 @@ RSpec.describe ElasticsearchHandler do
             existing_alias_info = client.indices.get_alias name: test_model.index_name
             expect(existing_alias_info[test_model_previous_version]["aliases"]).to have_key test_model.index_name
 
-            expect(subject).to receive(:fast_reindex)
-              .with(client, test_model_previous_version, client, test_model.versioned_index_name)
-              .and_return(false)
+            is_expected.to receive(:fast_reindex)
+              .with(client, test_model_previous_version, client, test_model.versioned_index_name, false)
+              .and_call_original.ordered
+
+            is_expected.to receive(:start_scroll)
+              .with(client, test_model_previous_version)
+              .and_return(expected_first_response).ordered
+
+            is_expected.to receive(:batch_from_search)
+              .with(test_model.versioned_index_name, expected_first_response)
+              .and_return(expected_first_batch).ordered
+
+            is_expected.to receive(:send_batch)
+              .with(client, expected_first_batch)
+              .and_return(first_batch_response).ordered
+
+            is_expected.to receive(:next_scroll)
+              .with(client)
+              .and_return(empty_response).ordered
+
             info = subject.smart_reindex_indices
 
+            expect(subject.has_errors).to be_truthy
             expect(client.indices.exists index: test_model_previous_version).to be_truthy
             expect(client.indices.exists index: test_model.versioned_index_name).to be_truthy
             expect(client.indices.exists_alias? name: test_model.index_name).to be_truthy
@@ -244,6 +286,38 @@ RSpec.describe ElasticsearchHandler do
             expect(existing_alias_info).not_to have_key test_model.versioned_index_name
 
             expect(info[:has_errors]).to include "#{test_model}"
+          }
+        end
+
+        context 'with Elasticsearch::Transport::Transport::Errors::GatewayTimeout' do
+          it {
+            client = Elasticsearch::Model.client
+            expect(test_model_previous_version).to match test_model.migration_version
+            expect(client.indices.exists index: test_model_previous_version).to be_truthy
+            expect(client.indices.exists index: test_model.versioned_index_name).to be_falsey
+            expect(client.indices.exists_alias? name: test_model.index_name)
+            existing_alias_info = client.indices.get_alias name: test_model.index_name
+            expect(existing_alias_info[test_model_previous_version]["aliases"]).to have_key test_model.index_name
+
+            is_expected.to receive(:fast_reindex)
+              .with(client, test_model_previous_version, client, test_model.versioned_index_name, false)
+              .and_raise(Elasticsearch::Transport::Transport::Errors::GatewayTimeout).ordered
+
+            is_expected.to receive(:fast_reindex)
+              .with(client, test_model_previous_version, client, test_model.versioned_index_name, true).ordered
+
+            info = subject.smart_reindex_indices
+
+            expect(client.indices.exists index: test_model_previous_version).to be_falsey
+            expect(client.indices.exists index: test_model.versioned_index_name).to be_truthy
+            expect(client.indices.exists_alias? name: test_model.index_name)
+            existing_alias_info = client.indices.get_alias name: test_model.index_name
+            expect(existing_alias_info[test_model.versioned_index_name]["aliases"]).to have_key test_model.index_name
+
+            expect(subject.has_errors).to be_falsey
+            expect(info[:reindexed]).to have_key "#{test_model}"
+            expect(info[:reindexed]["#{test_model}"][:from]).to eq test_model_previous_version
+            expect(info[:reindexed]["#{test_model}"][:to]).to eq test_model.versioned_index_name
           }
         end
       end
@@ -316,14 +390,28 @@ RSpec.describe ElasticsearchHandler do
     context 'interface' do
       let(:client) { instance_double(Elasticsearch::Transport::Client) }
       let(:source_index) { 'source_index' }
+      let(:expected_scroll_id) { SecureRandom.hex }
+      let(:search_response) {
+        {
+          '_scroll_id' => expected_scroll_id,
+          'hits' => {
+            'hits' => [
+              {'id' => SecureRandom.uuid }
+            ]
+          }
+        }
+      }
       let(:expected_scroll) { '1m' }
-      let(:expected_body) { {sort: ['_doc']} }
+      let(:expected_body) { {size: 10000, sort: ['_doc']} }
 
       context 'without body and scroll' do
         it {
           expect(client).to receive(:search)
             .with(index: source_index, scroll: expected_scroll, body: expected_body)
-          subject.start_scroll(client, source_index)
+            .and_return(search_response)
+          resp = subject.start_scroll(client, source_index)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
 
@@ -332,7 +420,10 @@ RSpec.describe ElasticsearchHandler do
         it {
           expect(client).to receive(:search)
             .with(index: source_index, scroll: expected_scroll, body: expected_body)
-          subject.start_scroll(client, source_index, scroll: expected_scroll)
+            .and_return(search_response)
+          resp = subject.start_scroll(client, source_index, scroll: expected_scroll)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
 
@@ -341,7 +432,10 @@ RSpec.describe ElasticsearchHandler do
         it {
           expect(client).to receive(:search)
             .with(index: source_index, scroll: expected_scroll, body: expected_body)
-          subject.start_scroll(client, source_index, body: expected_body)
+            .and_return(search_response)
+          resp = subject.start_scroll(client, source_index, body: expected_body)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
 
@@ -351,7 +445,10 @@ RSpec.describe ElasticsearchHandler do
         it {
           expect(client).to receive(:search)
             .with(index: source_index, scroll: expected_scroll, body: expected_body)
-          subject.start_scroll(client, source_index, scroll: expected_scroll, body: expected_body)
+            .and_return(search_response)
+          resp = subject.start_scroll(client, source_index, scroll: expected_scroll, body: expected_body)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
     end
@@ -366,6 +463,7 @@ RSpec.describe ElasticsearchHandler do
       it {
         resp = subject.start_scroll(client, source_index)
         expect(resp).to have_key '_scroll_id'
+        expect(subject.current_scroll_id).to eq(resp['_scroll_id'])
         expect(resp).to have_key 'hits'
         expect(resp['hits']).to have_key 'hits'
       }
@@ -374,29 +472,64 @@ RSpec.describe ElasticsearchHandler do
 
   describe '#next_scroll' do
     it { is_expected.not_to respond_to(:next_scroll).with(0).arguments }
-    it { is_expected.not_to respond_to(:next_scroll).with(1).arguments }
-    it { is_expected.to respond_to(:next_scroll).with(2).arguments }
-    it { is_expected.to respond_to(:next_scroll).with(2).arguments.and_keywords(:scroll) }
+    it { is_expected.to respond_to(:next_scroll).with(1).arguments }
+    it { is_expected.to respond_to(:next_scroll).with(1).arguments.and_keywords(:scroll) }
 
     context 'interface' do
       let(:client) { instance_double(Elasticsearch::Transport::Client) }
+      let(:initial_scroll_id) { SecureRandom.hex }
+      let(:intial_search_response) {
+        {
+          '_scroll_id' => initial_scroll_id,
+          'hits' => {
+            'hits' => [
+              {'id' => SecureRandom.uuid }
+            ]
+          }
+        }
+      }
+      let(:expected_scroll_id) { SecureRandom.hex }
+      let(:search_response) {
+        {
+          '_scroll_id' => expected_scroll_id,
+          'hits' => {
+            'hits' => [
+              {'id' => SecureRandom.uuid }
+            ]
+          }
+        }
+      }
       let(:expected_scroll_id) { SecureRandom.hex }
       let(:expected_scroll) { '5m' }
 
+      before do
+        expect(client).to receive(:search)
+          .with(index: 'source_index', scroll: '1m', body: {size: 10000, sort: ['_doc']})
+          .and_return(intial_search_response)
+        subject.start_scroll(client, 'source_index')
+      end
       context 'without scroll' do
         it {
+          expect(subject.current_scroll_id).to eq(initial_scroll_id)
           expect(client).to receive(:scroll)
-            .with(scroll_id: expected_scroll_id, scroll: expected_scroll)
-          subject.next_scroll(client, expected_scroll_id)
+            .with(scroll_id: initial_scroll_id, scroll: expected_scroll)
+            .and_return(search_response)
+          resp = subject.next_scroll(client)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
 
       context 'with scroll' do
         let(:expected_scroll) { '10s' }
         it {
+          expect(subject.current_scroll_id).to eq(initial_scroll_id)
           expect(client).to receive(:scroll)
-            .with(scroll_id: expected_scroll_id, scroll: expected_scroll)
-          subject.next_scroll(client, expected_scroll_id, scroll: expected_scroll)
+            .with(scroll_id: initial_scroll_id, scroll: expected_scroll)
+            .and_return(search_response)
+          resp = subject.next_scroll(client, scroll: expected_scroll)
+          expect(resp).to eq(search_response)
+          expect(subject.current_scroll_id).to eq(expected_scroll_id)
         }
       end
     end
@@ -404,14 +537,16 @@ RSpec.describe ElasticsearchHandler do
     context 'live' do
       let (:client) { Elasticsearch::Model.client }
       let(:start_scroll) { subject.start_scroll(client, DataFile.index_name ) }
-      let(:scroll_id) { start_scroll['_scroll_id'] }
       let(:indexed_data_file) { FactoryGirl.create(:data_file) }
       let(:indexed_folder) { FactoryGirl.create(:folder) }
       include_context 'elasticsearch prep', [], [:indexed_data_file, :indexed_folder]
 
       it {
-        resp = subject.next_scroll(client, scroll_id)
+        expect(start_scroll).not_to be_nil
+        expect(subject.current_scroll_id).to eq(start_scroll['_scroll_id'])
+        resp = subject.next_scroll(client)
         expect(resp).to have_key '_scroll_id'
+        expect(subject.current_scroll_id).to eq(resp['_scroll_id'])
         expect(resp).to have_key 'hits'
         expect(resp['hits']).to have_key 'hits'
       }
@@ -517,6 +652,7 @@ RSpec.describe ElasticsearchHandler do
     it { is_expected.not_to respond_to(:fast_reindex).with(2).arguments }
     it { is_expected.not_to respond_to(:fast_reindex).with(2).arguments }
     it { is_expected.to respond_to(:fast_reindex).with(4).arguments }
+    it { is_expected.to respond_to(:fast_reindex).with(5).arguments }
 
     context 'without errors' do
       let(:first_scroll_id) { SecureRandom.hex }
@@ -561,22 +697,23 @@ RSpec.describe ElasticsearchHandler do
           .and_return(first_batch_response)
 
         is_expected.to receive(:next_scroll)
-          .with(source_client, first_scroll_id)
+          .with(source_client)
           .and_return(expected_second_response)
 
-          is_expected.to receive(:batch_from_search)
-            .with(target_index, expected_second_response)
-            .and_return(expected_second_batch)
+        is_expected.to receive(:batch_from_search)
+          .with(target_index, expected_second_response)
+          .and_return(expected_second_batch)
 
         is_expected.to receive(:send_batch)
           .with(target_client, expected_second_batch)
           .and_return(second_batch_response)
 
         is_expected.to receive(:next_scroll)
-          .with(source_client, second_scroll_id)
+          .with(source_client)
           .and_return(empty_response)
 
-        expect(subject.fast_reindex(source_client, source_index, target_client, target_index)).to be_truthy
+        subject.fast_reindex(source_client, source_index, target_client, target_index)
+        expect(subject.has_errors).to be_falsey
       }
     end
 
@@ -619,16 +756,16 @@ RSpec.describe ElasticsearchHandler do
           .with(source_client, source_index)
           .and_return(expected_first_response)
 
-          is_expected.to receive(:batch_from_search)
-            .with(target_index, expected_first_response)
-            .and_return(expected_first_batch)
+        is_expected.to receive(:batch_from_search)
+          .with(target_index, expected_first_response)
+          .and_return(expected_first_batch)
 
         is_expected.to receive(:send_batch)
           .with(target_client, expected_first_batch)
           .and_return(first_batch_response)
 
         is_expected.to receive(:next_scroll)
-          .with(source_client, first_scroll_id)
+          .with(source_client)
           .and_return(expected_second_response)
 
         is_expected.to receive(:batch_from_search)
@@ -640,10 +777,52 @@ RSpec.describe ElasticsearchHandler do
           .and_return(second_batch_response)
 
         is_expected.to receive(:next_scroll)
-          .with(source_client, second_scroll_id)
+          .with(source_client)
           .and_return(empty_response)
 
-        expect(subject.fast_reindex(source_client, source_index, target_client, target_index)).to be_falsey
+        subject.fast_reindex(source_client, source_index, target_client, target_index)
+        expect(subject.has_errors).to be_truthy
+      }
+    end
+
+    context 'retry' do
+      let(:first_scroll_id) { SecureRandom.hex }
+      let(:second_scroll_id) { SecureRandom.hex }
+      let(:expected_first_response) {{
+        '_scroll_id' => second_scroll_id,
+        'hits' => {
+          'hits' => [
+            {'id' => SecureRandom.uuid }
+          ]
+        }
+      }}
+      let(:expected_first_batch) {{}}
+      let(:first_batch_response) {{}}
+      let(:empty_response) {{
+        'hits' => {
+          'hits' => []
+        }
+      }}
+
+      it {
+        is_expected.to receive(:next_scroll)
+          .with(source_client)
+          .and_return(expected_first_response)
+
+        is_expected.to receive(:batch_from_search)
+          .with(target_index, expected_first_response)
+          .and_return(expected_first_batch)
+
+        is_expected.to receive(:send_batch)
+          .with(target_client, expected_first_batch)
+          .and_return(first_batch_response)
+
+        is_expected.to receive(:next_scroll)
+          .with(source_client)
+          .and_return(empty_response)
+
+        subject.fast_reindex(source_client, source_index, target_client, target_index, true)
+        expect(subject.has_errors).to be_falsey
       }
     end
   end

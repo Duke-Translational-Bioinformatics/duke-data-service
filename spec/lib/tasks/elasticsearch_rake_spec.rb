@@ -226,28 +226,53 @@ describe "elasticsearch" do
 
       before { expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler) }
       context 'without errors' do
-        let(:successful) { true }
         it {
           expect(elasticsearch_handler).to receive(:fast_reindex)
             .with(expected_source_client,
                   expected_source_index,
                   expected_target_client,
-                  expected_target_index)
-            .and_return(true)
+                  expected_target_index,
+                  false)
+          expect(elasticsearch_handler).to receive(:has_errors)
+            .and_return(false)
           invoke_task expected_stderr: /reindex complete/
         }
       end
 
       context 'with errors' do
-        let(:successful) { false }
         it {
           expect(elasticsearch_handler).to receive(:fast_reindex)
             .with(expected_source_client,
                   expected_source_index,
                   expected_target_client,
-                  expected_target_index)
-            .and_return(successful)
+                  expected_target_index,
+                  false)
+            expect(elasticsearch_handler).to receive(:has_errors)
+              .and_return(true)
           invoke_task expected_stderr: /errors occurred/
+        }
+      end
+
+      context 'retry' do
+        it {
+          expect(elasticsearch_handler).to receive(:fast_reindex)
+            .with(expected_source_client,
+                  expected_source_index,
+                  expected_target_client,
+                  expected_target_index,
+                  false)
+            .and_raise(Elasticsearch::Transport::Transport::Errors::GatewayTimeout)
+            .ordered
+            expect(elasticsearch_handler).to receive(:fast_reindex)
+              .with(expected_source_client,
+                    expected_source_index,
+                    expected_target_client,
+                    expected_target_index,
+                    true)
+              .ordered
+          expect(elasticsearch_handler).to receive(:has_errors)
+            .and_return(false)
+          invoke_task expected_stderr: /reindex complete/
         }
       end
     end
@@ -270,27 +295,29 @@ describe "elasticsearch" do
         expect(ElasticsearchHandler).to receive(:new).with(verbose: true).and_return(elasticsearch_handler)
       }
       context 'without errors' do
-        let(:expected_success) { true }
         it {
           expect(elasticsearch_handler).to receive(:fast_reindex)
             .with(expected_source_client,
                   expected_source_index,
                   expected_target_client,
-                  expected_target_index)
-            .and_return(expected_success)
+                  expected_target_index,
+                false)
+          expect(elasticsearch_handler).to receive(:has_errors)
+            .and_return(false)
           invoke_task expected_stderr: /reindex complete/
         }
       end
 
       context 'with errors' do
-        let(:expected_success) { false }
         it {
           expect(elasticsearch_handler).to receive(:fast_reindex)
             .with(expected_source_client,
                   expected_source_index,
                   expected_target_client,
-                  expected_target_index)
-            .and_return(expected_success)
+                  expected_target_index,
+                false)
+            expect(elasticsearch_handler).to receive(:has_errors)
+              .and_return(true)
           invoke_task expected_stderr: /errors occurred/
         }
       end
