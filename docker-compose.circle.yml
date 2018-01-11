@@ -95,6 +95,11 @@ services:
       - elastic.client.local.env
     entrypoint: ['rspec']
     command: spec
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.5-management
+    ports:
+      - "12345:5672"
   dredd:
     build: ./docker/builds/dredd
     links:
