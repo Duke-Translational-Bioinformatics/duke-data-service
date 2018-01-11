@@ -30,6 +30,7 @@ dependencies:
     - ./docker/circle/cache_docker_image.sh neo4j 3.1.6
     - ./docker/circle/cache_docker_image.sh elasticsearch 5.4.3
 #    - curl -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 > jq; sudo mv jq /usr/bin/jq; sudo chmod +x /usr/bin/jq
+    - sudo apt-get install python-dev
     - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j elasticsearch
 
@@ -37,6 +38,7 @@ deployment:
  development:
    branch: develop
    commands:
+    - wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
     - heroku maintenance:on --app 'dukeds-dev'
     # - heroku run --exit-code rake assets:clobber --app 'dukeds-dev'
     - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
@@ -51,6 +53,7 @@ deployment:
  ua_test:
    branch: ua_test
    commands:
+    - wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
     - heroku maintenance:on --app 'dukeds-uatest'
     # - heroku run --exit-code rake assets:clobber --app 'dukeds-uatest'
     - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
@@ -65,6 +68,7 @@ deployment:
  production:
    branch: production
    commands:
+    - wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
     # - heroku run --exit-code rake assets:clobber --app 'dukeds'
     - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
     - git push git@heroku.com:dukeds.git $CIRCLE_SHA1:refs/heads/master:
