@@ -77,10 +77,24 @@ namespace :elasticsearch do
           target_client = source_client
         end
 
-        if ElasticsearchHandler.new(verbose: true).fast_reindex source_client, ENV['SOURCE_INDEX'], target_client, ENV['TARGET_INDEX']
-          $stderr.puts "reindex complete"
-        else
+        eh = ElasticsearchHandler.new(verbose: true)
+        trys = 5
+        current_try = 1
+        restart = false
+        while current_try < trys
+          begin
+            eh.fast_reindex source_client, ENV['SOURCE_INDEX'], target_client, ENV['TARGET_INDEX'], restart
+            current_try = trys
+          rescue Elasticsearch::Transport::Transport::Errors::GatewayTimeout
+            current_try = current_try + 1
+            restart = true
+          end
+        end
+
+        if eh.has_errors
           $stderr.puts "errors occurred"
+        else
+          $stderr.puts "reindex complete"
         end
       else
         $stderr.puts "ENV[SOURCE_INDEX] and ENV[TARGET_INDEX] are required"
