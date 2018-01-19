@@ -63,7 +63,7 @@ module Graphed
         action: 'update',
         graph_hash: graph_hash,
         attributes: {is_deleted: self.is_deleted}
-      ) if is_deleted_changed?
+      ) if will_save_change_to_is_deleted? || saved_change_to_is_deleted?
     end
   end
 
@@ -83,7 +83,7 @@ module Graphed
     end
 
     def manage_graph_relation
-      newly_deleted = is_deleted_changed? && is_deleted?
+      newly_deleted = will_save_change_to_is_deleted? && is_deleted?
       yield
       delete_graph_relation if newly_deleted
     end
