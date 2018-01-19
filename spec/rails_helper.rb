@@ -70,7 +70,9 @@ RSpec.configure do |config|
     Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
   end
   config.after(:each) do
-    Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
+    if Neo4j::Session.current
+      Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
+    end
   end
 end
 Shoulda::Matchers.configure do |config|
@@ -83,7 +85,7 @@ VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
   c.hook_into :webmock
   c.configure_rspec_metadata!
-  c.ignore_hosts URI(Rails.application.config.neo4j.session_path).host,
+  c.ignore_hosts URI(Rails.application.config.neo4j.session.path).host,
                  ENV['BONSAI_URL'].split(':').first,
                  URI(ENV['OPENID_URL']).host
   c.register_request_matcher :header_keys do |request_1, request_2|
