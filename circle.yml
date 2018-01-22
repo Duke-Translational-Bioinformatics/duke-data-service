@@ -36,6 +36,9 @@ dependencies:
     - sudo apt-get install python-dev
     - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j elasticsearch rabbitmq
+
+database:
+  post:
     - rake neo4j:load
 
 deployment:
