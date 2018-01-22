@@ -39,7 +39,7 @@ dependencies:
 
 database:
   post:
-    - rake neo4j:load
+    - bundle exec rake neo4j:load --trace
 
 deployment:
  development:
