@@ -70,9 +70,7 @@ RSpec.configure do |config|
     Sneakers::CONFIG[:connection].start if ENV['TEST_WITH_BUNNY']
   end
   config.after(:each) do
-    if Neo4j::Session.current
-      Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
-    end
+    Neo4j::ActiveBase.current_session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
 end
 Shoulda::Matchers.configure do |config|
