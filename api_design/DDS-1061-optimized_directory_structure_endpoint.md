@@ -14,7 +14,16 @@ The goal of this development epic is to produce a set of endpoints to be used in
 
 The legacy children endpoints have proven to be suboptimal for the GCB clients needs. The GCB client needs a paginated endpoint to list ALL children of a project or folder. The current children endpoints meet the information needs for their use, but it currently takes on average 15 minutes to get the directory structure for a project or folder with many subfolders and files (similar to our ua_test sprawl project).
 
-#### Design
+#### Proposal
+
+In this feature epic we will engage the GCB dds_client development team for feedback on two areas:
+
+- determine minimal query parameters required for their needs, for example, this endpoint may not need to support `name_contains` or `exclude_response_fields`
+- designing a response document with the minimal fields required to meet the dds_client requirements
+- include deleted children in response documents to facilitate detection of changes in the overall filesystem
+- sort children in order of last_updated_on to ensure most recently changed objects come out first in responses
+
+#### Document Design
 
 We will start with the following exemplar of the response provided by the current children endpoint. The goal of this phase is to tease out the specific information in this response, and craft a new JSON structure with these specific pieces of information only.
 
