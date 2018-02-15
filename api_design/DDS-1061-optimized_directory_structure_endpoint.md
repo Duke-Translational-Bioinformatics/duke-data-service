@@ -34,13 +34,12 @@ We started with an exemplar of the response provided by the current children end
 |Endpoint |Description |
 |---|---|
 | `GET /projects/:id/files` | Get list of files in a project. |
-| `GET /folders/:id/files` | Get list of files in a folder. |
 
 #### API Specification
 
 ##### List project / folder files
 
-`GET /projects/{id}/files` / `GET /folders/{id}/files`
+`GET /projects/{id}/files`
 
 ###### Response Example
 
