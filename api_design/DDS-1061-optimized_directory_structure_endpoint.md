@@ -57,10 +57,17 @@ Standard Pagination Headers are used for paginated responses.
     { "id": "4b24c20b-a4ed-4910-b51a-b747c76c4518",
       "name": "here.pyc",
       "size": 5843,
-      "ancestor_names": [
-        "project_name",
-        "foo",
-        "bar"
+      "ancestors": [
+          {
+              "kind": "dds-project",
+              "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+              "name": "Knockout Mouse Project (KOMP)"
+          },
+          {
+              "kind": "dds-folder",
+              "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+              "name": "Sequencing Archive"
+          }
       ],
       "hashes": [
         {
