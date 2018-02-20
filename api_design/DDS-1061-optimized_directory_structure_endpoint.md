@@ -41,6 +41,12 @@ We started with an exemplar of the response provided by the current children end
 
 `GET /projects/{id}/files`
 
+###### Permission
+
+The `download_file` permission is required because the `file_url` attribute is
+being returned. This could be reduced to `view_project`, with the `file_url`
+attribute omitted unless the `download_file` permission is pressent.
+
 ###### Response Example
 
 Standard Pagination Headers are used for paginated responses.
