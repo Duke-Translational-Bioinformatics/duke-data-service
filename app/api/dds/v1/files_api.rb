@@ -19,7 +19,7 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize DataFile.new(project: project), :download?
-        paginate(project.data_files.where(is_deleted: false))
+        paginate(project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false))
       end
 
       desc 'Create a file' do

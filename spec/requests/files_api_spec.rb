@@ -54,6 +54,20 @@ describe DDS::V1::FilesAPI do
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.data_files.count }
         let(:extras) { FactoryGirl.create_list(:data_file, 5, project: project) }
+
+        context 'with 1 per_page' do
+          let(:pagination_parameters) { { page: 1, per_page: 1 } }
+          let(:newer_file) { FactoryGirl.create(:data_file, project: project) }
+
+          it 'contains only the most recently updated file' do
+            expect(resource).to be_persisted
+            expect(newer_file).to be_persisted
+            resource.touch
+            is_expected.to eq(expected_response_status)
+            expect(response.body).to include(resource_serializer.new(resource).to_json)
+            expect(response.body).not_to include(resource_serializer.new(newer_file).to_json)
+          end
+        end
       end
 
       it_behaves_like 'a logically deleted resource' do
