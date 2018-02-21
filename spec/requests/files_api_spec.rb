@@ -8,11 +8,13 @@ describe DDS::V1::FilesAPI do
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
+  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent) { folder }
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_file) { FactoryGirl.create(:data_file, :root, project: other_project) }
   let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
 
   let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
@@ -25,6 +27,41 @@ describe DDS::V1::FilesAPI do
   let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
   let(:resource_stub) { FactoryGirl.build(:data_file, project: project, upload: upload) }
+
+  describe 'Project Files collection' do
+    let(:url) { "/api/v1/projects/#{project_id}/files" }
+    let(:project_id) { project.id }
+    let(:payload) {{}}
+    let(:resource_serializer) { DataFileSummarySerializer }
+
+    #List files for a project
+    it_behaves_like 'a GET request' do
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_file,
+          deleted_file
+        ] }
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { project.data_files.count }
+        let(:extras) { FactoryGirl.create_list(:data_file, 5, project: project) }
+      end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
+      it_behaves_like 'a software_agent accessible resource'
+    end
+  end
 
   describe 'Files collection' do
     let(:url) { "/api/v1/files" }
