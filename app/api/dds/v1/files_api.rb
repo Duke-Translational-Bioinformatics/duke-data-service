@@ -19,7 +19,19 @@ module DDS
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize DataFile.new(project: project), :download?
-        paginate(project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false))
+        files = project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false)
+
+        # plain query
+        #paginate(files)
+
+        # includes query, no joins + preloaded associations
+        paginate(files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]))
+
+        # includes query with reference, one join + no preloading
+        #paginate(files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]).references(:file_versions))
+
+        # join :file_versions, preload other associations
+        #paginate(files.includes(:file_versions).references(:file_versions).preload(file_versions: [upload: [:fingerprints, :storage_provider]]))
       end
 
       desc 'Create a file' do
