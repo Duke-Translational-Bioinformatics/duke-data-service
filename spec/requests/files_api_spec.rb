@@ -74,6 +74,55 @@ describe DDS::V1::FilesAPI do
         let(:deleted_resource) { project }
       end
       it_behaves_like 'a software_agent accessible resource'
+
+      context 'setting Project-Files-Query header' do
+        before(:each) do
+          allow(Rails.logger).to receive(:info).and_call_original
+        end
+
+        context 'unset' do
+          it 'logs the default' do
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = plain")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:includes)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:references)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to preload_only' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='preload_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = preload_only")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:references)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to join_only' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='join_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = join_only")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:references).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to join_and_preload' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='join_and_preload'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = join_and_preload")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:references).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:preload).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            is_expected.to eq 200
+          end
+        end
+      end
     end
   end
 

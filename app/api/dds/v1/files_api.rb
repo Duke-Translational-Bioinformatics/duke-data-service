@@ -21,17 +21,23 @@ module DDS
         authorize DataFile.new(project: project), :download?
         files = project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false)
 
-        # plain query
-        #paginate(files)
+        files_query = headers&.fetch("Project-Files-Query", nil) || "plain"
 
-        # includes query, no joins + preloaded associations
-        paginate(files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]))
+        case files_query
+        when 'preload_only'
+          # includes query, no joins + preloaded associations
+          files = files.includes(file_versions: [upload: [:fingerprints, :storage_provider]])
+        when 'join_only'
+          # includes query with reference, one join + no preloading
+          files = files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]).references(:file_versions)
+        when 'join_and_preload'
+          # join :file_versions, preload other associations
+          files = files.includes(:file_versions).references(:file_versions).preload(file_versions: [upload: [:fingerprints, :storage_provider]])
+        end
 
-        # includes query with reference, one join + no preloading
-        #paginate(files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]).references(:file_versions))
+        logger.info "Project-Files-Query = #{files_query}"
 
-        # join :file_versions, preload other associations
-        #paginate(files.includes(:file_versions).references(:file_versions).preload(file_versions: [upload: [:fingerprints, :storage_provider]]))
+        paginate(files)
       end
 
       desc 'Create a file' do
