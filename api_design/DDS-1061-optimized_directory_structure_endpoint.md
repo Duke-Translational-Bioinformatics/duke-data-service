@@ -41,6 +41,12 @@ We started with an exemplar of the response provided by the current children end
 
 `GET /projects/{id}/files`
 
+###### Permission
+
+The `download_file` permission is required because the `file_url` attribute is
+being returned. This could be reduced to `view_project`, with the `file_url`
+attribute omitted unless the `download_file` permission is pressent.
+
 ###### Response Example
 
 Standard Pagination Headers are used for paginated responses.
@@ -51,10 +57,17 @@ Standard Pagination Headers are used for paginated responses.
     { "id": "4b24c20b-a4ed-4910-b51a-b747c76c4518",
       "name": "here.pyc",
       "size": 5843,
-      "ancestor_names": [
-        "project_name",
-        "foo",
-        "bar"
+      "ancestors": [
+          {
+              "kind": "dds-project",
+              "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+              "name": "Knockout Mouse Project (KOMP)"
+          },
+          {
+              "kind": "dds-folder",
+              "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+              "name": "Sequencing Archive"
+          }
       ],
       "hashes": [
         {
@@ -62,7 +75,13 @@ Standard Pagination Headers are used for paginated responses.
           "value": "866aecf23d71d084133007b6122f1be5"
         }
       ],
-      "url": "https://swift.domain.com/v1/AUTH_xxxx/abcd/efg/?temp_url_sig=030303&temp_url_expires=1518192780&filename=file.txt" }
+      "file_url": {
+          "http_verb": "GET",
+          "host": "https://swift.oit.duke.edu",
+          "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738&filename=here.pyc",
+          "http_headers": [ ]
+      }
+    }
   ]
 }
 ```
