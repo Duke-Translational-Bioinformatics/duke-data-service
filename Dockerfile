@@ -24,6 +24,9 @@ RUN /usr/bin/apt-get update && /usr/bin/apt-get install -y postgresql libpq-dev
 #GraphViz for Rails ERD
 RUN /usr/bin/apt-get install -y graphviz
 
+#RubyGems system update
+RUN ["gem", "update", "--system", "2.7.6"]
+
 #miscellaneous
 RUN ["mkdir","-p","/var/www"]
 WORKDIR /var/www
