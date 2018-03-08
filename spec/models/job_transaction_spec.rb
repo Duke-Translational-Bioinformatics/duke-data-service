@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe JobTransaction, type: :model do
-  subject { FactoryGirl.create(:job_transaction) }
+  subject { FactoryBot.create(:job_transaction) }
 
   describe 'validations' do
     it {

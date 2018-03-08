@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe SoftwareAgent, type: :model do
-  subject { FactoryGirl.create(:software_agent) }
-  let(:deleted_software_agent) { FactoryGirl.create(:software_agent, :deleted) }
+  subject { FactoryBot.create(:software_agent) }
+  let(:deleted_software_agent) { FactoryBot.create(:software_agent, :deleted) }
 
   it_behaves_like 'an audited model'
 

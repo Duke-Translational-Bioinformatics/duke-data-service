@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe AncestorSerializer, type: :serializer do
-  let(:folder) { FactoryGirl.create(:folder) }
-  let(:project) { FactoryGirl.create(:project) }
+  let(:folder) { FactoryBot.create(:folder) }
+  let(:project) { FactoryBot.create(:project) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'kind' => resource.kind,

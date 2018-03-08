@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
-  let(:project) { FactoryGirl.create(:project, :inconsistent) }
-  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:project) { FactoryBot.create(:project, :inconsistent) }
+  let!(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
   let(:job_transaction) { described_class.initialize_job(project) }

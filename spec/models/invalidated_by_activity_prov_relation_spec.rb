@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe InvalidatedByActivityProvRelation, type: :model do
-  subject { FactoryGirl.create(:invalidated_by_activity_prov_relation) }
+  subject { FactoryBot.create(:invalidated_by_activity_prov_relation) }
   let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-invalidated-by' }
 

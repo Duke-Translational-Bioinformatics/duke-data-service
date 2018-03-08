@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ProvenanceGraphNode do
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let!(:object) {
-    FactoryGirl.create(:file_version, label: "OBJECT")
+    FactoryBot.create(:file_version, label: "OBJECT")
   }
   let!(:node) { object.graph_node }
   subject{ ProvenanceGraphNode.new(node) }

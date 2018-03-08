@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe AuthRoleSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:auth_role) }
+  let(:resource) { FactoryBot.create(:auth_role) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name,

@@ -17,7 +17,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     }
 
     before do
-      FactoryGirl.attributes_for(:duke_authentication_service).each do |key,value|
+      FactoryBot.attributes_for(:duke_authentication_service).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
     end
@@ -39,7 +39,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     }
 
     before do
-      FactoryGirl.attributes_for(:openid_authentication_service).each do |key,value|
+      FactoryBot.attributes_for(:openid_authentication_service).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
     end
@@ -64,8 +64,8 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
   describe 'auth_service:transfer_default' do
     include_context "rake"
     let(:task_name) { "auth_service:transfer_default" }
-    let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
-    let(:non_default_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+    let(:default_authentication_service) { FactoryBot.create(:duke_authentication_service, :default) }
+    let(:non_default_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
     context 'missing ENV[FROM_AUTH_SERVICE_ID]' do
       before do
@@ -170,7 +170,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'specified service is already default' do
-      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+      let(:authentication_service) { FactoryBot.create(:duke_authentication_service, :default) }
       before do
         ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
       end
@@ -183,14 +183,14 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'specified service is not already default' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       before do
         ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
       end
 
       context 'another default service already exists' do
-        let(:default_authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+        let(:default_authentication_service) { FactoryBot.create(:duke_authentication_service, :default) }
         it {
           expect {
             invoke_task expected_stderr: Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")
@@ -232,7 +232,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'specified service is already deprecated' do
-      let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :deprecated) }
+      let(:authentication_service) { FactoryBot.create(:duke_authentication_service, :deprecated) }
       before do
         ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
       end
@@ -245,7 +245,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'specified service is not already deprecated' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       before do
         ENV['AUTH_SERVICE_SERVICE_ID'] = authentication_service.service_id
@@ -282,7 +282,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'unknown AUTH_SERVICE_ID' do
-      let(:identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+      let(:identity_provider) { FactoryBot.create(:ldap_identity_provider) }
       before do
         ENV['AUTH_SERVICE_ID'] = SecureRandom.uuid
         ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
@@ -296,7 +296,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'unknown IDENTITY_PROVIDER_ID' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
       before do
         ENV['AUTH_SERVICE_ID'] = authentication_service.id
         ENV['IDENTITY_PROVIDER_ID'] = "#{SecureRandom.random_number}"
@@ -310,7 +310,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'identity_provider already set' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
       let(:identity_provider) { authentication_service.identity_provider }
 
       context 'to requested identity_provider' do
@@ -327,7 +327,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
       end
 
       context 'to a different identity_provider than the requested identity_provider' do
-        let(:other_identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+        let(:other_identity_provider) { FactoryBot.create(:ldap_identity_provider) }
         before do
           ENV['AUTH_SERVICE_ID'] = authentication_service.id
           ENV['IDENTITY_PROVIDER_ID'] = "#{other_identity_provider.id}"
@@ -342,8 +342,8 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'identity_provder not set' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
-      let(:identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
+      let(:identity_provider) { FactoryBot.create(:ldap_identity_provider) }
       before do
         ENV['AUTH_SERVICE_ID'] = authentication_service.id
         ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
@@ -386,7 +386,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'auth_service does not have an identity_provider' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
       before do
         ENV['AUTH_SERVICE_ID'] = authentication_service.id
       end
@@ -400,7 +400,7 @@ describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
     end
 
     context 'auth_service has an identity_provider' do
-      let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+      let(:authentication_service) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
       before do
         ENV['AUTH_SERVICE_ID'] = authentication_service.id
       end

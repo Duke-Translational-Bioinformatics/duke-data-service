@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe AttributedToUserProvRelation, type: :model do
-  subject { FactoryGirl.create(:attributed_to_user_prov_relation) }
+  subject { FactoryBot.create(:attributed_to_user_prov_relation) }
   let(:resource_serializer) { AttributedToUserProvRelationSerializer }
   let(:expected_relationship_type) { 'was-attributed-to' }
 

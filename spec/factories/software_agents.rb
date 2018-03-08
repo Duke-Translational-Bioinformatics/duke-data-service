@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :software_agent do
     name { "#{Faker::Team.name}_#{rand(10**3)}" }
     description { Faker::Hacker.say_something_smart }

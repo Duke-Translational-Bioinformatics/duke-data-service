@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UserPreviewSerializer, type: :serializer do
-  let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
+  let(:user_authentication_service) { FactoryBot.create(:user_authentication_service, :populated) }
   let(:resource) { user_authentication_service.user }
   let(:expected_attributes) {{
     'id' => resource.id,
