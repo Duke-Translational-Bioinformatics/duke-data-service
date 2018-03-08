@@ -59,7 +59,7 @@ gem 'rspec_junit_formatter'
 # https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
 gem 'newrelic_rpm'
 
-gem "factory_girl_rails"
+gem "factory_bot_rails"
 gem "faker"
 
 # Use Capistrano for deployment
