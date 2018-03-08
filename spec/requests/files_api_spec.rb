@@ -8,11 +8,13 @@ describe DDS::V1::FilesAPI do
   let(:folder) { FactoryGirl.create(:folder, project: project) }
   let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
   let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
+  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
   let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent) { folder }
   let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
   let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_file) { FactoryGirl.create(:data_file, :root, project: other_project) }
   let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
 
   let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
@@ -25,6 +27,104 @@ describe DDS::V1::FilesAPI do
   let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
   let(:resource_stub) { FactoryGirl.build(:data_file, project: project, upload: upload) }
+
+  describe 'Project Files collection' do
+    let(:url) { "/api/v1/projects/#{project_id}/files" }
+    let(:project_id) { project.id }
+    let(:payload) {{}}
+    let(:resource_serializer) { DataFileSummarySerializer }
+
+    #List files for a project
+    it_behaves_like 'a GET request' do
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { [
+          other_file,
+          deleted_file
+        ] }
+      end
+
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+
+      it_behaves_like 'an identified resource' do
+        let(:project_id) { "doesNotExist" }
+        let(:resource_class) { Project }
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { project.data_files.count }
+        let(:extras) { FactoryGirl.create_list(:data_file, 5, project: project) }
+
+        context 'with 1 per_page' do
+          let(:pagination_parameters) { { page: 1, per_page: 1 } }
+          let(:newer_file) { FactoryGirl.create(:data_file, project: project) }
+
+          it 'contains only the most recently updated file' do
+            expect(resource).to be_persisted
+            expect(newer_file).to be_persisted
+            resource.touch
+            is_expected.to eq(expected_response_status)
+            expect(response.body).to include(resource_serializer.new(resource).to_json)
+            expect(response.body).not_to include(resource_serializer.new(newer_file).to_json)
+          end
+        end
+      end
+
+      it_behaves_like 'a logically deleted resource' do
+        let(:deleted_resource) { project }
+      end
+      it_behaves_like 'a software_agent accessible resource'
+
+      context 'setting Project-Files-Query header' do
+        before(:each) do
+          allow(Rails.logger).to receive(:info).and_call_original
+        end
+
+        context 'unset' do
+          it 'logs the default' do
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = plain")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:includes)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:references)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to preload_only' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='preload_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = preload_only")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:references)
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to join_only' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='join_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = join_only")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:references).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).not_to receive(:preload)
+            is_expected.to eq 200
+          end
+        end
+
+        context 'set to join_and_preload' do
+          it 'logs proload_only' do
+            headers['Project-Files-Query']='join_and_preload'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = join_and_preload")
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:includes).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:references).with(:file_versions).and_call_original
+            expect_any_instance_of(DataFile::ActiveRecord_AssociationRelation).to receive(:preload).with(file_versions: [upload: [:fingerprints, :storage_provider]]).and_call_original
+            is_expected.to eq 200
+          end
+        end
+      end
+    end
+  end
 
   describe 'Files collection' do
     let(:url) { "/api/v1/files" }
