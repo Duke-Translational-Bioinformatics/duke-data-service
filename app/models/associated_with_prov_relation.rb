@@ -4,4 +4,8 @@ class AssociatedWithProvRelation < ProvRelation
   def kind
     'dds-relation-was-associated-with'
   end
+
+  def graph_model_name
+    'WasAssociatedWith'
+  end
 end

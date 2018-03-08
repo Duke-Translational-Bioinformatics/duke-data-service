@@ -17,7 +17,7 @@ RSpec.describe FileVersion, type: :model do
   end
 
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', logically_deleted: true
   it_behaves_like 'a job_transactionable model'
 
   context 'previous data_file version' do

@@ -300,6 +300,7 @@ end
 
 shared_examples 'a ProvRelationSerializer' do |from:, to:|
   let(:is_logically_deleted) { true }
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
   it_behaves_like 'a has_one association with', :relatable_from, from, root: :from
   it_behaves_like 'a has_one association with', :relatable_to, to, root: :to

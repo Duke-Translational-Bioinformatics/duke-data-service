@@ -1,99 +1,104 @@
-def create_indices
-  current_indices = DataFile.__elasticsearch__.client.cat.indices
-  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-    if current_indices.include? indexed_model.index_name
-      indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-    end
-    indexed_model.__elasticsearch__.client.indices.create(
-      index: indexed_model.index_name,
-      body: {
-        settings: indexed_model.settings.to_hash,
-        mappings: indexed_model.mappings.to_hash
-      }
-    )
-  end
-end
-
-def index_documents
-  batch_size = 500
-  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-    indexed_model.paginates_per batch_size
-    (1 .. indexed_model.page.total_pages).each do |page_num|
-      current_batch = indexed_model
-        .page(page_num)
-        .map { |f|
-          { index: {
-            _index: f.__elasticsearch__.index_name,
-            _type: f.__elasticsearch__.document_type,
-            _id: f.__elasticsearch__.id,
-            data: f.__elasticsearch__.as_indexed_json }
-          }
-      }
-      trys = 0
-      error_ids = []
-      while trys < 5
-        bulk_response = Elasticsearch::Model.client.bulk body: current_batch
-        if bulk_response["errors"]
-          trys += 1
-          error_ids = bulk_response["items"].select {|item|
-            item["index"]["status"] >= 400
-          }.map {|i|
-            i["index"]["_id"]
-          }
-          current_batch = current_batch.select {|b| error_ids.include? b[:index][:_id] }
-        else
-          trys = 5
-        end
-      end
-      unless error_ids.empty?
-        $stderr.puts "page #{page_num} Ids Not Loaded after #{trys} tries:"
-        $stderr.puts error_ids.join(',')
-      end
-      $stderr.print "+" * (current_batch.length - error_ids.length)
-    end
-  end
-end
-
-def drop_indices
-  current_indices = DataFile.__elasticsearch__.client.cat.indices
-  DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-    if current_indices.include? indexed_model.index_name
-      indexed_model.__elasticsearch__.client.indices.delete index: indexed_model.index_name
-    end
-  end
-end
-
 namespace :elasticsearch do
   namespace :index do
-    desc "creates indices for all indexed models"
+    desc "creates indices for all indexed models (in optional ENV[TARGET_URL])"
     task create: :environment do
       Rails.logger.level = 3
-      create_indices
+      if ENV['TARGET_URL']
+        ElasticsearchHandler.new(verbose: true).create_indices(Elasticsearch::Client.new url: ENV['TARGET_URL'])
+      else
+        ElasticsearchHandler.new(verbose: true).create_indices
+      end
     end #create
 
     desc "indexes all documents"
     task index_documents: :environment do
       Rails.logger.level = 3
-      index_documents
+      ElasticsearchHandler.new(verbose: true).index_documents
     end
 
-    desc "drops indices for all indexed models"
+    desc "drops indices for all indexed models (in optional ENV[TARGET_URL])"
     task drop: :environment do
       Rails.logger.level = 3
-      drop_indices
+      if ENV['TARGET_URL']
+        ElasticsearchHandler.new(verbose: true).drop_indices(Elasticsearch::Client.new url: ENV['TARGET_URL'])
+      else
+        ElasticsearchHandler.new(verbose: true).drop_indices
+      end
     end #drop
 
     desc "drop create and index all documents for all indexed models if ENV[RECREATE_SEARCH_MAPPINGS] is true."
     task rebuild: :environment do
       if ENV["RECREATE_SEARCH_MAPPINGS"]
         Rails.logger.level = 3
-        drop_indices
-        create_indices
-        index_documents
+        handler = ElasticsearchHandler.new(verbose: true)
+        handler.drop_indices
+        handler.create_indices
+        handler.index_documents
         puts "mappings rebuilt"
       else
         $stderr.puts "ENV[RECREATE_SEARCH_MAPPINGS] false"
       end
     end #rebuild
+
+    desc "attempt smart_reindex of all indexed models"
+    task smart_reindex: :environment do
+      Rails.logger.level = 3
+      info = ElasticsearchHandler.new(verbose: true).smart_reindex_indices
+      info[:skipped].each do |skipped_index|
+        $stderr.puts "#{skipped_index} index exists, nothing more to do"
+      end
+
+      info[:reindexed].keys.each do |indexed_model|
+        $stderr.puts "index for #{indexed_model} reindexed from #{info[:reindexed][indexed_model][:from]} to #{info[:reindexed][indexed_model][:to]}"
+      end
+
+      info[:migration_version_mismatch].keys.each do |indexed_model|
+        $stderr.puts "#{indexed_model} #{info[:migration_version_mismatch][indexed_model][:from]} migration_version does not match #{info[:migration_version_mismatch][indexed_model][:to]}"
+      end
+
+      info[:missing_aliases].each do |missing_alias|
+        $stderr.puts "#{missing_alias} alias does not exist!"
+      end
+
+      info[:has_errors].each do |indexed_model|
+        $stderr.puts "fast reindex of #{indexed_model} has errors, leaving indices in place"
+      end
+    end
+
+    desc "fast reindex ENV[SOURCE_INDEX] to (optional ENV[TARGET_URL]) ENV[TARGET_INDEX]"
+    task fast_reindex: :environment do
+      Rails.logger.level = 3
+      if ENV['SOURCE_INDEX'] && ENV['TARGET_INDEX']
+        source_client = Elasticsearch::Model.client
+        target_client = nil
+        if ENV['TARGET_URL']
+          target_client = Elasticsearch::Client.new url: ENV['TARGET_URL']
+        else
+          target_client = source_client
+        end
+
+        eh = ElasticsearchHandler.new(verbose: true)
+        trys = 5
+        current_try = 1
+        restart = false
+        while current_try < trys
+          begin
+            eh.fast_reindex source_client, ENV['SOURCE_INDEX'], target_client, ENV['TARGET_INDEX'], restart
+            current_try = trys
+          rescue Elasticsearch::Transport::Transport::Errors::GatewayTimeout
+            current_try = current_try + 1
+            restart = true
+          end
+        end
+
+        if eh.has_errors
+          $stderr.puts "errors occurred"
+        else
+          $stderr.puts "reindex complete"
+        end
+      else
+        $stderr.puts "ENV[SOURCE_INDEX] and ENV[TARGET_INDEX] are required"
+      end
+    end
   end
 end

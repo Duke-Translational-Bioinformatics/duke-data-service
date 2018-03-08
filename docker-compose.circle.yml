@@ -25,10 +25,12 @@ services:
     env_file:
       - neo4j.server.env
   elasticsearch:
-    image: elasticsearch:2.4
+    image: elasticsearch:5.4.3
     ports:
       - '9200:9200'
-    command: elasticsearch --action.auto_create_index=0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    command: elasticsearch -E 'action.auto_create_index=false'
   worker:
     image: dukedataservice_server
     entrypoint: ['rake', 'workers:run']
@@ -93,6 +95,11 @@ services:
       - elastic.client.local.env
     entrypoint: ['rspec']
     command: spec
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.5-management
+    ports:
+      - "12345:5672"
   dredd:
     build: ./docker/builds/dredd
     links:

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let!(:focus) {
     FactoryGirl.create(:file_version, label: "FOCUS")
   }

@@ -1,13 +1,20 @@
 require 'rails_helper'
 
-RSpec.describe Graph::Activity do
+RSpec.describe Graph::Agent do
+  before(:example) { resource.create_graph_node }
+  subject { resource.graph_model_object }
+
   context 'User' do
-    subject { FactoryGirl.create(:user).create_graph_node }
-    it_behaves_like 'a graphed model'
+    let(:resource) { FactoryGirl.create(:user) }
+    it_behaves_like 'a graphed model' do
+      it_behaves_like 'a Graphed::NodeModel'
+    end
   end
 
   context 'SoftwareAgent' do
-    subject { FactoryGirl.create(:software_agent).create_graph_node }
-    it_behaves_like 'a graphed model'
+    let(:resource) { FactoryGirl.create(:software_agent) }
+    it_behaves_like 'a graphed model' do
+      it_behaves_like 'a Graphed::NodeModel'
+    end
   end
 end

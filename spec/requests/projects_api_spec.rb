@@ -208,6 +208,7 @@ describe DDS::V1::ProjectsAPI do
           let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
 
           context 'with inline ActiveJob' do
+            include_context 'elasticsearch prep', [], []
             before do
               ActiveJob::Base.queue_adapter = :inline
               allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)

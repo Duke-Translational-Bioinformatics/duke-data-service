@@ -17,7 +17,9 @@ namespace :storage_provider do
         service_pass: ENV['SWIFT_PASS'],
         primary_key: ENV['SWIFT_PRIMARY_KEY'],
         secondary_key: ENV['SWIFT_SECONDARY_KEY'],
-        chunk_hash_algorithm: (ENV['SWIFT_CHUNK_HASH_ALGORITHM'] || 'md5')
+        chunk_hash_algorithm: (ENV['SWIFT_CHUNK_HASH_ALGORITHM'] || 'md5'),
+        chunk_max_number: ENV['SWIFT_CHUNK_MAX_NUMBER'],
+        chunk_max_size_bytes: ENV['SWIFT_CHUNK_MAX_SIZE_BYTES']
       )
       if sp.valid?
         begin

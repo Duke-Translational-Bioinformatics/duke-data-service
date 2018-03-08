@@ -10,12 +10,8 @@ class SoftwareAgent < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
 
-  def create_graph_node
-    super('Agent')
-  end
-
-  def graph_node
-    super('Agent')
+  def graph_model_name
+    'Agent'
   end
 
   def kind

@@ -45,7 +45,7 @@ module DDS
           end
 
           #graphdb must be configured
-          if ENV["GRAPHSTORY_URL"]
+          if ENV["GRAPHENEDB_URL"]
             #graphdb must be accessible with configured authentication or this will throw a Faraday::ConnectionFailed exception
             count = Neo4j::Session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
           else
