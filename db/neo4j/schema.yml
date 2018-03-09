@@ -1,0 +1,40 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of ActiveNode to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# Note that this schema.yml definition is the authoritative source for your
+# database schema. If you need to create the application database on another
+# system, you should be using neo4j:schema:load, not running all the migrations
+# from scratch. The latter is a flawed and unsustainable approach (the more migrations
+# you'll amass, the slower it'll run and the greater likelihood for issues).
+#
+# It's strongly recommended that you check this file into your version control system.
+
+---
+:constraints:
+- CONSTRAINT ON ( `neo4j::migrations::schemamigration`:`Neo4j::Migrations::SchemaMigration`
+  ) ASSERT `neo4j::migrations::schemamigration`.migration_id IS UNIQUE
+- CONSTRAINT ON ( activity:Activity ) ASSERT activity.uuid IS UNIQUE
+- CONSTRAINT ON ( agent:Agent ) ASSERT agent.uuid IS UNIQUE
+- CONSTRAINT ON ( fileversion:FileVersion ) ASSERT fileversion.uuid IS UNIQUE
+:indexes:
+- INDEX ON :Activity(is_deleted)
+- INDEX ON :Activity(model_id)
+- INDEX ON :Activity(model_kind)
+- INDEX ON :Agent(model_id)
+- INDEX ON :Agent(model_kind)
+- INDEX ON :FileVersion(is_deleted)
+- INDEX ON :FileVersion(model_id)
+- INDEX ON :FileVersion(model_kind)
+:versions:
+- '20180118225229'
+- '20180118225250'
+- '20180118225532'
+- '20180118225539'
+- '20180118225548'
+- '20180118225556'
+- '20180118225602'
+- '20180118225611'
+- '20180118225620'
+- '20180118225628'
+- '20180118225637'
