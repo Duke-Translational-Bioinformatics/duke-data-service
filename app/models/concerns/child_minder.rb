@@ -6,7 +6,7 @@ module ChildMinder
   end
 
   def manage_children
-    newly_deleted = is_deleted_changed? && is_deleted?
+    newly_deleted = will_save_change_to_is_deleted? && is_deleted?
     yield
     if has_children? && newly_deleted
       (1..paginated_children.total_pages).each do |page|

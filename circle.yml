@@ -38,6 +38,10 @@ dependencies:
     - sudo pip install --upgrade docker-compose==1.8.0
     - docker-compose up -d neo4j elasticsearch rabbitmq
 
+database:
+  post:
+    - bundle exec rake neo4j:schema:load --trace
+
 deployment:
  development:
    branch: develop
@@ -49,6 +53,7 @@ deployment:
     - git push git@heroku.com:dukeds-dev.git $CIRCLE_SHA1:refs/heads/master:
         timeout: 54000
     - heroku run rake --exit-code db:migrate --app 'dukeds-dev'
+    - heroku run --exit-code rake neo4j:schema:load --app 'dukeds-dev'
     - heroku run rake --exit-code db:seed --app 'dukeds-dev'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-dev'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-dev'
@@ -64,6 +69,7 @@ deployment:
     - git push git@heroku.com:dukeds-uatest.git $CIRCLE_SHA1:refs/heads/master:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds-uatest'
+    - heroku run --exit-code rake neo4j:schema:load --app 'dukeds-uatest'
     - heroku run --exit-code rake db:seed --app 'dukeds-uatest'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds-uatest'
     - heroku run --exit-code rake elasticsearch:index:rebuild --app 'dukeds-uatest'
@@ -78,6 +84,7 @@ deployment:
     - git push git@heroku.com:dukeds.git $CIRCLE_SHA1:refs/heads/master:
         timeout: 54000
     - heroku run --exit-code rake db:migrate --app 'dukeds'
+    - heroku run --exit-code rake neo4j:schema:load --app 'dukeds'
     - heroku run --exit-code rake db:seed --app 'dukeds'
     - heroku run --exit-code rake db:data:migrate --app 'dukeds'
     - heroku run --exit-code rake elasticsearch:index:rebuild  --app 'dukeds'

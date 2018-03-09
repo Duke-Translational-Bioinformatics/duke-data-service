@@ -8,6 +8,7 @@ fi
 docker-compose up -d db neo4j elasticsearch rabbitmq
 sleep 10 #GDNEO4J!!!!
 docker-compose run rake db:migrate
+docker-compose run rake neo4j:migrate
 docker-compose run rake db:seed
 docker-compose run authservice
 docker-compose run rake storage_provider:create
