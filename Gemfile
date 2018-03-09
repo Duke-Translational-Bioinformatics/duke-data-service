@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1'
 # Use postgresql as the database for Active Record
-gem "pg", "~> 0.18" # Specifying version for rails 5.1.4
+gem "pg"
 
 # Use neo4j for PROV graph relationships
 gem 'neo4j', '~> 8.0'
