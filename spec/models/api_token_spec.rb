@@ -49,7 +49,7 @@ RSpec.describe ApiToken do
         expect(decoded_token).to have_key('service_id')
         expect(decoded_token['service_id']).to eq(auth_service.service_id)
         expect(decoded_token).to have_key('exp')
-        expect(decoded_token['exp']).to eq(expires_on)
+        expect(decoded_token['exp']).to eq(expires_on.to_s)
       end
     end
   end
@@ -95,7 +95,7 @@ RSpec.describe ApiToken do
         expect(decoded_token).to have_key('software_agent_id')
         expect(decoded_token['software_agent_id']).to eq(software_agent.id)
         expect(decoded_token).to have_key('exp')
-        expect(decoded_token['exp']).to eq(expires_on)
+        expect(decoded_token['exp']).to eq(expires_on.to_s)
       end
     end
   end

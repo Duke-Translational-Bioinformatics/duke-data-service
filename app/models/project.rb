@@ -48,7 +48,7 @@ class Project < ActiveRecord::Base
   end
 
   def manage_container_index_project
-    if name_changed?
+    if will_save_change_to_name?
       if containers.count > 0
         (1..paginated_containers.total_pages).each do |page|
           ProjectContainerElasticsearchUpdateJob.perform_later(

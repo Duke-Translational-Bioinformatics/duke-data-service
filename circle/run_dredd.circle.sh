@@ -13,6 +13,7 @@ sleep 10
 docker-compose ps
 curl http://swift.local:12345/info
 docker-compose run rake db:migrate > /dev/null 2>&1
+docker-compose run rake neo4j:migrate > /dev/null 2>&1
 docker-compose run rake db:seed > /dev/null 2>&1
 docker-compose run authservice > /dev/null 2>&1
 docker-compose run rake storage_provider:create > /dev/null 2>&1
