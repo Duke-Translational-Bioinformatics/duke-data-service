@@ -181,14 +181,14 @@ RSpec.describe Folder, type: :model do
   end
 
   it_behaves_like 'a Restorable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
-    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
     before do
       expect(child_folder_file).to be_persisted
       child_folder_file.update_column(:is_deleted, true)
     end
   end
   it_behaves_like 'a Purgable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
-    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
     before do
       expect(child_folder_file).to be_persisted
       child_folder_file.update_column(:is_deleted, true)
@@ -214,7 +214,7 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'when child is not a Container' do
-      let(:incompatible_child) { FactoryGirl.create(:file_version) }
+      let(:incompatible_child) { FactoryBot.create(:file_version) }
       it {
         expect {
           begin
@@ -251,7 +251,7 @@ RSpec.describe Folder, type: :model do
 
       context 'from this project' do
         context 'from another folder' do
-          let(:child) { FactoryGirl.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
+          let(:child) { FactoryBot.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
           it {
             expect {
               expect(child.is_deleted?).to be_truthy

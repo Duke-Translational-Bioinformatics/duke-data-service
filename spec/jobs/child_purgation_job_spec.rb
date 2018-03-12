@@ -48,10 +48,10 @@ RSpec.describe ChildPurgationJob, type: :job do
   end
 
   context 'project' do
-    let(:project) { FactoryGirl.create(:project, is_deleted: true) }
-    let(:root_folder) { FactoryGirl.create(:folder, :root, project: project, is_deleted: true) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, is_deleted: true) }
-    let(:root_file) { FactoryGirl.create(:data_file, :root, project: project, is_deleted: true) }
+    let(:project) { FactoryBot.create(:project, is_deleted: true) }
+    let(:root_folder) { FactoryBot.create(:folder, :root, project: project, is_deleted: true) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, is_deleted: true) }
+    let(:root_file) { FactoryBot.create(:data_file, :root, project: project, is_deleted: true) }
 
     before do
       expect(folder_child).to be_persisted
@@ -62,10 +62,10 @@ RSpec.describe ChildPurgationJob, type: :job do
   end
 
   context 'folder' do
-    let(:folder) { FactoryGirl.create(:folder, is_deleted: true) }
-    let(:sub_folder) { FactoryGirl.create(:folder, parent: folder, is_deleted: true) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: sub_folder, is_deleted: true) }
-    let(:sub_file) { FactoryGirl.create(:data_file, parent: folder, is_deleted: true) }
+    let(:folder) { FactoryBot.create(:folder, is_deleted: true) }
+    let(:sub_folder) { FactoryBot.create(:folder, parent: folder, is_deleted: true) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: sub_folder, is_deleted: true) }
+    let(:sub_file) { FactoryBot.create(:data_file, parent: folder, is_deleted: true) }
 
     before do
       expect(folder_child).to be_persisted

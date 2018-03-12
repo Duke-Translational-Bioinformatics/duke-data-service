@@ -412,7 +412,7 @@ RSpec.describe DataFile, type: :model do
     end
 
     context 'when child is not a FileVersion' do
-      let(:incompatible_child) { FactoryGirl.create(:folder, :root, project: project) }
+      let(:incompatible_child) { FactoryBot.create(:folder, :root, project: project) }
       it {
         expect {
           begin
@@ -427,7 +427,7 @@ RSpec.describe DataFile, type: :model do
 
     context 'when child is a FileVersion' do
       context 'from another data_file' do
-        let(:child) { FactoryGirl.create(:file_version, data_file: root_file) }
+        let(:child) { FactoryBot.create(:file_version, data_file: root_file) }
         it {
           expect {
             begin
@@ -441,7 +441,7 @@ RSpec.describe DataFile, type: :model do
       end
 
       context 'of itself' do
-          let(:child) { FactoryGirl.create(:file_version, :deleted, data_file: subject) }
+          let(:child) { FactoryBot.create(:file_version, :deleted, data_file: subject) }
           it {
             expect {
               expect(child.is_deleted?).to be_truthy

@@ -159,7 +159,7 @@ describe "db:data:migrate" do
         before do
           Upload.skip_callback(:create, :before, :set_storage_container)
           expected_uploads_without_storage_container.times do
-            u = FactoryGirl.create(:upload)
+            u = FactoryBot.create(:upload)
           end
         end
 

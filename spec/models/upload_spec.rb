@@ -194,7 +194,7 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to respond_to :set_storage_container }
 
     context 'upload creation' do
-      subject { FactoryGirl.build(:upload) }
+      subject { FactoryBot.build(:upload) }
       it {
         expect(subject.storage_container).to be_nil
         subject.save
@@ -203,7 +203,7 @@ RSpec.describe Upload, type: :model do
     end
 
     context 'upload update' do
-      subject { FactoryGirl.create(:upload) }
+      subject { FactoryBot.create(:upload) }
       let(:original_storage_container) { subject.storage_container }
       let(:other_project) { completed_upload.project }
 

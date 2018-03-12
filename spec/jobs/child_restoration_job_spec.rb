@@ -47,10 +47,10 @@ RSpec.describe ChildRestorationJob, type: :job do
     end
   end
 
-  let(:folder) { FactoryGirl.create(:folder, is_deleted: true) }
-  let(:sub_folder) { FactoryGirl.create(:folder, parent: folder, is_deleted: true) }
-  let(:folder_child) { FactoryGirl.create(:data_file, parent: sub_folder, is_deleted: true) }
-  let(:sub_file) { FactoryGirl.create(:data_file, parent: folder, is_deleted: true) }
+  let(:folder) { FactoryBot.create(:folder, is_deleted: true) }
+  let(:sub_folder) { FactoryBot.create(:folder, parent: folder, is_deleted: true) }
+  let(:folder_child) { FactoryBot.create(:data_file, parent: sub_folder, is_deleted: true) }
+  let(:sub_file) { FactoryBot.create(:data_file, parent: folder, is_deleted: true) }
 
   before do
     expect(folder_child).to be_persisted

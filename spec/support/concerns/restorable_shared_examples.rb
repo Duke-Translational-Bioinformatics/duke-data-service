@@ -74,7 +74,7 @@ shared_examples 'a Restorable ChildMinder' do |resource_factory,
       end
 
       context 'has_children? false' do
-        subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+        subject { FactoryBot.create(resource_factory, is_deleted: true) }
         before do
           subject.children.delete_all
         end
@@ -127,7 +127,7 @@ shared_examples 'a Restorable ChildMinder' do |resource_factory,
       end
 
       context 'has_children? false' do
-        subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+        subject { FactoryBot.create(resource_factory, is_deleted: true) }
         before do
           subject.children.delete_all
         end

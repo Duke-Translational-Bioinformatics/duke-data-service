@@ -3,28 +3,28 @@ require 'rails_helper'
 describe DDS::V1::TrashbinAPI do
   include_context 'with authentication'
 
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
-  let(:project) { FactoryGirl.create(:project) }
-    let(:parent_folder) { FactoryGirl.create(:folder, project: project) }
-      let(:named_trashed_child_folder) { FactoryGirl.create(:folder, :deleted, name: 'The XXXX trashed child folder', parent: parent_folder, project: project) }
-        let(:depth_trashed_resource) { FactoryGirl.create(:data_file, :deleted, parent: named_trashed_child_folder, project: project) }
-        let(:depth_named_trashed_resource) { FactoryGirl.create(:data_file, :deleted, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
-        let(:depth_purged_resource) { FactoryGirl.create(:data_file, :purged, parent: named_trashed_child_folder, project: project) }
-        let(:depth_named_purged_resource) { FactoryGirl.create(:data_file, :purged, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
-      let(:trashed_child_resource) { FactoryGirl.create(:data_file, :deleted, parent: parent_folder, project: project) }
-    let(:trashed_resource) { FactoryGirl.create(:data_file, :root, :deleted, project: project, upload: upload) }
-    let(:named_trashed_resource) { FactoryGirl.create(:data_file, :root, :deleted, name: 'The XXXX trashed resource', project: project, upload: upload) }
-    let(:named_untrashed_resource) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root resource', project: project, upload: upload) }
-    let(:untrashed_resource) { FactoryGirl.create(:data_file, :root, project: project, upload: upload) }
-    let(:purged_resource) { FactoryGirl.create(:data_file, :root, :purged, project: project, upload: upload) }
-    let(:named_purged_resource) { FactoryGirl.create(:data_file, :root, :purged, name: 'The XXXX purged resource', project: project, upload: upload) }
-    let(:named_trashed_folder) { FactoryGirl.create(:folder, :root, :deleted, name: 'The XXXX trashed root folder', project: project) }
-      let(:named_trashed_resource_in_trashed_folder) { FactoryGirl.create(:data_file, :deleted, name: 'The XXXX trashed resource in trashed folder', parent: named_trashed_folder, project: project, upload: upload) }
-      let(:trashed_resource_in_trashed_folder) { FactoryGirl.create(:data_file, :deleted, parent: named_trashed_folder, project: project, upload: upload) }
+  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
+  let(:project) { FactoryBot.create(:project) }
+    let(:parent_folder) { FactoryBot.create(:folder, project: project) }
+      let(:named_trashed_child_folder) { FactoryBot.create(:folder, :deleted, name: 'The XXXX trashed child folder', parent: parent_folder, project: project) }
+        let(:depth_trashed_resource) { FactoryBot.create(:data_file, :deleted, parent: named_trashed_child_folder, project: project) }
+        let(:depth_named_trashed_resource) { FactoryBot.create(:data_file, :deleted, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
+        let(:depth_purged_resource) { FactoryBot.create(:data_file, :purged, parent: named_trashed_child_folder, project: project) }
+        let(:depth_named_purged_resource) { FactoryBot.create(:data_file, :purged, name: 'The XXXX depth trashed resource', parent: named_trashed_child_folder, project: project) }
+      let(:trashed_child_resource) { FactoryBot.create(:data_file, :deleted, parent: parent_folder, project: project) }
+    let(:trashed_resource) { FactoryBot.create(:data_file, :root, :deleted, project: project, upload: upload) }
+    let(:named_trashed_resource) { FactoryBot.create(:data_file, :root, :deleted, name: 'The XXXX trashed resource', project: project, upload: upload) }
+    let(:named_untrashed_resource) { FactoryBot.create(:data_file, :root, name: 'The XXXX root resource', project: project, upload: upload) }
+    let(:untrashed_resource) { FactoryBot.create(:data_file, :root, project: project, upload: upload) }
+    let(:purged_resource) { FactoryBot.create(:data_file, :root, :purged, project: project, upload: upload) }
+    let(:named_purged_resource) { FactoryBot.create(:data_file, :root, :purged, name: 'The XXXX purged resource', project: project, upload: upload) }
+    let(:named_trashed_folder) { FactoryBot.create(:folder, :root, :deleted, name: 'The XXXX trashed root folder', project: project) }
+      let(:named_trashed_resource_in_trashed_folder) { FactoryBot.create(:data_file, :deleted, name: 'The XXXX trashed resource in trashed folder', parent: named_trashed_folder, project: project, upload: upload) }
+      let(:trashed_resource_in_trashed_folder) { FactoryBot.create(:data_file, :deleted, parent: named_trashed_folder, project: project, upload: upload) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_folder) { FactoryGirl.create(:folder, :deleted, project: other_permission.project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_folder) { FactoryBot.create(:folder, :deleted, project: other_permission.project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
   let!(:resource_permission) { project_permission }
 
 
@@ -331,7 +331,7 @@ describe DDS::V1::TrashbinAPI do
           ] }
           it_behaves_like 'a paginated resource' do
             let(:expected_total_length) { project.children.where(is_deleted: true, is_purged: false).count }
-            let(:extras) { FactoryGirl.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
+            let(:extras) { FactoryBot.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
           end
         end
 
@@ -561,7 +561,7 @@ describe DDS::V1::TrashbinAPI do
           end
           it_behaves_like 'a paginated resource' do
             let(:expected_total_length) { parent_folder.children.count }
-            let(:extras) { FactoryGirl.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
+            let(:extras) { FactoryBot.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
           end
         end
       end
