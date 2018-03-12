@@ -108,7 +108,7 @@ GEM
     ffi (1.9.18)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    grape (0.16.2)
+    grape (0.17.0)
       activesupport
       builder
       hashie (>= 2.1.0)
@@ -338,7 +338,7 @@ DEPENDENCIES
   elasticsearch-rails (~> 5.0)
   factory_bot_rails
   faker
-  grape (= 0.16.2)
+  grape (~> 0.17.0)
   grape-active_model_serializers
   grape-kaminari
   grape-swagger

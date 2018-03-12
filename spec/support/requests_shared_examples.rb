@@ -195,25 +195,18 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   end
 
   context 'when per_page parameter > max_per_page' do
+    let(:expected_response_status) { 400 }
     let(:pagination_parameters) {
       {
         per_page: (max_per_page + 1),
         page: page
       }
     }
-    let(:per_page) { max_per_page }
-    let(:page) { 1 }
-    let(:expected_response_headers) {{
-       'X-Total' => expected_total_length.to_s,
-       'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
-       'X-Page' => page.to_s,
-       'X-Per-Page' => per_page.to_s,
-    }}
 
-    it 'should return default per_page' do
+    it 'should return a validation error' do
        expect(extras.count).to be > 0
        is_expected.to eq(expected_response_status)
-       expect(response.headers.to_h).to include(expected_response_headers)
+       expect(response.body).to eq "{\"error\":\"per_page must be less than #{max_per_page}\"}"
     end
   end
 end

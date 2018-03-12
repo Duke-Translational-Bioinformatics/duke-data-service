@@ -39,7 +39,7 @@ gem 'audited'
 gem 'active_record_union'
 
 gem 'jwt'
-gem 'grape', '0.16.2'
+gem 'grape', '~> 0.17.0'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
 gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
