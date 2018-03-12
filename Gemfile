@@ -27,9 +27,9 @@ gem 'grape-kaminari'
 
 # Use elasticsearch for search
 # must be included after kaminari according to elasticsearch-model documentation
-gem 'elasticsearch', '~> 2.0.0'
-gem 'elasticsearch-model', '~> 2.0.0'
-gem 'elasticsearch-rails', '~> 2.0.0'
+gem 'elasticsearch', '~> 5.0'
+gem 'elasticsearch-model', '~> 5.0'
+gem 'elasticsearch-rails', '~> 5.0'
 
 
 # Auditing

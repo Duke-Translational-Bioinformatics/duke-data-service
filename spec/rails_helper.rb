@@ -57,20 +57,11 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   SNEAKERS_CONFIG_ORIGINAL = Sneakers::CONFIG.dup
+  config.before(:suite) do
+    ElasticsearchHandler.new.drop_indices
+  end
   config.before(:context) do
     ActiveJob::Base.queue_adapter = :test
-
-    # Ensure indexes exist in elasticsearch for indexed_models
-    DeprecatedElasticsearchResponse.indexed_models.each do |indexed_model|
-      Elasticsearch::Model.client.indices.create(
-        index: indexed_model.index_name,
-        update_all_types: true,
-        body: {
-          settings: indexed_model.settings.to_hash,
-          mappings: indexed_model.mappings.to_hash
-        }
-      ) unless Elasticsearch::Model.client.indices.exists?(index: indexed_model.index_name)
-    end
   end
   config.after(:each) do
     ActiveJob::Base.queue_adapter = :test
