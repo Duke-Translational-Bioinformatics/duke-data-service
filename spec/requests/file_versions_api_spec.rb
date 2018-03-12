@@ -3,23 +3,23 @@ require 'rails_helper'
 describe DDS::V1::FileVersionsAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project) }
   let(:file_version) { data_file.file_versions.first }
   let(:upload) { file_version.upload }
-  let(:new_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
+  let(:new_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
   let(:current_file_version) do
     expect(data_file.update(upload: new_upload)).to be_truthy
     data_file.current_file_version
   end
-  let(:file_version_stub) { FactoryGirl.build(:file_version, data_file: data_file) }
-  let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
-  let(:deleted_data_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
+  let(:file_version_stub) { FactoryBot.build(:file_version, data_file: data_file) }
+  let(:deleted_file_version) { FactoryBot.create(:file_version, :deleted, data_file: data_file) }
+  let(:deleted_data_file) { FactoryBot.create(:data_file, :deleted, project: project) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_data_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_file_version) { FactoryGirl.create(:file_version, data_file: other_data_file) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_data_file) { FactoryBot.create(:data_file, project: other_permission.project) }
+  let(:other_file_version) { FactoryBot.create(:file_version, data_file: other_data_file) }
 
   let(:resource_class) { FileVersion }
   let(:resource_serializer) { FileVersionSerializer }

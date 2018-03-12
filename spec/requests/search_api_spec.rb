@@ -56,19 +56,19 @@ describe DDS::V1::SearchAPI do
   include_context 'with authentication'
 
   describe 'Search Provenance' do
-    let!(:project) { FactoryGirl.create(:project) }
-    let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+    let!(:project) { FactoryBot.create(:project) }
+    let!(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
     let!(:resource_permission) { project_permission }
-    let!(:data_file) { FactoryGirl.create(:data_file, project: project) }
+    let!(:data_file) { FactoryBot.create(:data_file, project: project) }
     let!(:start_node) { data_file.file_versions.first }
     let(:start_node_id) { start_node.id }
-    let!(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+    let!(:activity) { FactoryBot.create(:activity, creator: current_user) }
     let(:resource_class) { FileVersion }
     let(:resource_kind) { start_node.kind }
 
     # (activity)-(used)->(start_node)
     let!(:activity_used_start_node) {
-      FactoryGirl.create(:used_prov_relation,
+      FactoryBot.create(:used_prov_relation,
         relatable_from: activity,
         relatable_to: start_node
       )
@@ -76,12 +76,12 @@ describe DDS::V1::SearchAPI do
 
     # (activity)-(asocciatedWith)->(current_user)
     let!(:activity_associated_with_current_user) {
-      FactoryGirl.create(:associated_with_user_prov_relation,
+      FactoryBot.create(:associated_with_user_prov_relation,
         relatable_from: current_user,
         relatable_to: activity
       )
     }
-    let!(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
+    let!(:deleted_file_version) { FactoryBot.create(:file_version, :deleted, data_file: data_file) }
 
     describe 'POST /api/v1/search/provenance' do
       let(:url) { "/api/v1/search/provenance" }
@@ -89,12 +89,12 @@ describe DDS::V1::SearchAPI do
       let(:called_action) { 'POST' }
       include_context 'performs enqueued jobs', only: GraphPersistenceJob
 
-      let!(:other_file) { FactoryGirl.create(:data_file, project: project) }
+      let!(:other_file) { FactoryBot.create(:data_file, project: project) }
       let!(:other_file_version) { other_file.file_versions.first }
 
       # (start_node)-(derivedFrom)->(other_file_version)
       let!(:start_node_derived_from_other_file_version) {
-        FactoryGirl.create(:derived_from_file_version_prov_relation,
+        FactoryBot.create(:derived_from_file_version_prov_relation,
           relatable_from: start_node,
           relatable_to: other_file_version
         )
@@ -158,13 +158,13 @@ describe DDS::V1::SearchAPI do
       end
 
       context 'when a node is not accessible by user' do
-        let!(:other_project) { FactoryGirl.create(:project) }
-        let!(:other_file) { FactoryGirl.create(:data_file, project: other_project) }
+        let!(:other_project) { FactoryBot.create(:project) }
+        let!(:other_file) { FactoryBot.create(:data_file, project: other_project) }
         let!(:other_file_version) { other_file.file_versions.first }
 
         # (start_node)-(derivedFrom)->(other_file_version)
         let!(:start_node_derived_from_other_file_version) {
-          FactoryGirl.create(:derived_from_file_version_prov_relation,
+          FactoryBot.create(:derived_from_file_version_prov_relation,
             relatable_from: start_node,
             relatable_to: other_file_version
           )
@@ -180,19 +180,19 @@ describe DDS::V1::SearchAPI do
 
   describe 'Search Provenance wasGeneratedBy' do
     include_context 'performs enqueued jobs', only: GraphPersistenceJob
-    let!(:project) { FactoryGirl.create(:project) }
-    let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+    let!(:project) { FactoryBot.create(:project) }
+    let!(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
     let!(:resource_permission) { project_permission }
-    let!(:data_file) { FactoryGirl.create(:data_file, project: project) }
+    let!(:data_file) { FactoryBot.create(:data_file, project: project) }
     let!(:file_version) { data_file.file_versions.first }
     let(:file_version_id) { file_version.id }
-    let!(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+    let!(:activity) { FactoryBot.create(:activity, creator: current_user) }
     let(:resource_class) { FileVersion }
     let(:resource_kind) { file_version.kind }
 
     #(file_version)-[was_generated_by]->(activity)
     let!(:activity_generated_file_version) {
-      FactoryGirl.create(:generated_by_activity_prov_relation,
+      FactoryBot.create(:generated_by_activity_prov_relation,
         relatable_from: file_version,
         relatable_to: activity
       )
@@ -223,13 +223,13 @@ describe DDS::V1::SearchAPI do
       end
 
       context 'when a node is not accessible by user' do
-        let!(:other_project) { FactoryGirl.create(:project) }
-        let!(:other_file) { FactoryGirl.create(:data_file, project: other_project) }
+        let!(:other_project) { FactoryBot.create(:project) }
+        let!(:other_file) { FactoryBot.create(:data_file, project: other_project) }
         let!(:other_file_version) { other_file.file_versions.first }
 
         # (activity)-[used]->(other_file_version)
         let!(:activity_used_other_file_version) {
-          FactoryGirl.create(:used_prov_relation,
+          FactoryBot.create(:used_prov_relation,
             relatable_from: activity,
             relatable_to: other_file_version
           )
@@ -264,16 +264,16 @@ describe DDS::V1::SearchAPI do
           }
         }
       }
-      let!(:project) { FactoryGirl.create(:project) }
-      let!(:other_project) { FactoryGirl.create(:project) }
-      let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+      let!(:project) { FactoryBot.create(:project) }
+      let!(:other_project) { FactoryBot.create(:project) }
+      let!(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
       let!(:resource_permission) { project_permission }
 
       let(:indexed_data_file) {
-        FactoryGirl.create(:data_file, name: "foo", project: project)
+        FactoryBot.create(:data_file, name: "foo", project: project)
       }
       let(:indexed_folder) {
-        FactoryGirl.create(:folder, :root, name: "foo", project: project)
+        FactoryBot.create(:folder, :root, name: "foo", project: project)
       }
 
       let(:payload) {
@@ -315,7 +315,7 @@ describe DDS::V1::SearchAPI do
 
         context 'when user does not have rights to view a result' do
           let(:indexed_data_file) {
-            FactoryGirl.create(:data_file, name: "foo", project: other_project)
+            FactoryBot.create(:data_file, name: "foo", project: other_project)
           }
           let(:expected_response_status) { 201 }
 
@@ -356,7 +356,7 @@ describe DDS::V1::SearchAPI do
 
         context 'when user does not have rights to view a result' do
           let(:indexed_folder) {
-            FactoryGirl.create(:folder, :root, name: "foo", project: other_project)
+            FactoryBot.create(:folder, :root, name: "foo", project: other_project)
           }
           let(:expected_response_status) { 201 }
 
@@ -375,35 +375,35 @@ describe DDS::V1::SearchAPI do
     describe 'Search FolderFiles' do
       describe 'POST /api/v1/search/folders_files' do
         let(:url) { "/api/v1/search/folders_files" }
-        let!(:project) { FactoryGirl.create(:project) }
-        let!(:other_project) { FactoryGirl.create(:project) }
-        let!(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+        let!(:project) { FactoryBot.create(:project) }
+        let!(:other_project) { FactoryBot.create(:project) }
+        let!(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
         let!(:resource_permission) { project_permission }
 
         let(:indexed_data_file) {
-          FactoryGirl.create(:data_file, name: "foofile", project: project)
+          FactoryBot.create(:data_file, name: "foofile", project: project)
         }
         let(:extra_file_one) {
-          FactoryGirl.create(:data_file, project: project)
+          FactoryBot.create(:data_file, project: project)
         }
         let(:extra_file_two) {
-          FactoryGirl.create(:data_file, project: project)
+          FactoryBot.create(:data_file, project: project)
         }
         let(:indexed_folder) {
-          FactoryGirl.create(:folder, :root, name: "foofolder", project: project)
+          FactoryBot.create(:folder, :root, name: "foofolder", project: project)
         }
         let(:extra_folder_one) {
-          FactoryGirl.create(:folder, :root, project: project)
+          FactoryBot.create(:folder, :root, project: project)
         }
         let(:extra_folder_two) {
-          FactoryGirl.create(:folder, :root, project: project)
+          FactoryBot.create(:folder, :root, project: project)
         }
 
         let(:other_project_indexed_data_file) {
-          FactoryGirl.create(:data_file, name: "foobyfile", project: other_project)
+          FactoryBot.create(:data_file, name: "foobyfile", project: other_project)
         }
         let(:other_project_indexed_folder) {
-          FactoryGirl.create(:folder, :root, name: "foobyfolder", project: other_project)
+          FactoryBot.create(:folder, :root, name: "foobyfolder", project: other_project)
         }
 
         context 'no parameters provided' do

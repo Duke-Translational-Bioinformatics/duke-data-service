@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
-  let(:project) { FactoryGirl.create(:project) }
-  let!(:existing_tag_for_uniqueness_validation) { FactoryGirl.create(:tag, :skip_validation, taggable: project) }
-  subject { FactoryGirl.create(:tag) }
+  let(:project) { FactoryBot.create(:project) }
+  let!(:existing_tag_for_uniqueness_validation) { FactoryBot.create(:tag, :skip_validation, taggable: project) }
+  subject { FactoryBot.create(:tag) }
   let(:taggable_classes) {[
     Activity,
     DataFile
   ]}
-  let(:file) { FactoryGirl.create(:data_file) }
-  let(:tag) { FactoryGirl.create(:tag) }
+  let(:file) { FactoryBot.create(:data_file) }
+  let(:tag) { FactoryBot.create(:tag) }
 
   it_behaves_like 'an audited model'
 
@@ -47,7 +47,7 @@ RSpec.describe Tag, type: :model do
     it { expect(described_class.tag_labels).to be_a Array }
     context 'with tags' do
       let(:tag_label) { TagLabel.new(label: 'Foo', count: 2, last_used_on: DateTime.now) }
-      let!(:tags) { FactoryGirl.create_list(:tag, 2, label: 'Foo') }
+      let!(:tags) { FactoryBot.create_list(:tag, 2, label: 'Foo') }
       let(:foo_tag_label) { described_class.where(label: 'Foo').tag_labels.first }
       before { tags.each {|x| x.reload} }
 
@@ -59,7 +59,7 @@ RSpec.describe Tag, type: :model do
   end
 
   describe 'taggable indexing' do
-    let(:resource) { FactoryGirl.build(:tag, taggable: file) }
+    let(:resource) { FactoryBot.build(:tag, taggable: file) }
     before do
       expect(file).to be_persisted
     end

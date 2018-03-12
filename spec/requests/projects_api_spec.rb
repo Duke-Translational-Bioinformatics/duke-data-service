@@ -2,12 +2,12 @@ require 'rails_helper'
 
 describe DDS::V1::ProjectsAPI do
   include_context 'with authentication'
-  let(:project_admin_role) { FactoryGirl.create(:auth_role, :project_admin) }
-  let(:project) { FactoryGirl.create(:project) }
-  let(:deleted_project) { FactoryGirl.create(:project, :deleted) }
-  let(:other_project) { FactoryGirl.create(:project) }
-  let(:project_stub) { FactoryGirl.build(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:project_admin_role) { FactoryBot.create(:auth_role, :project_admin) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:deleted_project) { FactoryBot.create(:project, :deleted) }
+  let(:other_project) { FactoryBot.create(:project) }
+  let(:project_stub) { FactoryBot.build(:project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   let(:resource_class) { Project }
   let(:resource_serializer) { ProjectSerializer }
@@ -34,7 +34,7 @@ describe DDS::V1::ProjectsAPI do
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { Project.all.count }
-        let(:extras) { FactoryGirl.create_list(:project_permission, 5, :project_admin, user: current_user) }
+        let(:extras) { FactoryBot.create_list(:project_permission, 5, :project_admin, user: current_user) }
       end
     end
 
@@ -181,8 +181,8 @@ describe DDS::V1::ProjectsAPI do
       end
 
       context 'with invalid resource' do
-        let(:resource) { FactoryGirl.create(:project, :invalid) }
-        let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: resource) }
+        let(:resource) { FactoryBot.create(:project, :invalid) }
+        let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: resource) }
 
         it { expect(resource).to be_invalid }
         it { expect(resource).not_to be_is_deleted }
@@ -200,12 +200,12 @@ describe DDS::V1::ProjectsAPI do
       end
 
       context 'with root file and folder' do
-        let(:root_folder) { FactoryGirl.create(:folder, :root, project: resource) }
-        let(:root_file) { FactoryGirl.create(:data_file, :root, project: resource) }
+        let(:root_folder) { FactoryBot.create(:folder, :root, project: resource) }
+        let(:root_file) { FactoryBot.create(:data_file, :root, project: resource) }
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.where(is_deleted: false) }
-          let!(:storage_provider) { FactoryGirl.create(:storage_provider) }
+          let!(:storage_provider) { FactoryBot.create(:storage_provider) }
 
           context 'with inline ActiveJob' do
             include_context 'elasticsearch prep', [], []

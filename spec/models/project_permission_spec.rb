@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectPermission, type: :model do
-  subject {FactoryGirl.build(:project_permission)}
+  subject {FactoryBot.build(:project_permission)}
 
   it_behaves_like 'an audited model'
 

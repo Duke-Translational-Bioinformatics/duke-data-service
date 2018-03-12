@@ -3,22 +3,22 @@ require 'rails_helper'
 describe UsedProvRelationPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
   let(:user) { project_permission.user }
-  let(:other_user) { FactoryGirl.create(:user) }
+  let(:other_user) { FactoryBot.create(:user) }
 
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
-  let(:activity) { FactoryGirl.create(:activity, creator: user) }
-  let(:other_user_activity) { FactoryGirl.create(:activity, creator: other_user) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project) }
+  let(:file_version) { FactoryBot.create(:file_version, data_file: data_file) }
+  let(:activity) { FactoryBot.create(:activity, creator: user) }
+  let(:other_user_activity) { FactoryBot.create(:activity, creator: other_user) }
 
-  let(:used_prov_relation) { FactoryGirl.create(:used_prov_relation, creator: user, relatable_from: activity, relatable_to: file_version) }
+  let(:used_prov_relation) { FactoryBot.create(:used_prov_relation, creator: user, relatable_from: activity, relatable_to: file_version) }
   let(:used_prov_relation_creator) { used_prov_relation.creator }
-  let(:other_used_prov_relation) { FactoryGirl.create(:used_prov_relation) }
+  let(:other_used_prov_relation) { FactoryBot.create(:used_prov_relation) }
 
-  let(:from_users_activity_to_invisible_file_version) { FactoryGirl.create(:used_prov_relation, relatable_from: activity) }
-  let(:from_other_users_activity_to_visible_file_version) { FactoryGirl.create(:used_prov_relation,
+  let(:from_users_activity_to_invisible_file_version) { FactoryBot.create(:used_prov_relation, relatable_from: activity) }
+  let(:from_other_users_activity_to_visible_file_version) { FactoryBot.create(:used_prov_relation,
     relatable_from: other_user_activity,
     relatable_to: file_version)
   }

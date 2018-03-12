@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe ApiTokenSerializer, type: :serializer do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   context 'with UserAuthenticationService Authenticated User' do
-    let(:auth_service) { FactoryGirl.create(:duke_authentication_service) }
-    let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service,
+    let(:auth_service) { FactoryBot.create(:duke_authentication_service) }
+    let(:user_authentication_service) { FactoryBot.create(:user_authentication_service,
       user: user,
       authentication_service: auth_service
       )

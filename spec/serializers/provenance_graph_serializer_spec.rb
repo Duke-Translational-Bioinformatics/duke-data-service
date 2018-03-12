@@ -35,12 +35,12 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
   context 'SearchProvenanceGraph' do
     # (activity)-(used)->(focus)
     let!(:focus) {
-      FactoryGirl.create(:file_version, label: "FOCUS")
+      FactoryBot.create(:file_version, label: "FOCUS")
     }
 
-    let!(:activity) { FactoryGirl.create(:activity, name: "ACTIVITY") }
+    let!(:activity) { FactoryBot.create(:activity, name: "ACTIVITY") }
     let!(:activity_used_focus) {
-      FactoryGirl.create(:used_prov_relation,
+      FactoryBot.create(:used_prov_relation,
         relatable_from: activity,
         relatable_to: focus
       )
@@ -55,17 +55,17 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
 
   context 'OriginProvenanceGraph' do
     # (fv1ga)-[generated]->(fv1)
-    let!(:fv1) { FactoryGirl.create(:file_version, label: "FV1") }
-    let!(:fv1ga) { FactoryGirl.create(:activity, name: "FV1GA") }
+    let!(:fv1) { FactoryBot.create(:file_version, label: "FV1") }
+    let!(:fv1ga) { FactoryBot.create(:activity, name: "FV1GA") }
     let!(:fv1ga_generated_fv1) {
-      FactoryGirl.create(:generated_by_activity_prov_relation,
+      FactoryBot.create(:generated_by_activity_prov_relation,
         relatable_from: fv1,
         relatable_to: fv1ga
       )
     }
-    let!(:fv1_derived_from) { FactoryGirl.create(:file_version, label: "FV1_DERIVED_FROM") }
+    let!(:fv1_derived_from) { FactoryBot.create(:file_version, label: "FV1_DERIVED_FROM") }
     let!(:fv1_derived_from_fv1_derived_from) {
-      FactoryGirl.create(:derived_from_file_version_prov_relation,
+      FactoryBot.create(:derived_from_file_version_prov_relation,
         relatable_to: fv1_derived_from,
         relatable_from: fv1
       )

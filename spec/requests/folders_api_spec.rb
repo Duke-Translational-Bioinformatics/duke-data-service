@@ -2,23 +2,23 @@ require 'rails_helper'
 
 describe DDS::V1::FoldersAPI do
   include_context 'with authentication'
-  let(:folder) { FactoryGirl.create(:folder, :with_parent) }
+  let(:folder) { FactoryBot.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
 
-  let(:child_file) { FactoryGirl.create(:data_file, parent: folder) }
-  let(:folder_at_root) { FactoryGirl.create(:folder, :root, project: project) }
-  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project) }
-  let(:folder_stub) { FactoryGirl.build(:folder, project: project) }
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
+  let(:child_file) { FactoryBot.create(:data_file, parent: folder) }
+  let(:folder_at_root) { FactoryBot.create(:folder, :root, project: project) }
+  let(:deleted_folder) { FactoryBot.create(:folder, :deleted, project: project) }
+  let(:folder_stub) { FactoryBot.build(:folder, project: project) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
 
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
   let(:resource_id) { resource.id }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   let(:project_id) { project.id}
 
@@ -142,7 +142,7 @@ describe DDS::V1::FoldersAPI do
       end
 
       context 'with invalid child file' do
-        let!(:invalid_child_file) { FactoryGirl.create(:data_file, :invalid, parent: resource) }
+        let!(:invalid_child_file) { FactoryBot.create(:data_file, :invalid, parent: resource) }
 
         it { expect(invalid_child_file).to be_invalid }
 
@@ -161,7 +161,7 @@ describe DDS::V1::FoldersAPI do
       context 'with children' do
         let(:resource) { parent }
         let!(:child) { folder }
-        let!(:file_child) { FactoryGirl.create(:data_file, parent: parent) }
+        let!(:file_child) { FactoryBot.create(:data_file, parent: parent) }
         let!(:grand_child) { child_file }
 
         it_behaves_like 'a removable resource' do

@@ -11,7 +11,7 @@ describe "identity_provider", :if => ENV['TEST_RAKE_IDENTITY_PROVIDER'] do
         IDENTITY_PROVIDER_LDAP_BASE
       )
     }
-    let(:identity_provider_attributes) { FactoryGirl.attributes_for(:ldap_identity_provider) }
+    let(:identity_provider_attributes) { FactoryBot.attributes_for(:ldap_identity_provider) }
 
     context 'missing ENV[IDENTITY_PROVIDER_HOST]' do
       before do
@@ -52,7 +52,7 @@ describe "identity_provider", :if => ENV['TEST_RAKE_IDENTITY_PROVIDER'] do
 
     context 'required ENV present' do
       before do
-        FactoryGirl.attributes_for(:ldap_identity_provider).each do |key,value|
+        FactoryBot.attributes_for(:ldap_identity_provider).each do |key,value|
           ENV["IDENTITY_PROVIDER_#{key.upcase}"] = value
         end
       end
@@ -73,7 +73,7 @@ describe "identity_provider", :if => ENV['TEST_RAKE_IDENTITY_PROVIDER'] do
   describe 'identity_provider:destroy' do
     include_context "rake"
     let(:task_name) { "identity_provider:destroy" }
-    let(:identity_provider) { FactoryGirl.create(:ldap_identity_provider) }
+    let(:identity_provider) { FactoryBot.create(:ldap_identity_provider) }
 
     it { expect(subject.prerequisites).to  include("environment") }
 
@@ -102,7 +102,7 @@ describe "identity_provider", :if => ENV['TEST_RAKE_IDENTITY_PROVIDER'] do
       end
 
       context 'specified identity_provider registered to an authentication_service' do
-        let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, identity_provider: identity_provider) }
+        let(:authentication_service) { FactoryBot.create(:openid_authentication_service, identity_provider: identity_provider) }
         it {
           expect {
             invoke_task epected_stderr: /identity_provider is registered to one or more authentication_services. use auth_service:identity_provider:remove/

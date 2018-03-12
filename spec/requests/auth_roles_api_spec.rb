@@ -4,8 +4,8 @@ describe DDS::V1::AuthRolesAPI do
   include_context 'with authentication'
 
   let(:context) { 'project' }
-  let(:auth_role) { FactoryGirl.create(:auth_role, contexts: [context]) }
-  let(:other_context_auth_role) { FactoryGirl.create(:auth_role, contexts: ['system']) }
+  let(:auth_role) { FactoryBot.create(:auth_role, contexts: [context]) }
+  let(:other_context_auth_role) { FactoryBot.create(:auth_role, contexts: ['system']) }
   let(:resource) { auth_role }
   let(:resource_class) { AuthRole }
   let(:resource_serializer) { AuthRoleSerializer }

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TagSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:tag) }
+  let(:resource) { FactoryBot.create(:tag) }
   let(:expected_attributes) {{
     'label' => resource.label,
     'audit' => Hash,

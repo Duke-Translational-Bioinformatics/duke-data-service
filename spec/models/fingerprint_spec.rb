@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Fingerprint, type: :model do
-  subject { FactoryGirl.create(:fingerprint) }
+  subject { FactoryBot.create(:fingerprint) }
   let(:algorithms) { %w{md5 sha256 sha1} }
 
   it_behaves_like 'an audited model'

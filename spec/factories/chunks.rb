@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :chunk do
     upload
     sequence(:number, 1000)

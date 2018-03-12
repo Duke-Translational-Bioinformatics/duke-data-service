@@ -3,30 +3,30 @@ require 'rails_helper'
 describe DDS::V1::FilesAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
-  let(:folder) { FactoryGirl.create(:folder, project: project) }
-  let(:file) { FactoryGirl.create(:data_file, project: project, upload: upload) }
-  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid, project: project, upload: upload) }
-  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
+  let(:folder) { FactoryBot.create(:folder, project: project) }
+  let(:file) { FactoryBot.create(:data_file, project: project, upload: upload) }
+  let(:invalid_file) { FactoryBot.create(:data_file, :invalid, project: project, upload: upload) }
+  let(:deleted_file) { FactoryBot.create(:data_file, :deleted, project: project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent) { folder }
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
   let(:other_project) { other_permission.project }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
-  let(:other_file) { FactoryGirl.create(:data_file, :root, project: other_project) }
-  let(:other_upload) { FactoryGirl.create(:upload, project: other_project, creator: current_user) }
+  let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
+  let(:other_file) { FactoryBot.create(:data_file, :root, project: other_project) }
+  let(:other_upload) { FactoryBot.create(:upload, project: other_project, creator: current_user) }
 
-  let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
-  let(:incomplete_upload) { FactoryGirl.create(:upload, project: project, creator: current_user) }
-  let(:error_upload) { FactoryGirl.create(:upload, :with_error, project: project, creator: current_user) }
+  let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user) }
+  let(:incomplete_upload) { FactoryBot.create(:upload, project: project, creator: current_user) }
+  let(:error_upload) { FactoryBot.create(:upload, :with_error, project: project, creator: current_user) }
 
   let(:resource_class) { DataFile }
   let(:resource_serializer) { DataFileSerializer }
   let!(:resource) { file }
   let!(:resource_id) { resource.id }
   let!(:resource_permission) { project_permission }
-  let(:resource_stub) { FactoryGirl.build(:data_file, project: project, upload: upload) }
+  let(:resource_stub) { FactoryBot.build(:data_file, project: project, upload: upload) }
 
   describe 'Project Files collection' do
     let(:url) { "/api/v1/projects/#{project_id}/files" }
@@ -53,11 +53,11 @@ describe DDS::V1::FilesAPI do
 
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.data_files.count }
-        let(:extras) { FactoryGirl.create_list(:data_file, 5, project: project) }
+        let(:extras) { FactoryBot.create_list(:data_file, 5, project: project) }
 
         context 'with 1 per_page' do
           let(:pagination_parameters) { { page: 1, per_page: 1 } }
-          let(:newer_file) { FactoryGirl.create(:data_file, project: project) }
+          let(:newer_file) { FactoryBot.create(:data_file, project: project) }
 
           it 'contains only the most recently updated file' do
             expect(resource).to be_persisted
@@ -456,7 +456,7 @@ describe DDS::V1::FilesAPI do
     describe 'PUT' do
       subject { put(url, params: payload.to_json, headers: headers) }
       let(:called_action) { 'PUT' }
-      let!(:new_parent) { FactoryGirl.create(:folder, project: project) }
+      let!(:new_parent) { FactoryBot.create(:folder, project: project) }
       let(:payload) {{
         parent: { kind: new_parent.kind, id: new_parent.id }
       }}
