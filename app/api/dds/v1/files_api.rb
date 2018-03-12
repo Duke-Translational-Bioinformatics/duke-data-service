@@ -15,7 +15,7 @@ module DDS
       params do
         use :pagination
       end
-      get '/projects/:id/files', root: 'results', each_serializer: DataFileSummarySerializer do
+      get '/projects/:id/files', adapter: :json, root: 'results', each_serializer: DataFileSummarySerializer do
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize DataFile.new(project: project), :download?
