@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UploadCompletionJob, type: :job do
-  let(:upload) { FactoryGirl.create(:upload, :inconsistent) }
+  let(:upload) { FactoryBot.create(:upload, :inconsistent) }
   let(:job_transaction) { described_class.initialize_job(upload) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 RSpec.describe ActivitySerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:activity,
+  let(:resource) { FactoryBot.create(:activity,
     started_on: 10.minutes.ago,
     ended_on: DateTime.now
   ) }

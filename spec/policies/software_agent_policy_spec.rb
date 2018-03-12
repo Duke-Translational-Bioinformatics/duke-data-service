@@ -3,8 +3,8 @@ require 'rails_helper'
 describe SoftwareAgentPolicy do
   include_context 'policy declarations'
 
-  let(:software_agent) { FactoryGirl.create(:software_agent) }
-  let(:other_software_agent) { FactoryGirl.create(:software_agent) }
+  let(:software_agent) { FactoryBot.create(:software_agent) }
+  let(:other_software_agent) { FactoryBot.create(:software_agent) }
 
   it_behaves_like 'system_permission can access', :software_agent
   it_behaves_like 'system_permission can access', :other_software_agent
@@ -31,7 +31,7 @@ describe SoftwareAgentPolicy do
   end
 
   context 'when user does not have system_permission' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     describe '.scope' do
       it { expect(resolved_scope).to include(software_agent) }

@@ -1059,6 +1059,61 @@ Change the name of a file.
             "audit": { }
         }
 
+## Project Files collection [/projects/{id}/files]
++ Parameters
+    + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
+
+### List files [GET]
+This action can be used to list all files in a project.
+
+>**Permission:** download_file
+- - - - -
+
+>**Rules**
+- - - - -
++ Files that have been deleted (i.e. `"is_deleted": true`) are not included.
+
+**Response messages:**
+* 200: Valid API Token in 'Authorization' Header
+* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 404: Project does not exist
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "2b91658a-2b0f-4ac6-83f5-287391610d0e",
+                            "name": "Sequencing Archive"
+                        }
+                    ],
+                    "size": 30024000,
+                    "hashes": [
+                        {
+                            "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                            "algorithm": "md5"
+                        }
+                    ],
+                    "file_url": {
+                        "http_verb": "GET",
+                        "host": "https://swift.oit.duke.edu",
+                        "url": "/v1/AUTH_dev/418da9e8-7d01-4761-982c-811d95ac6653/0618a1bc-5042-48d2-af66-ed171354bf6b?temp_url_sig=93b5c5a2c920f0d4962c391d932e4054ec76916c&temp_url_expires=1448918738&filename=RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                        "http_headers": [ ]
+                    }
+                }
+            ]
+        }
+
 ## Group File Versions
 The actions herein are used to interact with prior versions of a file resource.
 

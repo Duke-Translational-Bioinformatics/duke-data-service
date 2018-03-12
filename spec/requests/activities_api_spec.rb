@@ -3,10 +3,10 @@ require 'rails_helper'
 describe DDS::V1::ActivitiesAPI do
   include_context 'with authentication'
 
-  let(:activity) { FactoryGirl.create(:activity) }
-  let(:activity_stub) { FactoryGirl.build(:activity) }
-  let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
-  let(:deleted_activity) { FactoryGirl.create(:activity, :deleted) }
+  let(:activity) { FactoryBot.create(:activity) }
+  let(:activity_stub) { FactoryBot.build(:activity) }
+  let(:system_permission) { FactoryBot.create(:system_permission, user: current_user) }
+  let(:deleted_activity) { FactoryBot.create(:activity, :deleted) }
   let(:resource_class) { Activity }
   let(:resource_serializer) { ActivitySerializer }
   let!(:resource) { activity }
@@ -127,7 +127,7 @@ describe DDS::V1::ActivitiesAPI do
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource' do
         let(:resource_counter) { resource_class.where(is_deleted: false) }
-        let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
+        let(:associated_with_user_prov_relation) { FactoryBot.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
 
         it 'should be marked as deleted and not delete associated_with_user_prov_relation' do
           expect(resource).to be_persisted
@@ -148,8 +148,8 @@ describe DDS::V1::ActivitiesAPI do
       it_behaves_like 'a logically deleted resource'
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }
-        let(:associated_with_user_prov_relation) { FactoryGirl.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
-        let(:associated_with_software_agent_prov_relation) { FactoryGirl.create(:associated_with_software_agent_prov_relation, relatable_from: software_agent, relatable_to: resource) }
+        let(:associated_with_user_prov_relation) { FactoryBot.create(:associated_with_user_prov_relation, relatable_from: current_user, relatable_to: resource) }
+        let(:associated_with_software_agent_prov_relation) { FactoryBot.create(:associated_with_software_agent_prov_relation, relatable_from: software_agent, relatable_to: resource) }
         it 'should not delete any associated_with prov_relations' do
           expect(resource).to be_persisted
           expect(associated_with_user_prov_relation).to be_persisted

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Project, type: :model do
-  subject { FactoryGirl.create(:project) }
+  subject { FactoryBot.create(:project) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -50,7 +50,7 @@ RSpec.describe Project, type: :model do
     it { is_expected.to validate_presence_of(:creator_id) }
 
     context 'when is_deleted true' do
-      subject { FactoryGirl.create(:project, :deleted) }
+      subject { FactoryBot.create(:project, :deleted) }
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:description) }
       it { is_expected.not_to validate_presence_of(:creator_id) }
@@ -58,8 +58,8 @@ RSpec.describe Project, type: :model do
   end
 
   describe '#set_project_admin' do
-    subject { FactoryGirl.build(:project) }
-    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
+    subject { FactoryBot.build(:project) }
+    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
     it { is_expected.to callback(:set_project_admin).after(:create) }
 
     it 'should give the project creator a project_admin permission' do
@@ -86,17 +86,17 @@ RSpec.describe Project, type: :model do
   end
 
   context 'with descendants' do
-    let(:folder) { FactoryGirl.create(:folder, :root, project: subject) }
-    let(:file) { FactoryGirl.create(:data_file, :root, project: subject) }
-    let(:invalid_file) { FactoryGirl.create(:data_file, :root, :invalid, project: subject) }
+    let(:folder) { FactoryBot.create(:folder, :root, project: subject) }
+    let(:file) { FactoryBot.create(:data_file, :root, project: subject) }
+    let(:invalid_file) { FactoryBot.create(:data_file, :root, :invalid, project: subject) }
 
     it_behaves_like 'a ChildMinder', :project, :file, :invalid_file, :folder
   end
 
   describe '#initialize_storage' do
-    subject { FactoryGirl.build(:project) }
-    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
-    let(:default_storage_provider) { FactoryGirl.create(:storage_provider) }
+    subject { FactoryBot.build(:project) }
+    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
+    let(:default_storage_provider) { FactoryBot.create(:storage_provider) }
     it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
@@ -131,9 +131,9 @@ RSpec.describe Project, type: :model do
       let(:new_name) { "#{Faker::Team.name}_#{rand(10**3)}" }
 
       context 'when project has containers' do
-        let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
-        let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
-        let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+        let(:root_folder) { FactoryBot.create(:folder, :root, project: subject) }
+        let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, project: subject) }
+        let(:root_file) { FactoryBot.create(:data_file, :root, project: subject) }
 
         let(:job_transaction) {
           subject.create_transaction('testing')
@@ -192,9 +192,9 @@ RSpec.describe Project, type: :model do
   end
 
   describe '#update_container_elasticsearch_index_project' do
-    let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
-    let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+    let(:root_folder) { FactoryBot.create(:folder, :root, project: subject) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, project: subject) }
+    let(:root_file) { FactoryBot.create(:data_file, :root, project: subject) }
 
     it { is_expected.not_to respond_to(:update_container_elasticsearch_index_project).with(0).arguments }
     it { is_expected.to respond_to(:update_container_elasticsearch_index_project).with(1).argument }

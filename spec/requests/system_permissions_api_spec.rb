@@ -3,16 +3,16 @@ require 'rails_helper'
 describe DDS::V1::SystemPermissionsAPI do
   include_context 'with authentication'
 
-  let(:system_permission) { FactoryGirl.create(:system_permission) }
-  let(:other_permission) { FactoryGirl.create(:system_permission) }
-  let!(:auth_role) { FactoryGirl.create(:auth_role, :system) }
-  let(:other_user) { FactoryGirl.create(:user) }
-  let!(:invalid_auth_role) { FactoryGirl.create(:auth_role) }
+  let(:system_permission) { FactoryBot.create(:system_permission) }
+  let(:other_permission) { FactoryBot.create(:system_permission) }
+  let!(:auth_role) { FactoryBot.create(:auth_role, :system) }
+  let(:other_user) { FactoryBot.create(:user) }
+  let!(:invalid_auth_role) { FactoryBot.create(:auth_role) }
 
   let(:resource_class) { SystemPermission }
   let(:resource_serializer) { SystemPermissionSerializer }
   let!(:resource) { system_permission }
-  let!(:resource_permission) { FactoryGirl.create(:system_permission, user: current_user) }
+  let!(:resource_permission) { FactoryBot.create(:system_permission, user: current_user) }
   let(:resource_user) { resource.user }
 
   describe 'System Permissions collection' do
@@ -80,7 +80,7 @@ describe DDS::V1::SystemPermissionsAPI do
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
-        let(:resource_user) {FactoryGirl.create(:user)}
+        let(:resource_user) {FactoryBot.create(:user)}
       end
 
       it_behaves_like 'a software_agent accessible resource'
@@ -104,7 +104,7 @@ describe DDS::V1::SystemPermissionsAPI do
         let(:resource_class) {'User'}
       end
       it_behaves_like 'an identified resource' do
-        let(:resource_user) {FactoryGirl.create(:user)}
+        let(:resource_user) {FactoryBot.create(:user)}
       end
       it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }

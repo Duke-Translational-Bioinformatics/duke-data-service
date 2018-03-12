@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TemplatableSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:data_file) }
+  let(:resource) { FactoryBot.create(:data_file) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'kind' => resource.kind,

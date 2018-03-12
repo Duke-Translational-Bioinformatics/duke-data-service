@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :job_transaction do
     association :transactionable, factory: :project
     key { Faker::App.name }

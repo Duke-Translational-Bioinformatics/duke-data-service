@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :used_prov_relation do
     association :creator, factory: :user
     is_deleted false

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ChunkPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:chunk) }
+  let(:resource) { FactoryBot.create(:chunk) }
   let(:expected_attributes) {{
     'number' => resource.number,
     'size' => resource.size,

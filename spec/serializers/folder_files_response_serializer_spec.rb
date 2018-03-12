@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe FolderFilesResponseSerializer, type: :serializer do
   let(:indexed_data_file) {
-    FactoryGirl.create(:data_file, name: "foo")
+    FactoryBot.create(:data_file, name: "foo")
   }
   let(:indexed_folder) {
-    FactoryGirl.create(:folder, name: "foo")
+    FactoryBot.create(:folder, name: "foo")
   }
   let(:filters) {[
     {'project.id' => [

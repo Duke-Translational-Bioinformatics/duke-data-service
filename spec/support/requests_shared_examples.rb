@@ -10,7 +10,7 @@ end
 shared_context 'with authentication' do
   include_context 'common headers'
   let(:user_auth) {
-    FactoryGirl.create(:user_authentication_service, :populated)
+    FactoryBot.create(:user_authentication_service, :populated)
   }
   let(:current_user) { user_auth.user }
   let(:api_token) {
@@ -22,10 +22,10 @@ end
 shared_context 'with software_agent authentication' do
   include_context 'common headers'
   let(:current_user) {
-    FactoryGirl.create(:user, :with_key)
+    FactoryBot.create(:user, :with_key)
   }
   let (:software_agent) {
-    FactoryGirl.create(:software_agent, :with_key, creator: current_user)
+    FactoryBot.create(:software_agent, :with_key, creator: current_user)
   }
   let(:api_token) {
     ApiToken.new(user: current_user, software_agent: software_agent).api_token
@@ -132,7 +132,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }
   let(:per_page) { 1 }
-  let(:extras) { FactoryGirl.create_list(resource.class.name.downcase.to_sym, 5) }
+  let(:extras) { FactoryBot.create_list(resource.class.name.downcase.to_sym, 5) }
 
   let(:pagination_parameters) {
     {

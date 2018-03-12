@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ApiToken do
-  let(:user) { FactoryGirl.create(:user, :with_key) }
+  let(:user) { FactoryBot.create(:user, :with_key) }
 
   it 'should require a User' do
     expect {
@@ -10,8 +10,8 @@ RSpec.describe ApiToken do
   end
 
   context 'with UserAuthenticationService Authenticated User' do
-    let(:auth_service) { FactoryGirl.create(:duke_authentication_service) }
-    let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service,
+    let(:auth_service) { FactoryBot.create(:duke_authentication_service) }
+    let(:user_authentication_service) { FactoryBot.create(:user_authentication_service,
       user: user,
       authentication_service: auth_service
       )
@@ -49,14 +49,14 @@ RSpec.describe ApiToken do
         expect(decoded_token).to have_key('service_id')
         expect(decoded_token['service_id']).to eq(auth_service.service_id)
         expect(decoded_token).to have_key('exp')
-        expect(decoded_token['exp']).to eq(expires_on)
+        expect(decoded_token['exp']).to eq(expires_on.to_s)
       end
     end
   end
 
   context 'with SoftwareAgent authenticated User' do
     let (:software_agent) {
-      FactoryGirl.create(:software_agent, :with_key, creator: user)
+      FactoryBot.create(:software_agent, :with_key, creator: user)
     }
 
     subject {
@@ -95,7 +95,7 @@ RSpec.describe ApiToken do
         expect(decoded_token).to have_key('software_agent_id')
         expect(decoded_token['software_agent_id']).to eq(software_agent.id)
         expect(decoded_token).to have_key('exp')
-        expect(decoded_token['exp']).to eq(expires_on)
+        expect(decoded_token['exp']).to eq(expires_on.to_s)
       end
     end
   end
