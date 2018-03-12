@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :ldap_identity_provider do
     host { Faker::Internet.url }
     port { Faker::Address.zip_code }

@@ -47,10 +47,10 @@ RSpec.describe ProjectContainerElasticsearchUpdateJob, type: :job do
     expect(folder_child).to be_persisted
   end
   context 'project' do
-    let(:project) { FactoryGirl.create(:project) }
-    let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: project) }
-    let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
+    let(:project) { FactoryBot.create(:project) }
+    let(:root_folder) { FactoryBot.create(:folder, :root, project: project) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, project: project) }
+    let(:root_file) { FactoryBot.create(:data_file, :root, project: project) }
 
     it_behaves_like 'a ProjectContainerElasticsearchUpdateJob', :project, :root_folder, :root_file
   end

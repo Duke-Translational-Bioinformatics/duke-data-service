@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::UserSummarySerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:user) }
+  let(:resource) { FactoryBot.create(:user) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'username' => resource.username,

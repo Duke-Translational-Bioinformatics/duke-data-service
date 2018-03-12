@@ -9,7 +9,7 @@ shared_context 'policy declarations' do
 end
 
 shared_examples 'system_permission can access' do |record_sym, allows: [:scope, :index?, :show?, :create?, :update?, :destroy?], denies: []|
-  let(:user) { FactoryGirl.create(:system_permission).user }
+  let(:user) { FactoryBot.create(:system_permission).user }
   let(:record) { send(record_sym) }
 
   expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
@@ -36,7 +36,7 @@ end
 shared_examples 'a user with project_permission' do |auth_role_permission, allows:, denies:[], on:|
   let(:user) { project_permission.user }
   let(:record) { send(on) }
-  let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [auth_role_permission].flatten) }
+  let(:auth_role) { FactoryBot.create(:auth_role, permissions: [auth_role_permission].flatten) }
 
   expected_permissions = [:index?, :show?, :create?, :update?, :destroy?]
   allowed_permissions = [allows].flatten.reject {|i| i.to_s == 'scope'}
@@ -66,7 +66,7 @@ end
 shared_examples 'a user without project_permission' do |auth_role_permission, denies:, on:|
   let(:user) { project_permission.user }
   let(:record) { send(on) }
-  let(:auth_role) { FactoryGirl.create(:auth_role, without_permissions: [auth_role_permission].flatten) }
+  let(:auth_role) { FactoryBot.create(:auth_role, without_permissions: [auth_role_permission].flatten) }
 
   denied_permissions = [denies].flatten.reject {|i| i.to_s == 'scope'}
 
@@ -85,9 +85,9 @@ shared_examples 'a user without project_permission' do |auth_role_permission, de
 end
 
 shared_examples 'system_permission cannot access' do |record_sym, with_software_agent|
-  let(:user) { FactoryGirl.create(:system_permission).user }
+  let(:user) { FactoryBot.create(:system_permission).user }
   if with_software_agent
-    let(:software_agent) { FactoryGirl.create(:software_agent) }
+    let(:software_agent) { FactoryBot.create(:software_agent) }
     let(:current_software_agent_set) {
       user.current_software_agent = software_agent
       true
@@ -110,7 +110,7 @@ shared_examples 'system_permission cannot access' do |record_sym, with_software_
 end
 
 shared_examples 'software_agent cannot access' do |record_sym|
-  let(:software_agent) { FactoryGirl.create(:software_agent) }
+  let(:software_agent) { FactoryBot.create(:software_agent) }
   let(:user) { software_agent.creator }
   let(:record) { send(record_sym) }
   let(:current_software_agent_set) {

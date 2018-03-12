@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe RestrictedObjectSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:folder) }
+  let(:resource) { FactoryBot.create(:folder) }
   let(:expected_attributes) {{
     'kind' => resource.kind,
     'id' => resource.id,

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe FileVersionUrlSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:file_version) }
+  let(:resource) { FactoryBot.create(:file_version) }
   let(:expected_attributes) {{
     'http_verb' => resource.http_verb,
     'host' => resource.host,

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :template do
     sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
     label { Faker::App.name }

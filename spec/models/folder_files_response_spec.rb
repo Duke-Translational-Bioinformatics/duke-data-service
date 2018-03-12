@@ -2,17 +2,17 @@ require 'rails_helper'
 
 RSpec.describe FolderFilesResponse do
   let(:indexed_data_file) {
-    FactoryGirl.create(:data_file, name: "foo bar")
+    FactoryBot.create(:data_file, name: "foo bar")
   }
   let(:deleted_data_file) {
-    FactoryGirl.create(:data_file, name: "foo bar", is_deleted: true)
+    FactoryBot.create(:data_file, name: "foo bar", is_deleted: true)
   }
-  let(:tag) { FactoryGirl.create(:tag, taggable: indexed_data_file) }
+  let(:tag) { FactoryBot.create(:tag, taggable: indexed_data_file) }
   let(:indexed_folder) {
-    FactoryGirl.create(:folder, name: "foo bar")
+    FactoryBot.create(:folder, name: "foo bar")
   }
   let(:deleted_folder) {
-    FactoryGirl.create(:folder, name: "foo bar", is_deleted: true)
+    FactoryBot.create(:folder, name: "foo bar", is_deleted: true)
   }
   let(:all_projects) {
     {'project.id' => [

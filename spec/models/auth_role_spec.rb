@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe AuthRole, type: :model do
   describe 'validations' do
-    subject {FactoryGirl.create(:auth_role)}
+    subject {FactoryBot.create(:auth_role)}
 
     it 'should require a unique id' do
       should validate_presence_of(:id)
@@ -34,8 +34,8 @@ RSpec.describe AuthRole, type: :model do
 
   describe 'queries' do
     let(:query_context) {'findme'}
-    let!(:with_context) { FactoryGirl.create_list(:auth_role, 5, contexts: [query_context]) }
-    let!(:others) { FactoryGirl.create_list(:auth_role, 5) }
+    let!(:with_context) { FactoryBot.create_list(:auth_role, 5, contexts: [query_context]) }
+    let!(:others) { FactoryBot.create_list(:auth_role, 5) }
 
     it 'should support with_context' do
       expect(AuthRole).to respond_to 'with_context'
@@ -70,8 +70,8 @@ RSpec.describe AuthRole, type: :model do
 
     describe '.with_permission' do
       let(:permission) { 'view_project' }
-      let!(:auth_role_with_permission) { FactoryGirl.create(:auth_role, permissions: [permission]) }
-      let!(:auth_role_without_permission) { FactoryGirl.create(:auth_role, without_permissions: [permission]) }
+      let!(:auth_role_with_permission) { FactoryBot.create(:auth_role, permissions: [permission]) }
+      let!(:auth_role_without_permission) { FactoryBot.create(:auth_role, without_permissions: [permission]) }
       it { is_expected.to respond_to :with_permission }
       it { expect(subject.with_permission(permission)).to include(auth_role_with_permission) }
       it { expect(subject.with_permission(permission)).not_to include(auth_role_without_permission) }

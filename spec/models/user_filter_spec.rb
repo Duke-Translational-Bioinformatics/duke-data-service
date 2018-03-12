@@ -2,13 +2,13 @@ require 'rails_helper'
 
 RSpec.describe UserFilter do
   subject { UserFilter.new }
-  let(:test_user) { FactoryGirl.create(:user, :delong) }
+  let(:test_user) { FactoryBot.create(:user, :delong) }
   let(:full_name_contains) { test_user.display_name.split(' ').first[0,3] }
   let(:first_name_begins_with) { test_user.first_name[0,3] }
   let(:last_name_begins_with) { test_user.last_name[0,3] }
-  let(:other_user_first_name) { FactoryGirl.create(:user, first_name: test_user.first_name) }
-  let(:other_user_last_name) { FactoryGirl.create(:user, last_name: test_user.last_name) }
-  let(:other_user_name_contains) { FactoryGirl.create(:user, display_name: "#{Faker::Name.first_name} #{test_user.display_name.split(' ').first} #{Faker::Name.last_name}")}
+  let(:other_user_first_name) { FactoryBot.create(:user, first_name: test_user.first_name) }
+  let(:other_user_last_name) { FactoryBot.create(:user, last_name: test_user.last_name) }
+  let(:other_user_name_contains) { FactoryBot.create(:user, display_name: "#{Faker::Name.first_name} #{test_user.display_name.split(' ').first} #{Faker::Name.last_name}")}
   let(:not_found) { SecureRandom.hex }
 
   it 'should support a query method' do

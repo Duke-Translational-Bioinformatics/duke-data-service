@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ApiKeySerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:api_key) }
+  let(:resource) { FactoryBot.create(:api_key) }
   let(:expected_attributes) {{
     'key' => resource.key
   }}

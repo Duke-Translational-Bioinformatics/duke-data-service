@@ -3,10 +3,10 @@ require 'rails_helper'
 describe DDS::V1::SoftwareAgentsAPI do
   include_context 'with authentication'
 
-  let(:software_agent) { FactoryGirl.create(:software_agent, :with_key) }
-  let(:deleted_software_agent) { FactoryGirl.create(:software_agent, :deleted) }
-  let(:software_agent_stub) { FactoryGirl.build(:software_agent) }
-  let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
+  let(:software_agent) { FactoryBot.create(:software_agent, :with_key) }
+  let(:deleted_software_agent) { FactoryBot.create(:software_agent, :deleted) }
+  let(:software_agent_stub) { FactoryBot.build(:software_agent) }
+  let(:system_permission) { FactoryBot.create(:system_permission, user: current_user) }
 
   let(:resource_class) { SoftwareAgent }
   let(:resource_serializer) { SoftwareAgentSerializer }
@@ -192,7 +192,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       let(:body) {
         {
           "agent_key": resource.api_key.key,
-          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+          "user_key": FactoryBot.create(:api_key, user_id: current_user.id).key
         }
       }
 
@@ -228,7 +228,7 @@ describe DDS::V1::SoftwareAgentsAPI do
     context 'with missing agent_key' do
       let(:body) {
         {
-          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+          "user_key": FactoryBot.create(:api_key, user_id: current_user.id).key
         }
       }
 
@@ -273,7 +273,7 @@ describe DDS::V1::SoftwareAgentsAPI do
       let(:body) {
         {
           "agent_key": SecureRandom.hex,
-          "user_key": FactoryGirl.create(:api_key, user_id: current_user.id).key
+          "user_key": FactoryBot.create(:api_key, user_id: current_user.id).key
         }
       }
 

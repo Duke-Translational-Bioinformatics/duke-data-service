@@ -2,18 +2,18 @@ require 'rails_helper'
 
 describe DDS::V1::ProjectTransfersAPI do
   include_context 'with authentication'
-  let(:project) { FactoryGirl.create(:project) }
-  let(:other_project) { FactoryGirl.create(:project) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:other_project) { FactoryBot.create(:project) }
 
-  let(:project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, project: project) }
-  let(:to_user) { FactoryGirl.create(:user) }
-  let(:other_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users) }
-  let(:project_transfer_stub) { FactoryGirl.build(:project_transfer, :with_to_users) }
-  let(:project_transfer_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
-  let(:pending_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :pending) }
-  let(:rejected_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, :rejected, project: project) }
-  let!(:project_viewer) { FactoryGirl.create(:auth_role, :project_viewer) }
-  let!(:project_admin) { FactoryGirl.create(:auth_role, :project_admin) }
+  let(:project_transfer) { FactoryBot.create(:project_transfer, :with_to_users, project: project) }
+  let(:to_user) { FactoryBot.create(:user) }
+  let(:other_project_transfer) { FactoryBot.create(:project_transfer, :with_to_users) }
+  let(:project_transfer_stub) { FactoryBot.build(:project_transfer, :with_to_users) }
+  let(:project_transfer_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:pending_project_transfer) { FactoryBot.create(:project_transfer, :with_to_users, :pending) }
+  let(:rejected_project_transfer) { FactoryBot.create(:project_transfer, :with_to_users, :rejected, project: project) }
+  let!(:project_viewer) { FactoryBot.create(:auth_role, :project_viewer) }
+  let!(:project_admin) { FactoryBot.create(:auth_role, :project_admin) }
 
   let(:resource_class) { ProjectTransfer }
   let(:resource_serializer) { ProjectTransferSerializer }
@@ -83,8 +83,8 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'GET' do
       subject { get(url, headers: headers) }
-      let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
-      let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
+      let(:project_transfer_from) { FactoryBot.create(:project_transfer, :with_to_users, from_user: current_user)}
+      let(:project_transfer_to) { FactoryBot.create(:project_transfer, :with_to_users, to_user: current_user)}
 
       it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'an authenticated resource'
@@ -162,7 +162,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'Reject project transfer' do
       let(:url) { "/api/v1/project_transfers/#{resource_id}/reject" }
-      let(:resource) { FactoryGirl.create(:project_transfer,
+      let(:resource) { FactoryBot.create(:project_transfer,
                                           :with_to_users,
                                           status: status,
                                           to_user: current_user) }
@@ -187,7 +187,7 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'when current user is not to_user' do
-          let(:resource) { FactoryGirl.create(:project_transfer,
+          let(:resource) { FactoryBot.create(:project_transfer,
                                               :with_to_users,
                                               status: status) }
           it_behaves_like 'an authorized resource'
@@ -216,7 +216,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'Cancel project transfer' do
       let(:url) { "/api/v1/project_transfers/#{resource_id}/cancel" }
-      let(:resource) { FactoryGirl.create(:project_transfer,
+      let(:resource) { FactoryBot.create(:project_transfer,
                                           :with_to_users,
                                           status: status,
                                           project: project) }
@@ -241,7 +241,7 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'when current user is not to_user' do
-          let(:resource) { FactoryGirl.create(:project_transfer,
+          let(:resource) { FactoryBot.create(:project_transfer,
                                               :with_to_users,
                                               status: status) }
           it_behaves_like 'an authorized resource'
@@ -270,7 +270,7 @@ describe DDS::V1::ProjectTransfersAPI do
 
     describe 'Accept project transfer' do
       let(:url) { "/api/v1/project_transfers/#{resource_id}/accept" }
-      let(:resource) { FactoryGirl.create(:project_transfer,
+      let(:resource) { FactoryBot.create(:project_transfer,
                                           :with_to_users,
                                           project: project,
                                           status: status,
@@ -296,7 +296,7 @@ describe DDS::V1::ProjectTransfersAPI do
           end
         end
         context 'when current user is not to_user' do
-          let(:resource) { FactoryGirl.create(:project_transfer,
+          let(:resource) { FactoryBot.create(:project_transfer,
                                               :with_to_users,
                                               status: status) }
           it_behaves_like 'an authorized resource'
@@ -326,9 +326,9 @@ describe DDS::V1::ProjectTransfersAPI do
         end
 
         context 'when project has project_permissions' do
-          let(:from_user_permission) { FactoryGirl.create(:project_permission, :project_admin, user: resource.from_user, project: project) }
-          let(:another_permission) { FactoryGirl.create(:project_permission, project: project) }
-          let(:different_permission) { FactoryGirl.create(:project_permission) }
+          let(:from_user_permission) { FactoryBot.create(:project_permission, :project_admin, user: resource.from_user, project: project) }
+          let(:another_permission) { FactoryBot.create(:project_permission, project: project) }
+          let(:different_permission) { FactoryBot.create(:project_permission) }
           before do
             expect(resource).to be_persisted
           end
@@ -371,8 +371,8 @@ describe DDS::V1::ProjectTransfersAPI do
     describe 'GET' do
       let(:payload) {nil}
       subject { get(url, params: payload, headers: headers) }
-      let(:project_transfer_from) { FactoryGirl.create(:project_transfer, :with_to_users, from_user: current_user)}
-      let(:project_transfer_to) { FactoryGirl.create(:project_transfer, :with_to_users, to_user: current_user)}
+      let(:project_transfer_from) { FactoryBot.create(:project_transfer, :with_to_users, from_user: current_user)}
+      let(:project_transfer_to) { FactoryBot.create(:project_transfer, :with_to_users, to_user: current_user)}
 
       it_behaves_like 'a feature toggled resource', env_key: 'SKIP_PROJECT_TRANSFERS'
       it_behaves_like 'an authenticated resource'

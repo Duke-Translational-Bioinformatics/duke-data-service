@@ -3,8 +3,8 @@ require 'rails_helper'
 describe TemplatePolicy do
   include_context 'policy declarations'
 
-  let(:template) { FactoryGirl.create(:template) }
-  let(:other_template) { FactoryGirl.create(:template) }
+  let(:template) { FactoryBot.create(:template) }
+  let(:other_template) { FactoryBot.create(:template) }
 
   it_behaves_like 'system_permission can access', :template
   it_behaves_like 'system_permission can access', :other_template

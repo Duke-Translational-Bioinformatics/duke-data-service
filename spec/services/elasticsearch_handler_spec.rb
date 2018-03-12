@@ -54,8 +54,8 @@ RSpec.describe ElasticsearchHandler do
   end
 
   describe "#index_documents" do
-    let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-    let(:indexed_folder) { FactoryGirl.create(:folder) }
+    let(:indexed_data_file) { FactoryBot.create(:data_file) }
+    let(:indexed_folder) { FactoryBot.create(:folder) }
     it { is_expected.to respond_to(:index_documents) }
 
     context 'with existing documents not already indexed' do
@@ -92,8 +92,8 @@ RSpec.describe ElasticsearchHandler do
     it { is_expected.to respond_to(:drop_indices).with(1).arguments }
 
     context 'nil client' do
-      let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-      let(:indexed_folder) { FactoryGirl.create(:folder) }
+      let(:indexed_data_file) { FactoryBot.create(:data_file) }
+      let(:indexed_folder) { FactoryBot.create(:folder) }
       include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], []
 
       it {
@@ -137,8 +137,8 @@ RSpec.describe ElasticsearchHandler do
     it { is_expected.to respond_to :smart_reindex_indices }
 
     context 'versioned_index_name exists' do
-      let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-      let(:indexed_folder) { FactoryGirl.create(:folder) }
+      let(:indexed_data_file) { FactoryBot.create(:data_file) }
+      let(:indexed_folder) { FactoryBot.create(:folder) }
       include_context 'elasticsearch prep', [], [:indexed_data_file, :indexed_folder]
 
       it {
@@ -184,9 +184,9 @@ RSpec.describe ElasticsearchHandler do
           end
           client.indices.flush
 
-          data_file = FactoryGirl.create(:data_file)
+          data_file = FactoryBot.create(:data_file)
           data_file.__elasticsearch__.index_document
-          folder = FactoryGirl.create(:folder)
+          folder = FactoryBot.create(:folder)
           folder.__elasticsearch__.index_document
 
           FolderFilesResponse.indexed_models.each do |indexed_model|
@@ -342,9 +342,9 @@ RSpec.describe ElasticsearchHandler do
           end
           client.indices.flush
 
-          data_file = FactoryGirl.create(:data_file)
+          data_file = FactoryBot.create(:data_file)
           data_file.__elasticsearch__.index_document
-          folder = FactoryGirl.create(:folder)
+          folder = FactoryBot.create(:folder)
           folder.__elasticsearch__.index_document
 
           FolderFilesResponse.indexed_models.each do |indexed_model|
@@ -456,8 +456,8 @@ RSpec.describe ElasticsearchHandler do
     context 'live' do
       let (:client) { Elasticsearch::Model.client }
       let(:source_index) { DataFile.index_name }
-      let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-      let(:indexed_folder) { FactoryGirl.create(:folder) }
+      let(:indexed_data_file) { FactoryBot.create(:data_file) }
+      let(:indexed_folder) { FactoryBot.create(:folder) }
       include_context 'elasticsearch prep', [], [:indexed_data_file, :indexed_folder]
 
       it {
@@ -537,8 +537,8 @@ RSpec.describe ElasticsearchHandler do
     context 'live' do
       let (:client) { Elasticsearch::Model.client }
       let(:start_scroll) { subject.start_scroll(client, DataFile.index_name ) }
-      let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-      let(:indexed_folder) { FactoryGirl.create(:folder) }
+      let(:indexed_data_file) { FactoryBot.create(:data_file) }
+      let(:indexed_folder) { FactoryBot.create(:folder) }
       include_context 'elasticsearch prep', [], [:indexed_data_file, :indexed_folder]
 
       it {
@@ -569,8 +569,8 @@ RSpec.describe ElasticsearchHandler do
 
     context 'live' do
       let(:client) { Elasticsearch::Model.client }
-      let(:indexed_data_file) { FactoryGirl.create(:data_file) }
-      let(:indexed_folder) { FactoryGirl.create(:folder) }
+      let(:indexed_data_file) { FactoryBot.create(:data_file) }
+      let(:indexed_folder) { FactoryBot.create(:folder) }
       let(:indexed_model) { DataFile }
       let(:source_index) { indexed_model.index_name }
       let(:target_index) { 'new_index' }

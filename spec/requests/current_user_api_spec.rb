@@ -113,7 +113,7 @@ describe DDS::V1::CurrentUserAPI do
 
       context 'with existing token' do
         let(:resource) {
-          FactoryGirl.create(:api_key, user_id: current_user.id)
+          FactoryBot.create(:api_key, user_id: current_user.id)
         }
         it_behaves_like 'a regeneratable resource' do
           let(:new_resource) {
@@ -144,7 +144,7 @@ describe DDS::V1::CurrentUserAPI do
 
       context 'with existing api_key' do
         let!(:resource) {
-          FactoryGirl.create(:api_key, user_id: current_user.id)
+          FactoryBot.create(:api_key, user_id: current_user.id)
         }
         it_behaves_like 'a viewable resource'
         it_behaves_like 'an authenticated resource'
@@ -155,7 +155,7 @@ describe DDS::V1::CurrentUserAPI do
     describe 'DELETE' do
       subject { delete(url, headers: headers) }
       let!(:resource) {
-        FactoryGirl.create(:api_key, user_id: current_user.id)
+        FactoryBot.create(:api_key, user_id: current_user.id)
       }
       let(:called_action) { 'DELETE' }
       it_behaves_like 'a removable resource'

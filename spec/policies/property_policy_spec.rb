@@ -3,9 +3,9 @@ require 'rails_helper'
 describe PropertyPolicy do
   include_context 'policy declarations'
 
-  let(:template) { FactoryGirl.create(:template) }
-  let(:property) { FactoryGirl.create(:property, template: template) }
-  let(:other_property) { FactoryGirl.create(:property) }
+  let(:template) { FactoryBot.create(:template) }
+  let(:property) { FactoryBot.create(:property, template: template) }
+  let(:other_property) { FactoryBot.create(:property) }
 
   it_behaves_like 'system_permission can access', :property
   it_behaves_like 'system_permission can access', :other_property

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFileUrlSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:data_file) }
+  let(:resource) { FactoryBot.create(:data_file) }
   let(:expected_attributes) {{
     'http_verb' => resource.http_verb,
     'host' => resource.host,

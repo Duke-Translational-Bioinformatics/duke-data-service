@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe OpenidAuthenticationService, type: :model do
-  subject { FactoryGirl.create(:openid_authentication_service, :openid_env) }
-  let(:first_time_user) { FactoryGirl.attributes_for(:user) }
+  subject { FactoryBot.create(:openid_authentication_service, :openid_env) }
+  let(:first_time_user) { FactoryBot.attributes_for(:user) }
   let(:first_time_user_userinfo) {{
     sub: "#{first_time_user[:username]}@duke.edu",
     dukeNetID: first_time_user[:username],
@@ -18,9 +18,9 @@ RSpec.describe OpenidAuthenticationService, type: :model do
     SecureRandom.hex
   }
 
-  let(:existing_user) { FactoryGirl.create(:user) }
+  let(:existing_user) { FactoryBot.create(:user) }
   let(:existing_user_auth) {
-    FactoryGirl.create(:user_authentication_service,
+    FactoryBot.create(:user_authentication_service,
     authentication_service: subject,
     uid: existing_user.username,
     user: existing_user)
@@ -41,7 +41,7 @@ RSpec.describe OpenidAuthenticationService, type: :model do
   }}
 
   let(:existing_first_authenticating_user) {
-    FactoryGirl.create(:user)
+    FactoryBot.create(:user)
   }
   let(:existing_first_authenticating_access_token) {
     SecureRandom.hex

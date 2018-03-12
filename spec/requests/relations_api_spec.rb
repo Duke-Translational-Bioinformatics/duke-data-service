@@ -3,8 +3,8 @@ require 'rails_helper'
 describe DDS::V1::RelationsAPI do
   include_context 'with authentication'
 
-  let(:viewable_project) { FactoryGirl.create(:project) }
-  let(:view_auth_role) { FactoryGirl.create(:auth_role,
+  let(:viewable_project) { FactoryBot.create(:project) }
+  let(:view_auth_role) { FactoryBot.create(:auth_role,
       id: "project_viewer",
       name: "Project Viewer",
       description: "Can only view project and file meta-data",
@@ -13,8 +13,8 @@ describe DDS::V1::RelationsAPI do
     )
   }
 
-  let(:deletable_project) { FactoryGirl.create(:project) }
-  let(:delete_auth_role) { FactoryGirl.create(:auth_role,
+  let(:deletable_project) { FactoryBot.create(:project) }
+  let(:delete_auth_role) { FactoryBot.create(:auth_role,
       id: "file_deleter",
       name: "File Deleter",
       description: "Can only delete files",
@@ -23,15 +23,15 @@ describe DDS::V1::RelationsAPI do
     )
   }
 
-  let(:view_project_permission) { FactoryGirl.create(:project_permission, auth_role: view_auth_role, user: current_user, project: viewable_project) }
-  let(:viewable_data_file) { FactoryGirl.create(:data_file, project: view_project_permission.project) }
-  let(:used_file_version) { FactoryGirl.create(:file_version, data_file: viewable_data_file) }
-  let(:generated_file_version) { FactoryGirl.create(:file_version, data_file: viewable_data_file) }
+  let(:view_project_permission) { FactoryBot.create(:project_permission, auth_role: view_auth_role, user: current_user, project: viewable_project) }
+  let(:viewable_data_file) { FactoryBot.create(:data_file, project: view_project_permission.project) }
+  let(:used_file_version) { FactoryBot.create(:file_version, data_file: viewable_data_file) }
+  let(:generated_file_version) { FactoryBot.create(:file_version, data_file: viewable_data_file) }
 
-  let(:activity) { FactoryGirl.create(:activity, creator: current_user)}
-  let(:users_sa) { FactoryGirl.create(:software_agent, creator: current_user) }
+  let(:activity) { FactoryBot.create(:activity, creator: current_user)}
+  let(:users_sa) { FactoryBot.create(:software_agent, creator: current_user) }
 
-  let(:other_users_activity) { FactoryGirl.create(:activity) }
+  let(:other_users_activity) { FactoryBot.create(:activity) }
   let(:other_user) { other_users_activity.creator }
 
   describe 'Provenance Relations collection' do
@@ -51,7 +51,7 @@ describe DDS::V1::RelationsAPI do
       }}
       let(:resource_serializer) { UsedProvRelationSerializer }
       let(:duplicate_of_record) {
-        FactoryGirl.create(:used_prov_relation,
+        FactoryBot.create(:used_prov_relation,
           relatable_from: activity,
           relatable_to: used_file_version
         )
@@ -139,7 +139,7 @@ describe DDS::V1::RelationsAPI do
       }}
       let(:resource_serializer) { GeneratedByActivityProvRelationSerializer }
       let(:duplicate_of_record) {
-        FactoryGirl.create(:generated_by_activity_prov_relation,
+        FactoryBot.create(:generated_by_activity_prov_relation,
           relatable_from: generated_file_version,
           relatable_to: activity
         )
@@ -229,7 +229,7 @@ describe DDS::V1::RelationsAPI do
       }}
       let(:resource_serializer) { DerivedFromFileVersionProvRelationSerializer }
       let(:duplicate_of_record) {
-        FactoryGirl.create(:derived_from_file_version_prov_relation,
+        FactoryBot.create(:derived_from_file_version_prov_relation,
           relatable_from: generated_file_version,
           relatable_to: used_file_version
         )
@@ -292,9 +292,9 @@ describe DDS::V1::RelationsAPI do
       subject { post(url, params: payload.to_json, headers: headers) }
       let(:resource_class) { InvalidatedByActivityProvRelation }
       let(:called_action) { "POST" }
-      let(:delete_file_permission) { FactoryGirl.create(:project_permission, auth_role: delete_auth_role, user: current_user, project: deletable_project) }
-      let(:deletable_data_file) { FactoryGirl.create(:data_file, project: delete_file_permission.project) }
-      let(:invalidated_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: deletable_data_file) }
+      let(:delete_file_permission) { FactoryBot.create(:project_permission, auth_role: delete_auth_role, user: current_user, project: deletable_project) }
+      let(:deletable_data_file) { FactoryBot.create(:data_file, project: delete_file_permission.project) }
+      let(:invalidated_file_version) { FactoryBot.create(:file_version, :deleted, data_file: deletable_data_file) }
 
       let(:payload) {{
         activity: {
@@ -307,7 +307,7 @@ describe DDS::V1::RelationsAPI do
       }}
       let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
       let(:duplicate_of_record) {
-        FactoryGirl.create(:invalidated_by_activity_prov_relation,
+        FactoryBot.create(:invalidated_by_activity_prov_relation,
           relatable_from: invalidated_file_version,
           relatable_to: activity
         )
@@ -379,64 +379,64 @@ describe DDS::V1::RelationsAPI do
       subject { get(url, headers: headers) }
 
       let(:associated_with_user_prov_relation) {
-        FactoryGirl.create(:associated_with_user_prov_relation,
+        FactoryBot.create(:associated_with_user_prov_relation,
           relatable_from: current_user,
           creator: current_user,
           relatable_to: activity)
       }
-      let(:activity_for_deleted) { FactoryGirl.create(:activity, creator: current_user)}
+      let(:activity_for_deleted) { FactoryBot.create(:activity, creator: current_user)}
       let(:deleted_associated_with_user_prov_relation) {
-        FactoryGirl.create(:associated_with_user_prov_relation,
+        FactoryBot.create(:associated_with_user_prov_relation,
           is_deleted: true,
           relatable_from: current_user,
           creator: current_user,
           relatable_to: activity_for_deleted)
       }
       let(:associated_with_software_agent_prov_relation) {
-        FactoryGirl.create(:associated_with_software_agent_prov_relation,
+        FactoryBot.create(:associated_with_software_agent_prov_relation,
           relatable_from: users_sa,
           creator: current_user,
           relatable_to: activity)
       }
       let(:attributed_to_user_prov_relation) {
-        FactoryGirl.create(:attributed_to_user_prov_relation,
+        FactoryBot.create(:attributed_to_user_prov_relation,
           relatable_to: current_user,
           creator: current_user,
           relatable_from: used_file_version)
       }
       let(:attributed_to_software_agent_prov_relation) {
-        FactoryGirl.create(:attributed_to_software_agent_prov_relation,
+        FactoryBot.create(:attributed_to_software_agent_prov_relation,
           relatable_to: users_sa,
           creator: current_user,
           relatable_from: used_file_version)
       }
       let(:used_prov_relation) {
-        FactoryGirl.create(:used_prov_relation,
+        FactoryBot.create(:used_prov_relation,
           creator: current_user,
           relatable_from: activity,
           relatable_to: used_file_version)
       }
       let(:generated_by_activity_prov_relation) {
-        FactoryGirl.create(:generated_by_activity_prov_relation,
+        FactoryBot.create(:generated_by_activity_prov_relation,
           relatable_to: activity,
           creator: current_user,
           relatable_from: generated_file_version)
       }
-      let(:deleted_data_file) { FactoryGirl.create(:data_file,
+      let(:deleted_data_file) { FactoryBot.create(:data_file,
         project: view_project_permission.project) }
 
-      let(:invalidated_file_version) { FactoryGirl.create(:file_version, :deleted,
+      let(:invalidated_file_version) { FactoryBot.create(:file_version, :deleted,
         data_file: deleted_data_file) }
 
       let(:invalidated_by_activity_prov_relation) {
-        FactoryGirl.create(:invalidated_by_activity_prov_relation,
+        FactoryBot.create(:invalidated_by_activity_prov_relation,
           relatable_to: activity,
           creator: current_user,
           relatable_from: invalidated_file_version)
       }
 
       let(:derived_from_file_version_prov_relation) {
-        FactoryGirl.create(:derived_from_file_version_prov_relation,
+        FactoryBot.create(:derived_from_file_version_prov_relation,
           relatable_to: used_file_version,
           creator: current_user,
           relatable_from: generated_file_version)
@@ -610,7 +610,7 @@ describe DDS::V1::RelationsAPI do
     describe 'associated_with' do
       describe 'user' do
         let(:resource) {
-          FactoryGirl.create(:associated_with_user_prov_relation,
+          FactoryBot.create(:associated_with_user_prov_relation,
             relatable_from: current_user,
             creator: current_user,
             relatable_to: activity)
@@ -669,7 +669,7 @@ describe DDS::V1::RelationsAPI do
 
       describe 'software_agent' do
         let(:resource) {
-          FactoryGirl.create(:associated_with_software_agent_prov_relation,
+          FactoryBot.create(:associated_with_software_agent_prov_relation,
             relatable_from: users_sa,
             creator: current_user,
             relatable_to: activity)
@@ -730,7 +730,7 @@ describe DDS::V1::RelationsAPI do
     describe 'attributed_to' do
       describe 'user' do
         let(:resource) {
-          FactoryGirl.create(:attributed_to_user_prov_relation,
+          FactoryBot.create(:attributed_to_user_prov_relation,
             relatable_to: current_user,
             creator: current_user,
             relatable_from: used_file_version)
@@ -789,7 +789,7 @@ describe DDS::V1::RelationsAPI do
 
       describe 'software_agent' do
         let(:resource) {
-          FactoryGirl.create(:attributed_to_software_agent_prov_relation,
+          FactoryBot.create(:attributed_to_software_agent_prov_relation,
             relatable_to: users_sa,
             creator: current_user,
             relatable_from: used_file_version)
@@ -849,7 +849,7 @@ describe DDS::V1::RelationsAPI do
 
     describe 'used' do
       let(:resource) {
-        FactoryGirl.create(:used_prov_relation,
+        FactoryBot.create(:used_prov_relation,
           creator: current_user,
           relatable_from: activity,
           relatable_to: used_file_version)
@@ -908,7 +908,7 @@ describe DDS::V1::RelationsAPI do
 
     describe 'generated_by' do
       let(:resource) {
-        FactoryGirl.create(:generated_by_activity_prov_relation,
+        FactoryBot.create(:generated_by_activity_prov_relation,
           relatable_to: activity,
           creator: current_user,
           relatable_from: generated_file_version)
@@ -967,11 +967,11 @@ describe DDS::V1::RelationsAPI do
     end #generated_by
 
     describe 'invalidated_by' do
-      let(:deleted_data_file) { FactoryGirl.create(:data_file, project: view_project_permission.project) }
-      let(:invalidated_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: deleted_data_file) }
+      let(:deleted_data_file) { FactoryBot.create(:data_file, project: view_project_permission.project) }
+      let(:invalidated_file_version) { FactoryBot.create(:file_version, :deleted, data_file: deleted_data_file) }
 
       let(:resource) {
-        FactoryGirl.create(:invalidated_by_activity_prov_relation,
+        FactoryBot.create(:invalidated_by_activity_prov_relation,
           relatable_to: activity,
           creator: current_user,
           relatable_from: invalidated_file_version)
@@ -1030,7 +1030,7 @@ describe DDS::V1::RelationsAPI do
 
     describe 'derived_from' do
       let(:resource) {
-        FactoryGirl.create(:derived_from_file_version_prov_relation,
+        FactoryBot.create(:derived_from_file_version_prov_relation,
           relatable_to: used_file_version,
           creator: current_user,
           relatable_from: generated_file_version)

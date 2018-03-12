@@ -3,16 +3,16 @@ require 'rails_helper'
 describe DDS::V1::ProjectPermissionsAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, project: project) }
-  let(:other_permission) { FactoryGirl.create(:project_permission) }
-  let!(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:other_user) { FactoryGirl.create(:user) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, project: project) }
+  let(:other_permission) { FactoryBot.create(:project_permission) }
+  let!(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:other_user) { FactoryBot.create(:user) }
 
   let(:resource_class) { ProjectPermission }
   let(:resource_serializer) { ProjectPermissionSerializer }
   let!(:resource) { project_permission }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:resource_project) { project }
   let(:resource_user) { resource.user }
 
@@ -26,7 +26,7 @@ describe DDS::V1::ProjectPermissionsAPI do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
           other_permission,
-          FactoryGirl.create(:project_permission, :project_admin, user: current_user)
+          FactoryBot.create(:project_permission, :project_admin, user: current_user)
         ] }
       end
 
