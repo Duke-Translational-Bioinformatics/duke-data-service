@@ -161,7 +161,7 @@ RSpec.describe ApplicationJob, type: :job do
       let(:retry_interval) { Faker::Number.between(1,10) }
       it { expect{child_class.execute(job_data)}.not_to raise_error }
       context 'when RecordNotFound raised' do
-        let(:project_role) { FactoryGirl.create(:project_role) }
+        let(:project_role) { FactoryBot.create(:project_role) }
         let(:job) { child_class.new(project_role) }
         before(:each) do
           described_class.deserialization_error_retry_interval = retry_interval

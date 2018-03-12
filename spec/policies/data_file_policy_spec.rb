@@ -3,12 +3,12 @@ require 'rails_helper'
 describe DataFilePolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project, upload: upload) }
-  let(:data_file_without_upload) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:other_data_file) { FactoryGirl.create(:data_file) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
+  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project, upload: upload) }
+  let(:data_file_without_upload) { FactoryBot.create(:data_file, project: project_permission.project) }
+  let(:other_data_file) { FactoryBot.create(:data_file) }
 
   it_behaves_like 'system_permission can access', :data_file
   it_behaves_like 'system_permission can access', :data_file_without_upload
@@ -21,7 +21,7 @@ describe DataFilePolicy do
   it_behaves_like 'a user with project_permission', :download_file, allows: [:download?], denies: [:move?, :rename?, :restore?], on: :data_file
 
   context 'when user is not upload creator' do
-    let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: project_permission.project) }
+    let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project_permission.project) }
 
     it_behaves_like 'a user with project_permission', :create_file, allows: [:move?, :restore?], denies: [:download?, :rename?], on: :data_file
     it_behaves_like 'a user with project_permission', :view_project, allows: [:scope, :index?, :show?], denies: [:download?, :move?, :rename?, :restore?], on: :data_file
@@ -47,7 +47,7 @@ describe DataFilePolicy do
   it_behaves_like 'a user without project_permission', [:create_file, :view_project, :update_file, :delete_file, :download_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :download?, :move?, :restore?, :rename?], on: :other_data_file
 
   context 'when user does not have project_permission' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     describe '.scope' do
       it { expect(resolved_scope).not_to include(data_file) }

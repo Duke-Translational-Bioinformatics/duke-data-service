@@ -4,11 +4,11 @@ describe DDS::V1::PropertiesAPI do
   include_context 'with authentication'
 
   let(:template) { property.template }
-  let(:property) { FactoryGirl.create(:property) }
-  let(:sibling_property) { FactoryGirl.create(:property, template: template) }
-  let(:other_property) { FactoryGirl.create(:property) }
-  let(:property_stub) { FactoryGirl.build(:property) }
-  let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
+  let(:property) { FactoryBot.create(:property) }
+  let(:sibling_property) { FactoryBot.create(:property, template: template) }
+  let(:other_property) { FactoryBot.create(:property) }
+  let(:property_stub) { FactoryBot.build(:property) }
+  let(:system_permission) { FactoryBot.create(:system_permission, user: current_user) }
 
   let(:resource_class) { Property }
   let(:resource_serializer) { PropertySerializer }
@@ -192,7 +192,7 @@ describe DDS::V1::PropertiesAPI do
 
       context 'with associated meta_property' do
         include_context 'elasticsearch prep', [:resource], []
-        before { FactoryGirl.create(:meta_property, property: resource) }
+        before { FactoryBot.create(:meta_property, property: resource) }
         it_behaves_like 'a validated resource' do
           let(:expected_reason) { 'The property cannot be deleted if it has been associated to one or more DDS objects.' }
           let(:expected_suggestion) { '' }

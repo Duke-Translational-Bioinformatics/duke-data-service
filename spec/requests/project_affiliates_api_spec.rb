@@ -3,12 +3,12 @@ require 'rails_helper'
 describe DDS::V1::ProjectAffiliatesAPI do
   include_context 'with authentication'
 
-  let(:affiliation) { FactoryGirl.create(:affiliation) }
+  let(:affiliation) { FactoryBot.create(:affiliation) }
   let(:project) { affiliation.project }
   let(:user) { affiliation.user }
-  let(:project_role) { FactoryGirl.create(:project_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, :project_admin, user: current_user, project: project) }
-  let(:other_affiliation) { FactoryGirl.create(:affiliation) }
+  let(:project_role) { FactoryBot.create(:project_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, :project_admin, user: current_user, project: project) }
+  let(:other_affiliation) { FactoryBot.create(:affiliation) }
 
   let(:resource_class) { Affiliation }
   let(:resource_serializer) { AffiliationSerializer }
@@ -72,7 +72,7 @@ describe DDS::V1::ProjectAffiliatesAPI do
       }}
 
       it_behaves_like 'a creatable resource' do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         let(:expected_response_status) {200}
         let(:new_object) {
           resource_class.where(

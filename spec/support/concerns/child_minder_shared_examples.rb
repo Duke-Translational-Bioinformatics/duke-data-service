@@ -19,7 +19,7 @@ shared_context 'a ChildMinder' do |resource_factory, expected_children_sym|
     it { is_expected.to respond_to(:has_children?) }
 
     context 'without children' do
-      subject { FactoryGirl.create(resource_factory) }
+      subject { FactoryBot.create(resource_factory) }
       before do
         subject.children.delete_all
       end

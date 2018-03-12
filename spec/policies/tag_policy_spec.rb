@@ -3,13 +3,13 @@ require 'rails_helper'
 describe TagPolicy do
   include_context 'policy declarations'
 
-  let(:tag) { FactoryGirl.create(:tag, taggable: taggable_object) }
+  let(:tag) { FactoryBot.create(:tag, taggable: taggable_object) }
 
   context 'with taggable DataFile' do
-    let(:taggable_object) { FactoryGirl.create(:data_file, project: project_permission.project) }
-    let(:other_tag) { FactoryGirl.create(:tag) }
-    let(:auth_role) { FactoryGirl.create(:auth_role) }
-    let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
+    let(:taggable_object) { FactoryBot.create(:data_file, project: project_permission.project) }
+    let(:other_tag) { FactoryBot.create(:tag) }
+    let(:auth_role) { FactoryBot.create(:auth_role) }
+    let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
 
     it_behaves_like 'system_permission can access', :tag
     it_behaves_like 'system_permission can access', :other_tag
@@ -24,7 +24,7 @@ describe TagPolicy do
     it_behaves_like 'a user without project_permission', [:view_project, :update_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?], on: :other_tag
 
     context 'when user does not have project_permission' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
 
       describe '.scope' do
         it { expect(resolved_scope).not_to include(tag) }
@@ -38,23 +38,23 @@ describe TagPolicy do
   end
 
   context 'with taggable Activity' do
-    let(:taggable_object) { FactoryGirl.create(:activity) }
-    let(:other_tag) { FactoryGirl.create(:tag, taggable: other_activity) }
-    let(:other_activity) { FactoryGirl.create(:activity) }
+    let(:taggable_object) { FactoryBot.create(:activity) }
+    let(:other_tag) { FactoryBot.create(:tag, taggable: other_activity) }
+    let(:other_activity) { FactoryBot.create(:activity) }
     let(:creator) { taggable_object.creator }
 
-    let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [:view_project]) }
-    let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
+    let(:auth_role) { FactoryBot.create(:auth_role, permissions: [:view_project]) }
+    let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
     let(:project_viewer) { project_permission.user }
     let(:visible_file_version) {
-      FactoryGirl.create(:data_file,
+      FactoryBot.create(:data_file,
                          project: project_permission.project).current_file_version
     }
     let(:visible_related_activity) {
-      FactoryGirl.create(:used_prov_relation,
+      FactoryBot.create(:used_prov_relation,
                          relatable_to: visible_file_version).relatable_from
     }
-    let(:related_tag) { FactoryGirl.create(:tag, taggable: visible_related_activity) }
+    let(:related_tag) { FactoryBot.create(:tag, taggable: visible_related_activity) }
 
     it_behaves_like 'system_permission can access', :tag
     it_behaves_like 'system_permission can access', :other_tag

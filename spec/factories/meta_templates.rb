@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :meta_template do
     association :templatable, factory: :data_file
     template

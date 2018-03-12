@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'jwt'
 
 RSpec.describe User, type: :model do
-  let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
+  let(:user_authentication_service) { FactoryBot.create(:user_authentication_service, :populated) }
   subject { user_authentication_service.user }
 
   it_behaves_like 'an audited model'
@@ -30,7 +30,7 @@ RSpec.describe User, type: :model do
 
   context 'current_software_agent attribute' do
     let (:software_agent) {
-      FactoryGirl.create(:software_agent, :with_key, creator: subject)
+      FactoryBot.create(:software_agent, :with_key, creator: subject)
     }
 
     it 'should be an accessor' do
@@ -49,7 +49,7 @@ RSpec.describe User, type: :model do
   end
 
   describe 'associations' do
-    subject {FactoryGirl.create(:user)}
+    subject {FactoryBot.create(:user)}
 
     it 'should have_many user_authentication_services' do
       should have_many :user_authentication_services
@@ -87,7 +87,7 @@ RSpec.describe User, type: :model do
   end
 
   describe 'validations' do
-    subject {FactoryGirl.create(:user)}
+    subject {FactoryBot.create(:user)}
 
     it 'should validate presence of username' do
       should validate_presence_of(:username)
@@ -96,29 +96,29 @@ RSpec.describe User, type: :model do
   end
 
   describe 'usage' do
-    subject { FactoryGirl.create(:user) }
-    let(:project_permissions) { FactoryGirl.create_list(:project_permission, 5, user: subject) }
+    subject { FactoryBot.create(:user) }
+    let(:project_permissions) { FactoryBot.create_list(:project_permission, 5, user: subject) }
     let(:projects) { project_permissions.collect {|p| p.project} }
     let(:uploads) {
       uploads = []
       projects.each do |project|
-        uploads << FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject, project: project)
+        uploads << FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: project)
       end
       uploads
     }
     let!(:files) {
       files = []
       uploads.each do |upload|
-        files << FactoryGirl.create(:data_file, project: upload.project, upload: upload)
+        files << FactoryBot.create(:data_file, project: upload.project, upload: upload)
       end
       files
     }
-    let!(:other_project) { FactoryGirl.create(:project, creator: subject) }
-    let!(:other_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject) }
-    let!(:other_file) { FactoryGirl.create(:data_file, upload: other_upload) }
-    let!(:deleted_project) { FactoryGirl.create(:project_permission, :deleted_project, user: subject).project }
-    let(:deleted_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: subject, project: projects.first)}
-    let!(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
+    let!(:other_project) { FactoryBot.create(:project, creator: subject) }
+    let!(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject) }
+    let!(:other_file) { FactoryBot.create(:data_file, upload: other_upload) }
+    let!(:deleted_project) { FactoryBot.create(:project_permission, :deleted_project, user: subject).project }
+    let(:deleted_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: projects.first)}
+    let!(:deleted_file) { FactoryBot.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
 
     describe 'project_count' do
       let(:expected_count) { projects.count }
@@ -154,7 +154,7 @@ RSpec.describe User, type: :model do
       end
 
       context 'when another user has uploaded a new version' do
-        let(:another_user_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: files.last.project) }
+        let(:another_user_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: files.last.project) }
         before(:each) do
           files.last.upload = another_user_upload
           expect(files.last.save).to be_truthy

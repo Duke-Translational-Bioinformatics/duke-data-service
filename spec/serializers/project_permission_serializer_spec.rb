@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectPermissionSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.build(:project_permission) }
+  let(:resource) { FactoryBot.build(:project_permission) }
 
   it_behaves_like 'a has_one association with', :user, UserPreviewSerializer
   it_behaves_like 'a has_one association with', :project, ProjectPreviewSerializer

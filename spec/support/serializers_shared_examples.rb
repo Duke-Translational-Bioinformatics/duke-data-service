@@ -1,10 +1,10 @@
 shared_context 'with auditor' do
-  let(:auditor) { FactoryGirl.create(:user) }
+  let(:auditor) { FactoryBot.create(:user) }
 end
 
 shared_context 'with software_agent' do
   let(:software_agent) {
-    FactoryGirl.create(:software_agent)
+    FactoryBot.create(:software_agent)
   }
 end
 

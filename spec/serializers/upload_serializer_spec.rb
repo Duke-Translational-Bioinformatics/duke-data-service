@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UploadSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:upload, :with_chunks) }
+  let(:resource) { FactoryBot.create(:upload, :with_chunks) }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
     'id' => resource.id,
@@ -30,14 +30,14 @@ RSpec.describe UploadSerializer, type: :serializer do
   end
 
   context 'with completed upload' do
-    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :completed, :with_fingerprint) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload has error' do
-    let(:resource) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end

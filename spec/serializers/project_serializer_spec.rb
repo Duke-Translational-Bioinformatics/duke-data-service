@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:project) }
+  let(:resource) { FactoryBot.create(:project) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
     'id' => resource.id,

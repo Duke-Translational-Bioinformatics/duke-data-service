@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     etag { SecureRandom.hex }
     sequence(:username) { |n| "#{Faker::Internet.user_name(nil, ['_'])}_#{n}" }
