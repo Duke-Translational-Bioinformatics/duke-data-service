@@ -37,6 +37,9 @@ describe DDS::V1::FilesAPI do
     #List files for a project
     it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
+        before do
+          allow_any_instance_of(DataFile).to receive(:url).and_return("mocked_temporary_url")
+        end
         let(:unexpected_resources) { [
           other_file,
           deleted_file
