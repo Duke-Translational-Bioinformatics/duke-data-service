@@ -12,7 +12,7 @@ module DDS
       end
       params do
       end
-      get '/files/:id/versions', root: 'results' do
+      get '/files/:id/versions', adapter: :json, root: 'results' do
         authenticate!
         file = DataFile.find(params[:id])
         authorize FileVersion.new(data_file: file), :index?

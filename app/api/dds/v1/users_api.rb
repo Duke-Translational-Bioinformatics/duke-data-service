@@ -16,13 +16,17 @@ module DDS
         optional :authentication_service_id, type: String, desc: 'authentication service uuid'
       end
       rescue_from Grape::Exceptions::ValidationErrors do |e|
-        error_json = {
-          "error" => 400,
-          "code" => "not_provided",
-          "reason" => "no access_token",
-          "suggestion" => "you might need to login through an authentication service"#,
-        }
-        error!(error_json, 400)
+        if e.errors.keys.flatten.include?('access_token')
+          error_json = {
+            "error" => 400,
+            "code" => "not_provided",
+            "reason" => "no access_token",
+            "suggestion" => "you might need to login through an authentication service"#,
+          }
+          error!(error_json, 400)
+        else
+          error!(e.message, 400)
+        end
       end
       get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
@@ -54,7 +58,7 @@ module DDS
         optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
         use :pagination
       end
-      get '/users', root: 'results' do
+      get '/users', adapter: :json, root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
         users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)

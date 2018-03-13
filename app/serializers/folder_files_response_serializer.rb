@@ -1,8 +1,4 @@
 class FolderFilesResponseSerializer < ActiveModel::Serializer
-  attributes :results, :aggs
-
-  def filter(keys)
-    keys.delete(:aggs) if object.aggs.nil?
-    keys
-  end
+  attribute :results
+  attribute :aggs, if: -> { object.aggs }
 end

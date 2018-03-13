@@ -10,7 +10,7 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
-      get '/projects/:project_id/permissions', root: 'results' do
+      get '/projects/:project_id/permissions', adapter: :json, root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         authorize ProjectPermission.new(project: project), :index?

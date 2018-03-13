@@ -43,7 +43,7 @@ module DDS
           [404, 'Project Does not Exist']
         ]
       end
-      get '/projects/:project_id/affiliates', root: 'results' do
+      get '/projects/:project_id/affiliates', adapter: :json, root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         authorize Affiliation.new(project: project), :index?

@@ -52,7 +52,7 @@ module DDS
           [404, 'Project does not exist']
         ]
       end
-      get '/projects/:project_id/transfers', root: 'results' do
+      get '/projects/:project_id/transfers', adapter: :json, root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
         policy_scope(ProjectTransfer).where(project: project)
@@ -185,7 +185,7 @@ module DDS
         }
         error!(error_json, 404)
       end
-      get '/project_transfers', root: 'results' do
+      get '/project_transfers', adapter: :json, root: 'results' do
         authenticate!
         project_transfer_params = declared(params, include_missing: false)
         project_transfers = policy_scope(ProjectTransfer)
