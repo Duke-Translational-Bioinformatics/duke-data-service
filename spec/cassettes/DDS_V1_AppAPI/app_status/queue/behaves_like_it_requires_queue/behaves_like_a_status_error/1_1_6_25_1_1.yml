@@ -27,14 +27,14 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc27f52aea83a4a6e98e3b-005aa7f287
+      - txacd193ee7bc04d9a92b0f-005aa7f28b
       Date:
-      - Tue, 13 Mar 2018 15:47:19 GMT
+      - Tue, 13 Mar 2018 15:47:23 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 13 Mar 2018 15:47:19 GMT
+  recorded_at: Tue, 13 Mar 2018 15:47:23 GMT
 - request:
     method: post
     uri: http://swift.local:12345/v1/AUTH_test
@@ -45,9 +45,9 @@ http_interactions:
       X-Auth-Token:
       - AUTH_tk80a0005587ee4ee69b6b1543689ad801
       X-Account-Meta-Temp-Url-Key:
-      - aa26855090fc6ffc2fb56c0d390bf17d
+      - c8cbfa1f49eceb9188077ad5492900f1
       X-Account-Meta-Temp-Url-Key-2:
-      - 773da2a9c243715c7bb5279e3bed5b21
+      - b49bae975c2857da8fcafb69489e98da
   response:
     status:
       code: 204
@@ -58,14 +58,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx8ff2f1a4d99f406680de4-005aa7f287
+      - tx3ccbaa5747244a17b21d2-005aa7f28b
       Date:
-      - Tue, 13 Mar 2018 15:47:19 GMT
+      - Tue, 13 Mar 2018 15:47:23 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 13 Mar 2018 15:47:19 GMT
+  recorded_at: Tue, 13 Mar 2018 15:47:23 GMT
 - request:
     method: get
     uri: http://swift.local:12345/auth/v1.0
@@ -93,14 +93,14 @@ http_interactions:
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx62b6fbe272334942a6fbe-005aa7f287
+      - tx6a8c3f132d4e47938c3bd-005aa7f28b
       Date:
-      - Tue, 13 Mar 2018 15:47:19 GMT
+      - Tue, 13 Mar 2018 15:47:23 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Tue, 13 Mar 2018 15:47:19 GMT
+  recorded_at: Tue, 13 Mar 2018 15:47:23 GMT
 - request:
     method: get
     uri: http://swift.local:12345/v1/AUTH_test
@@ -120,11 +120,11 @@ http_interactions:
       X-Account-Object-Count:
       - '0'
       X-Account-Meta-Temp-Url-Key-2:
-      - 773da2a9c243715c7bb5279e3bed5b21
+      - b49bae975c2857da8fcafb69489e98da
       X-Timestamp:
       - '1510935447.10448'
       X-Account-Meta-Temp-Url-Key:
-      - aa26855090fc6ffc2fb56c0d390bf17d
+      - c8cbfa1f49eceb9188077ad5492900f1
       X-Account-Bytes-Used:
       - '0'
       X-Account-Container-Count:
@@ -134,9 +134,9 @@ http_interactions:
       Accept-Ranges:
       - bytes
       X-Trans-Id:
-      - tx08b451067a2b4bbf963c9-005aa7f287
+      - tx3619b9416f98464cb6f41-005aa7f28b
       Date:
-      - Tue, 13 Mar 2018 15:47:19 GMT
+      - Tue, 13 Mar 2018 15:47:23 GMT
     body:
       encoding: UTF-8
       string: |
@@ -195,5 +195,5 @@ http_interactions:
         ec5b33af-4779-44fe-89c4-e5171f556735
         f7163563-311f-4415-8678-eb4bad217e8e
     http_version: 
-  recorded_at: Tue, 13 Mar 2018 15:47:19 GMT
+  recorded_at: Tue, 13 Mar 2018 15:47:23 GMT
 recorded_with: VCR 4.0.0
