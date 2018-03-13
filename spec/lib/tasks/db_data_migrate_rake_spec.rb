@@ -153,6 +153,41 @@ describe "db:data:migrate" do
       end
     end
 
+    describe 'upload storage_container migration' do
+      context 'when there are uploads with nil storage_provider' do
+        let(:expected_uploads_without_storage_container) { 3 }
+        before do
+          Upload.skip_callback(:create, :before, :set_storage_container)
+          expected_uploads_without_storage_container.times do
+            u = FactoryBot.create(:upload)
+          end
+        end
+
+        after do
+          Upload.set_callback(:create, :before, :set_storage_container)
+        end
+
+        it {
+          expect(Upload.where(storage_container: nil).count).to eq(expected_uploads_without_storage_container)
+          expect {
+            invoke_task expected_stdout: Regexp.new("#{expected_uploads_without_storage_container} uploads updated")
+          }.to change{
+            Upload.where(storage_container: nil).count
+          }.by(-expected_uploads_without_storage_container)
+        }
+      end
+
+      context 'when there are no uploads with nil storage_provider' do
+        it {
+          expect {
+            invoke_task expected_stdout: Regexp.new("0 uploads updated")
+          }.not_to change{
+            Upload.where(storage_container: nil).count
+          }
+        }
+      end
+    end
+
     describe 'migrate_storage_provider_chunk_environment' do
       let(:bad_storage_providers) {
         StorageProvider.where(

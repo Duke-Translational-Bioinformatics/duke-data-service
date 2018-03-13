@@ -4,6 +4,7 @@ class Project < ActiveRecord::Base
   include ChildMinder
   include RequestAudited
   include JobTransactionable
+  include UnRestorable
   audited
 
   belongs_to :creator, class_name: "User"
@@ -18,6 +19,7 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
+  validates :is_deleted, immutable: true, if: :is_deleted_was
 
   after_create :set_project_admin
   after_create :initialize_storage
@@ -89,6 +91,14 @@ class Project < ActiveRecord::Base
         logger.info "#{i["update"]["_id"]} #{i["update"]["status"]} #{i["update"]["response"]}"
       }
     end
+  end
+
+  def restore(child)
+    raise IncompatibleParentException.new("#{kind} #{id} is permenantly deleted, and cannot restore children.::Restore to a different project.") if is_deleted?
+    raise IncompatibleParentException.new("Projects can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.") unless child.is_a? Container
+    child.parent_id = nil
+    child.project_id = id
+    child.is_deleted = false
   end
 
   private

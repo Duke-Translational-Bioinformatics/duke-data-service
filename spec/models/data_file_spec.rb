@@ -4,6 +4,7 @@ RSpec.describe DataFile, type: :model do
   subject { child_file }
   let(:root_file) { FactoryBot.create(:data_file, :root) }
   let(:child_file) { FactoryBot.create(:data_file, :with_parent) }
+  let(:file_versions) { FactoryBot.create_list(:file_version, 2, data_file: child_file) }
   let(:invalid_file) { FactoryBot.create(:data_file, :invalid) }
   let(:deleted_file) { FactoryBot.create(:data_file, :deleted) }
   let(:project) { subject.project }
@@ -76,7 +77,6 @@ RSpec.describe DataFile, type: :model do
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:project_id) }
       it { is_expected.not_to validate_presence_of(:upload) }
-      it { expect(deleted_file.file_versions).to all( be_is_deleted ) }
     end
   end
 
@@ -385,6 +385,100 @@ RSpec.describe DataFile, type: :model do
         expect(subject[:data_file][:properties][:project][:properties][:name][:fields]).to have_key :raw
         expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "string"
         expect(subject[:data_file][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq "not_analyzed"
+      }
+    end
+  end
+
+  it_behaves_like 'a Restorable ChildMinder', :data_file, :file_versions
+  it_behaves_like 'a Purgable ChildMinder', :data_file, :file_versions
+
+
+  describe '#restore' do
+    let(:child) { file_versions.first }
+    context 'is_deleted? true' do
+      before do
+        subject.update_columns(is_deleted: true)
+      end
+      it {
+        expect {
+          begin
+            subject.restore(child)
+          rescue TrashbinParentException => e
+            expect(e.message).to eq("#{subject.kind} #{subject.id} is deleted, and cannot restore its versions.::Restore #{subject.kind} #{subject.id}.")
+            raise e
+          end
+        }.to raise_error(TrashbinParentException)
+      }
+    end
+
+    context 'when child is not a FileVersion' do
+      let(:incompatible_child) { FactoryBot.create(:folder, :root, project: project) }
+      it {
+        expect {
+          begin
+            subject.restore(incompatible_child)
+          rescue IncompatibleParentException => e
+            expect(e.message).to eq("Parent dds-file can only restore its own dds-file-version objects.::Perhaps you mistyped the object_kind or parent_kind.")
+            raise e
+          end
+        }.to raise_error(IncompatibleParentException)
+      }
+    end
+
+    context 'when child is a FileVersion' do
+      context 'from another data_file' do
+        let(:child) { FactoryBot.create(:file_version, data_file: root_file) }
+        it {
+          expect {
+            begin
+              subject.restore(child)
+            rescue IncompatibleParentException => e
+              expect(e.message).to eq("dds-file-version objects can only be restored to their original dds-file.::Try not supplying a parent in the payload.")
+              raise e
+            end
+          }.to raise_error(IncompatibleParentException)
+        }
+      end
+
+      context 'of itself' do
+          let(:child) { FactoryBot.create(:file_version, :deleted, data_file: subject) }
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+            }.not_to raise_error
+          }
+      end
+    end
+  end
+
+  describe '#purge' do
+    context 'undeleted' do
+      it {
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_truthy
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
+      }
+    end
+
+    context 'deleted' do
+      before do
+        subject.update_columns(is_deleted: true)
+        subject.reload
+      end
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_falsey
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
       }
     end
   end

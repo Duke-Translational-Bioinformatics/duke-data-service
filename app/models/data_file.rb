@@ -1,8 +1,11 @@
 # Folder and DataFile are siblings in the Container class through single table inheritance.
 
 class DataFile < Container
-
+  include Restorable
+  include Purgable
+  include ChildMinder
   include SearchableModel
+
   # change this variable to a new uuid (lowercase letters!)
   # any time the mappings below change
   def self.mapping_version
@@ -20,10 +23,10 @@ class DataFile < Container
   has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
+  alias children file_versions
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :set_current_file_version_attributes
-  before_save :set_file_versions_is_deleted, if: :is_deleted?
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
@@ -57,12 +60,6 @@ class DataFile < Container
 
   def url
     upload.temporary_url(name)
-  end
-
-  def set_file_versions_is_deleted
-    file_versions.each do |fv|
-      fv.is_deleted = true
-    end
   end
 
   def kind
@@ -119,5 +116,12 @@ class DataFile < Container
     create_audit = current_file_version.audits.find_by(action: "create")
     return unless create_audit
     create_audit.user
+  end
+
+  def restore(child)
+    raise TrashbinParentException.new("#{kind} #{id} is deleted, and cannot restore its versions.::Restore #{kind} #{id}.") if is_deleted?
+    raise IncompatibleParentException.new("Parent dds-file can only restore its own dds-file-version objects.::Perhaps you mistyped the object_kind or parent_kind.") unless child.is_a? FileVersion
+    raise IncompatibleParentException.new("dds-file-version objects can only be restored to their original dds-file.::Try not supplying a parent in the payload.") unless child.data_file_id == id
+    child.is_deleted = false
   end
 end

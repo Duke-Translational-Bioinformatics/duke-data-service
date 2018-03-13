@@ -116,6 +116,7 @@ ActiveRecord::Schema.define(version: 20170926165229) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.string   "label"
+    t.boolean  "is_purged",  default: false
     t.index ["id", "type"], name: "index_containers_on_id_and_type", using: :btree
     t.index ["parent_id"], name: "index_containers_on_parent_id", using: :btree
     t.index ["project_id", "parent_id", "is_deleted"], name: "index_containers_on_project_id_and_parent_id_and_is_deleted", using: :btree
@@ -130,6 +131,7 @@ ActiveRecord::Schema.define(version: 20170926165229) do
     t.boolean  "is_deleted",     default: false
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.boolean  "is_purged",      default: false
     t.index ["data_file_id"], name: "index_file_versions_on_data_file_id", using: :btree
   end
 
@@ -318,6 +320,7 @@ ActiveRecord::Schema.define(version: 20170926165229) do
     t.datetime "updated_at",            null: false
     t.uuid     "creator_id"
     t.boolean  "is_consistent"
+    t.string   "storage_container"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

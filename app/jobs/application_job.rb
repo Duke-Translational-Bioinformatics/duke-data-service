@@ -74,6 +74,11 @@ class ApplicationJob < ActiveJob::Base
     self.queue_name
   end
 
+  #JobRunner workers_registry inclusion
+  def self.should_be_registered_worker?
+    true
+  end
+
   private
 
   def self.opts

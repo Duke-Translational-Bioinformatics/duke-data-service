@@ -11,6 +11,10 @@ class DataFilePolicy < ApplicationPolicy
     permission :create_file
   end
 
+  def restore?
+    permission :create_file
+  end
+
   def rename?
     permission :update_file
   end

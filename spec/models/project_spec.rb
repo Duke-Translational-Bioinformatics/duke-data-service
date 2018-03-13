@@ -85,14 +85,6 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  context 'with descendants' do
-    let(:folder) { FactoryBot.create(:folder, :root, project: subject) }
-    let(:file) { FactoryBot.create(:data_file, :root, project: subject) }
-    let(:invalid_file) { FactoryBot.create(:data_file, :root, :invalid, project: subject) }
-
-    it_behaves_like 'a ChildMinder', :project, :file, :invalid_file, :folder
-  end
-
   describe '#initialize_storage' do
     subject { FactoryBot.build(:project) }
     let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
@@ -199,7 +191,7 @@ RSpec.describe Project, type: :model do
     it { is_expected.not_to respond_to(:update_container_elasticsearch_index_project).with(0).arguments }
     it { is_expected.to respond_to(:update_container_elasticsearch_index_project).with(1).argument }
 
-    context 'called', :vcr do
+    context 'called' do
       let(:page) { 1 }
       let(:new_name) { "#{Faker::Team.name}_#{rand(10**3)}" }
       include_context 'elasticsearch prep', [:root_folder, :folder_child, :root_file], [:root_folder, :folder_child, :root_file]
@@ -240,6 +232,233 @@ RSpec.describe Project, type: :model do
           expect(results).to include c_index.as_json
         end
       }
+    end
+  end
+
+  describe 'UnRestorable' do
+    let(:valid_child_file) { FactoryBot.create(:data_file, :root, project: subject) }
+    let(:invalid_child_file) { FactoryBot.create(:data_file, :root, :invalid, project: subject) }
+    let(:child_folder) { FactoryBot.create(:folder, :root, project: subject) }
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: child_folder)}
+    let(:project_children) { [valid_child_file, child_folder] }
+
+    it_behaves_like 'an UnRestorable ChildMinder', :project, :project_children
+
+    describe '#manage_children' do
+      context 'when is_deleted not changed' do
+        it {
+          expect(subject.is_deleted_changed?).to be_falsey
+          subject.manage_deletion
+          expect(ChildPurgationJob).not_to receive(:perform_later)
+          subject.manage_children
+        }
+      end
+
+      context 'when is_deleted changed from false to true' do
+        context 'has_children? true' do
+          include_context 'with job runner', ChildPurgationJob
+          let(:job_transaction) {
+            subject.create_transaction('testing')
+            ChildPurgationJob.initialize_job(subject)
+          }
+          before do
+            @old_max = Rails.application.config.max_children_per_job
+            Rails.application.config.max_children_per_job = 1
+            expect(child_folder).to be_persisted
+            child_folder.update_column(:is_deleted, true)
+            expect(child_folder.is_deleted?).to be_truthy
+            expect(valid_child_file).to be_persisted
+            valid_child_file.update_column(:is_deleted, true)
+            expect(valid_child_file.is_deleted?).to be_truthy
+            expect(invalid_child_file).to be_persisted
+            invalid_child_file.update_column(:is_deleted, true)
+            expect(invalid_child_file.is_deleted?).to be_truthy
+          end
+
+          after do
+            Rails.application.config.max_children_per_job = @old_max
+          end
+
+          it {
+            expect(subject.has_children?).to be_truthy
+            subject.is_deleted = true
+            subject.manage_deletion
+            expect(ChildPurgationJob).to receive(:initialize_job)
+              .with(subject)
+              .exactly(subject.children.count).times
+              .and_return(job_transaction)
+            (1..subject.children.count).each do |page|
+              expect(ChildPurgationJob).to receive(:perform_later).with(job_transaction, subject, page)
+            end
+            subject.manage_children
+          }
+        end
+
+        context 'has_children? false' do
+          subject { FactoryBot.create(:project, is_deleted: true) }
+          it {
+            expect(subject.has_children?).to be_falsey
+            subject.is_deleted = true
+            subject.manage_deletion
+            expect(ChildPurgationJob).not_to receive(:perform_later)
+            subject.manage_children
+          }
+        end
+      end
+
+      context 'when is_deleted changed from true to false' do
+        subject { FactoryBot.create(:project, is_deleted: true) }
+        it {
+          is_expected.to be_persisted
+          expect(subject.is_deleted?).to be_truthy
+          is_expected.not_to allow_value(false).for(:is_deleted)
+        }
+      end
+    end #manage_children
+
+    describe '#purge_children' do
+      include_context 'with job runner', ChildPurgationJob
+      let(:job_transaction) { ChildPurgationJob.initialize_job(subject) }
+      let(:child_job_transaction) { ChildPurgationJob.initialize_job(child_folder) }
+      let(:page) { 1 }
+
+      before do
+        expected_children.each do |cmc|
+          expect(cmc).to be_persisted
+        end
+        expect(child_folder_file).to be_persisted
+        @old_max = Rails.application.config.max_children_per_job
+        Rails.application.config.max_children_per_job = subject.children.count + child_folder.children.count
+      end
+
+      after do
+        Rails.application.config.max_children_per_job = @old_max
+      end
+
+      let(:expected_children) { [ child_folder, valid_child_file ] }
+      let(:child_minder_children) { expected_children }
+      it {
+        subject.current_transaction = job_transaction
+        expected_children.each do |cmc|
+          expect(cmc.is_deleted?).to be_falsey
+          expect(cmc.is_purged?).to be_falsey
+        end
+        child_minder_children.each do |cmc|
+          expect(ChildPurgationJob).to receive(:initialize_job)
+            .with(cmc)
+            .and_return(child_job_transaction)
+          expect(ChildPurgationJob).to receive(:perform_later)
+            .with(child_job_transaction, cmc, page).and_call_original
+        end
+        subject.purge_children(page)
+
+        expected_children.each do |cmc|
+          expect(cmc.reload).to be_truthy
+          expect(cmc.is_deleted?).to be_truthy
+          expect(cmc.is_purged?).to be_truthy
+        end
+      }
+    end #purge_children
+
+    describe '#restore' do
+      context 'is_deleted? true' do
+        before do
+          subject.update_columns(is_deleted: true)
+        end
+        it {
+          expect {
+            begin
+              subject.restore(valid_child_file)
+            rescue IncompatibleParentException => e
+              expect(e.message).to eq("#{subject.kind} #{subject.id} is permenantly deleted, and cannot restore children.::Restore to a different project.")
+              raise e
+            end
+          }.to raise_error(IncompatibleParentException)
+        }
+      end
+
+      context 'when child is not a Container' do
+        let(:incompatible_child) { FactoryBot.create(:file_version) }
+        it {
+          expect {
+            begin
+              subject.restore(incompatible_child)
+            rescue IncompatibleParentException => e
+              expect(e.message).to eq("Projects can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.")
+              raise e
+            end
+          }.to raise_error(IncompatibleParentException)
+        }
+      end
+
+      context 'when child is a Container' do
+        context 'from another project' do
+          context 'from a child folder' do
+            let(:child) { FactoryBot.create(:data_file, :with_parent, :deleted) }
+            it {
+              expect {
+                expect(child.is_deleted?).to be_truthy
+                subject.restore(child)
+                expect(child.is_deleted_changed?).to be_truthy
+                expect(child.project_id_changed?).to be_truthy
+                expect(child.parent_id_changed?).to be_truthy
+                expect(child.is_deleted?).to be_falsey
+                expect(child.project_id).to eq(subject.id)
+                expect(child.parent_id).to be_nil
+              }.not_to raise_error
+            }
+          end
+          context 'root' do
+            let(:child) { FactoryBot.create(:data_file, :root, :deleted) }
+            it {
+              expect {
+                expect(child.is_deleted?).to be_truthy
+                subject.restore(child)
+                expect(child.is_deleted_changed?).to be_truthy
+                expect(child.project_id_changed?).to be_truthy
+                expect(child.is_deleted?).to be_falsey
+                expect(child.project_id).to eq(subject.id)
+              }.not_to raise_error
+            }
+          end
+        end
+
+        context 'from this project' do
+          context 'from a child folder' do
+            let(:child) { child_folder_file }
+            before do
+              child.update_columns(is_deleted: true)
+              child.reload
+            end
+            it {
+              expect {
+                expect(child.is_deleted?).to be_truthy
+                subject.restore(child)
+                expect(child.is_deleted_changed?).to be_truthy
+                expect(child.parent_id_changed?).to be_truthy
+                expect(child.is_deleted?).to be_falsey
+                expect(child.parent_id).to be_nil
+              }.not_to raise_error
+            }
+          end
+
+          context 'from root' do
+            let(:child) { child_folder }
+            before do
+              child.update_columns(is_deleted: true)
+              child.reload
+            end
+            it {
+              expect {
+                expect(child.is_deleted?).to be_truthy
+                subject.restore(child)
+                expect(child.is_deleted_changed?).to be_truthy
+                expect(child.is_deleted?).to be_falsey
+              }.not_to raise_error
+            }
+          end
+        end
+      end
     end
   end
 end

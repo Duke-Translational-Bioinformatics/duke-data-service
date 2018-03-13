@@ -4,7 +4,8 @@ RSpec.describe Folder, type: :model do
   subject { FactoryBot.create(:folder, :with_parent) }
   let(:immediate_child_folder) { FactoryBot.create(:folder, parent: subject) }
   let(:immediate_child_file) { FactoryBot.create(:data_file, parent: subject) }
-  let(:invalid_immediate_child_file) { FactoryBot.create(:data_file, :invalid, parent: subject) }
+  let(:folder_children) {[ immediate_child_file, immediate_child_folder ]}
+  let(:folder_child_minder_children) { folder_children }
   let(:project) { subject.project }
   let(:other_project) { FactoryBot.create(:project) }
   let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
@@ -93,8 +94,6 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  it_behaves_like 'a ChildMinder', :folder, :immediate_child_file, :invalid_immediate_child_file, :immediate_child_folder
-
   describe '#parent_id=' do
     it 'should set project to parent.project' do
       expect(subject.parent).not_to eq other_folder
@@ -177,6 +176,138 @@ RSpec.describe Folder, type: :model do
         expect(subject[:folder][:properties][:project][:properties][:name][:fields]).to have_key :raw
         expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:type]).to eq "string"
         expect(subject[:folder][:properties][:project][:properties][:name][:fields][:raw][:index]).to eq "not_analyzed"
+      }
+    end
+  end
+
+  it_behaves_like 'a Restorable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
+    before do
+      expect(child_folder_file).to be_persisted
+      child_folder_file.update_column(:is_deleted, true)
+    end
+  end
+  it_behaves_like 'a Purgable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
+    before do
+      expect(child_folder_file).to be_persisted
+      child_folder_file.update_column(:is_deleted, true)
+    end
+  end
+
+
+  describe '#restore' do
+    context 'is_deleted? true' do
+      before do
+        subject.update_columns(is_deleted: true)
+      end
+      it {
+        expect {
+          begin
+            subject.restore(immediate_child_file)
+          rescue TrashbinParentException => e
+            expect(e.message).to eq("#{subject.kind} #{subject.id} is deleted, and cannot restore children.::Restore #{subject.kind} #{subject.id}.")
+            raise e
+          end
+        }.to raise_error(TrashbinParentException)
+      }
+    end
+
+    context 'when child is not a Container' do
+      let(:incompatible_child) { FactoryBot.create(:file_version) }
+      it {
+        expect {
+          begin
+            subject.restore(incompatible_child)
+          rescue IncompatibleParentException => e
+            expect(e.message).to eq("Folders can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.")
+            raise e
+          end
+        }.to raise_error(IncompatibleParentException)
+      }
+    end
+
+    context 'when child is a Container' do
+      context 'from another project' do
+        let(:child) { other_folder }
+        before do
+          child.update_columns(is_deleted: true)
+          child.reload
+        end
+        it {
+          expect {
+            expect(child.project_id).not_to eq(subject.id)
+            expect(child.is_deleted?).to be_truthy
+            subject.restore(child)
+            expect(child.is_deleted_changed?).to be_truthy
+            expect(child.project_id_changed?).to be_truthy
+            expect(child.parent_id_changed?).to be_truthy
+            expect(child.is_deleted?).to be_falsey
+            expect(child.project_id).to eq(subject.project_id)
+            expect(child.parent_id).to eq(subject.id)
+          }.not_to raise_error
+        }
+      end
+
+      context 'from this project' do
+        context 'from another folder' do
+          let(:child) { FactoryBot.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.parent_id_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+              expect(child.parent_id).to eq(subject.id)
+            }.not_to raise_error
+          }
+        end
+
+        context 'from this folder' do
+          let(:child) { immediate_child_file }
+          before do
+            child.update_columns(is_deleted: true)
+            child.reload
+          end
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+            }.not_to raise_error
+          }
+        end
+      end
+    end
+  end
+
+  describe '#purge' do
+    context 'undeleted' do
+      it {
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_truthy
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
+      }
+    end
+
+    context 'deleted' do
+      before do
+        subject.update_columns(is_deleted: true)
+        subject.reload
+      end
+      it {
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.is_purged?).to be_falsey
+        subject.purge
+        expect(subject.is_deleted_changed?).to be_falsey
+        expect(subject.is_purged_changed?).to be_truthy
+        expect(subject.is_purged?).to be_truthy
       }
     end
   end

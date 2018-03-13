@@ -382,13 +382,6 @@ describe DDS::V1::FilesAPI do
           expect(resource.is_deleted?).to be_truthy
         end
 
-        it 'should mark file_versions as deleted' do
-          expect(resource).to be_persisted
-          expect {
-            is_expected.to eq(204)
-          }.to change{FileVersion.where(is_deleted: true).count}
-        end
-
         it_behaves_like 'an identified resource' do
           let(:resource_id) {'notfoundid'}
         end
