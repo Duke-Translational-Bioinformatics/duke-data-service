@@ -39,7 +39,7 @@ module DDS
       params do
         optional :name_contains, type: String, desc: 'list templates whose name contains the specified string'
       end
-      get '/templates', root: 'results' do
+      get '/templates', adapter: :json, root: 'results' do
         authenticate!
         template_params = declared(params, include_missing: false)
         if name_contains = template_params[:name_contains]

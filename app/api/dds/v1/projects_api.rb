@@ -46,7 +46,7 @@ module DDS
       params do
         use :pagination
       end
-      get '/projects', root: 'results' do
+      get '/projects', adapter: :json, root: 'results' do
         authenticate!
         authorize Project.new, :index?
         paginate(policy_scope(Project).where(is_deleted: false))

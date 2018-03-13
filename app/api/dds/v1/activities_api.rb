@@ -10,7 +10,7 @@ module DDS
           [403, 'Forbidden']
         ]
       end
-      get '/activities', root: 'results' do
+      get '/activities', adapter: :json, root: 'results' do
         authenticate!
         authorize Activity.new, :index?
         policy_scope(Activity).where(is_deleted: false)

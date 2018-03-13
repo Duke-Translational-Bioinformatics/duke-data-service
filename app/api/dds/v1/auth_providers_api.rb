@@ -45,7 +45,7 @@ module DDS
       params do
         use :pagination
       end
-      get '/auth_providers', root: 'results', each_serializer: AuthenticationServiceSerializer do
+      get '/auth_providers', adapter: :json, root: 'results', each_serializer: AuthenticationServiceSerializer do
         paginate(AuthenticationService)
       end
 
@@ -78,7 +78,7 @@ module DDS
       params do
         use :pagination
       end
-      get '/auth_providers/:id/affiliates', root: 'results', each_serializer: AffiliateSerializer do
+      get '/auth_providers/:id/affiliates', adapter: :json, root: 'results', each_serializer: AffiliateSerializer do
         affiliate_params = declared(params, {include_missing: false}, [:full_name_contains])
         auth_service = AuthenticationService.find(params[:id])
         unsupported_affiliate_search_error! unless auth_service.identity_provider

@@ -19,7 +19,7 @@ module DDS
           desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
-      get '/folders/:id/children', root: 'results' do
+      get '/folders/:id/children', adapter: :json, root: 'results' do
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :index?
@@ -49,7 +49,7 @@ module DDS
           desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
-      get '/projects/:id/children', root: 'results' do
+      get '/projects/:id/children', adapter: :json, root: 'results' do
         authenticate!
         name_contains = params[:name_contains]
         project = hide_logically_deleted Project.find(params[:id])
