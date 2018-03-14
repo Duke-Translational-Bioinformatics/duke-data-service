@@ -3,39 +3,39 @@ require 'rails_helper'
 describe ActivityPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role, permissions: [:view_project]) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
+  let(:auth_role) { FactoryBot.create(:auth_role, permissions: [:view_project]) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
   let(:user) { project_permission.user }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:activity) { FactoryGirl.create(:activity, creator: user) }
-  let(:other_activity) { FactoryGirl.create(:activity) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project) }
+  let(:activity) { FactoryBot.create(:activity, creator: user) }
+  let(:other_activity) { FactoryBot.create(:activity) }
 
   it_behaves_like 'system_permission can access', :activity
   it_behaves_like 'system_permission can access', :other_activity
   it_behaves_like 'a policy for', :user, on: :other_activity, allows: [:index?, :create?]
 
   context 'authenticated user' do
-    let(:visible_used_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
-    let(:visible_used_prov_relation) { FactoryGirl.create(:used_prov_relation,
+    let(:visible_used_file_version) { FactoryBot.create(:file_version, data_file: data_file) }
+    let(:visible_used_prov_relation) { FactoryBot.create(:used_prov_relation,
       relatable_to: visible_used_file_version)
     }
-    let(:invisible_used_prov_relation) { FactoryGirl.create(:used_prov_relation) }
+    let(:invisible_used_prov_relation) { FactoryBot.create(:used_prov_relation) }
     let(:visible_using_activity) { visible_used_prov_relation.relatable_from }
     let(:invisible_using_activity) { invisible_used_prov_relation.relatable_from }
 
-    let(:visible_generated_file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
-    let(:visible_generated_prov_relation) { FactoryGirl.create(:generated_by_activity_prov_relation,
+    let(:visible_generated_file_version) { FactoryBot.create(:file_version, data_file: data_file) }
+    let(:visible_generated_prov_relation) { FactoryBot.create(:generated_by_activity_prov_relation,
       relatable_from: visible_generated_file_version)
     }
-    let(:invisible_generated_prov_relation) { FactoryGirl.create(:generated_by_activity_prov_relation) }
+    let(:invisible_generated_prov_relation) { FactoryBot.create(:generated_by_activity_prov_relation) }
     let(:visible_generating_activity) { visible_generated_prov_relation.relatable_to }
     let(:invisible_generating_activity) { invisible_generated_prov_relation.relatable_to }
 
-    let(:visible_invalidated_file_version) { FactoryGirl.create(:file_version, :deleted, data_file: data_file) }
-    let(:visible_invalidated_prov_relation) { FactoryGirl.create(:invalidated_by_activity_prov_relation,
+    let(:visible_invalidated_file_version) { FactoryBot.create(:file_version, :deleted, data_file: data_file) }
+    let(:visible_invalidated_prov_relation) { FactoryBot.create(:invalidated_by_activity_prov_relation,
       relatable_from: visible_invalidated_file_version)
     }
-    let(:invisible_invalidated_prov_relation) { FactoryGirl.create(:invalidated_by_activity_prov_relation) }
+    let(:invisible_invalidated_prov_relation) { FactoryBot.create(:invalidated_by_activity_prov_relation) }
     let(:visible_invalidating_activity) { visible_invalidated_prov_relation.relatable_to }
     let(:invisible_invalidating_activity) { invisible_invalidated_prov_relation.relatable_to }
 
@@ -52,7 +52,7 @@ describe ActivityPolicy do
     end
 
     context 'who created an activity' do
-      let(:built_activity) { FactoryGirl.build(:activity, creator: user) }
+      let(:built_activity) { FactoryBot.build(:activity, creator: user) }
       it_behaves_like 'a policy for', :user, on: :activity, allows: [:scope, :index?, :create?, :show?, :update?, :destroy?]
       it_behaves_like 'a policy for', :user, on: :built_activity, allows: [:index?, :create?, :show?, :update?, :destroy?]
     end

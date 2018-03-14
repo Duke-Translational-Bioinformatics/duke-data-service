@@ -12,7 +12,7 @@ RSpec.describe GraphPersistenceJob, type: :job do
     expect{described_class.perform_now}.to raise_error(ArgumentError)
   }
 
-  let(:agent) { FactoryGirl.create(:user) }
+  let(:agent) { FactoryBot.create(:user) }
   let(:graphed_class) { agent.graph_model_class }
   let(:job_transaction) { described_class.initialize_job(agent) }
 

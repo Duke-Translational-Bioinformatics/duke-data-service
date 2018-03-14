@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe MetaProperty, type: :model do
-  let(:templatable) { FactoryGirl.create(:data_file) }
-  let(:meta_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
-  let(:property) { FactoryGirl.create(:property, data_type: data_type, template: meta_template.template) }
+  let(:templatable) { FactoryBot.create(:data_file) }
+  let(:meta_template) { FactoryBot.create(:meta_template, templatable: templatable) }
+  let(:property) { FactoryBot.create(:property, data_type: data_type, template: meta_template.template) }
   let(:data_type) { 'string' }
-  let(:other_property) { FactoryGirl.create(:property) }
+  let(:other_property) { FactoryBot.create(:property) }
 
   it_behaves_like 'an audited model'
 
@@ -31,7 +31,7 @@ RSpec.describe MetaProperty, type: :model do
         :existing_meta_property_for_uniqueness_validation
       ],
       [:templatable]
-    let(:existing_meta_property_for_uniqueness_validation) { FactoryGirl.create(:meta_property, meta_template: meta_template) }
+    let(:existing_meta_property_for_uniqueness_validation) { FactoryBot.create(:meta_property, meta_template: meta_template) }
 
     it { is_expected.to validate_presence_of(:meta_template) }
     it { is_expected.to validate_presence_of(:property) }
@@ -40,7 +40,7 @@ RSpec.describe MetaProperty, type: :model do
     it { is_expected.to validate_uniqueness_of(:property).scoped_to(:meta_template_id).case_insensitive }
 
     context 'when a meta_template is set' do
-      subject { FactoryGirl.build(:meta_property, meta_template: meta_template) }
+      subject { FactoryBot.build(:meta_property, meta_template: meta_template) }
 
       it { is_expected.to allow_value(nil).for(:key) }
       it { is_expected.to allow_value(property.key).for(:key) }
@@ -48,7 +48,7 @@ RSpec.describe MetaProperty, type: :model do
     end
 
     context 'when a meta_template is nil' do
-      subject { FactoryGirl.build(:meta_property, meta_template: nil) }
+      subject { FactoryBot.build(:meta_property, meta_template: nil) }
 
       it { is_expected.to allow_value(nil).for(:key) }
       it { is_expected.not_to allow_value(property.key).for(:key) }
@@ -56,7 +56,7 @@ RSpec.describe MetaProperty, type: :model do
     end
 
     context 'with property set' do
-      subject { FactoryGirl.build(:meta_property, meta_template: meta_template, property: property) }
+      subject { FactoryBot.build(:meta_property, meta_template: meta_template, property: property) }
       context 'when data_type is string' do
         let(:data_type) { 'string' }
         it { is_expected.not_to validate_numericality_of(:value) }
@@ -111,14 +111,14 @@ RSpec.describe MetaProperty, type: :model do
       before { expect{subject.set_property_from_key}.not_to raise_error }
 
       context 'when key is nil' do
-        subject { FactoryGirl.build(:meta_property, meta_template: meta_template, property: property, key: nil) }
+        subject { FactoryBot.build(:meta_property, meta_template: meta_template, property: property, key: nil) }
 
         it { expect(subject.key).to be_nil }
         it { expect(subject.property).to eq(property) }
       end
 
       context 'when meta_template is nil' do
-        subject { FactoryGirl.build(:meta_property, meta_template: nil, key: property.key) }
+        subject { FactoryBot.build(:meta_property, meta_template: nil, key: property.key) }
 
         it { expect(subject.key).to eq(property.key) }
         it { expect(subject.meta_template).to be_nil }
@@ -126,7 +126,7 @@ RSpec.describe MetaProperty, type: :model do
       end
 
       context 'when key is a property from another template' do
-        subject { FactoryGirl.build(:meta_property, meta_template: meta_template, key: other_property.key) }
+        subject { FactoryBot.build(:meta_property, meta_template: meta_template, key: other_property.key) }
 
         it { expect(subject.key).to eq(other_property.key) }
         it { expect(subject.meta_template).to eq(meta_template) }
@@ -134,7 +134,7 @@ RSpec.describe MetaProperty, type: :model do
       end
 
       context 'when key is a property from the assigned template' do
-        subject { FactoryGirl.build(:meta_property, meta_template: meta_template, key: property.key) }
+        subject { FactoryBot.build(:meta_property, meta_template: meta_template, key: property.key) }
 
         it { expect(subject.key).to eq(property.key) }
         it { expect(subject.meta_template).to eq(meta_template) }
@@ -144,7 +144,7 @@ RSpec.describe MetaProperty, type: :model do
   end
 
   describe 'templatable indexing' do
-    let(:resource) { FactoryGirl.build(:meta_property, meta_template: meta_template, key: property.key) }
+    let(:resource) { FactoryBot.build(:meta_property, meta_template: meta_template, key: property.key) }
     before do
       expect(meta_template).to be_persisted
       expect(property).to be_persisted

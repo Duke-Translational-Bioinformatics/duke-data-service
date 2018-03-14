@@ -53,18 +53,18 @@ shared_examples 'an authentication service' do
         subject.update(is_default: true) unless subject.is_default?
 
         [:duke_authentication_service, :openid_authentication_service].each do |service_sym|
-            new_default_service = FactoryGirl.build(service_sym, :default)
+            new_default_service = FactoryBot.build(service_sym, :default)
             expect(new_default_service).not_to be_valid
-            non_default_service = FactoryGirl.build(service_sym)
+            non_default_service = FactoryBot.build(service_sym)
             expect(non_default_service).to be_valid
         end
 
         subject.update(is_default: false)
 
         [:duke_authentication_service, :openid_authentication_service].each do |service_sym|
-          new_default_service = FactoryGirl.build(service_sym, :default)
+          new_default_service = FactoryBot.build(service_sym, :default)
           expect(new_default_service).to be_valid
-          non_default_service = FactoryGirl.build(service_sym)
+          non_default_service = FactoryBot.build(service_sym)
           expect(non_default_service).to be_valid
         end
       end
@@ -357,7 +357,7 @@ shared_examples 'an authentication_service:create task' do |
     end
     context 'with existing default authentication service' do
       it {
-        FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :default)
+        FactoryBot.create(authentication_service_class.name.underscore.to_sym, :default)
         expected_env_keys.each do |expected_env_key|
           expect(ENV[expected_env_key]).to be_truthy
         end
@@ -398,7 +398,7 @@ shared_examples 'an authentication_service:create task' do |
     end
     context 'with existing default authentication service' do
       it {
-        FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :default)
+        FactoryBot.create(authentication_service_class.name.underscore.to_sym, :default)
         expected_env_keys.each do |expected_env_key|
           expect(ENV[expected_env_key]).to be_truthy
         end
@@ -441,10 +441,10 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'default authentication_service' do
     before do
-      FactoryGirl.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
+      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
-      FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
+      FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
     end
 
     it {
@@ -458,10 +458,10 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'non default authentication_service' do
     before do
-      FactoryGirl.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
+      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
         ENV["AUTH_SERVICE_#{key.upcase}"] = value
       end
-      FactoryGirl.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
+      FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
     end
 
     it {

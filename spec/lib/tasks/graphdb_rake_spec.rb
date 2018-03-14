@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
-  let(:current_user) { FactoryGirl.create(:user) }
+  let(:current_user) { FactoryBot.create(:user) }
 
   before(:all) do
     Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
@@ -18,23 +18,23 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
     Audited.audit_class.destroy_all
 
     #these simulate objects with ProvRelations that need nodes and relationsips
-    FactoryGirl.create_list(:user, 2).each do |user|
-      sa = FactoryGirl.create(:software_agent, creator: user)
-      user_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
-      user_df = FactoryGirl.create(:data_file, upload: user_upload)
-      user_fv = FactoryGirl.create(:file_version, data_file: user_df)
+    FactoryBot.create_list(:user, 2).each do |user|
+      sa = FactoryBot.create(:software_agent, creator: user)
+      user_upload = FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user)
+      user_df = FactoryBot.create(:data_file, upload: user_upload)
+      user_fv = FactoryBot.create(:file_version, data_file: user_df)
       AttributedToUserProvRelation.create(
         creator: user,
         relatable_from: user_fv,
         relatable_to: user)
-      user_activity = FactoryGirl.create(:activity, creator: user)
+      user_activity = FactoryBot.create(:activity, creator: user)
       AssociatedWithUserProvRelation.create(
         creator: user,
         relatable_from: user,
         relatable_to: user_activity)
-      sa_upload = FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user)
-      sa_df = FactoryGirl.create(:data_file, upload: sa_upload)
-      sa_fv = FactoryGirl.create(:file_version, data_file: sa_df)
+      sa_upload = FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user)
+      sa_df = FactoryBot.create(:data_file, upload: sa_upload)
+      sa_fv = FactoryBot.create(:file_version, data_file: sa_df)
       AttributedToUserProvRelation.create(
         creator: user,
         relatable_from: sa_fv,
@@ -43,7 +43,7 @@ describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
         creator: user,
         relatable_from: sa_fv,
         relatable_to: sa)
-      sa_activity = FactoryGirl.create(:activity, creator: user)
+      sa_activity = FactoryBot.create(:activity, creator: user)
       AssociatedWithUserProvRelation.create(
         creator: user,
         relatable_from: user,

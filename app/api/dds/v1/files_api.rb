@@ -1,6 +1,45 @@
 module DDS
   module V1
     class FilesAPI < Grape::API
+      helpers PaginationParams
+
+      desc 'List project files' do
+        detail 'Returns all files for the project.'
+        named 'list project files'
+        failure [
+          [200, "Valid API Token in 'Authorization' Header"],
+          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
+          [404, 'Project does not exist']
+        ]
+      end
+      params do
+        use :pagination
+      end
+      get '/projects/:id/files', adapter: :json, root: 'results', each_serializer: DataFileSummarySerializer do
+        authenticate!
+        project = hide_logically_deleted Project.find(params[:id])
+        authorize DataFile.new(project: project), :download?
+        files = project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false)
+
+        files_query = headers&.fetch("Project-Files-Query", nil) || "plain"
+
+        case files_query
+        when 'preload_only'
+          # includes query, no joins + preloaded associations
+          files = files.includes(file_versions: [upload: [:fingerprints, :storage_provider]])
+        when 'join_only'
+          # includes query with reference, one join + no preloading
+          files = files.includes(file_versions: [upload: [:fingerprints, :storage_provider]]).references(:file_versions)
+        when 'join_and_preload'
+          # join :file_versions, preload other associations
+          files = files.includes(:file_versions).references(:file_versions).preload(file_versions: [upload: [:fingerprints, :storage_provider]])
+        end
+
+        logger.info "Project-Files-Query = #{files_query}"
+
+        paginate(files)
+      end
+
       desc 'Create a file' do
         detail 'Creates a project file for the given payload.'
         named 'create project file'

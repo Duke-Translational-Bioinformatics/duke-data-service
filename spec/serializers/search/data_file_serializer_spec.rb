@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Search::DataFileSerializer, type: :serializer do
-  let(:data_file) { FactoryGirl.create(:data_file, :with_parent) }
+  let(:data_file) { FactoryBot.create(:data_file, :with_parent) }
 
   it_behaves_like 'a has_many association with', :tags, Search::TagSummarySerializer
 
@@ -10,7 +10,7 @@ RSpec.describe Search::DataFileSerializer, type: :serializer do
 
     context 'with tags' do
       include_context 'elasticsearch prep', [:tag], [:data_file]
-      let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
+      let(:tag) { FactoryBot.create(:tag, taggable: data_file) }
 
       it_behaves_like 'a json serializer' do
         it_behaves_like 'a tagged document'
@@ -18,9 +18,9 @@ RSpec.describe Search::DataFileSerializer, type: :serializer do
     end
 
     context 'with meta_templates' do
-      let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
-      let(:property) { FactoryGirl.create(:property, template: meta_template.template) }
-      let(:meta_property){ FactoryGirl.create(:meta_property, meta_template: meta_template, property: property) }
+      let(:meta_template) { FactoryBot.create(:meta_template, templatable: data_file) }
+      let(:property) { FactoryBot.create(:property, template: meta_template.template) }
+      let(:meta_property){ FactoryBot.create(:meta_property, meta_template: meta_template, property: property) }
       include_context 'elasticsearch prep', [:meta_template, :property, :meta_property], [:data_file]
 
       it_behaves_like 'a json serializer' do
@@ -29,10 +29,10 @@ RSpec.describe Search::DataFileSerializer, type: :serializer do
     end
 
     context 'with tags and meta_templates' do
-      let(:tag) { FactoryGirl.create(:tag, taggable: data_file) }
-      let(:meta_template) { FactoryGirl.create(:meta_template, templatable: data_file) }
-      let(:property) { FactoryGirl.create(:property, template: meta_template.template) }
-      let(:meta_property){ FactoryGirl.create(:meta_property,
+      let(:tag) { FactoryBot.create(:tag, taggable: data_file) }
+      let(:meta_template) { FactoryBot.create(:meta_template, templatable: data_file) }
+      let(:property) { FactoryBot.create(:property, template: meta_template.template) }
+      let(:meta_property){ FactoryBot.create(:meta_property,
         meta_template: meta_template, property: property, key: property.key
       ) }
       include_context 'elasticsearch prep', [:tag, :meta_template, :property, :meta_property], [:data_file]

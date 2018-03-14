@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe MetaTemplate, type: :model do
-  subject { FactoryGirl.create(:meta_template) }
+  subject { FactoryBot.create(:meta_template) }
   let(:templatable_classes) {[
     Activity,
     DataFile
   ]}
-  let(:file) { FactoryGirl.create(:data_file) }
-  let(:meta_template) { FactoryGirl.create(:meta_template) }
+  let(:file) { FactoryBot.create(:data_file) }
+  let(:meta_template) { FactoryBot.create(:meta_template) }
 
   it_behaves_like 'an audited model'
 
@@ -18,7 +18,7 @@ RSpec.describe MetaTemplate, type: :model do
   end
 
   describe 'validations' do
-    let!(:existing_tag_for_uniqueness_validation) { FactoryGirl.create(:meta_template, :skip_validation, templatable: file) }
+    let!(:existing_tag_for_uniqueness_validation) { FactoryBot.create(:meta_template, :skip_validation, templatable: file) }
     it { is_expected.to validate_presence_of(:templatable) }
     it { is_expected.to validate_presence_of(:template) }
     it 'restrict templatable_type to templatable_classes' do
@@ -39,9 +39,9 @@ RSpec.describe MetaTemplate, type: :model do
   end
 
   describe '#save' do
-    let(:template) { FactoryGirl.create(:template) }
-    let(:templatable) { FactoryGirl.create(:data_file) }
-    let(:meta_templates) { FactoryGirl.build_list(:meta_template, 4, template: template, templatable: templatable) }
+    let(:template) { FactoryBot.create(:template) }
+    let(:templatable) { FactoryBot.create(:data_file) }
+    let(:meta_templates) { FactoryBot.build_list(:meta_template, 4, template: template, templatable: templatable) }
     include_context 'with job runner', ProjectStorageProviderInitializationJob
     include_context 'with concurrent calls', object_list: :meta_templates, method: :save
     it { expect(MetaTemplate.count).to eq(1) }

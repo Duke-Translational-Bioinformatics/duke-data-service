@@ -9,7 +9,7 @@ module DDS
           [401, 'Unauthorized']
         ]
       end
-      get '/system/permissions', root: :results do
+      get '/system/permissions', adapter: :json, root: :results do
         authenticate!
         authorize SystemPermission.new, :index?
         policy_scope(SystemPermission).all

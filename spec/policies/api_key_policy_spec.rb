@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe ApiKeyPolicy do
   include_context 'policy declarations'
-  let(:user) { FactoryGirl.create(:user) }
-  let(:other_user) { FactoryGirl.create(:user) }
-  let(:user_key) { FactoryGirl.create(:api_key, user_id: user.id) }
-  let(:other_user_key) { FactoryGirl.create(:api_key, user_id: other_user.id) }
-  let(:user_software_agent) { FactoryGirl.create(:software_agent, :with_key, creator: user)}
-  let(:other_user_software_agent) { FactoryGirl.create(:software_agent, :with_key, creator: other_user)}
-  let(:user_software_agent_key) { FactoryGirl.create(:api_key, software_agent_id: user_software_agent.id) }
-  let(:other_user_software_agent_key) { FactoryGirl.create(:api_key, software_agent_id: other_user_software_agent.id) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:other_user) { FactoryBot.create(:user) }
+  let(:user_key) { FactoryBot.create(:api_key, user_id: user.id) }
+  let(:other_user_key) { FactoryBot.create(:api_key, user_id: other_user.id) }
+  let(:user_software_agent) { FactoryBot.create(:software_agent, :with_key, creator: user)}
+  let(:other_user_software_agent) { FactoryBot.create(:software_agent, :with_key, creator: other_user)}
+  let(:user_software_agent_key) { FactoryBot.create(:api_key, software_agent_id: user_software_agent.id) }
+  let(:other_user_software_agent_key) { FactoryBot.create(:api_key, software_agent_id: other_user_software_agent.id) }
 
   it_behaves_like 'system_permission can access', :user_key
   it_behaves_like 'system_permission cannot access', :user_key, 'with software_agent'

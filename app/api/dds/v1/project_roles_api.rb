@@ -10,7 +10,7 @@ module DDS
             [401, 'Unauthorized']
           ]
         end
-        get '/', root: 'results' do
+        get '/', adapter: :json, root: 'results' do
           authenticate!
           ProjectRole.all
         end

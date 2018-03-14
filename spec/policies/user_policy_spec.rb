@@ -3,9 +3,9 @@ require 'rails_helper'
 describe UserPolicy do
   include_context 'policy declarations'
 
-  let(:user) { FactoryGirl.create(:user) }
-  let(:other_user) { FactoryGirl.create(:user) }
-  let(:new_user) { FactoryGirl.build(:user) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:other_user) { FactoryBot.create(:user) }
+  let(:new_user) { FactoryBot.build(:user) }
 
   describe '.scope' do
     it { expect(resolved_scope).to include(other_user) }

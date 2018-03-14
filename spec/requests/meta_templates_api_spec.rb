@@ -3,25 +3,25 @@ require 'rails_helper'
 describe DDS::V1::MetaTemplatesAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project) }
+  let(:activity) { FactoryBot.create(:activity, creator: current_user) }
   let(:templatable) { data_file }
-  let(:meta_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
-  let(:meta_template_stub) { FactoryGirl.build(:meta_template, templatable: templatable) }
+  let(:meta_template) { FactoryBot.create(:meta_template, templatable: templatable) }
+  let(:meta_template_stub) { FactoryBot.build(:meta_template, templatable: templatable) }
 
   let(:template) { meta_template.template }
   let(:property_data_type) { 'string' }
-  let(:property) { FactoryGirl.create(:property, data_type: property_data_type, template: template) }
-  let(:meta_property) { FactoryGirl.create(:meta_property, property: property, meta_template: meta_template) }
-  let(:meta_property_stub) { FactoryGirl.build(:meta_property, property: property) }
+  let(:property) { FactoryBot.create(:property, data_type: property_data_type, template: template) }
+  let(:meta_property) { FactoryBot.create(:meta_property, property: property, meta_template: meta_template) }
+  let(:meta_property_stub) { FactoryBot.build(:meta_property, property: property) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin) }
-  let(:other_templatable) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_meta_template) { FactoryGirl.create(:meta_template, templatable: other_templatable) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin) }
+  let(:other_templatable) { FactoryBot.create(:data_file, project: other_permission.project) }
+  let(:other_meta_template) { FactoryBot.create(:meta_template, templatable: other_templatable) }
 
-  let(:not_allowed_meta_template) { FactoryGirl.create(:meta_template) }
+  let(:not_allowed_meta_template) { FactoryBot.create(:meta_template) }
 
   let(:resource_class) { MetaTemplate }
   let(:resource_serializer) { MetaTemplateSerializer }
@@ -39,9 +39,9 @@ describe DDS::V1::MetaTemplatesAPI do
     describe 'GET' do
       subject { get(url, params: query_params, headers: headers) }
       let(:query_params) {{}}
-      let(:different_templatable) { FactoryGirl.create(:data_file, project: project) }
-      let(:meta_template_diff_templatable) { FactoryGirl.create(:meta_template, templatable: different_templatable) }
-      let(:meta_template_diff_template) { FactoryGirl.create(:meta_template, templatable: templatable) }
+      let(:different_templatable) { FactoryBot.create(:data_file, project: project) }
+      let(:meta_template_diff_templatable) { FactoryBot.create(:meta_template, templatable: different_templatable) }
+      let(:meta_template_diff_template) { FactoryBot.create(:meta_template, templatable: templatable) }
 
       it_behaves_like 'a listable resource' do
         let(:expected_list_length) { expected_resources.length }
@@ -107,7 +107,7 @@ describe DDS::V1::MetaTemplatesAPI do
       include_context 'elasticsearch prep', [:template, :property], [:templatable]
 
       subject { post(url, params: payload.to_json, headers: headers) }
-      let(:template) { FactoryGirl.create(:template) }
+      let(:template) { FactoryBot.create(:template) }
       let(:called_action) { 'POST' }
       let!(:payload) {{
         properties: [
@@ -173,7 +173,7 @@ describe DDS::V1::MetaTemplatesAPI do
       end
 
       context 'with property key from another template' do
-        let(:payload_property_key) { FactoryGirl.create(:property).key }
+        let(:payload_property_key) { FactoryBot.create(:property).key }
         it_behaves_like 'a validated resource'
       end
 
@@ -226,7 +226,7 @@ describe DDS::V1::MetaTemplatesAPI do
       end
 
       context 'with a nonexistent meta template' do
-        let(:template) { FactoryGirl.create(:template) }
+        let(:template) { FactoryBot.create(:template) }
         let(:resource_class) {'MetaTemplate'}
         it_behaves_like 'an identified resource'
       end
@@ -280,7 +280,7 @@ describe DDS::V1::MetaTemplatesAPI do
       end
 
       context 'with a nonexistent meta template' do
-        let(:template) { FactoryGirl.create(:template) }
+        let(:template) { FactoryBot.create(:template) }
         let(:resource_class) {'MetaTemplate'}
         it_behaves_like 'an identified resource'
       end
@@ -296,7 +296,7 @@ describe DDS::V1::MetaTemplatesAPI do
       end
 
       context 'with property key from another template' do
-        let(:payload_property_key) { FactoryGirl.create(:property).key }
+        let(:payload_property_key) { FactoryBot.create(:property).key }
         it_behaves_like 'a validated resource'
       end
 
@@ -354,7 +354,7 @@ describe DDS::V1::MetaTemplatesAPI do
       end
 
       context 'with a nonexistent meta template' do
-        let(:template) { FactoryGirl.create(:template) }
+        let(:template) { FactoryBot.create(:template) }
         let(:resource_class) {'MetaTemplate'}
         it_behaves_like 'an identified resource'
       end

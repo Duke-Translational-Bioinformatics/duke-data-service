@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
-  subject { FactoryGirl.create(:upload, :with_chunks) }
-  let(:fingerprint) { FactoryGirl.create(:fingerprint, upload: subject) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_chunks, :with_fingerprint, :completed) }
-  let(:upload_with_error) { FactoryGirl.create(:upload, :with_chunks, :with_error) }
+  subject { FactoryBot.create(:upload, :with_chunks) }
+  let(:fingerprint) { FactoryBot.create(:fingerprint, upload: subject) }
+  let(:completed_upload) { FactoryBot.create(:upload, :with_chunks, :with_fingerprint, :completed) }
+  let(:upload_with_error) { FactoryBot.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
 
@@ -133,7 +133,7 @@ RSpec.describe Upload, type: :model do
   end
 
   describe '#complete' do
-    let(:fingerprint_attributes) { FactoryGirl.attributes_for(:fingerprint) }
+    let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
     before { subject.fingerprints_attributes = [fingerprint_attributes] }
 
     it { is_expected.to respond_to :complete }
@@ -184,9 +184,9 @@ RSpec.describe Upload, type: :model do
   end
 
   describe '#minimum_chunk_size' do
-    let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+    let(:storage_provider) { FactoryBot.create(:storage_provider) }
     let(:size) { storage_provider.chunk_max_number }
-    subject { FactoryGirl.create(:upload, storage_provider: storage_provider, size: size) }
+    subject { FactoryBot.create(:upload, storage_provider: storage_provider, size: size) }
     let(:expected_minimum_chunk_size) {
       (subject.size.to_f / subject.storage_provider.chunk_max_number).ceil
     }
@@ -210,7 +210,7 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'swift methods', :vcr do
-    subject { FactoryGirl.create(:upload, :swift, :with_chunks) }
+    subject { FactoryBot.create(:upload, :swift, :with_chunks) }
 
     describe '#create_and_validate_storage_manifest' do
       it { is_expected.to respond_to :create_and_validate_storage_manifest }

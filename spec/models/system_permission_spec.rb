@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe SystemPermission, type: :model do
-  subject { FactoryGirl.build(:system_permission) }
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:system_auth_role) { FactoryGirl.create(:auth_role, :system) }
+  subject { FactoryBot.build(:system_permission) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:system_auth_role) { FactoryBot.create(:auth_role, :system) }
 
   describe 'associations' do
     it 'should have a user' do

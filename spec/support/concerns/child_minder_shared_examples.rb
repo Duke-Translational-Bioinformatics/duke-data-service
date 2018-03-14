@@ -16,7 +16,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
     it { is_expected.to respond_to(:has_children?) }
 
     context 'without children' do
-      subject { FactoryGirl.create(resource_factory) }
+      subject { FactoryBot.create(resource_factory) }
       it { expect(subject.children.count).to eq(0) }
       it { expect(subject.has_children?).to be_falsey }
     end
@@ -96,7 +96,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
       end
 
       context 'has_children? false' do
-        subject { FactoryGirl.create(resource_factory) }
+        subject { FactoryBot.create(resource_factory) }
         it {
           expect(subject).not_to be_has_children
           subject.is_deleted = true
@@ -111,7 +111,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
     end
 
     context 'when is_deleted changed from true to false' do
-      subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+      subject { FactoryBot.create(resource_factory, is_deleted: true) }
       it {
         expect(subject.is_deleted?).to be_truthy
         subject.is_deleted = false
@@ -147,7 +147,7 @@ shared_examples 'a ChildMinder' do |resource_factory,
     context 'called', :vcr do
       let(:job_transaction) { ChildDeletionJob.initialize_job(subject) }
       let(:child_job_transaction) { ChildDeletionJob.initialize_job(child_folder) }
-      let(:child_folder_file) { FactoryGirl.create(:data_file, parent: child_folder)}
+      let(:child_folder_file) { FactoryBot.create(:data_file, parent: child_folder)}
       let(:page) { 1 }
 
       before do

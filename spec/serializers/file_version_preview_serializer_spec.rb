@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe FileVersionPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:file_version) }
+  let(:resource) { FactoryBot.create(:file_version) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
     'id' => resource.id,

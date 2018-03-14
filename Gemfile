@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.0'
+gem 'rails', '~> 5.1'
 # Use postgresql as the database for Active Record
-gem 'pg'
+gem "pg"
 
 # Use neo4j for PROV graph relationships
-gem 'neo4j', '~> 7.0'
+gem 'neo4j', '~> 8.0'
 
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers', '~> 2.5.0'
@@ -39,9 +39,8 @@ gem 'audited'
 gem 'active_record_union'
 
 gem 'jwt'
-gem 'grape', '0.16.2'
+gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
-gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
 gem 'turbolinks'
 gem 'uglifier'
@@ -59,7 +58,7 @@ gem 'rspec_junit_formatter'
 # https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
 gem 'newrelic_rpm'
 
-gem "factory_girl_rails"
+gem "factory_bot_rails"
 gem "faker"
 
 # Use Capistrano for deployment
