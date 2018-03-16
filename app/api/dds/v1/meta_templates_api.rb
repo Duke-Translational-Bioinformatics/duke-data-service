@@ -146,7 +146,7 @@ module DDS
         failure [
           {code: 200, message: 'This will never happen'},
           {code: 204, message: 'Successfully Deleted'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Object or template does not exist'}
         ]
       end

@@ -113,8 +113,8 @@ module DDS
         detail 'view tag'
         named 'view tag'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Tag does not exist'}
         ]
       end
@@ -130,7 +130,7 @@ module DDS
         named 'delete tag'
         failure [
           {code: 204, message: 'Successfully Deleted'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Tag does not exist'}
         ]
       end

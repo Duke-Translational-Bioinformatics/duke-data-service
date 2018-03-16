@@ -198,7 +198,7 @@ module DDS
         named 'View relation'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 403, message: 'Forbidden'},
           {code: 404, message: 'Relation does not exist'}
         ]

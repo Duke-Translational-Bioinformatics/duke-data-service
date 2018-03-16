@@ -69,8 +69,8 @@ module DDS
         detail 'Returns the user details for a given uuid of a user.'
         named 'view user'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'User does not exist'}
         ]
       end

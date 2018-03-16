@@ -7,8 +7,8 @@ module DDS
         detail 'Returns the immediate children of the folder.'
         named 'list folder children'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Folder does not exist'}
         ]
       end
@@ -37,8 +37,8 @@ module DDS
         detail 'Returns the immediate children of the project.'
         named 'list project children'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Project does not exist'}
         ]
       end

@@ -7,8 +7,8 @@ module DDS
         detail 'Returns all files for the project.'
         named 'list project files'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Project does not exist'}
         ]
       end
@@ -47,7 +47,7 @@ module DDS
           {code: 200, message: 'This will never happen'},
           {code: 201, message: 'Successfully Created'},
           {code: 400, message: 'Upload has an IntegrityException'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Project Does not Exist, Parent Folder or Upload does not exist in Project'}
         ]
       end
@@ -90,7 +90,7 @@ module DDS
         named 'view file metadata'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist'}
         ]
       end
@@ -106,7 +106,7 @@ module DDS
         named 'update file'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist'}
         ]
       end
@@ -137,7 +137,7 @@ module DDS
         failure [
           {code: 200, message: 'This will never happen'},
           {code: 204, message: 'Successfully Deleted'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist'}
         ]
       end
@@ -154,7 +154,7 @@ module DDS
         named 'download file'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist, or Upload is not consistent'}
         ]
       end
@@ -172,7 +172,7 @@ module DDS
         named 'move file'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist, Parent does not exist in Project'}
         ]
       end
@@ -205,7 +205,7 @@ module DDS
         named 'rename file'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'File does not exist'}
         ]
       end

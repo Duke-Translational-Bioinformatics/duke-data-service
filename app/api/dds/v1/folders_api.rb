@@ -6,8 +6,8 @@ module DDS
         named 'create project folder'
         failure [
           {code: 200, message: 'This will never happen'},
-          {code: 201, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 201, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Project Does not Exist, Parent Folder does not exist in Project'}
         ]
       end
@@ -43,8 +43,8 @@ module DDS
         detail 'Returns the folder details for a given uuid of a folder.'
         named 'view folder'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Folder does not exist'}
         ]
       end
@@ -61,7 +61,7 @@ module DDS
         failure [
           {code: 200, message: 'This will never happen'},
           {code: 204, message: 'Successfully Deleted'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Folder does not exist'}
         ]
       end
@@ -77,8 +77,8 @@ module DDS
         detail 'Move a folder with a given uuid to a new parent.'
         named 'move folder'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Folder does not exist, Parent does not exist'}
         ]
       end
@@ -110,8 +110,8 @@ module DDS
         detail 'Give a folder with a given uuid a new name.'
         named 'rename folder'
         failure [
-          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 404, message: 'Folder does not exist'}
         ]
       end

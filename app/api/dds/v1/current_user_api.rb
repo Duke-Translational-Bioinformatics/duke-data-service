@@ -6,7 +6,7 @@ module DDS
         named 'current_user'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'}
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'}
         ]
       end
       get '/current_user', root: false do
@@ -19,7 +19,7 @@ module DDS
         named 'current_user usage'
         failure [
           {code: 200, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'}
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'}
         ]
       end
       get '/current_user/usage', serializer: UserUsageSerializer do
@@ -32,7 +32,7 @@ module DDS
         named 'manage current_user api_key'
         failure [
           {code: 201, message: 'Success'},
-          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
           {code: 403, message: 'Forbidden (software_agent restricted)'}
         ]
       end
