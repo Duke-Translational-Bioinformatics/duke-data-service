@@ -6,9 +6,9 @@ module DDS
           detail 'Lists authorization roles for a given context.'
           named 'list authorization roles'
           failure [
-            [200, 'Success'],
-            [401, 'Unauthorized'],
-            [404, 'Unsupported Context']
+            {code: 200, message: 'Success'},
+            {code: 401, message: 'Unauthorized'},
+            {code: 404, message: 'Unsupported Context'}
           ]
         end
         params do
@@ -36,9 +36,9 @@ module DDS
           detail 'View authorization role details.'
           named 'view authorization role'
           failure [
-            [200, 'Success'],
-            [401, 'Unauthorized'],
-            [404, 'Unkown AuthRole']
+            {code: 200, message: 'Success'},
+            {code: 401, message: 'Unauthorized'},
+            {code: 404, message: 'Unkown AuthRole'}
           ]
         end
         get '/:id', root: false do

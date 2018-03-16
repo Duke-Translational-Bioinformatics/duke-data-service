@@ -7,11 +7,11 @@ module DDS
         detail 'Creates a project for the given payload.'
         named 'create project'
         failure [
-          [200, 'This will never actually happen'],
-          [202, 'Accepted, subject to further processing'],
-          [400, 'Project Name Already Exists'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'This will never actually happen'},
+          {code: 202, message: 'Accepted, subject to further processing'},
+          {code: 400, message: 'Project Name Already Exists'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       params do
@@ -39,8 +39,8 @@ module DDS
         detail 'Lists projects for which the current user has the "view_project" permission.'
         named 'list projects'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
@@ -56,10 +56,10 @@ module DDS
         detail 'Returns the project details for a given project uuid.'
         named 'view project'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       params do
@@ -76,11 +76,11 @@ module DDS
         detail 'Update the project details for a given project uuid.'
         named 'update project'
         failure [
-          [200, 'Success'],
-          [400, 'Project Name Already Exists'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Project Name Already Exists'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       params do
@@ -104,10 +104,10 @@ module DDS
         detail 'Marks a project as being deleted.'
         named 'delete project'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       params do

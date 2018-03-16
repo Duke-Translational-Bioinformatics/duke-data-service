@@ -5,9 +5,9 @@ module DDS
         detail 'If there are previous versions of a file, this action can be used to retrieve information about the older versions.'
         named 'list file versions'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       params do
@@ -23,9 +23,9 @@ module DDS
         detail 'view file version'
         named 'view file version'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       params do
@@ -41,9 +41,9 @@ module DDS
         detail 'update file version'
         named 'update file version'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Valid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       params do
@@ -63,10 +63,10 @@ module DDS
         detail 'Deletes the file version from view'
         named 'delete file version metadata'
         failure [
-          [200, "This will never happen"],
-          [204, 'Successfully Deleted'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File version does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File version does not exist'}
         ]
       end
       delete '/file_versions/:id/', root: false do
@@ -84,9 +84,9 @@ module DDS
         detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download the file version.'
         named 'download file_version'
         failure [
-          [200, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File version does not exist, or Upload is not consistent']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File version does not exist, or Upload is not consistent'}
         ]
       end
       get '/file_versions/:id/url', root: false, serializer: FileVersionUrlSerializer do
@@ -102,9 +102,9 @@ module DDS
         detail 'promote file version'
         named 'promote file version'
         failure [
-          [201, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File version does not exist']
+          {code: 201, message: 'Valid API Token in 'Authorization' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'File version does not exist'}
         ]
       end
       post '/file_versions/:id/current', root: false do

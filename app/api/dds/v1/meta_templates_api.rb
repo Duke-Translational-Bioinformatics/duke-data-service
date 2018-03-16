@@ -5,9 +5,9 @@ module DDS
         detail 'Used to retrieve all metadata associated with a DDS object, optionally find a template instance by name.'
         named 'view object metadata'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Object or template does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Object or template does not exist'}
         ]
       end
       params do
@@ -29,12 +29,12 @@ module DDS
         detail 'Creates object metadata.'
         named 'create object metadata'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Successfully Created'],
-          [400, 'Validation error'],
-          [401, 'Unauthorized'],
-          [404, 'Object or template does not exist'],
-          [409, 'Template instance already exists for the DDS object']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Validation error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Object or template does not exist'},
+          {code: 409, message: 'Template instance already exists for the DDS object'}
         ]
       end
       params do
@@ -82,10 +82,10 @@ module DDS
         detail 'Used to retrieve the metadata template instance for a corresponding DDS object.'
         named 'view object metadata'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Object or Template does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Object or Template does not exist'}
         ]
       end
       get '/meta/:object_kind/:object_id/:template_id', root: false do
@@ -102,11 +102,11 @@ module DDS
         detail 'Updates object metadata'
         named 'update object metadata'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Object or Template does not exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Object or Template does not exist'}
         ]
       end
       params do
@@ -144,10 +144,10 @@ module DDS
         detail 'Deletes objet metadata'
         named 'delete objet metadata'
         failure [
-          [200, "This will never happen"],
-          [204, 'Successfully Deleted'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Object or template does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 404, message: 'Object or template does not exist'}
         ]
       end
       delete '/meta/:object_kind/:object_id/:template_id', root: false do

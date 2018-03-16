@@ -5,8 +5,8 @@ module DDS
         detail 'allows a user to get their User object with a valid api_token'
         named 'current_user'
         failure [
-          [200, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"]
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'}
         ]
       end
       get '/current_user', root: false do
@@ -18,8 +18,8 @@ module DDS
         detail 'get data about user projects, files, and storage usage'
         named 'current_user usage'
         failure [
-          [200, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"]
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'}
         ]
       end
       get '/current_user/usage', serializer: UserUsageSerializer do
@@ -31,9 +31,9 @@ module DDS
         detail 'create or recreate the current_user api_key'
         named 'manage current_user api_key'
         failure [
-          [201, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [403, 'Forbidden (software_agent restricted)']
+          {code: 201, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in 'Authorization' Header'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'}
         ]
       end
       put '/current_user/api_key', serializer: ApiKeySerializer do
@@ -55,10 +55,10 @@ module DDS
         detail 'View current_user api_key.'
         named 'view current_user api_key'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Current User or ApiKey Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Current User or ApiKey Does not Exist'}
         ]
       end
       get '/current_user/api_key', serializer: ApiKeySerializer do
@@ -81,10 +81,10 @@ module DDS
         detail 'Delete a Current User API key'
         named 'delete current_user api_key'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Current User Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Current User Does not Exist'}
         ]
       end
       delete '/current_user/api_key', root: false do
