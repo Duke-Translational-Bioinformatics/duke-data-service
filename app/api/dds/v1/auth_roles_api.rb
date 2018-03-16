@@ -23,7 +23,7 @@ module DDS
           }
           error!(error_json, 404)
         end
-        get '/', root: 'results' do
+        get '/', adapter: :json, root: 'results' do
           authenticate!
           role_params = declared(params, include_missing: false)
           auth_roles = role_params[:context] ?

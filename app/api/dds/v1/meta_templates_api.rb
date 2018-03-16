@@ -13,7 +13,7 @@ module DDS
       params do
         optional :meta_template_name, type: String, desc: "The unique meta_template_name of the template; performs an exact match."
       end
-      get '/meta/:object_kind/:object_id', root: 'results' do
+      get '/meta/:object_kind/:object_id', adapter: :json, root: 'results' do
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         templatable_object = object_kind.find(params[:object_id])

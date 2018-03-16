@@ -46,7 +46,7 @@ module DDS
       params do
         optional :key, type: String, desc: "The unique key of the template property"
       end
-      get '/templates/:template_id/properties', root: 'results' do
+      get '/templates/:template_id/properties', adapter: :json, root: 'results' do
         authenticate!
         property_params = declared(params, {include_missing: false})
         template = Template.find(params[:template_id])

@@ -37,6 +37,9 @@ describe DDS::V1::FilesAPI do
     #List files for a project
     it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
+        before do
+          allow_any_instance_of(DataFile).to receive(:url).and_return("mocked_temporary_url")
+        end
         let(:unexpected_resources) { [
           other_file,
           deleted_file
@@ -87,6 +90,13 @@ describe DDS::V1::FilesAPI do
             expect_any_instance_of(ActiveRecord::AssociationRelation).not_to receive(:references)
             expect_any_instance_of(ActiveRecord::AssociationRelation).not_to receive(:preload)
             is_expected.to eq 200
+          end
+
+          it 'logs PROJECT_FILES_QUERY_DEFAULT env' do
+            ENV['PROJECT_FILES_QUERY_DEFAULT'] = 'preload_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = preload_only")
+            is_expected.to eq 200
+            ENV.delete('PROJECT_FILES_QUERY_DEFAULT')
           end
         end
 

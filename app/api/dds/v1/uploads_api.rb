@@ -58,7 +58,7 @@ module DDS
             requires :project_id, type: String, desc: "The ID of the Project"
             use :pagination
           end
-          get '/uploads', root: 'results' do
+          get '/uploads', adapter: :json, root: 'results' do
             authenticate!
             project = hide_logically_deleted Project.find(params[:project_id])
             authorize Upload.new(project: project), :index?
