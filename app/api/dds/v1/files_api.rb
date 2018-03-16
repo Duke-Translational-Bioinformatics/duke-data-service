@@ -21,7 +21,7 @@ module DDS
         authorize DataFile.new(project: project), :download?
         files = project.data_files.unscope(:order).order(updated_at: :desc).where(is_deleted: false)
 
-        files_query = headers&.fetch("Project-Files-Query", nil) || "plain"
+        files_query = headers&.fetch("Project-Files-Query", ENV['PROJECT_FILES_QUERY_DEFAULT']) || "plain"
 
         case files_query
         when 'preload_only'

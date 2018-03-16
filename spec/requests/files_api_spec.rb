@@ -91,6 +91,13 @@ describe DDS::V1::FilesAPI do
             expect_any_instance_of(ActiveRecord::AssociationRelation).not_to receive(:preload)
             is_expected.to eq 200
           end
+
+          it 'logs PROJECT_FILES_QUERY_DEFAULT env' do
+            ENV['PROJECT_FILES_QUERY_DEFAULT'] = 'preload_only'
+            expect(Rails.logger).to receive(:info).with("Project-Files-Query = preload_only")
+            is_expected.to eq 200
+            ENV.delete('PROJECT_FILES_QUERY_DEFAULT')
+          end
         end
 
         context 'set to preload_only' do
