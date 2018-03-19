@@ -2,11 +2,11 @@ module UnRestorable
   extend ActiveSupport::Concern
 
   included do
-    before_update :manage_deletion, if: :saved_change_to_is_deleted?
+    before_update :manage_deletion
   end
 
   def manage_deletion
-    if is_deleted?
+    if will_save_change_to_is_deleted? && is_deleted?
       @child_job = ChildPurgationJob
     end
   end

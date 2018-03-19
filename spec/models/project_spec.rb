@@ -247,6 +247,18 @@ RSpec.describe Project, type: :model do
     describe '#manage_children' do
       context 'when is_deleted not changed' do
         it {
+          expect(project_children).not_to be_empty
+          expect(subject.is_deleted_changed?).to be_falsey
+          subject.manage_deletion
+          expect(ChildPurgationJob).not_to receive(:perform_later)
+          subject.manage_children
+        }
+      end
+
+      context 'when deleted and is_deleted not changed' do
+        subject { FactoryBot.create(:project, :deleted) }
+        it {
+          expect(project_children).not_to be_empty
           expect(subject.is_deleted_changed?).to be_falsey
           subject.manage_deletion
           expect(ChildPurgationJob).not_to receive(:perform_later)
