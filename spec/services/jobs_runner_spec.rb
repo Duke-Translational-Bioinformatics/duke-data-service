@@ -13,9 +13,20 @@ RSpec.describe JobsRunner do
     index_documents: ElasticsearchIndexJob,
     update_project_container_elasticsearch: ProjectContainerElasticsearchUpdateJob,
     graph_persistence: GraphPersistenceJob,
-    complete_upload: UploadCompletionJob
+    complete_upload: UploadCompletionJob,
+    purge_upload: UploadStorageRemovalJob,
+    purge_children: ChildPurgationJob,
+    restore_children: ChildRestorationJob
   } }
   let(:registered_worker_classes) { workers_registry_hash.values }
+  let(:expected_jobs) { ApplicationJob.descendants.reject{|klass| klass.methods.include? :is_fake_job_spec_job? }.sort { |x,y| x.to_s <=> y.to_s } }
+
+  it {
+    expect(registered_worker_classes.sort { |x,y| x.to_s <=> y.to_s } ).to include(*expected_jobs)
+    expect(registered_worker_classes).to include MessageLogWorker
+    expect(described_class.workers_registry.values.sort { |x,y| x.to_s <=> y.to_s }).to include(*expected_jobs)
+    expect(described_class.workers_registry.values).to include MessageLogWorker
+  }
 
   shared_context 'with job_wrapper' do
     let(:job_wrapper) { application_job_class.job_wrapper }

@@ -7,6 +7,10 @@ class FolderPolicy < ApplicationPolicy
     permission :create_file
   end
 
+  def restore?
+    permission :create_file
+  end
+
   def update?
     permission :create_file
   end
@@ -15,7 +19,7 @@ class FolderPolicy < ApplicationPolicy
     permission :create_file
   end
 
-  def rename? 
+  def rename?
     permission :create_file
   end
 

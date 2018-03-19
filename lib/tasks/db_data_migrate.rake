@@ -108,6 +108,15 @@ def migrate_nil_consistency_status
   puts "#{updated_uploads} uploads updated."
 end
 
+def migrate_nil_storage_container
+  updated_uploads = 0
+  Upload.where(storage_container: nil).each do |u|
+    u.update_columns(storage_container: u.project_id)
+    updated_uploads += 1
+  end
+  puts "#{updated_uploads} uploads updated"
+end
+
 def migrate_storage_provider_chunk_environment
   bad_storage_providers = StorageProvider.where(
     chunk_max_size_bytes: nil,
@@ -136,6 +145,7 @@ namespace :db do
       create_missing_fingerprints
       type_untyped_authentication_services
       migrate_nil_consistency_status
+      migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
     end
   end
