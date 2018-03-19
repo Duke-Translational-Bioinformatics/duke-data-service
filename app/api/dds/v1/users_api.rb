@@ -7,8 +7,8 @@ module DDS
         detail 'This allows a client to present an access token from a registered authentication service and get an api token'
         named 'api_token'
         failure [
-          [200,'Success'],
-          [401, 'Missing, or invalid Access Token']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, or invalid Access Token'}
         ]
       end
       params do
@@ -48,8 +48,8 @@ module DDS
         detail 'This allows a client to get a list of users, with an optional filter'
         named 'users'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
@@ -69,9 +69,9 @@ module DDS
         detail 'Returns the user details for a given uuid of a user.'
         named 'view user'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'User does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'User does not exist'}
         ]
       end
       params do

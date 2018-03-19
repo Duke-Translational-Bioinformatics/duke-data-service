@@ -5,9 +5,9 @@ module DDS
         detail 'Lists all activities'
         named 'list activities'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'}
         ]
       end
       get '/activities', adapter: :json, root: 'results' do
@@ -20,11 +20,11 @@ module DDS
         detail 'Creates an activity for the given payload.'
         named 'create activity'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Successfully Created'],
-          [400, 'Activity requires a name'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Activity requires a name'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'}
         ]
       end
       params do
@@ -55,10 +55,10 @@ module DDS
         detail 'Returns the activity details for a given UUID.'
         named 'view activity'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Activity Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Activity Does not Exist'}
         ]
       end
       params do
@@ -75,11 +75,11 @@ module DDS
         detail 'Updates the activity details for a given UUID.'
         named 'update activity'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (activity restricted)'],
-          [404, 'Activity Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (activity restricted)'},
+          {code: 404, message: 'Activity Does not Exist'}
         ]
       end
       params do
@@ -105,10 +105,10 @@ module DDS
         detail 'Marks an activity as being deleted.'
         named 'delete activity'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (activity restricted)'],
-          [404, 'Activity Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (activity restricted)'},
+          {code: 404, message: 'Activity Does not Exist'}
         ]
       end
       params do
