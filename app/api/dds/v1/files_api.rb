@@ -7,9 +7,9 @@ module DDS
         detail 'Returns all files for the project.'
         named 'list project files'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Project does not exist'}
         ]
       end
       params do
@@ -44,11 +44,11 @@ module DDS
         detail 'Creates a project file for the given payload.'
         named 'create project file'
         failure [
-          [200, "This will never happen"],
-          [201, "Successfully Created"],
-          [400, 'Upload has an IntegrityException'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project Does not Exist, Parent Folder or Upload does not exist in Project']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Upload has an IntegrityException'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Project Does not Exist, Parent Folder or Upload does not exist in Project'}
         ]
       end
       params do
@@ -89,9 +89,9 @@ module DDS
         detail 'Access metadata details about a file.'
         named 'view file metadata'
         failure [
-          [200, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       get '/files/:id/', root: false do
@@ -105,9 +105,9 @@ module DDS
         detail 'Updates one or more file resource properties; if this action modifies the upload property, the previous file resource is transitioned to version history (see File Versions)'
         named 'update file'
         failure [
-          [200, 'Success'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       params do
@@ -135,10 +135,10 @@ module DDS
         detail 'Deletes the file from view'
         named 'delete file metadata'
         failure [
-          [200, "This will never happen"],
-          [204, 'Successfully Deleted'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       delete '/files/:id/', root: false do
@@ -153,9 +153,9 @@ module DDS
         detail 'Generates and returns a storage provider specific pre-signed URL that client can use to download file.'
         named 'download file'
         failure [
-          [200, "Success"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist, or Upload is not consistent']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist, or Upload is not consistent'}
         ]
       end
       get '/files/:id/url', root: false, serializer: DataFileUrlSerializer do
@@ -171,9 +171,9 @@ module DDS
         detail 'Move a file metadata object to a new parent'
         named 'move file'
         failure [
-          [200, 'Success'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist, Parent does not exist in Project']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist, Parent does not exist in Project'}
         ]
       end
       params do
@@ -204,9 +204,9 @@ module DDS
         detail 'Rename a file metadata object'
         named 'rename file'
         failure [
-          [200, 'Success'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'File does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'File does not exist'}
         ]
       end
       params do

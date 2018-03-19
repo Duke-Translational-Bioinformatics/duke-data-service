@@ -39,7 +39,7 @@ module DDS
         detail 'Lists Authentication Providers'
         named 'list Authentication Providers'
         failure [
-          [200, 'Success']
+          {code: 200, message: 'Success'}
         ]
       end
       params do
@@ -53,8 +53,8 @@ module DDS
         detail 'Show Authentication Provider Details'
         named 'show authentication provider details'
         failure [
-          [200, 'Success'],
-          [404, 'Authentication Provider Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 404, message: 'Authentication Provider Does not Exist'}
         ]
       end
       get '/auth_providers/:id', root: false, serializer: AuthenticationServiceSerializer do
@@ -65,10 +65,10 @@ module DDS
         detail 'List Auth Provider Affiliates'
         named 'list authentication provider affiliates'
         failure [
-          [200, 'Success'],
-          [404, 'AuthenticationService does not exist'],
-          [400, 'AuthenticationService does not support affiliate search'],
-          [503, 'Identity Provider Communication Failure']
+          {code: 200, message: 'Success'},
+          {code: 404, message: 'AuthenticationService does not exist'},
+          {code: 400, message: 'AuthenticationService does not support affiliate search'},
+          {code: 503, message: 'Identity Provider Communication Failure'}
         ]
       end
       params do
@@ -94,11 +94,11 @@ module DDS
         detail 'View Auth Provider Affiliate'
         named 'view_auth_provider_affiliate'
         failure [
-          [200, 'Success'],
-          [404, 'AuthenticationService does not exist or Affiliate does not exist in AuthenticationService'],
-          [400, 'AuthenticationService does not support affiliate search'],
-          [401, 'Unauthorized'],
-          [503, 'Identity Provider Communication Failure']
+          {code: 200, message: 'Success'},
+          {code: 404, message: 'AuthenticationService does not exist or Affiliate does not exist in AuthenticationService'},
+          {code: 400, message: 'AuthenticationService does not support affiliate search'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 503, message: 'Identity Provider Communication Failure'}
         ]
       end
       params do
@@ -125,11 +125,11 @@ module DDS
         detail 'Create User Account for Affiliate'
         named 'create_user_account_for_affiliate'
         failure [
-          [201, 'Success'],
-          [404, 'AuthenticationService does not exist or Affiliate does not exist in AuthenticationService'],
-          [400, 'AuthenticationService does not support affiliate search'],
-          [401, 'Unauthorized'],
-          [503, 'Identity Provider Communication Failure']
+          {code: 201, message: 'Success'},
+          {code: 404, message: 'AuthenticationService does not exist or Affiliate does not exist in AuthenticationService'},
+          {code: 400, message: 'AuthenticationService does not support affiliate search'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 503, message: 'Identity Provider Communication Failure'}
         ]
       end
       params do

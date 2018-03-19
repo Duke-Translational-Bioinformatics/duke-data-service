@@ -5,8 +5,8 @@ module DDS
         detail 'Returns a list of all storage providers'
         named 'list storage providers'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       get '/storage_providers', adapter: :json, root: :results do
@@ -18,9 +18,9 @@ module DDS
         detail 'Returns the storage providers for a given user'
         named 'show storage providers'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'StorageProvider Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'StorageProvider Does not Exist'}
         ]
       end
       params do
