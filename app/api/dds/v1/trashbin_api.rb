@@ -7,11 +7,11 @@ module DDS
         detail 'Show Details of a Trashbin Item.'
         named 'show trashbin item'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Item Does not Exist'],
-          [404, 'Object kind not supported']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Item Does not Exist'},
+          {code: 404, message: 'Object kind not supported'}
         ]
       end
       params do
@@ -30,13 +30,13 @@ module DDS
         detail 'Restores the item, and any children, to an undeleted status to the specified parent folder or project.'
         named 'restore trashbin item'
         failure [
-          [200, 'Success'],
-          [404, 'Parent object does not exist or is itself in the trashbin'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Object or Parent kind not supported'],
-          [404, 'Object not found in trash bin'],
-          [404, 'Parent object does not exist or is itself in the trashbin']
+          {code: 200, message: 'Success'},
+          {code: 404, message: 'Parent object does not exist or is itself in the trashbin'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Object or Parent kind not supported'},
+          {code: 404, message: 'Object not found in trash bin'},
+          {code: 404, message: 'Parent object does not exist or is itself in the trashbin'}
         ]
       end
       params do
@@ -99,11 +99,11 @@ module DDS
         detail 'Purges the item and any children, and permenantly removes any stored files from the storage_provider. If a FileVersion is restored, the parent is optional, otherwise it is required.'
         named 'purge trashbin item'
         failure [
-          [200, 'Successfully Purged'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Item Does not Exist'],
-          [404, 'Object kind not supported']
+          {code: 200, message: 'Successfully Purged'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Item Does not Exist'},
+          {code: 404, message: 'Object kind not supported'}
         ]
       end
       params do
@@ -136,9 +136,9 @@ module DDS
         detail 'Returns the trashed children of the folder.'
         named 'list folder children in the trashbin'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist or is purged']
+          {code: 200, message: "Valid API Token in 'Authorization' Header"},
+          {code: 401, message: "Missing, Expired, or Invalid API Token in 'Authorization' Header"},
+          {code: 404, message: 'Folder does not exist or is purged'}
         ]
       end
       params do
@@ -146,7 +146,7 @@ module DDS
         optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
         use :pagination
       end
-      get '/trashbin/folders/:id/children', root: 'results' do
+      get '/trashbin/folders/:id/children', adapter: :json, root: 'results' do
         authenticate!
         folder = Folder.find_by!(id: params[:id], is_purged: false)
         authorize folder, :index?
@@ -167,9 +167,9 @@ module DDS
         detail 'Returns the trashed children of the project.'
         named 'list project children in the trashbin'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project does not exist or has been deleted']
+          {code: 200, message: "Valid API Token in 'Authorization' Header"},
+          {code: 401, message: "Missing, Expired, or Invalid API Token in 'Authorization' Header"},
+          {code: 404, message: 'Project does not exist or has been deleted'}
         ]
       end
       params do
@@ -177,7 +177,7 @@ module DDS
         optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
         use :pagination
       end
-      get '/trashbin/projects/:id/children', root: 'results' do
+      get '/trashbin/projects/:id/children', adapter: :json, root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:id])
         authorize DataFile.new(project: project), :index?
