@@ -28,7 +28,7 @@ all projects.
 |Endpoint |Description |
 |---|---|
 | `POST /projects/` | Create project |
-| `GET /projects/` | List project |
+| `GET /projects/` | List projects |
 | `PUT /projects/{id}` | Update project |
 
 #### API Specification
@@ -68,7 +68,7 @@ unique across all projects.
   "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
   "name": "Knockout Mouse Project (KOMP)",
   "description": "Goal of generating a targeted knockout mutation...",
-  "slug": "knockout_mouse_project_komp"
+  "slug": "knockout_mouse_project_komp",
   "is_deleted": false,
   "audit": { }
 }
@@ -94,7 +94,7 @@ a `slug` match.
       "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
       "name": "Knockout Mouse Project (KOMP)",
       "description": "Goal of generating a targeted knockout mutation...",
-      "slug": "knockout_mouse_project_komp"
+      "slug": "knockout_mouse_project_komp",
       "is_deleted": false,
       "audit": { }
     }
@@ -135,7 +135,7 @@ unique across all projects.
   "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
   "name": "Knockout Mouse Project (KOMP)",
   "description": "Goal of generating a targeted knockout mutation...",
-  "slug": "knockout_mouse"
+  "slug": "knockout_mouse",
   "is_deleted": false,
   "audit": { }
 }
