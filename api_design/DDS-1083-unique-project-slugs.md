@@ -14,12 +14,12 @@ run on or soon after deployment.
 #### Background
 
 The `project.name` field is human-readable, but not unique. The `project.id` is
-a 36 character long UUID that unique, but not human-readable.
+a 36 character long UUID that is unique, but not human-readable.
 
 #### Proposal
 
 Add a `slug` field to `project` that is both human-readable and unique across
-all projects.
+all projects. For more information on URL Slugs: https://en.wikipedia.org/wiki/Clean_URL#Slug
 
 ## Implementation View
 
