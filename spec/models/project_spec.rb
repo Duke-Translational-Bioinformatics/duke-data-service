@@ -49,6 +49,16 @@ RSpec.describe Project, type: :model do
     it { is_expected.to validate_presence_of(:description) }
     it { is_expected.to validate_presence_of(:creator_id) }
 
+    it { is_expected.to validate_uniqueness_of(:slug).allow_blank }
+    it { is_expected.to allow_value('avalidslug').for(:slug) }
+    it { is_expected.to allow_value('a_valid_slug').for(:slug) }
+    it { is_expected.to allow_value('4_v4l1d_5lug').for(:slug) }
+    it { is_expected.not_to allow_value('slug-with-dashes').for(:slug) }
+    it { is_expected.not_to allow_value('SlugWithCaps').for(:slug) }
+    it { is_expected.not_to allow_value('slug with spaces').for(:slug) }
+    it { is_expected.not_to allow_value('slug.with.punctuation?').for(:slug) }
+    it { is_expected.not_to allow_value("multiline\nslug").for(:slug) }
+
     context 'when is_deleted true' do
       subject { FactoryBot.create(:project, :deleted) }
       it { is_expected.not_to validate_presence_of(:name) }
