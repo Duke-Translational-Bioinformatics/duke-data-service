@@ -138,10 +138,15 @@ of the upload using the project.id and upload.id at request time.  This tightly 
 	+ These changes will also allow us to extend the `/move` endpoints to support cross project moves.
   + **IMPORTANT** we will need a data migration upon initial deployment to each heroku environment which sets the container_id to the current project.id for all existing (completed, consistent) uploads.
 
-+ FileVersion will have a manage_upload method that submits a UploadStoragePurgeJob for its upload when
++ FileVersion will have a manage_purge method that submits a UploadStoragePurgeJob for its upload when
 is_purged is set to true (after_save).
 
 ###### Background Workers
+
+Projects, Folders, and DataFiles will have a manage_children method that responds to updates to is_deleted and is_purged by submitting jobs to apply the same change to all children (Project/Folder children are folders and data_files, data_file children are file_versions). This entails the creation of the following jobs:
+  + child_deletion_job: sets is_deleted: true for all children.
+  + child_restoration_job: sets is_deleted: false for all children.
+  + child_purgation_job: sets is_deleted: true, is_purged:true for all children.
 
 upload\_storage\_purge_job: worker that monitors a queue for uploads to purge, and destroys their swift storage object.
 
