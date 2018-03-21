@@ -7,7 +7,6 @@ module ChildMinder
 
   def manage_children
     if has_children? && @child_job
-      newly_deleted = will_save_change_to_is_deleted? && is_deleted?
       (1..paginated_children.total_pages).each do |page|
         @child_job.perform_later(
           @child_job.initialize_job(self),
