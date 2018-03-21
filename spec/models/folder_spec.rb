@@ -25,6 +25,7 @@ RSpec.describe Folder, type: :model do
     it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
     it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
     it { is_expected.to have_many(:meta_templates) }
+    it { expect(subject.file_versions).to be_nil }
   end
 
   describe 'validations' do

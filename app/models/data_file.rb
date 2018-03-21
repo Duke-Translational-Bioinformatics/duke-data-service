@@ -17,7 +17,6 @@ class DataFile < Container
     '366f0fd9-5526-4479-b4f1-5c61e8c1eb53'
   end
 
-  has_many :file_versions, -> { order('version_number ASC') }, autosave: true
   has_many :tags, as: :taggable
   has_many :meta_templates, as: :templatable
 
