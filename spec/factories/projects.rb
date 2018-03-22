@@ -18,5 +18,9 @@ FactoryBot.define do
     trait :inconsistent do
       is_consistent { false }
     end
+
+    trait :with_slug do
+      slug { Faker::Internet.slug(nil, '_') }
+    end
   end
 end
