@@ -13,14 +13,24 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Permission:** authenticated
 - - - - -
 
+>**Request Properties**
+- - - - -
++ **name (string, required)** - The project name.
++ **description (string, required)** - A bit of text describing the project.
++ **slug (string, optional)** - A unique, short name consisting of lowercase
+  letters, numbers, and underscores(\_). When omitted, the slug is automatically
+  generated based on the project name.
+
 >**Rules**
 - - - - -
 + User who creates project is granted the `project_admin` authorization role.
++ When the `slug` property is set, a validation error will be raised if it is not
+unique across all projects.
 
 **Response messages:**
 * 200: This will never happen
 * 201: Created Successfully
-* 400: Project Name Already Exists
+* 400: Validation Error
 * 401: Unauthorized
 * 404: Project Does not Exist
 
@@ -28,6 +38,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
         {
             "name": "Knockout Mouse Project (KOMP)",
+            "slug": "knockout_mouse_project_komp",
             "description": "Goal of generating a targeted knockout mutation..."
         }
 
@@ -37,10 +48,13 @@ Represents a container for storing, organizing, retrieving and sharing research 
           "kind": "dds-project",
           "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
           "name": "Knockout Mouse Project (KOMP)",
+          "slug": "knockout_mouse_project_komp",
           "description": "Goal of generating a targeted knockout mutation...",
           "is_deleted": false,
           "audit": { }
         }
+
+## Projects collection [/projects{?slug}]
 
 ### List projects [GET]
 >**Permission:** authenticated [scope: view_project]
@@ -49,6 +63,9 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Rules**
 - - - - -
 + Projects that have been deleted (i.e. `"is_deleted": true`) are not included.
++ When `slug` is submitted, only the project with the matching `slug` will be
+returned in the `results` array. An empty array is returned when there is not
+a `slug` match.
 
 **Response messages:**
 * 200: Success
@@ -62,6 +79,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
                     "kind": "dds-project",
                     "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
                     "name": "Knockout Mouse Project (KOMP)",
+                    "slug": "knockout_mouse_project_komp",
                     "description": "Goal of generating a targeted knockout mutation...",
                     "is_deleted": false,
                     "audit": { }
@@ -89,6 +107,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
             "kind": "dds-project",
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
+            "slug": "knockout_mouse_project_komp",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false,
             "audit": { }
@@ -98,13 +117,22 @@ Represents a container for storing, organizing, retrieving and sharing research 
 >**Permission:** update_project
 - - - - -
 
+>**Request Properties**
+- - - - -
++ **name (string, optional)** - The project name.
++ **description (string, optional)** - A bit of text describing the project.
++ **slug (string, optional)** - A unique, short name consisting of lowercase
+  letters, numbers, and underscores(\_). When omitted, the slug is automatically
+  generated based on the project name.
+
 >**Rules**
 - - - - -
-+ Only `name` and `description` properties may be updated via this action.
++ When the `slug` property is set, a validation error will be raised if it is not
+unique across all projects.
 
 **Response messages:**
 * 200: Success
-* 400: Project Name Already Exists
+* 400: Validation Error
 * 401: Unauthorized
 * 403: Forbidden
 * 404: Project Does not Exist
@@ -113,6 +141,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
 
         {
             "name": "Knockout Mouse Project (KOMP)",
+            "slug": "knockout_mouse",
             "description": "Goal of generating a targeted knockout mutation..."
         }
 
@@ -122,6 +151,7 @@ Represents a container for storing, organizing, retrieving and sharing research 
             "kind": "dds-project",
             "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
             "name": "Knockout Mouse Project (KOMP)",
+            "slug": "knockout_mouse",
             "description": "Goal of generating a targeted knockout mutation...",
             "is_deleted": false,
             "audit": { }
@@ -399,7 +429,7 @@ Represents an individual that plays some project level role of interest from a c
 
 **Response messages:**
 * 200: Success
-* 400: Project Name Already Exists
+* 400: Validation Error
 * 401: Unauthorized
 * 404: Project Does not Exist
 
