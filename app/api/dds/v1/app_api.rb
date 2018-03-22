@@ -5,8 +5,8 @@ module DDS
         detail 'this returns a health status'
         named 'app_storage'
         failure [
-          [200,'Database functional, and seeded correctly'],
-          [503, 'database not seeded, or not functional']
+          {code: 200, message: 'Database functional, and seeded correctly'},
+          {code: 503, message: 'database not seeded, or not functional'}
         ]
       end
       get '/app/status', root: false do
@@ -47,7 +47,7 @@ module DDS
           #graphdb must be configured
           if ENV["GRAPHENEDB_URL"]
             #graphdb must be accessible with configured authentication or this will throw a Faraday::ConnectionFailed exception
-            count = Neo4j::Session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
+            Neo4j::ActiveBase.current_session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
           else
             status[:status] = 'error'
             logger.error 'graphdb environment is not set'

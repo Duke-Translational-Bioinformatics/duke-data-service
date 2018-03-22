@@ -5,10 +5,10 @@ module DDS
         detail 'Deletes any existing project role for the user and assigns new role.'
         named 'create project affiliation'
         failure [
-          [200, 'Success'],
-          [400, 'Project Name Already Exists'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Project Name Already Exists'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       params do
@@ -38,12 +38,12 @@ module DDS
         detail 'List project affiliations'
         named 'list project affiliation'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
-      get '/projects/:project_id/affiliates', root: 'results' do
+      get '/projects/:project_id/affiliates', adapter: :json, root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         authorize Affiliation.new(project: project), :index?
@@ -54,9 +54,9 @@ module DDS
         detail 'View project level affiliation for a user'
         named 'get project affiliation'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       get '/projects/:project_id/affiliates/:user_id', root: false do
@@ -72,9 +72,9 @@ module DDS
         detail 'Remove project level affiliation for a user'
         named 'delete project affiliation'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
       delete '/projects/:project_id/affiliates/:user_id', root: false do

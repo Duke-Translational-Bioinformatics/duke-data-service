@@ -3,11 +3,11 @@ require 'rails_helper'
 describe FileVersionPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:file_version) { FactoryGirl.create(:file_version, data_file: data_file) }
-  let(:other_file_version) { FactoryGirl.create(:file_version) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project) }
+  let(:file_version) { FactoryBot.create(:file_version, data_file: data_file) }
+  let(:other_file_version) { FactoryBot.create(:file_version) }
 
   it_behaves_like 'system_permission can access', :file_version
   it_behaves_like 'system_permission can access', :other_file_version
@@ -26,7 +26,7 @@ describe FileVersionPolicy do
   it_behaves_like 'a user without project_permission', [:view_project, :update_file, :delete_file, :download_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :download?], on: :other_file_version
 
   context 'when user does not have project_permission' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     describe '.scope' do
       it { expect(resolved_scope).not_to include(file_version) }

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectRole, type: :model do
-  subject {FactoryGirl.create(:project_role)}
+  subject {FactoryBot.create(:project_role)}
 
   it 'should have id as primary key' do
     expect(ProjectRole.primary_key).to eq('id')

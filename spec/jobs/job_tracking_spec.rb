@@ -11,7 +11,7 @@ RSpec.describe JobTracking do
   end
 
   context '::register_job_status' do
-    let(:transaction) { FactoryGirl.create(:job_transaction) }
+    let(:transaction) { FactoryBot.create(:job_transaction) }
     let(:expected_state) { 'testing' }
     before do
       expect(transaction).to be_persisted
@@ -124,7 +124,7 @@ RSpec.describe JobTracking do
     end
 
     context 'argument transactionable' do
-      let(:argument) { FactoryGirl.create(:folder) }
+      let(:argument) { FactoryBot.create(:folder) }
 
       it {
         expect(argument.class).to include(JobTransactionable)
@@ -143,7 +143,7 @@ RSpec.describe JobTracking do
   end
 
   describe '::start_job' do
-    let(:initial_transaction) { FactoryGirl.create(:job_transaction, state: 'initialized') }
+    let(:initial_transaction) { FactoryBot.create(:job_transaction, state: 'initialized') }
     it { is_expected.to respond_to(:start_job).with(1).argument }
     it {
       expect {
@@ -159,7 +159,7 @@ RSpec.describe JobTracking do
   end
 
   describe '::complete_job' do
-    let(:initial_transaction) { FactoryGirl.create(:job_transaction) }
+    let(:initial_transaction) { FactoryBot.create(:job_transaction) }
     it { is_expected.to respond_to(:complete_job).with(1).argument }
     it {
       expect {

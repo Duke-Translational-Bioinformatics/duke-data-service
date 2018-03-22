@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe StorageProvider, type: :model do
-  let(:chunk) { FactoryGirl.create(:chunk) }
-  let(:storage_provider) { FactoryGirl.create(:storage_provider) }
-  let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+  let(:chunk) { FactoryBot.create(:chunk) }
+  let(:storage_provider) { FactoryBot.create(:storage_provider) }
+  let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
   let(:content_type) {'text/plain'}
   let(:filename) {'text_file.txt'}
   subject { storage_provider }

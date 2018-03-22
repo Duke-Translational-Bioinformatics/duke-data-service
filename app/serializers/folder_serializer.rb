@@ -1,4 +1,26 @@
 class FolderSerializer < ActiveModel::Serializer
+  def self.options_with_conditional(name, options)
+    key = options[:key] || name
+    except = {unless: "instance_options&.fetch(:except, nil)&.include?('#{key}'.to_sym)"}
+    options.merge(except)
+  end
+
+  def self.attribute(name, options = {}, &block)
+    super(name, options_with_conditional(name, options), &block)
+  end
+
+  def self.has_many(name, options = {}, &block)
+    super(name, options_with_conditional(name, options), &block)
+  end
+
+  def self.has_one(name, options = {}, &block)
+    super(name, options_with_conditional(name, options), &block)
+  end
+
+  def self.belongs_to(name, options = {}, &block)
+    super(name, options_with_conditional(name, options), &block)
+  end
+
   include AuditSummarySerializer
   attributes :kind, :id, :parent, :name, :is_deleted, :audit
 

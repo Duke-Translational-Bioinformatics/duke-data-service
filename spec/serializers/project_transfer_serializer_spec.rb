@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectTransferSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:project_transfer, :with_to_users, status: :pending) }
+  let(:resource) { FactoryBot.create(:project_transfer, :with_to_users, status: :pending) }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
     'id' => resource.id,

@@ -5,12 +5,12 @@ module DDS
         detail 'Lists all software agents (software_agent gets empty list)'
         named 'list software agents'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'}
         ]
       end
-      get '/software_agents', root: 'results' do
+      get '/software_agents', adapter: :json, root: 'results' do
         authenticate!
         authorize SoftwareAgent.new, :index?
         policy_scope(SoftwareAgent).where(is_deleted: false)
@@ -20,11 +20,11 @@ module DDS
         detail 'Creates a software agent for the given payload.'
         named 'create software agent'
         failure [
-          [200, 'This will never actually happen'],
-          [201, 'Created Successfully'],
-          [400, 'Software agent requires a name'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)']
+          {code: 200, message: 'This will never actually happen'},
+          {code: 201, message: 'Created Successfully'},
+          {code: 400, message: 'Software agent requires a name'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'}
         ]
       end
       params do
@@ -54,10 +54,10 @@ module DDS
         detail 'Returns the software agent details for a given UUID.'
         named 'view software agent'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -74,11 +74,11 @@ module DDS
         detail 'Updates the software agent details for a given UUID.'
         named 'update software agent'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -103,10 +103,10 @@ module DDS
         detail 'Marks a software agent as being deleted.'
         named 'delete software agent'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -124,10 +124,10 @@ module DDS
         detail 'regenerates software_agent api_key'
         named 'regenerate software_agent api_key'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -148,10 +148,10 @@ module DDS
         detail 'View software_agent api_key'
         named 'view software_agent api_key'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -167,10 +167,10 @@ module DDS
         detail 'delete software_agent api_key'
         named 'delete software_agent api_key'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (software_agent restricted)'],
-          [404, 'Software Agent Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (software_agent restricted)'},
+          {code: 404, message: 'Software Agent Does not Exist'}
         ]
       end
       params do
@@ -188,10 +188,10 @@ module DDS
         detail 'Get software agent access token'
         named 'get software_agent access token'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Success'],
-          [400, 'Missing Required Keys'],
-          [404, 'Software Agent or User Does not Exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Success'},
+          {code: 400, message: 'Missing Required Keys'},
+          {code: 404, message: 'Software Agent or User Does not Exist'}
         ]
       end
       params do

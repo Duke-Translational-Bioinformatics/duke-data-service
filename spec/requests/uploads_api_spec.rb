@@ -3,23 +3,23 @@ require 'rails_helper'
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let!(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-  let(:upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id, project: project) }
-  let(:other_upload) { FactoryGirl.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:completed_upload) { FactoryGirl.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+  let(:project) { FactoryBot.create(:project) }
+  let!(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+  let(:upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id, project: project) }
+  let(:other_upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id) }
+  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
 
-  let(:chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 1) }
+  let(:chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 1) }
 
-  let(:user) { FactoryGirl.create(:user) }
-  let(:upload_stub) { FactoryGirl.build(:upload, storage_provider_id: storage_provider.id) }
-  let(:chunk_stub) { FactoryGirl.build(:chunk, upload_id: upload.id) }
-  let(:fingerprint_stub) { FactoryGirl.build(:fingerprint) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:upload_stub) { FactoryBot.build(:upload, storage_provider_id: storage_provider.id) }
+  let(:chunk_stub) { FactoryBot.build(:chunk, upload_id: upload.id) }
+  let(:fingerprint_stub) { FactoryBot.build(:fingerprint) }
 
   let(:resource_class) { Upload }
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project_id}/uploads" }
@@ -44,7 +44,7 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.uploads.count }
-        let(:extras) { FactoryGirl.create_list(:upload, 5, project: project, storage_provider_id: storage_provider.id) }
+        let(:extras) { FactoryBot.create_list(:upload, 5, project: project, storage_provider_id: storage_provider.id) }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -245,7 +245,7 @@ describe DDS::V1::UploadsAPI do
       end
 
       context 'storage_provider.chunk_max_number exceeded' do
-        let(:other_chunk) { FactoryGirl.create(:chunk, upload_id: upload.id, number: 2) }
+        let(:other_chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 2) }
         before do
           storage_provider.update(chunk_max_number: 1)
         end

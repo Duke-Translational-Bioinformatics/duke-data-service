@@ -9,9 +9,10 @@
 #    verbose is true, some methods will print information to stderr
 #
 class ElasticsearchHandler
-  attr_reader :verbose
+  attr_reader :verbose, :has_errors, :current_scroll_id
   def initialize(verbose:false)
     @verbose = verbose
+    @has_errors = false
   end
 
   # create_indices
@@ -135,13 +136,25 @@ class ElasticsearchHandler
               }
             )
 
-            if fast_reindex(client, aliased_index_name, client, indexed_model.versioned_index_name)
+            restart = false
+            trys = 5
+            current_try = 1
+            while current_try < trys do
+              begin
+                fast_reindex(client, aliased_index_name, client, indexed_model.versioned_index_name, restart)
+                current_try = trys
+              rescue Elasticsearch::Transport::Transport::Errors::GatewayTimeout
+                restart = true
+                current_try = current_try + 1
+              end
+            end
+            if @has_errors
+              reindex_information[:has_errors] << "#{indexed_model}"
+            else
               client.indices.delete_alias index: aliased_index_name, name: indexed_model.index_name
               client.indices.put_alias index: indexed_model.versioned_index_name, name: indexed_model.index_name
               client.indices.delete index: aliased_index_name
               reindex_information[:reindexed]["#{indexed_model}"] = {from: aliased_index_name, to: indexed_model.versioned_index_name}
-            else
-              reindex_information[:has_errors] << "#{indexed_model}"
             end
           else
             reindex_information[:migration_version_mismatch]["#{indexed_model}"] = {from: aliased_index_name, to: indexed_model.migration_version}
@@ -154,12 +167,16 @@ class ElasticsearchHandler
     reindex_information
   end
 
-  def start_scroll(client, index, scroll:'1m', body:{sort: ['_doc']})
-    client.search index: index, scroll: scroll, body: body
+  def start_scroll(client, index, scroll:'1m', body:{size: 10000, sort: ['_doc']})
+    resp = client.search index: index, scroll: scroll, body: body
+    @current_scroll_id = resp['_scroll_id']
+    resp
   end
 
-  def next_scroll(client, scroll_id, scroll:'5m')
-    client.scroll(scroll_id: scroll_id, scroll: scroll)
+  def next_scroll(client, scroll:'5m')
+    resp = client.scroll(scroll_id: @current_scroll_id, scroll: scroll)
+    @current_scroll_id = resp['_scroll_id']
+    resp
   end
 
   def send_batch(client, batch)
@@ -188,26 +205,33 @@ class ElasticsearchHandler
   #  This can be used to:
   #    - fast reindex of one index to another index on the same cluster
   #    - transfer data from one elasticsearch cluster to another
-  def fast_reindex(source_client, source_index, target_client, target_index)
-    has_errors = false
-    r = start_scroll(source_client, source_index)
-    while !r['hits']['hits'].empty? do
-      bulk_response = send_batch(
-        target_client, batch_from_search(target_index, r)
-      )
-      if bulk_response["errors"]
-        has_errors = true
-        if @verbose
-          $stderr.puts "errors:"
-          $stderr.puts bulk_response["items"].select {|item|
-            item["index"]["status"] >= 400
-          }.map {|i|
-            i["index"]["_id"]
-          }.to_json
-        end
-      end
-      r = next_scroll(source_client, r['_scroll_id'])
+  def fast_reindex(source_client, source_index, target_client, target_index, restart=false)
+    if restart
+      scroll_result = next_scroll(source_client)
+    else
+      scroll_result = start_scroll(source_client, source_index)
     end
-    !has_errors
+
+    while !scroll_result['hits']['hits'].empty? do
+      bulk_response = send_batch(
+        target_client, batch_from_search(target_index, scroll_result)
+      )
+      check_batch_errors bulk_response
+      scroll_result = next_scroll(source_client)
+    end
+  end
+
+  def check_batch_errors(bulk_response)
+    if bulk_response["errors"]
+      if @verbose
+        $stderr.puts "errors:"
+        $stderr.puts bulk_response["items"].select {|item|
+          item["index"]["status"] >= 400
+        }.map {|i|
+          i["index"]["_id"]
+        }.to_json
+      end
+      @has_errors = true
+    end
   end
 end

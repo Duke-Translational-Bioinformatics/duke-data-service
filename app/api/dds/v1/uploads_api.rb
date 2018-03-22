@@ -9,10 +9,10 @@ module DDS
             detail 'This is the first step in uploading a large file. An upload objects is created along with a composite status object used to track the progress of the chunked upload.'
             named 'create upload'
             failure [
-              [200, 'This will never happen'],
-              [201, 'Created Successfully'],
-              [401, 'Unauthorized'],
-              [404, 'Project Does not Exist, or is not yet consistent']
+              {code: 200, message: 'This will never happen'},
+              {code: 201, message: 'Created Successfully'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Project Does not Exist, or is not yet consistent'}
             ]
           end
           params do
@@ -49,16 +49,16 @@ module DDS
             detail 'List file uploads for a project'
             named 'list uploads'
             failure [
-              [200, 'Success'],
-              [401, 'Unauthorized'],
-              [404, 'Project Does not Exist']
+              {code: 200, message: 'Success'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Project Does not Exist'}
             ]
           end
           params do
             requires :project_id, type: String, desc: "The ID of the Project"
             use :pagination
           end
-          get '/uploads', root: 'results' do
+          get '/uploads', adapter: :json, root: 'results' do
             authenticate!
             project = hide_logically_deleted Project.find(params[:project_id])
             authorize Upload.new(project: project), :index?
@@ -74,9 +74,9 @@ module DDS
             detail 'View upload details/status'
             named 'show upload'
             failure [
-              [200, 'Success'],
-              [401, 'Unauthorized'],
-              [404, 'Upload Does not Exist']
+              {code: 200, message: 'Success'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Upload Does not Exist'}
             ]
           end
           params do
@@ -93,10 +93,10 @@ module DDS
             detail 'Get pre-signed URL to upload the next chunk. This will also ensure that the project container exists in the storage_provider.'
             named 'create chunk'
             failure [
-              [200, 'Success'],
-              [401, 'Unauthorized'],
-              [404, 'Upload Does not Exist'],
-              [500, 'Unexpected StorageProviderException experienced']
+              {code: 200, message: 'Success'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Upload Does not Exist'},
+              {code: 500, message: 'Unexpected StorageProviderException experienced'}
             ]
           end
           params do
@@ -135,9 +135,9 @@ module DDS
             detail 'Complete the chunked file upload'
             named 'complete upload'
             failure [
-              [202, 'Accepted, subject to further processing'],
-              [401, 'Unauthorized'],
-              [404, 'Upload Does not Exist'],
+              {code: 202, message: 'Accepted, subject to further processing'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Upload Does not Exist'},
             ]
           end
           params do
@@ -165,11 +165,11 @@ module DDS
             detail 'Report hash (fingerprint) for the uploaded (or to be uploaded) file.'
             named 'report upload hash'
             failure [
-              [200, 'Success'],
-              [400, 'Validation Error'],
-              [401, 'Unauthorized'],
-              [404, 'Upload Does not Exist'],
-              [500, 'Unexpected StorageProviderException experienced']
+              {code: 200, message: 'Success'},
+              {code: 400, message: 'Validation Error'},
+              {code: 401, message: 'Unauthorized'},
+              {code: 404, message: 'Upload Does not Exist'},
+              {code: 500, message: 'Unexpected StorageProviderException experienced'}
             ]
           end
           params do

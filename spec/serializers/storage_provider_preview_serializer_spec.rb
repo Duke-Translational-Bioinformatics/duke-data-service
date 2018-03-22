@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe StorageProviderPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:storage_provider) }
+  let(:resource) { FactoryBot.create(:storage_provider) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.display_name,

@@ -2,13 +2,13 @@ require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
   subject { child_file }
-  let(:root_file) { FactoryGirl.create(:data_file, :root) }
-  let(:child_file) { FactoryGirl.create(:data_file, :with_parent) }
-  let(:invalid_file) { FactoryGirl.create(:data_file, :invalid) }
-  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted) }
+  let(:root_file) { FactoryBot.create(:data_file, :root) }
+  let(:child_file) { FactoryBot.create(:data_file, :with_parent) }
+  let(:invalid_file) { FactoryBot.create(:data_file, :invalid) }
+  let(:deleted_file) { FactoryBot.create(:data_file, :deleted) }
   let(:project) { subject.project }
-  let(:other_project) { FactoryGirl.create(:project) }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_project) { FactoryBot.create(:project) }
+  let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
   let(:uri_encoded_name) { URI.encode(subject.name) }
 
   it_behaves_like 'an audited model'
@@ -30,9 +30,9 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe 'validations' do
-    let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
-    let(:incomplete_upload) { FactoryGirl.create(:upload, project: subject.project) }
-    let(:upload_with_error) { FactoryGirl.create(:upload, :with_error, project: subject.project) }
+    let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+    let(:incomplete_upload) { FactoryBot.create(:upload, project: subject.project) }
+    let(:upload_with_error) { FactoryBot.create(:upload, :with_error, project: subject.project) }
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:project_id) }
@@ -114,9 +114,9 @@ RSpec.describe DataFile, type: :model do
     end
 
     describe '#upload' do
-      subject { FactoryGirl.build(:data_file, without_upload: true) }
-      let(:completed_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
-      let(:different_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+      subject { FactoryBot.build(:data_file, without_upload: true) }
+      let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+      let(:different_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
 
       context 'before save' do
         it { expect(subject.upload).to be_nil }
@@ -225,7 +225,7 @@ RSpec.describe DataFile, type: :model do
       end
 
       context 'with multiple file_versions' do
-        let(:last_file_version) { FactoryGirl.create(:file_version, data_file: subject) }
+        let(:last_file_version) { FactoryBot.create(:file_version, data_file: subject) }
         before do
           expect(last_file_version).to be_persisted
           subject.reload
@@ -268,12 +268,12 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe '#creator' do
-    let(:creator) { FactoryGirl.create(:user) }
+    let(:creator) { FactoryBot.create(:user) }
     it { is_expected.to respond_to :creator }
 
     context 'with nil current_file_version' do
       subject {
-        df = FactoryGirl.create(:data_file)
+        df = FactoryBot.create(:data_file)
         df.file_versions.destroy_all
         df
       }
@@ -285,7 +285,7 @@ RSpec.describe DataFile, type: :model do
 
     context 'with nil current_file_version create audit' do
       subject {
-        FactoryGirl.create(:data_file)
+        FactoryBot.create(:data_file)
       }
 
       around(:each) do |example|
@@ -304,7 +304,7 @@ RSpec.describe DataFile, type: :model do
     context 'with current_file_version and create audit' do
       subject {
         Audited.audit_class.as_user(creator) do
-          FactoryGirl.create(:data_file)
+          FactoryBot.create(:data_file)
         end
       }
       it {
@@ -329,7 +329,7 @@ RSpec.describe DataFile, type: :model do
     it_behaves_like 'a SearchableModel' do
       context 'when ElasticsearchIndexJob::perform_later raises an error' do
         context 'with new data_file' do
-          subject { FactoryGirl.build(:data_file, :root) }
+          subject { FactoryBot.build(:data_file, :root) }
           before(:each) do
             expect(ElasticsearchIndexJob).to receive(:perform_later).with(anything, anything).and_raise("boom!")
           end

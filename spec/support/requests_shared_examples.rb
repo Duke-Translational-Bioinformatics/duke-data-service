@@ -10,7 +10,7 @@ end
 shared_context 'with authentication' do
   include_context 'common headers'
   let(:user_auth) {
-    FactoryGirl.create(:user_authentication_service, :populated)
+    FactoryBot.create(:user_authentication_service, :populated)
   }
   let(:current_user) { user_auth.user }
   let(:api_token) {
@@ -22,10 +22,10 @@ end
 shared_context 'with software_agent authentication' do
   include_context 'common headers'
   let(:current_user) {
-    FactoryGirl.create(:user, :with_key)
+    FactoryBot.create(:user, :with_key)
   }
   let (:software_agent) {
-    FactoryGirl.create(:software_agent, :with_key, creator: current_user)
+    FactoryBot.create(:software_agent, :with_key, creator: current_user)
   }
   let(:api_token) {
     ApiToken.new(user: current_user, software_agent: software_agent).api_token
@@ -132,7 +132,7 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   let(:expected_total_length) { resource_class.count }
   let(:page) { 2 }
   let(:per_page) { 1 }
-  let(:extras) { FactoryGirl.create_list(resource.class.name.downcase.to_sym, 5) }
+  let(:extras) { FactoryBot.create_list(resource.class.name.downcase.to_sym, 5) }
 
   let(:pagination_parameters) {
     {
@@ -203,17 +203,12 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
     }
     let(:per_page) { max_per_page }
     let(:page) { 1 }
-    let(:expected_response_headers) {{
-       'X-Total' => expected_total_length.to_s,
-       'X-Total-Pages' => ((expected_total_length.to_f/per_page).ceil).to_s,
-       'X-Page' => page.to_s,
-       'X-Per-Page' => per_page.to_s,
-    }}
+    let(:expected_response_body) { {error: "per_page must be less than #{max_per_page}"}.to_json }
 
-    it 'should return default per_page' do
+    it 'should return a validation error' do
        expect(extras.count).to be > 0
-       is_expected.to eq(expected_response_status)
-       expect(response.headers.to_h).to include(expected_response_headers)
+       is_expected.to eq(400)
+       expect(response.body).to eq(expected_response_body)
     end
   end
 end

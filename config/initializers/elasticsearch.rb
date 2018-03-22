@@ -1,6 +1,7 @@
 Elasticsearch::Model.client = Elasticsearch::Client.new(
   host: ENV['BONSAI_URL'],
-  logger: Rails.logger
+  logger: Rails.logger,
+  adapter: ::Faraday.default_adapter
 )
 
 Rails.application.config.elasticsearch_index_settings = {}

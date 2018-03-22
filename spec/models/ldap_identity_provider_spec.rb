@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe LdapIdentityProvider, type: :model do
 
   subject { auth_provider.identity_provider }
-  let(:auth_provider) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
-  let(:test_user) { FactoryGirl.attributes_for(:user) }
+  let(:auth_provider) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
+  let(:test_user) { FactoryBot.attributes_for(:user) }
 
   it { is_expected.to be_an IdentityProvider }
 
@@ -57,7 +57,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
       context 'greater than 3 characters' do
         context 'missing uid' do
-          let(:test_user) { FactoryGirl.attributes_for(:user).reject{|k| k == :username } }
+          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == :username } }
           let(:ldap_returns) { [test_user] }
           include_context 'mocked ldap', returns: :ldap_returns
           subject { auth_provider.identity_provider.affiliates(
@@ -71,7 +71,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
         end
 
         context 'missing mail' do
-          let(:test_user) { FactoryGirl.attributes_for(:user).reject{|k| k == :email } }
+          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == :email } }
           let(:ldap_returns) { [test_user] }
           include_context 'mocked ldap', returns: :ldap_returns
           subject { auth_provider.identity_provider.affiliates(

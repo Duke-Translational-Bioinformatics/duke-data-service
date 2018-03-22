@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :storage_provider do
     name { Faker::Name.name }
     display_name { Faker::Name.name }

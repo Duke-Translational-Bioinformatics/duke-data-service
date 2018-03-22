@@ -3,19 +3,19 @@ require 'rails_helper'
 describe DDS::V1::TagsAPI do
   include_context 'with authentication'
 
-  let(:project) { FactoryGirl.create(:project) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project) }
-  let(:activity) { FactoryGirl.create(:activity, creator: current_user) }
+  let(:project) { FactoryBot.create(:project) }
+  let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project) }
+  let(:activity) { FactoryBot.create(:activity, creator: current_user) }
   let(:taggable) { data_file }
-  let(:tag) { FactoryGirl.create(:tag, taggable: taggable) }
-  let(:tag_stub) { FactoryGirl.build(:tag, taggable: taggable) }
+  let(:tag) { FactoryBot.create(:tag, taggable: taggable) }
+  let(:tag_stub) { FactoryBot.build(:tag, taggable: taggable) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_taggable) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:other_tag) { FactoryGirl.create(:tag, taggable: other_taggable) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_taggable) { FactoryBot.create(:data_file, project: other_permission.project) }
+  let(:other_tag) { FactoryBot.create(:tag, taggable: other_taggable) }
 
-  let(:not_allowed_tag) { FactoryGirl.create(:tag) }
+  let(:not_allowed_tag) { FactoryBot.create(:tag) }
 
   let(:resource_class) { Tag }
   let(:resource_serializer) { TagSerializer }
@@ -247,8 +247,8 @@ describe DDS::V1::TagsAPI do
 
       context 'with label_contains parameter' do
         let(:label_query) { SecureRandom.hex }
-        let!(:resource) { FactoryGirl.create(:tag, label: "what #{label_query} ever", taggable: taggable) }
-        let!(:diff_tag) { FactoryGirl.create(:tag, taggable: taggable) }
+        let!(:resource) { FactoryBot.create(:tag, label: "what #{label_query} ever", taggable: taggable) }
+        let!(:diff_tag) { FactoryBot.create(:tag, taggable: taggable) }
         let!(:diff_tag_label) { Tag.where(label: diff_tag.label).tag_labels.first }
         let(:query_params) { "?label_contains=#{label_query}" }
 

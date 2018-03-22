@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ChunkSerializer, type: :serializer, vcr: true do
-  let(:resource) { FactoryGirl.create(:chunk, :swift) }
+  let(:resource) { FactoryBot.create(:chunk, :swift) }
   let(:expected_attributes) {{
     'http_verb' => resource.http_verb,
     'host' => resource.host,

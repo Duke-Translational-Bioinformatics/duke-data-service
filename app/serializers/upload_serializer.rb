@@ -5,7 +5,7 @@ class UploadSerializer < ActiveModel::Serializer
   has_one :project, serializer: ProjectPreviewSerializer
   has_one :storage_provider, serializer: StorageProviderPreviewSerializer
   has_many :chunks, serializer: ChunkPreviewSerializer
-  has_many :fingerprints, root: :hashes, serializer: FingerprintSerializer
+  has_many :fingerprints, key: :hashes, serializer: FingerprintSerializer
 
   def status
     {

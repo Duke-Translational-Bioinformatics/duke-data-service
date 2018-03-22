@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe DukeAuthenticationService, type: :model do
-  subject { FactoryGirl.create(:duke_authentication_service) }
-  let(:new_user) { FactoryGirl.build(:user) }
+  subject { FactoryBot.create(:duke_authentication_service) }
+  let(:new_user) { FactoryBot.build(:user) }
   let (:first_time_user_token) {
     {
       'service_id' => subject.id,
@@ -17,9 +17,9 @@ RSpec.describe DukeAuthenticationService, type: :model do
     JWT.encode(first_time_user_token, Rails.application.secrets.secret_key_base)
   }
 
-  let(:existing_user) { FactoryGirl.create(:user) }
+  let(:existing_user) { FactoryBot.create(:user) }
   let(:existing_user_auth) {
-    FactoryGirl.create(:user_authentication_service,
+    FactoryBot.create(:user_authentication_service,
     authentication_service: subject,
     user: existing_user)
   }

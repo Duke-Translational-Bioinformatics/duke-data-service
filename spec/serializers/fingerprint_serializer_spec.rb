@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe FingerprintSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:fingerprint) }
+  let(:resource) { FactoryBot.create(:fingerprint) }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
     'algorithm' => resource.algorithm,

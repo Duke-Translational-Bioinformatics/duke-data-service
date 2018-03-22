@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "db:data:migrate" do
   include_context "rake"
   let(:task_path) { "lib/tasks/db_data_migrate" }
-  let(:current_user) { FactoryGirl.create(:user) }
+  let(:current_user) { FactoryBot.create(:user) }
   let(:file_version_audits) { Audited.audit_class.where(auditable: FileVersion.all) }
   let(:data_file_audits) { Audited.audit_class.where(auditable: DataFile.all) }
 
@@ -11,13 +11,13 @@ describe "db:data:migrate" do
 
   describe "#invoke" do
     context 'when creating fingerprints' do
-      let(:fingerprint_upload) { FactoryGirl.create(:fingerprint).upload }
-      let(:incomplete_upload_with_fingerprint_value) { FactoryGirl.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_fingerprint_value) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_capitalized_algorithm) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
-      let(:upload_with_invalid_fingerprint_algorithm) { FactoryGirl.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
+      let(:fingerprint_upload) { FactoryBot.create(:fingerprint).upload }
+      let(:incomplete_upload_with_fingerprint_value) { FactoryBot.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_fingerprint_value) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
+      let(:upload_with_capitalized_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
+      let(:upload_with_invalid_fingerprint_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
       context 'for upload without fingerprint_value' do
-        before { FactoryGirl.create(:upload) }
+        before { FactoryBot.create(:upload) }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
       end
@@ -48,7 +48,7 @@ describe "db:data:migrate" do
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
       end
       context 'for upload with associated fingerprint and fingerprint_value' do
-        let(:fingerprint) { FactoryGirl.create(:fingerprint, upload: upload_with_fingerprint_value) }
+        let(:fingerprint) { FactoryBot.create(:fingerprint, upload: upload_with_fingerprint_value) }
         before { expect(fingerprint).to be_persisted }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
@@ -56,8 +56,8 @@ describe "db:data:migrate" do
     end
 
     context 'without any untyped authentication services' do
-      let(:duke_authentication_service) { FactoryGirl.create(:duke_authentication_service) }
-      let(:openid_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:duke_authentication_service) { FactoryBot.create(:duke_authentication_service) }
+      let(:openid_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       it {
         expect {
@@ -71,9 +71,9 @@ describe "db:data:migrate" do
     context 'with untyped authentication services' do
       let(:default_type) { DukeAuthenticationService }
       let(:untyped_authentication_service) {
-        AuthenticationService.create(FactoryGirl.attributes_for(:duke_authentication_service))
+        AuthenticationService.create(FactoryBot.attributes_for(:duke_authentication_service))
       }
-      let(:openid_authentication_service) { FactoryGirl.create(:openid_authentication_service) }
+      let(:openid_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       it {
         expect(untyped_authentication_service).not_to be_a default_type
@@ -120,14 +120,14 @@ describe "db:data:migrate" do
     end
 
     describe 'consistency migration', :vcr do
-      let(:storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+      let(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
 
       before do
         expect(storage_provider).to be_persisted
       end
 
       context 'for project' do
-        let(:record) { FactoryGirl.create(:project, is_consistent: nil) }
+        let(:record) { FactoryBot.create(:project, is_consistent: nil) }
         let(:init_project_storage) {
           storage_provider.put_container(record.id)
           expect(storage_provider.get_container_meta(record.id)).not_to be_nil
@@ -135,13 +135,13 @@ describe "db:data:migrate" do
         it_behaves_like 'a consistency migration', :init_project_storage
 
         context 'with deleted project' do
-          before(:each) { FactoryGirl.create(:project, :deleted, is_consistent: nil) }
+          before(:each) { FactoryBot.create(:project, :deleted, is_consistent: nil) }
           it { expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count} }
         end
       end
 
       context 'for upload' do
-        let(:record) { FactoryGirl.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
+        let(:record) { FactoryBot.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
         let(:init_upload) {
           storage_provider.put_container(record.project.id)
           expect(storage_provider.get_container_meta(record.project.id)).not_to be_nil
@@ -163,7 +163,7 @@ describe "db:data:migrate" do
 
       context 'a storage_provider has nil chunk_max_size_bytes, chunk_max_number' do
         let(:storage_provider) {
-          FactoryGirl.create(:storage_provider, :skip_validation,
+          FactoryBot.create(:storage_provider, :skip_validation,
             chunk_max_size_bytes: nil,
             chunk_max_number: nil
           )
@@ -203,7 +203,7 @@ describe "db:data:migrate" do
       end
 
       context 'no storage_providers have nil chunk_max_size_bytes, chunk_max_number' do
-        let(:storage_provider) { FactoryGirl.create(:storage_provider) }
+        let(:storage_provider) { FactoryBot.create(:storage_provider) }
 
         context 'ENV includes SWIFT_CHUNK_MAX_NUMBER and SWIFT_CHUNK_MAX_SIZE_BYTES' do
           include_context 'with env_override'

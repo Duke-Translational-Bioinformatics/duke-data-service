@@ -3,14 +3,14 @@ require 'rails_helper'
 describe ContainerPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
-  let(:data_file) { FactoryGirl.create(:data_file, project: project_permission.project, upload: upload) }
-  let(:data_file_without_upload) { FactoryGirl.create(:data_file, project: project_permission.project) }
-  let(:other_data_file) { FactoryGirl.create(:data_file) }
-  let(:folder) { FactoryGirl.create(:folder, project: project_permission.project) }
-  let(:other_folder) { FactoryGirl.create(:folder) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
+  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
+  let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project, upload: upload) }
+  let(:data_file_without_upload) { FactoryBot.create(:data_file, project: project_permission.project) }
+  let(:other_data_file) { FactoryBot.create(:data_file) }
+  let(:folder) { FactoryBot.create(:folder, project: project_permission.project) }
+  let(:other_folder) { FactoryBot.create(:folder) }
 
   it_behaves_like 'system_permission can access', :data_file, allows: [:scope, :index?, :show?]
   it_behaves_like 'system_permission can access', :data_file_without_upload, allows: [:scope, :index?, :show?]
@@ -34,7 +34,7 @@ describe ContainerPolicy do
   it_behaves_like 'a user without project_permission', [:create_file, :view_project, :update_file, :delete_file], denies: [:scope, :index?, :show?, :create?, :update?, :destroy?, :move?, :rename?], on: :other_folder
 
   context 'when user does not have project_permission' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     describe '.scope' do
       it { expect(resolved_scope).not_to include(data_file) }

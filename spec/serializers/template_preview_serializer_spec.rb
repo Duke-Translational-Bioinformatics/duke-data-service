@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TemplatePreviewSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:template) }
+  let(:resource) { FactoryBot.create(:template) }
   let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name

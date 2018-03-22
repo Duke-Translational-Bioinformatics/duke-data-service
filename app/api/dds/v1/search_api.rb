@@ -7,10 +7,10 @@ module DDS
         detail 'Search Provenance related to a start_node by max_hops degrees of separation (default inifinite)'
         named 'Search Provenance'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'start_node or start_node kind does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'start_node or start_node kind does not exist'}
         ]
       end
       params do
@@ -20,7 +20,7 @@ module DDS
         end
         optional :max_hops, type: Integer, desc: "Maximum number of degrees of seperation from start node (default infinite)"
       end
-      post '/search/provenance', root: 'graph', serializer: ProvenanceGraphSerializer do
+      post '/search/provenance', adapter: :json, root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_tags = declared(params, include_missing: false)
         max_hops = prov_tags[:max_hops]
@@ -37,9 +37,9 @@ module DDS
         detail 'This is a targeted query that navigates "up" the provenance chain for a file version to see how it was generated (i.e. by what activity) and from what source file versions. Given a list of file versions, this action perform the following query for each file version: 1. Gets the generating activity. 2. For the generating activity, gets the list of wasGeneratedBy and used file versions. A graph structure of the unique nodes and relationships is returned.'
         named 'Search Provenance wasGeneratedBy'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
@@ -47,7 +47,7 @@ module DDS
           requires :id, type: String, desc: 'The unique file version id.'
         end
       end
-      post '/search/provenance/origin', root: 'graph', serializer: ProvenanceGraphSerializer do
+      post '/search/provenance/origin', adapter: :json, root: 'graph', serializer: ProvenanceGraphSerializer do
         authenticate!
         prov_params = declared(params, include_missing: false)
         OriginProvenanceGraph.new(
@@ -59,10 +59,10 @@ module DDS
         detail 'This endpoint is scheduled to be removed very soon. You should use /search/folders_files instead.'
         named 'Deprecated!'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'One or more included kinds is not supported, or not indexed']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'One or more included kinds is not supported, or not indexed'}
         ]
       end
       params do
@@ -89,15 +89,15 @@ module DDS
         detail 'This endpoint allows searches of folders and files with a variety of query, filter, and post_filter features'
         named 'search folders_files'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Success'],
-          [401, 'Unauthorized'],
-          [400, 'Invalid value specified for query_string.fields'],
-          [400, 'Invalid "{key: value}" specified for filters[].object'],
-          [400, 'Required fields - aggs[].field, aggs[].name must be specified'],
-          [400, 'Invalid value specified for aggs[].field'],
-          [400, 'Invalid size specified for aggs[].size - out of range'],
-          [400, 'Invalid "{key: value}" specified for post_filters[].object']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 400, message: 'Invalid value specified for query_string.fields'},
+          {code: 400, message: 'Invalid "{key: value}" specified for filters[].object'},
+          {code: 400, message: 'Required fields - aggs[].field, aggs[].name must be specified'},
+          {code: 400, message: 'Invalid value specified for aggs[].field'},
+          {code: 400, message: 'Invalid size specified for aggs[].size - out of range'},
+          {code: 400, message: 'Invalid "{key: value}" specified for post_filters[].object'}
         ]
       end
       params do

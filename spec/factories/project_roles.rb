@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :project_role do
     id { "#{Faker::Lorem.word}_#{rand(10**3)}" }
     name { Faker::Lorem.word.titleize }

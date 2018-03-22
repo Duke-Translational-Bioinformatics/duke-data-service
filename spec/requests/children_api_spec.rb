@@ -3,25 +3,25 @@ require 'rails_helper'
 describe DDS::V1::ChildrenAPI do
   include_context 'with authentication'
 
-  let(:folder) { FactoryGirl.create(:folder, :with_parent) }
+  let(:folder) { FactoryBot.create(:folder, :with_parent) }
   let(:parent) { folder.parent }
   let(:project) { folder.project }
-  let(:file) { FactoryGirl.create(:data_file, parent: parent, project: project) }
+  let(:file) { FactoryBot.create(:data_file, parent: parent, project: project) }
 
-  let(:root_folder) { FactoryGirl.create(:folder, :root, project: project) }
-  let(:root_file) { FactoryGirl.create(:data_file, :root, project: project) }
-  let(:root_deleted_folder) { FactoryGirl.create(:folder, :deleted, :root, project: project) }
+  let(:root_folder) { FactoryBot.create(:folder, :root, project: project) }
+  let(:root_file) { FactoryBot.create(:data_file, :root, project: project) }
+  let(:root_deleted_folder) { FactoryBot.create(:folder, :deleted, :root, project: project) }
 
-  let(:named_root_folder) { FactoryGirl.create(:folder, :root, name: 'The XXXX root folder', project: project) }
-  let(:named_child_folder) { FactoryGirl.create(:folder, name: 'The XXXX child folder', parent: folder, project: project) }
-  let(:named_root_file) { FactoryGirl.create(:data_file, :root, name: 'The XXXX root file', project: project) }
-  let(:named_child_file) { FactoryGirl.create(:data_file, name: 'The XXXX child file', parent: folder, project: project) }
+  let(:named_root_folder) { FactoryBot.create(:folder, :root, name: 'The XXXX root folder', project: project) }
+  let(:named_child_folder) { FactoryBot.create(:folder, name: 'The XXXX child folder', parent: folder, project: project) }
+  let(:named_root_file) { FactoryBot.create(:data_file, :root, name: 'The XXXX root file', project: project) }
+  let(:named_child_file) { FactoryBot.create(:data_file, name: 'The XXXX child file', parent: folder, project: project) }
 
-  let(:other_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user) }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_permission.project) }
-  let(:deleted_folder) { FactoryGirl.create(:folder, :deleted, project: project, parent: folder) }
-  let(:other_file) { FactoryGirl.create(:data_file, project: other_permission.project) }
-  let(:deleted_file) { FactoryGirl.create(:data_file, :deleted, project: project, parent: folder) }
+  let(:other_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+  let(:other_folder) { FactoryBot.create(:folder, project: other_permission.project) }
+  let(:deleted_folder) { FactoryBot.create(:folder, :deleted, project: project, parent: folder) }
+  let(:other_file) { FactoryBot.create(:data_file, project: other_permission.project) }
+  let(:deleted_file) { FactoryBot.create(:data_file, :deleted, project: project, parent: folder) }
 
   let(:file_class) { DataFile }
   let(:file_serializer) { DataFileSerializer }
@@ -29,7 +29,7 @@ describe DDS::V1::ChildrenAPI do
   let(:resource_class) { Folder }
   let(:resource_serializer) { FolderSerializer }
   let!(:resource) { folder }
-  let!(:resource_permission) { FactoryGirl.create(:project_permission, :project_admin, user: current_user, project: project) }
+  let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
   let(:parent_id) { parent.id }
   let(:payload) {{}}
 
@@ -50,11 +50,11 @@ describe DDS::V1::ChildrenAPI do
           let(:excluded_fields) { [:id, :project] }
           let(:query_params) { "?exclude_response_fields=#{excluded_fields.join(' ')}" }
           let(:serialized_resource) {
-            resource_serializer.new(serializable_resource, except: excluded_fields)
+            resource_serializer.new(serializable_resource).as_json.reject{|k,v| excluded_fields.include? k}
           }
           it 'does not serialize excluded fields' do
-            expect(serialized_resource.attributes.keys).not_to include(excluded_fields)
-            expect(serialized_resource.associations.keys).not_to include(excluded_fields)
+            expect(serialized_resource.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to be_empty
             is_expected.to eq(expected_response_status)
             expect(response.body).to include(serialized_resource.to_json)
           end
@@ -62,7 +62,7 @@ describe DDS::V1::ChildrenAPI do
       end
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { parent.children.count }
-        let(:extras) { FactoryGirl.create_list(:folder, 5, parent: parent, project: project) }
+        let(:extras) { FactoryBot.create_list(:folder, 5, parent: parent, project: project) }
       end
 
       context 'with name_contains query parameter' do
@@ -240,19 +240,28 @@ describe DDS::V1::ChildrenAPI do
           let(:excluded_fields) { [:id, :project] }
           let(:query_params) { "?exclude_response_fields=#{excluded_fields.join(' ')}" }
           let(:serialized_resource) {
-            resource_serializer.new(serializable_resource, except: excluded_fields)
+            resource_serializer.new(serializable_resource).as_json.reject{|k,v| excluded_fields.include? k}
+          }
+          let(:serialized_file) {
+            file_serializer.new(root_file).as_json.reject{|k,v| excluded_fields.include? k}
           }
           it 'does not serialize excluded fields' do
-            expect(serialized_resource.attributes.keys).not_to include(excluded_fields)
-            expect(serialized_resource.associations.keys).not_to include(excluded_fields)
+            expect(serialized_resource.keys).not_to include(*excluded_fields)
+            expect(serialized_resource.keys).not_to be_empty
             is_expected.to eq(expected_response_status)
             expect(response.body).to include(serialized_resource.to_json)
+          end
+          it 'does not serialize excluded fields for file' do
+            expect(serialized_file.keys).not_to include(*excluded_fields)
+            expect(serialized_file.keys).not_to be_empty
+            is_expected.to eq(expected_response_status)
+            expect(response.body).to include(serialized_file.to_json)
           end
         end
       end
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.children.count }
-        let(:extras) { FactoryGirl.create_list(:folder, 5, :root, project: project) }
+        let(:extras) { FactoryBot.create_list(:folder, 5, :root, project: project) }
       end
 
       context 'with name_contains query parameter' do

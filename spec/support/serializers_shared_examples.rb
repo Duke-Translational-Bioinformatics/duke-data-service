@@ -1,10 +1,10 @@
 shared_context 'with auditor' do
-  let(:auditor) { FactoryGirl.create(:user) }
+  let(:auditor) { FactoryBot.create(:user) }
 end
 
 shared_context 'with software_agent' do
   let(:software_agent) {
-    FactoryGirl.create(:software_agent)
+    FactoryBot.create(:software_agent)
   }
 end
 
@@ -282,19 +282,19 @@ end
 
 shared_examples 'a has_one association with' do |name, serialized_with, root: name|
   it "#{name} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(name)
-    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasOne)
-    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
-    expect(described_class._associations[name].embedded_key).to eq(root)
+    expect(described_class._reflections).to have_key(root)
+    expect(described_class._reflections[root].name).to eq(name)
+    expect(described_class._reflections[root]).to be_a(ActiveModel::Serializer::HasOneReflection)
+    expect(described_class._reflections[root].options[:serializer]).to eq(serialized_with)
   end
 end
 
 shared_examples 'a has_many association with' do |name, serialized_with, root: name|
   it "#{name} serialized using #{serialized_with}" do
-    expect(described_class._associations).to have_key(name)
-    expect(described_class._associations[name]).to be_a(ActiveModel::Serializer::Association::HasMany)
-    expect(described_class._associations[name].serializer_from_options).to eq(serialized_with)
-    expect(described_class._associations[name].embedded_key).to eq(root)
+    expect(described_class._reflections).to have_key(root)
+    expect(described_class._reflections[root].name).to eq(name)
+    expect(described_class._reflections[root]).to be_a(ActiveModel::Serializer::HasManyReflection)
+    expect(described_class._reflections[root].options[:serializer]).to eq(serialized_with)
   end
 end
 
