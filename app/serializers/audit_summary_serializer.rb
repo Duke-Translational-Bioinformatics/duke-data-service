@@ -10,11 +10,24 @@ module AuditSummarySerializer
         audit_summary[:last_updated_on] = audit.created_at
         audit_summary[:last_updated_by] = audit_user_info_hash(audit)
 
-        if audit&.comment&.fetch('action', nil) == 'DELETE' && 
-            object.respond_to?('is_deleted') && object.is_deleted
+        if audit&.comment&.fetch('action', nil) == 'DELETE' &&
+            audit&.audited_changes&.fetch('is_deleted', [true,false])[1]
           audit_summary[:deleted_on] = audit.created_at
           audit_summary[:deleted_by] = audit_user_info_hash(audit)
         end
+
+        if audit&.comment&.fetch('endpoint', '').match(/\/restore$/) &&
+            !audit&.audited_changes&.fetch('is_deleted', [true,true])[1]
+          audit_summary[:restored_on] = audit.created_at
+          audit_summary[:restored_by] = audit_user_info_hash(audit)
+        end
+
+        if audit&.comment&.fetch('endpoint', '').match(/\/purge$/) &&
+            audit&.audited_changes&.fetch('is_purged', [true,false])[1]
+          audit_summary[:purged_on] = audit.created_at
+          audit_summary[:purged_by] = audit_user_info_hash(audit)
+        end
+
       elsif audit[:action] == "destroy"
         audit_summary[:deleted_on] = audit.created_at
         audit_summary[:deleted_by] = audit_user_info_hash(audit)
