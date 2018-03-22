@@ -16,13 +16,15 @@ module AuditSummarySerializer
           audit_summary[:deleted_by] = audit_user_info_hash(audit)
         end
 
-        if audit&.comment&.fetch('endpoint', '').match(/\/restore$/) &&
+        if audit&.comment &&
+            audit&.comment&.fetch('endpoint', '').match(/\/restore$/) &&
             !audit&.audited_changes&.fetch('is_deleted', [true,true])[1]
           audit_summary[:restored_on] = audit.created_at
           audit_summary[:restored_by] = audit_user_info_hash(audit)
         end
 
-        if audit&.comment&.fetch('endpoint', '').match(/\/purge$/) &&
+        if audit&.comment &&
+            audit&.comment&.fetch('endpoint', '').match(/\/purge$/) &&
             audit&.audited_changes&.fetch('is_purged', [true,false])[1]
           audit_summary[:purged_on] = audit.created_at
           audit_summary[:purged_by] = audit_user_info_hash(audit)
