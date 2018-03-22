@@ -41,8 +41,8 @@ RSpec.describe AuditSummarySerializer do
     before do
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          update_attribute => update_value,
-          :audit_comment => {"action": update_action}
+          "#{update_attribute}": update_value,
+          audit_comment:  {"action": update_action}
         )
       end
     end
@@ -60,8 +60,8 @@ RSpec.describe AuditSummarySerializer do
     before do
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          :is_deleted => true,
-          :audit_comment => {"action": 'DELETE'}
+          is_deleted: true,
+          audit_comment: {"action": 'DELETE'}
         )
       end
     end
@@ -71,14 +71,14 @@ RSpec.describe AuditSummarySerializer do
     before do
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          :is_deleted => true,
-          :audit_comment => {"action": 'DELETE'}
+          is_deleted: true,
+          audit_comment: {"action": 'DELETE'}
         )
       end
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          :is_deleted => false,
-          :audit_comment => {"endpoint": '/api/v1/trashbin/restore'}
+          is_deleted: false,
+          audit_comment: {"endpoint": '/api/v1/trashbin/restore'}
         )
       end
     end
@@ -88,14 +88,14 @@ RSpec.describe AuditSummarySerializer do
     before do
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          :is_deleted => true,
-          :audit_comment => {"action": 'DELETE'}
+          is_deleted: true,
+          audit_comment: {"action": 'DELETE'}
         )
       end
       Audited.audit_class.as_user(auditor) do
         audited_object.update_attributes!(
-          :is_purged => true,
-          :audit_comment => {"endpoint": '/api/v1/trashbin/purge'}
+          is_purged: true,
+          audit_comment: {"endpoint": '/api/v1/trashbin/purge'}
         )
       end
     end
@@ -112,12 +112,12 @@ RSpec.describe AuditSummarySerializer do
         include_context 'current_user'
         let(:expected_audit_summary) {
         {
-          :created_on=> expected_audit.created_at,
-          :created_by=> expected_audit.user.audited_user_info,
-          :last_updated_on=>nil,
-          :last_updated_by=>nil,
-          :deleted_on=>nil,
-          :deleted_by=>nil
+          created_on:  expected_audit.created_at,
+          created_by:  expected_audit.user.audited_user_info,
+          last_updated_on: nil,
+          last_updated_by: nil,
+          deleted_on: nil,
+          deleted_by: nil
         }}
         it {
           is_expected.to eq expected_audit_summary
@@ -127,18 +127,18 @@ RSpec.describe AuditSummarySerializer do
         include_context 'current_user.current_software_agent'
         let(:expected_audit_summary) {
         {
-          :created_on=> expected_audit.created_at,
-          :created_by=> expected_audit.user.audited_user_info.merge!(
+          created_on:  expected_audit.created_at,
+          created_by:  expected_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :last_updated_on=>nil,
-          :last_updated_by=>nil,
-          :deleted_on=>nil,
-          :deleted_by=>nil
+          last_updated_on: nil,
+          last_updated_by: nil,
+          deleted_on: nil,
+          deleted_by: nil
         }}
         it {
           is_expected.to eq expected_audit_summary
@@ -158,12 +158,12 @@ RSpec.describe AuditSummarySerializer do
       context 'with user not using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info,
-          :last_updated_on=> update_audit.created_at,
-          :last_updated_by=> update_audit.user.audited_user_info,
-          :deleted_on=>nil,
-          :deleted_by=>nil
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info,
+          last_updated_on:  update_audit.created_at,
+          last_updated_by:  update_audit.user.audited_user_info,
+          deleted_on: nil,
+          deleted_by: nil
         }}
         include_context 'current_user'
         include_context 'update event'
@@ -176,24 +176,24 @@ RSpec.describe AuditSummarySerializer do
       context 'with user using a software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info.merge!(
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :last_updated_on=> update_audit.created_at,
-          :last_updated_by=> update_audit.user.audited_user_info.merge!(
+          last_updated_on:  update_audit.created_at,
+          last_updated_by:  update_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :deleted_on=>nil,
-          :deleted_by=>nil
+          deleted_on: nil,
+          deleted_by: nil
         }}
         include_context 'current_user.current_software_agent'
         include_context 'update event'
@@ -215,12 +215,12 @@ RSpec.describe AuditSummarySerializer do
         context 'with user not using software_agent' do
           let(:expected_audit_summary) {
           {
-            :created_on=> creation_audit.created_at,
-            :created_by=> creation_audit.user.audited_user_info,
-            :last_updated_on=> nil,
-            :last_updated_by=> nil,
-            :deleted_on=>delete_audit.created_at,
-            :deleted_by=>delete_audit.user.audited_user_info
+            created_on:  creation_audit.created_at,
+            created_by:  creation_audit.user.audited_user_info,
+            last_updated_on:  nil,
+            last_updated_by:  nil,
+            deleted_on: delete_audit.created_at,
+            deleted_by: delete_audit.user.audited_user_info
           }}
           include_context 'current_user'
           include_context 'deletion event'
@@ -232,18 +232,18 @@ RSpec.describe AuditSummarySerializer do
         context 'with user using software_agent' do
           let(:expected_audit_summary) {
           {
-            :created_on=> creation_audit.created_at,
-            :created_by=> creation_audit.user.audited_user_info.merge!(
+            created_on:  creation_audit.created_at,
+            created_by:  creation_audit.user.audited_user_info.merge!(
             {
               "agent": {
                 "id": software_agent.id,
                 "name": software_agent.name
               }
             }),
-            :last_updated_on=> nil,
-            :last_updated_by=> nil,
-            :deleted_on=>delete_audit.created_at,
-            :deleted_by=>delete_audit.user.audited_user_info.merge!(
+            last_updated_on:  nil,
+            last_updated_by:  nil,
+            deleted_on: delete_audit.created_at,
+            deleted_by: delete_audit.user.audited_user_info.merge!(
             {
               "agent": {
                 "id": software_agent.id,
@@ -270,12 +270,12 @@ RSpec.describe AuditSummarySerializer do
         context 'with user not using software_agent' do
           let(:expected_audit_summary) {
           {
-            :created_on=> creation_audit.created_at,
-            :created_by=> creation_audit.user.audited_user_info,
-            :last_updated_on=> update_audit.created_at,
-            :last_updated_by=> update_audit.user.audited_user_info,
-            :deleted_on=> delete_audit.created_at,
-            :deleted_by=> delete_audit.user.audited_user_info
+            created_on:  creation_audit.created_at,
+            created_by:  creation_audit.user.audited_user_info,
+            last_updated_on:  update_audit.created_at,
+            last_updated_by:  update_audit.user.audited_user_info,
+            deleted_on:  delete_audit.created_at,
+            deleted_by:  delete_audit.user.audited_user_info
           }}
           include_context 'current_user'
           include_context 'update event'
@@ -288,24 +288,24 @@ RSpec.describe AuditSummarySerializer do
         context 'with user using software_agent' do
           let(:expected_audit_summary) {
           {
-            :created_on=> creation_audit.created_at,
-            :created_by=> creation_audit.user.audited_user_info.merge!(
+            created_on:  creation_audit.created_at,
+            created_by:  creation_audit.user.audited_user_info.merge!(
             {
               "agent": {
                 "id": software_agent.id,
                 "name": software_agent.name
               }
             }),
-            :last_updated_on=> update_audit.created_at,
-            :last_updated_by=> update_audit.user.audited_user_info.merge!(
+            last_updated_on:  update_audit.created_at,
+            last_updated_by:  update_audit.user.audited_user_info.merge!(
             {
               "agent": {
                 "id": software_agent.id,
                 "name": software_agent.name
               }
             }),
-            :deleted_on=>delete_audit.created_at,
-            :deleted_by=>delete_audit.user.audited_user_info.merge!(
+            deleted_on: delete_audit.created_at,
+            deleted_by: delete_audit.user.audited_user_info.merge!(
             {
               "agent": {
                 "id": software_agent.id,
@@ -335,12 +335,12 @@ RSpec.describe AuditSummarySerializer do
       context 'with user not using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info,
-          :last_updated_on=> delete_audit.created_at,
-          :last_updated_by=> delete_audit.user.audited_user_info,
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info,
+          last_updated_on:  delete_audit.created_at,
+          last_updated_by:  delete_audit.user.audited_user_info,
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info
         }}
         include_context 'current_user'
         include_context 'logical deletion event'
@@ -352,24 +352,24 @@ RSpec.describe AuditSummarySerializer do
       context 'with user using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info.merge!(
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :last_updated_on=> delete_audit.created_at,
-          :last_updated_by=> delete_audit.user.audited_user_info.merge!(
+          last_updated_on:  delete_audit.created_at,
+          last_updated_by:  delete_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info.merge!(
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
@@ -392,14 +392,14 @@ RSpec.describe AuditSummarySerializer do
       context 'with user not using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info,
-          :last_updated_on=> restore_audit.created_at,
-          :last_updated_by=> restore_audit.user.audited_user_info,
-          :restored_on=> restore_audit.created_at,
-          :restored_by=> restore_audit.user.audited_user_info,
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info,
+          last_updated_on:  restore_audit.created_at,
+          last_updated_by:  restore_audit.user.audited_user_info,
+          restored_on:  restore_audit.created_at,
+          restored_by:  restore_audit.user.audited_user_info,
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info
         }}
         include_context 'current_user'
         include_context 'restoration event'
@@ -411,32 +411,32 @@ RSpec.describe AuditSummarySerializer do
       context 'with user using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info.merge!(
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :last_updated_on=> restore_audit.created_at,
-          :last_updated_by=> restore_audit.user.audited_user_info.merge!(
+          last_updated_on:  restore_audit.created_at,
+          last_updated_by:  restore_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :restored_on=> restore_audit.created_at,
-          :restored_by=> restore_audit.user.audited_user_info.merge!(
+          restored_on:  restore_audit.created_at,
+          restored_by:  restore_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info.merge!(
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
@@ -459,14 +459,14 @@ RSpec.describe AuditSummarySerializer do
       context 'with user not using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info,
-          :last_updated_on=> purge_audit.created_at,
-          :last_updated_by=> purge_audit.user.audited_user_info,
-          :purged_on=> purge_audit.created_at,
-          :purged_by=> purge_audit.user.audited_user_info,
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info,
+          last_updated_on:  purge_audit.created_at,
+          last_updated_by:  purge_audit.user.audited_user_info,
+          purged_on:  purge_audit.created_at,
+          purged_by:  purge_audit.user.audited_user_info,
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info
         }}
         include_context 'current_user'
         include_context 'purge event'
@@ -478,32 +478,32 @@ RSpec.describe AuditSummarySerializer do
       context 'with user using software_agent' do
         let(:expected_audit_summary) {
         {
-          :created_on=> creation_audit.created_at,
-          :created_by=> creation_audit.user.audited_user_info.merge!(
+          created_on:  creation_audit.created_at,
+          created_by:  creation_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :last_updated_on=> purge_audit.created_at,
-          :last_updated_by=> purge_audit.user.audited_user_info.merge!(
+          last_updated_on:  purge_audit.created_at,
+          last_updated_by:  purge_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :purged_on=> purge_audit.created_at,
-          :purged_by=> purge_audit.user.audited_user_info.merge!(
+          purged_on:  purge_audit.created_at,
+          purged_by:  purge_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
               "name": software_agent.name
             }
           }),
-          :deleted_on=>delete_audit.created_at,
-          :deleted_by=>delete_audit.user.audited_user_info.merge!(
+          deleted_on: delete_audit.created_at,
+          deleted_by: delete_audit.user.audited_user_info.merge!(
           {
             "agent": {
               "id": software_agent.id,
