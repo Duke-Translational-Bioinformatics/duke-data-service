@@ -44,12 +44,16 @@ module DDS
         ]
       end
       params do
+        optional :slug, type: String, desc: 'Slug of project to find'
         use :pagination
       end
       get '/projects', adapter: :json, root: 'results' do
+        slug = params[:slug]
         authenticate!
         authorize Project.new, :index?
-        paginate(policy_scope(Project).where(is_deleted: false))
+        projects = policy_scope(Project).where(is_deleted: false)
+        projects = projects.where(slug: slug) if slug && !slug.blank?
+        paginate(projects)
       end
 
       desc 'View project details' do

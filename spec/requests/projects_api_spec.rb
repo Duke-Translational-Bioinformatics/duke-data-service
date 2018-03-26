@@ -30,6 +30,65 @@ describe DDS::V1::ProjectsAPI do
         ] }
       end
 
+      context 'with slugged project' do
+        let(:project) { FactoryBot.create(:project, :with_slug) }
+        let(:non_slug) { FactoryBot.create(:project_permission, :project_admin, user: current_user).project }
+        before(:each) do
+          expect(project).to be_persisted
+          expect(non_slug).to be_persisted
+          expect(non_slug.slug).to be_nil
+        end
+
+        context 'slug param not set' do
+          it_behaves_like 'a listable resource' do
+            let(:expected_resources) { [
+              project,
+              non_slug
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+          it_behaves_like 'a listable resource' do
+            let(:payload) {{slug: ''}}
+            let(:expected_resources) { [
+              project,
+              non_slug
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+        end
+
+        context 'slug param set to existing slug' do
+          let(:payload) {{slug: project.slug}}
+          it_behaves_like 'a listable resource' do
+            let(:expected_resources) { [
+              project
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+        end
+
+        context 'nonexistent slug' do
+          let(:payload) {{slug: 'NONEXISTENT-SLUG'}}
+          it 'returns an empty results array' do
+            is_expected.to eq(expected_response_status)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('results')
+            returned_results = response_json['results']
+            expect(returned_results).to be_a(Array)
+            expect(returned_results).to be_empty
+          end
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'a paginated resource' do
