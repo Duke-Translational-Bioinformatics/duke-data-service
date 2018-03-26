@@ -5,11 +5,11 @@ module DDS
         detail 'Returns a list of users with their associated auth_roles'
         named 'list permissions'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
-      get '/system/permissions', root: :results do
+      get '/system/permissions', adapter: :json, root: :results do
         authenticate!
         authorize SystemPermission.new, :index?
         policy_scope(SystemPermission).all
@@ -19,9 +19,9 @@ module DDS
         detail 'Creates or updates system permission for a given user'
         named 'grant permission'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'User or AuthRole Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'User or AuthRole Does not Exist'}
         ]
       end
       params do
@@ -48,9 +48,9 @@ module DDS
         detail 'Returns the system permissions for a given user'
         named 'show permissions'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'User Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'User Does not Exist'}
         ]
       end
       get '/system/permissions/:user_id', root: false do
@@ -66,9 +66,9 @@ module DDS
         detail 'Deletes system permissions for a given user'
         named 'delete permissions'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [404, 'User Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'User Does not Exist'}
         ]
       end
       delete '/system/permissions/:user_id', root: false do

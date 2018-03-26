@@ -109,7 +109,7 @@ shared_examples 'a Purgable ChildMinder' do |resource_factory,
       end
 
       context 'has_children? false' do
-        subject { FactoryGirl.create(resource_factory, is_deleted: true) }
+        subject { FactoryBot.create(resource_factory, is_deleted: true) }
         before do
           subject.children.delete_all
         end

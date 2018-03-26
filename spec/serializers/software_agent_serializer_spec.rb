@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SoftwareAgentSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.create(:software_agent) }
+  let(:resource) { FactoryBot.create(:software_agent) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
     'id' => resource.id,

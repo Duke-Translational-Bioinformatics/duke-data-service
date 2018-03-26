@@ -55,8 +55,9 @@ module DukeDataService
       end
     end
     # Neo4j using Graph Story
-    config.neo4j.session_type = :server_db
-    config.neo4j.session_path = ENV["GRAPHSTORY_URL"]
+    config.neo4j.wait_for_connection = true
+    config.neo4j.session.type = :http
+    config.neo4j.session.path = ENV["GRAPHENEDB_URL"]
 
     # ActiveJob using Sneakers(RabbitMQ)
     config.active_job.queue_adapter = ENV['ACTIVE_JOB_QUEUE_ADAPTER'] || :sneakers

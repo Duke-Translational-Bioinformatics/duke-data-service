@@ -3,10 +3,10 @@ require 'rails_helper'
 describe DDS::V1::TemplatesAPI do
   include_context 'with authentication'
 
-  let(:template) { FactoryGirl.create(:template, creator: current_user) }
-  let(:template_stub) { FactoryGirl.build(:template) }
-  let(:other_template) { FactoryGirl.create(:template) }
-  let(:system_permission) { FactoryGirl.create(:system_permission, user: current_user) }
+  let(:template) { FactoryBot.create(:template, creator: current_user) }
+  let(:template_stub) { FactoryBot.build(:template) }
+  let(:other_template) { FactoryBot.create(:template) }
+  let(:system_permission) { FactoryBot.create(:system_permission, user: current_user) }
 
   let(:resource_class) { Template }
   let(:resource_serializer) { TemplateSerializer }
@@ -105,7 +105,7 @@ describe DDS::V1::TemplatesAPI do
         end
 
         context 'when partial match' do
-          let(:template) { FactoryGirl.create(:template, name: 'only_a_partial_match', creator: current_user) }
+          let(:template) { FactoryBot.create(:template, name: 'only_a_partial_match', creator: current_user) }
           let(:name_contains) { 'a_partial' }
           it_behaves_like 'a searchable resource' do
             let(:expected_resources) { [
@@ -179,7 +179,7 @@ describe DDS::V1::TemplatesAPI do
         let!(:resource_id) { other_template.id }
       end
       context 'with associated meta_template' do
-        before { FactoryGirl.create(:meta_template, template: resource) }
+        before { FactoryBot.create(:meta_template, template: resource) }
         it_behaves_like 'a validated resource' do
           let(:expected_reason) { 'The template cannot be deleted if it has been associated to one or more DDS objects.' }
           let(:expected_suggestion) { '' }

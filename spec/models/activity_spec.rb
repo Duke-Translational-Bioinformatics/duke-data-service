@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Activity, type: :model do
   subject { activity }
-  let(:activity) { FactoryGirl.create(:activity) }
-  let(:deleted_activity) { FactoryGirl.create(:activity, :deleted) }
+  let(:activity) { FactoryBot.create(:activity) }
+  let(:deleted_activity) { FactoryBot.create(:activity, :deleted) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -13,7 +13,7 @@ RSpec.describe Activity, type: :model do
   end
 
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', logically_deleted: true
 
   context 'started_on' do
     context 'default' do
@@ -29,7 +29,7 @@ RSpec.describe Activity, type: :model do
     context 'set by user' do
       it 'is expected to be set to the user supplied value' do
         user_supplied_started_on = 10.minutes.ago
-        new_record = FactoryGirl.create(:activity, started_on: user_supplied_started_on)
+        new_record = FactoryBot.create(:activity, started_on: user_supplied_started_on)
         new_record.reload
         expect(new_record.started_on.to_i).to be == user_supplied_started_on.to_i
       end

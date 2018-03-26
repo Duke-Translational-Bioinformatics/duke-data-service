@@ -19,11 +19,15 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
-  validates :is_deleted, immutable: true, if: :is_deleted_was
+  validates :is_deleted, immutable: true, if: :was_deleted?
 
   after_create :set_project_admin
   after_create :initialize_storage
   after_update :manage_container_index_project
+
+  def was_deleted?
+    will_save_change_to_is_deleted? && !is_deleted
+  end
 
   def set_project_admin
     project_admin_role = AuthRole.where(id: 'project_admin').first
@@ -48,7 +52,7 @@ class Project < ActiveRecord::Base
   end
 
   def manage_container_index_project
-    if name_changed?
+    if will_save_change_to_name?
       if containers.count > 0
         (1..paginated_containers.total_pages).each do |page|
           ProjectContainerElasticsearchUpdateJob.perform_later(

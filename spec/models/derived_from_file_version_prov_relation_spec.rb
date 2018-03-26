@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe DerivedFromFileVersionProvRelation, type: :model do
-  subject { FactoryGirl.create(:derived_from_file_version_prov_relation) }
+  subject { FactoryBot.create(:derived_from_file_version_prov_relation) }
   let(:resource_serializer) { DerivedFromFileVersionProvRelationSerializer }
   let(:expected_relationship_type) { 'was-derived-from' }
 
@@ -12,6 +12,7 @@ RSpec.describe DerivedFromFileVersionProvRelation, type: :model do
   end
 
   describe 'validations' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     it { is_expected.to allow_value('FileVersion').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('User').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('SoftwareAgent').for(:relatable_from_type) }

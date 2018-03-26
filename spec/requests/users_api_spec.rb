@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::UsersAPI do
   let(:resource_class) { User }
-  let(:resource) { FactoryGirl.create(:user) }
+  let(:resource) { FactoryBot.create(:user) }
   let(:resource_serializer) { UserSerializer }
 
   describe '/api/v1/user/api_token' do
@@ -12,7 +12,7 @@ describe DDS::V1::UsersAPI do
     let(:headers) { common_headers }
 
     context 'duke_authentication_service' do
-      let(:first_time_user) { FactoryGirl.attributes_for(:user) }
+      let(:first_time_user) { FactoryBot.attributes_for(:user) }
       let(:first_time_user_token) {
         {
           'service_id' => authentication_service.service_id,
@@ -31,7 +31,7 @@ describe DDS::V1::UsersAPI do
       }
 
       let(:existing_user_auth) {
-        FactoryGirl.create(:user_authentication_service,
+        FactoryBot.create(:user_authentication_service,
         :populated,
         authentication_service: authentication_service)
       }
@@ -54,18 +54,18 @@ describe DDS::V1::UsersAPI do
       }
 
       context 'as default authentication_service' do
-        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service, :default) }
+        let(:authentication_service) { FactoryBot.create(:duke_authentication_service, :default) }
         it_behaves_like 'an authentication request endpoint'
       end
 
       context 'as identified authentication_service' do
-        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service) }
+        let(:authentication_service) { FactoryBot.create(:duke_authentication_service) }
         it_behaves_like 'an authentication request endpoint'
       end
     end
 
     context 'openid_authentication_service' do
-      let(:first_time_user) { FactoryGirl.attributes_for(:user) }
+      let(:first_time_user) { FactoryBot.attributes_for(:user) }
       let(:first_time_user_userinfo) {{
         sub: "#{first_time_user[:username]}@duke.edu",
         dukeNetID: first_time_user[:username],
@@ -81,9 +81,9 @@ describe DDS::V1::UsersAPI do
         SecureRandom.hex
       }
 
-      let(:existing_user) { FactoryGirl.create(:user) }
+      let(:existing_user) { FactoryBot.create(:user) }
       let(:existing_user_auth) {
-        FactoryGirl.create(:user_authentication_service,
+        FactoryBot.create(:user_authentication_service,
         authentication_service: authentication_service,
         uid: existing_user.username,
         user: existing_user)
@@ -104,7 +104,7 @@ describe DDS::V1::UsersAPI do
       }}
 
       let(:existing_first_authenticating_user) {
-        FactoryGirl.create(:user)
+        FactoryBot.create(:user)
       }
       let(:existing_first_authenticating_access_token) {
         SecureRandom.hex
@@ -127,12 +127,12 @@ describe DDS::V1::UsersAPI do
       include_context 'mocked openid request to', :authentication_service
 
       context 'as default authentication_service' do
-        let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :default , :openid_env) }
+        let(:authentication_service) { FactoryBot.create(:openid_authentication_service, :default , :openid_env) }
         it_behaves_like 'an authentication request endpoint'
       end
 
       context 'as identified authentication_service' do
-        let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :openid_env) }
+        let(:authentication_service) { FactoryBot.create(:openid_authentication_service, :openid_env) }
         it_behaves_like 'an authentication request endpoint'
       end
     end
@@ -150,7 +150,7 @@ describe DDS::V1::UsersAPI do
       let!(:users_with_last_name) {
         users = []
         5.times do
-          nuser = FactoryGirl.create(
+          nuser = FactoryBot.create(
             :user_authentication_service,
             :populated)
           nuser.user.update(
@@ -163,7 +163,7 @@ describe DDS::V1::UsersAPI do
       let!(:users_with_first_name) {
         users = []
         5.times do
-          nuser = FactoryGirl.create(
+          nuser = FactoryBot.create(
             :user_authentication_service,
             :populated)
           nuser.user.update(
@@ -176,7 +176,7 @@ describe DDS::V1::UsersAPI do
       let!(:users_with_display_name) {
         users = []
         5.times do
-          auser = FactoryGirl.create(:user_authentication_service, :populated)
+          auser = FactoryBot.create(:user_authentication_service, :populated)
           auser.user.update(
             :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
           )

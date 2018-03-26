@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe AssociatedWithUserProvRelation, type: :model do
-  subject { FactoryGirl.create(:associated_with_user_prov_relation) }
+  subject { FactoryBot.create(:associated_with_user_prov_relation) }
   let(:resource_serializer) { AssociatedWithUserProvRelationSerializer }
   let(:expected_relationship_type) { 'was-associated-with' }
 
@@ -12,6 +12,7 @@ RSpec.describe AssociatedWithUserProvRelation, type: :model do
   end
 
   describe 'validations' do
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     it { is_expected.to allow_value('User').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('SoftwareAgent').for(:relatable_from_type) }
     it { is_expected.not_to allow_value('Project').for(:relatable_from_type) }

@@ -5,11 +5,11 @@ module DDS
         detail 'Creates an object tag.'
         named 'create object tag'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Successfully Created'],
-          [400, 'Tag requires a label'],
-          [401, 'Unauthorized'],
-          [404, 'Tag does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Tag requires a label'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Tag does not exist'}
         ]
       end
       params do
@@ -36,11 +36,11 @@ module DDS
         detail 'Lists tag objects for which the current user has the "view_project" permission.'
         named 'list tag objects'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
-      get '/tags/:object_kind/:object_id', root: 'results' do
+      get '/tags/:object_kind/:object_id', adapter: :json, root: 'results' do
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         taggable_object = object_kind.find(params[:object_id])
@@ -52,11 +52,11 @@ module DDS
         detail 'Append a list of tags to an object.'
         named 'append object tags'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Successfully Created'],
-          [400, 'Tag requires a label'],
-          [401, 'Unauthorized'],
-          [404, 'Tag does not exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Tag requires a label'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Tag does not exist'}
         ]
       end
       params do
@@ -64,7 +64,7 @@ module DDS
           requires :label, type: String, desc: "The textual tag content"
         end
       end
-      post '/tags/:object_kind/:object_id/append', root: 'results' do
+      post '/tags/:object_kind/:object_id/append', adapter: :json, root: 'results' do
         authenticate!
         append_params = declared(params, include_missing: false)
         object_kind = KindnessFactory.by_kind(params[:object_kind])
@@ -87,15 +87,15 @@ module DDS
         detail 'Get a list of the distinct tag label values visible to the current user.'
         named 'list tag labels'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
         optional :object_kind, type: String, desc: "Restricts search scope to tags for this kind of object"
         optional :label_contains, type: String, desc: "Searches for tags that contain this text fragment"
       end
-      get '/tags/labels', root: 'results' do
+      get '/tags/labels', adapter: :json, root: 'results' do
         authenticate!
         tag_params = declared(params, include_missing: false)
         scoped_tags = policy_scope(Tag)
@@ -113,9 +113,9 @@ module DDS
         detail 'view tag'
         named 'view tag'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Tag does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Tag does not exist'}
         ]
       end
       get '/tags/:id', root: false do
@@ -129,9 +129,9 @@ module DDS
         detail 'Deletes the tag'
         named 'delete tag'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Tag does not exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Tag does not exist'}
         ]
       end
       delete '/tags/:id', root: false do

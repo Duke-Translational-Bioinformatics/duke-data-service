@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UserSerializer, type: :serializer do
-  let(:user_authentication_service) { FactoryGirl.create(:user_authentication_service, :populated) }
+  let(:user_authentication_service) { FactoryBot.create(:user_authentication_service, :populated) }
   let(:resource) { user_authentication_service.user }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
@@ -25,7 +25,7 @@ RSpec.describe UserSerializer, type: :serializer do
 
     context 'with current_software_agent' do
       before do
-        resource.current_software_agent = FactoryGirl.create(:software_agent)
+        resource.current_software_agent = FactoryBot.create(:software_agent)
       end
       it { expect(subject['agent']).not_to be_nil }
     end

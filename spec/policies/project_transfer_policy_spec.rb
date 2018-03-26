@@ -3,11 +3,11 @@ require 'rails_helper'
 describe ProjectTransferPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users, project: project_permission.project) }
-  let(:other_project_transfer) { FactoryGirl.create(:project_transfer, :with_to_users) }
-  let(:to_user) { FactoryGirl.create(:project_transfer_user, project_transfer: project_transfer).to_user }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
+  let(:project_transfer) { FactoryBot.create(:project_transfer, :with_to_users, project: project_permission.project) }
+  let(:other_project_transfer) { FactoryBot.create(:project_transfer, :with_to_users) }
+  let(:to_user) { FactoryBot.create(:project_transfer_user, project_transfer: project_transfer).to_user }
 
   it_behaves_like 'system_permission can access', :project_transfer
   it_behaves_like 'system_permission can access', :other_project_transfer

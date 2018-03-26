@@ -11,8 +11,4 @@ class AttributedToUserProvRelation < AttributedToProvRelation
     allow_nil: true
   validates :relatable_to_type, inclusion: { in: %w(User),
     message: "AttributedToUserProvRelation must be to a User" }
-
-  def set_relationship_type
-    self.relationship_type = 'was-attributed-to'
-  end
 end

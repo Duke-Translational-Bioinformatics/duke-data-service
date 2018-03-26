@@ -5,21 +5,21 @@ describe DDS::V1::AppAPI do
 
   include_context 'with sneakers'
   shared_context 'seeded rdbms' do
-    let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
+    let!(:auth_roles) { FactoryBot.create_list(:auth_role, 4) }
   end
   shared_context 'authentication_service created' do
-    let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
+    let(:authentication_service) { FactoryBot.create(:duke_authentication_service)}
     before { expect(authentication_service).to be_persisted }
   end
   shared_context 'storage_provider setup' do
-    let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+    let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
 
     before do
       swift_storage_provider.register_keys
     end
   end
   before do
-    ENV["GRAPHSTORY_URL"] = 'http://neo4j.db.host:7474'
+    ENV["GRAPHENEDB_URL"] = 'http://neo4j.db.host:7474'
   end
 
   describe 'app status', :vcr do
@@ -83,7 +83,7 @@ describe DDS::V1::AppAPI do
 
       context 'has not registered its keys' do
         let(:status_error) { 'storage_provider has not registered its keys' }
-        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
+        let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
         before do
           expect(swift_storage_provider).to be_persisted
           #vcr records storage_provider.get_account_info with keys not registered
@@ -100,9 +100,9 @@ describe DDS::V1::AppAPI do
 
       context 'is not connected' do
         let(:status_error) { 'storage_provider is not connected' }
-        let(:swift_storage_provider) { FactoryGirl.create(:storage_provider, :swift) }
-        let!(:auth_roles) { FactoryGirl.create_list(:auth_role, 4) }
-        let(:authentication_service) { FactoryGirl.create(:duke_authentication_service)}
+        let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+        let!(:auth_roles) { FactoryBot.create_list(:auth_role, 4) }
+        let(:authentication_service) { FactoryBot.create(:duke_authentication_service)}
         before do
           stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
           expect(swift_storage_provider).to be_persisted
@@ -125,7 +125,7 @@ describe DDS::V1::AppAPI do
       context 'environment is not set' do
         let(:status_error) { 'graphdb environment is not set' }
         before do
-          ENV["GRAPHSTORY_URL"] = nil
+          ENV["GRAPHENEDB_URL"] = nil
         end
         it_behaves_like 'a status error', :status_error
       end

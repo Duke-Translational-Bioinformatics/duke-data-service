@@ -6,7 +6,7 @@ module UnRestorable
   end
 
   def manage_deletion
-    if is_deleted_changed? && is_deleted?
+    if will_save_change_to_is_deleted? && is_deleted?
       @child_job = ChildPurgationJob
     end
   end

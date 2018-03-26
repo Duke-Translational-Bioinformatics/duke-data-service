@@ -3,7 +3,7 @@ require 'rails_helper'
 describe DDS::V1::ProjectRolesAPI do
   include_context 'with authentication'
 
-  let(:project_role) { FactoryGirl.create(:project_role) }
+  let(:project_role) { FactoryBot.create(:project_role) }
   let(:resource) { project_role }
   let(:resource_class) { ProjectRole }
   let(:resource_serializer) { ProjectRoleSerializer }

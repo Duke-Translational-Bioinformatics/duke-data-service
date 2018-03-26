@@ -5,10 +5,10 @@ module DDS
         detail 'Creates a template.'
         named 'create template'
         failure [
-          [200, 'This will never happen'],
-          [201, 'Successfully Created'],
-          [400, 'Validation error'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'This will never happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Validation error'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
@@ -32,14 +32,14 @@ module DDS
         detail 'List templates.'
         named 'list templates'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
         optional :name_contains, type: String, desc: 'list templates whose name contains the specified string'
       end
-      get '/templates', root: 'results' do
+      get '/templates', adapter: :json, root: 'results' do
         authenticate!
         template_params = declared(params, include_missing: false)
         if name_contains = template_params[:name_contains]
@@ -54,10 +54,10 @@ module DDS
         detail 'Returns the template details for a given UUID.'
         named 'view template'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (template restricted)'],
-          [404, 'Template Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (template restricted)'},
+          {code: 404, message: 'Template Does not Exist'}
         ]
       end
       params do
@@ -73,11 +73,11 @@ module DDS
         detail 'Updates template UUID.'
         named 'update template'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (template restricted)'],
-          [404, 'Template Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (template restricted)'},
+          {code: 404, message: 'Template Does not Exist'}
         ]
       end
       params do
@@ -102,10 +102,10 @@ module DDS
         detail 'Deletes a template.'
         named 'delete template'
         failure [
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden (template restricted)'],
-          [404, 'Template Does not Exist']
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden (template restricted)'},
+          {code: 404, message: 'Template Does not Exist'}
         ]
       end
       params do

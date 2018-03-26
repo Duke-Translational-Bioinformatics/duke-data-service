@@ -7,9 +7,9 @@ module DDS
         detail 'Returns the immediate children of the folder.'
         named 'list folder children'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Folder does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Folder does not exist'}
         ]
       end
       params do
@@ -19,7 +19,7 @@ module DDS
           desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
-      get '/folders/:id/children', root: 'results' do
+      get '/folders/:id/children', adapter: :json, root: 'results' do
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :index?
@@ -37,9 +37,9 @@ module DDS
         detail 'Returns the immediate children of the project.'
         named 'list project children'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'Project does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'Project does not exist'}
         ]
       end
       params do
@@ -49,7 +49,7 @@ module DDS
           desc: 'Space delimited list of fields to exclude from the serialized response.'
         use :pagination
       end
-      get '/projects/:id/children', root: 'results' do
+      get '/projects/:id/children', adapter: :json, root: 'results' do
         authenticate!
         name_contains = params[:name_contains]
         project = hide_logically_deleted Project.find(params[:id])

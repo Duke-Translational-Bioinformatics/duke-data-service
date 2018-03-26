@@ -1,17 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe SearchProvenanceGraph do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:policy_scope) { Proc.new {|scope| scope } }
 
   # (activity)-(used)->(focus)
   let!(:focus) {
-    FactoryGirl.create(:file_version, label: "FOCUS")
+    FactoryBot.create(:file_version, label: "FOCUS")
   }
 
-  let!(:activity) { FactoryGirl.create(:activity, name: "ACTIVITY") }
+  let!(:activity) { FactoryBot.create(:activity, name: "ACTIVITY") }
   let!(:activity_creator) { activity.creator }
   let!(:activity_used_focus) {
-    FactoryGirl.create(:used_prov_relation,
+    FactoryBot.create(:used_prov_relation,
       relatable_from: activity,
       relatable_to: focus
     )
@@ -19,7 +20,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (activity)-(asocciatedWith)->(activity.creator)
   let!(:activity_associated_with_activity_creator) {
-    FactoryGirl.create(:associated_with_user_prov_relation,
+    FactoryBot.create(:associated_with_user_prov_relation,
       relatable_from: activity_creator,
       relatable_to: activity
     )
@@ -27,10 +28,10 @@ RSpec.describe SearchProvenanceGraph do
 
   # (activity)-(associatedWith)->(software_agent)
   let!(:software_agent) {
-    FactoryGirl.create(:software_agent, name: "SOFTWARE_AGENT")
+    FactoryBot.create(:software_agent, name: "SOFTWARE_AGENT")
   }
   let!(:activity_associated_with_software_agent) {
-    FactoryGirl.create(:associated_with_software_agent_prov_relation,
+    FactoryBot.create(:associated_with_software_agent_prov_relation,
       relatable_from: software_agent,
       relatable_to: activity
     )
@@ -38,7 +39,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (focus)-(attributedTo)->(activity.creator)
   let!(:focus_attributed_to_activity_creator) {
-    FactoryGirl.create(:attributed_to_user_prov_relation,
+    FactoryBot.create(:attributed_to_user_prov_relation,
       relatable_from: focus,
       relatable_to: activity_creator
     )
@@ -46,7 +47,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (focus)-(attributedTo)->(software_agent)
   let!(:focus_attributed_to_software_agent) {
-    FactoryGirl.create(:attributed_to_software_agent_prov_relation,
+    FactoryBot.create(:attributed_to_software_agent_prov_relation,
       relatable_from: focus,
       relatable_to: software_agent
     )
@@ -54,10 +55,10 @@ RSpec.describe SearchProvenanceGraph do
 
   # (generated_file)-(generatedBy)->(activity)
   let!(:generated_file) {
-    FactoryGirl.create(:file_version, label: "GENERATED_FILE")
+    FactoryBot.create(:file_version, label: "GENERATED_FILE")
   }
   let!(:generated_file_generated_by_activity) {
-    FactoryGirl.create(:generated_by_activity_prov_relation,
+    FactoryBot.create(:generated_by_activity_prov_relation,
       relatable_from: generated_file,
       relatable_to: activity
     )
@@ -65,7 +66,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (generated_file)-(derivedFrom)->(focus)
   let!(:generated_file_derived_from_focus) {
-    FactoryGirl.create(:derived_from_file_version_prov_relation,
+    FactoryBot.create(:derived_from_file_version_prov_relation,
       relatable_from: generated_file,
       relatable_to: focus
     )
@@ -73,7 +74,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (generated_file)-(attributedTo)->(activity.creator)
   let!(:generated_file_attributed_to_activity_creator) {
-    FactoryGirl.create(:attributed_to_user_prov_relation,
+    FactoryBot.create(:attributed_to_user_prov_relation,
       relatable_from: generated_file,
       relatable_to: activity.creator
     )
@@ -81,13 +82,13 @@ RSpec.describe SearchProvenanceGraph do
 
   # (deleted_file)-(invalidatedBy)->(invalidating_activity)
   let(:deleted_file) {
-    FactoryGirl.create(:file_version, :deleted, label: "DELETED_FILE")
+    FactoryBot.create(:file_version, :deleted, label: "DELETED_FILE")
   }
   let!(:invalidating_activity) {
-    FactoryGirl.create(:activity, name: "INVALIDATING_ACTIVITY")
+    FactoryBot.create(:activity, name: "INVALIDATING_ACTIVITY")
   }
   let!(:deleted_file_invalidated_by_invalidating_activity) {
-    FactoryGirl.create(:invalidated_by_activity_prov_relation,
+    FactoryBot.create(:invalidated_by_activity_prov_relation,
       relatable_from: deleted_file,
       relatable_to: invalidating_activity
     )
@@ -95,7 +96,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (deleted_file)-(derivedFrom)->(focus)
   let!(:deleted_file_derived_from_focus) {
-    FactoryGirl.create(:derived_from_file_version_prov_relation,
+    FactoryBot.create(:derived_from_file_version_prov_relation,
       relatable_from: deleted_file,
       relatable_to: focus
     )
@@ -103,7 +104,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (invalidating_activity)-(asocciatedWith)->(activity_creator)
   let!(:invalidating_activity_associated_with_activity_creator) {
-    FactoryGirl.create(:associated_with_user_prov_relation,
+    FactoryBot.create(:associated_with_user_prov_relation,
       relatable_to: invalidating_activity,
       relatable_from: activity_creator
     )
@@ -111,10 +112,10 @@ RSpec.describe SearchProvenanceGraph do
 
   # (invalidating_activity)-(associatedWith)->(other_software_agent)
   let!(:other_software_agent) {
-    FactoryGirl.create(:software_agent, name: "OTHER_SOFTWARE_AGENT")
+    FactoryBot.create(:software_agent, name: "OTHER_SOFTWARE_AGENT")
   }
   let!(:invalidating_activity_associated_with_other_software_agent) {
-    FactoryGirl.create(:associated_with_software_agent_prov_relation,
+    FactoryBot.create(:associated_with_software_agent_prov_relation,
       relatable_from: other_software_agent,
       relatable_to: invalidating_activity
     )
@@ -122,10 +123,10 @@ RSpec.describe SearchProvenanceGraph do
 
   # (invalidating_activity)-(used)->(invalidating_file)
   let!(:invalidating_file) {
-    FactoryGirl.create(:file_version, label: "INVALIDATING_FILE")
+    FactoryBot.create(:file_version, label: "INVALIDATING_FILE")
   }
   let!(:invalidating_activity_used_invalidating_file) {
-    FactoryGirl.create(:used_prov_relation,
+    FactoryBot.create(:used_prov_relation,
       relatable_to: invalidating_file,
       relatable_from: invalidating_activity
     )
@@ -133,7 +134,7 @@ RSpec.describe SearchProvenanceGraph do
 
   # (deleted_file)-(attributedTo)->(activity.creator)
   let!(:deleted_file_attributed_to_activity_creator) {
-    FactoryGirl.create(:attributed_to_user_prov_relation,
+    FactoryBot.create(:attributed_to_user_prov_relation,
       relatable_from: deleted_file,
       relatable_to: activity.creator
     )

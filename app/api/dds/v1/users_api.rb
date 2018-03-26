@@ -7,8 +7,8 @@ module DDS
         detail 'This allows a client to present an access token from a registered authentication service and get an api token'
         named 'api_token'
         failure [
-          [200,'Success'],
-          [401, 'Missing, or invalid Access Token']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Missing, or invalid Access Token'}
         ]
       end
       params do
@@ -16,13 +16,17 @@ module DDS
         optional :authentication_service_id, type: String, desc: 'authentication service uuid'
       end
       rescue_from Grape::Exceptions::ValidationErrors do |e|
-        error_json = {
-          "error" => 400,
-          "code" => "not_provided",
-          "reason" => "no access_token",
-          "suggestion" => "you might need to login through an authentication service"#,
-        }
-        error!(error_json, 400)
+        if e.errors.keys.flatten.include?('access_token')
+          error_json = {
+            "error" => 400,
+            "code" => "not_provided",
+            "reason" => "no access_token",
+            "suggestion" => "you might need to login through an authentication service"#,
+          }
+          error!(error_json, 400)
+        else
+          error!(e.message, 400)
+        end
       end
       get '/user/api_token', serializer: ApiTokenSerializer do
         token_info_params = declared(params)
@@ -44,8 +48,8 @@ module DDS
         detail 'This allows a client to get a list of users, with an optional filter'
         named 'users'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
         ]
       end
       params do
@@ -54,7 +58,7 @@ module DDS
         optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
         use :pagination
       end
-      get '/users', root: 'results' do
+      get '/users', adapter: :json, root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
         users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)
@@ -65,9 +69,9 @@ module DDS
         detail 'Returns the user details for a given uuid of a user.'
         named 'view user'
         failure [
-          [200, "Valid API Token in 'Authorization' Header"],
-          [401, "Missing, Expired, or Invalid API Token in 'Authorization' Header"],
-          [404, 'User does not exist']
+          {code: 200, message: 'Valid API Token in \'Authorization\' Header'},
+          {code: 401, message: 'Missing, Expired, or Invalid API Token in \'Authorization\' Header'},
+          {code: 404, message: 'User does not exist'}
         ]
       end
       params do

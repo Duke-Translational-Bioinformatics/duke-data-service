@@ -1,4 +1,4 @@
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require 'faker'
 
 def user_name
@@ -162,7 +162,7 @@ namespace :api_test_user do
       software_agent = SoftwareAgent.where(creator_id: api_test_user.id).take
       unless software_agent
         Audited.audit_class.as_user(api_test_user.user) do
-          software_agent = FactoryGirl.create(:software_agent, :with_key, creator: api_test_user.user)
+          software_agent = FactoryBot.create(:software_agent, :with_key, creator: api_test_user.user)
         end
       end
       $stdout.print software_agent.api_key.key
@@ -176,7 +176,7 @@ namespace :api_test_user_pool do
   desc "creates a pool of users for api tests to use in tests where other users are needed"
   task create: :environment do
     auth_service = get_auth_service
-    users = FactoryGirl.build_list(:user_authentication_service, 2, :populated, authentication_service_id: auth_service.id)
+    users = FactoryBot.build_list(:user_authentication_service, 2, :populated, authentication_service_id: auth_service.id)
     users.each do |auser|
       auser.uid = "api_test_pool_#{auser.uid}"
       auser.save

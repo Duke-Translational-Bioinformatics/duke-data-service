@@ -46,10 +46,10 @@ RSpec.describe ChildDeletionJob, type: :job do
   end
 
   context 'folder' do
-    let(:folder) { FactoryGirl.create(:folder) }
-    let(:sub_folder) { FactoryGirl.create(:folder, parent: folder) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: sub_folder) }
-    let(:sub_file) { FactoryGirl.create(:data_file, parent: folder) }
+    let(:folder) { FactoryBot.create(:folder) }
+    let(:sub_folder) { FactoryBot.create(:folder, parent: folder) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: sub_folder) }
+    let(:sub_file) { FactoryBot.create(:data_file, parent: folder) }
 
     before do
       expect(folder_child).to be_persisted

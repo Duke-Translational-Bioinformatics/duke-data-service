@@ -20,8 +20,8 @@ class GeneratedByActivityProvRelation < ProvRelation
 
   validate :generating_activity, unless: :is_deleted
 
-  def set_relationship_type
-    self.relationship_type = 'was-generated-by'
+  def graph_model_name
+    'WasGeneratedBy'
   end
 
   def generating_activity

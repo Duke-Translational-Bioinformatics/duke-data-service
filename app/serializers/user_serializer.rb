@@ -10,7 +10,7 @@ class UserSerializer < ActiveModel::Serializer
              :last_login_on,
              :audit
 
-  has_one :current_software_agent, root: :agent, serializer: SoftwareAgentPreviewSerializer
+  has_one :current_software_agent, key: :agent, serializer: SoftwareAgentPreviewSerializer
 
   def last_login_on
     object.last_login_at
@@ -21,6 +21,8 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def auth_provider
-    UserAuthenticationServiceSerializer.new(object.user_authentication_services.first)
+    if auth_provider = object.user_authentication_services.first
+      UserAuthenticationServiceSerializer.new(auth_provider)
+    end
   end
 end

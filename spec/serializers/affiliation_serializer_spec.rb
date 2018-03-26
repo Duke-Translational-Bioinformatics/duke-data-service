@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe AffiliationSerializer, type: :serializer do
-  let(:resource) { FactoryGirl.build(:affiliation) }
+  let(:resource) { FactoryBot.build(:affiliation) }
   let(:expected_attributes) {{
     'user' => { 'id' => resource.user.id,
                 'full_name' => resource.user.display_name,

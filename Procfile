@@ -8,4 +8,5 @@ child_restoration_job: bundle exec rake workers:restore_children:run
 upload_storage_removal_job: bundle exec rake workers:purge_upload:run
 elasticsearch_index_job: bundle exec rake workers:index_documents:run
 project_container_elasticsearch_update_job: bundle exec rake workers:update_project_container_elasticsearch:run
+graph_persistence_job: bundle exec rake workers:graph_persistence:run
 upload_completion_job: bundle exec rake workers:complete_upload:run

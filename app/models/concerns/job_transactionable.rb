@@ -6,6 +6,7 @@ module JobTransactionable
     has_many :job_transactions, as: :transactionable
     before_create :root_create_transaction
     before_update :root_update_transaction
+    before_destroy :root_destroy_transaction
     after_touch :root_update_transaction
   end
 
@@ -23,5 +24,11 @@ module JobTransactionable
 
   def root_update_transaction
     create_transaction 'updated'
+  end
+
+  def root_destroy_transaction
+    create_transaction 'destroyed'
+    @current_transaction.save
+    @current_transaction
   end
 end

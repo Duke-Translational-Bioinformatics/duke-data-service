@@ -5,12 +5,12 @@ module DDS
         detail 'Lists project permissions.'
         named 'list project permissions'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project Does not Exist'}
         ]
       end
-      get '/projects/:project_id/permissions', root: 'results' do
+      get '/projects/:project_id/permissions', adapter: :json, root: 'results' do
         authenticate!
         project = hide_logically_deleted Project.find(params[:project_id])
         authorize ProjectPermission.new(project: project), :index?
@@ -21,9 +21,9 @@ module DDS
         detail 'Revokes (deletes) any existing project level authorization roles for the user and grants new set.'
         named 'grant project permissions'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project, User, or AuthRole Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project, User, or AuthRole Does not Exist'}
         ]
       end
       params do
@@ -59,9 +59,9 @@ module DDS
         detail 'View project permissions.'
         named 'view project permissions'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project or User Does not Exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project or User Does not Exist'}
         ]
       end
       get '/projects/:project_id/permissions/:user_id', root: false do
@@ -80,10 +80,10 @@ module DDS
         detail 'Revoke project permissions'
         named 'revoke project permissions'
         failure [
-          [200, 'This will never happen'],
-          [204, 'Successfully Deleted'],
-          [401, 'Unauthorized'],
-          [404, 'Project or User Does not Exist']
+          {code: 200, message: 'This will never happen'},
+          {code: 204, message: 'Successfully Deleted'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project or User Does not Exist'}
         ]
       end
       delete '/projects/:project_id/permissions/:user_id', root: false do

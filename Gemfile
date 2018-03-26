@@ -1,15 +1,15 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.0'
+gem 'rails', '~> 5.1'
 # Use postgresql as the database for Active Record
-gem 'pg'
+gem "pg"
 
 # Use neo4j for PROV graph relationships
-gem 'neo4j', '~> 7.0'
+gem 'neo4j', '~> 8.0'
 
 # Use sneakers(RabbitMQ) for background jobs
-gem 'sneakers'
+gem 'sneakers', '~> 2.5.0'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
@@ -17,19 +17,20 @@ gem 'net-ldap'
 # Use puma as the webserver in development
 gem 'puma'
 gem 'rack-cors', :require => 'rack/cors'
-gem 'grape-middleware-lograge'
 gem "rack-timeout"
 
 gem 'grape-swagger'
+gem 'grape_logging'
 gem 'kaminari'
 gem 'kaminari-grape' #needed for kaminari 1.x
 gem 'grape-kaminari'
 
 # Use elasticsearch for search
 # must be included after kaminari according to elasticsearch-model documentation
-gem 'elasticsearch', '~> 2.0.0'
-gem 'elasticsearch-model'
-gem 'elasticsearch-rails'
+gem 'elasticsearch', '~> 5.0'
+gem 'elasticsearch-model', '~> 5.0'
+gem 'elasticsearch-rails', '~> 5.0'
+
 
 # Auditing
 gem 'audited'
@@ -38,9 +39,8 @@ gem 'audited'
 gem 'active_record_union'
 
 gem 'jwt'
-gem 'grape', '0.16.2'
+gem 'grape'
 gem "hashie-forbidden_attributes" #overrides strong_params in grape endpoints
-gem 'active_model_serializers', '~> 0.9.0'
 gem "grape-active_model_serializers"
 gem 'turbolinks'
 gem 'uglifier'
@@ -58,7 +58,7 @@ gem 'rspec_junit_formatter'
 # https://docs.newrelic.com/docs/agents/ruby-agent/installation-configuration/ruby-agent-installation
 gem 'newrelic_rpm'
 
-gem "factory_girl_rails"
+gem "factory_bot_rails"
 gem "faker"
 
 # Use Capistrano for deployment
@@ -76,7 +76,7 @@ end
 group :docker, :test do
   gem 'pry-byebug'
 end
-  
+
 group :test do
   gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :upload do
     project
     sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }

@@ -11,8 +11,8 @@ class DerivedFromFileVersionProvRelation < ProvRelation
   validates :relatable_to_type, inclusion: { in: %w(FileVersion),
     message: "DerivedFromFileVersionProvRelation must be to a FileVersion" }
 
-  def set_relationship_type
-    self.relationship_type = 'was-derived-from'
+  def graph_model_name
+    'WasDerivedFrom'
   end
 
   def kind

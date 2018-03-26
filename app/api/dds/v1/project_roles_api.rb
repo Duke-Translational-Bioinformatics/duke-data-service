@@ -6,11 +6,11 @@ module DDS
           detail 'Lists project roles.'
           named 'list project roles'
           failure [
-            [200, 'Success'],
-            [401, 'Unauthorized']
+            {code: 200, message: 'Success'},
+            {code: 401, message: 'Unauthorized'}
           ]
         end
-        get '/', root: 'results' do
+        get '/', adapter: :json, root: 'results' do
           authenticate!
           ProjectRole.all
         end
@@ -19,9 +19,9 @@ module DDS
           detail 'View project role details.'
           named 'view project role'
           failure [
-            [200, 'Success'],
-            [401, 'Unauthorized'],
-            [404, 'Unkown ProjectRole']
+            {code: 200, message: 'Success'},
+            {code: 401, message: 'Unauthorized'},
+            {code: 404, message: 'Unkown ProjectRole'}
           ]
         end
         get '/:id', root: false do

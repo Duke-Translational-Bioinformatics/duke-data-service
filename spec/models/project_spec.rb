@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Project, type: :model do
-  subject { FactoryGirl.create(:project) }
+  subject { FactoryBot.create(:project) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -50,7 +50,7 @@ RSpec.describe Project, type: :model do
     it { is_expected.to validate_presence_of(:creator_id) }
 
     context 'when is_deleted true' do
-      subject { FactoryGirl.create(:project, :deleted) }
+      subject { FactoryBot.create(:project, :deleted) }
       it { is_expected.not_to validate_presence_of(:name) }
       it { is_expected.not_to validate_presence_of(:description) }
       it { is_expected.not_to validate_presence_of(:creator_id) }
@@ -58,8 +58,8 @@ RSpec.describe Project, type: :model do
   end
 
   describe '#set_project_admin' do
-    subject { FactoryGirl.build(:project) }
-    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
+    subject { FactoryBot.build(:project) }
+    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
     it { is_expected.to callback(:set_project_admin).after(:create) }
 
     it 'should give the project creator a project_admin permission' do
@@ -85,13 +85,10 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  context 'with descendants' do
-  end
-
   describe '#initialize_storage' do
-    subject { FactoryGirl.build(:project) }
-    let!(:auth_role) { FactoryGirl.create(:auth_role, :project_admin) }
-    let(:default_storage_provider) { FactoryGirl.create(:storage_provider) }
+    subject { FactoryBot.build(:project) }
+    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
+    let(:default_storage_provider) { FactoryBot.create(:storage_provider) }
     it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
@@ -126,9 +123,9 @@ RSpec.describe Project, type: :model do
       let(:new_name) { "#{Faker::Team.name}_#{rand(10**3)}" }
 
       context 'when project has containers' do
-        let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
-        let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
-        let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+        let(:root_folder) { FactoryBot.create(:folder, :root, project: subject) }
+        let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, project: subject) }
+        let(:root_file) { FactoryBot.create(:data_file, :root, project: subject) }
 
         let(:job_transaction) {
           subject.create_transaction('testing')
@@ -187,9 +184,9 @@ RSpec.describe Project, type: :model do
   end
 
   describe '#update_container_elasticsearch_index_project' do
-    let(:root_folder) { FactoryGirl.create(:folder, :root, project: subject) }
-    let(:folder_child) { FactoryGirl.create(:data_file, parent: root_folder, project: subject) }
-    let(:root_file) { FactoryGirl.create(:data_file, :root, project: subject) }
+    let(:root_folder) { FactoryBot.create(:folder, :root, project: subject) }
+    let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder, project: subject) }
+    let(:root_file) { FactoryBot.create(:data_file, :root, project: subject) }
 
     it { is_expected.not_to respond_to(:update_container_elasticsearch_index_project).with(0).arguments }
     it { is_expected.to respond_to(:update_container_elasticsearch_index_project).with(1).argument }
@@ -239,10 +236,10 @@ RSpec.describe Project, type: :model do
   end
 
   describe 'UnRestorable' do
-    let(:valid_child_file) { FactoryGirl.create(:data_file, :root, project: subject) }
-    let(:invalid_child_file) { FactoryGirl.create(:data_file, :root, :invalid, project: subject) }
-    let(:child_folder) { FactoryGirl.create(:folder, :root, project: subject) }
-    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: child_folder)}
+    let(:valid_child_file) { FactoryBot.create(:data_file, :root, project: subject) }
+    let(:invalid_child_file) { FactoryBot.create(:data_file, :root, :invalid, project: subject) }
+    let(:child_folder) { FactoryBot.create(:folder, :root, project: subject) }
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: child_folder)}
     let(:project_children) { [valid_child_file, child_folder] }
 
     it_behaves_like 'an UnRestorable ChildMinder', :project, :project_children
@@ -250,6 +247,18 @@ RSpec.describe Project, type: :model do
     describe '#manage_children' do
       context 'when is_deleted not changed' do
         it {
+          expect(project_children).not_to be_empty
+          expect(subject.is_deleted_changed?).to be_falsey
+          subject.manage_deletion
+          expect(ChildPurgationJob).not_to receive(:perform_later)
+          subject.manage_children
+        }
+      end
+
+      context 'when deleted and is_deleted not changed' do
+        subject { FactoryBot.create(:project, :deleted) }
+        it {
+          expect(project_children).not_to be_empty
           expect(subject.is_deleted_changed?).to be_falsey
           subject.manage_deletion
           expect(ChildPurgationJob).not_to receive(:perform_later)
@@ -298,7 +307,7 @@ RSpec.describe Project, type: :model do
         end
 
         context 'has_children? false' do
-          subject { FactoryGirl.create(:project, is_deleted: true) }
+          subject { FactoryBot.create(:project, is_deleted: true) }
           it {
             expect(subject.has_children?).to be_falsey
             subject.is_deleted = true
@@ -310,7 +319,7 @@ RSpec.describe Project, type: :model do
       end
 
       context 'when is_deleted changed from true to false' do
-        subject { FactoryGirl.create(:project, is_deleted: true) }
+        subject { FactoryBot.create(:project, is_deleted: true) }
         it {
           is_expected.to be_persisted
           expect(subject.is_deleted?).to be_truthy
@@ -381,7 +390,7 @@ RSpec.describe Project, type: :model do
       end
 
       context 'when child is not a Container' do
-        let(:incompatible_child) { FactoryGirl.create(:file_version) }
+        let(:incompatible_child) { FactoryBot.create(:file_version) }
         it {
           expect {
             begin
@@ -397,7 +406,7 @@ RSpec.describe Project, type: :model do
       context 'when child is a Container' do
         context 'from another project' do
           context 'from a child folder' do
-            let(:child) { FactoryGirl.create(:data_file, :with_parent, :deleted) }
+            let(:child) { FactoryBot.create(:data_file, :with_parent, :deleted) }
             it {
               expect {
                 expect(child.is_deleted?).to be_truthy
@@ -412,7 +421,7 @@ RSpec.describe Project, type: :model do
             }
           end
           context 'root' do
-            let(:child) { FactoryGirl.create(:data_file, :root, :deleted) }
+            let(:child) { FactoryBot.create(:data_file, :root, :deleted) }
             it {
               expect {
                 expect(child.is_deleted?).to be_truthy

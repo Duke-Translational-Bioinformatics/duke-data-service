@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Chunk, type: :model do
-  subject { FactoryGirl.create(:chunk) }
+  subject { FactoryBot.create(:chunk) }
   let(:storage_provider) { subject.storage_provider }
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
@@ -31,17 +31,17 @@ RSpec.describe Chunk, type: :model do
     it { is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive }
 
     describe 'upload_chunk_maximum' do
-      let(:storage_provider) { FactoryGirl.create(:storage_provider, chunk_max_number: 1) }
+      let(:storage_provider) { FactoryBot.create(:storage_provider, chunk_max_number: 1) }
       context '< storage_provider.chunk_max_number' do
-        let(:upload) { FactoryGirl.create(:upload, storage_provider: storage_provider) }
-        subject { FactoryGirl.build(:chunk, upload: upload) }
+        let(:upload) { FactoryBot.create(:upload, storage_provider: storage_provider) }
+        subject { FactoryBot.build(:chunk, upload: upload) }
         it { is_expected.to be_valid }
       end
 
       context '>= storage_provider.chunk_max_number' do
-        let(:upload) { FactoryGirl.create(:upload, :with_chunks, storage_provider: storage_provider) }
+        let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: storage_provider) }
         let(:expected_validation_message) { "maximum upload chunks exceeded." }
-        subject { FactoryGirl.build(:chunk, upload: upload, number: 2) }
+        subject { FactoryBot.build(:chunk, upload: upload, number: 2) }
 
         it {
           is_expected.not_to be_valid
@@ -93,7 +93,7 @@ RSpec.describe Chunk, type: :model do
 
     context 'called' do
       subject {
-        FactoryGirl.create(:chunk, :swift, size: chunk_data.length, number: 1)
+        FactoryBot.create(:chunk, :swift, size: chunk_data.length, number: 1)
       }
       let(:storage_provider) { subject.storage_provider }
       let(:chunk_data) { 'some random chunk' }

@@ -4,8 +4,8 @@ describe DDS::V1::AuthProvidersAPI do
   before { allow_any_instance_of(Net::LDAP).to receive(:search).and_raise(Net::LDAP::Error) }
   include_context 'without authentication'
   let(:auth_providers) {[
-      FactoryGirl.create(:duke_authentication_service),
-      FactoryGirl.create(:openid_authentication_service)
+      FactoryBot.create(:duke_authentication_service),
+      FactoryBot.create(:openid_authentication_service)
   ]}
   let(:query_params) { '' }
   let(:resource_serializer) { AuthenticationServiceSerializer }
@@ -38,8 +38,8 @@ describe DDS::V1::AuthProvidersAPI do
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { AuthenticationService.all.count }
         let(:extras) {
-          FactoryGirl.create_list(:duke_authentication_service, 3) +
-            FactoryGirl.create_list(:openid_authentication_service, 3)
+          FactoryBot.create_list(:duke_authentication_service, 3) +
+            FactoryBot.create_list(:openid_authentication_service, 3)
         }
       end
     end
@@ -76,11 +76,11 @@ describe DDS::V1::AuthProvidersAPI do
   end
 
   describe 'Auth Provider Affiliates' do
-    let(:authentication_service) { FactoryGirl.create(:openid_authentication_service, :with_ldap_identity_provider) }
+    let(:authentication_service) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
     let(:authentication_service_id) { authentication_service.id }
 
     let(:resource) {
-      user = FactoryGirl.build(:user)
+      user = FactoryBot.build(:user)
       user.user_authentication_services.build([{
         uid: user.username,
         authentication_service: authentication_service
@@ -115,7 +115,7 @@ describe DDS::V1::AuthProvidersAPI do
           end
           it_behaves_like 'a paginated resource' do
             let(:returned_users) { extras + [resource] }
-            let(:extras) { FactoryGirl.create_list(:user, 5) }
+            let(:extras) { FactoryBot.create_list(:user, 5) }
             let(:expected_total_length) { returned_users.count }
           end
           context 'with invalid authentication_service_id' do
@@ -194,9 +194,9 @@ describe DDS::V1::AuthProvidersAPI do
       end
       it_behaves_like 'an identified affiliate'
       context 'affiliate dds_user already exists' do
-        let(:existing_user) { FactoryGirl.create(:user) }
+        let(:existing_user) { FactoryBot.create(:user) }
         let(:existing_user_authentication_service) {
-          FactoryGirl.create(:user_authentication_service,
+          FactoryBot.create(:user_authentication_service,
             uid: existing_user.username,
             authentication_service: authentication_service,
             user: existing_user

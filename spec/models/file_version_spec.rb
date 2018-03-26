@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe FileVersion, type: :model do
   subject { file_version }
-  let(:file_version) { FactoryGirl.create(:file_version) }
+  let(:file_version) { FactoryBot.create(:file_version) }
   let(:data_file) { file_version.data_file }
-  let(:deleted_file_version) { FactoryGirl.create(:file_version, :deleted) }
+  let(:deleted_file_version) { FactoryBot.create(:file_version, :deleted) }
   let(:uri_encoded_name) { URI.encode(subject.data_file.name) }
   let(:upload) { file_version.upload }
-  let(:other_upload) { FactoryGirl.create(:upload, :completed, :with_fingerprint) }
+  let(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -17,7 +17,7 @@ RSpec.describe FileVersion, type: :model do
   end
 
   it_behaves_like 'a logically deleted model'
-  it_behaves_like 'a graphed node', auto_create: true, logically_deleted: true
+  it_behaves_like 'a graphed node', logically_deleted: true
   it_behaves_like 'a job_transactionable model'
 
   context 'previous data_file version' do
@@ -103,7 +103,7 @@ RSpec.describe FileVersion, type: :model do
     end
 
     describe '#next_version_number' do
-      let(:data_file) { FactoryGirl.create(:data_file) }
+      let(:data_file) { FactoryBot.create(:data_file) }
       subject { data_file.file_versions.last }
       it { is_expected.to respond_to(:next_version_number) }
 
@@ -113,15 +113,15 @@ RSpec.describe FileVersion, type: :model do
         it { expect(subject.next_version_number).to eq expected_next_version_number }
 
         context 'with versions for other files' do
-          let!(:other_file_version) { FactoryGirl.create(:file_version) }
+          let!(:other_file_version) { FactoryBot.create(:file_version) }
           it { expect(subject.next_version_number).to eq expected_next_version_number }
         end
       end
     end
 
     describe '#set_version_number' do
-      subject { FactoryGirl.build(:file_version) }
-      let!(:existing_file_version) { FactoryGirl.create(:file_version, data_file: subject.data_file) }
+      subject { FactoryBot.build(:file_version) }
+      let!(:existing_file_version) { FactoryBot.create(:file_version, data_file: subject.data_file) }
       it { is_expected.not_to be_persisted }
       it { is_expected.to respond_to(:set_version_number) }
       it { expect(subject.set_version_number).to eq subject.next_version_number }
@@ -130,7 +130,7 @@ RSpec.describe FileVersion, type: :model do
         it { expect(subject.version_number).to eq subject.next_version_number }
       end
       context 'with persisted file_version' do
-        subject { FactoryGirl.create(:file_version, version_number: 123) }
+        subject { FactoryBot.create(:file_version, version_number: 123) }
         let!(:original_version) { subject.version_number }
         before { is_expected.to be_persisted }
         it { expect(subject.set_version_number).to eq original_version }

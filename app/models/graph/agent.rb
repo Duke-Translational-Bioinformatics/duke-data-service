@@ -1,6 +1,5 @@
 class Graph::Agent
-  include Neo4j::ActiveNode
-  include Graphed::Model
+  include Graphed::NodeModel
 
   property :model_id, index: :exact
   property :model_kind, index: :exact

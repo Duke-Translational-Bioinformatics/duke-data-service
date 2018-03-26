@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :property do
     template
     sequence(:key) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }

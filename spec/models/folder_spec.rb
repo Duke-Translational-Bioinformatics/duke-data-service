@@ -1,15 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
-  subject { FactoryGirl.create(:folder, :with_parent) }
-  let(:immediate_child_folder) { FactoryGirl.create(:folder, parent: subject) }
-  let(:immediate_child_file) { FactoryGirl.create(:data_file, parent: subject) }
+  subject { FactoryBot.create(:folder, :with_parent) }
+  let(:immediate_child_folder) { FactoryBot.create(:folder, parent: subject) }
+  let(:immediate_child_file) { FactoryBot.create(:data_file, parent: subject) }
   let(:folder_children) {[ immediate_child_file, immediate_child_folder ]}
   let(:folder_child_minder_children) { folder_children }
-
   let(:project) { subject.project }
-  let(:other_project) { FactoryGirl.create(:project) }
-  let(:other_folder) { FactoryGirl.create(:folder, project: other_project) }
+  let(:other_project) { FactoryBot.create(:project) }
+  let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -108,12 +107,12 @@ RSpec.describe Folder, type: :model do
   end
 
   describe '.creator' do
-    let(:creator) { FactoryGirl.create(:user) }
+    let(:creator) { FactoryBot.create(:user) }
     it { is_expected.to respond_to :creator }
 
     context 'with nil creation audit' do
       subject {
-        FactoryGirl.create(:folder)
+        FactoryBot.create(:folder)
       }
 
       around(:each) do |example|
@@ -131,7 +130,7 @@ RSpec.describe Folder, type: :model do
     context 'with creation audit' do
       subject {
         Audited.audit_class.as_user(creator) do
-          FactoryGirl.create(:folder)
+          FactoryBot.create(:folder)
         end
       }
 
@@ -182,14 +181,14 @@ RSpec.describe Folder, type: :model do
   end
 
   it_behaves_like 'a Restorable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
-    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
     before do
       expect(child_folder_file).to be_persisted
       child_folder_file.update_column(:is_deleted, true)
     end
   end
   it_behaves_like 'a Purgable ChildMinder', :folder, :folder_children, :folder_child_minder_children do
-    let(:child_folder_file) { FactoryGirl.create(:data_file, parent: immediate_child_folder)}
+    let(:child_folder_file) { FactoryBot.create(:data_file, parent: immediate_child_folder)}
     before do
       expect(child_folder_file).to be_persisted
       child_folder_file.update_column(:is_deleted, true)
@@ -215,7 +214,7 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'when child is not a Container' do
-      let(:incompatible_child) { FactoryGirl.create(:file_version) }
+      let(:incompatible_child) { FactoryBot.create(:file_version) }
       it {
         expect {
           begin
@@ -252,7 +251,7 @@ RSpec.describe Folder, type: :model do
 
       context 'from this project' do
         context 'from another folder' do
-          let(:child) { FactoryGirl.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
+          let(:child) { FactoryBot.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
           it {
             expect {
               expect(child.is_deleted?).to be_truthy

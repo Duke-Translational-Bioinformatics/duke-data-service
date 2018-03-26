@@ -1,14 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe ProvenanceGraphRelationshipSerializer, type: :serializer do
+  include_context 'performs enqueued jobs', only: GraphPersistenceJob
   # (activity)-(used)->(focus)
   let!(:focus) {
-    FactoryGirl.create(:file_version, label: "FOCUS")
+    FactoryBot.create(:file_version, label: "FOCUS")
   }
 
-  let!(:activity) { FactoryGirl.create(:activity, name: "ACTIVITY") }
+  let!(:activity) { FactoryBot.create(:activity, name: "ACTIVITY") }
   let!(:activity_used_focus) {
-    FactoryGirl.create(:used_prov_relation,
+    FactoryBot.create(:used_prov_relation,
       relatable_from: activity,
       relatable_to: focus
     )

@@ -8,7 +8,7 @@ class OriginProvenanceGraph < ProvenanceGraph
     OPTIONAL MATCH (generating_activity)-[contributing:WasGeneratedBy|:Used]-(contributed:FileVersion)
     OPTIONAL MATCH (file_version)-[derivation:WasDerivedFrom]->(derived_from:FileVersion)'
 
-    Neo4j::Session.query.match(match_clause).params(
+    Neo4j::Core::Query.new(session: Neo4j::ActiveBase.current_session).match(match_clause).params(
       file_versions: file_versions.map{|fv| fv[:id] }.flatten
     ).pluck(
       "file_version",

@@ -1,15 +1,17 @@
 module DDS
   module V1
     class TrashbinAPI < Grape::API
+      helpers PaginationParams
+
       desc 'View Trashbin Item details' do
         detail 'Show Details of a Trashbin Item.'
         named 'show trashbin item'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Item Does not Exist'],
-          [404, 'Object kind not supported']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Item Does not Exist'},
+          {code: 404, message: 'Object kind not supported'}
         ]
       end
       params do
@@ -28,13 +30,13 @@ module DDS
         detail 'Restores the item, and any children, to an undeleted status to the specified parent folder or project.'
         named 'restore trashbin item'
         failure [
-          [200, 'Success'],
-          [404, 'Parent object does not exist or is itself in the trashbin'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Object or Parent kind not supported'],
-          [404, 'Object not found in trash bin'],
-          [404, 'Parent object does not exist or is itself in the trashbin']
+          {code: 200, message: 'Success'},
+          {code: 404, message: 'Parent object does not exist or is itself in the trashbin'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Object or Parent kind not supported'},
+          {code: 404, message: 'Object not found in trash bin'},
+          {code: 404, message: 'Parent object does not exist or is itself in the trashbin'}
         ]
       end
       params do
@@ -97,11 +99,11 @@ module DDS
         detail 'Purges the item and any children, and permenantly removes any stored files from the storage_provider. If a FileVersion is restored, the parent is optional, otherwise it is required.'
         named 'purge trashbin item'
         failure [
-          [200, 'Successfully Purged'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Item Does not Exist'],
-          [404, 'Object kind not supported']
+          {code: 200, message: 'Successfully Purged'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Item Does not Exist'},
+          {code: 404, message: 'Object kind not supported'}
         ]
       end
       params do
@@ -128,6 +130,68 @@ module DDS
           purge_object.save
         end
         body false
+      end
+
+      desc 'List folder children in trashbin' do
+        detail 'Returns the trashed children of the folder.'
+        named 'list folder children in the trashbin'
+        failure [
+          {code: 200, message: "Valid API Token in 'Authorization' Header"},
+          {code: 401, message: "Missing, Expired, or Invalid API Token in 'Authorization' Header"},
+          {code: 404, message: 'Folder does not exist or is purged'}
+        ]
+      end
+      params do
+        optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
+        use :pagination
+      end
+      get '/trashbin/folders/:id/children', adapter: :json, root: 'results' do
+        authenticate!
+        folder = Folder.find_by!(id: params[:id], is_purged: false)
+        authorize folder, :index?
+        name_contains = params[:name_contains]
+        descendants = params[:recurse] ? policy_scope(folder.descendants) : policy_scope(folder.children)
+        descendants = descendants.where(is_deleted: true, is_purged: false)
+        if name_contains
+          if name_contains.empty?
+            descendants = descendants.none
+          else
+            descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          end
+        end
+        paginate(descendants.includes(:parent, :project, :audits))
+      end
+
+      desc 'List project children in the trashbin' do
+        detail 'Returns the trashed children of the project.'
+        named 'list project children in the trashbin'
+        failure [
+          {code: 200, message: "Valid API Token in 'Authorization' Header"},
+          {code: 401, message: "Missing, Expired, or Invalid API Token in 'Authorization' Header"},
+          {code: 404, message: 'Project does not exist or has been deleted'}
+        ]
+      end
+      params do
+        optional :name_contains, type: String, desc: 'list children whose name contains this string'
+        optional :recurse, type: Boolean, desc: 'If true, searches recursively into subfolders'
+        use :pagination
+      end
+      get '/trashbin/projects/:id/children', adapter: :json, root: 'results' do
+        authenticate!
+        project = hide_logically_deleted Project.find(params[:id])
+        authorize DataFile.new(project: project), :index?
+        name_contains = params[:name_contains]
+        descendants = params[:recurse] ? project.containers : project.children
+        descendants = descendants.where(is_deleted: true, is_purged: false)
+        if name_contains
+          if name_contains.empty?
+            descendants = descendants.none
+          else
+            descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
+          end
+        end
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits)))
       end
     end
   end

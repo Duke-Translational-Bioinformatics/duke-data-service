@@ -3,10 +3,10 @@ require 'rails_helper'
 describe UploadPolicy do
   include_context 'policy declarations'
 
-  let(:auth_role) { FactoryGirl.create(:auth_role) }
-  let(:project_permission) { FactoryGirl.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryGirl.create(:upload, project: project_permission.project) }
-  let(:other_upload) { FactoryGirl.create(:upload) }
+  let(:auth_role) { FactoryBot.create(:auth_role) }
+  let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
+  let(:upload) { FactoryBot.create(:upload, project: project_permission.project) }
+  let(:other_upload) { FactoryBot.create(:upload) }
 
   it_behaves_like 'system_permission can access', :upload
   it_behaves_like 'system_permission can access', :other_upload
@@ -24,7 +24,7 @@ describe UploadPolicy do
 
 
   context 'when user does not have project_permission' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     describe '.scope' do
       it { expect(resolved_scope).not_to include(upload) }

@@ -8,11 +8,11 @@ module DDS
         detail 'Initiates a project transfer from the current owner to a new owner or list of owners.'
         named 'initiate project transfer'
         failure [
-          [200, 'This will never actually happen'],
-          [201, 'Successfully Created'],
-          [400, 'Project Transfer Already Exists'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden']
+          {code: 200, message: 'This will never actually happen'},
+          {code: 201, message: 'Successfully Created'},
+          {code: 400, message: 'Project Transfer Already Exists'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'}
         ]
       end
       params do
@@ -47,12 +47,12 @@ module DDS
         detail 'list project transfers'
         named 'list project transfers'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Project does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Project does not exist'}
         ]
       end
-      get '/projects/:project_id/transfers', root: 'results' do
+      get '/projects/:project_id/transfers', adapter: :json, root: 'results' do
         authenticate!
         project = Project.find(params[:project_id])
         policy_scope(ProjectTransfer).where(project: project)
@@ -62,10 +62,10 @@ module DDS
         detail 'Used to view an instance of a project transfer.'
         named 'view a project transfer'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project transfer does not exist']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project transfer does not exist'}
         ]
       end
       get '/project_transfers/:id', root: false do
@@ -79,11 +79,11 @@ module DDS
         detail 'Reject a pending project transfer.'
         named 'reject a project transfer'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project transfer does not exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project transfer does not exist'}
         ]
       end
       params do
@@ -108,11 +108,11 @@ module DDS
         detail 'Cancel a pending project transfer.'
         named 'cancel a project transfer'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project transfer does not exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project transfer does not exist'}
         ]
       end
       params do
@@ -137,11 +137,11 @@ module DDS
         detail 'Accept a pending project transfer.'
         named 'accept a project transfer'
         failure [
-          [200, 'Success'],
-          [400, 'Validation Error'],
-          [401, 'Unauthorized'],
-          [403, 'Forbidden'],
-          [404, 'Project transfer does not exist']
+          {code: 200, message: 'Success'},
+          {code: 400, message: 'Validation Error'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 403, message: 'Forbidden'},
+          {code: 404, message: 'Project transfer does not exist'}
         ]
       end
       params do
@@ -166,9 +166,9 @@ module DDS
         detail 'View all project transfers.'
         named 'view all project transfers'
         failure [
-          [200, 'Success'],
-          [401, 'Unauthorized'],
-          [404, 'Unsupported Status']
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'},
+          {code: 404, message: 'Unsupported Status'}
         ]
       end
       params do
@@ -185,7 +185,7 @@ module DDS
         }
         error!(error_json, 404)
       end
-      get '/project_transfers', root: 'results' do
+      get '/project_transfers', adapter: :json, root: 'results' do
         authenticate!
         project_transfer_params = declared(params, include_missing: false)
         project_transfers = policy_scope(ProjectTransfer)

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ProvenanceGraphSerializer, type: :serializer do
   shared_examples 'a ProvenanceGraphSerializer' do |expected_object_node_syms:, expected_object_relationship_syms:|
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     let(:expected_object_nodes) { expected_object_node_syms.map{|enodesym| send(enodesym) }.flatten }
     let(:expected_object_relationships) { expected_object_relationship_syms.map{|ersym| send(ersym) }.flatten }
 
@@ -34,12 +35,12 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
   context 'SearchProvenanceGraph' do
     # (activity)-(used)->(focus)
     let!(:focus) {
-      FactoryGirl.create(:file_version, label: "FOCUS")
+      FactoryBot.create(:file_version, label: "FOCUS")
     }
 
-    let!(:activity) { FactoryGirl.create(:activity, name: "ACTIVITY") }
+    let!(:activity) { FactoryBot.create(:activity, name: "ACTIVITY") }
     let!(:activity_used_focus) {
-      FactoryGirl.create(:used_prov_relation,
+      FactoryBot.create(:used_prov_relation,
         relatable_from: activity,
         relatable_to: focus
       )
@@ -54,17 +55,17 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
 
   context 'OriginProvenanceGraph' do
     # (fv1ga)-[generated]->(fv1)
-    let!(:fv1) { FactoryGirl.create(:file_version, label: "FV1") }
-    let!(:fv1ga) { FactoryGirl.create(:activity, name: "FV1GA") }
+    let!(:fv1) { FactoryBot.create(:file_version, label: "FV1") }
+    let!(:fv1ga) { FactoryBot.create(:activity, name: "FV1GA") }
     let!(:fv1ga_generated_fv1) {
-      FactoryGirl.create(:generated_by_activity_prov_relation,
+      FactoryBot.create(:generated_by_activity_prov_relation,
         relatable_from: fv1,
         relatable_to: fv1ga
       )
     }
-    let!(:fv1_derived_from) { FactoryGirl.create(:file_version, label: "FV1_DERIVED_FROM") }
+    let!(:fv1_derived_from) { FactoryBot.create(:file_version, label: "FV1_DERIVED_FROM") }
     let!(:fv1_derived_from_fv1_derived_from) {
-      FactoryGirl.create(:derived_from_file_version_prov_relation,
+      FactoryBot.create(:derived_from_file_version_prov_relation,
         relatable_to: fv1_derived_from,
         relatable_from: fv1
       )
