@@ -142,6 +142,8 @@ of the upload using the project.id and upload.id at request time.  This tightly 
 + FileVersion will have a manage_purge method that submits a UploadStoragePurgeJob for its upload when
 is_purged is set to true (after_save).
 
++ Container needs a `restore_to_parent_id` attribute which holds the id of the parent into which the item should be restored by default. `delete /{projects,files}/{id}` should set the restore_to_parent_id to the parent_id and unset the parent_id when the item is deleted.
+
 ###### Background Workers
 
 Projects, Folders, and DataFiles will have a manage_children method that responds to updates to is_deleted and is_purged by submitting jobs to apply the same change to all children (Project/Folder children are folders and data_files, data_file children are file_versions). This entails the creation of the following jobs:
