@@ -28,6 +28,9 @@ RSpec.describe ErrorQueueHandler do
       def perform
         raise 'boom!'
       end
+      def self.should_be_registered_worker?
+        false
+      end
     end)
   }
   let(:sneakers_worker_class) { application_job.job_wrapper }
