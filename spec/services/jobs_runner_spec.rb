@@ -5,7 +5,8 @@ RSpec.describe JobsRunner do
   let(:initialized_with) { sneakers_worker }
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
-  let(:application_job_class) { Class.new(ApplicationJob) }
+  let(:job_class_name) {|example| "jobs_runner_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
+  let(:application_job_class) { Object.const_set(job_class_name, Class.new(ApplicationJob)) }
   let(:workers_registry_hash) { {
     message_logger: MessageLogWorker,
     initialize_project_storage: ProjectStorageProviderInitializationJob,

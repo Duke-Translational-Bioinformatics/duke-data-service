@@ -88,7 +88,7 @@ RSpec.describe ApplicationJob, type: :job do
         arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
       )
     }
-    let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
+    let(:child_class_name) {|example| "application_job_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
       Object.const_set(child_class_name, Class.new(described_class) do
