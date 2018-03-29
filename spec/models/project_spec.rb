@@ -288,5 +288,14 @@ RSpec.describe Project, type: :model do
         end
       end
     end
+
+    context 'called when project is invalid' do
+      before do
+        subject.name = 'foo bar baz'
+        subject.description = nil
+        is_expected.not_to be_valid
+      end
+      it { expect(call_generate_slug).to eq 'foo_bar_baz' }
+    end
   end
 end
