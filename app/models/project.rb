@@ -93,11 +93,10 @@ class Project < ActiveRecord::Base
   end
 
   def generate_slug
-    count = 0
     self.slug = slug_prefix = name.gsub('-','_').parameterize(separator: '_')
-    while count < 1000 && !self.valid?
-      count += 1
-      self.slug = "#{slug_prefix}_#{count}"
+    unless self.valid?
+      slugs = (1..1000).to_a.collect {|i| "#{slug_prefix}_#{i}"}
+      self.slug = (slugs - self.class.where("slug LIKE '#{slug_prefix}%'").pluck(:slug)).first
     end
     self.slug
   end
