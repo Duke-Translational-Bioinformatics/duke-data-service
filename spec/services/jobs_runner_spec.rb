@@ -5,7 +5,14 @@ RSpec.describe JobsRunner do
   let(:initialized_with) { sneakers_worker }
   let(:sneakers_worker) { Class.new { include Sneakers::Worker } }
   let(:mocked_sneakers_runner) { instance_double(Sneakers::Runner) }
-  let(:application_job_class) { Class.new(ApplicationJob) }
+  let(:job_class_name) {|example| "jobs_runner_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
+  let(:application_job_class) {
+    Object.const_set(job_class_name, Class.new(ApplicationJob) do
+      def self.should_be_registered_worker?
+        false
+      end
+    end)
+  }
   let(:workers_registry_hash) { {
     message_logger: MessageLogWorker,
     initialize_project_storage: ProjectStorageProviderInitializationJob,
@@ -19,7 +26,7 @@ RSpec.describe JobsRunner do
     restore_children: ChildRestorationJob
   } }
   let(:registered_worker_classes) { workers_registry_hash.values }
-  let(:expected_jobs) { ApplicationJob.descendants.reject{|klass| klass.methods.include? :is_fake_job_spec_job? }.sort { |x,y| x.to_s <=> y.to_s } }
+  let(:expected_jobs) { ApplicationJob.descendants.select{|klass| klass.should_be_registered_worker? }.sort { |x,y| x.to_s <=> y.to_s } }
 
   it {
     expect(registered_worker_classes.sort { |x,y| x.to_s <=> y.to_s } ).to include(*expected_jobs)

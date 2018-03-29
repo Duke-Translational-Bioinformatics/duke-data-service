@@ -16,12 +16,13 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 
 |Endpoint |Description |
 |---|---|
-| `GET /trashbin/projects/{id}/children{?name_contains}` | Get a list of immediate descendants of the project that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
-| `GET /trashbin/folders/{id}/children{?name_contains}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, a recursive search is performed.  The results are sorted in most recently deleted order. |
+| `GET /trashbin/projects/{id}/children{?name_contains,recurse}` | Get a list of immediate descendants of the project that are in the trash bin. If `name_contains` is specified, only children with the names containing the supplied value are returned. If `recurse` is true (default false), a recursive search is performed. The results are sorted in most recently deleted order. |
+| `GET /trashbin/folders/{id}/children{?name_contains,recurse}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, only children with the names containing the supplied value are returned. If `recurse` is true (default false), a recursive search is performed. The results are sorted in most recently deleted order. |
 | `GET /trashbin/{object_id}/{object_kind}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
 | `PUT /trashbin/{object_kind}/{object_id}/restore` | Restore the specified object and all descendants (recursive) from the trash bin to original parent or a new parent; an exception is thrown if parent does not exist or is itself deleted. |
 | `PUT /trashbin/{object_kind}/{object_id}/purge` | Purges the specified object and all descendants (recursive) from the trash bin; once purged, the object is no longer visible from the trash bin context, and in the case of a file version, the file content is permanently removed from the storage provider (e.g. Duke OIT Swift). |
-
+| `DELETE /folders/{id}` | Places the specified folder, and all of its descendants, into the trash bin. If the folder is a subfolder of another folder when it is deleted, it will be placed into the root of the project trash bin, such that it will only show up in a call to `GET /trashbin/projects/{id}/children`, and will not show up in the results of `GET /trashbin/folders/{parent_id}/children`. The folder can still be restored to its original parent folder, unless its parent has also been placed into the trash bin. |
+| `DELETE /files/{id}` |  Places the specified file, and all of its file_versions, into the trash bin. If the file is inside a folder when it is deleted, it will be placed into the root of the project trash bin, such that it will only show up in a call to `GET /trashbin/projects/{id}/children` , and will not show up in the results of `GET /trashbin/folders/{parent_id}/children`. The file can still be restored to its original parent folder, unless its parent has also been placed into the trash bin. |
 
 **Note:** *An object is considered to be in the trash bin if it has been deleted (`"is_deleted": true`), but not purged (`"is_purged": false`); a purged object is immutable.*
 
@@ -140,6 +141,8 @@ of the upload using the project.id and upload.id at request time.  This tightly 
 
 + FileVersion will have a manage_purge method that submits a UploadStoragePurgeJob for its upload when
 is_purged is set to true (after_save).
+
++ Container needs a `restore_to_parent_id` attribute which holds the id of the parent into which the item should be restored by default. `delete /{projects,files}/{id}` should set the restore_to_parent_id to the parent_id and unset the parent_id when the item is deleted.
 
 ###### Background Workers
 
