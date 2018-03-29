@@ -252,4 +252,41 @@ RSpec.describe Project, type: :model do
       }
     end
   end
+
+  describe '#generate_slug' do
+    let(:call_generate_slug) { subject.generate_slug }
+    it { is_expected.to respond_to(:generate_slug) }
+    it { expect(subject.slug).to be_nil }
+    it 'populates slug and returns the new value' do
+      expect(call_generate_slug).not_to be_nil
+      expect(subject.slug).to eq call_generate_slug
+    end
+    it 'uses name to generate slug' do
+      subject.name = 'foobarbaz'
+      expect(call_generate_slug).to eq 'foobarbaz'
+    end
+
+    context 'called with name set to' do
+      before {|example| subject.name = example.description }
+      after { is_expected.to be_valid }
+      it 'foo-bar baz' do
+        expect(call_generate_slug).to eq 'foo_bar_baz'
+      end
+      it ' _ Foo-bär baz -_ ' do
+        expect(call_generate_slug).to eq 'foo_bar_baz'
+      end
+
+      context 'existing slug' do
+        before do
+          FactoryBot.create(:project, slug: 'foo_bar_baz')
+          (1..3).each do |i|
+            FactoryBot.create(:project, slug: "foo_bar_baz_#{i}")
+          end
+        end
+        it 'foo_bar_baz' do
+          expect(call_generate_slug).to eq 'foo_bar_baz_4'
+        end
+      end
+    end
+  end
 end

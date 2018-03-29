@@ -92,6 +92,16 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def generate_slug
+    count = 0
+    self.slug = slug_prefix = name.gsub('-','_').parameterize(separator: '_')
+    while count < 1000 && !self.valid?
+      count += 1
+      self.slug = "#{slug_prefix}_#{count}"
+    end
+    self.slug
+  end
+
   private
 
   def paginated_containers(page=1)
