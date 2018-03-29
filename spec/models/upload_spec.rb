@@ -331,6 +331,7 @@ RSpec.describe Upload, type: :model do
           subject.create_and_validate_storage_manifest
         end
         it {
+          original_chunks = subject.chunks.all
           resp = HTTParty.head(
             "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
             headers: subject.storage_provider.auth_header
@@ -343,13 +344,21 @@ RSpec.describe Upload, type: :model do
             )
             expect(resp.response.code.to_i).to eq(200)
           end
-          subject.purge_storage
+          purge_time = DateTime.now
+          expect {
+            subject.purge_storage
+          }.to change{Chunk.count}.by(-original_chunks.length)
+          subject.reload
+          expect(subject.purged_on).not_to be_nil
+          expect(subject.purged_on).to be >= purge_time
+          expect(subject.chunks.count).to eq(0)
+
           resp = HTTParty.head(
             "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
             headers: subject.storage_provider.auth_header
           )
           expect(resp.response.code.to_i).to eq(404)
-          subject.chunks.each do |chunk|
+          original_chunks.each do |chunk|
             resp = HTTParty.head(
               "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
               headers: subject.storage_provider.auth_header
