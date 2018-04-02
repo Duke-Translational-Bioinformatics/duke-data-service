@@ -28,7 +28,7 @@ class DataFile < Container
   after_set_parent_attribute :set_project_to_parent_project
   before_save :set_current_file_version_attributes
 
-  validates :project_id, presence: true, immutable: true, unless: :is_deleted
+  validates :project_id, presence: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
 
   validates_each :upload, unless: :is_deleted do |record, attr, value|

@@ -37,17 +37,6 @@ RSpec.describe Folder, type: :model do
       should validate_presence_of(:project_id)
     end
 
-    it 'should not allow project_id to be changed' do
-      should allow_value(project).for(:project)
-      is_expected.to be_valid
-      should allow_value(project.id).for(:project_id)
-      should_not allow_value(other_project.id).for(:project_id)
-      should allow_value(project.id).for(:project_id)
-      is_expected.to be_valid
-      should allow_value(other_project).for(:project)
-      is_expected.not_to be_valid
-    end
-
     it 'should allow is_deleted to be set' do
       should allow_value(true).for(:is_deleted)
       should allow_value(false).for(:is_deleted)

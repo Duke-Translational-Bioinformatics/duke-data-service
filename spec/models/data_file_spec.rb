@@ -39,17 +39,6 @@ RSpec.describe DataFile, type: :model do
     it { is_expected.to validate_presence_of(:project_id) }
     it { is_expected.to validate_presence_of(:upload) }
 
-    it 'should not allow project_id to be changed' do
-      should allow_value(project).for(:project)
-      expect(subject).to be_valid
-      should allow_value(project.id).for(:project_id)
-      should_not allow_value(other_project.id).for(:project_id)
-      should allow_value(project.id).for(:project_id)
-      expect(subject).to be_valid
-      should allow_value(other_project).for(:project)
-      expect(subject).not_to be_valid
-    end
-
     it 'should require upload has no error' do
       should allow_value(completed_upload).for(:upload)
       should_not allow_value(upload_with_error).for(:upload)
