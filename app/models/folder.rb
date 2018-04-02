@@ -25,7 +25,7 @@ class Folder < Container
 
   after_set_parent_attribute :set_project_to_parent_project
 
-  validates :project_id, presence: true, immutable: true
+  validates :project_id, presence: true, unless: :is_deleted
   validates_each :parent, :parent_id do |record, attr, value|
     record.errors.add(attr, 'cannot be itself') if record.parent == record
     record.errors.add(attr, 'cannot be a child folder') if record.parent &&
