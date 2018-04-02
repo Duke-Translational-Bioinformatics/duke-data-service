@@ -64,7 +64,6 @@ describe DDS::V1::TrashbinAPI do
 
   describe 'PUT /trashbin/{object_kind}/{object_id}/restore' do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}/restore" }
-    subject { put(url, params: payload.to_json, headers: headers) }
     let(:called_action) { 'PUT' }
     let(:parent_kind) { parent_folder.kind }
     let(:parent_id) { parent_folder.id }
@@ -74,73 +73,137 @@ describe DDS::V1::TrashbinAPI do
     let(:resource_kind) { trashed_resource.kind }
     let(:resource_id) { trashed_resource.id }
 
-    let(:payload) {{
-      parent: {
-        kind: parent_kind,
-        id: parent_id
-      }
-    }}
+    context 'without payload' do
+      subject { put(url, headers: headers) }
 
-    it_behaves_like 'an identified resource' do
-      let(:resource_id) { "doesNotExist" }
-    end
-
-    it_behaves_like 'an identified resource' do
-      let(:resource_id) { untrashed_resource.id }
-    end
-
-    it_behaves_like 'an identified resource' do
-      let(:parent_id) { "doesNotExist" }
-      let(:resource_class) { Folder }
-    end
-
-    it_behaves_like 'a client error' do
-      let(:expected_response) { 404 }
-      let(:expected_reason) { "dds-folder #{parent_folder.id} is deleted, and cannot restore children." }
-      let(:expected_suggestion) { "Restore #{parent_folder.kind} #{parent_folder.id}." }
-      before do
-        parent_folder.update_columns(is_deleted: true)
-      end
-    end
-
-    it_behaves_like 'a kinded resource' do
-      let(:resource_kind) { 'invalid-kind' }
-    end
-
-    it_behaves_like 'a kinded resource' do
-      let(:parent_kind) { 'invalid-kind' }
-      let(:resource_kind) { 'invalid-kind' }
-    end
-
-    it_behaves_like 'an authenticated resource'
-    it_behaves_like 'an authorized resource'
-    it_behaves_like 'an annotate_audits endpoint' do
-      let(:expected_audits) { 3 }
-    end
-
-    it_behaves_like 'an updatable resource' do
-      it 'restores the object to the requested parent' do
-        is_expected.to eq(expected_response_status)
-        trashed_resource.reload
-        expect(trashed_resource.is_deleted).to be_falsey
-        expect(trashed_resource.parent.id).to eq(parent_id)
-      end
-
-      it_behaves_like 'a software_agent accessible resource' do
-        it 'restores the object to the requested parent' do
-          is_expected.to eq(expected_response_status)
-          trashed_resource.reload
-          expect(trashed_resource.is_deleted).to be_falsey
-          expect(trashed_resource.parent.id).to eq(parent_id)
+      context 'resource in root of the project' do
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { "doesNotExist" }
         end
 
+        it_behaves_like 'an identified resource' do
+          let(:resource_id) { untrashed_resource.id }
+        end
+
+        it_behaves_like 'a client error' do
+          let(:expected_response) { 404 }
+          let(:expected_reason) { "dds-project #{project.id} is permenantly deleted, and cannot restore children." }
+          let(:expected_suggestion) { "Restore to a different project." }
+          before do
+            project.update_columns(is_deleted: true)
+          end
+        end
+
+        it_behaves_like 'a kinded resource' do
+          let(:resource_kind) { 'invalid-kind' }
+        end
+
+        it_behaves_like 'an authenticated resource'
+        it_behaves_like 'an authorized resource'
         it_behaves_like 'an annotate_audits endpoint' do
-            let(:expected_audits) { 2 }
+          let(:expected_audits) { 2 }
+        end
+
+        it_behaves_like 'an updatable resource' do
+          it 'restores the object to the requested parent' do
+            is_expected.to eq(expected_response_status)
+            trashed_resource.reload
+            expect(trashed_resource.is_deleted).to be_falsey
+          end
+
+          it_behaves_like 'a software_agent accessible resource' do
+            it 'restores the object to the requested parent' do
+              is_expected.to eq(expected_response_status)
+              trashed_resource.reload
+              expect(trashed_resource.is_deleted).to be_falsey
+            end
+
+            it_behaves_like 'an annotate_audits endpoint' do
+                let(:expected_audits) { 1 }
+            end
+          end
+        end
+      end
+
+      context 'resource in a folder' do
+        let(:resource) { trashed_child_resource }
+        let(:resource_kind) { trashed_child_resource.kind }
+        let(:resource_id) { trashed_child_resource.id }
+
+        before do
+          expect(parent_folder).to be_persisted
+        end
+
+        it_behaves_like 'a client error' do
+          let(:expected_response) { 404 }
+          let(:expected_reason) { "dds-folder #{parent_folder.id} is deleted, and cannot restore children." }
+          let(:expected_suggestion) { "Restore #{parent_folder.kind} #{parent_folder.id}." }
+          before do
+            parent_folder.update_columns(is_deleted: true)
+          end
+        end
+
+        it_behaves_like 'an updatable resource' do
+          it 'restores the object to the requested parent' do
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.is_deleted).to be_falsey
+          end
+        end
+      end
+    end
+
+    context 'with payload' do
+      subject { put(url, params: payload.to_json, headers: headers) }
+      let(:payload) {{
+        parent: {
+          kind: parent_kind,
+          id: parent_id
+        }
+      }}
+
+      context 'for parent in same project' do
+        it_behaves_like 'an authorized resource'
+
+        it_behaves_like 'an identified resource' do
+          let(:parent_id) { "doesNotExist" }
+          let(:resource_class) { Folder }
+        end
+
+        it_behaves_like 'a kinded resource' do
+          let(:parent_kind) { 'invalid-kind' }
+          let(:resource_kind) { 'invalid-kind' }
+        end
+      end
+
+      context 'for parent in different project' do
+        let(:other_project_folder) { FactoryBot.create(:folder, project: other_permission.project) }
+        let(:parent_kind) { other_project_folder.kind }
+        let(:parent_id) { other_project_folder.id }
+
+        before do
+          expect(other_project_folder).to be_persisted
+        end
+
+        it_behaves_like 'an authorized resource'
+        it_behaves_like 'an authorized resource' do
+          let(:resource_permission) { other_permission }
+        end
+
+        it_behaves_like 'an updatable resource' do
+          it 'restores the object to the requested parent' do
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.is_deleted).to be_falsey
+            expect(resource.project_id).to eq other_permission.project.id
+            expect(resource.parent_id).to eq(other_project_folder.id)
+          end
         end
       end
     end
 
     context 'file_version' do
+      subject { put(url, headers: headers) }
       context 'containing file not deleted' do
         let(:file_version) {
           fv = untrashed_resource.file_versions.first
@@ -153,7 +216,6 @@ describe DDS::V1::TrashbinAPI do
         let(:resource_kind) { file_version.kind }
         let(:resource_class) { FileVersion }
         let(:resource_serializer) { FileVersionSerializer }
-        let(:payload) {{}}
         it_behaves_like 'an updatable resource' do
           it 'restores the object' do
             expect(file_version.is_deleted).to be_truthy
@@ -173,7 +235,6 @@ describe DDS::V1::TrashbinAPI do
         }
         let(:resource_kind) { file_version.kind }
         let(:resource_id) { file_version.id }
-        let(:payload) {{}}
 
         it_behaves_like 'a client error' do
           let(:expected_response) { 404 }
@@ -188,6 +249,7 @@ describe DDS::V1::TrashbinAPI do
       let(:resource_id) { project.id }
       let(:resource_kind) { project.kind }
       let(:resource_class) { Project }
+      subject { put(url, headers: headers) }
 
       before do
         resource.update_columns(is_deleted: true)
@@ -204,6 +266,7 @@ describe DDS::V1::TrashbinAPI do
       let(:resource_id) { purged_resource.id }
       let(:resource_kind) { purged_resource.kind }
       let(:resource_class) { purged_resource.class }
+      subject { put(url, headers: headers) }
 
       it_behaves_like 'a viewable resource'
     end

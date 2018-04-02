@@ -81,9 +81,10 @@ module DDS
         parent_params = declared(params, {include_missing: false}, [:parent])
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         purge_object = object_kind.find_by!(id: params[:object_id], is_deleted: true)
+        authorize purge_object, :destroy?
         raise UnRestorableException.new(purge_object.kind) unless purge_object.class.include? Restorable
         unless purge_object.is_purged?
-          target_parent = purge_object.parent
+          target_parent = purge_object.parent || purge_object.project
           if params[:parent]
            parent_kind = KindnessFactory.by_kind(parent_params[:parent][:kind])
            target_parent = parent_kind.find(parent_params[:parent][:id])
@@ -123,10 +124,10 @@ module DDS
         authenticate!
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         purge_object = object_kind.find_by!(id: params[:object_id], is_deleted: true)
+        authorize purge_object, :destroy?
         raise UnPurgableException.new(purge_object.kind) unless purge_object.class.include? Purgable
         unless purge_object.is_purged?
           purge_object.purge
-          authorize purge_object, :destroy?
           purge_object.save
         end
         body false
