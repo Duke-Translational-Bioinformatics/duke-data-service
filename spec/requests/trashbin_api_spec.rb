@@ -335,6 +335,14 @@ describe DDS::V1::TrashbinAPI do
           end
         end
 
+        it_behaves_like 'a sorted index resource', :trashed_resource do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            trashed_resource.touch
+          end
+        end
+
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent accessible resource'
 
@@ -434,6 +442,13 @@ describe DDS::V1::TrashbinAPI do
               trashed_resource_in_trashed_folder
             ] }
           end
+          it_behaves_like 'a sorted index resource', :named_trashed_resource do
+            let(:sort_column) { :updated_at }
+            let(:sort_order) { "asc" }
+            before do
+              named_trashed_resource.touch
+            end
+          end
         end
       end
 
@@ -462,6 +477,14 @@ describe DDS::V1::TrashbinAPI do
               named_trashed_resource_in_trashed_folder,
               trashed_resource_in_trashed_folder
             ] }
+          end
+
+          it_behaves_like 'a sorted index resource', :named_trashed_resource do
+            let(:sort_column) { :updated_at }
+            let(:sort_order) { "asc" }
+            before do
+              named_trashed_resource.touch
+            end
           end
         end
       end
@@ -493,6 +516,14 @@ describe DDS::V1::TrashbinAPI do
             named_purged_resource
           ] }
         end
+
+        it_behaves_like 'a sorted index resource', :named_trashed_resource do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            named_trashed_resource.touch
+          end
+        end
       end
     end
 
@@ -521,6 +552,14 @@ describe DDS::V1::TrashbinAPI do
             purged_resource,
             named_purged_resource
           ] }
+        end
+
+        it_behaves_like 'a sorted index resource', :named_trashed_resource do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            named_trashed_resource.touch
+          end
         end
       end
     end
@@ -563,6 +602,14 @@ describe DDS::V1::TrashbinAPI do
             let(:expected_total_length) { parent_folder.children.count }
             let(:extras) { FactoryBot.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
           end
+
+          it_behaves_like 'a sorted index resource', :named_trashed_child_folder do
+            let(:sort_column) { :updated_at }
+            let(:sort_order) { "asc" }
+            before do
+              named_trashed_child_folder.touch
+            end
+          end
         end
       end
 
@@ -588,6 +635,13 @@ describe DDS::V1::TrashbinAPI do
               purged_resource,
               named_purged_resource,
             ] }
+          end
+          it_behaves_like 'a sorted index resource', :named_trashed_resource_in_trashed_folder do
+            let(:sort_column) { :updated_at }
+            let(:sort_order) { "asc" }
+            before do
+              named_trashed_resource_in_trashed_folder.touch
+            end
           end
         end
       end
@@ -620,6 +674,13 @@ describe DDS::V1::TrashbinAPI do
             trashed_resource_in_trashed_folder
           ] }
         end
+        it_behaves_like 'a sorted index resource', :named_trashed_child_folder do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            named_trashed_child_folder.touch
+          end
+        end
       end
     end
 
@@ -650,6 +711,13 @@ describe DDS::V1::TrashbinAPI do
             trashed_resource_in_trashed_folder
           ] }
         end
+        it_behaves_like 'a sorted index resource', :named_trashed_child_folder do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            named_trashed_child_folder.touch
+          end
+        end
       end
     end
 
@@ -679,6 +747,13 @@ describe DDS::V1::TrashbinAPI do
             named_trashed_resource_in_trashed_folder,
             trashed_resource_in_trashed_folder
           ] }
+        end
+        it_behaves_like 'a sorted index resource', :named_trashed_child_folder do
+          let(:sort_column) { :updated_at }
+          let(:sort_order) { "asc" }
+          before do
+            named_trashed_child_folder.touch
+          end
         end
       end
     end

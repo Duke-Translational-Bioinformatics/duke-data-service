@@ -213,6 +213,32 @@ shared_examples 'a paginated resource' do |payload_sym: :payload, default_per_pa
   end
 end
 
+shared_examples 'a sorted index resource' do |expected_last_item_sym|
+  let(:expected_last_item) { send(expected_last_item_sym) }
+  let(:sort_column) { :created_at }
+  let(:sort_order) { "desc" }
+
+  it 'should return a sorted index' do
+    is_expected.to eq(expected_response_status)
+    response_json = JSON.parse(response.body)
+    expect(response_json).to have_key('results')
+    returned_results = response_json['results']
+    expect(returned_results).to be_a(Array)
+    last_date = nil
+    returned_results.each do |this_result|
+      this_result_object = KindnessFactory.by_kind(this_result["kind"]).find(this_result["id"])
+      if last_date.nil?
+        last_date = this_result_object.send(sort_column)
+      elsif sort_order == "asc"
+        expect(this_result_object.send(sort_column)).to be >= last_date
+      else
+        expect(this_result_object.send(sort_column)).to be <= last_date
+      end
+    end
+    expect(returned_results.last["id"]).to eq(expected_last_item.id)
+  end
+end
+
 shared_examples 'a creatable resource' do
   let(:expected_response_status) {201}
   let(:new_object) {

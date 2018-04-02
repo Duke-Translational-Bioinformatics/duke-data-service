@@ -160,7 +160,7 @@ module DDS
             descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
           end
         end
-        paginate(descendants.includes(:parent, :project, :audits))
+        paginate(descendants.includes(:parent, :project, :audits).order('updated_at ASC'))
       end
 
       desc 'List project children in the trashbin' do
@@ -191,7 +191,7 @@ module DDS
             descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
           end
         end
-        paginate(policy_scope(descendants.includes(:parent, :project, :audits)))
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits).order('updated_at ASC')))
       end
     end
   end
