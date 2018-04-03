@@ -225,6 +225,7 @@ shared_examples 'a sorted index resource' do |expected_last_item_sym|
     returned_results = response_json['results']
     expect(returned_results).to be_a(Array)
     expect(returned_results).not_to be_empty
+    expect(returned_results.count).to be > 1
     last_date = nil
     returned_results.each do |this_result|
       this_result_object = KindnessFactory.by_kind(this_result["kind"]).find(this_result["id"])
