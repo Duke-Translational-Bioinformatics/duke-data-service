@@ -224,11 +224,32 @@ describe DDS::V1::ProjectsAPI do
     describe 'PUT' do
       let(:payload) {{
         name: project_stub.name,
+        slug: project_slug,
         description: project_stub.description
       }}
+      let(:project_slug) { 'a_project_slug' }
 
       it_behaves_like 'a PUT request' do
-        it_behaves_like 'an updatable resource'
+        it_behaves_like 'an updatable resource' do
+          it 'sets project slug' do
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(project_slug)
+          end
+        end
+
+        context 'without slug set' do
+          let(:payload) {{
+            name: project_stub.name,
+            description: project_stub.description
+          }}
+          it_behaves_like 'an updatable resource'
+        end
+
+        context 'with non-unique slug' do
+          before { FactoryBot.create(:project, slug: project_slug) }
+          it_behaves_like 'a validated resource'
+        end
 
         it_behaves_like 'a validated resource' do
           let(:payload) {{
