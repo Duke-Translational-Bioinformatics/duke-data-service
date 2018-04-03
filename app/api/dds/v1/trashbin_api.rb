@@ -183,7 +183,7 @@ module DDS
         authorize DataFile.new(project: project), :index?
         name_contains = params[:name_contains]
         descendants = params[:recurse] ? project.containers : project.children
-        descendants = descendants.where(is_deleted: true, is_purged: false)
+        descendants = descendants.unscope(:order).where(is_deleted: true, is_purged: false)
         if name_contains
           if name_contains.empty?
             descendants = descendants.none

@@ -300,20 +300,18 @@ describe DDS::V1::TrashbinAPI do
   end
 
   describe 'GET /trashbin/projects/{id}/children{?name_contains}{?recurse}' do
-    let(:url) { "/api/v1/trashbin/projects/#{parent_id}/children#{query_params}" }
+    let(:url) { "/api/v1/trashbin/projects/#{parent_id}/children" }
     let(:parent_id) { project.id }
     let(:payload) {{}}
 
     context 'default' do
-      let(:query_params) { '' }
-
+      let(:expected_resources) { [
+        trashed_resource,
+        named_trashed_resource,
+        named_trashed_folder
+      ] }
       it_behaves_like 'a GET request' do
         it_behaves_like 'a searchable resource' do
-          let(:expected_resources) { [
-            trashed_resource,
-            named_trashed_resource,
-            named_trashed_folder
-          ] }
           let(:unexpected_resources) { [
             parent_folder,
             named_trashed_child_folder,
@@ -329,17 +327,22 @@ describe DDS::V1::TrashbinAPI do
             named_trashed_resource_in_trashed_folder,
             trashed_resource_in_trashed_folder
           ] }
-          it_behaves_like 'a paginated resource' do
-            let(:expected_total_length) { project.children.where(is_deleted: true, is_purged: false).count }
-            let(:extras) { FactoryBot.create_list(:folder, 5, :deleted, parent: parent_folder, project: project) }
-          end
+        end
+
+        it_behaves_like 'a paginated resource' do
+          let(:expected_total_length) { project.children.where(is_deleted: true, is_purged: false).count }
+          let(:extras) { FactoryBot.create_list(:folder, 5, :deleted, project: project) }
         end
 
         it_behaves_like 'a sorted index resource', :trashed_resource do
           let(:sort_column) { :updated_at }
           let(:sort_order) { "asc" }
           before do
+            expected_resources.each do |expected_resource|
+              expect(expected_resource).to be_persisted
+            end
             trashed_resource.touch
+            expect(project.children.count).to be > 1
           end
         end
 
@@ -358,7 +361,9 @@ describe DDS::V1::TrashbinAPI do
     end
 
     context 'name_contains' do
-      let(:query_params) { "?name_contains=#{name_contains}" }
+      let(:payload) { {
+        name_contains: name_contains
+      } }
 
       describe 'empty string' do
         let(:name_contains) { '' }
@@ -418,13 +423,13 @@ describe DDS::V1::TrashbinAPI do
 
       describe 'string with a match' do
         let(:name_contains) { 'XXXX' }
+        let(:expected_resources) { [
+          named_trashed_resource,
+          named_trashed_folder
+        ] }
 
         it_behaves_like 'a GET request' do
           it_behaves_like 'a searchable resource' do
-            let(:expected_resources) { [
-              named_trashed_resource,
-              named_trashed_folder
-            ] }
             let(:unexpected_resources) { [
               parent_folder,
               named_trashed_child_folder,
@@ -446,6 +451,9 @@ describe DDS::V1::TrashbinAPI do
             let(:sort_column) { :updated_at }
             let(:sort_order) { "asc" }
             before do
+              expected_resources.each do |expected_resource|
+                expect(expected_resource).to be_persisted
+              end
               named_trashed_resource.touch
             end
           end
@@ -454,13 +462,13 @@ describe DDS::V1::TrashbinAPI do
 
       describe 'lowercase string with a match' do
         let(:name_contains) { 'xxxx' }
+        let(:expected_resources) { [
+          named_trashed_resource,
+          named_trashed_folder
+        ] }
 
         it_behaves_like 'a GET request' do
           it_behaves_like 'a searchable resource' do
-            let(:expected_resources) { [
-              named_trashed_resource,
-              named_trashed_folder
-            ] }
             let(:unexpected_resources) { [
               parent_folder,
               named_trashed_child_folder,
@@ -483,6 +491,9 @@ describe DDS::V1::TrashbinAPI do
             let(:sort_column) { :updated_at }
             let(:sort_order) { "asc" }
             before do
+              expected_resources.each do |expected_resource|
+                expect(expected_resource).to be_persisted
+              end
               named_trashed_resource.touch
             end
           end
@@ -491,21 +502,23 @@ describe DDS::V1::TrashbinAPI do
     end
 
     context 'recurse' do
-      let(:query_params) { "?recurse=true" }
+      let(:payload) {{
+        recurse: true
+      }}
+      let(:expected_resources) { [
+        named_trashed_child_folder,
+        depth_trashed_resource,
+        depth_named_trashed_resource,
+        trashed_child_resource,
+        trashed_resource,
+        named_trashed_resource,
+        named_trashed_folder,
+        named_trashed_resource_in_trashed_folder,
+        trashed_resource_in_trashed_folder
+      ] }
 
       it_behaves_like 'a GET request' do
         it_behaves_like 'a searchable resource' do
-          let(:expected_resources) { [
-            named_trashed_child_folder,
-            depth_trashed_resource,
-            depth_named_trashed_resource,
-            trashed_child_resource,
-            trashed_resource,
-            named_trashed_resource,
-            named_trashed_folder,
-            named_trashed_resource_in_trashed_folder,
-            trashed_resource_in_trashed_folder
-          ] }
           let(:unexpected_resources) { [
             parent_folder,
             depth_purged_resource,
@@ -521,6 +534,9 @@ describe DDS::V1::TrashbinAPI do
           let(:sort_column) { :updated_at }
           let(:sort_order) { "asc" }
           before do
+            expected_resources.each do |expected_resource|
+              expect(expected_resource).to be_persisted
+            end
             named_trashed_resource.touch
           end
         end
@@ -528,17 +544,20 @@ describe DDS::V1::TrashbinAPI do
     end
 
     context 'name_contains and resurse' do
-      let(:query_params) { '?recurse=true&name_contains=XXXX' }
+      let(:payload) {{
+        recurse:true,
+        name_contains: 'XXXX'
+      }}
+      let(:expected_resources) { [
+        named_trashed_child_folder,
+        depth_named_trashed_resource,
+        named_trashed_resource,
+        named_trashed_folder,
+        named_trashed_resource_in_trashed_folder
+      ] }
 
       it_behaves_like 'a GET request' do
         it_behaves_like 'a searchable resource' do
-          let(:expected_resources) { [
-            named_trashed_child_folder,
-            depth_named_trashed_resource,
-            named_trashed_resource,
-            named_trashed_folder,
-            named_trashed_resource_in_trashed_folder
-          ] }
           let(:unexpected_resources) { [
             depth_trashed_resource,
             trashed_child_resource,
@@ -558,6 +577,9 @@ describe DDS::V1::TrashbinAPI do
           let(:sort_column) { :updated_at }
           let(:sort_order) { "asc" }
           before do
+            expected_resources.each do |expected_resource|
+              expect(expected_resource).to be_persisted
+            end
             named_trashed_resource.touch
           end
         end
