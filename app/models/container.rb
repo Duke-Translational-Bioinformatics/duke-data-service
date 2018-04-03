@@ -8,10 +8,12 @@ class Container < ActiveRecord::Base
   audited
   belongs_to :project
 	belongs_to :parent, class_name: "Folder"
+  belongs_to :deleted_from_parent, class_name: "Folder"
   has_many :project_permissions, through: :project
   has_many :tags, as: :taggable
 
   define_model_callbacks :set_parent_attribute
+
   validates :name, presence: true, unless: :is_deleted
 
   def ancestors
@@ -36,5 +38,15 @@ class Container < ActiveRecord::Base
 
   def set_project_to_parent_project
     self.project = self.parent.project if self.parent
+  end
+
+  def set_deleted_from_parent
+    if is_deleted?
+      self.deleted_from_parent_id = self.parent_id
+      self.parent_id = nil
+    elsif is_deleted_was && !is_deleted?
+      self.parent_id = self.deleted_from_parent_id
+      self.deleted_from_parent_id = nil
+    end
   end
 end

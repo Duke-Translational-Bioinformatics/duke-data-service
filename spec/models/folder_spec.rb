@@ -22,6 +22,7 @@ RSpec.describe Folder, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
+    it { is_expected.to belong_to(:deleted_from_parent) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
     it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
@@ -308,6 +309,54 @@ RSpec.describe Folder, type: :model do
         expect(subject.is_deleted_changed?).to be_falsey
         expect(subject.is_purged_changed?).to be_truthy
         expect(subject.is_purged?).to be_truthy
+      }
+    end
+  end
+
+  describe '#set_deleted_from_parent' do
+    it { is_expected.to respond_to(:set_deleted_from_parent) }
+
+    context 'being restored' do
+      subject { FactoryBot.create(:folder, :deleted, :with_parent) }
+      it {
+        subject.deleted_from_parent_id = subject.parent_id
+        subject.parent_id = nil
+        subject.save
+
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+        original_parent = subject.deleted_from_parent
+
+        subject.is_deleted = false
+        expect(subject.is_deleted_was).to be_truthy
+        subject.set_deleted_from_parent
+
+        expect(subject.parent_id).not_to be_nil
+        expect(subject.parent).not_to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.parent).to eq(original_parent)
+      }
+    end
+
+    context 'being deleted' do
+      it {
+        expect(subject.parent_id).not_to be_nil
+        expect(subject.parent).not_to be_nil
+        original_parent = subject.parent
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+
+        subject.is_deleted = true
+        subject.set_deleted_from_parent
+
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+        expect(subject.deleted_from_parent).to eq(original_parent)
       }
     end
   end
