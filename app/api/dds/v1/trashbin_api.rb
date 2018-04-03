@@ -152,7 +152,7 @@ module DDS
         authorize folder, :index?
         name_contains = params[:name_contains]
         descendants = params[:recurse] ? policy_scope(folder.descendants) : policy_scope(folder.children)
-        descendants = descendants.where(is_deleted: true, is_purged: false)
+        descendants = descendants.unscope(:order).where(is_deleted: true, is_purged: false)
         if name_contains
           if name_contains.empty?
             descendants = descendants.none
