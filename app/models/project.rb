@@ -95,8 +95,9 @@ class Project < ActiveRecord::Base
   def generate_slug
     self.slug = slug_prefix = name.gsub('-','_').parameterize(separator: '_')
     if self.invalid? && self.errors.details[:slug].any? {|x| x[:error]==:taken}
-      slugs = (1..1000).to_a.collect {|i| "#{slug_prefix}_#{i}"}
-      self.slug = (slugs - self.class.where("slug LIKE '#{slug_prefix}%'").pluck(:slug)).first
+      existing_slugs = self.class.where("slug LIKE '#{slug_prefix}_%'").pluck(:slug)
+      mock_slugs = (1..existing_slugs.length + 1).to_a.collect {|i| "#{slug_prefix}_#{i}"}
+      self.slug = (mock_slugs - existing_slugs).first
     end
     self.slug
   end
