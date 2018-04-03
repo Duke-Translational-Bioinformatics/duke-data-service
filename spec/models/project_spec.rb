@@ -279,6 +279,15 @@ RSpec.describe Project, type: :model do
       context 'existing slug' do
         before do
           FactoryBot.create(:project, slug: 'foo_bar_baz')
+        end
+        it 'foo_bar_baz' do
+          expect(call_generate_slug).to eq 'foo_bar_baz_1'
+        end
+      end
+
+      context 'existing slugs' do
+        before do
+          FactoryBot.create(:project, slug: 'foo_bar_baz')
           (1..3).each do |i|
             FactoryBot.create(:project, slug: "foo_bar_baz_#{i}")
           end
