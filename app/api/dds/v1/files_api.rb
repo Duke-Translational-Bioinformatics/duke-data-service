@@ -145,7 +145,9 @@ module DDS
         authenticate!
         file = hide_logically_deleted(DataFile.find(params[:id]))
         authorize file, :destroy?
-        file.update_attribute(:is_deleted, true)
+        file.is_deleted = true
+        file.set_deleted_from_parent
+        file.save
         body false
       end
 

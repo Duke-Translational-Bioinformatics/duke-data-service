@@ -130,14 +130,48 @@ describe DDS::V1::FoldersAPI do
       let(:called_action) { 'DELETE' }
       include_context 'with job runner', ChildDeletionJob
 
-      it_behaves_like 'a removable resource' do
-        let(:resource_counter) { resource_class.where(is_deleted: false) }
+      context 'root folder' do
+        let(:resource) { folder_at_root }
 
-        it 'should be marked as deleted' do
-          expect(resource).to be_persisted
-          is_expected.to eq(204)
-          resource.reload
-          expect(resource.is_deleted?).to be_truthy
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+          end
+        end
+      end
+
+      context 'folder child folder' do
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
+            expect(resource.parent).not_to be_nil
+            expect(resource.deleted_from_parent).to be_nil
+            original_resource_parent = resource.parent
+
+            expect(child_file).to be_persisted
+            expect(child_file.parent).not_to be_nil
+            expect(child_file.deleted_from_parent).to be_nil
+            original_child_parent = child_file.parent
+
+            is_expected.to eq(204)
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+            expect(resource.parent).to be_nil
+            expect(resource.deleted_from_parent).not_to be_nil
+            expect(resource.deleted_from_parent).to eq original_resource_parent
+
+            child_file.reload
+            expect(child_file.parent).not_to be_nil
+            expect(child_file.deleted_from_parent).to be_nil
+            expect(child_file.parent).to eq original_child_parent
+          end
         end
       end
 

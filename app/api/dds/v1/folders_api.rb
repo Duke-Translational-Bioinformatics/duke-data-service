@@ -69,7 +69,9 @@ module DDS
         authenticate!
         folder = hide_logically_deleted Folder.find(params[:id])
         authorize folder, :destroy?
-        folder.update(is_deleted: true)
+        folder.is_deleted = true
+        folder.set_deleted_from_parent
+        folder.save
         body false
       end
 
