@@ -322,6 +322,7 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.uuid "creator_id"
     t.boolean "is_consistent"
     t.string "storage_container"
+    t.datetime "purged_on"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

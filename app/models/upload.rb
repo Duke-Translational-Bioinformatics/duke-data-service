@@ -110,8 +110,10 @@ class Upload < ActiveRecord::Base
   def purge_storage
     chunks.each do |chunk|
       chunk.purge_storage
+      chunk.destroy
     end
     storage_provider.delete_object_manifest(storage_container, id)
+    self.update(purged_on: DateTime.now)
   end
 
   def max_size_bytes
