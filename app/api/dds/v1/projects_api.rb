@@ -16,6 +16,7 @@ module DDS
       end
       params do
         requires :name, type: String, desc: 'The Name of the Project'
+        optional :slug, type: String, desc: 'A unique, short name consisting of lowercase letters, numbers, and underscores(\_)'
         requires :description, type: String, desc: 'The Description of the Project'
       end
       post '/projects', root: false do
@@ -24,6 +25,7 @@ module DDS
         project = Project.new({
           etag: SecureRandom.hex,
           name: project_params[:name],
+          slug: project_params[:slug],
           description: project_params[:description],
           creator_id: current_user.id,
         })
