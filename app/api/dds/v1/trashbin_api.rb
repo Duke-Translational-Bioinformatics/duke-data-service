@@ -152,7 +152,7 @@ module DDS
         authorize folder, :index?
         name_contains = params[:name_contains]
         descendants = params[:recurse] ? policy_scope(folder.descendants) : policy_scope(folder.children)
-        descendants = descendants.where(is_deleted: true, is_purged: false)
+        descendants = descendants.unscope(:order).where(is_deleted: true, is_purged: false)
         if name_contains
           if name_contains.empty?
             descendants = descendants.none
@@ -160,7 +160,7 @@ module DDS
             descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
           end
         end
-        paginate(descendants.includes(:parent, :project, :audits))
+        paginate(descendants.includes(:parent, :project, :audits).order('updated_at ASC'))
       end
 
       desc 'List project children in the trashbin' do
@@ -183,7 +183,7 @@ module DDS
         authorize DataFile.new(project: project), :index?
         name_contains = params[:name_contains]
         descendants = params[:recurse] ? project.containers : project.children
-        descendants = descendants.where(is_deleted: true, is_purged: false)
+        descendants = descendants.unscope(:order).where(is_deleted: true, is_purged: false)
         if name_contains
           if name_contains.empty?
             descendants = descendants.none
@@ -191,7 +191,7 @@ module DDS
             descendants = descendants.where(Container.arel_table[:name].matches("%#{name_contains}%"))
           end
         end
-        paginate(policy_scope(descendants.includes(:parent, :project, :audits)))
+        paginate(policy_scope(descendants.includes(:parent, :project, :audits).order('updated_at ASC')))
       end
     end
   end
