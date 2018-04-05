@@ -75,7 +75,7 @@ create\_file or system\_admin
 * 404: Object not found in trash bin
 
 ###### Request Parameters
-**parent.kind (string, optional)** - The kind of parent object; this can be a project (`dds-project`) or folder (`dds-folder`).
+**parent.kind (string, optional)** - The kind of parent object; this can only be a project (`dds-project`) or folder (`dds-folder`). Objects can only be restored to their original project, or to a folder in their original project.
 **parent.id (string, optional)** - The unique id of the parent.
 
 ###### Rules
