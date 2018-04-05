@@ -372,7 +372,7 @@ RSpec.describe Project, type: :model do
       }
     end #purge_children
 
-    describe '#restore' do
+    describe '.restore' do
       context 'is_deleted? true' do
         before do
           subject.update_columns(is_deleted: true)
@@ -404,71 +404,35 @@ RSpec.describe Project, type: :model do
       end
 
       context 'when child is a Container' do
-        context 'from another project' do
-          context 'from a child folder' do
-            let(:child) { FactoryBot.create(:data_file, :with_parent, :deleted) }
-            it {
-              expect {
-                expect(child.is_deleted?).to be_truthy
-                subject.restore(child)
-                expect(child.is_deleted_changed?).to be_truthy
-                expect(child.project_id_changed?).to be_truthy
-                expect(child.parent_id_changed?).to be_truthy
-                expect(child.is_deleted?).to be_falsey
-                expect(child.project_id).to eq(subject.id)
-                expect(child.parent_id).to be_nil
-              }.not_to raise_error
-            }
-          end
-          context 'root' do
-            let(:child) { FactoryBot.create(:data_file, :root, :deleted) }
-            it {
-              expect {
-                expect(child.is_deleted?).to be_truthy
-                subject.restore(child)
-                expect(child.is_deleted_changed?).to be_truthy
-                expect(child.project_id_changed?).to be_truthy
-                expect(child.is_deleted?).to be_falsey
-                expect(child.project_id).to eq(subject.id)
-              }.not_to raise_error
-            }
-          end
+        before do
+          child.move_to_trashbin
+          child.save
+          child.reload
+        end
+        context 'from a child folder' do
+          let(:child) { child_folder_file }
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+              expect(child.parent_id).to be_nil
+            }.not_to raise_error
+          }
         end
 
-        context 'from this project' do
-          context 'from a child folder' do
-            let(:child) { child_folder_file }
-            before do
-              child.update_columns(is_deleted: true)
-              child.reload
-            end
-            it {
-              expect {
-                expect(child.is_deleted?).to be_truthy
-                subject.restore(child)
-                expect(child.is_deleted_changed?).to be_truthy
-                expect(child.parent_id_changed?).to be_truthy
-                expect(child.is_deleted?).to be_falsey
-                expect(child.parent_id).to be_nil
-              }.not_to raise_error
-            }
-          end
-
-          context 'from root' do
-            let(:child) { child_folder }
-            before do
-              child.update_columns(is_deleted: true)
-              child.reload
-            end
-            it {
-              expect {
-                expect(child.is_deleted?).to be_truthy
-                subject.restore(child)
-                expect(child.is_deleted_changed?).to be_truthy
-                expect(child.is_deleted?).to be_falsey
-              }.not_to raise_error
-            }
-          end
+        context 'from root' do
+          let(:child) { child_folder }
+          it {
+            expect {
+              expect(child.is_deleted?).to be_truthy
+              subject.restore(child)
+              expect(child.is_deleted_changed?).to be_truthy
+              expect(child.is_deleted?).to be_falsey
+              expect(child.parent_id).to be_nil
+            }.not_to raise_error
+          }
         end
       end
     end

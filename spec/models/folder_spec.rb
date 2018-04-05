@@ -197,10 +197,11 @@ RSpec.describe Folder, type: :model do
   end
 
 
-  describe '#restore' do
+  describe '.restore' do
     context 'is_deleted? true' do
       before do
-        subject.update_columns(is_deleted: true)
+        subject.move_to_trashbin
+        subject.save
       end
       it {
         expect {
@@ -229,62 +230,40 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'when child is a Container' do
-      context 'from another project' do
-        let(:child) { other_folder }
-        before do
-          child.update_columns(is_deleted: true)
-          child.reload
-        end
+      before do
+        child.move_to_trashbin
+        child.save
+        child.reload
+      end
+      context 'from another folder' do
+        let(:child) { FactoryBot.create(:folder, project: project, parent: immediate_child_folder) }
         it {
           expect {
-            expect(child.project_id).not_to eq(subject.id)
             expect(child.is_deleted?).to be_truthy
             subject.restore(child)
             expect(child.is_deleted_changed?).to be_truthy
-            expect(child.project_id_changed?).to be_truthy
-            expect(child.parent_id_changed?).to be_truthy
             expect(child.is_deleted?).to be_falsey
-            expect(child.project_id).to eq(subject.project_id)
             expect(child.parent_id).to eq(subject.id)
           }.not_to raise_error
         }
       end
 
-      context 'from this project' do
-        context 'from another folder' do
-          let(:child) { FactoryBot.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
-          it {
-            expect {
-              expect(child.is_deleted?).to be_truthy
-              subject.restore(child)
-              expect(child.is_deleted_changed?).to be_truthy
-              expect(child.parent_id_changed?).to be_truthy
-              expect(child.is_deleted?).to be_falsey
-              expect(child.parent_id).to eq(subject.id)
-            }.not_to raise_error
-          }
-        end
-
-        context 'from this folder' do
-          let(:child) { immediate_child_file }
-          before do
-            child.update_columns(is_deleted: true)
-            child.reload
-          end
-          it {
-            expect {
-              expect(child.is_deleted?).to be_truthy
-              subject.restore(child)
-              expect(child.is_deleted_changed?).to be_truthy
-              expect(child.is_deleted?).to be_falsey
-            }.not_to raise_error
-          }
-        end
+      context 'from this folder' do
+        let(:child) { immediate_child_file }
+        it {
+          expect {
+            expect(child.is_deleted?).to be_truthy
+            subject.restore(child)
+            expect(child.is_deleted_changed?).to be_truthy
+            expect(child.is_deleted?).to be_falsey
+            expect(child.parent_id).to eq(subject.id)
+          }.not_to raise_error
+        }
       end
     end
   end
 
-  describe '#purge' do
+  describe '.purge' do
     context 'undeleted' do
       it {
         expect(subject.is_deleted?).to be_falsey
@@ -299,7 +278,8 @@ RSpec.describe Folder, type: :model do
 
     context 'deleted' do
       before do
-        subject.update_columns(is_deleted: true)
+        subject.move_to_trashbin
+        subject.save
         subject.reload
       end
       it {

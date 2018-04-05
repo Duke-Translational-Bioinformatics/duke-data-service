@@ -74,8 +74,6 @@ class Folder < Container
   def restore(child)
     raise TrashbinParentException.new("#{kind} #{id} is deleted, and cannot restore children.::Restore #{kind} #{id}.") if is_deleted?
     raise IncompatibleParentException.new("Folders can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.") unless child.is_a? Container
-    child.parent_id = id
-    child.project_id = project_id
-    child.is_deleted = false
+    child.restore_from_trashbin self
   end
 end
