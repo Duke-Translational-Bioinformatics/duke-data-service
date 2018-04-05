@@ -262,53 +262,100 @@ RSpec.describe DataFile, type: :model do
       end
     end
 
-    describe '#set_deleted_from_parent' do
-      it { is_expected.to respond_to(:set_deleted_from_parent) }
+    describe '.move_to_trashbin' do
+      it { is_expected.to respond_to(:move_to_trashbin) }
 
-      context 'being restored' do
-        subject { FactoryBot.create(:data_file, :deleted, :with_parent) }
-        it {
-          subject.deleted_from_parent_id = subject.parent_id
-          subject.parent_id = nil
-          subject.save
+      subject { child_file }
+      it {
+        expect(subject.parent_id).not_to be_nil
+        expect(subject.parent).not_to be_nil
+        original_parent = subject.parent
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.is_deleted?).to be_falsey
 
-          expect(subject.parent_id).to be_nil
-          expect(subject.parent).to be_nil
-          expect(subject.deleted_from_parent_id).not_to be_nil
-          expect(subject.deleted_from_parent).not_to be_nil
-          original_parent = subject.deleted_from_parent
+        subject.move_to_trashbin
 
-          subject.is_deleted = false
-          expect(subject.is_deleted_was).to be_truthy
-          subject.set_deleted_from_parent
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+        expect(subject.deleted_from_parent).to eq(original_parent)
+      }
+    end
+  end
 
-          expect(subject.parent_id).not_to be_nil
-          expect(subject.parent).not_to be_nil
-          expect(subject.deleted_from_parent_id).to be_nil
-          expect(subject.deleted_from_parent).to be_nil
-          expect(subject.parent).to eq(original_parent)
-        }
-      end
+  describe '.restore_from_trashbin' do
+    it { is_expected.to respond_to(:restore_from_trashbin) }
 
-      context 'being deleted' do
-        subject { child_file }
-        it {
-          expect(subject.parent_id).not_to be_nil
-          expect(subject.parent).not_to be_nil
-          original_parent = subject.parent
-          expect(subject.deleted_from_parent_id).to be_nil
-          expect(subject.deleted_from_parent).to be_nil
+    context 'to original parent' do
+      it {
+        subject.move_to_trashbin
+        subject.save
 
-          subject.is_deleted = true
-          subject.set_deleted_from_parent
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+        original_parent = subject.deleted_from_parent
 
-          expect(subject.parent_id).to be_nil
-          expect(subject.parent).to be_nil
-          expect(subject.deleted_from_parent_id).not_to be_nil
-          expect(subject.deleted_from_parent).not_to be_nil
-          expect(subject.deleted_from_parent).to eq(original_parent)
-        }
-      end
+        subject.restore_from_trashbin
+
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.parent_id).not_to be_nil
+        expect(subject.parent).not_to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.parent).to eq(original_parent)
+      }
+    end
+
+    context 'to new parent folder' do
+      let(:new_parent) { other_folder }
+      it {
+        subject.move_to_trashbin
+        subject.save
+
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+        original_parent = subject.deleted_from_parent
+
+        subject.restore_from_trashbin(other_folder)
+
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.parent_id).not_to be_nil
+        expect(subject.parent).not_to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.parent).not_to eq(original_parent)
+        expect(subject.parent).to eq(new_parent)
+      }
+    end
+
+    context 'to project root' do
+      it {
+        subject.move_to_trashbin
+        subject.save
+
+        expect(subject.is_deleted?).to be_truthy
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).not_to be_nil
+        expect(subject.deleted_from_parent).not_to be_nil
+
+        subject.restore_from_trashbin(project)
+
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+      }
     end
   end
 

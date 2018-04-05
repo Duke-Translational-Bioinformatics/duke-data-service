@@ -40,12 +40,21 @@ class Container < ActiveRecord::Base
     self.project = self.parent.project if self.parent
   end
 
-  def set_deleted_from_parent
-    if is_deleted?
-      self.deleted_from_parent_id = self.parent_id
-      self.parent_id = nil
-    elsif is_deleted_was && !is_deleted?
+  def move_to_trashbin
+    self.is_deleted = true
+    self.deleted_from_parent_id = self.parent_id
+    self.parent_id = nil
+  end
+
+  def restore_from_trashbin(new_parent=nil)
+    self.is_deleted = false
+    if new_parent.nil?
       self.parent_id = self.deleted_from_parent_id
+      self.deleted_from_parent_id = nil
+    elsif new_parent.is_a? Folder
+      self.deleted_from_parent_id = nil
+      self.parent_id = new_parent.id
+    else
       self.deleted_from_parent_id = nil
     end
   end
