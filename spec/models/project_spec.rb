@@ -372,7 +372,7 @@ RSpec.describe Project, type: :model do
       }
     end #purge_children
 
-    describe '.restore' do
+    describe '#restore' do
       context 'is_deleted? true' do
         before do
           subject.update_columns(is_deleted: true)
