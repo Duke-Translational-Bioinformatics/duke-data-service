@@ -292,7 +292,7 @@ RSpec.describe DataFile, type: :model do
       let(:original_parent) { subject.deleted_from_parent }
       it {
         subject.move_to_trashbin
-        subject.save
+        expect(subject.save).to be_truthy
 
         expect(subject.is_deleted?).to be_truthy
         expect(subject.parent_id).to be_nil
@@ -316,7 +316,7 @@ RSpec.describe DataFile, type: :model do
         let(:original_parent) { subject.deleted_from_parent }
         it {
           subject.move_to_trashbin
-          subject.save
+          expect(subject.save).to be_truthy
 
           expect(subject.is_deleted?).to be_truthy
           expect(subject.parent_id).to be_nil
@@ -342,7 +342,7 @@ RSpec.describe DataFile, type: :model do
         let(:original_parent) { subject.deleted_from_parent }
         it {
           subject.move_to_trashbin
-          subject.save
+          expect(subject.save).to be_truthy
 
           expect(subject.is_deleted?).to be_truthy
           expect(subject.parent_id).to be_nil
@@ -368,7 +368,7 @@ RSpec.describe DataFile, type: :model do
       let(:target_project) { project }
       it {
         subject.move_to_trashbin
-        subject.save
+        expect(subject.save).to be_truthy
 
         expect(subject.is_deleted?).to be_truthy
         expect(subject.parent_id).to be_nil
@@ -392,7 +392,7 @@ RSpec.describe DataFile, type: :model do
       let(:target_project) { other_project }
       it {
         subject.move_to_trashbin
-        subject.save
+        expect(subject.save).to be_truthy
 
         expect(subject.is_deleted?).to be_truthy
         expect(subject.parent_id).to be_nil
@@ -416,7 +416,7 @@ RSpec.describe DataFile, type: :model do
       let(:new_parent) { file_versions.first }
       it {
         subject.move_to_trashbin
-        subject.save
+        expect(subject.save).to be_truthy
 
         expect {
           subject.restore_from_trashbin new_parent
