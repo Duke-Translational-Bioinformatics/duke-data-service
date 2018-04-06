@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFile, type: :model do
+
   subject { child_file }
   let(:root_file) { FactoryBot.create(:data_file, :root) }
   let(:child_file) { FactoryBot.create(:data_file, :with_parent) }
@@ -286,19 +287,22 @@ RSpec.describe DataFile, type: :model do
   end
 
   describe '#restore_from_trashbin' do
+    let(:original_parent) { subject.deleted_from_parent }
+    include_context 'trashed resource'
+
     it { is_expected.to respond_to(:restore_from_trashbin) }
 
+    before do
+      expect(subject.is_deleted?).to be_truthy
+      expect(subject.parent_id).to be_nil
+      expect(subject.parent).to be_nil
+      expect(original_parent).not_to be_nil
+    end
+
     context 'to original parent' do
-      let(:original_parent) { subject.deleted_from_parent }
+
+
       it {
-        subject.move_to_trashbin
-        expect(subject.save).to be_truthy
-
-        expect(subject.is_deleted?).to be_truthy
-        expect(subject.parent_id).to be_nil
-        expect(subject.parent).to be_nil
-        expect(original_parent).not_to be_nil
-
         subject.restore_from_trashbin
 
         expect(subject.is_deleted?).to be_falsey
@@ -313,16 +317,8 @@ RSpec.describe DataFile, type: :model do
     context 'to new parent folder' do
       context 'in original project' do
         let(:new_parent) { FactoryBot.create(:folder, project: project) }
-        let(:original_parent) { subject.deleted_from_parent }
+
         it {
-          subject.move_to_trashbin
-          expect(subject.save).to be_truthy
-
-          expect(subject.is_deleted?).to be_truthy
-          expect(subject.parent_id).to be_nil
-          expect(subject.parent).to be_nil
-          expect(original_parent).not_to be_nil
-
           subject.restore_from_trashbin new_parent
 
           expect(subject.is_deleted?).to be_falsey
@@ -339,16 +335,8 @@ RSpec.describe DataFile, type: :model do
 
       context 'in different project' do
         let(:new_parent) { other_folder }
-        let(:original_parent) { subject.deleted_from_parent }
+
         it {
-          subject.move_to_trashbin
-          expect(subject.save).to be_truthy
-
-          expect(subject.is_deleted?).to be_truthy
-          expect(subject.parent_id).to be_nil
-          expect(subject.parent).to be_nil
-          expect(original_parent).not_to be_nil
-
           subject.restore_from_trashbin new_parent
 
           expect(subject.is_deleted?).to be_falsey
@@ -366,16 +354,8 @@ RSpec.describe DataFile, type: :model do
 
     context 'to original project root' do
       let(:target_project) { project }
+
       it {
-        subject.move_to_trashbin
-        expect(subject.save).to be_truthy
-
-        expect(subject.is_deleted?).to be_truthy
-        expect(subject.parent_id).to be_nil
-        expect(subject.parent).to be_nil
-        expect(subject.deleted_from_parent_id).not_to be_nil
-        expect(subject.deleted_from_parent).not_to be_nil
-
         subject.restore_from_trashbin target_project
 
         expect(subject.is_deleted?).to be_falsey
@@ -390,16 +370,8 @@ RSpec.describe DataFile, type: :model do
 
     context 'to different project root' do
       let(:target_project) { other_project }
+
       it {
-        subject.move_to_trashbin
-        expect(subject.save).to be_truthy
-
-        expect(subject.is_deleted?).to be_truthy
-        expect(subject.parent_id).to be_nil
-        expect(subject.parent).to be_nil
-        expect(subject.deleted_from_parent_id).not_to be_nil
-        expect(subject.deleted_from_parent).not_to be_nil
-
         subject.restore_from_trashbin target_project
 
         expect(subject.is_deleted?).to be_falsey
@@ -414,10 +386,9 @@ RSpec.describe DataFile, type: :model do
 
     context 'to non project or folder' do
       let(:new_parent) { file_versions.first }
-      it {
-        subject.move_to_trashbin
-        expect(subject.save).to be_truthy
+      let(:original_parent) { new_parent.parent }
 
+      it {
         expect {
           subject.restore_from_trashbin new_parent
         }.to raise_error(IncompatibleParentException)
