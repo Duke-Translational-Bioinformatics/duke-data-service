@@ -197,7 +197,7 @@ RSpec.describe Folder, type: :model do
   end
 
 
-  describe '.restore' do
+  describe '#restore' do
     context 'is_deleted? true' do
       before do
         subject.move_to_trashbin
@@ -293,14 +293,13 @@ RSpec.describe Folder, type: :model do
     end
   end
 
-  describe '.move_to_trashbin' do
+  describe '#move_to_trashbin' do
+    let(:original_parent) { subject.parent }
     it { is_expected.to respond_to(:move_to_trashbin) }
 
     it {
       expect(subject.is_deleted?).to be_falsey
-      expect(subject.parent_id).not_to be_nil
-      expect(subject.parent).not_to be_nil
-      original_parent = subject.parent
+      expect(original_parent).not_to be_nil
       expect(subject.deleted_from_parent_id).to be_nil
       expect(subject.deleted_from_parent).to be_nil
 
@@ -315,8 +314,9 @@ RSpec.describe Folder, type: :model do
     }
   end
 
-  describe '.restore_from_trashbin' do
+  describe '#restore_from_trashbin' do
     context 'to original parent' do
+      let(:original_parent) { subject.deleted_from_parent }
       it {
         subject.move_to_trashbin
         subject.save
@@ -324,9 +324,7 @@ RSpec.describe Folder, type: :model do
         expect(subject.is_deleted?).to be_truthy
         expect(subject.parent_id).to be_nil
         expect(subject.parent).to be_nil
-        expect(subject.deleted_from_parent_id).not_to be_nil
-        expect(subject.deleted_from_parent).not_to be_nil
-        original_parent = subject.deleted_from_parent
+        expect(original_parent).not_to be_nil
 
         subject.restore_from_trashbin
 
@@ -340,8 +338,63 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'to new parent folder' do
-      let(:new_parent) { FactoryBot.create(:folder, project: project) }
+      context 'in original project' do
 
+        let(:original_parent) { subject.deleted_from_parent }
+        let(:new_parent) { FactoryBot.create(:folder, project: project) }
+        it {
+          subject.move_to_trashbin
+          subject.save
+
+          expect(subject.is_deleted?).to be_truthy
+          expect(subject.parent_id).to be_nil
+          expect(subject.parent).to be_nil
+          expect(original_parent).not_to be_nil
+
+          subject.restore_from_trashbin new_parent
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).not_to eq(original_parent)
+          expect(subject.parent).to eq(new_parent)
+          expect(subject.project_id).to eq(new_parent.project_id)
+          expect(subject).to be_valid
+        }
+      end
+
+      context 'in different project' do
+        let(:original_parent) { subject.deleted_from_parent }
+        let(:new_parent) { FactoryBot.create(:folder, project: other_project) }
+
+        it {
+          subject.move_to_trashbin
+          subject.save
+
+          expect(subject.is_deleted?).to be_truthy
+          expect(subject.parent_id).to be_nil
+          expect(subject.parent).to be_nil
+          expect(original_parent).not_to be_nil
+
+          subject.restore_from_trashbin new_parent
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).not_to eq(original_parent)
+          expect(subject.parent).to eq(new_parent)
+          expect(subject.project_id).to eq(new_parent.project_id)
+          expect(subject).not_to be_valid
+        }
+      end
+    end
+
+    context 'to original project root' do
+      let(:target_project) { project }
       it {
         subject.move_to_trashbin
         subject.save
@@ -351,21 +404,21 @@ RSpec.describe Folder, type: :model do
         expect(subject.parent).to be_nil
         expect(subject.deleted_from_parent_id).not_to be_nil
         expect(subject.deleted_from_parent).not_to be_nil
-        original_parent = subject.deleted_from_parent
 
-        subject.restore_from_trashbin(new_parent)
+        subject.restore_from_trashbin target_project
 
         expect(subject.is_deleted?).to be_falsey
-        expect(subject.parent_id).not_to be_nil
-        expect(subject.parent).not_to be_nil
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
         expect(subject.deleted_from_parent_id).to be_nil
         expect(subject.deleted_from_parent).to be_nil
-        expect(subject.parent).not_to eq(original_parent)
-        expect(subject.parent).to eq(new_parent)
+        expect(subject.project_id).to eq(target_project.id)
+        expect(subject).to be_valid
       }
     end
 
-    context 'to original parent' do
+    context 'to different project root' do
+      let(:target_project) { other_project }
       it {
         subject.move_to_trashbin
         subject.save
@@ -375,16 +428,28 @@ RSpec.describe Folder, type: :model do
         expect(subject.parent).to be_nil
         expect(subject.deleted_from_parent_id).not_to be_nil
         expect(subject.deleted_from_parent).not_to be_nil
-        original_parent = subject.deleted_from_parent
 
-        subject.restore_from_trashbin
+        subject.restore_from_trashbin target_project
 
         expect(subject.is_deleted?).to be_falsey
-        expect(subject.parent_id).not_to be_nil
-        expect(subject.parent).not_to be_nil
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
         expect(subject.deleted_from_parent_id).to be_nil
         expect(subject.deleted_from_parent).to be_nil
-        expect(subject.parent).to eq(original_parent)
+        expect(subject.project_id).to eq(target_project.id)
+        expect(subject).not_to be_valid
+      }
+    end
+
+    context 'to non project or folder' do
+      let(:new_parent) { immediate_child_file }
+      it {
+        subject.move_to_trashbin
+        subject.save
+
+        expect {
+          subject.restore_from_trashbin new_parent
+        }.to raise_error(IncompatibleParentException)
       }
     end
   end

@@ -54,8 +54,12 @@ class Container < ActiveRecord::Base
     elsif new_parent.is_a? Folder
       self.deleted_from_parent_id = nil
       self.parent_id = new_parent.id
-    else
+      self.project_id = new_parent.project_id
+    elsif new_parent.is_a? Project
       self.deleted_from_parent_id = nil
+      self.project_id = new_parent.id
+    else
+      raise IncompatibleParentException.new("Objects can only be restored to a dds-folder or dds-project.::Perhaps you mistyped the object_kind.")
     end
   end
 end
