@@ -64,7 +64,7 @@ describe DDS::V1::TrashbinAPI do
 
   describe 'PUT /trashbin/{object_kind}/{object_id}/restore' do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}/restore" }
-    let(:called_action) { 'PUT' }
+    let(:payload) {{}}
 
     context 'container object' do
       let(:parent_kind) { parent_folder.kind }
@@ -82,54 +82,54 @@ describe DDS::V1::TrashbinAPI do
       end
 
       context 'without payload' do
-        subject { put(url, headers: headers) }
-
         context 'resource in root of the project' do
-          it_behaves_like 'an identified resource' do
-            let(:resource_id) { "doesNotExist" }
-          end
-
-          it_behaves_like 'an identified resource' do
-            let(:resource_id) { untrashed_resource.id }
-          end
-
-          context 'that is deleted' do
-            before do
-              project.update_columns(is_deleted: true)
-            end
-            it_behaves_like 'a client error' do
-              let(:expected_response) { 404 }
-              let(:expected_reason) { "dds-project #{project.id} is permenantly deleted, and cannot restore children." }
-              let(:expected_suggestion) { "Restore to a different project." }
-            end
-          end
-
-          it_behaves_like 'a kinded resource' do
-            let(:resource_kind) { 'invalid-kind' }
-          end
-
-          it_behaves_like 'an authenticated resource'
-          it_behaves_like 'an authorized resource'
-          it_behaves_like 'an annotate_audits endpoint'
-
-          it_behaves_like 'an updatable resource' do
-            it 'restores the object' do
-              is_expected.to eq(expected_response_status)
-              trashed_resource.reload
-              expect(trashed_resource.is_deleted?).to be_falsey
-              expect(trashed_resource.parent_id).to be_nil
-              expect(trashed_resource.deleted_from_parent_id).to be_nil
+          it_behaves_like 'a PUT request' do
+            it_behaves_like 'an identified resource' do
+              let(:resource_id) { "doesNotExist" }
             end
 
-            it_behaves_like 'a software_agent accessible resource' do
+            it_behaves_like 'an identified resource' do
+              let(:resource_id) { untrashed_resource.id }
+            end
+
+            context 'that is deleted' do
+              before do
+                project.update_columns(is_deleted: true)
+              end
+              it_behaves_like 'a client error' do
+                let(:expected_response) { 404 }
+                let(:expected_reason) { "dds-project #{project.id} is permenantly deleted, and cannot restore children." }
+                let(:expected_suggestion) { "Restore to a different project." }
+              end
+            end
+
+            it_behaves_like 'a kinded resource' do
+              let(:resource_kind) { 'invalid-kind' }
+            end
+
+            it_behaves_like 'an authenticated resource'
+            it_behaves_like 'an authorized resource'
+            it_behaves_like 'an annotate_audits endpoint'
+
+            it_behaves_like 'an updatable resource' do
               it 'restores the object' do
                 is_expected.to eq(expected_response_status)
                 trashed_resource.reload
                 expect(trashed_resource.is_deleted?).to be_falsey
+                expect(trashed_resource.parent_id).to be_nil
+                expect(trashed_resource.deleted_from_parent_id).to be_nil
               end
 
-              it_behaves_like 'an annotate_audits endpoint' do
-                  let(:expected_audits) { 1 }
+              it_behaves_like 'a software_agent accessible resource' do
+                it 'restores the object' do
+                  is_expected.to eq(expected_response_status)
+                  trashed_resource.reload
+                  expect(trashed_resource.is_deleted?).to be_falsey
+                end
+
+                it_behaves_like 'an annotate_audits endpoint' do
+                    let(:expected_audits) { 1 }
+                end
               end
             end
           end
