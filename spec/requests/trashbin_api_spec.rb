@@ -66,22 +66,22 @@ describe DDS::V1::TrashbinAPI do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}/restore" }
     let(:payload) {{}}
 
-    context 'container object' do
-      let(:parent_kind) { parent_folder.kind }
-      let(:parent_id) { parent_folder.id }
-      let(:resource) {
-        trashed_resource
-      }
-      let(:resource_class) { DataFile }
-      let(:resource_serializer) { DataFileSerializer }
-      let(:resource_kind) { trashed_resource.kind }
-      let(:resource_id) { trashed_resource.id }
-      before do
-        resource.move_to_trashbin
-        resource.save
-      end
+    it_behaves_like 'a PUT request' do
+      context 'container object' do
+        let(:parent_kind) { parent_folder.kind }
+        let(:parent_id) { parent_folder.id }
+        let(:resource) {
+          trashed_resource
+        }
+        let(:resource_class) { DataFile }
+        let(:resource_serializer) { DataFileSerializer }
+        let(:resource_kind) { trashed_resource.kind }
+        let(:resource_id) { trashed_resource.id }
+        before do
+          resource.move_to_trashbin
+          resource.save
+        end
 
-      it_behaves_like 'a PUT request' do
         context 'without payload' do
           context 'resource in root of the project' do
             it_behaves_like 'an identified resource' do
@@ -231,77 +231,73 @@ describe DDS::V1::TrashbinAPI do
           end
         end
       end
-    end
 
-    context 'file_version' do
-      subject { put(url, headers: headers) }
-      context 'containing file not deleted' do
-        let(:file_version) {
-          fv = untrashed_resource.file_versions.first
-          fv.update_columns(is_deleted: true)
-          fv.reload
-          fv
-        }
-        let(:resource) { file_version }
-        let(:resource_id) { file_version.id }
-        let(:resource_kind) { file_version.kind }
-        let(:resource_class) { FileVersion }
-        let(:resource_serializer) { FileVersionSerializer }
-        it_behaves_like 'an updatable resource' do
-          it 'restores the object' do
-            expect(file_version.is_deleted).to be_truthy
-            expect(file_version.data_file.is_deleted).to be_falsey
-            is_expected.to eq(expected_response_status)
-            file_version.reload
-            expect(file_version.is_deleted).to be_falsey
+      context 'file_version' do
+        context 'containing file not deleted' do
+          let(:file_version) {
+            fv = untrashed_resource.file_versions.first
+            fv.update_columns(is_deleted: true)
+            fv.reload
+            fv
+          }
+          let(:resource) { file_version }
+          let(:resource_id) { file_version.id }
+          let(:resource_kind) { file_version.kind }
+          let(:resource_class) { FileVersion }
+          let(:resource_serializer) { FileVersionSerializer }
+          it_behaves_like 'an updatable resource' do
+            it 'restores the object' do
+              expect(file_version.is_deleted).to be_truthy
+              expect(file_version.data_file.is_deleted).to be_falsey
+              is_expected.to eq(expected_response_status)
+              file_version.reload
+              expect(file_version.is_deleted).to be_falsey
+            end
+          end
+        end
+
+        context 'containing data_file deleted' do
+          let(:file_version) {
+            fv = trashed_resource.file_versions.first
+            fv.update_columns(is_deleted: true)
+            fv
+          }
+          let(:resource_kind) { file_version.kind }
+          let(:resource_id) { file_version.id }
+
+          it_behaves_like 'a client error' do
+            let(:expected_response) { 404 }
+            let(:expected_reason) { "#{trashed_resource.kind} #{trashed_resource.id} is deleted, and cannot restore its versions." }
+            let(:expected_suggestion) { "Restore #{file_version.data_file.kind} #{file_version.data_file_id}." }
           end
         end
       end
 
-      context 'containing data_file deleted' do
-        let(:file_version) {
-          fv = trashed_resource.file_versions.first
-          fv.update_columns(is_deleted: true)
-          fv
-        }
-        let(:resource_kind) { file_version.kind }
-        let(:resource_id) { file_version.id }
+      context 'object is not Restorable' do
+        let(:resource) { project }
+        let(:resource_id) { project.id }
+        let(:resource_kind) { project.kind }
+        let(:resource_class) { Project }
 
+        before do
+          resource.update_columns(is_deleted: true)
+        end
         it_behaves_like 'a client error' do
           let(:expected_response) { 404 }
-          let(:expected_reason) { "#{trashed_resource.kind} #{trashed_resource.id} is deleted, and cannot restore its versions." }
-          let(:expected_suggestion) { "Restore #{file_version.data_file.kind} #{file_version.data_file_id}." }
+          let(:expected_reason) { "#{project.kind} Not Restorable" }
+          let(:expected_suggestion) { "#{project.kind} is not Restorable" }
         end
       end
-    end
 
-    context 'object is not Restorable' do
-      let(:resource) { project }
-      let(:resource_id) { project.id }
-      let(:resource_kind) { project.kind }
-      let(:resource_class) { Project }
-      subject { put(url, headers: headers) }
+      context 'already purged object' do
+        let(:resource) { purged_resource }
+        let(:resource_id) { purged_resource.id }
+        let(:resource_kind) { purged_resource.kind }
+        let(:resource_class) { purged_resource.class }
+        let(:resource_serializer) { DataFileSerializer }
 
-      before do
-        resource.update_columns(is_deleted: true)
+        it_behaves_like 'a viewable resource'
       end
-      it_behaves_like 'a client error' do
-        let(:expected_response) { 404 }
-        let(:expected_reason) { "#{project.kind} Not Restorable" }
-        let(:expected_suggestion) { "#{project.kind} is not Restorable" }
-      end
-    end
-
-    context 'already purged object' do
-      let(:resource) { purged_resource }
-      let(:resource_id) { purged_resource.id }
-      let(:resource_kind) { purged_resource.kind }
-      let(:resource_class) { purged_resource.class }
-      let(:resource_serializer) { DataFileSerializer }
-
-      subject { put(url, headers: headers) }
-
-      it_behaves_like 'a viewable resource'
     end
   end
 
