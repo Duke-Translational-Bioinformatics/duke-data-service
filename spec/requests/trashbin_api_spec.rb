@@ -81,8 +81,8 @@ describe DDS::V1::TrashbinAPI do
         resource.save
       end
 
-      context 'without payload' do
-        it_behaves_like 'a PUT request' do
+      it_behaves_like 'a PUT request' do
+        context 'without payload' do
           context 'resource in root of the project' do
             it_behaves_like 'an identified resource' do
               let(:resource_id) { "doesNotExist" }
@@ -168,68 +168,67 @@ describe DDS::V1::TrashbinAPI do
             end
           end
         end
-      end
 
-      context 'with payload' do
-        subject { put(url, params: payload.to_json, headers: headers) }
-        let(:payload) {{
-          parent: {
-            kind: parent_kind,
-            id: parent_id
-          }
-        }}
+        context 'with payload' do
+          let(:payload) {{
+            parent: {
+              kind: parent_kind,
+              id: parent_id
+            }
+          }}
 
-        context 'for parent in same project' do
-          it_behaves_like 'an authorized resource'
+          context 'for parent in same project' do
+            it_behaves_like 'an authorized resource'
 
-          it_behaves_like 'an identified resource' do
-            let(:parent_id) { "doesNotExist" }
-            let(:resource_class) { Folder }
-          end
+            it_behaves_like 'an identified resource' do
+              let(:parent_id) { "doesNotExist" }
+              let(:resource_class) { Folder }
+            end
 
-          it_behaves_like 'a kinded resource' do
-            let(:parent_kind) { 'invalid-kind' }
-            let(:resource_kind) { 'invalid-kind' }
-          end
+            it_behaves_like 'a kinded resource' do
+              let(:parent_kind) { 'invalid-kind' }
+              let(:resource_kind) { 'invalid-kind' }
+            end
 
-          it_behaves_like 'an updatable resource' do
-            it 'restores the object' do
-              original_parent = resource.deleted_from_parent
-              is_expected.to eq(expected_response_status)
-              resource.reload
-              expect(resource.is_deleted?).to be_falsey
-              expect(resource.parent).not_to eq original_parent
-              expect(resource.parent).to eq parent_folder
-              expect(resource.deleted_from_parent_id).to be_nil
+            it_behaves_like 'an updatable resource' do
+              it 'restores the object' do
+                original_parent = resource.deleted_from_parent
+                is_expected.to eq(expected_response_status)
+                resource.reload
+                expect(resource.is_deleted?).to be_falsey
+                expect(resource.parent).not_to eq original_parent
+                expect(resource.parent).to eq parent_folder
+                expect(resource.deleted_from_parent_id).to be_nil
+              end
             end
           end
-        end
 
-        context 'for parent in different project' do
-          let(:other_project_folder) { FactoryBot.create(:folder, project: other_permission.project) }
-          let(:parent_kind) { other_project_folder.kind }
-          let(:parent_id) { other_project_folder.id }
+          context 'for parent in different project' do
+            let(:other_project_folder) { FactoryBot.create(:folder, project: other_permission.project) }
+            let(:parent_kind) { other_project_folder.kind }
+            let(:parent_id) { other_project_folder.id }
 
-          before do
-            expect(other_project_folder).to be_persisted
+            before do
+              expect(other_project_folder).to be_persisted
+            end
+
+            it_behaves_like 'an authorized resource'
+            it_behaves_like 'an authorized resource' do
+              let(:resource_permission) { other_permission }
+            end
+
+            it_behaves_like 'an identified resource' do
+              let(:parent_id) { "doesNotExist" }
+              let(:resource_class) { Folder }
+            end
+
+            it_behaves_like 'a kinded resource' do
+              let(:parent_kind) { 'invalid-kind' }
+              let(:resource_kind) { 'invalid-kind' }
+            end
+
+            it_behaves_like 'a validated resource'
           end
-
-          it_behaves_like 'an authorized resource'
-          it_behaves_like 'an authorized resource' do
-            let(:resource_permission) { other_permission }
-          end
-
-          it_behaves_like 'an identified resource' do
-            let(:parent_id) { "doesNotExist" }
-            let(:resource_class) { Folder }
-          end
-
-          it_behaves_like 'a kinded resource' do
-            let(:parent_kind) { 'invalid-kind' }
-            let(:resource_kind) { 'invalid-kind' }
-          end
-
-          it_behaves_like 'a validated resource'
         end
       end
     end
