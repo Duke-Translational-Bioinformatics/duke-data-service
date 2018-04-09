@@ -300,18 +300,34 @@ RSpec.describe DataFile, type: :model do
     end
 
     context 'to original parent' do
+      context 'folder' do
+        it {
+          subject.restore_from_trashbin
 
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).to eq(original_parent)
+        }
+      end
 
-      it {
-        subject.restore_from_trashbin
+      context 'project' do
+        subject { root_file }
+        let(:original_parent) { root_file.project }
 
-        expect(subject.is_deleted?).to be_falsey
-        expect(subject.parent_id).not_to be_nil
-        expect(subject.parent).not_to be_nil
-        expect(subject.deleted_from_parent_id).to be_nil
-        expect(subject.deleted_from_parent).to be_nil
-        expect(subject.parent).to eq(original_parent)
-      }
+        it {
+          subject.restore_from_trashbin
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).to be_nil
+          expect(subject.parent).to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.project).to eq(original_parent)
+        }
+      end
     end
 
     context 'to new parent folder' do

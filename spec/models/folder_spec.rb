@@ -318,16 +318,34 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'to original parent' do
-      it {
-        subject.restore_from_trashbin
+      context 'folder' do
+        it {
+          subject.restore_from_trashbin
 
-        expect(subject.is_deleted?).to be_falsey
-        expect(subject.parent_id).not_to be_nil
-        expect(subject.parent).not_to be_nil
-        expect(subject.deleted_from_parent_id).to be_nil
-        expect(subject.deleted_from_parent).to be_nil
-        expect(subject.parent).to eq(original_parent)
-      }
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).to eq(original_parent)
+        }
+      end
+
+      context 'project' do
+        subject { other_folder }
+        let(:original_parent) { subject.project }
+
+        it {
+          subject.restore_from_trashbin
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).to be_nil
+          expect(subject.parent).to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.project).to eq(original_parent)
+        }
+      end
     end
 
     context 'to new parent folder' do
