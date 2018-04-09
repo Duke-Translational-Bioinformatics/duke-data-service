@@ -323,14 +323,6 @@ describe DDS::V1::TrashbinAPI do
         let(:resource_id) { untrashed_resource.id }
       end
 
-      it_behaves_like 'a client error' do
-        let(:resource_kind) { trashed_file_version.kind }
-        let(:resource_id) { trashed_file_version.id }
-        let(:expected_response) { 404 }
-        let(:expected_reason) { "#{trashed_file_version.kind} Not Purgable" }
-        let(:expected_suggestion) { "#{trashed_file_version.kind} is not Purgable" }
-      end
-
       it_behaves_like 'a kinded resource' do
         let(:resource_kind) { 'invalid-kind' }
       end
@@ -360,7 +352,18 @@ describe DDS::V1::TrashbinAPI do
         end
       end
 
-      context 'object is not Purgable' do
+      context 'object Not Purgable' do
+        let(:resource_kind) { trashed_file_version.kind }
+        let(:resource_id) { trashed_file_version.id }
+
+        it_behaves_like 'a client error' do
+          let(:expected_response) { 404 }
+          let(:expected_reason) { "#{resource_kind} Not Purgable" }
+          let(:expected_suggestion) { "#{resource_kind} is not Purgable" }
+        end
+      end
+
+      context 'deleted project' do
         let(:resource) { project }
         let(:resource_id) { project.id }
         let(:resource_kind) { project.kind }
@@ -375,7 +378,7 @@ describe DDS::V1::TrashbinAPI do
         end
       end
 
-      context 'already purged object' do
+      context 'already purged container' do
         let(:resource) { purged_resource }
         let(:resource_id) { purged_resource.id }
         let(:resource_kind) { purged_resource.kind }
