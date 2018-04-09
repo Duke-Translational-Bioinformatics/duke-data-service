@@ -82,8 +82,8 @@ describe DDS::V1::TrashbinAPI do
       end
 
       context 'without payload' do
-        context 'resource in root of the project' do
-          it_behaves_like 'a PUT request' do
+        it_behaves_like 'a PUT request' do
+          context 'resource in root of the project' do
             it_behaves_like 'an identified resource' do
               let(:resource_id) { "doesNotExist" }
             end
@@ -133,38 +133,38 @@ describe DDS::V1::TrashbinAPI do
               end
             end
           end
-        end
 
-        context 'resource in a folder' do
-          let(:resource) { trashed_child_resource }
-          let(:resource_kind) { trashed_child_resource.kind }
-          let(:resource_id) { trashed_child_resource.id }
+          context 'resource in a folder' do
+            let(:resource) { trashed_child_resource }
+            let(:resource_kind) { trashed_child_resource.kind }
+            let(:resource_id) { trashed_child_resource.id }
 
-          before do
-            expect(parent_folder).to be_persisted
-          end
-
-          context 'that is deleted' do
             before do
-              pf = resource.deleted_from_parent
-              pf.move_to_trashbin
-              pf.save
+              expect(parent_folder).to be_persisted
             end
-            it_behaves_like 'a client error' do
-              let(:expected_response) { 404 }
-              let(:expected_reason) { "dds-folder #{parent_folder.id} is deleted, and cannot restore children." }
-              let(:expected_suggestion) { "Restore #{parent_folder.kind} #{parent_folder.id}." }
-            end
-          end
 
-          it_behaves_like 'an updatable resource' do
-            it 'restores the object' do
-              original_parent = resource.deleted_from_parent
-              is_expected.to eq(expected_response_status)
-              resource.reload
-              expect(resource.is_deleted?).to be_falsey
-              expect(resource.parent).to eq original_parent
-              expect(resource.deleted_from_parent_id).to be_nil
+            context 'that is deleted' do
+              before do
+                pf = resource.deleted_from_parent
+                pf.move_to_trashbin
+                pf.save
+              end
+              it_behaves_like 'a client error' do
+                let(:expected_response) { 404 }
+                let(:expected_reason) { "dds-folder #{parent_folder.id} is deleted, and cannot restore children." }
+                let(:expected_suggestion) { "Restore #{parent_folder.kind} #{parent_folder.id}." }
+              end
+            end
+
+            it_behaves_like 'an updatable resource' do
+              it 'restores the object' do
+                original_parent = resource.deleted_from_parent
+                is_expected.to eq(expected_response_status)
+                resource.reload
+                expect(resource.is_deleted?).to be_falsey
+                expect(resource.parent).to eq original_parent
+                expect(resource.deleted_from_parent_id).to be_nil
+              end
             end
           end
         end
