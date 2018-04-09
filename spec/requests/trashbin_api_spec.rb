@@ -303,8 +303,6 @@ describe DDS::V1::TrashbinAPI do
 
   describe 'PUT /trashbin/{object_kind}/{object_id}/purge' do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}/purge" }
-    subject { put(url, params: payload.to_json, headers: headers) }
-    let(:called_action) { 'PUT' }
     let(:trashed_file_version) {
       fv = trashed_resource.file_versions.first
       fv.update_columns(is_deleted: true)
@@ -316,77 +314,79 @@ describe DDS::V1::TrashbinAPI do
     let(:resource_class) { trashed_resource.class }
     let(:payload) {{}}
 
-    it_behaves_like 'an identified resource' do
-      let(:resource_id) { "doesNotExist" }
-    end
+    it_behaves_like 'a PUT request' do
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { "doesNotExist" }
+      end
 
-    it_behaves_like 'an identified resource' do
-      let(:resource_id) { untrashed_resource.id }
-    end
+      it_behaves_like 'an identified resource' do
+        let(:resource_id) { untrashed_resource.id }
+      end
 
-    it_behaves_like 'a client error' do
-      let(:resource_kind) { trashed_file_version.kind }
-      let(:resource_id) { trashed_file_version.id }
-      let(:expected_response) { 404 }
-      let(:expected_reason) { "#{trashed_file_version.kind} Not Purgable" }
-      let(:expected_suggestion) { "#{trashed_file_version.kind} is not Purgable" }
-    end
+      it_behaves_like 'a client error' do
+        let(:resource_kind) { trashed_file_version.kind }
+        let(:resource_id) { trashed_file_version.id }
+        let(:expected_response) { 404 }
+        let(:expected_reason) { "#{trashed_file_version.kind} Not Purgable" }
+        let(:expected_suggestion) { "#{trashed_file_version.kind} is not Purgable" }
+      end
 
-    it_behaves_like 'a kinded resource' do
-      let(:resource_kind) { 'invalid-kind' }
-    end
+      it_behaves_like 'a kinded resource' do
+        let(:resource_kind) { 'invalid-kind' }
+      end
 
-    it_behaves_like 'an authenticated resource'
-    it_behaves_like 'an authorized resource'
-    it_behaves_like 'an annotate_audits endpoint' do
-      let(:expected_response_status) { 204 }
-    end
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'an authorized resource'
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:expected_response_status) { 204 }
+      end
 
-    it 'purges the object' do
-      is_expected.to eq(204)
-      trashed_resource.reload
-      expect(trashed_resource.is_purged).to be_truthy
-    end
-
-    it_behaves_like 'a software_agent accessible resource' do
-      let(:expected_response_status) { 204 }
       it 'purges the object' do
         is_expected.to eq(204)
         trashed_resource.reload
         expect(trashed_resource.is_purged).to be_truthy
       end
 
-      it_behaves_like 'an annotate_audits endpoint' do
+      it_behaves_like 'a software_agent accessible resource' do
         let(:expected_response_status) { 204 }
+        it 'purges the object' do
+          is_expected.to eq(204)
+          trashed_resource.reload
+          expect(trashed_resource.is_purged).to be_truthy
+        end
+
+        it_behaves_like 'an annotate_audits endpoint' do
+          let(:expected_response_status) { 204 }
+        end
       end
-    end
 
-    context 'object is not Purgable' do
-      let(:resource) { project }
-      let(:resource_id) { project.id }
-      let(:resource_kind) { project.kind }
+      context 'object is not Purgable' do
+        let(:resource) { project }
+        let(:resource_id) { project.id }
+        let(:resource_kind) { project.kind }
 
-      before do
-        resource.update_columns(is_deleted: true)
+        before do
+          resource.update_columns(is_deleted: true)
+        end
+        it_behaves_like 'a client error' do
+          let(:expected_response) { 404 }
+          let(:expected_reason) { "#{project.kind} Not Purgable" }
+          let(:expected_suggestion) { "#{project.kind} is not Purgable" }
+        end
       end
-      it_behaves_like 'a client error' do
-        let(:expected_response) { 404 }
-        let(:expected_reason) { "#{project.kind} Not Purgable" }
-        let(:expected_suggestion) { "#{project.kind} is not Purgable" }
-      end
-    end
 
-    context 'already purged object' do
-      let(:resource) { purged_resource }
-      let(:resource_id) { purged_resource.id }
-      let(:resource_kind) { purged_resource.kind }
-      let(:resource_class) { purged_resource.class }
+      context 'already purged object' do
+        let(:resource) { purged_resource }
+        let(:resource_id) { purged_resource.id }
+        let(:resource_kind) { purged_resource.kind }
+        let(:resource_class) { purged_resource.class }
 
-      it 'should return an empty 204 response' do
-        is_expected.to eq(204)
-        expect(response.status).to eq(204)
-        expect(response.body).not_to eq('null')
-        expect(response.body).to be
+        it 'should return an empty 204 response' do
+          is_expected.to eq(204)
+          expect(response.status).to eq(204)
+          expect(response.body).not_to eq('null')
+          expect(response.body).to be
+        end
       end
     end
   end
