@@ -171,7 +171,10 @@ A folder is a container for files and sub-folders; folders are located in the to
 
 >**Rules**
 - - - - -
-+ This operation recursively deletes all of the folder children (i.e. folders, files and file versions).
++ This operation places the specified folder, and all of its descendants (i.e.
+folders,files, and file versions), into the trash bin. If the folder is a
+subfolder of another folder when it is deleted, it will be placed into the root
+of the project trash bin.
 
 **Response messages:**
 * 200: This will never happen
@@ -887,7 +890,9 @@ Updates one or more file resource properties; if this action includes an `upload
 
 >**Rules**
 - - - - -
-+ This operation recursively deletes all the related file versions.
++ This operation places the specified file, and all of its file_versions, into
+the trash bin. If the file is inside a folder when it is deleted, it will be placed
+into the root of the project trash bin.
 
 **Response messages:**
 * 200: This will never happen
