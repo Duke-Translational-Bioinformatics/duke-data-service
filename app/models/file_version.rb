@@ -12,6 +12,7 @@ class FileVersion < ActiveRecord::Base
   audited
   belongs_to :data_file
   alias parent data_file
+  alias deleted_from_parent data_file
 
   belongs_to :upload
   has_many :project_permissions, through: :data_file

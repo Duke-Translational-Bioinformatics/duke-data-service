@@ -81,18 +81,25 @@ module DDS
         parent_params = declared(params, {include_missing: false}, [:parent])
         object_kind = KindnessFactory.by_kind(params[:object_kind])
         purge_object = object_kind.find_by!(id: params[:object_id], is_deleted: true)
+        authorize purge_object, :destroy?
         raise UnRestorableException.new(purge_object.kind) unless purge_object.class.include? Restorable
-        unless purge_object.is_purged?
-          target_parent = purge_object.parent
+        if purge_object.is_purged?
+          purge_object
+        else
+          target_parent = purge_object.deleted_from_parent || purge_object.project
           if params[:parent]
-           parent_kind = KindnessFactory.by_kind(parent_params[:parent][:kind])
-           target_parent = parent_kind.find(parent_params[:parent][:id])
+            parent_kind = KindnessFactory.by_kind(parent_params[:parent][:kind])
+            target_parent = parent_kind.find(parent_params[:parent][:id])
           end
-          target_parent.restore(purge_object)
+
+          target_parent.restore purge_object
           authorize purge_object, :restore?
-          purge_object.save
+          if purge_object.save
+            purge_object
+          else
+            validation_error!(purge_object)
+          end
         end
-        purge_object
       end
 
       desc 'Purge Trashbin Item' do

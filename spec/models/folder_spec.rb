@@ -22,6 +22,7 @@ RSpec.describe Folder, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:parent) }
+    it { is_expected.to belong_to(:deleted_from_parent) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to have_many(:children).class_name('Container').with_foreign_key('parent_id').autosave(true) }
     it { is_expected.to have_many(:folders).with_foreign_key('parent_id') }
@@ -198,9 +199,8 @@ RSpec.describe Folder, type: :model do
 
   describe '#restore' do
     context 'is_deleted? true' do
-      before do
-        subject.update_columns(is_deleted: true)
-      end
+      include_context 'trashed resource'
+
       it {
         expect {
           begin
@@ -228,57 +228,32 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'when child is a Container' do
-      context 'from another project' do
-        let(:child) { other_folder }
-        before do
-          child.update_columns(is_deleted: true)
-          child.reload
-        end
+      include_context 'trashed resource', :child
+
+      context 'from another folder' do
+        let(:child) { FactoryBot.create(:folder, project: project, parent: immediate_child_folder) }
         it {
           expect {
-            expect(child.project_id).not_to eq(subject.id)
             expect(child.is_deleted?).to be_truthy
             subject.restore(child)
             expect(child.is_deleted_changed?).to be_truthy
-            expect(child.project_id_changed?).to be_truthy
-            expect(child.parent_id_changed?).to be_truthy
             expect(child.is_deleted?).to be_falsey
-            expect(child.project_id).to eq(subject.project_id)
             expect(child.parent_id).to eq(subject.id)
           }.not_to raise_error
         }
       end
 
-      context 'from this project' do
-        context 'from another folder' do
-          let(:child) { FactoryBot.create(:folder, :deleted, project: project, parent: immediate_child_folder) }
-          it {
-            expect {
-              expect(child.is_deleted?).to be_truthy
-              subject.restore(child)
-              expect(child.is_deleted_changed?).to be_truthy
-              expect(child.parent_id_changed?).to be_truthy
-              expect(child.is_deleted?).to be_falsey
-              expect(child.parent_id).to eq(subject.id)
-            }.not_to raise_error
-          }
-        end
-
-        context 'from this folder' do
-          let(:child) { immediate_child_file }
-          before do
-            child.update_columns(is_deleted: true)
-            child.reload
-          end
-          it {
-            expect {
-              expect(child.is_deleted?).to be_truthy
-              subject.restore(child)
-              expect(child.is_deleted_changed?).to be_truthy
-              expect(child.is_deleted?).to be_falsey
-            }.not_to raise_error
-          }
-        end
+      context 'from this folder' do
+        let(:child) { immediate_child_file }
+        it {
+          expect {
+            expect(child.is_deleted?).to be_truthy
+            subject.restore(child)
+            expect(child.is_deleted_changed?).to be_truthy
+            expect(child.is_deleted?).to be_falsey
+            expect(child.parent_id).to eq(subject.id)
+          }.not_to raise_error
+        }
       end
     end
   end
@@ -297,10 +272,8 @@ RSpec.describe Folder, type: :model do
     end
 
     context 'deleted' do
-      before do
-        subject.update_columns(is_deleted: true)
-        subject.reload
-      end
+      include_context 'trashed resource'
+
       it {
         expect(subject.is_deleted?).to be_truthy
         expect(subject.is_purged?).to be_falsey
@@ -308,6 +281,150 @@ RSpec.describe Folder, type: :model do
         expect(subject.is_deleted_changed?).to be_falsey
         expect(subject.is_purged_changed?).to be_truthy
         expect(subject.is_purged?).to be_truthy
+      }
+    end
+  end
+
+  describe '#move_to_trashbin' do
+    let(:original_parent) { subject.parent }
+    it { is_expected.to respond_to(:move_to_trashbin) }
+
+    it {
+      expect(subject.is_deleted?).to be_falsey
+      expect(original_parent).not_to be_nil
+      expect(subject.deleted_from_parent_id).to be_nil
+      expect(subject.deleted_from_parent).to be_nil
+
+      subject.move_to_trashbin
+
+      expect(subject.is_deleted?).to be_truthy
+      expect(subject.parent_id).to be_nil
+      expect(subject.parent).to be_nil
+      expect(subject.deleted_from_parent_id).not_to be_nil
+      expect(subject.deleted_from_parent).not_to be_nil
+      expect(subject.deleted_from_parent).to eq(original_parent)
+    }
+  end
+
+  describe '#restore_from_trashbin' do
+    let(:original_parent) { subject.deleted_from_parent }
+    include_context 'trashed resource'
+
+    before do
+      expect(subject.is_deleted?).to be_truthy
+      expect(subject.parent_id).to be_nil
+      expect(subject.parent).to be_nil
+      expect(original_parent).not_to be_nil
+    end
+
+    context 'to original parent' do
+      context 'folder' do
+        it {
+          subject.restore_from_trashbin
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).to eq(original_parent)
+        }
+      end
+
+      context 'project' do
+        subject { other_folder }
+        let(:original_parent) { subject.project }
+
+        it {
+          subject.restore_from_trashbin
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).to be_nil
+          expect(subject.parent).to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.project).to eq(original_parent)
+        }
+      end
+    end
+
+    context 'to new parent folder' do
+      context 'in original project' do
+        let(:new_parent) { FactoryBot.create(:folder, project: project) }
+
+        it {
+          subject.restore_from_trashbin new_parent
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).not_to eq(original_parent)
+          expect(subject.parent).to eq(new_parent)
+          expect(subject.project_id).to eq(new_parent.project_id)
+          expect(subject).to be_valid
+        }
+      end
+
+      context 'in different project' do
+        let(:new_parent) { FactoryBot.create(:folder, project: other_project) }
+
+        it {
+          subject.restore_from_trashbin new_parent
+
+          expect(subject.is_deleted?).to be_falsey
+          expect(subject.parent_id).not_to be_nil
+          expect(subject.parent).not_to be_nil
+          expect(subject.deleted_from_parent_id).to be_nil
+          expect(subject.deleted_from_parent).to be_nil
+          expect(subject.parent).not_to eq(original_parent)
+          expect(subject.parent).to eq(new_parent)
+          expect(subject.project_id).to eq(new_parent.project_id)
+          expect(subject).not_to be_valid
+        }
+      end
+    end
+
+    context 'to original project root' do
+      let(:target_project) { project }
+
+      it {
+        subject.restore_from_trashbin target_project
+
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.project_id).to eq(target_project.id)
+        expect(subject).to be_valid
+      }
+    end
+
+    context 'to different project root' do
+      let(:target_project) { other_project }
+
+      it {
+        subject.restore_from_trashbin target_project
+
+        expect(subject.is_deleted?).to be_falsey
+        expect(subject.parent_id).to be_nil
+        expect(subject.parent).to be_nil
+        expect(subject.deleted_from_parent_id).to be_nil
+        expect(subject.deleted_from_parent).to be_nil
+        expect(subject.project_id).to eq(target_project.id)
+        expect(subject).not_to be_valid
+      }
+    end
+
+    context 'to non project or folder' do
+      let(:new_parent) { immediate_child_file }
+
+      it {
+        expect {
+          subject.restore_from_trashbin new_parent
+        }.to raise_error(IncompatibleParentException)
       }
     end
   end
