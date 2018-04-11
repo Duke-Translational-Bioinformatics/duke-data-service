@@ -16,8 +16,10 @@ and are not moved to the trash bin, therefore projects cannot be restored.
 Client apps should implement delete confirmation workflow, such as requiring
 users to enter the project name.**
 
-Items in the trash bin can be restored, either to its original parent, to the
-root of the project, or to a new parent in the same project.
+Items in the trash bin can be restored, either to their original parent, to the
+root of the project, or to a new parent in the same project. File versions cannot
+be individually restored, but will instead restore all version history of the
+original owning file.
 
 Items in the trash bin can be purged. Once purged, the object is no longer
 visible from the trash bin context, and, in the case of a file version, the file
@@ -71,9 +73,19 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
 
-### Restore Trashbin Item instance [GET]
->**Permission:** create\_file or system\_admin
+### Restore Trashbin Item instance [PUT]
+>**Permission:** create_file or system_admin
 - - - - -
+
+>**Rules**
+- - - - -
++ If parent is not supplied in the payload, an attempt will be made to restore to the original parent.
++ An exception is returned if the parent is itself in the trash bin. You must restore the parent before you can restore a child to it.
++ `dds-file` and `dds-folder` objects can only be restored to a `dds-project` or `dds-folder` parent.
++ If a `dds-file` is restored, all deleted version history will be restored as well.
++ `dds-file-version` objects can only be restored to their original "owning" file.
++ If a `dds-file-version` is restored, all deleted version history of the original "owning" file will be restored as well.
+
 **Response messages:**
 * 201: Valid API Token in 'Authorization' Header
 * 400: Parent object does not exist, has been purged, or is in the trash bin
@@ -110,7 +122,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
             "audit": { }
         }
 
-## Purge Trashbin Item [/trashbin/{object_id}/{object_kind}/restore]
+## Purge Trashbin Item [/trashbin/{object_id}/{object_kind}/purge]
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
     + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
@@ -125,9 +137,15 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 * 403: Forbidden
 * 404: Item does not exist in the trash bin
 
-+ Response 201 (application/json)
++ Response 201
 
-## Project Trashbin Items [GET /trashbin/project/{id}/children{?name_contains,recurse}]
+## Project Trashbin Items [/trashbin/project/{id}/children{?name_contains,recurse}]
++ Parameters
+    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the project.
+    + name_contains (string, optional)
+    + recurse (boolean, optional)
+
+### Project Trashbin Items instance [GET]
 >**Permission:** view_project or system_admin
 - - - - -
 
@@ -142,11 +160,6 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
 * 404: Item does not exist in the trash bin
-
-+ Parameters
-    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the project.
-    + name_contains (string, optional)
-    + recurse (boolean, optional, default false)
 
 + Response 200 (application/json)
 
@@ -228,7 +241,13 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
             ]
         }
 
-## Folder Trashbin Items [GET /trashbin/folder/{id}/children{?name_contains,recurse}]
+## Folder Trashbin Items [/trashbin/folder/{id}/children{?name_contains,recurse}]
++ Parameters
+    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the folder.
+    + name_contains (string, optional)
+    + recurse (boolean, optional)
+
+### Folder Trashbin Items instance [GET]
 >**Permission:** view_project or system_admin
 - - - - -
 
@@ -243,11 +262,6 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
 * 404: Item does not exist in the trash bin
-
-+ Parameters
-    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the folder.
-    + name_contains (string, optional)
-    + recurse (boolean, optional, default false)
 
 + Response 200 (application/json)
 
