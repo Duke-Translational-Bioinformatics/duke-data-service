@@ -106,7 +106,7 @@ module DDS
         detail 'Purges the item and any children, and permenantly removes any stored files from the storage_provider. If a FileVersion is restored, the parent is optional, otherwise it is required.'
         named 'purge trashbin item'
         failure [
-          {code: 200, message: 'Successfully Purged'},
+          {code: 204, message: 'Successfully Purged'},
           {code: 401, message: 'Unauthorized'},
           {code: 403, message: 'Forbidden'},
           {code: 404, message: 'Item Does not Exist'},

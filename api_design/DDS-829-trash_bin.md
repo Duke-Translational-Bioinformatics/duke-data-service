@@ -68,10 +68,10 @@ view_project
 create\_file or system\_admin
 
 ###### Response Messages
-* 201: Success
-* 400: Parent object does not exist, has been purged, or is in the trash bin
+* 200: Success
 * 401: Unauthorized
 * 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Object not found in trash bin
 
 ###### Request Parameters
@@ -102,6 +102,13 @@ create\_file or system\_admin
 
 ###### Permissions
 project\_admin or system\_admin
+
+###### Response Messages
+* 204: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
+* 404: Object not found in trash bin
 
 ###### Rules
 + Purge of a specific file version (`dds-file-version`) cannot be performed via this endpoint - version can only be purged via the "owning" file (`dds-file`).
