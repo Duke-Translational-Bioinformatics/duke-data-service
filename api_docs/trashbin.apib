@@ -34,7 +34,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 >**Permission:** view_project
 - - - - -
 **Response messages:**
-* 200: Valid API Token in 'Authorization' Header
+* 200: Success
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
 * 404: Item does not exist in the trash bin
@@ -64,7 +64,8 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                     "name": "Sequencing Core"
                 }
             ],
-            "is_deleted": false,
+            "is_deleted": true,
+            "is_purged": false,
             "audit": { }
         }
 
@@ -87,13 +88,13 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 + If a `dds-file-version` is restored, all deleted version history of the original "owning" file will be restored as well.
 
 **Response messages:**
-* 201: Valid API Token in 'Authorization' Header
-* 400: Parent object does not exist, has been purged, or is in the trash bin
+* 200: Success
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
 
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
         {
             "kind": "dds-folder",
@@ -119,6 +120,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                 }
             ],
             "is_deleted": false,
+            "is_purged": false,
             "audit": { }
         }
 
@@ -131,13 +133,13 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 >**Permission:** create_file or system_admin
 - - - - -
 **Response messages:**
-* 201: Valid API Token in 'Authorization' Header
-* 400: Parent object does not exist, has been purged, or is in the trash bin
+* 204: Success
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
 
-+ Response 201
++ Response 204
 
 ## Project Trashbin Items [/trashbin/project/{id}/children{?name_contains,recurse}]
 + Parameters
@@ -155,10 +157,10 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 + Lists only immediate children of the project unless the `recurse` parameter is specified, when specified, invokes a recursive search of the project hierarchy.
 
 **Response messages:**
-* 201: Valid API Token in 'Authorization' Header
-* 400: Parent object does not exist, has been purged, or is in the trash bin
+* 200: Success
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
 
 + Response 200 (application/json)
@@ -188,7 +190,8 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                             "name": "Sequencing Core"
                         }
                     ],
-                    "is_deleted": false,
+                    "is_deleted": true,
+                    "is_purged": false,
                     "audit": { }
                 },
                 {
@@ -214,7 +217,8 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                             "name": "Sequencing Archive"
                         }
                     ],
-                    "is_deleted": false,
+                    "is_deleted": true,
+                    "is_purged": false,
                     "current_version": {
                         "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                         "version": 1,
@@ -257,10 +261,10 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 + Lists only immediate children of the folder unless the `recurse` parameter is specified, when specified, invokes a recursive search of the folder hierarchy.
 
 **Response messages:**
-* 201: Valid API Token in 'Authorization' Header
-* 400: Parent object does not exist, has been purged, or is in the trash bin
+* 200: Success
 * 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
 * 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
 
 + Response 200 (application/json)
@@ -290,7 +294,8 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                             "name": "Sequencing Core"
                         }
                     ],
-                    "is_deleted": false,
+                    "is_deleted": true,
+                    "is_purged": false,
                     "audit": { }
                 },
                 {
@@ -316,7 +321,8 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
                             "name": "Sequencing Archive"
                         }
                     ],
-                    "is_deleted": false,
+                    "is_deleted": true,
+                    "is_purged": false,
                     "current_version": {
                         "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
                         "version": 1,
