@@ -1,3 +1,31 @@
+def purge_deleted_objects
+  if ENV["PURGE_OBJECTS"]
+    Project.where(is_deleted: true).all.each do |deleted_project|
+      deleted_project.force_purgation
+      deleted_project.manage_deletion
+      deleted_project.manage_children
+    end
+
+    Folder.where(is_deleted: true, is_purged: false).all.each do |deleted_folder|
+      unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
+        deleted_folder.update(is_deleted: true, is_purged: true)
+      end
+    end
+
+    DataFile.where(is_deleted: true, is_purged: false).all.each do |deleted_file|
+      unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
+        deleted_file.update(is_deleted: true, is_purged: true)
+      end
+    end
+
+    FileVersion.where(is_deleted: true, is_purged: false).all.each do |deleted_file_version|
+      unless deleted_file_version.parent.is_deleted?
+        deleted_file_version.update(is_deleted: true, is_purged: true)
+      end
+    end
+  end
+end
+
 def type_untyped_authentication_services
   default_type = "DukeAuthenticationService"
   untyped = AuthenticationService.where(type: nil)
@@ -147,6 +175,7 @@ namespace :db do
       migrate_nil_consistency_status
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
+      purge_deleted_objects
     end
   end
 end
