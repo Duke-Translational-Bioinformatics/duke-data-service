@@ -1,12 +1,13 @@
 module UnRestorable
   extend ActiveSupport::Concern
+  attr_accessor :force_purgation
 
   included do
     before_update :manage_deletion
   end
 
   def manage_deletion
-    if will_save_change_to_is_deleted? && is_deleted?
+    if (will_save_change_to_is_deleted? && is_deleted?) || force_purgation
       @child_job = ChildPurgationJob
     end
   end
