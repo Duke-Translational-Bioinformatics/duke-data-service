@@ -245,6 +245,58 @@ RSpec.describe Project, type: :model do
     it_behaves_like 'an UnRestorable ChildMinder', :project, :project_children
 
     describe '#manage_children' do
+      context 'force_purgation' do
+        context 'false' do
+          it {
+            expect(project_children).not_to be_empty
+            expect(subject.force_purgation).to be_falsey
+            subject.manage_deletion
+            expect(ChildPurgationJob).not_to receive(:perform_later)
+            subject.manage_children
+          }
+        end
+
+        context 'true' do
+          include_context 'with job runner', ChildPurgationJob
+          let(:job_transaction) {
+            subject.create_transaction('testing')
+            ChildPurgationJob.initialize_job(subject)
+          }
+          before do
+            @old_max = Rails.application.config.max_children_per_job
+            Rails.application.config.max_children_per_job = 1
+            expect(child_folder).to be_persisted
+            child_folder.update_column(:is_deleted, true)
+            expect(child_folder.is_deleted?).to be_truthy
+            expect(valid_child_file).to be_persisted
+            valid_child_file.update_column(:is_deleted, true)
+            expect(valid_child_file.is_deleted?).to be_truthy
+            expect(invalid_child_file).to be_persisted
+            invalid_child_file.update_column(:is_deleted, true)
+            expect(invalid_child_file.is_deleted?).to be_truthy
+          end
+
+          after do
+            Rails.application.config.max_children_per_job = @old_max
+          end
+
+          it {
+            expect(project_children).not_to be_empty
+            subject.force_purgation = true
+            expect(subject.force_purgation).to be_truthy
+            subject.manage_deletion
+            expect(ChildPurgationJob).to receive(:initialize_job)
+              .with(subject)
+              .exactly(subject.children.count).times
+              .and_return(job_transaction)
+            (1..subject.children.count).each do |page|
+              expect(ChildPurgationJob).to receive(:perform_later).with(job_transaction, subject, page)
+            end
+            subject.manage_children
+          }
+        end
+      end
+
       context 'when is_deleted not changed' do
         it {
           expect(project_children).not_to be_empty
