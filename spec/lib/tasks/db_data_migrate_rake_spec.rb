@@ -310,9 +310,11 @@ describe "db:data:migrate" do
         let(:deleted_file_version_in_deleted_file) { FactoryBot.create(:file_version, data_file: deleted_file) }
 
         it {
+          expect(deleted_project.force_purgation).to be_falsey
           expect(project_relation).to receive(:all).and_return([ deleted_project ])
-          expect(deleted_project).to receive(:force_purgation=).with(true).and_call_original
-          expect(deleted_project).to receive(:manage_deletion)
+          expect(deleted_project).to receive(:manage_deletion) {
+            expect(deleted_project.force_purgation).to be_truthy
+          }
           expect(deleted_project).to receive(:manage_children)
           expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
           expect(Project).to receive(:where).with(is_deleted: true).and_return(project_relation)
