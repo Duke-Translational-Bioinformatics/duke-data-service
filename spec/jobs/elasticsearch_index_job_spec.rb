@@ -8,6 +8,8 @@ RSpec.describe ElasticsearchIndexJob, type: :job do
   it { expect(prefix_delimiter).not_to be_nil }
   it { expect(described_class.queue_name).to eq("#{prefix}#{prefix_delimiter}elasticsearch_index") }
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   context 'data_file' do
     it_behaves_like 'an ElasticsearchIndexJob', :data_file
   end

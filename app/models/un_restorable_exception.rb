@@ -1,0 +1,2 @@
+class UnRestorableException < StandardError
+end

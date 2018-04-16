@@ -153,6 +153,41 @@ describe "db:data:migrate" do
       end
     end
 
+    describe 'upload storage_container migration' do
+      context 'when there are uploads with nil storage_provider' do
+        let(:expected_uploads_without_storage_container) { 3 }
+        before do
+          Upload.skip_callback(:create, :before, :set_storage_container)
+          expected_uploads_without_storage_container.times do
+            u = FactoryBot.create(:upload)
+          end
+        end
+
+        after do
+          Upload.set_callback(:create, :before, :set_storage_container)
+        end
+
+        it {
+          expect(Upload.where(storage_container: nil).count).to eq(expected_uploads_without_storage_container)
+          expect {
+            invoke_task expected_stdout: Regexp.new("#{expected_uploads_without_storage_container} uploads updated")
+          }.to change{
+            Upload.where(storage_container: nil).count
+          }.by(-expected_uploads_without_storage_container)
+        }
+      end
+
+      context 'when there are no uploads with nil storage_provider' do
+        it {
+          expect {
+            invoke_task expected_stdout: Regexp.new("0 uploads updated")
+          }.not_to change{
+            Upload.where(storage_container: nil).count
+          }
+        }
+      end
+    end
+
     describe 'migrate_storage_provider_chunk_environment' do
       let(:bad_storage_providers) {
         StorageProvider.where(
@@ -237,6 +272,73 @@ describe "db:data:migrate" do
             ).count }
           }
         end
+      end
+    end
+
+    describe 'purge_deleted_objects' do
+      context 'ENV[\"PURGE_OBJECTS\"] not set' do
+        it {
+          expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
+          expect(Project).not_to receive(:where).with(is_deleted: true)
+          expect(Folder).not_to receive(:where).with(is_deleted: true)
+          expect(DataFile).not_to receive(:where).with(is_deleted: true)
+          expect(FileVersion).not_to receive(:where).with(is_deleted: true)
+          invoke_task
+        }
+      end
+
+      context 'ENV[\"PURGE_OBJECTS\"] set' do
+        include_context 'with env_override'
+        let(:env_override) { {
+          'PURGE_OBJECTS' => "1"
+        } }
+        let(:project_relation) { Project.where(is_deleted: true) }
+        let(:deleted_project) { FactoryBot.create(:project, is_deleted: true) }
+
+        let(:folder_relation) { Folder.where(is_deleted: true, is_purged: false) }
+        let(:deleted_folder) { FactoryBot.create(:folder, is_deleted: true) }
+        let(:deleted_folder_in_deleted_project) { FactoryBot.create(:folder, :root, project: deleted_project, is_deleted: true) }
+        let(:deleted_folder_in_deleted_parent) { FactoryBot.create(:folder, parent: deleted_folder, is_deleted: true) }
+
+        let(:file_relation) { DataFile.where(is_deleted: true, is_purged: false) }
+        let(:deleted_file) { FactoryBot.create(:data_file, is_deleted: true) }
+        let(:deleted_file_in_deleted_project) { FactoryBot.create(:data_file, :root, project: deleted_project, is_deleted: true) }
+        let(:deleted_file_in_deleted_parent) { FactoryBot.create(:data_file, parent: deleted_folder, is_deleted: true) }
+
+        let(:file_version_relation) { FileVersion.where(is_deleted: true, is_purged: false) }
+        let(:deleted_file_version) { FactoryBot.create(:file_version, is_deleted: true) }
+        let(:deleted_file_version_in_deleted_file) { FactoryBot.create(:file_version, data_file: deleted_file) }
+
+        it {
+          expect(deleted_project.force_purgation).to be_falsey
+          expect(project_relation).to receive(:all).and_return([ deleted_project ])
+          expect(deleted_project).to receive(:manage_deletion) {
+            expect(deleted_project.force_purgation).to be_truthy
+          }
+          expect(deleted_project).to receive(:manage_children)
+          expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
+          expect(Project).to receive(:where).with(is_deleted: true).and_return(project_relation)
+
+
+          expect(folder_relation).to receive(:all).and_return( [ deleted_folder, deleted_folder_in_deleted_project, deleted_folder_in_deleted_parent ] )
+          expect(deleted_folder).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_folder_in_deleted_project).not_to receive(:update)
+          expect(deleted_folder_in_deleted_parent).not_to receive(:update)
+          expect(Folder).to receive(:where).with(is_deleted: true, is_purged: false).and_return(folder_relation)
+
+          expect(file_relation).to receive(:all).and_return( [ deleted_file, deleted_file_in_deleted_project, deleted_file_in_deleted_parent ] )
+          expect(deleted_file).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_file_in_deleted_project).not_to receive(:update)
+          expect(deleted_file_in_deleted_parent).not_to receive(:update)
+          expect(DataFile).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_relation)
+
+          expect(file_version_relation).to receive(:all).and_return( [ deleted_file_version, deleted_file_version_in_deleted_file ] )
+          expect(deleted_file_version).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_file_version_in_deleted_file).not_to receive(:update)
+          expect(FileVersion).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_version_relation)
+
+          invoke_task
+        }
       end
     end
   end

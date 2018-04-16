@@ -1,0 +1,2 @@
+class UnPurgableException < StandardError
+end

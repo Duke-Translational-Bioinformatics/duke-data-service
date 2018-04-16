@@ -5,7 +5,7 @@ RSpec.describe Chunk, type: :model do
   let(:storage_provider) { subject.storage_provider }
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
-  let(:expected_sub_path) { [subject.project_id, expected_object_path].join('/')}
+  let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
   let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
   let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
   let(:is_logically_deleted) { false }
@@ -52,9 +52,11 @@ RSpec.describe Chunk, type: :model do
   end
 
   describe 'instance methods' do
-    it 'is_expected.to delegate project_id to upload' do
+    it 'should delegate #project_id and #storage_container to upload' do
       is_expected.to delegate_method(:project_id).to(:upload)
       expect(subject.project_id).to eq(subject.upload.project_id)
+      is_expected.to delegate_method(:storage_container).to(:upload)
+      expect(subject.storage_container).to eq(subject.upload.storage_container)
     end
 
     it { is_expected.to delegate_method(:chunk_max_size_bytes).to(:storage_provider) }
@@ -84,6 +86,48 @@ RSpec.describe Chunk, type: :model do
   it 'is_expected.to have a url method' do
     is_expected.to respond_to :url
     expect(subject.url).to eq expected_url
+  end
+
+  context '#purge_storage', :vcr do
+    it { is_expected.to respond_to :purge_storage }
+
+    context 'called' do
+      subject {
+        FactoryBot.create(:chunk, :swift, size: chunk_data.length, number: 1)
+      }
+      let(:storage_provider) { subject.storage_provider }
+      let(:chunk_data) { 'some random chunk' }
+      before do
+        storage_provider.register_keys
+        storage_provider.put_container(subject.storage_container)
+        storage_provider.put_object(
+          subject.storage_container,
+          subject.object_path,
+          chunk_data
+        )
+      end
+      after do
+        begin
+          storage_provider.delete_object(subject.storage_container, subject.object_path)
+        rescue
+          #ignore
+        end
+      end
+      it {
+        resp = HTTParty.get(
+          "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
+          headers: storage_provider.auth_header
+        )
+        expect(resp.response.code.to_i).to eq(200)
+        expect(resp.body).to eq(chunk_data)
+        subject.purge_storage
+        resp = HTTParty.get(
+          "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
+          headers: storage_provider.auth_header
+        )
+        expect(resp.response.code.to_i).to eq(404)
+      }
+    end
   end
 
   describe '#total_chunks' do

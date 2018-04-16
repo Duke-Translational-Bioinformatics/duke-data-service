@@ -1,3 +1,31 @@
+def purge_deleted_objects
+  if ENV["PURGE_OBJECTS"]
+    Project.where(is_deleted: true).all.each do |deleted_project|
+      deleted_project.force_purgation = true
+      deleted_project.manage_deletion
+      deleted_project.manage_children
+    end
+
+    Folder.where(is_deleted: true, is_purged: false).all.each do |deleted_folder|
+      unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
+        deleted_folder.update(is_deleted: true, is_purged: true)
+      end
+    end
+
+    DataFile.where(is_deleted: true, is_purged: false).all.each do |deleted_file|
+      unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
+        deleted_file.update(is_deleted: true, is_purged: true)
+      end
+    end
+
+    FileVersion.where(is_deleted: true, is_purged: false).all.each do |deleted_file_version|
+      unless deleted_file_version.parent.is_deleted?
+        deleted_file_version.update(is_deleted: true, is_purged: true)
+      end
+    end
+  end
+end
+
 def type_untyped_authentication_services
   default_type = "DukeAuthenticationService"
   untyped = AuthenticationService.where(type: nil)
@@ -108,6 +136,15 @@ def migrate_nil_consistency_status
   puts "#{updated_uploads} uploads updated."
 end
 
+def migrate_nil_storage_container
+  updated_uploads = 0
+  Upload.where(storage_container: nil).each do |u|
+    u.update_columns(storage_container: u.project_id)
+    updated_uploads += 1
+  end
+  puts "#{updated_uploads} uploads updated"
+end
+
 def migrate_storage_provider_chunk_environment
   bad_storage_providers = StorageProvider.where(
     chunk_max_size_bytes: nil,
@@ -136,7 +173,9 @@ namespace :db do
       create_missing_fingerprints
       type_untyped_authentication_services
       migrate_nil_consistency_status
+      migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
+      purge_deleted_objects
     end
   end
 end
