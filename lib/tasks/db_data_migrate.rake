@@ -1,7 +1,7 @@
 def purge_deleted_objects
   if ENV["PURGE_OBJECTS"]
     Project.where(is_deleted: true).all.each do |deleted_project|
-      deleted_project.force_purgation
+      deleted_project.force_purgation = true
       deleted_project.manage_deletion
       deleted_project.manage_children
     end
