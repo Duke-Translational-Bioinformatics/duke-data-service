@@ -1,6 +1,8 @@
 def purge_deleted_objects
   if ENV["PURGE_OBJECTS"]
+    purge_state = 'trashbin_migration'
     Project.where(is_deleted: true).all.each do |deleted_project|
+      deleted_project.create_transaction(purge_state)
       deleted_project.force_purgation = true
       deleted_project.manage_deletion
       deleted_project.manage_children
@@ -8,18 +10,21 @@ def purge_deleted_objects
 
     Folder.where(is_deleted: true, is_purged: false).all.each do |deleted_folder|
       unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
+        deleted_folder.create_transaction(purge_state)
         deleted_folder.update(is_deleted: true, is_purged: true)
       end
     end
 
     DataFile.where(is_deleted: true, is_purged: false).all.each do |deleted_file|
       unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
+        deleted_file.create_transaction(purge_state)
         deleted_file.update(is_deleted: true, is_purged: true)
       end
     end
 
     FileVersion.where(is_deleted: true, is_purged: false).all.each do |deleted_file_version|
       unless deleted_file_version.parent.is_deleted?
+        deleted_file_version.create_transaction(purge_state)
         deleted_file_version.update(is_deleted: true, is_purged: true)
       end
     end
