@@ -21,13 +21,6 @@ def purge_deleted_objects
         deleted_file.update(is_deleted: true, is_purged: true)
       end
     end
-
-    FileVersion.where(is_deleted: true, is_purged: false).all.each do |deleted_file_version|
-      unless deleted_file_version.parent.is_deleted?
-        deleted_file_version.create_transaction(purge_state)
-        deleted_file_version.update(is_deleted: true, is_purged: true)
-      end
-    end
   end
 end
 
