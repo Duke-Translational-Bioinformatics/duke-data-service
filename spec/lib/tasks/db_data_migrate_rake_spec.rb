@@ -308,32 +308,43 @@ describe "db:data:migrate" do
         let(:file_version_relation) { FileVersion.where(is_deleted: true, is_purged: false) }
         let(:deleted_file_version) { FactoryBot.create(:file_version, is_deleted: true) }
         let(:deleted_file_version_in_deleted_file) { FactoryBot.create(:file_version, data_file: deleted_file) }
+        let(:expected_transaction_state) { 'trashbin_migration' }
 
         it {
           expect(deleted_project.force_purgation).to be_falsey
           expect(project_relation).to receive(:all).and_return([ deleted_project ])
           expect(deleted_project).to receive(:manage_deletion) {
+            expect(deleted_project.current_transaction).not_to be_nil
+            expect(deleted_project.current_transaction.state).to eq expected_transaction_state
             expect(deleted_project.force_purgation).to be_truthy
           }
           expect(deleted_project).to receive(:manage_children)
           expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
           expect(Project).to receive(:where).with(is_deleted: true).and_return(project_relation)
 
-
           expect(folder_relation).to receive(:all).and_return( [ deleted_folder, deleted_folder_in_deleted_project, deleted_folder_in_deleted_parent ] )
-          expect(deleted_folder).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_folder).to receive(:update).with(is_deleted: true, is_purged: true) {
+            expect(deleted_folder.current_transaction).not_to be_nil
+            expect(deleted_folder.current_transaction.state).to eq expected_transaction_state
+          }
           expect(deleted_folder_in_deleted_project).not_to receive(:update)
           expect(deleted_folder_in_deleted_parent).not_to receive(:update)
           expect(Folder).to receive(:where).with(is_deleted: true, is_purged: false).and_return(folder_relation)
 
           expect(file_relation).to receive(:all).and_return( [ deleted_file, deleted_file_in_deleted_project, deleted_file_in_deleted_parent ] )
-          expect(deleted_file).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_file).to receive(:update).with(is_deleted: true, is_purged: true) {
+            expect(deleted_file.current_transaction).not_to be_nil
+            expect(deleted_file.current_transaction.state).to eq expected_transaction_state
+          }
           expect(deleted_file_in_deleted_project).not_to receive(:update)
           expect(deleted_file_in_deleted_parent).not_to receive(:update)
           expect(DataFile).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_relation)
 
           expect(file_version_relation).to receive(:all).and_return( [ deleted_file_version, deleted_file_version_in_deleted_file ] )
-          expect(deleted_file_version).to receive(:update).with(is_deleted: true, is_purged: true)
+          expect(deleted_file_version).to receive(:update).with(is_deleted: true, is_purged: true) {
+            expect(deleted_file_version.current_transaction).not_to be_nil
+            expect(deleted_file_version.current_transaction.state).to eq expected_transaction_state
+          }
           expect(deleted_file_version_in_deleted_file).not_to receive(:update)
           expect(FileVersion).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_version_relation)
 
