@@ -280,9 +280,9 @@ describe "db:data:migrate" do
         it {
           expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
           expect(Project).not_to receive(:where).with(is_deleted: true)
-          expect(Folder).not_to receive(:where).with(is_deleted: true)
-          expect(DataFile).not_to receive(:where).with(is_deleted: true)
-          expect(FileVersion).not_to receive(:where).with(is_deleted: true)
+          expect(Folder).not_to receive(:where).with(is_deleted: true, is_purged: false)
+          expect(DataFile).not_to receive(:where).with(is_deleted: true, is_purged: false)
+          expect(FileVersion).not_to receive(:where).with(is_deleted: true, is_purged: false)
           invoke_task
         }
       end
@@ -340,14 +340,7 @@ describe "db:data:migrate" do
           expect(deleted_file_in_deleted_parent).not_to receive(:update)
           expect(DataFile).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_relation)
 
-          expect(file_version_relation).to receive(:all).and_return( [ deleted_file_version, deleted_file_version_in_deleted_file ] )
-          expect(deleted_file_version).to receive(:update).with(is_deleted: true, is_purged: true) {
-            expect(deleted_file_version.current_transaction).not_to be_nil
-            expect(deleted_file_version.current_transaction.state).to eq expected_transaction_state
-          }
-          expect(deleted_file_version_in_deleted_file).not_to receive(:update)
-          expect(FileVersion).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_version_relation)
-
+          expect(FileVersion).not_to receive(:where).with(is_deleted: true, is_purged: false)
           invoke_task
         }
       end
