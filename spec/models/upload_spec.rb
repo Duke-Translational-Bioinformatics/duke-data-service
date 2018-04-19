@@ -378,20 +378,31 @@ RSpec.describe Upload, type: :model do
             let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
             it {
               #create authentication failure
-              original_storage_provider = subject.storage_provider
-              subject.storage_provider = fake_storage_provider
-              expect(subject.save).to be_truthy
+              original_auth_header = subject.storage_provider.auth_header
+              original_storage_url = subject.storage_provider.storage_url
+              expect(
+                subject.storage_provider.update(
+                  service_user: fake_storage_provider.service_user
+                )
+              ).to be_truthy
+
+              resp = HTTParty.head(
+                "#{original_storage_url}/#{subject.sub_path}",
+                headers: original_auth_header
+              )
+              expect(resp.response.code.to_i).to eq(200)
 
               original_chunks = subject.chunks.all
 
               subject.chunks.each do |chunk|
                 resp = HTTParty.head(
-                  "#{original_storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: original_storage_provider.auth_header
+                  "#{original_storage_url}/#{chunk.sub_path}",
+                  headers: original_auth_header
                 )
                 expect(resp.response.code.to_i).to eq(200)
               end
 
+              subject.storage_provider.remove_instance_variable(:'@auth_uri_resp')
               purge_time = DateTime.now
               expect {
                 expect {
@@ -402,10 +413,16 @@ RSpec.describe Upload, type: :model do
               subject.reload
               expect(subject.purged_on).to be_nil
 
+              resp = HTTParty.head(
+                "#{original_storage_url}/#{subject.sub_path}",
+                headers: original_auth_header
+              )
+              expect(resp.response.code.to_i).to eq(200)
+
               original_chunks.each do |chunk|
                 resp = HTTParty.head(
-                  "#{original_storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: original_storage_provider.auth_header
+                  "#{original_url}/#{chunk.sub_path}",
+                  headers: original_auth_header
                 )
                 expect(resp.response.code.to_i).to eq(200)
               end
