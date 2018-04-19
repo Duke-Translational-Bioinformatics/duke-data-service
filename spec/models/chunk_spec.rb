@@ -137,27 +137,29 @@ RSpec.describe Chunk, type: :model do
           let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
           it {
             #create authentication failure
-            original_storage_provider = subject.storage_provider
-            upload = subject.upload
-            upload.storage_provider = fake_storage_provider
-            expect(upload.save).to be_truthy
-            subject.reload
-            expect(subject.storage_provider).to eq(fake_storage_provider)
+            original_auth_header = storage_provider.auth_header
+            original_storage_url = storage_provider.storage_url
+            expect(
+              storage_provider.update(
+                service_user: fake_storage_provider.service_user
+              )
+            ).to be_truthy
 
             resp = HTTParty.get(
-              "#{original_storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-              headers: original_storage_provider.auth_header
+              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
+              headers: original_auth_header
             )
             expect(resp.response.code.to_i).to eq(200)
             expect(resp.body).to eq(chunk_data)
 
+            storage_provider.remove_instance_variable(:'@auth_uri_resp')
             expect {
               subject.purge_storage
             }.to raise_error(StorageProviderException)
 
             resp = HTTParty.get(
-              "#{original_storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-              headers: original_storage_provider.auth_header
+              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
+              headers: original_auth_header
             )
             expect(resp.response.code.to_i).to eq(200)
             expect(resp.body).to eq(chunk_data)
