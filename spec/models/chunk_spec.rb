@@ -113,20 +113,76 @@ RSpec.describe Chunk, type: :model do
           #ignore
         end
       end
-      it {
-        resp = HTTParty.get(
-          "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-          headers: storage_provider.auth_header
-        )
-        expect(resp.response.code.to_i).to eq(200)
-        expect(resp.body).to eq(chunk_data)
-        subject.purge_storage
-        resp = HTTParty.get(
-          "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-          headers: storage_provider.auth_header
-        )
-        expect(resp.response.code.to_i).to eq(404)
-      }
+
+      context 'StorageProviderException' do
+        context 'Not Found' do
+          it {
+            expect {
+              subject.storage_provider.delete_object(subject.storage_container, subject.object_path)
+            }.not_to raise_error
+
+            resp = HTTParty.get(
+              "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
+              headers: storage_provider.auth_header
+            )
+            expect(resp.response.code.to_i).to eq(404)
+
+            expect {
+              subject.purge_storage
+            }.not_to raise_error
+          }
+        end
+
+        context 'Other Exception' do
+          let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
+          it {
+            #create authentication failure
+            original_auth_header = storage_provider.auth_header
+            original_storage_url = storage_provider.storage_url
+            expect(
+              storage_provider.update(
+                service_user: fake_storage_provider.service_user
+              )
+            ).to be_truthy
+
+            resp = HTTParty.get(
+              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
+              headers: original_auth_header
+            )
+            expect(resp.response.code.to_i).to eq(200)
+            expect(resp.body).to eq(chunk_data)
+
+            storage_provider.remove_instance_variable(:'@auth_uri_resp')
+            expect {
+              subject.purge_storage
+            }.to raise_error(StorageProviderException)
+
+            resp = HTTParty.get(
+              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
+              headers: original_auth_header
+            )
+            expect(resp.response.code.to_i).to eq(200)
+            expect(resp.body).to eq(chunk_data)
+          }
+        end
+      end
+
+      context 'No StorageProviderException' do
+        it {
+          resp = HTTParty.get(
+            "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
+            headers: storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(200)
+          expect(resp.body).to eq(chunk_data)
+          subject.purge_storage
+          resp = HTTParty.get(
+            "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
+            headers: storage_provider.auth_header
+          )
+          expect(resp.response.code.to_i).to eq(404)
+        }
+      end
     end
   end
 

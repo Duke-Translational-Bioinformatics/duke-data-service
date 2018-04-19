@@ -330,42 +330,144 @@ RSpec.describe Upload, type: :model do
         before do
           subject.create_and_validate_storage_manifest
         end
-        it {
-          original_chunks = subject.chunks.all
-          resp = HTTParty.head(
-            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-            headers: subject.storage_provider.auth_header
-          )
-          expect(resp.response.code.to_i).to eq(200)
-          subject.chunks.each do |chunk|
+
+        context 'with StorageProviderException' do
+          context 'Object Not Found' do
+            it {
+              original_chunks = subject.chunks.all
+              subject.chunks.each do |chunk|
+                resp = HTTParty.head(
+                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+                  headers: subject.storage_provider.auth_header
+                )
+                expect(resp.response.code.to_i).to eq(200)
+              end
+
+              expect {
+                subject.storage_provider.delete_object_manifest(subject.storage_container, subject.id)
+              }.not_to raise_error
+
+              resp = HTTParty.head(
+                "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
+                headers: subject.storage_provider.auth_header
+              )
+              expect(resp.response.code.to_i).to eq(404)
+
+              purge_time = DateTime.now
+              expect {
+                expect {
+                  subject.purge_storage
+                }.to change{Chunk.count}.by(-original_chunks.length)
+              }.not_to raise_error
+
+              subject.reload
+              expect(subject.purged_on).not_to be_nil
+              expect(subject.purged_on).to be >= purge_time
+              expect(subject.chunks.count).to eq(0)
+              original_chunks.each do |chunk|
+                resp = HTTParty.head(
+                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+                  headers: subject.storage_provider.auth_header
+                )
+                expect(resp.response.code.to_i).to eq(404)
+              end
+            }
+          end
+
+          context 'Other Exception' do
+            let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
+            it {
+              #create authentication failure
+              original_auth_header = subject.storage_provider.auth_header
+              original_storage_url = subject.storage_provider.storage_url
+              expect(
+                subject.storage_provider.update(
+                  service_user: fake_storage_provider.service_user
+                )
+              ).to be_truthy
+
+              resp = HTTParty.head(
+                "#{original_storage_url}/#{subject.sub_path}",
+                headers: original_auth_header
+              )
+              expect(resp.response.code.to_i).to eq(200)
+
+              original_chunks = subject.chunks.all
+
+              subject.chunks.each do |chunk|
+                resp = HTTParty.head(
+                  "#{original_storage_url}/#{chunk.sub_path}",
+                  headers: original_auth_header
+                )
+                expect(resp.response.code.to_i).to eq(200)
+              end
+
+              subject.storage_provider.remove_instance_variable(:'@auth_uri_resp')
+              purge_time = DateTime.now
+              expect {
+                expect {
+                  subject.purge_storage
+                }.not_to change{Chunk.count}
+              }.to raise_error(StorageProviderException)
+
+              subject.reload
+              expect(subject.purged_on).to be_nil
+
+              resp = HTTParty.head(
+                "#{original_storage_url}/#{subject.sub_path}",
+                headers: original_auth_header
+              )
+              expect(resp.response.code.to_i).to eq(200)
+
+              original_chunks.each do |chunk|
+                resp = HTTParty.head(
+                  "#{original_url}/#{chunk.sub_path}",
+                  headers: original_auth_header
+                )
+                expect(resp.response.code.to_i).to eq(200)
+              end
+            }
+          end
+        end
+
+        context 'no StorageProviderException' do
+          it {
+            original_chunks = subject.chunks.all
             resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
               headers: subject.storage_provider.auth_header
             )
             expect(resp.response.code.to_i).to eq(200)
-          end
-          purge_time = DateTime.now
-          expect {
-            subject.purge_storage
-          }.to change{Chunk.count}.by(-original_chunks.length)
-          subject.reload
-          expect(subject.purged_on).not_to be_nil
-          expect(subject.purged_on).to be >= purge_time
-          expect(subject.chunks.count).to eq(0)
+            subject.chunks.each do |chunk|
+              resp = HTTParty.head(
+                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+                headers: subject.storage_provider.auth_header
+              )
+              expect(resp.response.code.to_i).to eq(200)
+            end
+            purge_time = DateTime.now
+            expect {
+              subject.purge_storage
+            }.to change{Chunk.count}.by(-original_chunks.length)
+            subject.reload
+            expect(subject.purged_on).not_to be_nil
+            expect(subject.purged_on).to be >= purge_time
+            expect(subject.chunks.count).to eq(0)
 
-          resp = HTTParty.head(
-            "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-            headers: subject.storage_provider.auth_header
-          )
-          expect(resp.response.code.to_i).to eq(404)
-          original_chunks.each do |chunk|
             resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
               headers: subject.storage_provider.auth_header
             )
             expect(resp.response.code.to_i).to eq(404)
-          end
-        }
+            original_chunks.each do |chunk|
+              resp = HTTParty.head(
+                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
+                headers: subject.storage_provider.auth_header
+              )
+              expect(resp.response.code.to_i).to eq(404)
+            end
+          }
+        end
       end #calls
     end #purge_storage
   end #swift methods

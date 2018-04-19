@@ -19,31 +19,31 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txfd2e257ad07e4edeb80ee-005abd2557
+      - tx18554ce7ae0a4e6eb3f5e-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:43 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:43 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd
     body:
       encoding: UTF-8
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       X-Container-Meta-Access-Control-Allow-Origin:
       - "*"
   response:
@@ -56,30 +56,30 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txcc535a9340ef4848be4e7-005abd2557
+      - tx86a748eae6d44defb40ef-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:43 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:43 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382/1
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41/1
     body:
       encoding: UTF-8
       string: this is a chunk
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:48 GMT
       Content-Length:
       - '0'
       Etag:
@@ -87,34 +87,34 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx2981a3b7bd04482299caf-005abd2557
+      - tx2b02c43714904700bbabc-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:43 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:43 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382?multipart-manifest=put
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: '[{"path":"906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
+      string: '[{"path":"181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41/1","etag":"2b1f638751fa49d7fba5a64fecf48bb2","size_bytes":15}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       Content-Type:
       - text/plain
       Content-Disposition:
-      - attachment; filename=omnis_dicta_1
+      - attachment; filename=perspiciatis_ut_135
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Thu, 29 Mar 2018 17:41:45 GMT
+      - Thu, 19 Apr 2018 16:53:48 GMT
       Content-Length:
       - '0'
       Etag:
@@ -122,23 +122,23 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx10938a26f83349918d7de-005abd2557
+      - tx8ffee23bbc8648ce91726-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: head
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
   response:
     status:
       code: 200
@@ -147,76 +147,37 @@ http_interactions:
       Content-Length:
       - '15'
       Content-Disposition:
-      - attachment; filename=omnis_dicta_1
+      - attachment; filename=perspiciatis_ut_135
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Thu, 29 Mar 2018 17:41:45 GMT
+      - Thu, 19 Apr 2018 16:53:48 GMT
       Etag:
       - '"b77622f6f760a1bed182840a7c02a53c"'
       X-Timestamp:
-      - '1522345304.00498'
+      - '1524156827.42425'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - tx26996a2f27e04c7d8099b-005abd2558
+      - txc6a526462572405ca5e62-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: head
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41/1
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Content-Length:
-      - '15'
-      Content-Disposition:
-      - attachment; filename=omnis_dicta_1
-      Accept-Ranges:
-      - bytes
-      Last-Modified:
-      - Thu, 29 Mar 2018 17:41:45 GMT
-      Etag:
-      - '"b77622f6f760a1bed182840a7c02a53c"'
-      X-Timestamp:
-      - '1522345304.00498'
-      X-Static-Large-Object:
-      - 'True'
-      Content-Type:
-      - text/plain
-      X-Trans-Id:
-      - tx0cc7911e50cd4803be76e-005abd2558
-      Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
-    body:
-      encoding: UTF-8
-      string: ''
-    http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
-- request:
-    method: head
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382/1
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
   response:
     status:
       code: 200
@@ -227,93 +188,31 @@ http_interactions:
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:48 GMT
       Etag:
       - 2b1f638751fa49d7fba5a64fecf48bb2
       X-Timestamp:
-      - '1522345303.81650'
+      - '1524156827.35591'
       Content-Type:
       - application/x-www-form-urlencoded
       X-Trans-Id:
-      - tx118edeca54d74279bc841-005abd2558
+      - txba7997df9f2c4c6db94d7-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
-- request:
-    method: get
-    uri: http://swift.local:12345/auth/v1.0
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      X-Auth-User:
-      - test:tester
-      X-Auth-Key:
-      - testing
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      X-Storage-Url:
-      - http://swift.local:12345/v1/AUTH_test
-      X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
-      Content-Type:
-      - text/html; charset=UTF-8
-      X-Storage-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
-      Content-Length:
-      - '0'
-      X-Trans-Id:
-      - tx72ce075089ed4c91a3de0-005abd2558
-      Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
-    body:
-      encoding: UTF-8
-      string: ''
-    http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: delete
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382/1
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41?multipart-manifest=delete
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
-  response:
-    status:
-      code: 204
-      message: No Content
-    headers:
-      Content-Length:
-      - '0'
-      Content-Type:
-      - text/html; charset=UTF-8
-      X-Trans-Id:
-      - tx093ba2c0cd31423dae200-005abd2558
-      Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
-    body:
-      encoding: UTF-8
-      string: ''
-    http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
-- request:
-    method: delete
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382?multipart-manifest=delete
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
   response:
     status:
       code: 200
@@ -322,17 +221,44 @@ http_interactions:
       Content-Type:
       - text/plain
       X-Trans-Id:
-      - txcfd14c6e579e4ebdaa637-005abd2558
+      - tx660f1ddb95974e95af8ac-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
       Transfer-Encoding:
       - chunked
     body:
       encoding: UTF-8
-      string: "Number Deleted: 1\nNumber Not Found: 1\nResponse Body: \nResponse Status:
+      string: "Number Deleted: 2\nNumber Not Found: 0\nResponse Body: \nResponse Status:
         200 OK\nErrors:\n"
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
+- request:
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txbe5b67b1d648496ea136b-005ad8c99b
+      Date:
+      - Thu, 19 Apr 2018 16:53:47 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
     method: get
     uri: http://swift.local:12345/auth/v1.0
@@ -352,31 +278,121 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txb5d46c8834dc4e6bbd6d9-005abd2558
+      - tx10de138bb7f44643b5cb5-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 - request:
-    method: head
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382
+    method: delete
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41/1
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Length:
+      - '70'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx65ce9b7c74554a798a353-005ad8c99b
+      Date:
+      - Thu, 19 Apr 2018 16:53:47 GMT
+    body:
+      encoding: UTF-8
+      string: "<html><h1>Not Found</h1><p>The resource could not be found.</p></html>"
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
+- request:
+    method: delete
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41?multipart-manifest=delete
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - txb32cbd65dcc14082896ac-005ad8c99b
+      Date:
+      - Thu, 19 Apr 2018 16:53:47 GMT
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: "Number Deleted: 0\nNumber Not Found: 1\nResponse Body: \nResponse Status:
+        200 OK\nErrors:\n"
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx9c97849cc8ea4f46a6a2a-005ad8c99b
+      Date:
+      - Thu, 19 Apr 2018 16:53:47 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
+- request:
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/181450e8-5447-452f-b3d6-dd1d44790bcd/2b07ab49-318e-4ca3-a793-50fd8b04bf41/1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tkea2586f2a4114dfd81cca926d6797c0b
   response:
     status:
       code: 404
@@ -387,39 +403,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txf7cda67a862b413992932-005abd2558
+      - tx67c93180f2ac4318825f7-005ad8c99b
       Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
+      - Thu, 19 Apr 2018 16:53:47 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
-- request:
-    method: head
-    uri: http://swift.local:12345/v1/AUTH_test/906753da-075f-4906-b4c0-a63aff22854c/4d4641d9-fcf6-48d2-bff2-3ad57ceef382/1
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      X-Auth-Token:
-      - AUTH_tk5c529ccedcd241758700fbf6bc1a73cf
-  response:
-    status:
-      code: 404
-      message: Not Found
-    headers:
-      Content-Length:
-      - '0'
-      Content-Type:
-      - text/html; charset=UTF-8
-      X-Trans-Id:
-      - tx31cf27f687844cf8b1e10-005abd2558
-      Date:
-      - Thu, 29 Mar 2018 17:41:44 GMT
-    body:
-      encoding: UTF-8
-      string: ''
-    http_version: 
-  recorded_at: Thu, 29 Mar 2018 17:41:44 GMT
+  recorded_at: Thu, 19 Apr 2018 16:53:47 GMT
 recorded_with: VCR 4.0.0
