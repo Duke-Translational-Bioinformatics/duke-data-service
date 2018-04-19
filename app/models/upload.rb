@@ -112,8 +112,17 @@ class Upload < ActiveRecord::Base
       chunk.purge_storage
       chunk.destroy
     end
-    storage_provider.delete_object_manifest(storage_container, id)
-    self.update(purged_on: DateTime.now)
+
+    begin
+      storage_provider.delete_object_manifest(storage_container, id)
+      self.update(purged_on: DateTime.now)
+    rescue StorageProviderException => e
+      if e.message.match /Not Found/
+        self.update(purged_on: DateTime.now)
+      else
+        raise e
+      end
+    end
   end
 
   def max_size_bytes

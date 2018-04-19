@@ -1,0 +1,226 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - txd055bc6870654ee9b5fdd-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: post
+    uri: http://swift.local:12345/v1/AUTH_test
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+      X-Account-Meta-Temp-Url-Key:
+      - 2538b597aae09e3b7bde43046bd871f9
+      X-Account-Meta-Temp-Url-Key-2:
+      - 10e4c2920d1db441a716fcc07a6a37ce
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txad7d670c27c44497b7cbb-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/513bb812-8b4b-424e-a5d1-ca59fa18d0bb
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - txef21e91954ba4ff2bb5c8-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/513bb812-8b4b-424e-a5d1-ca59fa18d0bb/2f040144-bf4e-4e4a-af6c-4ea7a0de4003/1
+    body:
+      encoding: UTF-8
+      string: some random chunk
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Thu, 19 Apr 2018 14:30:14 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - 8a8d11f83f5846788f3ee8aab1fc90e9
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx2ee30fef9b19403780644-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: get
+    uri: http://swift.local:12345/v1/AUTH_test/513bb812-8b4b-424e-a5d1-ca59fa18d0bb/2f040144-bf4e-4e4a-af6c-4ea7a0de4003/1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '17'
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Thu, 19 Apr 2018 14:30:14 GMT
+      Etag:
+      - 8a8d11f83f5846788f3ee8aab1fc90e9
+      X-Timestamp:
+      - '1524148213.09145'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      X-Trans-Id:
+      - tx8d2ee38984914c4a8d883-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: some random chunk
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: get
+    uri: http://swift.local:12345/v1/AUTH_test/513bb812-8b4b-424e-a5d1-ca59fa18d0bb/2f040144-bf4e-4e4a-af6c-4ea7a0de4003/1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '17'
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Thu, 19 Apr 2018 14:30:14 GMT
+      Etag:
+      - 8a8d11f83f5846788f3ee8aab1fc90e9
+      X-Timestamp:
+      - '1524148213.09145'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      X-Trans-Id:
+      - tx914d74ec6df549c794c0c-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: some random chunk
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+- request:
+    method: delete
+    uri: http://swift.local:12345/v1/AUTH_test/513bb812-8b4b-424e-a5d1-ca59fa18d0bb/2f040144-bf4e-4e4a-af6c-4ea7a0de4003/1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk3f936bd39f2b4751aafaf0c815d64332
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx740b31b35472405aad0ed-005ad8a7f5
+      Date:
+      - Thu, 19 Apr 2018 14:30:13 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Thu, 19 Apr 2018 14:30:13 GMT
+recorded_with: VCR 4.0.0

@@ -53,7 +53,13 @@ class Chunk < ActiveRecord::Base
   end
 
   def purge_storage
-    storage_provider.delete_object(storage_container, object_path)
+    begin
+      storage_provider.delete_object(storage_container, object_path)
+    rescue StorageProviderException => e
+      unless e.message.match /Not Found/
+        raise e
+      end
+    end
   end
 
   def total_chunks
