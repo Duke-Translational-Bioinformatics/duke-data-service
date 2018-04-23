@@ -16,9 +16,9 @@ module DDS
       end
       get '/trashbin/projects', adapter: :json, root: 'results' do
         authenticate!
-        paginate(policy_scope(Project).joins(:containers).where(containers: {parent_id: nil, is_deleted:true, is_purged: false}))
+        paginate(policy_scope(Project).joins(:containers).where(containers: {parent_id: nil, is_deleted:true, is_purged: false}).distinct)
       end
-      
+
       desc 'View Trashbin Item details' do
         detail 'Show Details of a Trashbin Item.'
         named 'show trashbin item'
