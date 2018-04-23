@@ -16,6 +16,7 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 
 |Endpoint |Description |
 |---|---|
+| `GET /trashbin/projects` | Get a list of projects which have at least one immediate descendant in the trashbin. |
 | `GET /trashbin/projects/{id}/children{?name_contains,recurse}` | Get a list of immediate descendants of the project that are in the trash bin. If `name_contains` is specified, only children with the names containing the supplied value are returned. If `recurse` is true (default false), a recursive search is performed. The results are sorted in most recently deleted order. |
 | `GET /trashbin/folders/{id}/children{?name_contains,recurse}` | Get a list of immediate descendants of the folder that are in the trash bin.  If `name_contains` is specified, only children with the names containing the supplied value are returned. If `recurse` is true (default false), a recursive search is performed. The results are sorted in most recently deleted order. |
 | `GET /trashbin/{object_id}/{object_kind}` | Get instance of object that has been deleted (i.e. moved to trash bin). |
@@ -28,6 +29,16 @@ The trash bin API will allow users to manage deleted objects.  The API allows us
 
 #### API Specification
 This section defines the proposed API interfaces.
+
+##### List projects that have descendants in the trash bin
+`GET /trashbin/projects`
+
+###### Response Messages
+* 200: Success
+* 401: Unauthorized
+
+###### Permissions
+authenticated [scope: view_project]
 
 ##### List objects in trash bin that are project descendants
 `GET /trashbin/projects/{id}/children{?name_contains}`
