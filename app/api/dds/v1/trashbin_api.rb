@@ -3,6 +3,22 @@ module DDS
     class TrashbinAPI < Grape::API
       helpers PaginationParams
 
+      desc 'List Projects with Items in Trashbin' do
+        detail 'List Projects with Items in Trashbin.'
+        named 'list trashbin children'
+        failure [
+          {code: 200, message: 'Success'},
+          {code: 401, message: 'Unauthorized'}
+        ]
+      end
+      params do
+        use :pagination
+      end
+      get '/trashbin/projects', adapter: :json, root: 'results' do
+        authenticate!
+        paginate(policy_scope(Project).joins(:containers).where(containers: {parent_id: nil, is_deleted:true, is_purged: false}))
+      end
+      
       desc 'View Trashbin Item details' do
         detail 'Show Details of a Trashbin Item.'
         named 'show trashbin item'
