@@ -29,6 +29,7 @@ describe DDS::V1::TrashbinAPI do
 
   describe 'GET /trashbin/projects' do
     let(:resource) { project }
+    let(:project_child) { FactoryBot.create(:folder, :deleted, project: project) }
     let(:resource_class) { Project }
     let(:resource_serializer) { ProjectSerializer }
 
@@ -65,6 +66,7 @@ describe DDS::V1::TrashbinAPI do
     before do
       [
         project,
+        project_child,
         other_permission.project,
         no_trash_project,
         no_trash_child_folder,
@@ -81,6 +83,7 @@ describe DDS::V1::TrashbinAPI do
       ].each do |expected_object|
         expect(expected_object).to be_persisted
       end
+
     end
     it_behaves_like 'a GET request' do
       it_behaves_like 'an authenticated resource'
