@@ -27,6 +27,86 @@ describe DDS::V1::TrashbinAPI do
   let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
   let!(:resource_permission) { project_permission }
 
+  describe 'GET /trashbin/projects' do
+    let(:resource) { project }
+    let(:project_child) { FactoryBot.create(:folder, :deleted, project: project) }
+    let(:resource_class) { Project }
+    let(:resource_serializer) { ProjectSerializer }
+
+    let(:no_trash_project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+    let(:no_trash_project) { no_trash_project_permission.project }
+    let(:no_trash_child_folder) { FactoryBot.create(:folder, project: no_trash_project) }
+    let(:no_trash_child_file) { FactoryBot.create(:data_file, :root, project: no_trash_project) }
+
+    let(:purged_trash_project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+    let(:purged_trash_project) { purged_trash_project_permission.project }
+    let(:purged_trash_child_folder) { FactoryBot.create(:folder, is_deleted: true, is_purged: true, project: purged_trash_project) }
+    let(:purged_trash_child_file) { FactoryBot.create(:data_file, :root, is_deleted: true, is_purged: true, project: purged_trash_project) }
+
+    let(:unowned_project_with_trash) { FactoryBot.create(:project) }
+    let(:unowned_child_folder) { FactoryBot.create(:folder, is_deleted: true, is_purged: false, project: unowned_project_with_trash) }
+    let(:unowned_child_file) { FactoryBot.create(:data_file, :root, is_deleted: true, is_purged: false, project: unowned_project_with_trash) }
+
+    let(:all_projects) {[
+      project,
+      other_permission.project,
+      no_trash_project,
+      purged_trash_project,
+      unowned_project_with_trash
+    ]}
+    let(:unexpected_projects) { [
+      no_trash_project,
+      purged_trash_project,
+      unowned_project_with_trash
+    ] }
+
+    let(:url) { '/api/v1/trashbin/projects' }
+    let(:payload) {{}}
+
+    before do
+      [
+        project,
+        project_child,
+        other_permission.project,
+        no_trash_project,
+        no_trash_child_folder,
+        no_trash_child_file,
+        purged_trash_project,
+        purged_trash_child_folder,
+        purged_trash_child_file,
+        other_permission.project,
+        other_folder,
+        named_trashed_folder,
+        unowned_project_with_trash,
+        unowned_child_file,
+        unowned_child_folder
+      ].each do |expected_object|
+        expect(expected_object).to be_persisted
+      end
+
+    end
+    it_behaves_like 'a GET request' do
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource'
+
+      it_behaves_like 'a listable resource' do
+        let(:unexpected_resources) { unexpected_projects }
+        let(:expected_list_length) { all_projects.length - unexpected_projects.length }
+      end
+
+      it_behaves_like 'a paginated resource' do
+        let(:expected_total_length) { all_projects.length + extras.length - unexpected_projects.length  }
+        let(:extras) {
+          FactoryBot.create_list(
+            :project_permission, 5,
+            :project_admin,
+            user: current_user).map {|pp|
+              FactoryBot.create(:folder, is_deleted: true, is_purged: false, project: pp.project).project
+          }
+        }
+      end
+    end
+  end
 
   describe 'GET /trashbin/{object_kind}/{object_id}' do
     let(:url) { "/api/v1/trashbin/#{resource_kind}/#{resource_id}" }

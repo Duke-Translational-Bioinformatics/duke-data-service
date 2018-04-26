@@ -25,6 +25,36 @@ Items in the trash bin can be purged. Once purged, the object is no longer
 visible from the trash bin context, and, in the case of a file version, the file
 content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 
+## Trashbin Projects instance [/trashbin/projects]
+### Trashbin Projects instance [GET]
+>**Permission:** authenticated [scope: view_project]
+- - - - -
+
+>**Rules**
+- - - - -
++ Projects that have been deleted (i.e. `"is_deleted": true`) are not included.
++ Only Projects with 1 or more immediate children in the trashbin are returned.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)",
+                    "description": "Goal of generating a targeted knockout mutation...",
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+
 ## Trashbin Item instance [/trashbin/{object_id}/{object_kind}]
 + Parameters
     + object_kind (string, required, `dds-file`) ... The kind of object.
@@ -35,7 +65,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 - - - - -
 **Response messages:**
 * 200: Success
-* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 401: Unauthorized
 * 403: Forbidden
 * 404: Item does not exist in the trash bin
 
@@ -89,7 +119,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 
 **Response messages:**
 * 200: Success
-* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 401: Unauthorized
 * 403: Forbidden
 * 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
@@ -134,7 +164,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 - - - - -
 **Response messages:**
 * 204: Success
-* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 401: Unauthorized
 * 403: Forbidden
 * 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
@@ -158,7 +188,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 
 **Response messages:**
 * 200: Success
-* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 401: Unauthorized
 * 403: Forbidden
 * 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
@@ -250,7 +280,7 @@ content is permanently removed from the storage provider (e.g. Duke OIT Swift).
 
 **Response messages:**
 * 200: Success
-* 401: Missing, Expired, or Invalid API Token in 'Authorization' Header
+* 401: Unauthorized
 * 403: Forbidden
 * 404: Parent object does not exist, has been purged, or is in the trash bin
 * 404: Item does not exist in the trash bin
