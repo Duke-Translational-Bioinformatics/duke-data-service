@@ -82,11 +82,11 @@ jobs:
         - v1-dep-
     # This is based on your 1.0 configuration file or project settings
     - run:
-      name: Install Docker Compose
-      command: |
-        curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-        chmod +x ~/docker-compose
-        sudo mv ~/docker-compose /usr/local/bin/docker-compose
+        name: Install Docker Compose
+        command: |
+          curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+          chmod +x ~/docker-compose
+          sudo mv ~/docker-compose /usr/local/bin/docker-compose
     - setup_remote_docker
     - run: ./docker/circle/cache_docker_image.sh neo4j 3.1.6
     - run: ./docker/circle/cache_docker_image.sh elasticsearch 5.4.3
