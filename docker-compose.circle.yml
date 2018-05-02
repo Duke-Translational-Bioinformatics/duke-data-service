@@ -19,7 +19,7 @@ services:
     env_file:
       - db.env
   neo4j:
-    image: neo4j:3.0.2
+    image: neo4j:3.1.6
     ports:
       - '7474:7474'
     env_file:
