@@ -51,9 +51,6 @@ jobs:
     - run:
         working_directory: ~/Duke-Translational-Bioinformatics/duke-data-service
         command: gem update --system 2.7.6
-    - run:
-        working_directory: ~/Duke-Translational-Bioinformatics/duke-data-service
-        command: curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
     # This is based on your 1.0 configuration file or project settings
     - run:
         working_directory: ~/Duke-Translational-Bioinformatics/duke-data-service
