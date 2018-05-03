@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    parallelism: 4
+    environment:
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      OPENID_CLIENT_ID: test
+      BONSAI_URL: elastic.local:9200
+      GRAPHENEDB_URL: http://neo4j.db.host:7474
+      OPENID_CLIENT_SECRET: testpass
+      OPENID_URL: http://oit.oauth.edu
+      CLOUDAMQP_URL: amqp://rabbitmq.local:12345
+      DDSURL: http://0.0.0.0:3001
+      LOCALDEV: true
+    docker:
+      - image: ruby:2.3.3
+    steps:
+    - checkout
