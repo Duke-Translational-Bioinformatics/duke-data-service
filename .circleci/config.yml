@@ -10,7 +10,7 @@ jobs:
       GRAPHENEDB_URL: http://neo4j.db.host:7474
       OPENID_CLIENT_SECRET: testpass
       OPENID_URL: http://oit.oauth.edu
-      CLOUDAMQP_URL: amqp://rabbitmq.local:12345
+      CLOUDAMQP_URL: amqp://rabbitmq.local:5672
       DDSURL: http://0.0.0.0:3001
       LOCALDEV: true
 
@@ -36,6 +36,7 @@ jobs:
       - image: neo4j:3.0.2
         environment:
           NEO4J_AUTH: none
+      - image: rabbitmq:3.5-management
 
     steps:
       - checkout
