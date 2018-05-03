@@ -32,7 +32,12 @@ jobs:
     steps:
       - checkout
       - run: chmod +x docker/includes/install_node.sh
-      - run: docker/includes/install_node.sh
+      - run:
+          name: Install Node
+          command: docker/includes/install_node.sh
+          environment:
+            LATEST_NODE: node-v0.12.7-linux-x64
+            LATEST_NODE_URL: https://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
       - run:
           name: install dockerize
           command: wget https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/dockerize-latest.tar.gz && tar -C /usr/local/bin -xzvf dockerize-latest.tar.gz && rm dockerize-latest.tar.gz
