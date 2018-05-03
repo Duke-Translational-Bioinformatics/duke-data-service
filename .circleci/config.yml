@@ -29,6 +29,11 @@ jobs:
           POSTGRES_USER: ubuntu
           POSTGRES_DB: circle_ruby_test
           POSTGRES_PASSWORD: ""
+      - image: elasticsearch:5.4.3
+          environment:
+            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          command: elasticsearch -E 'action.auto_create_index=false'
+
     steps:
       - checkout
       - run: chmod +x docker/includes/install_node.sh
@@ -72,9 +77,14 @@ jobs:
           key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
+
       - run:
           name: Wait for DB
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Wait for Elasticsearch
+          command: dockerize -wait tcp://localhost:7474 -timeout 1m
 
       - run: |-
           mkdir -p config && echo 'test:
