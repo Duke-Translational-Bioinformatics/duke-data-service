@@ -107,6 +107,10 @@ jobs:
           name: Database setup
           command: bin/rails db:schema:load --trace
 
+      - run:
+          name: Load neo4j schema
+          command: bundle exec rake neo4j:schema:load --trace
+
       # Run rspec in parallel
       - type: shell
         command: |
