@@ -30,9 +30,9 @@ jobs:
           POSTGRES_DB: circle_ruby_test
           POSTGRES_PASSWORD: ""
       - image: elasticsearch:5.4.3
-          environment:
-            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-          command: elasticsearch -E 'action.auto_create_index=false'
+        environment:
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        command: elasticsearch -E 'action.auto_create_index=false'
 
     steps:
       - checkout
