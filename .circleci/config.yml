@@ -70,9 +70,6 @@ jobs:
           ' | sudo tee -a /etc/hosts
     - run:
         working_directory: ~/Duke-Translational-Bioinformatics/duke-data-service
-        command: 'sudo docker info >/dev/null 2>&1 || sudo service docker start; '
-    - run:
-        working_directory: ~/Duke-Translational-Bioinformatics/duke-data-service
         command: rm -f Duke-Translational-Bioinformatics/duke-data-service/.rvmrc; echo 2.3.3 > Duke-Translational-Bioinformatics/duke-data-service/.ruby-version; rvm use 2.3.3 --default
     # Dependencies
     #   This would typically go in either a build or a build-and-test job when using workflows
