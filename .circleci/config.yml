@@ -84,7 +84,7 @@ jobs:
 
       - run:
           name: Wait for Elasticsearch
-          command: dockerize -wait tcp://localhost:7474 -timeout 1m
+          command: dockerize -wait tcp://localhost:9200 -timeout 1m
 
       - run: |-
           mkdir -p config && echo 'test:
