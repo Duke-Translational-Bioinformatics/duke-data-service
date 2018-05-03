@@ -13,7 +13,49 @@ jobs:
       CLOUDAMQP_URL: amqp://rabbitmq.local:12345
       DDSURL: http://0.0.0.0:3001
       LOCALDEV: true
+
     docker:
-      - image: ruby:2.3.3
+      # Copied from rails circle demo
+      - image: circleci/ruby:2.3-node
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          PGHOST: 127.0.0.1
+          PGUSER: circleci-demo-ruby
+          RAILS_ENV: test
+      - image: circleci/postgres:9.5-alpine
+        environment:
+          POSTGRES_USER: circleci-demo-ruby
+          POSTGRES_DB: rails_blog
+          POSTGRES_PASSWORD: ""
     steps:
-    - checkout
+      - checkout
+
+      # Which version of bundler?
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      # Restore bundle cache
+      - restore_cache:
+          keys:
+            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+            - rails-demo-bundle-v2-
+
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+
+      # Store bundle cache
+      - save_cache:
+          key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Database setup
+          command: bin/rails db:schema:load --trace
