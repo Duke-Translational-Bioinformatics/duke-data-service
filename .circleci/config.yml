@@ -43,6 +43,15 @@ jobs:
           name: install dockerize
           command: wget https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/dockerize-latest.tar.gz && tar -C /usr/local/bin -xzvf dockerize-latest.tar.gz && rm dockerize-latest.tar.gz
 
+      - run:
+        name: Set hostnames for external services
+        command: |-
+          printf '0.0.0.0       swift.local
+          0.0.0.0       neo4j.db.host
+          0.0.0.0       elastic.local
+          0.0.0.0       rabbitmq.local
+          ' | sudo tee -a /etc/hosts
+
       # Which version of bundler?
       - run:
           name: Which bundler?
