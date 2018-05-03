@@ -50,7 +50,7 @@ jobs:
             0.0.0.0       neo4j.db.host
             0.0.0.0       elastic.local
             0.0.0.0       rabbitmq.local
-            ' | sudo tee -a /etc/hosts
+            ' | tee -a /etc/hosts
 
       # Which version of bundler?
       - run:
