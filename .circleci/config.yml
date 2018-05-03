@@ -31,7 +31,8 @@ jobs:
           POSTGRES_PASSWORD: ""
     steps:
       - checkout
-      - run: ls -l docker/includes
+      - run: chmod +x docker/includes/install_node.sh
+      - run: docker/includes/install_node.sh
       - run:
           name: install dockerize
           command: wget https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/dockerize-latest.tar.gz && tar -C /usr/local/bin -xzvf dockerize-latest.tar.gz && rm dockerize-latest.tar.gz
