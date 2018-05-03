@@ -32,6 +32,7 @@ jobs:
     steps:
       - checkout
       - run: chmod +x docker/includes/install_node.sh
+      - run: mkdir -p /root/installs
       - run:
           name: Install Node
           command: docker/includes/install_node.sh
