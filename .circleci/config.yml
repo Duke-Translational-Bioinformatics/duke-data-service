@@ -93,6 +93,10 @@ jobs:
           name: Wait for Neo4j
           command: dockerize -wait tcp://localhost:7474 -timeout 1m
 
+      - run:
+          name: Wait for RabbitMQ
+          command: dockerize -wait tcp://localhost:5672 -timeout 1m
+
       - run: |-
           mkdir -p config && echo 'test:
             database: circle_ruby_test
