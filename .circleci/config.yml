@@ -38,6 +38,7 @@ jobs:
 
     steps:
       - checkout
+      - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: chmod +x docker/includes/install_node.sh
       - run: mkdir -p /root/installs
       - run:
@@ -119,10 +120,15 @@ jobs:
         command: |
           bundle exec rspec --profile 10 \
                             --format RspecJunitFormatter \
-                            --out test_results/rspec.xml \
+                            --out $CIRCLE_TEST_REPORTS/rspec.xml \
                             --format progress \
                             $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
 
-      # Save test results for timing analysis
+      # Save test results for timing analysis'
       - store_test_results:
-          path: test_results
+          path: /tmp/circleci-test-results
+      # Save artifacts
+      - store_artifacts:
+          path: /tmp/circleci-artifacts
+      - store_artifacts:
+          path: /tmp/circleci-test-results
