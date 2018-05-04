@@ -135,23 +135,3 @@ jobs:
           path: /tmp/circleci-artifacts
       - store_artifacts:
           path: /tmp/circleci-test-results
-  deploy:
-    steps:
-      - checkout
-      - run:
-          name: Deploy to Heroku
-          command: |
-            echo git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git circleci_test_dev
-      - run: heroku apps
-
-workflows:
-  version: 2
-  build-deploy:
-    jobs:
-      - build
-      - deploy:
-        requires:
-          - build
-        filters:
-          branches:
-            only: circleci_test_develop
