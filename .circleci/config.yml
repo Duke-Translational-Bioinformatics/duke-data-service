@@ -3,16 +3,16 @@ jobs:
   build:
     parallelism: 4
     environment:
+      LOCALDEV: true
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
-      OPENID_CLIENT_ID: test
+      DDSURL: http://0.0.0.0:3001
       BONSAI_URL: elastic.local:9200
+      CLOUDAMQP_URL: amqp://rabbitmq.local:5672
       GRAPHENEDB_URL: http://neo4j.db.host:7474
+      OPENID_CLIENT_ID: test
       OPENID_CLIENT_SECRET: testpass
       OPENID_URL: http://oit.oauth.edu
-      CLOUDAMQP_URL: amqp://rabbitmq.local:5672
-      DDSURL: http://0.0.0.0:3001
-      LOCALDEV: true
 
     docker:
       # Copied from rails circle demo
