@@ -127,6 +127,7 @@ jobs:
                             --format progress \
                             ${some_tests}
 
+      - run: echo $HEROKU_API_KEY
       # Save test results for timing analysis'
       - store_test_results:
           path: /tmp/circleci-test-results
