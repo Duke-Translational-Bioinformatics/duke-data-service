@@ -136,6 +136,8 @@ jobs:
       - store_artifacts:
           path: /tmp/circleci-test-results
   deploy:
+    machine:
+      enabled: true
     steps:
       - checkout
       - run:
