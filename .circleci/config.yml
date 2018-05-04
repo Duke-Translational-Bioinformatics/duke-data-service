@@ -142,6 +142,7 @@ jobs:
           name: Deploy to Heroku
           command: |
             echo git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git circleci_test_dev
+      - run: heroku apps
 
 workflows:
   version: 2
