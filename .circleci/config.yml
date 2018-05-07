@@ -120,7 +120,6 @@ jobs:
         command: |
           some_tests=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings) && \
           echo Running tests from: ${some_tests} && \
-          echo Skipping tests... || \
           bundle exec rspec --profile 10 \
                             --format RspecJunitFormatter \
                             --out $CIRCLE_TEST_REPORTS/rspec.xml \
