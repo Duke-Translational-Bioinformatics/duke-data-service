@@ -146,7 +146,7 @@ jobs:
       - run:
           name: Deploy to Heroku
           command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$(.circleci/heroku-app-name.sh).git master
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$(.circleci/heroku-app-name.sh).git HEAD:master
       - run: heroku maintenance -a $(.circleci/heroku-app-name.sh)
 
 workflows:
