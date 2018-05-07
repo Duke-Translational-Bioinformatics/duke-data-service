@@ -127,10 +127,6 @@ jobs:
                             --format progress \
                             ${some_tests}
 
-      - run:
-          name: Deploy to Heroku
-          command: |
-            echo git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git circleci_test_dev
       # Save test results for timing analysis'
       - store_test_results:
           path: /tmp/circleci-test-results
