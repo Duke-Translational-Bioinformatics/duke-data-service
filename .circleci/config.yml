@@ -140,7 +140,9 @@ jobs:
       enabled: true
     steps:
       - checkout
-      - run: echo Deploying $CIRCLE_BRANCH branch to Heroku App $(.circleci/heroku-app-name.sh)
+      - run:
+          name: Ensure heroku app name variable is set
+          command: .circleci/heroku-app-name.sh
       - run:
           name: Deploy to Heroku
           command: |
