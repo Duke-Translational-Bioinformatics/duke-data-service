@@ -140,10 +140,11 @@ jobs:
       enabled: true
     steps:
       - checkout
+      - run: echo Deploying $CIRCLE_BRANCH branch to Heroku App $(.circleci/heroku-app-name.sh)
       - run:
           name: Deploy to Heroku
           command: |
-            echo git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git circleci_test_dev
+            echo git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
       - run: heroku apps
 
 workflows:
