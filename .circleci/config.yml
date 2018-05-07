@@ -143,11 +143,18 @@ jobs:
       - run:
           name: Ensure heroku app name variable is set
           command: .circleci/heroku-app-name.sh
+      - run: heroku maintenance on --app "$(.circleci/heroku-app-name.sh)"
       - run:
           name: Deploy to Heroku
           command: |
-            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$(.circleci/heroku-app-name.sh).git HEAD:master
-      - run: heroku maintenance -a $(.circleci/heroku-app-name.sh)
+            git push "https://heroku:$HEROKU_API_KEY@git.heroku.com/$(.circleci/heroku-app-name.sh).git" HEAD:master
+      - run: heroku run --exit-code rake db:migrate --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku run --exit-code rake neo4j:schema:load --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku run --exit-code rake db:seed --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku run --exit-code rake db:data:migrate --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku run --exit-code rake elasticsearch:index:rebuild --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku config:unset RECREATE_SEARCH_MAPPINGS --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku maintenance:off --app "$(.circleci/heroku-app-name.sh)"
 
 workflows:
   version: 2
