@@ -143,7 +143,7 @@ jobs:
       - run:
           name: Ensure heroku app name variable is set
           command: .circleci/heroku-app-name.sh
-      - run: heroku maintenance on --app "$(.circleci/heroku-app-name.sh)"
+      - run: heroku maintenance:on --app "$(.circleci/heroku-app-name.sh)"
       - run:
           name: Deploy to Heroku
           command: |
