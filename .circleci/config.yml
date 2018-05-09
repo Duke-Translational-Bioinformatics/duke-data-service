@@ -151,7 +151,8 @@ jobs:
           command: cat .circleci/required-config-var-names
       - run:
           name: Ensure required heroku config vars are set
-          command: ! grep -Fvxf /tmp/heroku-config-var-names .circleci/required-config-var-names
+          command: |
+            ! grep -Fvxf /tmp/heroku-config-var-names .circleci/required-config-var-names
       - run: heroku maintenance:on --app "$(.circleci/heroku-app-name.sh)"
       - run:
           name: Deploy to Heroku
