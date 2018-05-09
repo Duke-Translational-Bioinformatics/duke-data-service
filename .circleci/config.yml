@@ -144,7 +144,8 @@ jobs:
           command: .circleci/heroku-app-name.sh
       - run:
           name: Store current heroku config
-          command: heroku config -a "$(.circleci/heroku-app-name.sh)" | tail -n +2 | cut -d: -f1 | tee /tmp/heroku-config-var-names
+          command: |
+            heroku config -a "$(.circleci/heroku-app-name.sh)" | tail -n +2 | cut -d: -f1 | tee /tmp/heroku-config-var-names
       - run:
           name: Required heroku config vars
           command: cat .circleci/required-config-var-names
