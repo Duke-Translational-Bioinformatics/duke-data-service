@@ -60,7 +60,7 @@ jobs:
             0.0.0.0       rabbitmq.local
             ' | tee -a /etc/hosts
 
-      # Which version of bundler?
+      - run: gem install bundler
       - run:
           name: Which bundler?
           command: bundle -v
@@ -68,8 +68,8 @@ jobs:
       # Restore bundle cache
       - restore_cache:
           keys:
-            - rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
-            - rails-demo-bundle-v2-
+            - duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+            - duke-data-service-bundle-
 
       - run:
           name: Bundle Install
@@ -77,7 +77,7 @@ jobs:
 
       # Store bundle cache
       - save_cache:
-          key: rails-demo-bundle-v2-{{ checksum "Gemfile.lock" }}
+          key: duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
 
