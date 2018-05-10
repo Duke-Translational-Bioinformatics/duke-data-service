@@ -60,7 +60,7 @@ jobs:
             0.0.0.0       rabbitmq.local
             ' | tee -a /etc/hosts
 
-      # Which version of bundler?
+      - run: gem install bundler
       - run:
           name: Which bundler?
           command: bundle -v
