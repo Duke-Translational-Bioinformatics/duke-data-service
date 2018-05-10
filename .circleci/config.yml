@@ -10,9 +10,6 @@ jobs:
       BONSAI_URL: elastic.local:9200
       CLOUDAMQP_URL: amqp://rabbitmq.local:5672
       GRAPHENEDB_URL: http://neo4j.db.host:7474
-      OPENID_CLIENT_ID: test
-      OPENID_CLIENT_SECRET: testpass
-      OPENID_URL: http://oit.oauth.edu
 
     docker:
       # Copied from rails circle demo
