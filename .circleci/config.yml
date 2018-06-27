@@ -177,6 +177,6 @@ workflows:
           filters:
             branches:
               only:
-                - circleci_test_develop
-                - circleci_test_ua_test
-                - circleci_test_production
+                - develop
+                - ua_test
+                - production
