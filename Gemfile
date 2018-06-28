@@ -95,4 +95,4 @@ end
 group :docker, :development, :ua_test, :production do
   gem 'rails_12factor'
 end
-ruby "2.3.3"
+ruby "2.3"
