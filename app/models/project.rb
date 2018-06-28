@@ -98,6 +98,16 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def generate_slug
+    self.slug = slug_prefix = name.gsub('-','_').parameterize(separator: '_')
+    if self.invalid? && self.errors.details[:slug].any? {|x| x[:error]==:taken}
+      existing_slugs = self.class.where("slug LIKE '#{slug_prefix}_%'").pluck(:slug)
+      mock_slugs = (1..existing_slugs.length + 1).to_a.collect {|i| "#{slug_prefix}_#{i}"}
+      self.slug = (mock_slugs - existing_slugs).first
+    end
+    self.slug
+  end
+
   def restore(child)
     raise IncompatibleParentException.new("#{kind} #{id} is permenantly deleted, and cannot restore children.::Restore to a different project.") if is_deleted?
     raise IncompatibleParentException.new("Projects can only restore dds-file or dds-folder objects.::Perhaps you mistyped the object_kind.") unless child.is_a? Container
