@@ -30,6 +30,10 @@ RSpec.describe ApplicationJob, type: :job do
   it { expect(ActiveJob::Base.queue_adapter).to be_a(ActiveJob::QueueAdapters::SneakersAdapter) }
 
   it { expect(described_class).to respond_to(:create_bindings) }
+  it {
+    expect(described_class).to respond_to(:should_be_registered_worker?)
+    expect(described_class.should_be_registered_worker?).to be_truthy
+  }
 
   it_behaves_like 'a JobTracking resource'
 
@@ -84,7 +88,7 @@ RSpec.describe ApplicationJob, type: :job do
         arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
       )
     }
-    let(:child_class_name) { "#{Faker::Internet.slug(nil, '_')}_job".classify }
+    let(:child_class_name) {|example| "application_job_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
     let(:child_class) {
       klass_queue_name = child_class_queue_name
       Object.const_set(child_class_name, Class.new(described_class) do
@@ -98,6 +102,9 @@ RSpec.describe ApplicationJob, type: :job do
         end
         def self.run_count
           @run_count
+        end
+        def self.should_be_registered_worker?
+          false
         end
       end)
     }

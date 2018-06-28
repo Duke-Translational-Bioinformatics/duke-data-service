@@ -19,10 +19,9 @@ class Chunk < ActiveRecord::Base
 
   validates :fingerprint_value, presence: true
   validates :fingerprint_algorithm, presence: true
-
   validate :upload_chunk_maximum, if: :storage_provider
 
-  delegate :project_id, :minimum_chunk_size, to: :upload
+  delegate :project_id, :minimum_chunk_size, :storage_container, to: :upload
   delegate :chunk_max_size_bytes, to: :storage_provider
 
   def http_verb
@@ -42,7 +41,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def sub_path
-    [project_id, object_path].join('/')
+    [storage_container, object_path].join('/')
   end
 
   def expiry
@@ -51,6 +50,16 @@ class Chunk < ActiveRecord::Base
 
   def url
     storage_provider.build_signed_url(http_verb, sub_path, expiry)
+  end
+
+  def purge_storage
+    begin
+      storage_provider.delete_object(storage_container, object_path)
+    rescue StorageProviderException => e
+      unless e.message.match /Not Found/
+        raise e
+      end
+    end
   end
 
   def total_chunks

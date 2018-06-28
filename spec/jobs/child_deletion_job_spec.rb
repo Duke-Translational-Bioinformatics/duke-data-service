@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe ChildDeletionJob, type: :job do
 
+  it { expect(described_class.should_be_registered_worker?).to be_truthy }
+
   shared_examples 'a ChildDeletionJob' do |
       parent_sym,
       child_folder_sym,
@@ -43,24 +45,15 @@ RSpec.describe ChildDeletionJob, type: :job do
     end
   end
 
-  before do
-    expect(folder_child).to be_persisted
-  end
-  context 'project' do
-    let(:project) { FactoryBot.create(:project) }
-    let(:root_folder) { FactoryBot.create(:folder, :root, project: project) }
-    let(:folder_child) { FactoryBot.create(:data_file, parent: root_folder) }
-    let(:root_file) { FactoryBot.create(:data_file, :root, project: project) }
-
-    it_behaves_like 'a ChildDeletionJob', :project, :root_folder, :root_file
-  end
-
   context 'folder' do
     let(:folder) { FactoryBot.create(:folder) }
     let(:sub_folder) { FactoryBot.create(:folder, parent: folder) }
     let(:folder_child) { FactoryBot.create(:data_file, parent: sub_folder) }
     let(:sub_file) { FactoryBot.create(:data_file, parent: folder) }
 
+    before do
+      expect(folder_child).to be_persisted
+    end
     it_behaves_like 'a ChildDeletionJob', :folder, :sub_folder, :sub_file
   end
 end

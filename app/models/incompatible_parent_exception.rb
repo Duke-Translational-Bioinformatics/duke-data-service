@@ -1,0 +1,2 @@
+class IncompatibleParentException < StandardError
+end

@@ -29,6 +29,11 @@ FactoryBot.define do
       is_deleted true
     end
 
+    trait :purged do
+      is_deleted true
+      is_purged true
+    end
+
     trait :invalid do
       to_create {|instance| instance.save(validate: false) }
       name { nil }
