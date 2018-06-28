@@ -19,6 +19,7 @@ class Project < ActiveRecord::Base
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
   validates :creator_id, presence: true, unless: :is_deleted
+  validates :slug, uniqueness: {allow_blank: true}, format: {with: /\A[a-z0-9_]*\z/}
   validates :is_deleted, immutable: true, if: :was_deleted?
 
   after_create :set_project_admin
