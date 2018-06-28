@@ -16,6 +16,7 @@ module DDS
       end
       params do
         requires :name, type: String, desc: 'The Name of the Project'
+        optional :slug, type: String, desc: 'A unique, short name consisting of lowercase letters, numbers, and underscores(\_)'
         requires :description, type: String, desc: 'The Description of the Project'
       end
       post '/projects', root: false do
@@ -24,6 +25,7 @@ module DDS
         project = Project.new({
           etag: SecureRandom.hex,
           name: project_params[:name],
+          slug: project_params[:slug],
           description: project_params[:description],
           creator_id: current_user.id,
         })
@@ -90,11 +92,12 @@ module DDS
       params do
         requires :id, type: String, desc: 'Project UUID'
         optional :name, type: String, desc: 'The Name of the Project'
+        optional :slug, type: String, desc: 'A unique, short name consisting of lowercase letters, numbers, and underscores(\_)'
         optional :description, type: String, desc: 'The Description of the Project'
       end
       put '/projects/:id', root: false do
         authenticate!
-        project_params = declared(params, {include_missing: false}, [:name, :description])
+        project_params = declared(params, {include_missing: false}, [:name, :slug, :description])
         project = hide_logically_deleted Project.find(params[:id])
         authorize project, :update?
         if project.update(project_params.merge(etag: SecureRandom.hex))

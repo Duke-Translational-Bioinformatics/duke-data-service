@@ -18,7 +18,10 @@ class JobsRunner
       index_documents: ElasticsearchIndexJob,
       update_project_container_elasticsearch: ProjectContainerElasticsearchUpdateJob,
       graph_persistence: GraphPersistenceJob,
-      complete_upload: UploadCompletionJob
+      complete_upload: UploadCompletionJob,
+      purge_upload: UploadStorageRemovalJob,
+      purge_children: ChildPurgationJob,
+      restore_children: ChildRestorationJob
     }
   end
 

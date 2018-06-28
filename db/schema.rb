@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180321142736) do
+ActiveRecord::Schema.define(version: 20180403120319) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -116,6 +116,8 @@ ActiveRecord::Schema.define(version: 20180321142736) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "label"
+    t.boolean "is_purged", default: false
+    t.uuid "deleted_from_parent_id"
     t.index ["id", "type"], name: "index_containers_on_id_and_type"
     t.index ["parent_id"], name: "index_containers_on_parent_id"
     t.index ["project_id", "parent_id", "is_deleted"], name: "index_containers_on_project_id_and_parent_id_and_is_deleted"
@@ -130,6 +132,7 @@ ActiveRecord::Schema.define(version: 20180321142736) do
     t.boolean "is_deleted", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_purged", default: false
     t.index ["data_file_id"], name: "index_file_versions_on_data_file_id"
   end
 
@@ -319,6 +322,8 @@ ActiveRecord::Schema.define(version: 20180321142736) do
     t.datetime "updated_at", null: false
     t.uuid "creator_id"
     t.boolean "is_consistent"
+    t.string "storage_container"
+    t.datetime "purged_on"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

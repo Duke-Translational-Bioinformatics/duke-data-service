@@ -102,8 +102,10 @@ describe DDS::V1::ProjectsAPI do
       # let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name,
+        slug: project_slug,
         description: resource.description
       }}
+      let(:project_slug) { 'a_project_slug' }
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
@@ -123,6 +125,25 @@ describe DDS::V1::ProjectsAPI do
               project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
               expect(project_admin_permission).to be
             end
+
+            it 'sets project slug' do
+              is_expected.to eq(expected_response_status)
+              response_json = JSON.parse(response.body)
+              expect(response_json).to have_key('id')
+              new_object = resource_class.find(response_json['id'])
+              expect(new_object.slug).to eq(project_slug)
+            end
+          end
+
+          context 'without slug set' do
+            let(:payload) {{
+              name: resource.name,
+              description: resource.description
+            }}
+            it_behaves_like 'a creatable resource' do
+              let(:resource) { project_stub }
+              let(:expected_response_status) { 202 }
+            end
           end
 
           it_behaves_like 'an authenticated resource'
@@ -138,6 +159,11 @@ describe DDS::V1::ProjectsAPI do
                 is_expected.to eq(400)
               }.not_to change{resource_class.count}
             end
+          end
+
+          context 'with non-unique slug' do
+            before { FactoryBot.create(:project, slug: project_slug) }
+            it_behaves_like 'a validated resource'
           end
 
           it_behaves_like 'an annotate_audits endpoint' do
@@ -198,11 +224,32 @@ describe DDS::V1::ProjectsAPI do
     describe 'PUT' do
       let(:payload) {{
         name: project_stub.name,
+        slug: project_slug,
         description: project_stub.description
       }}
+      let(:project_slug) { 'a_project_slug' }
 
       it_behaves_like 'a PUT request' do
-        it_behaves_like 'an updatable resource'
+        it_behaves_like 'an updatable resource' do
+          it 'sets project slug' do
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(project_slug)
+          end
+        end
+
+        context 'without slug set' do
+          let(:payload) {{
+            name: project_stub.name,
+            description: project_stub.description
+          }}
+          it_behaves_like 'an updatable resource'
+        end
+
+        context 'with non-unique slug' do
+          before { FactoryBot.create(:project, slug: project_slug) }
+          it_behaves_like 'a validated resource'
+        end
 
         it_behaves_like 'a validated resource' do
           let(:payload) {{
@@ -271,6 +318,8 @@ describe DDS::V1::ProjectsAPI do
             before do
               ActiveJob::Base.queue_adapter = :inline
               allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object_manifest).and_return(true)
             end
 
             it {
@@ -290,7 +339,7 @@ describe DDS::V1::ProjectsAPI do
                 expect(root_folder.is_deleted?).to be_falsey
                 expect(root_file.is_deleted?).to be_falsey
                 is_expected.to eq(204)
-              }.to have_enqueued_job(ChildDeletionJob)
+              }.to have_enqueued_job(ChildPurgationJob)
             }
           end
         end
