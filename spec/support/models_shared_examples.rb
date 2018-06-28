@@ -131,3 +131,11 @@ shared_context 'with concurrent calls' do |object_list:, method:|
     threads.each(&:join)
   end
 end
+
+shared_context 'trashed resource' do |resource_sym=nil|
+  let(:resource_to_trash) { resource_sym.nil? ? subject : send(resource_sym) }
+  before do
+    resource_to_trash.move_to_trashbin
+    expect(resource_to_trash.save).to be_truthy
+  end
+end

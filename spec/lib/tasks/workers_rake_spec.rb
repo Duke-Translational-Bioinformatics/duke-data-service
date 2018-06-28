@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'sneakers/runner'
+require 'yaml'
 Dir[Rails.root.join('app/jobs/*.rb')].each { |f| require f }
 
 describe "workers" do
@@ -56,4 +57,17 @@ describe "workers" do
       end
     end
   end
+end
+
+describe 'Heroku ProcFile Rake Tasks' do
+  subject {
+    proc_file_path = Rails.root.join "Procfile"
+    proc_file = YAML.load_file(proc_file_path)
+    proc_file.values.map { |v| v.split("\s").last }.sort
+  }
+  let(:expected_jobs) {
+    JobsRunner.workers_registry.keys.map {|v| "workers:#{v}:run" }.sort
+  }
+
+  it { is_expected.to include(*expected_jobs) }
 end

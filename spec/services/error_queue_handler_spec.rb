@@ -19,15 +19,19 @@ RSpec.describe ErrorQueueHandler do
     durable: true,
     arguments: {'x-dead-letter-exchange': "#{prefixed_queue_name}-retry"}
   ) }
+  let(:job_class_name) {|example| "error_queue_handler_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
   let(:application_job) {
     job_queue_name = queue_name
-    Class.new(ApplicationJob) do
+    Object.const_set(job_class_name, Class.new(ApplicationJob) do
       queue_as job_queue_name
 
       def perform
         raise 'boom!'
       end
-    end
+      def self.should_be_registered_worker?
+        false
+      end
+    end)
   }
   let(:sneakers_worker_class) { application_job.job_wrapper }
   let(:sneakers_worker) { sneakers_worker_class.new }

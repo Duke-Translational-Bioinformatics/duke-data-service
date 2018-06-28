@@ -1,6 +1,6 @@
 class UploadSerializer < ActiveModel::Serializer
   include AuditSummarySerializer
-  attributes :id, :name, :content_type, :size, :etag, :chunks, :status, :audit
+  attributes :id, :name, :content_type, :size, :etag, :storage_container, :chunks, :status, :audit
 
   has_one :project, serializer: ProjectPreviewSerializer
   has_one :storage_provider, serializer: StorageProviderPreviewSerializer
@@ -11,6 +11,7 @@ class UploadSerializer < ActiveModel::Serializer
     {
       initiated_on: object.created_at,
       completed_on: object.completed_at,
+      purged_on: object.purged_on,
       error_on: object.error_at,
       error_message: object.error_message
     }
