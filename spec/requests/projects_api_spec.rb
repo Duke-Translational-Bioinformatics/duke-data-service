@@ -318,6 +318,8 @@ describe DDS::V1::ProjectsAPI do
             before do
               ActiveJob::Base.queue_adapter = :inline
               allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object).and_return(true)
+              allow_any_instance_of(StorageProvider).to receive(:delete_object_manifest).and_return(true)
             end
 
             it {
@@ -337,7 +339,7 @@ describe DDS::V1::ProjectsAPI do
                 expect(root_folder.is_deleted?).to be_falsey
                 expect(root_file.is_deleted?).to be_falsey
                 is_expected.to eq(204)
-              }.to have_enqueued_job(ChildDeletionJob)
+              }.to have_enqueued_job(ChildPurgationJob)
             }
           end
         end
