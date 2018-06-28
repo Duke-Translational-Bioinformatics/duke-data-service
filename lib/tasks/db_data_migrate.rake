@@ -2,7 +2,7 @@
 def purge_deleted_objects
   if ENV["PURGE_OBJECTS"]
     purge_state = 'trashbin_migration'
-    Project.where(is_deleted: true).find_in_batches.do |group|
+    Project.where(is_deleted: true).find_in_batches do |group|
       print "p"
       group.each do |deleted_project|
         deleted_project.create_transaction(purge_state)
