@@ -1,0 +1,366 @@
+FORMAT: 1A
+
+# Trashbin Resources
+
+## Group << API Summary
+
+## Group Trashbin
+The trash bin API will allow users to manage deleted objects.  The API
+allows users to view, restore, and purge (i.e. permanently remove)
+deleted objects. Objects that are moved to the "trash bin" when deleted
+are as follows: **folders, files, and file versions**.
+
+**The deletion of an entire project is a permanent (destructive) operation.
+The project and all of its contents are immediately considered "purged"
+and are not moved to the trash bin, therefore projects cannot be restored.
+Client apps should implement delete confirmation workflow, such as requiring
+users to enter the project name.**
+
+Items in the trash bin can be restored, either to their original parent, to the
+root of the project, or to a new parent in the same project. File versions cannot
+be individually restored, but will instead restore all version history of the
+original owning file.
+
+Items in the trash bin can be purged. Once purged, the object is no longer
+visible from the trash bin context, and, in the case of a file version, the file
+content is permanently removed from the storage provider (e.g. Duke OIT Swift).
+
+## Trashbin Projects instance [/trashbin/projects]
+### Trashbin Projects instance [GET]
+>**Permission:** authenticated [scope: view_project]
+- - - - -
+
+>**Rules**
+- - - - -
++ Projects that have been deleted (i.e. `"is_deleted": true`) are not included.
++ Only Projects with 1 or more immediate children in the trashbin are returned.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)",
+                    "description": "Goal of generating a targeted knockout mutation...",
+                    "is_deleted": false,
+                    "audit": { }
+                }
+            ]
+        }
+
+
+## Trashbin Item instance [/trashbin/{object_id}/{object_kind}]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+
+### View Trashbin item [GET]
+>**Permission:** view_project
+- - - - -
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Item does not exist in the trash bin
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-folder",
+            "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
+            "name": "Raw Data",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "ancestors": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
+            ],
+            "is_deleted": true,
+            "is_purged": false,
+            "audit": { }
+        }
+
+## Restore Trashbin Item [/trashbin/{object_id}/{object_kind}/restore]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+
+### Restore Trashbin Item instance [PUT]
+>**Permission:** create_file or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ If parent is not supplied in the payload, an attempt will be made to restore to the original parent.
++ An exception is returned if the parent is itself in the trash bin. You must restore the parent before you can restore a child to it.
++ `dds-file` and `dds-folder` objects can only be restored to a `dds-project` or `dds-folder` parent.
++ If a `dds-file` is restored, all deleted version history will be restored as well.
++ `dds-file-version` objects can only be restored to their original "owning" file.
++ If a `dds-file-version` is restored, all deleted version history of the original "owning" file will be restored as well.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
+* 404: Item does not exist in the trash bin
+
++ Response 200 (application/json)
+
+        {
+            "kind": "dds-folder",
+            "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+            "parent": {
+                "kind": "dds-folder",
+                "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy"
+            },
+            "name": "Raw Data",
+            "project": {
+                "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+            },
+            "ancestors": [
+                {
+                    "kind": "dds-project",
+                    "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                    "name": "Knockout Mouse Project (KOMP)"
+                },
+                {
+                    "kind": "dds-folder",
+                    "id": "552be8c5-209d-4e3b-afaf-cb66686ffbyy",
+                    "name": "Sequencing Core"
+                }
+            ],
+            "is_deleted": false,
+            "is_purged": false,
+            "audit": { }
+        }
+
+## Purge Trashbin Item [/trashbin/{object_id}/{object_kind}/purge]
++ Parameters
+    + object_kind (string, required, `dds-file`) ... The kind of object.
+    + object_id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the object.
+
+### Purge Trashbin Item instance [PUT]
+>**Permission:** create_file or system_admin
+- - - - -
+**Response messages:**
+* 204: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
+* 404: Item does not exist in the trash bin
+
++ Response 204
+
+## Project Trashbin Items [/trashbin/project/{id}/children{?name_contains,recurse}]
++ Parameters
+    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the project.
+    + name_contains (string, optional)
+    + recurse (boolean, optional)
+
+### Project Trashbin Items instance [GET]
+>**Permission:** view_project or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ Lists all children of the project unless the `name_contains` parameter is specified; when specified, only childen whose name contains the `name_contains` parameter are returned.
++ Lists only immediate children of the project unless the `recurse` parameter is specified, when specified, invokes a recursive search of the project hierarchy.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
+* 404: Item does not exist in the trash bin
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-folder",
+                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+                    "parent": {
+                        "kind": "dds-project",
+                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "name": "Raw Data",
+                    "project": {
+                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        }
+                    ],
+                    "is_deleted": true,
+                    "audit": { }
+                },
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": {
+                        "kind": "dds-project",
+                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        }
+                    ],
+                    "is_deleted": true,
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                {
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": {
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                "name": "duke_oit_swift",
+                                "description": "Duke OIT Storage"
+                            }
+                        }
+                    },
+                    "audit": { }
+                }
+            ]
+        }
+
+## Folder Trashbin Items [/trashbin/folder/{id}/children{?name_contains,recurse}]
++ Parameters
+    + id (string, required, `777be35a-98e0-4c2e-9a17-7bc009f9b111`) ... The unique id of the folder.
+    + name_contains (string, optional)
+    + recurse (boolean, optional)
+
+### Folder Trashbin Items instance [GET]
+>**Permission:** view_project or system_admin
+- - - - -
+
+>**Rules**
+- - - - -
++ Lists all children of the folder unless the `name_contains` parameter is specified; when specified, only children whose name contains the `name_contains` parameter are returned.
++ Lists only immediate children of the folder unless the `recurse` parameter is specified, when specified, invokes a recursive search of the folder hierarchy.
+
+**Response messages:**
+* 200: Success
+* 401: Unauthorized
+* 403: Forbidden
+* 404: Parent object does not exist, has been purged, or is in the trash bin
+* 404: Item does not exist in the trash bin
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "kind": "dds-folder",
+                    "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a",
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "name": "Raw Data",
+                    "project": {
+                        "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1"
+                    },
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                            "name": "Raw Data"
+                        }
+                    ],
+                    "is_deleted": true,
+                    "audit": { }
+                },
+                {
+                    "kind": "dds-file",
+                    "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                    "parent": {
+                        "kind": "dds-folder",
+                        "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111"
+                    },
+                    "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+                    "project": {
+                        "id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"
+                    },
+                    "ancestors": [
+                        {
+                            "kind": "dds-project",
+                            "id": "ca29f7df-33ca-46dd-a015-92c46fdb6fd1",
+                            "name": "Knockout Mouse Project (KOMP)"
+                        },
+                        {
+                            "kind": "dds-folder",
+                            "id": "777be35a-98e0-4c2e-9a17-7bc009f9b111",
+                            "name": "Raw Data"
+                        }
+                    ],
+                    "is_deleted": true,
+                    "current_version": {
+                        "id": "89ef1e77-1a0b-40a8-aaca-260d13987f2b",
+                        "version": 1,
+                        "label": "Initial raw data from device",
+                        "upload": {
+                            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+                            "size": 30024000,
+                            "hashes": [
+                                {
+                                    "value": "cf23df2207d99a74fbe169e3eba035e633b65d94",
+                                    "algorithm": "md5",
+                                    "audit": { }
+                                }
+                            ],
+                            "storage_provider": {
+                                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                                "name": "duke_oit_swift",
+                                "description": "Duke OIT Storage"
+                            }
+                        }
+                    },
+                    "audit": { }
+                }
+            ]
+        }

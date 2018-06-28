@@ -11,6 +11,10 @@ class FileVersionPolicy < ApplicationPolicy
     permission :update_file
   end
 
+  def restore?
+    permission :update_file
+  end
+
   def update?
     permission :update_file
   end
