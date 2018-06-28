@@ -379,25 +379,44 @@ describe DDS::V1::FilesAPI do
     describe 'DELETE' do
       subject { delete(url, headers: headers) }
       let(:called_action) { 'DELETE' }
-      it_behaves_like 'a removable resource' do
-        let(:resource_counter) { resource_class.where(is_deleted: false) }
 
-        it 'should be marked as deleted' do
-          expect(resource).to be_persisted
-          is_expected.to eq(204)
-          resource.reload
-          expect(resource.is_deleted?).to be_truthy
-        end
+      context 'root data_file' do
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
 
-        it 'should mark file_versions as deleted' do
-          expect(resource).to be_persisted
-          expect {
+          it 'should be marked as deleted' do
+            expect(resource).to be_persisted
             is_expected.to eq(204)
-          }.to change{FileVersion.where(is_deleted: true).count}
-        end
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+          end
 
-        it_behaves_like 'an identified resource' do
-          let(:resource_id) {'notfoundid'}
+          it_behaves_like 'an identified resource' do
+            let(:resource_id) {'notfoundid'}
+          end
+        end
+      end
+
+      context 'folder child file' do
+        let(:resource) { FactoryBot.create(:data_file, project: project, upload: upload, parent: folder) }
+
+        it_behaves_like 'a removable resource' do
+          let(:resource_counter) { resource_class.where(is_deleted: false) }
+
+          it 'should be marked as deleted and moved to the root of the project' do
+            expect(resource).to be_persisted
+            expect(resource.parent).not_to be_nil
+            expect(resource.deleted_from_parent).to be_nil
+            original_parent = resource.parent
+
+            is_expected.to eq(204)
+
+            resource.reload
+            expect(resource.is_deleted?).to be_truthy
+            expect(resource.parent).to be_nil
+            expect(resource.deleted_from_parent).not_to be_nil
+            expect(resource.deleted_from_parent).to eq original_parent
+          end
         end
       end
 
