@@ -32,7 +32,8 @@ describe DDS::V1::ProjectsAPI do
 
       context 'with slugged project' do
         let(:project) { FactoryBot.create(:project, :with_slug) }
-        let(:non_slug) { FactoryBot.create(:project_permission, :project_admin, user: current_user).project }
+        let(:non_slug_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+        let(:non_slug) { non_slug_permission.project.tap {|p| p.update_attribute(:slug, nil)} }
         before(:each) do
           expect(project).to be_persisted
           expect(non_slug).to be_persisted
