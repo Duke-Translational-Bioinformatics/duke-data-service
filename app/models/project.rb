@@ -22,6 +22,7 @@ class Project < ActiveRecord::Base
   validates :slug, uniqueness: {allow_blank: true}, format: {with: /\A[a-z0-9_]*\z/}
   validates :is_deleted, immutable: true, if: :was_deleted?
 
+  before_validation :generate_slug, if: :slug_is_blank?
   after_create :set_project_admin
   after_create :initialize_storage
   after_update :manage_container_index_project
@@ -98,9 +99,14 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def slug_is_blank?
+    slug.blank?
+  end
+
   def generate_slug
     self.slug = slug_prefix = name.gsub('-','_').parameterize(separator: '_')
-    if self.invalid? && self.errors.details[:slug].any? {|x| x[:error]==:taken}
+    self.slug = '_' if slug_is_blank?
+    if invalid? && errors.details[:slug].any? {|x| x[:error]==:taken}
       existing_slugs = self.class.where("slug LIKE '#{slug_prefix}_%'").pluck(:slug)
       mock_slugs = (1..existing_slugs.length + 1).to_a.collect {|i| "#{slug_prefix}_#{i}"}
       self.slug = (mock_slugs - existing_slugs).first

@@ -245,9 +245,34 @@ RSpec.describe Project, type: :model do
     end
   end
 
+  it { is_expected.to respond_to(:slug_is_blank?) }
+  describe '#slug_is_blank?' do
+    subject { FactoryBot.build(:project) }
+
+    context 'when slug is nil' do
+      it { expect(subject.slug).to be_nil }
+      it { expect(subject.slug_is_blank?).to be_truthy }
+    end
+
+    context 'when slug is empty string' do
+      before { subject.slug = '' }
+      it { expect(subject.slug).to eq '' }
+      it { expect(subject.slug_is_blank?).to be_truthy }
+    end
+
+    context 'when slug is not blank' do
+      before { subject.slug = 'n0tBl4nk' }
+      it { expect(subject.slug).to eq 'n0tBl4nk' }
+      it { expect(subject.slug_is_blank?).to be_falsey }
+    end
+  end
+
   describe '#generate_slug' do
+    subject { FactoryBot.build(:project) }
     let(:call_generate_slug) { subject.generate_slug }
     it { is_expected.to respond_to(:generate_slug) }
+    it { is_expected.to callback(:generate_slug).before(:validation).if(:slug_is_blank?) }
+
     it { expect(subject.slug).to be_nil }
     it 'populates slug and returns the new value' do
       expect(call_generate_slug).not_to be_nil
@@ -266,6 +291,9 @@ RSpec.describe Project, type: :model do
       end
       it ' _ Foo-bär baz -_ ' do
         expect(call_generate_slug).to eq 'foo_bar_baz'
+      end
+      it '#@!' do
+        expect(call_generate_slug).to eq '_'
       end
 
       context 'existing slug' do

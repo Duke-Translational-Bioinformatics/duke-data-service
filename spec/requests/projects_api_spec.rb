@@ -32,7 +32,8 @@ describe DDS::V1::ProjectsAPI do
 
       context 'with slugged project' do
         let(:project) { FactoryBot.create(:project, :with_slug) }
-        let(:non_slug) { FactoryBot.create(:project_permission, :project_admin, user: current_user).project }
+        let(:non_slug_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+        let(:non_slug) { non_slug_permission.project.tap {|p| p.update_attribute(:slug, nil)} }
         before(:each) do
           expect(project).to be_persisted
           expect(non_slug).to be_persisted
@@ -143,6 +144,14 @@ describe DDS::V1::ProjectsAPI do
             it_behaves_like 'a creatable resource' do
               let(:resource) { project_stub }
               let(:expected_response_status) { 202 }
+
+              it 'sets project slug' do
+                is_expected.to eq(expected_response_status)
+                response_json = JSON.parse(response.body)
+                expect(response_json).to have_key('id')
+                new_object = resource_class.find(response_json['id'])
+                expect(new_object.slug).not_to be_blank
+              end
             end
           end
 
@@ -229,7 +238,7 @@ describe DDS::V1::ProjectsAPI do
       }}
       let(:project_slug) { 'a_project_slug' }
 
-      it_behaves_like 'a PUT request' do
+      it_behaves_like 'a PUT request', response_status: 200 do
         it_behaves_like 'an updatable resource' do
           it 'sets project slug' do
             is_expected.to eq(expected_response_status)
@@ -244,6 +253,31 @@ describe DDS::V1::ProjectsAPI do
             description: project_stub.description
           }}
           it_behaves_like 'an updatable resource'
+          it 'returns without changing slug' do
+            original_slug = resource.slug
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(original_slug)
+          end
+        end
+
+        context 'with only slug set' do
+          let(:payload) {{
+            slug: project_slug
+          }}
+          it_behaves_like 'an updatable resource'
+        end
+
+        context 'with blank slug set' do
+          let(:payload) {{
+            slug: ''
+          }}
+          it 'returns without changing slug' do
+            original_slug = resource.slug
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(original_slug)
+          end
         end
 
         context 'with non-unique slug' do
