@@ -163,6 +163,13 @@ def migrate_storage_provider_chunk_environment
   end
 end
 
+def populate_nil_project_slugs
+  Project.where(slug: nil).unscope(:order).order('is_deleted ASC').order('created_at ASC').all.each do |p|
+    p.generate_slug
+    p.save
+  end
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -174,6 +181,7 @@ namespace :db do
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
       purge_deleted_objects
+      populate_nil_project_slugs
     end
   end
 end

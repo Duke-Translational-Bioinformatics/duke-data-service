@@ -345,5 +345,38 @@ describe "db:data:migrate" do
         }
       end
     end
+
+    context 'with missing project slugs' do
+      let(:projects) { FactoryBot.build_list(:project, 4, name: 'foo') }
+      let(:slugged_project) { FactoryBot.create(:project, :with_slug) }
+      let(:original_slug) { slugged_project.slug }
+      before do
+        expect(projects).not_to be_empty
+        projects.each_with_index do |p, i|
+          p.is_deleted = (i%2 == 0)
+          p.save(validate: false)
+        end
+        expect(projects[0]).to be_is_deleted
+        expect(projects[1]).not_to be_is_deleted
+        expect(projects[2]).to be_is_deleted
+        expect(projects[3]).not_to be_is_deleted
+        expect(projects).to all( have_attributes(name: 'foo').and be_slug_is_blank )
+        expect(original_slug).not_to be_blank
+      end
+      it 'populates nil project slugs' do
+        expect {
+          invoke_task
+        }.to change{
+          Project.where(slug: nil).count
+        }.by(-4)
+        expect(projects.map(&:reload)).to all( be_truthy )
+        expect(projects[1].slug).to eq('foo')
+        expect(projects[3].slug).to eq('foo_1')
+        expect(projects[0].slug).to eq('foo_2')
+        expect(projects[2].slug).to eq('foo_3')
+        expect(slugged_project.reload).to be_truthy
+        expect(slugged_project.slug).to eq original_slug
+      end
+    end
   end
 end
