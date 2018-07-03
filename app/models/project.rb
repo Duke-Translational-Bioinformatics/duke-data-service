@@ -22,6 +22,7 @@ class Project < ActiveRecord::Base
   validates :slug, uniqueness: {allow_blank: true}, format: {with: /\A[a-z0-9_]*\z/}
   validates :is_deleted, immutable: true, if: :was_deleted?
 
+  before_validation :generate_slug, if: :slug_is_blank?
   after_create :set_project_admin
   after_create :initialize_storage
   after_update :manage_container_index_project
@@ -96,6 +97,10 @@ class Project < ActiveRecord::Base
         logger.info "#{i["update"]["_id"]} #{i["update"]["status"]} #{i["update"]["response"]}"
       }
     end
+  end
+
+  def slug_is_blank?
+    self.slug.blank?
   end
 
   def generate_slug
