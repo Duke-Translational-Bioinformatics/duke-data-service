@@ -292,6 +292,9 @@ RSpec.describe Project, type: :model do
       it ' _ Foo-bär baz -_ ' do
         expect(call_generate_slug).to eq 'foo_bar_baz'
       end
+      it '#@!' do
+        expect(call_generate_slug).to eq '_'
+      end
 
       context 'existing slug' do
         before do
