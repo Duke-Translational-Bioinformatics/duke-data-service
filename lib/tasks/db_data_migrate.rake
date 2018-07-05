@@ -164,10 +164,15 @@ def migrate_storage_provider_chunk_environment
 end
 
 def populate_nil_project_slugs
+  slug_count = 0
+  puts 'Populate Project slugs:'
   Project.where(slug: nil).unscope(:order).order('is_deleted ASC').order('created_at ASC').all.each do |p|
     p.generate_slug
     p.save
+    slug_count += 1
+    print '.'
   end
+  puts " #{slug_count} Project slugs populated."
 end
 
 namespace :db do

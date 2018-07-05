@@ -362,18 +362,20 @@ describe "db:data:migrate" do
         expect(projects[3]).not_to be_is_deleted
         expect(projects).to all( have_attributes(name: 'foo').and be_slug_is_blank )
         expect(original_slug).not_to be_blank
-      end
-      it 'populates nil project slugs' do
         expect {
-          invoke_task
+          invoke_task expected_stdout: Regexp.new("Populate Project slugs:\n.... 4 Project slugs populated.")
         }.to change{
           Project.where(slug: nil).count
         }.by(-4)
+      end
+      it 'populates nil project slugs ordered by !is_deleted, oldest first' do
         expect(projects.map(&:reload)).to all( be_truthy )
         expect(projects[1].slug).to eq('foo')
         expect(projects[3].slug).to eq('foo_1')
         expect(projects[0].slug).to eq('foo_2')
         expect(projects[2].slug).to eq('foo_3')
+      end
+      it 'leaves existing slugs alone' do
         expect(slugged_project.reload).to be_truthy
         expect(slugged_project.slug).to eq original_slug
       end
