@@ -337,7 +337,7 @@ describe "db:data:migrate" do
       end
     end
 
-    context 'with missing project slugs' do
+    describe 'populate_nil_project_slugs' do
       let(:projects) { FactoryBot.build_list(:project, 4, name: 'foo') }
       let(:slugged_project) { FactoryBot.create(:project, :with_slug) }
       let(:original_slug) { slugged_project.slug }
