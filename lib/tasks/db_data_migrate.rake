@@ -1,24 +1,37 @@
+
 def purge_deleted_objects
   if ENV["PURGE_OBJECTS"]
     purge_state = 'trashbin_migration'
-    Project.where(is_deleted: true).all.each do |deleted_project|
-      deleted_project.create_transaction(purge_state)
-      deleted_project.force_purgation = true
-      deleted_project.manage_deletion
-      deleted_project.manage_children
-    end
-
-    Folder.where(is_deleted: true, is_purged: false).all.each do |deleted_folder|
-      unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
-        deleted_folder.create_transaction(purge_state)
-        deleted_folder.update(is_deleted: true, is_purged: true)
+    Project.where(is_deleted: true).find_in_batches do |group|
+      print "p"
+      group.each do |deleted_project|
+        deleted_project.create_transaction(purge_state)
+        deleted_project.force_purgation = true
+        deleted_project.manage_deletion
+        deleted_project.manage_children
+        print '.'
       end
     end
 
-    DataFile.where(is_deleted: true, is_purged: false).all.each do |deleted_file|
-      unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
-        deleted_file.create_transaction(purge_state)
-        deleted_file.update(is_deleted: true, is_purged: true)
+    Folder.where(is_deleted: true, is_purged: false).find_in_batches do |group|
+      print 'f'
+      group.each do |deleted_folder|
+        unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
+          deleted_folder.create_transaction(purge_state)
+          deleted_folder.update(is_deleted: true, is_purged: true)
+        end
+        print '.'
+      end
+    end
+
+    DataFile.where(is_deleted: true, is_purged: false).find_in_batches do |group|
+      print 'd'
+      group.each do |deleted_file|
+        unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
+          deleted_file.create_transaction(purge_state)
+          deleted_file.update(is_deleted: true, is_purged: true)
+        end
+        print '.'
       end
     end
   end
