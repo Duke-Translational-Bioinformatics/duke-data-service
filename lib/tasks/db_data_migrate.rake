@@ -163,6 +163,22 @@ def migrate_storage_provider_chunk_environment
   end
 end
 
+def populate_nil_project_slugs
+  Project.paginates_per 500
+  slug_count = 0
+  puts 'Populate Project slugs:'
+  slugless_projects = Project.where(slug: nil).unscope(:order).order('is_deleted ASC').order('created_at ASC')
+  (1 .. slugless_projects.page.total_pages).each do |page_num|
+    slugless_projects.page(page_num).each do |p|
+      p.generate_slug
+      p.save
+      slug_count += 1
+      print '.'
+    end
+  end
+  puts " #{slug_count} Project slugs populated."
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -174,6 +190,7 @@ namespace :db do
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
       purge_deleted_objects
+      populate_nil_project_slugs
     end
   end
 end
