@@ -173,6 +173,9 @@ describe "db:data:migrate" do
           }.to change{
             Upload.where(storage_container: nil).count
           }.by(-expected_uploads_without_storage_container)
+          Upload.all.each do |upload|
+            expect(upload.storage_container).to eq(upload.project_id)
+          end
         }
       end
 

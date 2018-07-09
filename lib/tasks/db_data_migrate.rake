@@ -149,10 +149,7 @@ end
 
 def migrate_nil_storage_container
   updated_uploads = 0
-  Upload.where(storage_container: nil).each do |u|
-    u.update_columns(storage_container: u.project_id)
-    updated_uploads += 1
-  end
+  updated_uploads = Upload.where(storage_container: nil).update_all('storage_container = project_id')
   puts "#{updated_uploads} uploads updated"
 end
 
