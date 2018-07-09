@@ -117,16 +117,17 @@ def migrate_nil_consistency_status
   storage_provider = StorageProvider.first
   updated_projects = 0
   updated_uploads = 0
-  projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
-  puts "#{projects.count} projects with nil consistency_status."
-  projects.each do |p|
-    if storage_provider.get_container_meta(p.id)
-      p.update_columns(is_consistent: true)
-    else
-      p.update_columns(is_consistent: false)
+  puts "#{Project.where(is_consistent: nil).where.not(is_deleted: true).count} projects with nil consistency_status."
+  Project.where(is_consistent: nil).where.not(is_deleted: true).find_in_batches do |projects|
+    projects.each do |p|
+      if storage_provider.get_container_meta(p.id)
+        p.update_columns(is_consistent: true)
+      else
+        p.update_columns(is_consistent: false)
+      end
+      print '.'
+      updated_projects += 1
     end
-    print '.'
-    updated_projects += 1
   end
   puts "#{updated_projects} projects updated."
 
