@@ -130,18 +130,19 @@ def migrate_nil_consistency_status
   end
   puts "#{updated_projects} projects updated."
 
-  uploads = Upload.where(is_consistent: nil)
-  puts "#{uploads.count} uploads with nil consistency_status."
-  uploads.each do |u|
-    begin
-      if storage_provider.get_object_metadata(u.project.id, u.id)
-        u.update_columns(is_consistent: true)
+  puts "#{Upload.where(is_consistent: nil).count} uploads with nil consistency_status."
+  Upload.where(is_consistent: nil).find_in_batches do |uploads|
+    uploads.each do |u|
+      begin
+        if storage_provider.get_object_metadata(u.project.id, u.id)
+          u.update_columns(is_consistent: true)
+        end
+      rescue StorageProviderException
+        u.update_columns(is_consistent: false)
       end
-    rescue StorageProviderException
-      u.update_columns(is_consistent: false)
+      updated_uploads += 1
+      print '.'
     end
-    updated_uploads += 1
-    print '.'
   end
   puts "#{updated_uploads} uploads updated."
 end
