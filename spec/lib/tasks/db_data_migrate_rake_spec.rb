@@ -23,7 +23,6 @@ describe "db:data:migrate" do
       end
       context 'for incomplete upload with fingerprint_value' do
         before { expect(incomplete_upload_with_fingerprint_value).to be_persisted }
-        it { invoke_task(expected_stdout: /Creating fingerprints for 0 uploads/) }
         it { expect {invoke_task}.to change{Fingerprint.count}.by(0) }
         it { expect {invoke_task}.to change{Audited.audit_class.count}.by(0) }
       end

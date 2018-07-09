@@ -81,24 +81,23 @@ def fill_new_authentication_service_attributes
 end
 
 def create_missing_fingerprints
-  #uploads = Upload.where.not(fingerprint_value: nil)
-  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
   fingerprint_count = Fingerprint.count
   failures = []
-  puts "Creating fingerprints for #{uploads.count} uploads"
-  uploads.each do |u|
-    ActiveRecord::Base.transaction do
-      Audited.audit_class.as_user(u.audits.last.user) do
-          u.fingerprints.build(
-            value: u.fingerprint_value,
-            algorithm: u.fingerprint_algorithm.downcase
-          )
-          if u.save
-            print '.'
-          else
-            print 'F'
-            failures << u
-          end
+  Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order).find_in_batches do |group|
+    group.each do |u|
+      ActiveRecord::Base.transaction do
+        Audited.audit_class.as_user(u.audits.last.user) do
+            u.fingerprints.build(
+              value: u.fingerprint_value,
+              algorithm: u.fingerprint_algorithm.downcase
+            )
+            if u.save
+              print '.'
+            else
+              print 'F'
+              failures << u
+            end
+        end
       end
     end
   end
