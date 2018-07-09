@@ -276,15 +276,44 @@ describe "db:data:migrate" do
     end
 
     describe 'purge_deleted_objects' do
+      let(:deleted_project) { FactoryBot.create(:project, is_deleted: true) }
+
+      let(:deleted_folder) { FactoryBot.create(:folder, is_deleted: true) }
+      let(:deleted_folder_in_deleted_project) { FactoryBot.create(:folder, :root, project: deleted_project, is_deleted: true) }
+      let(:deleted_folder_in_deleted_parent) { FactoryBot.create(:folder, parent: deleted_folder, is_deleted: true) }
+
+      let(:deleted_file) { FactoryBot.create(:data_file, is_deleted: true) }
+      let(:deleted_file_in_deleted_project) { FactoryBot.create(:data_file, :root, project: deleted_project, is_deleted: true) }
+      let(:deleted_file_in_deleted_parent) { FactoryBot.create(:data_file, parent: deleted_folder, is_deleted: true) }
+
+      let(:deleted_file_version) { FactoryBot.create(:file_version, is_deleted: true) }
+      let(:deleted_file_version_in_deleted_file) { FactoryBot.create(:file_version, data_file: deleted_file) }
+      let(:expected_transaction_state) { 'trashbin_migration' }
+
+      before(:each) do
+        purgables = [
+          deleted_folder, deleted_folder_in_deleted_project, deleted_folder_in_deleted_parent,
+          deleted_file, deleted_file_in_deleted_project, deleted_file_in_deleted_parent,
+          deleted_file_version, deleted_file_version_in_deleted_file
+        ]
+        expect(deleted_project).to be_persisted
+        expect(purgables).to all( be_persisted )
+        expect(purgables).to all( have_attributes(is_purged: false) )
+      end
+
       context 'ENV[\"PURGE_OBJECTS\"] not set' do
-        it {
-          expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
-          expect(Project).not_to receive(:where).with(is_deleted: true)
-          expect(Folder).not_to receive(:where).with(is_deleted: true, is_purged: false)
-          expect(DataFile).not_to receive(:where).with(is_deleted: true, is_purged: false)
-          expect(FileVersion).not_to receive(:where).with(is_deleted: true, is_purged: false)
-          invoke_task
-        }
+        it 'does not create job transactions or purge containers' do
+          expect(ENV["PURGE_OBJECTS"]).to be_nil
+          expect {
+            expect {
+              invoke_task
+            }.not_to change{
+              JobTransaction.where(key: 'test.child_purgation', state: 'initialized').count
+            }
+          }.not_to change{
+            Container.where(is_purged: true).count
+          }
+        end
       end
 
       context 'ENV[\"PURGE_OBJECTS\"] set' do
@@ -292,57 +321,54 @@ describe "db:data:migrate" do
         let(:env_override) { {
           'PURGE_OBJECTS' => "1"
         } }
-        let(:project_relation) { Project.where(is_deleted: true) }
-        let(:deleted_project) { FactoryBot.create(:project, is_deleted: true) }
 
-        let(:folder_relation) { Folder.where(is_deleted: true, is_purged: false) }
-        let(:deleted_folder) { FactoryBot.create(:folder, is_deleted: true) }
-        let(:deleted_folder_in_deleted_project) { FactoryBot.create(:folder, :root, project: deleted_project, is_deleted: true) }
-        let(:deleted_folder_in_deleted_parent) { FactoryBot.create(:folder, parent: deleted_folder, is_deleted: true) }
+        it 'creates job transactions and purges containers' do
+          expect(ENV["PURGE_OBJECTS"]).to eq '1'
+          expect {
+            expect {
+              invoke_task
+            }.to change{
+              JobTransaction.where(key: 'test.child_purgation', state: 'initialized').count
+            }.by(3)
+          }.to change{
+            Container.where(is_purged: true).count
+          }.by(2)
+        end
+      end
+    end
 
-        let(:file_relation) { DataFile.where(is_deleted: true, is_purged: false) }
-        let(:deleted_file) { FactoryBot.create(:data_file, is_deleted: true) }
-        let(:deleted_file_in_deleted_project) { FactoryBot.create(:data_file, :root, project: deleted_project, is_deleted: true) }
-        let(:deleted_file_in_deleted_parent) { FactoryBot.create(:data_file, parent: deleted_folder, is_deleted: true) }
-
-        let(:file_version_relation) { FileVersion.where(is_deleted: true, is_purged: false) }
-        let(:deleted_file_version) { FactoryBot.create(:file_version, is_deleted: true) }
-        let(:deleted_file_version_in_deleted_file) { FactoryBot.create(:file_version, data_file: deleted_file) }
-        let(:expected_transaction_state) { 'trashbin_migration' }
-
-        it {
-          expect(deleted_project.force_purgation).to be_falsey
-          expect(project_relation).to receive(:all).and_return([ deleted_project ])
-          expect(deleted_project).to receive(:manage_deletion) {
-            expect(deleted_project.current_transaction).not_to be_nil
-            expect(deleted_project.current_transaction.state).to eq expected_transaction_state
-            expect(deleted_project.force_purgation).to be_truthy
-          }
-          expect(deleted_project).to receive(:manage_children)
-          expect(Project).to receive(:where).with(hash_excluding(:is_deleted => true)).and_call_original
-          expect(Project).to receive(:where).with(is_deleted: true).and_return(project_relation)
-
-          expect(folder_relation).to receive(:all).and_return( [ deleted_folder, deleted_folder_in_deleted_project, deleted_folder_in_deleted_parent ] )
-          expect(deleted_folder).to receive(:update).with(is_deleted: true, is_purged: true) {
-            expect(deleted_folder.current_transaction).not_to be_nil
-            expect(deleted_folder.current_transaction.state).to eq expected_transaction_state
-          }
-          expect(deleted_folder_in_deleted_project).not_to receive(:update)
-          expect(deleted_folder_in_deleted_parent).not_to receive(:update)
-          expect(Folder).to receive(:where).with(is_deleted: true, is_purged: false).and_return(folder_relation)
-
-          expect(file_relation).to receive(:all).and_return( [ deleted_file, deleted_file_in_deleted_project, deleted_file_in_deleted_parent ] )
-          expect(deleted_file).to receive(:update).with(is_deleted: true, is_purged: true) {
-            expect(deleted_file.current_transaction).not_to be_nil
-            expect(deleted_file.current_transaction.state).to eq expected_transaction_state
-          }
-          expect(deleted_file_in_deleted_project).not_to receive(:update)
-          expect(deleted_file_in_deleted_parent).not_to receive(:update)
-          expect(DataFile).to receive(:where).with(is_deleted: true, is_purged: false).and_return(file_relation)
-
-          expect(FileVersion).not_to receive(:where).with(is_deleted: true, is_purged: false)
-          invoke_task
-        }
+    describe 'populate_nil_project_slugs' do
+      let(:projects) { FactoryBot.build_list(:project, 4, name: 'foo') }
+      let(:slugged_project) { FactoryBot.create(:project, :with_slug) }
+      let(:original_slug) { slugged_project.slug }
+      before do
+        expect(projects).not_to be_empty
+        projects.each_with_index do |p, i|
+          p.is_deleted = (i%2 == 0)
+          p.save(validate: false)
+        end
+        expect(projects[0]).to be_is_deleted
+        expect(projects[1]).not_to be_is_deleted
+        expect(projects[2]).to be_is_deleted
+        expect(projects[3]).not_to be_is_deleted
+        expect(projects).to all( have_attributes(name: 'foo').and be_slug_is_blank )
+        expect(original_slug).not_to be_blank
+        expect {
+          invoke_task expected_stdout: Regexp.new("Populate Project slugs:\n.... 4 Project slugs populated.")
+        }.to change{
+          Project.where(slug: nil).count
+        }.by(-4)
+      end
+      it 'populates nil project slugs ordered by !is_deleted, oldest first' do
+        expect(projects.map(&:reload)).to all( be_truthy )
+        expect(projects[1].slug).to eq('foo')
+        expect(projects[3].slug).to eq('foo_1')
+        expect(projects[0].slug).to eq('foo_2')
+        expect(projects[2].slug).to eq('foo_3')
+      end
+      it 'leaves existing slugs alone' do
+        expect(slugged_project.reload).to be_truthy
+        expect(slugged_project.slug).to eq original_slug
       end
     end
   end
