@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe ProjectSerializer, type: :serializer do
-  let(:resource) { FactoryBot.create(:project) }
+  let(:resource) { FactoryBot.create(:project, :with_slug) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
     'id' => resource.id,
     'name' => resource.name,
+    'slug' => resource.slug,
     'description' => resource.description,
     'is_deleted' => resource.is_deleted
   }}
