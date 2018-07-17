@@ -83,8 +83,11 @@ end
 def create_missing_fingerprints
   fingerprint_count = Fingerprint.count
   failures = []
-  Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order).find_in_batches do |group|
-    group.each do |u|
+  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
+  puts "Creating fingerprints for #{uploads.count} uploads"
+
+  uploads.find_in_batches do |upload_batch|
+    upload_batch.each do |u|
       ActiveRecord::Base.transaction do
         Audited.audit_class.as_user(u.audits.last.user) do
             u.fingerprints.build(
@@ -117,9 +120,10 @@ def migrate_nil_consistency_status
   storage_provider = StorageProvider.first
   updated_projects = 0
   updated_uploads = 0
-  puts "#{Project.where(is_consistent: nil).where.not(is_deleted: true).count} projects with nil consistency_status."
-  Project.where(is_consistent: nil).where.not(is_deleted: true).find_in_batches do |projects|
-    projects.each do |p|
+  projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
+  puts "#{projects.count} projects with nil consistency_status."
+  projects.find_in_batches do |project_batch|
+    project_batch.each do |p|
       if storage_provider.get_container_meta(p.id)
         p.update_columns(is_consistent: true)
       else
@@ -131,9 +135,10 @@ def migrate_nil_consistency_status
   end
   puts "#{updated_projects} projects updated."
 
-  puts "#{Upload.where(is_consistent: nil).count} uploads with nil consistency_status."
-  Upload.where(is_consistent: nil).find_in_batches do |uploads|
-    uploads.each do |u|
+  uploads = Upload.where(is_consistent: nil)
+  puts "#{uploads.count} uploads with nil consistency_status."
+  uploads.find_in_batches do |upload_batch|
+    upload_batch.each do |u|
       begin
         if storage_provider.get_object_metadata(u.project.id, u.id)
           u.update_columns(is_consistent: true)
