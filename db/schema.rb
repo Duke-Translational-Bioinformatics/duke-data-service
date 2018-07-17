@@ -223,6 +223,7 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_consistent"
+    t.string "slug"
   end
 
   create_table "properties", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
