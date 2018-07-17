@@ -1,24 +1,37 @@
+
 def purge_deleted_objects
   if ENV["PURGE_OBJECTS"]
     purge_state = 'trashbin_migration'
-    Project.where(is_deleted: true).all.each do |deleted_project|
-      deleted_project.create_transaction(purge_state)
-      deleted_project.force_purgation = true
-      deleted_project.manage_deletion
-      deleted_project.manage_children
-    end
-
-    Folder.where(is_deleted: true, is_purged: false).all.each do |deleted_folder|
-      unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
-        deleted_folder.create_transaction(purge_state)
-        deleted_folder.update(is_deleted: true, is_purged: true)
+    Project.where(is_deleted: true).find_in_batches do |group|
+      print "p"
+      group.each do |deleted_project|
+        deleted_project.create_transaction(purge_state)
+        deleted_project.force_purgation = true
+        deleted_project.manage_deletion
+        deleted_project.manage_children
+        print '.'
       end
     end
 
-    DataFile.where(is_deleted: true, is_purged: false).all.each do |deleted_file|
-      unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
-        deleted_file.create_transaction(purge_state)
-        deleted_file.update(is_deleted: true, is_purged: true)
+    Folder.where(is_deleted: true, is_purged: false).find_in_batches do |group|
+      print 'f'
+      group.each do |deleted_folder|
+        unless deleted_folder.project.is_deleted? || (deleted_folder.parent && deleted_folder.parent.is_deleted?)
+          deleted_folder.create_transaction(purge_state)
+          deleted_folder.update(is_deleted: true, is_purged: true)
+        end
+        print '.'
+      end
+    end
+
+    DataFile.where(is_deleted: true, is_purged: false).find_in_batches do |group|
+      print 'd'
+      group.each do |deleted_file|
+        unless deleted_file.project.is_deleted? || (deleted_file.parent && deleted_file.parent.is_deleted?)
+          deleted_file.create_transaction(purge_state)
+          deleted_file.update(is_deleted: true, is_purged: true)
+        end
+        print '.'
       end
     end
   end
@@ -68,24 +81,26 @@ def fill_new_authentication_service_attributes
 end
 
 def create_missing_fingerprints
-  #uploads = Upload.where.not(fingerprint_value: nil)
-  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
   fingerprint_count = Fingerprint.count
   failures = []
+  uploads = Upload.eager_load(:fingerprints).where('fingerprints.id is NULL').where.not(fingerprint_value: nil, completed_at: nil).unscope(:order)
   puts "Creating fingerprints for #{uploads.count} uploads"
-  uploads.each do |u|
-    ActiveRecord::Base.transaction do
-      Audited.audit_class.as_user(u.audits.last.user) do
-          u.fingerprints.build(
-            value: u.fingerprint_value,
-            algorithm: u.fingerprint_algorithm.downcase
-          )
-          if u.save
-            print '.'
-          else
-            print 'F'
-            failures << u
-          end
+
+  uploads.find_in_batches do |upload_batch|
+    upload_batch.each do |u|
+      ActiveRecord::Base.transaction do
+        Audited.audit_class.as_user(u.audits.last.user) do
+            u.fingerprints.build(
+              value: u.fingerprint_value,
+              algorithm: u.fingerprint_algorithm.downcase
+            )
+            if u.save
+              print '.'
+            else
+              print 'F'
+              failures << u
+            end
+        end
       end
     end
   end
@@ -107,39 +122,40 @@ def migrate_nil_consistency_status
   updated_uploads = 0
   projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
   puts "#{projects.count} projects with nil consistency_status."
-  projects.each do |p|
-    if storage_provider.get_container_meta(p.id)
-      p.update_columns(is_consistent: true)
-    else
-      p.update_columns(is_consistent: false)
+  projects.find_in_batches do |project_batch|
+    project_batch.each do |p|
+      if storage_provider.get_container_meta(p.id)
+        p.update_columns(is_consistent: true)
+      else
+        p.update_columns(is_consistent: false)
+      end
+      print '.'
+      updated_projects += 1
     end
-    print '.'
-    updated_projects += 1
   end
   puts "#{updated_projects} projects updated."
 
   uploads = Upload.where(is_consistent: nil)
   puts "#{uploads.count} uploads with nil consistency_status."
-  uploads.each do |u|
-    begin
-      if storage_provider.get_object_metadata(u.project.id, u.id)
-        u.update_columns(is_consistent: true)
+  uploads.find_in_batches do |upload_batch|
+    upload_batch.each do |u|
+      begin
+        if storage_provider.get_object_metadata(u.project.id, u.id)
+          u.update_columns(is_consistent: true)
+        end
+      rescue StorageProviderException
+        u.update_columns(is_consistent: false)
       end
-    rescue StorageProviderException
-      u.update_columns(is_consistent: false)
+      updated_uploads += 1
+      print '.'
     end
-    updated_uploads += 1
-    print '.'
   end
   puts "#{updated_uploads} uploads updated."
 end
 
 def migrate_nil_storage_container
   updated_uploads = 0
-  Upload.where(storage_container: nil).each do |u|
-    u.update_columns(storage_container: u.project_id)
-    updated_uploads += 1
-  end
+  updated_uploads = Upload.where(storage_container: nil).update_all('storage_container = project_id')
   puts "#{updated_uploads} uploads updated"
 end
 
