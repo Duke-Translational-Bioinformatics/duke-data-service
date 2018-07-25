@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: List
+metadata: {}
+items:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: duke-data-service
+    name: duke-data-service
+  spec:
+    lookupPolicy:
+      local: true
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: duke-data-service
+    name: duke-data-service
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: duke-data-service:latest
+    postCommit: {}
+    resources: {}
+    source:
+      git:
+        uri: https://github.com/dmlond/duke-data-service.git
+        ref: jenkins-bot-base
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ruby:2.4
+          namespace: openshift
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+if [ -n "$RUBYGEM_MIRROR" ]; then
+  bundle config mirror.https://rubygems.org $RUBYGEM_MIRROR
+fi
+
+shopt -s dotglob
+echo "---> Installing application source ..."
+mv /tmp/src/* ./
+
+echo "---> Building your Ruby application from source ..."
+if [ -f Gemfile ]; then
+  ADDTL_BUNDLE_ARGS="--retry 2 --system"
+
+  echo "---> Running 'bundle install ${ADDTL_BUNDLE_ARGS}' ..."
+  bundle install ${ADDTL_BUNDLE_ARGS}
+fi
+
+# Fix source directory permissions
+fix-permissions ./
+
+# Make the ./tmp folder world writeable as Rails or other frameworks might use
+# it to store temporary data (uploads/cache/sessions/etcd).
+# The ./db folder has to be writeable as well because when Rails complete the
+# migration it writes the schema version into ./db/schema.db
+set +e
+[[ -d ./tmp ]] && chgrp -R 0 ./tmp && chmod -R g+rw ./tmp
+[[ -d ./db ]] && chgrp -R 0 ./db && chmod -R g+rw ./db
+set -e

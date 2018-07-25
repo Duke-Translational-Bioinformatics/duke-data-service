@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: List
+metadata: {}
+items:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: duke-data-service
+    name: dev-ci
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: "BuildConfig"
+  metadata:
+    labels:
+      app: duke-data-service
+    name: dev-ci
+  spec:
+    source:
+      git:
+        uri: https://github.com/dmlond/duke-data-service.git
+        ref: jenkins-bot-base
+      type: Git
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: build/bootstrap/Jenkinsfile
