@@ -28,7 +28,9 @@ describe 'job_transaction:clean_up' do
   context 'when oldest completed from 4 months ago' do
     let(:oldest_completed_at) { Time.now - 4.month - 1.day }
     before(:each) do
-      expect(JobTransaction).to receive(:delete_all_complete_by_request_id).exactly(4).times
+      4.times do |i|
+        expect(JobTransaction).to receive(:delete_all_complete_by_request_id).with(created_before: Time.now - (4 - i).months).ordered
+      end
     end
     it { invoke_task(expected_stdout: /Delete from 4 months ago./) }
     it { invoke_task(expected_stdout: /Delete from 3 months ago./) }
