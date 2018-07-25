@@ -27,14 +27,15 @@ describe 'job_transaction:clean_up' do
 
   context 'when oldest completed from 4 months ago' do
     let(:oldest_completed_at) { Time.now - 4.month - 1.day }
+    let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 1000) } }
     before(:each) do
       4.times do |i|
-        expect(JobTransaction).to receive(:delete_all_complete_by_request_id).with(created_before: Time.now - (4 - i).months).ordered
+        expect(JobTransaction).to receive(:delete_all_complete_by_request_id).with(created_before: Time.now - (4 - i).months).and_return(deleted_counts[i]).ordered
       end
     end
-    it { invoke_task(expected_stdout: /Delete from 4 months ago./) }
-    it { invoke_task(expected_stdout: /Delete from 3 months ago./) }
-    it { invoke_task(expected_stdout: /Delete from 2 months ago./) }
-    it { invoke_task(expected_stdout: /Delete from 1 month ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[0]} from 4 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[1]} from 3 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[2]} from 2 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[3]} from 1 month ago./) }
   end
 end
