@@ -1,9 +1,15 @@
 require 'rails_helper'
 
 describe 'job_transaction:clean_up' do
+  include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
   let(:oldest_completed_at) { nil }
+  around(:each) do |example|
+    travel_to(Time.now) do #freeze_time
+      example.run
+    end
+  end
   before(:each) do
     expect(JobTransaction).to receive(:oldest_completed_at).and_return(oldest_completed_at)
   end
