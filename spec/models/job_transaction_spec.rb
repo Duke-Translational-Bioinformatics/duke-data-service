@@ -34,7 +34,8 @@ RSpec.describe JobTransaction, type: :model do
 
   describe '.delete_all_complete_by_request_id' do
     let(:delete_all_complete_by_request_id) { described_class.delete_all_complete_by_request_id }
-    it { expect(described_class).to respond_to(:delete_all_complete_by_request_id) }
+    it { expect(described_class).to respond_to(:delete_all_complete_by_request_id).with(0).arguments }
+    it { expect(described_class).to respond_to(:delete_all_complete_by_request_id).with_keywords(:created_before) }
     it { expect(delete_all_complete_by_request_id).to eq 0 }
 
     context 'with multiple completed' do

@@ -10,8 +10,7 @@ class JobTransaction < ActiveRecord::Base
     unscope(:order).order(:created_at).where(state: 'complete').first&.created_at
   end
 
-  def self.delete_all_complete_by_request_id
-    created_before = Time.now
+  def self.delete_all_complete_by_request_id(created_before: Time.now)
     where(request_id: select(:request_id).where(state: 'complete')).where('created_at < ?', created_before).delete_all
   end
 
