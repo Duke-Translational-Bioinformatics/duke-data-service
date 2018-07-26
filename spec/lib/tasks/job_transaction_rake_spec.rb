@@ -22,7 +22,7 @@ describe 'job_transaction:clean_up' do
   context 'when oldest completed from this month' do
     let(:oldest_completed_at) { Time.now - 1.day }
     before(:each) { expect(JobTransaction).not_to receive(:delete_all_complete_by_request_id) }
-    it { invoke_task(expected_stdout: /No completed transactions older than 1 month found./) }
+    it { invoke_task(expected_stdout: /No completed JobTransactions older than 1 month found./) }
   end
 
   context 'when oldest completed from 4 months ago' do

@@ -9,7 +9,7 @@ namespace :job_transaction do
           puts "Deleted #{del_num} from #{m} #{'month'.pluralize(m)} ago."
         end
       else
-        puts "No completed transactions older than 1 month found."
+        puts "No completed JobTransactions older than 1 month found."
       end
     else
       puts "No completed JobTransactions found."
