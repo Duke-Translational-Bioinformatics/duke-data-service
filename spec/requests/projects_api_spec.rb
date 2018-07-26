@@ -30,6 +30,66 @@ describe DDS::V1::ProjectsAPI do
         ] }
       end
 
+      context 'with slugged project' do
+        let(:project) { FactoryBot.create(:project, :with_slug) }
+        let(:non_slug_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user) }
+        let(:non_slug) { non_slug_permission.project.tap {|p| p.update_attribute(:slug, nil)} }
+        before(:each) do
+          expect(project).to be_persisted
+          expect(non_slug).to be_persisted
+          expect(non_slug.slug).to be_nil
+        end
+
+        context 'slug param not set' do
+          it_behaves_like 'a listable resource' do
+            let(:expected_resources) { [
+              project,
+              non_slug
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+          it_behaves_like 'a listable resource' do
+            let(:payload) {{slug: ''}}
+            let(:expected_resources) { [
+              project,
+              non_slug
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+        end
+
+        context 'slug param set to existing slug' do
+          let(:payload) {{slug: project.slug}}
+          it_behaves_like 'a listable resource' do
+            let(:expected_resources) { [
+              project
+            ] }
+            let(:unexpected_resources) { [
+              deleted_project,
+              other_project
+            ] }
+          end
+        end
+
+        context 'nonexistent slug' do
+          let(:payload) {{slug: 'NONEXISTENT-SLUG'}}
+          it 'returns an empty results array' do
+            is_expected.to eq(expected_response_status)
+            response_json = JSON.parse(response.body)
+            expect(response_json).to have_key('results')
+            returned_results = response_json['results']
+            expect(returned_results).to be_a(Array)
+            expect(returned_results).to be_empty
+          end
+        end
+      end
+
       it_behaves_like 'an authenticated resource'
       it_behaves_like 'a software_agent accessible resource'
       it_behaves_like 'a paginated resource' do
@@ -43,8 +103,10 @@ describe DDS::V1::ProjectsAPI do
       # let(:called_action) { "POST" }
       let(:payload) {{
         name: resource.name,
+        slug: project_slug,
         description: resource.description
       }}
+      let(:project_slug) { 'a_project_slug' }
       include_context 'with job runner', ProjectStorageProviderInitializationJob
 
       context 'with queued ActiveJob' do
@@ -64,6 +126,33 @@ describe DDS::V1::ProjectsAPI do
               project_admin_permission = new_object.project_permissions.where(user_id: current_user.id, auth_role_id: project_admin_role.id).first
               expect(project_admin_permission).to be
             end
+
+            it 'sets project slug' do
+              is_expected.to eq(expected_response_status)
+              response_json = JSON.parse(response.body)
+              expect(response_json).to have_key('id')
+              new_object = resource_class.find(response_json['id'])
+              expect(new_object.slug).to eq(project_slug)
+            end
+          end
+
+          context 'without slug set' do
+            let(:payload) {{
+              name: resource.name,
+              description: resource.description
+            }}
+            it_behaves_like 'a creatable resource' do
+              let(:resource) { project_stub }
+              let(:expected_response_status) { 202 }
+
+              it 'sets project slug' do
+                is_expected.to eq(expected_response_status)
+                response_json = JSON.parse(response.body)
+                expect(response_json).to have_key('id')
+                new_object = resource_class.find(response_json['id'])
+                expect(new_object.slug).not_to be_blank
+              end
+            end
           end
 
           it_behaves_like 'an authenticated resource'
@@ -79,6 +168,11 @@ describe DDS::V1::ProjectsAPI do
                 is_expected.to eq(400)
               }.not_to change{resource_class.count}
             end
+          end
+
+          context 'with non-unique slug' do
+            before { FactoryBot.create(:project, slug: project_slug) }
+            it_behaves_like 'a validated resource'
           end
 
           it_behaves_like 'an annotate_audits endpoint' do
@@ -139,11 +233,57 @@ describe DDS::V1::ProjectsAPI do
     describe 'PUT' do
       let(:payload) {{
         name: project_stub.name,
+        slug: project_slug,
         description: project_stub.description
       }}
+      let(:project_slug) { 'a_project_slug' }
 
-      it_behaves_like 'a PUT request' do
-        it_behaves_like 'an updatable resource'
+      it_behaves_like 'a PUT request', response_status: 200 do
+        it_behaves_like 'an updatable resource' do
+          it 'sets project slug' do
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(project_slug)
+          end
+        end
+
+        context 'without slug set' do
+          let(:payload) {{
+            name: project_stub.name,
+            description: project_stub.description
+          }}
+          it_behaves_like 'an updatable resource'
+          it 'returns without changing slug' do
+            original_slug = resource.slug
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(original_slug)
+          end
+        end
+
+        context 'with only slug set' do
+          let(:payload) {{
+            slug: project_slug
+          }}
+          it_behaves_like 'an updatable resource'
+        end
+
+        context 'with blank slug set' do
+          let(:payload) {{
+            slug: ''
+          }}
+          it 'returns without changing slug' do
+            original_slug = resource.slug
+            is_expected.to eq(expected_response_status)
+            resource.reload
+            expect(resource.slug).to eq(original_slug)
+          end
+        end
+
+        context 'with non-unique slug' do
+          before { FactoryBot.create(:project, slug: project_slug) }
+          it_behaves_like 'a validated resource'
+        end
 
         it_behaves_like 'a validated resource' do
           let(:payload) {{
