@@ -59,4 +59,22 @@ RSpec.describe JobTransaction, type: :model do
       it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-6) }
     end
   end
+
+  describe '.delete_all_orphans' do
+    let(:delete_all_orphans) { described_class.delete_all_orphans }
+    it { expect(described_class).to respond_to(:delete_all_orphans).with(0).arguments }
+    it { expect(described_class).to respond_to(:delete_all_orphans).with_keywords(:created_before) }
+    it { expect(delete_all_orphans).to eq 0 }
+
+    context 'with multiple orphans' do
+      let(:transactionable) { FactoryBot.create(:api_key) }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: transactionable) }
+      before(:each) do
+        expect(transactionable).not_to respond_to :job_transactions
+        expect(JobTransaction.count).to eq 0
+        expect(orphan_jobs).to be_a Array
+      end
+      it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-3) }
+    end
+  end
 end
