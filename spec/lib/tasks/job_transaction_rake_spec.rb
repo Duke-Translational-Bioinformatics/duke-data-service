@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'job_transaction:clean_up' do
+describe 'job_transaction:clean_up:completed' do
   include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
