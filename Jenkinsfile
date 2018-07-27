@@ -83,7 +83,7 @@ pipeline {
               ]
             ]
 
-            def job = openshift.create(testJob)
+            def job = openshift.create(syncJob)
             def hasError = false
             timeout(20) { // die after 20 minutes
               job.related("pods").watch {
