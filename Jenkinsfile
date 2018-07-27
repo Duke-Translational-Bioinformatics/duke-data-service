@@ -33,7 +33,7 @@ pipeline {
               error("duke-data-service has not been initialized in the project!")
             }
             def is = allSelector.narrow('is')
-            def iso = dc.object()
+            def iso = is.object()
 
             def container = [
               "name": "branch-sync-${env.BUILD_NUMBER}",
