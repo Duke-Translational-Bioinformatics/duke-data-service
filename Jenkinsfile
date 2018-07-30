@@ -10,17 +10,7 @@ def notifyBuildFixed(buildStatus, subject) {
 pipeline {
   agent any
   stages {
-    stage('Base') {
-      when {
-        branch 'jenkins-bot-base'
-      }
-      steps {
-        script {
-          echo "jenkins-bot-base ENVIRONMENT:"
-          env.getEnvironment().each { name, value -> echo "Name: $name -> Value $value" }
-        }//Base.steps.script
-      }//Base.steps
-    } //Base
+    // add stages that should run before BranchSync here
     stage('BranchSync') {
       when {
         branch 'jenkins-bot-head'
@@ -28,11 +18,11 @@ pipeline {
       steps {
         script {
           openshift.withCluster() { // Use "default" cluster or fallback to OpenShift cluster detection
-            def allSelector = openshift.selector([ "is/duke-data-service" ])
-            if ( allSelector.count() != 1 ) {
+            def isSelector = openshift.selector([ "is/duke-data-service" ])
+            if ( isSelector.count() != 1 ) {
               error("duke-data-service has not been initialized in the project!")
             }
-            def is = allSelector.narrow('is')
+            def is = isSelector.narrow('is')
             def iso = is.object()
 
             def container = [
