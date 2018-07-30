@@ -10,10 +10,9 @@ def notifyBuildFixed(buildStatus, subject) {
 pipeline {
   agent any
   stages
-    //Dont forget to change the branch here
     stage('BranchSync') {
       when {
-        branch 'jenkins-pot-head'
+        branch 'jenkins-bot-head'
       }
       steps {
         script {
