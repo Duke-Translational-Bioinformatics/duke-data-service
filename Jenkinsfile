@@ -9,7 +9,7 @@ def notifyBuildFixed(buildStatus, subject) {
 
 pipeline {
   agent any
-  stages
+  stages {
     stage('BranchSync') {
       when {
         branch 'jenkins-bot-head'
