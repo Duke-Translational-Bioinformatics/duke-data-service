@@ -44,6 +44,11 @@ RSpec.describe JobTransaction, type: :model do
         expect(complete_jobs).to be_a Array
       end
       it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-3) }
+
+      context 'created_before last completed' do
+        let(:delete_all_complete_by_request_id) { described_class.delete_all_complete_by_request_id(created_before: complete_jobs.last.created_at) }
+        it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-2) }
+      end
     end
 
     context 'with multiple completed and referencing request ids' do
@@ -57,6 +62,11 @@ RSpec.describe JobTransaction, type: :model do
         expect(complete_jobs).to be_a Array
       end
       it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-6) }
+
+      context 'created_before last completed' do
+        let(:delete_all_complete_by_request_id) { described_class.delete_all_complete_by_request_id(created_before: complete_jobs.last.created_at) }
+        it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-4) }
+      end
     end
   end
 
