@@ -10,10 +10,8 @@ def notifyBuildFixed(buildStatus, subject) {
 pipeline {
   agent any
   stages {
-    // add stages that should run before BranchSync here
-    stage('BranchSync') {
       when {
-        branch 'jenkins-bot-head'
+        branch 'jenkins-pot-head'
       }
       steps {
         script {
