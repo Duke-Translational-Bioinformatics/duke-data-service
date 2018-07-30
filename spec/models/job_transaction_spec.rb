@@ -76,5 +76,17 @@ RSpec.describe JobTransaction, type: :model do
       end
       it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-3) }
     end
+
+    context 'with matching request ids' do
+      let(:transactionable) { FactoryBot.create(:api_key) }
+      let(:request_id) { SecureRandom.uuid }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: transactionable, request_id: request_id) }
+      before(:each) do
+        expect(transactionable).not_to respond_to :job_transactions
+        expect(JobTransaction.count).to eq 0
+        expect(orphan_jobs).to be_a Array
+      end
+      it { expect{delete_all_orphans}.not_to change{JobTransaction.count} }
+    end
   end
 end
