@@ -75,6 +75,11 @@ RSpec.describe JobTransaction, type: :model do
         expect(orphan_jobs).to be_a Array
       end
       it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-3) }
+
+      context 'created_before last orphan' do
+        let(:delete_all_orphans) { described_class.delete_all_orphans(created_before: orphan_jobs.last.created_at) }
+        it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-2) }
+      end
     end
 
     context 'with matching request ids' do
