@@ -21,8 +21,8 @@ user = client.user
 user.login
 repo = client.repo("#{ENV['REPOSITORY']}")
 diff = client.compare(repo.id, ENV['BASE'], ENV['HEAD'])
-if diff.status == "ahead"
-  $stderr.puts "Previous PR Merge commit detected"
+if diff.status == "ahead" || diff.status == "diverged"
+  $stderr.puts "Previous commit detected"
   title = "[#{name}]: Merge Commit Merge"
   body = "
   Please merge commits from a previous Pull Request merge.
