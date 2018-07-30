@@ -54,7 +54,7 @@ pipeline {
               "env": [
                 [
                   "name": "HEAD",
-                  "value": "${env.GIT_BRANCH}"
+                  "value": "${env.BRANCH_NAME}"
                 ]
               ]
             ]
