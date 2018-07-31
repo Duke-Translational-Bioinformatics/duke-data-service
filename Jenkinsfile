@@ -15,7 +15,7 @@ pipeline {
   stages {
     stage('BranchSync') {
       when {
-        when { expression { return ( env.BRANCH_NAME == params.SYNC_BRANCH ) } }
+        expression { return ( env.BRANCH_NAME == params.SYNC_BRANCH ) }
       }
       steps {
         script {
