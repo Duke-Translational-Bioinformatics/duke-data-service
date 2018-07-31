@@ -8,16 +8,13 @@ def notifyBuildFixed(buildStatus, subject) {
 }
 
 pipeline {
-  parameters {
-    string(defaultValue: 'jenkins-bot-head', description: 'branch to sync from', name: 'SYNC_BRANCH' )
-  }
   agent any
   stages {
     stage('BranchSync') {
       when {
         anyOf {
           expression {
-            if ( env.BRANCH_NAME == params.SYNC_BRANCH ) {
+            if ( env.SYNC_BRANCH  && env.BRANCH_NAME == env.SYNC_BRANCH ) {
               return env.BRANCH_NAME
             }
             return null
