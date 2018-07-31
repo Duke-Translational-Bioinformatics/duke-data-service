@@ -12,7 +12,11 @@ pipeline {
   stages {
     stage('BranchSync') {
       when {
-        branch 'jenkins-bot-head'
+        anyOf {
+          branch 'jenkins-bot-head'
+          branch 'ua_test'
+          branch 'production'
+        }
       }
       steps {
         script {
