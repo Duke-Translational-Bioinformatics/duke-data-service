@@ -5,8 +5,8 @@ required_environment = [
   'BOT_NAME',
   'BOT_TOKEN',
   'REPOSITORY',
-  'BASE',
-  'HEAD'
+  'MERGE_TO',
+  'MERGE_FROM'
 ]
 
 required_environment.each do |required_env|
@@ -20,7 +20,7 @@ client = Octokit::Client.new(:access_token => ENV['BOT_TOKEN'])
 user = client.user
 user.login
 repo = client.repo("#{ENV['REPOSITORY']}")
-diff = client.compare(repo.id, ENV['BASE'], ENV['HEAD'])
+diff = client.compare(repo.id, ENV['MERGE_TO'], ENV['MERGE_FROM'])
 if diff.status == "ahead" || diff.status == "diverged"
   $stderr.puts "Previous commit detected"
   title = "[#{name}]: Merge Commit Merge"
@@ -31,8 +31,8 @@ if diff.status == "ahead" || diff.status == "diverged"
   begin
     this_pr = client.create_pull_request(
       repo.id,
-      ENV['BASE'],
-      ENV['HEAD'],
+      ENV['MERGE_TO'],
+      ENV['MERGE_FROM'],
       title,
       body
     )
