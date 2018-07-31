@@ -14,8 +14,9 @@ pipeline {
       when {
         anyOf {
           expression {
-            if ( env.SYNC_BRANCH  && env.BRANCH_NAME == env.SYNC_BRANCH ) {
-              return env.BRANCH_NAME
+            // && env.BRANCH_NAME == env.SYNC_BRANCH
+            if ( env.SYNC_BRANCH ) {
+              return env.SYNC_BRANCH
             }
             return null
           }
