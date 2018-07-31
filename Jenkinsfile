@@ -15,7 +15,17 @@ pipeline {
   stages {
     stage('BranchSync') {
       when {
-        expression { return ( env.BRANCH_NAME == params.SYNC_BRANCH ) }
+        anyOf {
+          expression {
+            if ( env.BRANCH_NAME == params.SYNC_BRANCH ) {
+              echo "syncing"
+              return env.BRANCH_NAME
+            }
+            return null
+          }
+          branch 'ua_test'
+          branch 'production'
+        }
       }
       steps {
         script {
