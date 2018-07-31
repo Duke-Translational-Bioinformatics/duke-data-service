@@ -8,24 +8,11 @@ def notifyBuildFixed(buildStatus, subject) {
 }
 
 pipeline {
-  parameters {
-      string(defaultValue: 'jenkins-bot-head', description: 'Branch that needs to be synchronized', name: 'SYNC_BRANCH')
-  }
   agent any
   stages {
     stage('BranchSync') {
       when {
-        anyOf {
-          expression {
-            if ( env.BRANCH_NAME == params.SYNC_BRANCH ) {
-              echo "syncing"
-              return env.BRANCH_NAME
-            }
-            return null
-          }
-          branch 'ua_test'
-          branch 'production'
-        }
+        branch 'jenkins-bot-head'
       }
       steps {
         script {
