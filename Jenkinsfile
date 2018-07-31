@@ -13,7 +13,12 @@ pipeline {
     stage('BranchSync') {
       when {
         anyOf {
-          branch 'jenkins-bot-head'
+          expression {
+            if ( env.BRANCH_NAME == 'jenkins-bot-head' ) {
+              return env.BRANCH_NAME
+            }
+            return null
+          }
           branch 'ua_test'
           branch 'production'
         }
