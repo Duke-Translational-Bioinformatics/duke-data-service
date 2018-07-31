@@ -19,7 +19,6 @@ RSpec.describe JobTransaction, type: :model do
     }
   end
 
-
   describe '.oldest_completed_at' do
     let(:oldest_completed_at) { described_class.oldest_completed_at }
     it { expect(described_class).to respond_to(:oldest_completed_at) }
@@ -90,6 +89,29 @@ RSpec.describe JobTransaction, type: :model do
       context 'created_before last completed' do
         let(:delete_all_complete_jobs) { described_class.delete_all_complete_jobs(created_before: complete_jobs.last.created_at) }
         it { expect{delete_all_complete_jobs}.to change{JobTransaction.count}.by(-4) }
+      end
+    end
+  end
+
+  describe '.oldest_orphan_created_at' do
+    let(:oldest_orphan_created_at) { described_class.oldest_orphan_created_at }
+    it { expect(described_class).to respond_to(:oldest_orphan_created_at) }
+    it { expect(oldest_orphan_created_at).to be_nil }
+
+    context 'with multiple orphans' do
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: not_transactionable) }
+      let(:orphan_times) { orphan_jobs.collect {|j| j.created_at} }
+      before(:each) do
+        expect(orphan_jobs).to be_a Array
+        orphan_jobs.each {|j| expect(j.reload).to be_truthy}
+      end
+      it { expect(orphan_times.uniq).to eq orphan_times }
+      it { expect(orphan_times.sort).to eq orphan_times }
+      it { expect(oldest_orphan_created_at).to eq orphan_times.first }
+
+      it 'ignores non-orphans' do
+        FactoryBot.create(:job_transaction, request_id: orphan_jobs.first.request_id, transactionable: not_transactionable)
+        expect(oldest_orphan_created_at).to eq orphan_times.second
       end
     end
   end
