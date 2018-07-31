@@ -1,7 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe JobTransaction, type: :model do
-  subject { FactoryBot.create(:job_transaction) }
+  subject { FactoryBot.create(:job_transaction, transactionable: not_transactionable) }
+
+  # Transactionable objects automaticalaly create JobTransactions
+  # Using 'not_transactionable' to create fewer objects.
+  let(:not_transactionable) { FactoryBot.create(:api_key) }
+  before(:each) { expect(not_transactionable).not_to respond_to :job_transactions }
 
   describe 'validations' do
     it {
@@ -14,13 +19,14 @@ RSpec.describe JobTransaction, type: :model do
     }
   end
 
+
   describe '.oldest_completed_at' do
     let(:oldest_completed_at) { described_class.oldest_completed_at }
     it { expect(described_class).to respond_to(:oldest_completed_at) }
     it { expect(oldest_completed_at).to be_nil }
 
     context 'with multiple completed' do
-      let(:complete_jobs) { FactoryBot.create_list(:job_transaction, 3, state: 'complete') }
+      let(:complete_jobs) { FactoryBot.create_list(:job_transaction, 3, state: 'complete', transactionable: not_transactionable) }
       let(:complete_times) { complete_jobs.collect {|j| j.created_at} }
       before(:each) do
         expect(complete_jobs).to be_a Array
@@ -39,7 +45,7 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(delete_all_complete_by_request_id).to eq 0 }
 
     context 'with multiple completed' do
-      let(:complete_jobs) { FactoryBot.create_list(:job_transaction, 3, state: 'complete') }
+      let(:complete_jobs) { FactoryBot.create_list(:job_transaction, 3, state: 'complete', transactionable: not_transactionable) }
       before(:each) do
         expect(complete_jobs).to be_a Array
       end
@@ -52,10 +58,10 @@ RSpec.describe JobTransaction, type: :model do
     end
 
     context 'with multiple completed and referencing request ids' do
-      let(:request_jobs) { FactoryBot.create_list(:job_transaction, 3) }
+      let(:request_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: not_transactionable) }
       let(:complete_jobs) do
         request_jobs.collect do |i|
-          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id)
+          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id, transactionable: not_transactionable)
         end
       end
       before(:each) do
@@ -70,10 +76,10 @@ RSpec.describe JobTransaction, type: :model do
     end
 
     context 'with multiple completed, referencing request ids and keys' do
-      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3) }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: not_transactionable) }
       let(:complete_jobs) do
         initial_jobs.collect do |i|
-          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id, key: i.key)
+          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id, key: i.key, transactionable: not_transactionable)
         end
       end
       before(:each) do
@@ -95,10 +101,8 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(delete_all_orphans).to eq 0 }
 
     context 'with multiple orphans' do
-      let(:transactionable) { FactoryBot.create(:api_key) }
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: transactionable) }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: not_transactionable) }
       before(:each) do
-        expect(transactionable).not_to respond_to :job_transactions
         expect(JobTransaction.count).to eq 0
         expect(orphan_jobs).to be_a Array
       end
@@ -111,11 +115,9 @@ RSpec.describe JobTransaction, type: :model do
     end
 
     context 'with matching request ids' do
-      let(:transactionable) { FactoryBot.create(:api_key) }
       let(:request_id) { SecureRandom.uuid }
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: transactionable, request_id: request_id) }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: not_transactionable, request_id: request_id) }
       before(:each) do
-        expect(transactionable).not_to respond_to :job_transactions
         expect(JobTransaction.count).to eq 0
         expect(orphan_jobs).to be_a Array
       end
