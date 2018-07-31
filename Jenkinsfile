@@ -42,7 +42,7 @@ pipeline {
               ],
               "env": [
                 [
-                  "name": "HEAD",
+                  "name": "MERGE_FROM",
                   "value": "${env.BRANCH_NAME}"
                 ]
               ]
