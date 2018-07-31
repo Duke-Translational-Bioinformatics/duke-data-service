@@ -11,7 +11,7 @@ class JobTransaction < ActiveRecord::Base
   end
 
   def self.delete_all_complete_by_request_id(created_before: Time.now)
-    where(request_id: select(:request_id).where(state: 'complete').where('created_at < ?', created_before)).delete_all
+    where('(request_id, key) in (?)', select(:request_id, :key).where(state: 'complete').where('created_at < ?', created_before)).delete_all
   end
 
   def self.delete_all_orphans(created_before: Time.now)

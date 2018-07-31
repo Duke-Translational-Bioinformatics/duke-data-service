@@ -52,10 +52,28 @@ RSpec.describe JobTransaction, type: :model do
     end
 
     context 'with multiple completed and referencing request ids' do
+      let(:request_jobs) { FactoryBot.create_list(:job_transaction, 3) }
+      let(:complete_jobs) do
+        request_jobs.collect do |i|
+          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id)
+        end
+      end
+      before(:each) do
+        expect(complete_jobs).to be_a Array
+      end
+      it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-3) }
+
+      context 'created_before last completed' do
+        let(:delete_all_complete_by_request_id) { described_class.delete_all_complete_by_request_id(created_before: complete_jobs.last.created_at) }
+        it { expect{delete_all_complete_by_request_id}.to change{JobTransaction.count}.by(-2) }
+      end
+    end
+
+    context 'with multiple completed, referencing request ids and keys' do
       let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3) }
       let(:complete_jobs) do
         initial_jobs.collect do |i|
-          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id)
+          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id, key: i.key)
         end
       end
       before(:each) do
