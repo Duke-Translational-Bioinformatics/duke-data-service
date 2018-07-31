@@ -15,13 +15,13 @@ describe 'job_transaction:clean_up:completed' do
   end
 
   context 'when oldest_completed_at returns nil' do
-    before(:each) { expect(JobTransaction).not_to receive(:delete_all_complete_by_request_id) }
+    before(:each) { expect(JobTransaction).not_to receive(:delete_all_complete_jobs) }
     it { invoke_task(expected_stdout: /No completed JobTransactions found./) }
   end
 
   context 'when oldest completed from this month' do
     let(:oldest_completed_at) { Time.now - 1.day }
-    before(:each) { expect(JobTransaction).not_to receive(:delete_all_complete_by_request_id) }
+    before(:each) { expect(JobTransaction).not_to receive(:delete_all_complete_jobs) }
     it { invoke_task(expected_stdout: /No completed JobTransactions older than 1 month found./) }
   end
 
@@ -30,7 +30,7 @@ describe 'job_transaction:clean_up:completed' do
     let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 1000) } }
     before(:each) do
       4.times do |i|
-        expect(JobTransaction).to receive(:delete_all_complete_by_request_id).with(created_before: Time.now - (4 - i).months).and_return(deleted_counts[i]).ordered
+        expect(JobTransaction).to receive(:delete_all_complete_jobs).with(created_before: Time.now - (4 - i).months).and_return(deleted_counts[i]).ordered
       end
     end
     it { invoke_task(expected_stdout: /Deleted #{deleted_counts[0]} from 4 months ago./) }

@@ -6,7 +6,7 @@ namespace :job_transaction do
         months_ago = ((Time.now - oldest) / 1.month).floor
         if months_ago > 0
           months_ago.downto(1).each do |m|
-            del_num = JobTransaction.delete_all_complete_by_request_id(created_before: Time.now - m.months)
+            del_num = JobTransaction.delete_all_complete_jobs(created_before: Time.now - m.months)
             puts "Deleted #{del_num} from #{m} #{'month'.pluralize(m)} ago."
           end
         else
