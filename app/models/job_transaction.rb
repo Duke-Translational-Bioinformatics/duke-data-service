@@ -8,11 +8,11 @@ class JobTransaction < ActiveRecord::Base
   scope :orphans, -> { where(request_id: select(:request_id).group(:request_id).having('count(*) = 1')) }
 
   def self.oldest_completed_at
-    unscope(:order).order(:created_at).where(state: 'complete').first&.created_at
+    reorder(:created_at).where(state: 'complete').first&.created_at
   end
 
   def self.oldest_orphan_created_at
-    orphans.unscope(:order).order(:created_at).first&.created_at
+    orphans.reorder(:created_at).first&.created_at
   end
 
   def self.delete_all_complete_jobs(created_before: Time.now)
