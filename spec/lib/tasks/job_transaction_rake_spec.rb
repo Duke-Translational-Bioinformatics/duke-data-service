@@ -33,10 +33,10 @@ describe 'job_transaction:clean_up:completed' do
         expect(JobTransaction).to receive(:delete_all_complete_jobs).with(created_before: Time.now - (4 - i).months).and_return(deleted_counts[i]).ordered
       end
     end
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[0]} from 4 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[1]} from 3 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[2]} from 2 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[3]} from 1 month ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[0]} JobTransactions for completed jobs from 4 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[1]} JobTransactions for completed jobs from 3 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[2]} JobTransactions for completed jobs from 2 months ago./) }
+    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[3]} JobTransactions for completed jobs from 1 month ago./) }
   end
 end
 
