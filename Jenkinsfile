@@ -9,7 +9,7 @@ def notifyBuildFixed(buildStatus, subject) {
 
 pipeline {
   parameters {
-    string(defaultValue: null, description: 'branch to sync (create Pull Request) from. By default, only ua_test and production branches are synced to the sync_to branch', name: 'sync_from')
+    string(description: 'branch to sync (create Pull Request) from. By default, only ua_test and production branches are synced to the sync_to branch', name: 'sync_from')
     string(defaultValue: 'develop', description: 'branch to sync (create Pull Request) to. Defaults to develop', name: 'sync_to')
   }
   agent any
