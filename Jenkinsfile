@@ -8,15 +8,19 @@ def notifyBuildFixed(buildStatus, subject) {
 }
 
 pipeline {
+  parameters {
+    string(defaultValue: null, description: 'branch to sync (create Pull Request) from. By default, only ua_test and production branches are synced to the sync_to branch', name: 'sync_from')
+    string(defaultValue: 'develop', description: 'branch to sync (create Pull Request) to. Defaults to develop', name: 'sync_to')
+  }
   agent any
   stages {
     stage('BranchSync') {
       when {
         anyOf {
           expression {
-            // && env.BRANCH_NAME == env.SYNC_BRANCH
-            if ( env.SYNC_BRANCH ) {
-              return env.SYNC_BRANCH
+
+            if ( params.sync_from && env.BRANCH_NAME == params.sync_from ) {
+              return sync.sync_from
             }
             return null
           }
@@ -54,6 +58,10 @@ pipeline {
                 [
                   "name": "MERGE_FROM",
                   "value": "${env.BRANCH_NAME}"
+                ],
+                [
+                  "name": "MERGE_TO",
+                  "value": "${params.sync_to}"
                 ]
               ]
             ]
