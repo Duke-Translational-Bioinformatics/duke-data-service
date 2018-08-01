@@ -20,7 +20,7 @@ pipeline {
           expression {
 
             if ( params.sync_from && env.BRANCH_NAME == params.sync_from ) {
-              return sync.sync_from
+              return params.sync_from
             }
             return null
           }
