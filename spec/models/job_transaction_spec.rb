@@ -116,7 +116,7 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(oldest_orphan_created_at).to be_nil }
 
     context 'with multiple orphans' do
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy) }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
       let(:orphan_times) { orphan_jobs.collect {|j| j.created_at} }
       before(:each) do
         expect(orphan_jobs).to be_a Array
@@ -127,7 +127,7 @@ RSpec.describe JobTransaction, type: :model do
       it { expect(oldest_orphan_created_at).to eq orphan_times.first }
 
       it 'ignores non-orphans' do
-        FactoryBot.create(:job_transaction, :transactionable_dummy, request_id: orphan_jobs.first.request_id)
+        FactoryBot.create(:job_transaction, transactionable: orphan_jobs.first.transactionable, request_id: orphan_jobs.first.request_id)
         expect(oldest_orphan_created_at).to eq orphan_times.second
       end
     end
@@ -140,7 +140,7 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(delete_all_orphans).to eq 0 }
 
     context 'with multiple orphans' do
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy) }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
       before(:each) do
         expect(JobTransaction.count).to eq 0
         expect(orphan_jobs).to be_a Array
@@ -153,14 +153,30 @@ RSpec.describe JobTransaction, type: :model do
       end
     end
 
-    context 'with matching request ids' do
+    context 'with matching request and transactionable ids' do
       let(:request_id) { SecureRandom.uuid }
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, request_id: request_id) }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
       before(:each) do
         expect(JobTransaction.count).to eq 0
-        expect(orphan_jobs).to be_a Array
+        expect(initial_jobs).to be_a Array
+        initial_jobs.each do |i|
+          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id)
+        end
       end
       it { expect{delete_all_orphans}.not_to change{JobTransaction.count} }
+    end
+
+    context 'with matching request and transactionable ids and create/update state' do
+      let(:request_id) { SecureRandom.uuid }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      before(:each) do
+        expect(JobTransaction.count).to eq 0
+        expect(initial_jobs).to be_a Array
+        initial_jobs.each do |i|
+          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id, state: 'updated')
+        end
+      end
+      it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-6) }
     end
   end
 end

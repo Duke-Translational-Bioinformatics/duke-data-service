@@ -5,7 +5,7 @@ class JobTransaction < ActiveRecord::Base
   validates :key, presence: true
   validates :request_id, presence: true
   validates :state, presence: true
-  scope :orphans, -> { where(request_id: select(:request_id).group(:request_id).having('count(*) = 1')) }
+  scope :orphans, -> { where(state: ['created', 'updated']).where('(transactionable_id, request_id) not in (?)', select(:transactionable_id, :request_id).where.not(state: ['created', 'updated'])) }
 
   def self.oldest_completed_at
     reorder(:created_at).where(state: 'complete').first&.created_at
