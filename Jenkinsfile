@@ -130,8 +130,8 @@ pipeline {
       steps {
         script {
           openshift.withCluster() { // Use "default" cluster or fallback to OpenShift cluster detection
-            def isSelector = openshift.selector([ "is/duke-data-service" ])
-            if ( isSelector.count() != 1 ) {
+            def imageStreamS = openshift.selector([ "is/duke-data-service" ])
+            if ( imageStreamS.count() != 1 ) {
               error("duke-data-service has not been initialized in the project!")
             }
             def imageStream = imageStreamS.narrow('is').object()
