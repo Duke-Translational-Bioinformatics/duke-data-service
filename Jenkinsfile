@@ -21,7 +21,7 @@ pipeline {
       steps {
         script {
           def props = readJSON file: 'bots/bot_manifest.json'
-          echo props
+          echo "WOULD RUN ${props["branch"][0]}"
         }
       }
     }
