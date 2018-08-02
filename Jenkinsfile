@@ -14,6 +14,15 @@ pipeline {
   }
   agent any
   stages {
+    stage('readJSON') {
+      when {
+        branch 'jenkins-bot-base'
+      }
+      steps {
+        def props = readJSON file: 'bots/bot_manifest.json'
+        echo props
+      }
+    }
     stage('BranchSync') {
       when {
         anyOf {
