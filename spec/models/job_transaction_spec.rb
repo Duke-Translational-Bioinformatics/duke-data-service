@@ -91,6 +91,25 @@ RSpec.describe JobTransaction, type: :model do
         it { expect{delete_all_complete_jobs}.to change{JobTransaction.count}.by(-4) }
       end
     end
+
+    context 'with multiple completed, referencing request ids and keys, different transactionables' do
+      let(:different_transactionable) { FactoryBot.create(:api_key) }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, transactionable: different_transactionable) }
+      let(:complete_jobs) do
+        initial_jobs.collect do |i|
+          FactoryBot.create(:job_transaction, state: 'complete', request_id: i.request_id, key: i.key, transactionable: not_transactionable)
+        end
+      end
+      before(:each) do
+        expect(complete_jobs).to be_a Array
+      end
+      it { expect{delete_all_complete_jobs}.to change{JobTransaction.count}.by(-3) }
+
+      context 'created_before last completed' do
+        let(:delete_all_complete_jobs) { described_class.delete_all_complete_jobs(created_before: complete_jobs.last.created_at) }
+        it { expect{delete_all_complete_jobs}.to change{JobTransaction.count}.by(-2) }
+      end
+    end
   end
 
   describe '.oldest_orphan_created_at' do
