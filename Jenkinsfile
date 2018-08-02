@@ -18,7 +18,6 @@ pipeline {
       when {
         anyOf {
           expression {
-
             if ( params.sync_from && env.BRANCH_NAME == params.sync_from ) {
               return params.sync_from
             }
@@ -30,6 +29,20 @@ pipeline {
       }
       steps {
         script {
+          def bot_manifest = readJSON file: 'bots/manifest.json'
+
+          //this job runs on branch changes, so it should run bots for branch changes
+          for (bot in bot_manifest['branch']) {
+            def botEnvironment = "${bot.replaceAll('_','-').take(bot.lastIndexOf('.'))}-bot-environment"
+            def botEnvironmentSelector = openshift.selector(["secret/${botEnvironment}"])
+            if ( botEnvironmentSelector.count() == 1) {
+              echo "Will run ${bot} with environment ${botEnvironment}"
+            }
+            else {
+              echo "Will run ${bot} without an environment, fingers crossed."
+            }
+          }
+
           openshift.withCluster() { // Use "default" cluster or fallback to OpenShift cluster detection
             def isSelector = openshift.selector([ "is/duke-data-service" ])
             if ( isSelector.count() != 1 ) {
