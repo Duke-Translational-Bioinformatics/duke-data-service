@@ -1,0 +1,22 @@
+def notifyBuildFixed(buildStatus, subject) {
+  // only report if it the build failed before and is now fixed
+  if (!buildStatus) {
+    mail to: 'darin.london@duke.edu',
+         subject: subject,
+         body: "Good Job!"
+  }
+}
+
+pipeline {
+  agent any
+  stages {
+    stage('Bootstrap') {
+      steps {
+        script {
+          echo "ENVIRONMENT:"
+          env.getEnvironment().each { name, value -> echo "Name: $name -> Value $value" }
+        }//Bootstrap.steps.script
+      }//Bootstrap.steps
+    } //Bootstrap
+  } //stages
+} //pipeline

@@ -64,6 +64,9 @@ gem "faker"
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Bot Gems
+gem "octokit", "~> 4.0"
+
 group :development, :docker do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
@@ -95,4 +98,4 @@ end
 group :docker, :development, :ua_test, :production do
   gem 'rails_12factor'
 end
-ruby "2.3.3"
+ruby "2.4.3"
