@@ -40,4 +40,11 @@ RSpec.describe ProjectPermission, type: :model do
       should validate_presence_of(:auth_role_id)
     end
   end
+
+  describe '#update_project_etag' do
+    it {
+      is_expected.to callback(:update_project_etag ).after(:save)
+      is_expected.to callback(:update_project_etag ).after(:destroy)
+    }
+  end
 end
