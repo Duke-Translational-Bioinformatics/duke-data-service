@@ -39,4 +39,32 @@ RSpec.describe Affiliation, type: :model do
       should validate_presence_of(:project_role_id)
     end
   end
+
+  describe '#update_project_etag' do
+    let(:created_object) { FactoryBot.build(:affiliation) }
+
+    let(:user) { FactoryBot.create(:user) }
+    let(:object_unchanged) {
+      FactoryBot.create(:affiliation, user: user)
+    }
+    let(:new_project_role) { FactoryBot.create(:project_role) }
+    let(:object_to_update) {
+      FactoryBot.create(:affiliation, user: user)
+    }
+    let(:object_to_destroy) {
+      FactoryBot.create(:affiliation)
+    }
+
+    before do
+      unchanged_project_role = object_unchanged.project_role
+      object_unchanged.project_role = unchanged_project_role
+      object_to_update.project_role = new_project_role
+    end
+
+    it_behaves_like 'a parent project etag update',
+      :created_object,
+      :object_unchanged,
+      :object_to_update,
+      :object_to_destroy
+  end
 end
