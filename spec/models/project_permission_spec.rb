@@ -44,8 +44,8 @@ RSpec.describe ProjectPermission, type: :model do
 
   describe '#update_project_etag' do
     it {
-      is_expected.to callback(:update_project_etag ).after(:save)
-      is_expected.to callback(:update_project_etag ).after(:destroy)
+      is_expected.to callback(:update_project_etag).after(:save)
+      is_expected.to callback(:update_project_etag).after(:destroy)
     }
 
     context 'after create' do
@@ -128,6 +128,5 @@ RSpec.describe ProjectPermission, type: :model do
         expect(last_project_audit.request_uuid).to eq(last_subject_audit.request_uuid)
       }
     end
-
   end
 end
