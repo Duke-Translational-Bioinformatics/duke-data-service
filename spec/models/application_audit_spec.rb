@@ -25,6 +25,8 @@ RSpec.describe ApplicationAudit, type: :model do
       context 'after subject#save' do
         before(:each) { expect(subject.save).to be_truthy }
         it { expect(subject.user).to eq current_user }
+        it { expect(subject.comment).to be_a Hash }
+        it { expect(subject.comment).not_to include('software_agent_id') }
       end
     end
 
