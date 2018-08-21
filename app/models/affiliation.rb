@@ -2,7 +2,7 @@ class Affiliation < ActiveRecord::Base
   include RequestAudited
   default_scope { order('created_at DESC') }
   audited
-  after_save :update_project_etag
+  after_save :update_project_etag, if: :saved_changes?
   after_destroy :update_project_etag
 
   belongs_to :user
