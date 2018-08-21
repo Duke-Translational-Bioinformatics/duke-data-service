@@ -17,10 +17,12 @@ class ProjectPermission < ActiveRecord::Base
   private
 
   def update_project_etag
-    last_audit = self.audits.last
-    new_comment = last_audit.comment ? last_audit.comment.merge({raised_by_audit: last_audit.id}) : {raised_by_audit: last_audit.id}
-    self.project.update(etag: SecureRandom.hex, audit_comment: new_comment)
-    last_parent_audit = self.project.audits.last
-    last_parent_audit.update(request_uuid: last_audit.request_uuid)
+    if saved_changes?
+      last_audit = self.audits.last
+      new_comment = last_audit.comment ? last_audit.comment.merge({raised_by_audit: last_audit.id}) : {raised_by_audit: last_audit.id}
+      self.project.update(etag: SecureRandom.hex, audit_comment: new_comment)
+      last_parent_audit = self.project.audits.last
+      last_parent_audit.update(request_uuid: last_audit.request_uuid)
+    end
   end
 end
