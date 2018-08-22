@@ -6,4 +6,8 @@ class ApplicationAudit < Audited::Audit
   def self.store_current_user(current_user)
     ::Audited.store[:audited_user] = current_user
   end
+
+  def self.reset_store
+    ::Audited.store.delete(:audited_user)
+  end
 end

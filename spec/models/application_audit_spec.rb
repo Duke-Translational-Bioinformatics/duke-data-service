@@ -5,11 +5,13 @@ RSpec.describe ApplicationAudit, type: :model do
   let(:original_store_keys) { Audited.store.keys }
   before(:each) { expect { original_store_keys }.not_to raise_error }
   after(:each) do
-    Audited.store.keep_if {|k,v| original_store_keys.include? k}
+    described_class.reset_store
     expect(Audited.store.keys).to eq original_store_keys
   end
 
   it { expect{subject.save}.not_to raise_error }
+
+  it { expect(described_class).to respond_to(:reset_store) }
 
   describe '.store_current_user' do
     it { expect(described_class).to respond_to(:store_current_user).with(1).argument }
