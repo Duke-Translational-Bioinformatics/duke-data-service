@@ -17,15 +17,15 @@ RSpec.describe AuditSummarySerializer do
 
   shared_context 'current_user' do
     include_context 'with auditor'
+    let(:original_store_keys) { Audited.store.keys }
 
     before do
-      Audited.store[:current_user] = auditor
-      Audited.store[:audit_attributes] = {
-        comment: {}
-      }
+      expect { original_store_keys }.not_to raise_error
+      ApplicationAudit.store_current_user(auditor)
     end
     after do
-      Audited.store.clear
+      Audited.store.keep_if {|k,v| original_store_keys.include? k}
+      expect(Audited.store.keys).to eq original_store_keys
     end
   end
 
