@@ -148,8 +148,8 @@ module DDS
         end
 
         def populate_audit_store_with_request
+          ApplicationAudit.store_current_request_uuid(SecureRandom.uuid)
           audit_attributes = {
-            request_uuid: SecureRandom.uuid,
             remote_address: request.ip,
             comment: {
               endpoint: request.env["REQUEST_URI"],
