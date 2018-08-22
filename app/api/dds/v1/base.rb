@@ -149,8 +149,8 @@ module DDS
 
         def populate_audit_store_with_request
           ApplicationAudit.store_current_request_uuid(SecureRandom.uuid)
+          ApplicationAudit.store_current_remote_address(request.ip)
           audit_attributes = {
-            remote_address: request.ip,
             comment: {
               endpoint: request.env["REQUEST_URI"],
               action: request.env["REQUEST_METHOD"]
