@@ -1,17 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe ApplicationAudit, type: :model do
+  it { expect(described_class).to respond_to(:clear_store) }
   it { expect(Audited.audit_class).to eq described_class }
-  let(:original_store_keys) { Audited.store.keys }
-  before(:each) { expect { original_store_keys }.not_to raise_error }
+  let(:store_keys) { [:audited_user, :current_request_uuid, :current_remote_address] }
   after(:each) do
-    described_class.reset_store
-    expect(Audited.store.keys).to eq original_store_keys
+    described_class.clear_store
+    expect(Audited.store.keys).not_to include *store_keys
   end
 
   it { expect{subject.save}.not_to raise_error }
-
-  it { expect(described_class).to respond_to(:reset_store) }
 
   describe '.store_current_user' do
     it { expect(described_class).to respond_to(:store_current_user).with(1).argument }

@@ -16,7 +16,7 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_remote_address] = remote_address
   end
 
-  def self.reset_store
+  def self.clear_store
     [:audited_user, :current_request_uuid, :current_remote_address].each { |k| ::Audited.store.delete(k) }
   end
 end
