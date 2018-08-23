@@ -1,5 +1,6 @@
 class ApplicationAudit < Audited::Audit
   before_create do
+    self.comment = ::Audited.store[:current_comment]
     self.comment ||= {}
     self.comment[:software_agent_id] = user.current_software_agent&.id if user&.current_software_agent
   end
@@ -16,7 +17,11 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_remote_address] = remote_address
   end
 
+  def self.store_current_comment(comment)
+    ::Audited.store[:current_comment] = comment
+  end
+
   def self.clear_store
-    [:audited_user, :current_request_uuid, :current_remote_address].each { |k| ::Audited.store.delete(k) }
+    [:audited_user, :current_request_uuid, :current_remote_address, :current_comment].each { |k| ::Audited.store.delete(k) }
   end
 end

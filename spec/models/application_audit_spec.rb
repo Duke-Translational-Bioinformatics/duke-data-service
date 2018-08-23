@@ -82,4 +82,27 @@ RSpec.describe ApplicationAudit, type: :model do
       end
     end
   end
+
+  describe '.store_current_comment' do
+    it { expect(described_class).to respond_to(:store_current_comment).with(1).argument }
+    it { expect(subject.comment).to be_nil }
+
+    context 'when called' do
+      before(:each) do
+        expect{ described_class.store_current_comment(comment) }.not_to raise_error
+      end
+      let(:comment) { {
+        endpoint: Faker::Internet.url,
+        action: 'GET'
+      } }
+      let(:expected_comment) { comment.stringify_keys }
+      it { expect(subject.comment).to be_nil }
+
+      context 'after subject#save' do
+        before(:each) { expect(subject.save).to be_truthy }
+        it { expect(subject.comment).not_to eq comment }
+        it { expect(subject.comment).to eq expected_comment }
+      end
+    end
+  end
 end
