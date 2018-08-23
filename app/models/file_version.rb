@@ -1,7 +1,6 @@
 class FileVersion < ActiveRecord::Base
   include Kinded
   include Graphed::Node
-  include RequestAudited
   include JobTransactionable
   include Restorable
   include Purgable

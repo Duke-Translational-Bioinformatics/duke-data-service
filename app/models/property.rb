@@ -1,5 +1,4 @@
 class Property < ActiveRecord::Base
-  include RequestAudited
   audited
 
   belongs_to :template

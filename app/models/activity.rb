@@ -1,7 +1,6 @@
 class Activity < ActiveRecord::Base
   include Kinded
   include Graphed::Node
-  include RequestAudited
 
   include SearchableModel
   # change this variable to a new uuid (lowercase letters!)

@@ -1,5 +1,4 @@
 class MetaProperty < ActiveRecord::Base
-  include RequestAudited
   attr_accessor :key
 
   audited

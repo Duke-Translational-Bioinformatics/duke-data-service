@@ -1,10 +1,7 @@
-shared_examples 'an audited model' do |request_audited: true|
+shared_examples 'an audited model' do
   let(:primary_key_column) { described_class.column_for_attribute(:id) }
   let(:audited_foriegn_key_column) { Audited.audit_class.column_for_attribute(:auditable_id) }
 
-  if request_audited
-    it { is_expected.to be_a(RequestAudited) }
-  end
   it 'should have audit compatible primary key' do
     expect(primary_key_column.sql_type).to eq(audited_foriegn_key_column.sql_type)
   end

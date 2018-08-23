@@ -2,7 +2,6 @@ class Project < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
   include ChildMinder
-  include RequestAudited
   include JobTransactionable
   include UnRestorable
   audited

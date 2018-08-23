@@ -1,7 +1,6 @@
 class Container < ActiveRecord::Base
   default_scope { order('created_at DESC') }
   include Kinded
-  include RequestAudited
   include Restorable
   include Purgable
 
