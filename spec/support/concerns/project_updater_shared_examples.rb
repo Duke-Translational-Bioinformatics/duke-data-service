@@ -13,21 +13,42 @@ shared_examples 'a ProjectUpdater' do
 
   describe '#update_project_etag' do
     let!(:original_project_etag) { project.etag }
-    it {
+    let(:audit_comment) { nil }
+
+    before do
+      subject.audit_comment = audit_comment
       expect(create_subject).to be_truthy
       expect(change_subject).to be_truthy
       subject.update_project_etag
       project.reload
       subject.reload
-      last_project_audit = project.audits.last
-      last_subject_audit = subject.audits.last
+    end
+
+    it {
       expect(project.etag).not_to eq(original_project_etag)
-
-      expected_comment = last_subject_audit.comment ? last_subject_audit.comment.merge({raised_by_audit: last_subject_audit.id}) : {raised_by_audit: last_subject_audit.id}
-      expect(last_project_audit.comment.symbolize_keys).to eq(expected_comment)
-
-      expect(last_project_audit.request_uuid).to eq(last_subject_audit.request_uuid)
     }
+
+    describe 'with audit comment' do
+      let(:last_project_audit) { project.audits.last }
+      let(:last_subject_audit) { subject.audits.last }
+
+      context 'present' do
+        let(:audit_comment) {{"foo" => "bar"}}
+        let(:expected_comment) { audit_comment.merge({raised_by_audit: last_subject_audit.id}) }
+        it {
+          expect(last_project_audit.comment.symbolize_keys).to eq(expected_comment.symbolize_keys)
+          expect(last_project_audit.request_uuid).to eq(last_subject_audit.request_uuid)
+        }
+      end
+
+      context 'absent' do
+        let(:expected_comment) { {raised_by_audit: last_subject_audit.id} }
+        it {
+          expect(last_project_audit.comment.symbolize_keys).to eq(expected_comment)
+          expect(last_project_audit.request_uuid).to eq(last_subject_audit.request_uuid)
+        }
+      end
+    end
   end
 
   context 'after create' do
@@ -46,7 +67,7 @@ shared_examples 'a ProjectUpdater' do
     context 'without change' do
       it {
         is_expected.not_to receive(:update_project_etag)
-        expect(subject.saved_changes?).to be_falsey
+        expect(subject.changed?).to be_falsey
         expect(subject.save).to be_truthy
       }
     end
