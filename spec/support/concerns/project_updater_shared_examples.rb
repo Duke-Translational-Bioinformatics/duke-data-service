@@ -28,7 +28,7 @@ shared_examples 'a ProjectUpdater' do
       expect(project.etag).not_to eq(original_project_etag)
     }
 
-    describe 'with audit comment' do
+    context 'with audit comment' do
       let(:last_project_audit) { project.audits.last }
       let(:last_subject_audit) { subject.audits.last }
 
