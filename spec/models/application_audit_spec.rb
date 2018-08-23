@@ -103,6 +103,18 @@ RSpec.describe ApplicationAudit, type: :model do
         it { expect(subject.comment).not_to eq comment }
         it { expect(subject.comment).to eq expected_comment }
       end
+
+      context 'with subject.comment set' do
+        before(:each) { subject.comment = subject_comment }
+        let(:subject_comment) { {'foo' => 'bar'} }
+        let(:expected_comment) { subject_comment.merge(comment).stringify_keys }
+        it { expect(subject.comment).to eq subject_comment }
+
+        context 'after subject#save' do
+          before(:each) { expect(subject.save).to be_truthy }
+          it { expect(subject.comment).to eq expected_comment }
+        end
+      end
     end
   end
 end
