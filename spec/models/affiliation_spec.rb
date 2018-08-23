@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Affiliation, type: :model do
   subject { FactoryBot.build(:affiliation) }
+  let(:new_project_role) { FactoryBot.create(:project_role) }
+  let(:change_subject) {
+    subject.project_role = new_project_role
+    true
+  }
 
   it_behaves_like 'an audited model'
   describe 'associations' do
@@ -39,4 +44,6 @@ RSpec.describe Affiliation, type: :model do
       should validate_presence_of(:project_role_id)
     end
   end
+
+  it_behaves_like 'a ProjectUpdater'
 end
