@@ -156,4 +156,20 @@ RSpec.describe ApplicationAudit, type: :model do
       end
     end
   end
+
+  describe '.current_comment' do
+    it { expect(described_class).to respond_to(:current_comment) }
+    it { expect(described_class.current_comment).to be_nil }
+
+    context 'after .current_comment= called' do
+      before(:each) do
+        expect{ described_class.current_comment = comment }.not_to raise_error
+      end
+      let(:comment) { {
+        endpoint: Faker::Internet.url,
+        action: 'GET'
+      } }
+      it { expect(described_class.current_comment).to eq comment }
+    end
+  end
 end

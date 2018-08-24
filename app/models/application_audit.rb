@@ -33,6 +33,10 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_comment] = comment
   end
 
+  def self.current_comment
+    ::Audited.store[:current_comment]
+  end
+
   def self.clear_store
     [:audited_user, :current_request_uuid, :current_remote_address, :current_comment].each { |k| ::Audited.store.delete(k) }
   end
