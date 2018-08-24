@@ -65,13 +65,13 @@ RSpec.describe ApplicationAudit, type: :model do
     end
   end
 
-  describe '.store_current_remote_address' do
-    it { expect(described_class).to respond_to(:store_current_remote_address).with(1).argument }
+  describe '.current_remote_address=' do
+    it { expect(described_class).to respond_to(:current_remote_address=).with(1).argument }
     it { expect(subject.remote_address).to be_nil }
 
     context 'when called' do
       before(:each) do
-        expect{ described_class.store_current_remote_address(remote_address) }.not_to raise_error
+        expect{ described_class.current_remote_address = remote_address }.not_to raise_error
       end
       let(:remote_address) { Faker::Internet.ip_v4_address }
       it { expect(subject.remote_address).to be_nil }

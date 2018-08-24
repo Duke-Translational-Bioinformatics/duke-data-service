@@ -13,7 +13,7 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_request_uuid] = request_uuid
   end
 
-  def self.store_current_remote_address(remote_address)
+  def self.current_remote_address=(remote_address)
     ::Audited.store[:current_remote_address] = remote_address
   end
 
