@@ -144,7 +144,7 @@ module DDS
         end
 
         def populate_audit_store_with_user(user)
-          ApplicationAudit.store_current_user(user)
+          ApplicationAudit.current_user = user
         end
 
         def populate_audit_store_with_request

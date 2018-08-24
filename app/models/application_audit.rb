@@ -5,7 +5,7 @@ class ApplicationAudit < Audited::Audit
     self.comment[:software_agent_id] = user.current_software_agent&.id if user&.current_software_agent
   end
 
-  def self.store_current_user(current_user)
+  def self.current_user=(current_user)
     ::Audited.store[:audited_user] = current_user
   end
 

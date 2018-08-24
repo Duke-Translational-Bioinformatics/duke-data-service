@@ -19,7 +19,7 @@ RSpec.describe AuditSummarySerializer do
     include_context 'with auditor'
 
     before do
-      ApplicationAudit.store_current_user(auditor)
+      ApplicationAudit.current_user = auditor
     end
     after do
       ApplicationAudit.clear_store
