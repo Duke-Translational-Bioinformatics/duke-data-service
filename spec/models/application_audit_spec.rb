@@ -78,6 +78,19 @@ RSpec.describe ApplicationAudit, type: :model do
     end
   end
 
+  describe '.current_request_uuid' do
+    it { expect(described_class).to respond_to(:current_request_uuid) }
+    it { expect(described_class.current_request_uuid).to be_nil }
+
+    context 'after .current_request_uuid= called' do
+      before(:each) do
+        expect{ described_class.current_request_uuid = request_uuid }.not_to raise_error
+      end
+      let(:request_uuid) { SecureRandom.uuid }
+      it { expect(described_class.current_request_uuid).to eq request_uuid }
+    end
+  end
+
   describe '.current_remote_address=' do
     it { expect(described_class).to respond_to(:current_remote_address=).with(1).argument }
     it { expect(subject.remote_address).to be_nil }
