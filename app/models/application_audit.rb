@@ -1,7 +1,7 @@
 class ApplicationAudit < Audited::Audit
   before_create do
     self.comment ||= {}
-    self.comment.merge!(::Audited.store[:current_comment]) if ::Audited.store[:current_comment]
+    self.comment.merge!(self.class.current_comment) if self.class.current_comment
     self.comment[:software_agent_id] = user.current_software_agent&.id if user&.current_software_agent
   end
 
