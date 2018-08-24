@@ -148,7 +148,7 @@ module DDS
         end
 
         def populate_audit_store_with_request
-          ApplicationAudit.store_current_request_uuid(SecureRandom.uuid)
+          ApplicationAudit.current_request_uuid=(SecureRandom.uuid)
           ApplicationAudit.store_current_remote_address(request.ip)
           ApplicationAudit.store_current_comment(
             {

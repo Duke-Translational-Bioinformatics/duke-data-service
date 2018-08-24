@@ -47,13 +47,13 @@ RSpec.describe ApplicationAudit, type: :model do
     end
   end
 
-  describe '.store_current_request_uuid' do
-    it { expect(described_class).to respond_to(:store_current_request_uuid).with(1).argument }
+  describe '.current_request_uuid=' do
+    it { expect(described_class).to respond_to(:current_request_uuid=).with(1).argument }
     it { expect(subject.request_uuid).to be_nil }
 
     context 'when called' do
       before(:each) do
-        expect{ described_class.store_current_request_uuid(request_uuid) }.not_to raise_error
+        expect{ described_class.current_request_uuid = request_uuid }.not_to raise_error
       end
       let(:request_uuid) { SecureRandom.uuid }
       it { expect(subject.request_uuid).to be_nil }
