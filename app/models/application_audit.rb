@@ -9,6 +9,10 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:audited_user] = current_user
   end
 
+  def self.current_user
+    ::Audited.store[:audited_user]
+  end
+
   def self.current_request_uuid=(request_uuid)
     ::Audited.store[:current_request_uuid] = request_uuid
   end

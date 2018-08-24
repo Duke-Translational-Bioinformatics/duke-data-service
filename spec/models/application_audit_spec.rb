@@ -47,6 +47,19 @@ RSpec.describe ApplicationAudit, type: :model do
     end
   end
 
+  describe '.current_user' do
+    it { expect(described_class).to respond_to(:current_user) }
+    it { expect(described_class.current_user).to be_nil }
+
+    context 'after .current_user= called' do
+      before(:each) do
+        expect{ described_class.current_user = current_user }.not_to raise_error
+      end
+      let(:current_user) { FactoryBot.create(:user, :save_without_auditing) }
+      it { expect(described_class.current_user).to eq current_user }
+    end
+  end
+
   describe '.current_request_uuid=' do
     it { expect(described_class).to respond_to(:current_request_uuid=).with(1).argument }
     it { expect(subject.request_uuid).to be_nil }
