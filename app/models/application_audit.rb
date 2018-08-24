@@ -17,7 +17,7 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_remote_address] = remote_address
   end
 
-  def self.store_current_comment(comment)
+  def self.current_comment=(comment)
     ::Audited.store[:current_comment] = comment
   end
 

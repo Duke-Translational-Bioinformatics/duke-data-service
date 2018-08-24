@@ -83,13 +83,13 @@ RSpec.describe ApplicationAudit, type: :model do
     end
   end
 
-  describe '.store_current_comment' do
-    it { expect(described_class).to respond_to(:store_current_comment).with(1).argument }
+  describe '.current_comment=' do
+    it { expect(described_class).to respond_to(:current_comment=).with(1).argument }
     it { expect(subject.comment).to be_nil }
 
     context 'when called' do
       before(:each) do
-        expect{ described_class.store_current_comment(comment) }.not_to raise_error
+        expect{ described_class.current_comment = comment }.not_to raise_error
       end
       let(:comment) { {
         endpoint: Faker::Internet.url,
