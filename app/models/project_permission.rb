@@ -1,5 +1,4 @@
 class ProjectPermission < ActiveRecord::Base
-  include RequestAudited
   include ProjectUpdater
   default_scope { order('created_at DESC') }
   audited

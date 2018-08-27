@@ -1,0 +1,43 @@
+class ApplicationAudit < Audited::Audit
+  before_create do
+    self.comment ||= {}
+    self.comment.merge!(self.class.current_comment) if self.class.current_comment
+    self.comment[:software_agent_id] = user.current_software_agent&.id if user&.current_software_agent
+  end
+
+  def self.current_user=(current_user)
+    ::Audited.store[:audited_user] = current_user
+  end
+
+  def self.current_user
+    ::Audited.store[:audited_user]
+  end
+
+  def self.current_request_uuid=(request_uuid)
+    ::Audited.store[:current_request_uuid] = request_uuid
+  end
+
+  def self.current_request_uuid
+    ::Audited.store[:current_request_uuid]
+  end
+
+  def self.current_remote_address=(remote_address)
+    ::Audited.store[:current_remote_address] = remote_address
+  end
+
+  def self.current_remote_address
+    ::Audited.store[:current_remote_address]
+  end
+
+  def self.current_comment=(comment)
+    ::Audited.store[:current_comment] = comment
+  end
+
+  def self.current_comment
+    ::Audited.store[:current_comment]
+  end
+
+  def self.clear_store
+    [:audited_user, :current_request_uuid, :current_remote_address, :current_comment].each { |k| ::Audited.store.delete(k) }
+  end
+end

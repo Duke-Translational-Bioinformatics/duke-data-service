@@ -17,5 +17,9 @@ FactoryBot.define do
     trait :with_key do
       api_key
     end
+
+    trait :save_without_auditing do
+      to_create {|instance| instance.save_without_auditing }
+    end
   end
 end

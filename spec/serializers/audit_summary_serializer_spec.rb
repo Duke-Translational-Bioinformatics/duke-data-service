@@ -19,13 +19,10 @@ RSpec.describe AuditSummarySerializer do
     include_context 'with auditor'
 
     before do
-      Audited.store[:current_user] = auditor
-      Audited.store[:audit_attributes] = {
-        comment: {}
-      }
+      ApplicationAudit.current_user = auditor
     end
     after do
-      Audited.store.clear
+      ApplicationAudit.clear_store
     end
   end
 

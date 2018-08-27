@@ -144,19 +144,16 @@ module DDS
         end
 
         def populate_audit_store_with_user(user)
-          Audited.store[:current_user] = user
+          ApplicationAudit.current_user = user
         end
 
         def populate_audit_store_with_request
-          audit_attributes = {
-            request_uuid: SecureRandom.uuid,
-            remote_address: request.ip,
-            comment: {
-              endpoint: request.env["REQUEST_URI"],
-              action: request.env["REQUEST_METHOD"]
-            }
+          ApplicationAudit.current_request_uuid = SecureRandom.uuid
+          ApplicationAudit.current_remote_address = request.ip
+          ApplicationAudit.current_comment = {
+            endpoint: request.env["REQUEST_URI"],
+            action: request.env["REQUEST_METHOD"]
           }
-          Audited.store.merge!({audit_attributes: audit_attributes})
         end
 
         def hide_logically_deleted(object)
