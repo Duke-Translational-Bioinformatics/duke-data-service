@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :project_role do
-    id { "#{Faker::Lorem.word}_#{rand(10**3)}" }
+    sequence(:id) { |n| "#{Faker::Lorem.word}_#{n}" }
     name { Faker::Lorem.word.titleize }
     description { Faker::Lorem.sentence }
 

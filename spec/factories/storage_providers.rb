@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :storage_provider do
     name { Faker::Name.name }
-    display_name { Faker::Name.name }
+    sequence(:display_name) { |n| "#{Faker::Name.name}_#{n}" }
     description { Faker::Company.catch_phrase }
     url_root { Faker::Internet.domain_name }
     provider_version { Faker::App.version }
