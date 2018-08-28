@@ -21,9 +21,6 @@ RSpec.describe AuditSummarySerializer do
     before do
       ApplicationAudit.current_user = auditor
     end
-    after do
-      ApplicationAudit.clear_store
-    end
   end
 
   shared_context 'current_user.current_software_agent' do

@@ -1,4 +1,5 @@
 class ApplicationAudit < Audited::Audit
+  before_save { self.class.generate_current_request_uuid }
   before_create do
     self.comment ||= {}
     self.comment.merge!(self.class.current_comment) if self.class.current_comment
@@ -19,6 +20,10 @@ class ApplicationAudit < Audited::Audit
 
   def self.current_request_uuid
     ::Audited.store[:current_request_uuid]
+  end
+
+  def self.generate_current_request_uuid
+    self.current_request_uuid ||= SecureRandom.uuid
   end
 
   def self.current_remote_address=(remote_address)

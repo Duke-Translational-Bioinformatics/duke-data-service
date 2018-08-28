@@ -72,7 +72,10 @@ RSpec.describe ApplicationAudit, type: :model do
       it { expect(subject.request_uuid).to be_nil }
 
       context 'after subject#save' do
-        before(:each) { expect(subject.save).to be_truthy }
+        before(:each) do
+          expect(described_class).not_to receive(:current_request_uuid=)
+          expect(subject.save).to be_truthy
+        end
         it { expect(subject.request_uuid).to eq request_uuid }
       end
     end
@@ -88,6 +91,32 @@ RSpec.describe ApplicationAudit, type: :model do
       end
       let(:request_uuid) { SecureRandom.uuid }
       it { expect(described_class.current_request_uuid).to eq request_uuid }
+    end
+  end
+
+  describe '.generate_current_request_uuid' do
+    it { expect(described_class).to respond_to(:generate_current_request_uuid) }
+    it { expect(described_class.generate_current_request_uuid).to match /\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/ }
+    it { expect(described_class.current_request_uuid).to be_nil }
+    it { expect(subject.request_uuid).to be_nil }
+    context 'when called' do
+      let(:call_method) { described_class.generate_current_request_uuid }
+      before(:each) { expect{ call_method }.not_to raise_error }
+      it { expect(described_class.current_request_uuid).to eq call_method }
+      it { expect(subject.request_uuid).to be_nil }
+      it 'is idempotent' do
+        expect(described_class.generate_current_request_uuid).to eq call_method
+      end
+    end
+
+    context 'after subject#save' do
+      before(:each) do
+        expect(described_class).to receive(:generate_current_request_uuid).and_call_original
+        expect(subject.save).to be_truthy
+      end
+      it { expect(described_class.current_request_uuid).not_to be_nil }
+      it { expect(subject.request_uuid).not_to be_nil }
+      it { expect(subject.request_uuid).to eq described_class.current_request_uuid }
     end
   end
 
