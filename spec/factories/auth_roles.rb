@@ -4,7 +4,7 @@ FactoryBot.define do
       without_permissions false
     end
 
-    id { "#{Faker::Internet.domain_word}_#{rand(10**3)}" }
+    sequence(:id) { |n| "#{Faker::Internet.domain_word}_#{n}" }
     name { Faker::App.name }
     description { Faker::Hacker.say_something_smart }
     contexts  { (0..Faker::Number.digit.to_i).collect { Faker::Internet.slug } }
