@@ -42,6 +42,42 @@ RSpec.describe ChildDeletionJob, type: :job do
         expect(parent).to receive(:delete_children).with(page)
         described_class.perform_now(job_transaction, parent, page)
       }
+
+      context 'with ApplicationAudit env' do
+        let(:current_user) { FactoryBot.create(:user) }
+        let(:current_remote_address) { Faker::Internet.ip_v4_address }
+        let(:current_comment) { {
+          'endpoint' => Faker::Internet.url,
+          'action' => 'GET'
+        } }
+        let(:deletion_request_uuid) { ApplicationAudit.generate_current_request_uuid }
+        before(:each) do
+          ApplicationAudit.current_user = current_user
+          ApplicationAudit.current_remote_address = current_remote_address
+          ApplicationAudit.current_comment = current_comment
+          expect(deletion_request_uuid).not_to be_nil
+          expect(child_folder).to be_persisted
+          expect(child_file).to be_persisted
+          expect(parent.root_destroy_transaction).not_to be_nil
+          ApplicationAudit.clear_store
+          expect(job_transaction.request_id).to eq deletion_request_uuid
+        end
+        it 'creates audits with current_user' do
+          expect {
+            described_class.perform_now(job_transaction, parent, page)
+          }.to change{Audited.audit_class.where(user: current_user).count}
+        end
+        it 'creates audits with current_remote_address' do
+          expect {
+            described_class.perform_now(job_transaction, parent, page)
+          }.to change{Audited.audit_class.where(remote_address: current_remote_address).count}
+        end
+        it 'creates audits with current_comment' do
+          expect {
+            described_class.perform_now(job_transaction, parent, page)
+          }.to change{Audited.audit_class.where(comment: current_comment).count}
+        end
+      end
     end
   end
 
