@@ -12,7 +12,7 @@ module JobTransactionable
 
   def create_transaction(state)
     @current_transaction = job_transactions.build(
-      request_id: current_transaction ? current_transaction.request_id : SecureRandom.uuid,
+      request_id: current_transaction ? current_transaction.request_id : ApplicationAudit.generate_current_request_uuid,
       key: self.class.name,
       state: state
     )
