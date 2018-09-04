@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :user_authentication_service do
-    uid { "#{Faker::Internet.user_name(nil, ['_'])}_#{Faker::Number.number(3) }" }
+    sequence(:uid) { |n| "#{Faker::Internet.user_name(nil, ['_'])}_#{n}" }
 
     trait :populated do
       user

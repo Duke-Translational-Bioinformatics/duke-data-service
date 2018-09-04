@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :project do
-    name { "#{Faker::Team.name}_#{rand(10**3)}" }
+    sequence(:name) { |n| "#{Faker::Team.name}_#{n}" }
     description { Faker::Hacker.say_something_smart }
     association :creator, factory: :user
     etag { SecureRandom.hex }

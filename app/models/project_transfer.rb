@@ -1,5 +1,4 @@
 class ProjectTransfer < ActiveRecord::Base
-  include RequestAudited
   audited
 
   belongs_to :project

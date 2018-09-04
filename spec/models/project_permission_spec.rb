@@ -1,7 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe ProjectPermission, type: :model do
-  subject {FactoryBot.build(:project_permission)}
+  subject {
+    FactoryBot.build(:project_permission, :project_admin)
+  }
+  let(:new_auth_role) {
+    FactoryBot.create(:auth_role, :project_viewer)
+  }
+  let(:change_subject) {
+    subject.auth_role = new_auth_role
+    true
+  }
 
   it_behaves_like 'an audited model'
 
@@ -40,4 +49,6 @@ RSpec.describe ProjectPermission, type: :model do
       should validate_presence_of(:auth_role_id)
     end
   end
+
+  it_behaves_like 'a ProjectUpdater'
 end
