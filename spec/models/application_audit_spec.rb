@@ -192,11 +192,66 @@ RSpec.describe ApplicationAudit, type: :model do
       before(:each) do
         expect{ described_class.current_comment = comment }.not_to raise_error
       end
-      let(:comment) { {
-        endpoint: Faker::Internet.url,
-        action: 'GET'
-      } }
       it { expect(described_class.current_comment).to eq comment }
+    end
+  end
+
+  describe '.set_current_env_from_request_uuid' do
+    it { expect(described_class).to respond_to(:set_current_env_from_request_uuid).with(1).argument }
+    context 'with existing audit' do
+      let(:last_audit) { described_class.new }
+      before(:each) do
+        described_class.current_request_uuid = request_uuid
+        described_class.current_user = current_user
+        described_class.current_remote_address = remote_address
+        described_class.current_comment = comment
+        expect(last_audit.save).to be_truthy
+        described_class.clear_store
+      end
+      it { expect(last_audit.user).to eq current_user }
+      it { expect(last_audit.request_uuid).to eq request_uuid }
+      it { expect(last_audit.remote_address).to eq remote_address }
+      it { expect(last_audit.comment).to eq expected_comment }
+      it { expect(described_class.current_user).to be_nil }
+      it { expect(described_class.current_request_uuid).to be_nil }
+      it { expect(described_class.current_remote_address).to be_nil }
+      it { expect(described_class.current_comment).to be_nil }
+
+      context 'when called with request_uuid' do
+        before(:each) do
+          expect{ described_class.set_current_env_from_request_uuid(request_uuid) }.not_to raise_error
+        end
+        it { expect(described_class.current_user).to eq current_user }
+        it { expect(described_class.current_request_uuid).to eq request_uuid }
+        it { expect(described_class.current_remote_address).to eq remote_address }
+        it { expect(described_class.current_comment).to eq expected_comment }
+      end
+
+      context 'when called with nonexistent request_uuid' do
+        let(:nonexistent_request_uuid) { SecureRandom.uuid }
+        before(:each) do
+          expect{ described_class.set_current_env_from_request_uuid(nonexistent_request_uuid) }.not_to raise_error
+        end
+        it { expect(described_class.current_request_uuid).to eq nonexistent_request_uuid }
+        it { expect(described_class.current_user).to be_nil }
+        it { expect(described_class.current_remote_address).to be_nil }
+        it { expect(described_class.current_comment).to be_nil }
+      end
+
+      context 'when audit env is populated and called with nonexistent request_uuid' do
+        let(:nonexistent_request_uuid) { SecureRandom.uuid }
+        before(:each) do
+          described_class.current_request_uuid = SecureRandom.uuid
+          described_class.current_user = FactoryBot.create(:user, :save_without_auditing)
+          described_class.current_remote_address = Faker::Internet.ip_v4_address
+          described_class.current_comment = {foo: 'bar'}
+          expect{ described_class.set_current_env_from_request_uuid(nonexistent_request_uuid) }.not_to raise_error
+        end
+        it { expect(described_class.current_request_uuid).to eq nonexistent_request_uuid }
+        it { expect(described_class.current_user).to be_nil }
+        it { expect(described_class.current_remote_address).to be_nil }
+        it { expect(described_class.current_comment).to be_nil }
+      end
     end
   end
 end

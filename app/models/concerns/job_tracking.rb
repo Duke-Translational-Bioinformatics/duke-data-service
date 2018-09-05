@@ -20,11 +20,7 @@ module JobTracking
         initial_transaction,
         'in progress'
       )
-      request_audit = ApplicationAudit.where(request_uuid: initial_transaction.request_id).last
-      ApplicationAudit.current_request_uuid = request_audit&.request_uuid
-      ApplicationAudit.current_user = request_audit&.user
-      ApplicationAudit.current_remote_address = request_audit&.remote_address
-      ApplicationAudit.current_comment = request_audit&.comment
+      ApplicationAudit.set_current_env_from_request_uuid(initial_transaction.request_id)
     end
 
     def self.complete_job(initial_transaction)
