@@ -62,6 +62,11 @@ RSpec.describe ChildDeletionJob, type: :job do
           ApplicationAudit.clear_store
           expect(job_transaction.request_id).to eq deletion_request_uuid
         end
+        it 'creates audits with deletion_request_uuid' do
+          expect {
+            described_class.perform_now(job_transaction, parent, page)
+          }.to change{Audited.audit_class.where(request_uuid: deletion_request_uuid).count}
+        end
         it 'creates audits with current_user' do
           expect {
             described_class.perform_now(job_transaction, parent, page)
