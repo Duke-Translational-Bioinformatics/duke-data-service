@@ -72,6 +72,9 @@ RSpec.configure do |config|
   config.after(:each) do
     Neo4j::ActiveBase.current_session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
+  config.after(:each) do
+    Audited.store.clear
+  end
 end
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

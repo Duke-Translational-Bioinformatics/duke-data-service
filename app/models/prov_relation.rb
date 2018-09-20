@@ -4,7 +4,6 @@ class ProvRelation < ActiveRecord::Base
 
   include Kinded
   include Graphed::Relation
-  include RequestAudited
   audited
 
   validates :creator_id, presence: true

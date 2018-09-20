@@ -1,5 +1,4 @@
 class Upload < ActiveRecord::Base
-  include RequestAudited
   include JobTransactionable
   default_scope { order('created_at DESC') }
   audited

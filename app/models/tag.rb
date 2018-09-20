@@ -1,5 +1,4 @@
 class Tag < ActiveRecord::Base
-  include RequestAudited
   default_scope { order('created_at DESC') }
   audited
 

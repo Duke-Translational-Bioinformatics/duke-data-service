@@ -3,7 +3,6 @@ require 'jwt'
 class User < ActiveRecord::Base
   include Kinded
   include Graphed::Node
-  include RequestAudited
 
   default_scope { order('created_at DESC') }
   audited except: :last_login_at
