@@ -338,7 +338,6 @@ RSpec.describe Project, type: :model do
     context 'empty slug' do
       subject { FactoryBot.build(:project, name: previous.name) }
       it {
-        is_expected.to be_valid
         expect(subject.save).to be_truthy
       }
     end
