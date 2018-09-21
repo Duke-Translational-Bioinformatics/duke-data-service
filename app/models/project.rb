@@ -109,6 +109,7 @@ class Project < ActiveRecord::Base
       existing_slugs = self.class.where("slug LIKE '#{slug_prefix}_%'").pluck(:slug)
       mock_slugs = (1..existing_slugs.length + 1).to_a.collect {|i| "#{slug_prefix}_#{i}"}
       self.slug = (mock_slugs - existing_slugs).first
+      valid?
     end
     self.slug
   end
