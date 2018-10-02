@@ -247,6 +247,8 @@ RSpec.describe ApplicationAudit, type: :model do
           described_class.current_comment = {foo: 'bar'}
           expect{ described_class.set_current_env_from_request_uuid(nonexistent_request_uuid) }.not_to raise_error
         end
+        # current audit env values are reset to nil when a nonexistent
+        # request_uuid is passed to set_current_env_from_request_uuid
         it { expect(described_class.current_request_uuid).to eq nonexistent_request_uuid }
         it { expect(described_class.current_user).to be_nil }
         it { expect(described_class.current_remote_address).to be_nil }
