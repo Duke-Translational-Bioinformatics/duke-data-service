@@ -149,7 +149,7 @@ describe DDS::V1::UsersAPI do
       let(:full_name_contains) { 'xxxx' }
       let!(:users_with_last_name) {
         users = []
-        5.times do
+        3.times do
           nuser = FactoryBot.create(
             :user_authentication_service,
             :populated)
@@ -162,7 +162,7 @@ describe DDS::V1::UsersAPI do
 
       let!(:users_with_first_name) {
         users = []
-        5.times do
+        3.times do
           nuser = FactoryBot.create(
             :user_authentication_service,
             :populated)
@@ -175,7 +175,7 @@ describe DDS::V1::UsersAPI do
 
       let!(:users_with_display_name) {
         users = []
-        5.times do
+        3.times do
           auser = FactoryBot.create(:user_authentication_service, :populated)
           auser.user.update(
             :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
