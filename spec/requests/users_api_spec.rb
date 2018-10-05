@@ -185,7 +185,7 @@ describe DDS::V1::UsersAPI do
         users
       }
 
-      describe 'without filters' do
+      context 'without filters' do
         let(:payload) {{}}
         let(:resource) { users_with_first_name[0].user }
 
@@ -195,7 +195,7 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with last_name_begins_with filter' do
+      context 'with last_name_begins_with filter' do
         let(:payload) { {last_name_begins_with: last_name_begins_with} }
         let(:resource) { users_with_last_name[0].user }
 
@@ -237,7 +237,7 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with first_name_begins_with' do
+      context 'with first_name_begins_with' do
         let(:payload) { {first_name_begins_with: first_name_begins_with} }
         let(:resource) { users_with_first_name[0].user }
 
@@ -278,7 +278,7 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with full_name_contains' do
+      context 'with full_name_contains' do
         let(:payload) { {full_name_contains: full_name_contains} }
         let(:resource) { users_with_display_name[0].user }
 
@@ -319,7 +319,7 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with username' do
+      context 'with username' do
         let(:payload) { {username: resource.username} }
 
         it_behaves_like 'a listable resource' do
@@ -327,7 +327,7 @@ describe DDS::V1::UsersAPI do
         end
       end
 
-      describe 'with email' do
+      context 'with email' do
         let(:payload) { {email: resource.email} }
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { 1 }
