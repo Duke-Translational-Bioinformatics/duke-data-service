@@ -318,6 +318,14 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent accessible resource'
       end
+
+      describe 'with username' do
+        let(:payload) { {username: resource.username} }
+
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { 1 }
+        end
+      end
     end
   end
 

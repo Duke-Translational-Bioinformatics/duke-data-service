@@ -56,12 +56,14 @@ module DDS
         optional :last_name_begins_with, type: String, desc: 'list users whose last name begins with this string'
         optional :first_name_begins_with, type: String, desc: 'list users whose first name begins with this string'
         optional :full_name_contains, type: String, desc: 'list users whose full name contains this string'
+        optional :username, type: String, desc: 'list users whose username matches this string'
         use :pagination
       end
       get '/users', adapter: :json, root: 'results' do
         authenticate!
         query_params = declared(params, include_missing: false)
         users = UserFilter.new(query_params).query(User.all).order(last_name: :asc)
+        users = users.where(username: query_params[:username]) if query_params[:username]
         paginate(users)
       end
 
