@@ -33,5 +33,22 @@ namespace :job_transaction do
         puts "No orphan JobTransactions found."
       end
     end
+
+    desc 'Removes logical orphan JobTransactions older than a month'
+    task logical_orphans: :environment do
+      if oldest = JobTransaction.oldest_logical_orphan_created_at
+        months_ago = ((Time.now - oldest) / 1.month).floor
+        if months_ago > 0
+          months_ago.downto(1).each do |m|
+            del_num = JobTransaction.delete_all_logical_orphans(created_before: Time.now - m.months)
+            puts "Deleted #{del_num} logical orphan JobTransactions from #{m} #{'month'.pluralize(m)} ago."
+          end
+        else
+          puts "No logical orphan JobTransactions older than 1 month found."
+        end
+      else
+        puts "No logical orphan JobTransactions found."
+      end
+    end
   end
 end
