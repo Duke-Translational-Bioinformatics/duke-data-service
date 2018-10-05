@@ -326,6 +326,25 @@ describe DDS::V1::UsersAPI do
           let(:expected_list_length) { 1 }
         end
       end
+
+      describe 'with email' do
+        let(:payload) { {email: resource.email} }
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { 1 }
+        end
+
+        context 'duplicate email exists' do
+          let(:payload) { {email: email_dup.email} }
+          let(:email_dup) { FactoryBot.create(:user, email: resource.email) }
+          it_behaves_like 'a listable resource' do
+            let(:expected_list_length) { 2 }
+            it 'should include user with email dup' do
+              is_expected.to eq(expected_response_status)
+              expect(response.body).to include(resource_serializer.new(email_dup).to_json)
+            end
+          end
+        end
+      end
     end
   end
 
