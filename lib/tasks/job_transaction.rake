@@ -50,5 +50,8 @@ namespace :job_transaction do
         puts "No logical orphan JobTransactions found."
       end
     end
+
+    desc 'Invoke all job_transaction:clean_up tasks'
+    task :all => %w[job_transaction:clean_up:completed job_transaction:clean_up:orphans job_transaction:clean_up:logical_orphans]
   end
 end

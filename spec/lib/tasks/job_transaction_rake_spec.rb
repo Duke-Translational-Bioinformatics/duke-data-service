@@ -119,3 +119,26 @@ describe 'job_transaction:clean_up:logical_orphans' do
     it { invoke_task(expected_stdout: /Deleted #{deleted_counts[3]} logical orphan JobTransactions from 1 month ago./) }
   end
 end
+
+describe 'job_transaction:clean_up:all' do
+  include ActiveSupport::Testing::TimeHelpers
+  include_context "rake"
+
+  let(:a_month_ago) { Time.now - 1.month }
+  let(:just_over_a_month_ago) { Time.now - 1.month - 1.day }
+  around(:each) do |example|
+    travel_to(Time.now) do #freeze_time
+      example.run
+    end
+  end
+
+  it 'calls clean_up tasks in the correct order' do
+    expect(JobTransaction).to receive(:oldest_completed_at).and_return(just_over_a_month_ago).ordered
+    expect(JobTransaction).to receive(:delete_all_complete_jobs).with(created_before: a_month_ago).and_return(1).ordered
+    expect(JobTransaction).to receive(:oldest_orphan_created_at).and_return(just_over_a_month_ago).ordered
+    expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago).and_return(1).ordered
+    expect(JobTransaction).to receive(:oldest_logical_orphan_created_at).and_return(just_over_a_month_ago).ordered
+    expect(JobTransaction).to receive(:delete_all_logical_orphans).with(created_before: a_month_ago).and_return(1).ordered
+    invoke_task
+  end
+end
