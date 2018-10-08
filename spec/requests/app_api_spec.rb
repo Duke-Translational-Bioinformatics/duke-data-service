@@ -12,7 +12,7 @@ describe DDS::V1::AppAPI do
     before { expect(authentication_service).to be_persisted }
   end
   shared_context 'storage_provider setup' do
-    let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+    let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
 
     before do
       swift_storage_provider.register_keys
@@ -83,7 +83,7 @@ describe DDS::V1::AppAPI do
 
       context 'has not registered its keys' do
         let(:status_error) { 'storage_provider has not registered its keys' }
-        let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+        let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
         before do
           expect(swift_storage_provider).to be_persisted
           #vcr records storage_provider.get_account_info with keys not registered
@@ -100,7 +100,7 @@ describe DDS::V1::AppAPI do
 
       context 'is not connected' do
         let(:status_error) { 'storage_provider is not connected' }
-        let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+        let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
         let!(:auth_roles) { FactoryBot.create_list(:auth_role, 4) }
         let(:authentication_service) { FactoryBot.create(:duke_authentication_service)}
         before do
