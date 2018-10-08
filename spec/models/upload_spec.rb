@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
-  subject { FactoryBot.create(:upload, :with_chunks) }
+  subject { FactoryBot.create(:upload, :swift, :with_chunks) }
   let(:fingerprint) { FactoryBot.create(:fingerprint, upload: subject) }
-  let(:completed_upload) { FactoryBot.create(:upload, :with_chunks, :with_fingerprint, :completed) }
-  let(:upload_with_error) { FactoryBot.create(:upload, :with_chunks, :with_error) }
+  let(:completed_upload) { FactoryBot.create(:upload, :swift, :with_chunks, :with_fingerprint, :completed) }
+  let(:upload_with_error) { FactoryBot.create(:upload, :swift, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
 
