@@ -457,7 +457,7 @@
 </li>
 </ul>
 <h4>Example URI</h4><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/current_user/api_key</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>204</code></strong></div></div></div></section><section id="users" class="resource-group"><h2 class="group-heading">Users <a href="#users" class="permalink">&para;</a></h2><p>Represents registered users.</p>
-<div id="users-users-collection" class="resource"><h3 class="resource-heading">Users collection <a href="#users-users-collection" class="permalink">&nbsp;&para;</a></h3><div id="users-users-collection-get" class="action get"><h4 class="action-heading"><div class="name">List users</div><a href="#users-users-collection-get" class="method get">GET</a><code class="uri">/users{?full_name_contains,first_name_begins_with,last_name_begins_with}</code></h4><blockquote>
+<div id="users-users-collection" class="resource"><h3 class="resource-heading">Users collection <a href="#users-users-collection" class="permalink">&nbsp;&para;</a></h3><div id="users-users-collection-get" class="action get"><h4 class="action-heading"><div class="name">List users</div><a href="#users-users-collection-get" class="method get">GET</a><code class="uri">/users{?full_name_contains,first_name_begins_with,last_name_begins_with,username,email}</code></h4><blockquote>
 <p><strong>Permission:</strong> authenticated</p>
 </blockquote>
 <hr>
@@ -470,9 +470,11 @@
 <p>401: Unauthorized</p>
 </li>
 </ul>
-<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/users?<span class="hljs-attribute">full_name_contains=</span><span class="hljs-literal">gardner</span>&<span class="hljs-attribute">first_name_begins_with=</span><span class="hljs-literal">mat</span>&<span class="hljs-attribute">last_name_begins_with=</span><span class="hljs-literal">gar</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>full_name_contains</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>gardner</span></span><p>Returns users where their full name contains the specified string.</p>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/users?<span class="hljs-attribute">full_name_contains=</span><span class="hljs-literal">gardner</span>&<span class="hljs-attribute">first_name_begins_with=</span><span class="hljs-literal">mat</span>&<span class="hljs-attribute">last_name_begins_with=</span><span class="hljs-literal">gar</span>&<span class="hljs-attribute">username=</span><span class="hljs-literal">mrgardener01</span>&<span class="hljs-attribute">email=</span><span class="hljs-literal">mrgardner01@duke.edu</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>full_name_contains</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>gardner</span></span><p>Returns users where their full name contains the specified string.</p>
 </dd><dt>first_name_begins_with</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>mat</span></span><p>Returns users where their first name begins with the specified string.</p>
 </dd><dt>last_name_begins_with</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>gar</span></span><p>Returns users where their last name begins with the specified string.</p>
+</dd><dt>username</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>mrgardener01</span></span><p>Returns users where their username matches the specified string.</p>
+</dd><dt>email</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>mrgardner01@duke.edu</span></span><p>Returns users where their email matches the specified string.</p>
 </dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">results</span>": <span class="hljs-value">[
     {
@@ -481,6 +483,7 @@
       "<span class="hljs-attribute">first_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew"</span></span>,
       "<span class="hljs-attribute">last_name</span>": <span class="hljs-value"><span class="hljs-string">"Gardner"</span></span>,
       "<span class="hljs-attribute">full_name</span>": <span class="hljs-value"><span class="hljs-string">"Matthew Gardner"</span></span>,
+      "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"mrgardner01@duke.edu"</span></span>,
       "<span class="hljs-attribute">auth_provider</span>": <span class="hljs-value">{
         "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c"</span></span>,
         "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"duke"</span></span>,
@@ -644,7 +647,7 @@
   </span>}</span>,
   "<span class="hljs-attribute">last_login_on</span>": <span class="hljs-value"><span class="hljs-string">"2015-01-01T12:00:00Z"</span></span>,
   "<span class="hljs-attribute">audit</span>": <span class="hljs-value">{}
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 24 Apr 2018</p><script>/* eslint-env browser */
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 08 Oct 2018</p><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 
