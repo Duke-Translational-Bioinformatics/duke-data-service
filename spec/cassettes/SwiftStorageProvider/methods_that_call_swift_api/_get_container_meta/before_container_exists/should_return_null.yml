@@ -19,58 +19,47 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx5e8572b17ad94e0bae37f-0057b5e650
+      - txc1358f84a5d24f8497d92-005bb7b56f
       Date:
-      - Thu, 18 Aug 2016 16:46:08 GMT
+      - Fri, 05 Oct 2018 19:03:11 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
+  recorded_at: Fri, 05 Oct 2018 19:03:11 GMT
 - request:
-    method: get
-    uri: http://swift.local:12345/v1/AUTH_test
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/the_container
     body:
       encoding: US-ASCII
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
   response:
     status:
-      code: 200
-      message: OK
+      code: 404
+      message: Not Found
     headers:
       Content-Length:
-      - '14'
-      Accept-Ranges:
-      - bytes
-      X-Timestamp:
-      - '1471538767.86845'
-      X-Account-Bytes-Used:
       - '0'
-      X-Account-Container-Count:
-      - '1'
       Content-Type:
-      - text/plain; charset=utf-8
-      X-Account-Object-Count:
-      - '0'
+      - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx59a85c0c91264d1f9c5d7-0057b5e650
+      - tx8c27ef086db0473d86fb6-005bb7b56f
       Date:
-      - Thu, 18 Aug 2016 16:46:08 GMT
+      - Fri, 05 Oct 2018 19:03:11 GMT
     body:
       encoding: UTF-8
-      string: |
-        the_container
+      string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Fri, 05 Oct 2018 19:03:11 GMT
+recorded_with: VCR 4.0.0
