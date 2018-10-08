@@ -119,7 +119,7 @@ describe "db:data:migrate" do
     end
 
     describe 'consistency migration', :vcr do
-      let(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
 
       before do
         expect(storage_provider).to be_persisted
