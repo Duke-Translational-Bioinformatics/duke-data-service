@@ -50,6 +50,19 @@ def type_untyped_authentication_services
   puts "Fin!"
 end
 
+def type_untyped_storage_providers
+  default_type = "SwiftStorageProvider"
+  untyped = StorageProvider.where(type: nil)
+  pre_count = untyped.count
+  if pre_count > 0
+    changed = untyped.update_all(type: default_type)
+    $stderr.puts "#{changed} untyped storage_providers changed to #{default_type}"
+  else
+    $stderr.puts "0 untyped storage_providers changed"
+  end
+  puts "Fin!"
+end
+
 def fill_new_authentication_service_attributes
   if ENV["AUTH_SERVICE_SERVICE_ID"]
     new_attributes = [
@@ -202,6 +215,7 @@ namespace :db do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_missing_fingerprints
       type_untyped_authentication_services
+      type_untyped_storage_providers
       migrate_nil_consistency_status
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
