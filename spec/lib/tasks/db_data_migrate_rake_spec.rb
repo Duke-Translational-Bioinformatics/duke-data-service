@@ -59,6 +59,8 @@ describe "db:data:migrate" do
       let(:openid_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       it {
+        expect(duke_authentication_service).to be_persisted
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: /0 untyped authentication_services changed/
         }.not_to change{
@@ -76,6 +78,7 @@ describe "db:data:migrate" do
 
       it {
         expect(untyped_authentication_service).not_to be_a default_type
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: Regexp.new("1 untyped authentication_services changed to #{default_type}")
         }.to change{
