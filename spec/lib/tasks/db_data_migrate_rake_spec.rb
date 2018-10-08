@@ -91,6 +91,7 @@ describe "db:data:migrate" do
     context 'without untyped storage providers' do
       let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
       it {
+        expect(storage_provider).to be_persisted
         expect {
           invoke_task expected_stderr: /0 untyped storage_providers changed/
         }.not_to change{
@@ -104,10 +105,11 @@ describe "db:data:migrate" do
       let(:untyped_storage_provider) {
         StorageProvider.create(FactoryBot.attributes_for(:swift_storage_provider))
       }
-      let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      let(:typed_storage_provider) { FactoryBot.create(:swift_storage_provider) }
 
       it {
         expect(untyped_storage_provider).not_to be_a default_type
+        expect(typed_storage_provider).to be_persisted
         expect {
           invoke_task expected_stderr: Regexp.new("1 untyped storage_providers changed to #{default_type}")
         }.to change{
@@ -115,8 +117,8 @@ describe "db:data:migrate" do
         }.by(-1)
         expected_to_be_typed_storage_provider = StorageProvider.find(untyped_storage_provider.id)
         expect(expected_to_be_typed_storage_provider).to be_a default_type
-        swift_storage_provider.reload
-        expect(swift_storage_provider).to be_a SwiftStorageProvider
+        typed_storage_provider.reload
+        expect(typed_storage_provider).to be_a SwiftStorageProvider
       }
     end
 
