@@ -403,7 +403,7 @@ Generates a secret key for the current user that can be used to access the API a
 ## Group Users
 Represents registered users.
 
-## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with}]
+## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with,username,email}]
 
 ### List users [GET]
 >**Permission:** authenticated
@@ -417,6 +417,8 @@ Represents registered users.
     + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
     + first_name_begins_with (string, optional, `mat`) ... Returns users where their first name begins with the specified string.
     + last_name_begins_with (string, optional, `gar`) ... Returns users where their last name begins with the specified string.
+    + username (string, optional, `mrgardener01`) ... Returns users where their username matches the specified string.
+    + email (string, optional, `mrgardner01@duke.edu`) ... Returns users where their email matches the specified string.
 
 + Response 200 (application/json)
 
@@ -428,6 +430,7 @@ Represents registered users.
                     "first_name": "Matthew",
                     "last_name": "Gardner",
                     "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu",
                     "auth_provider": {
                         "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
                         "name": "duke",

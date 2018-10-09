@@ -144,50 +144,8 @@ describe DDS::V1::UsersAPI do
       let(:url) { "/api/v1/users" }
       let(:resource_serializer) {UserSerializer}
 
-      let(:last_name_begins_with) { 'Abc' }
-      let(:first_name_begins_with) { 'Xyz' }
-      let(:full_name_contains) { 'xxxx' }
-      let!(:users_with_last_name) {
-        users = []
-        5.times do
-          nuser = FactoryBot.create(
-            :user_authentication_service,
-            :populated)
-          nuser.user.update(
-            last_name: "#{last_name_begins_with}#{Faker::Name.last_name}")
-          users << nuser
-        end
-        users
-      }
-
-      let!(:users_with_first_name) {
-        users = []
-        5.times do
-          nuser = FactoryBot.create(
-            :user_authentication_service,
-            :populated)
-          nuser.user.update(
-            :first_name => "#{first_name_begins_with}#{Faker::Name.first_name}")
-          users << nuser
-        end
-        users
-      }
-
-      let!(:users_with_display_name) {
-        users = []
-        5.times do
-          auser = FactoryBot.create(:user_authentication_service, :populated)
-          auser.user.update(
-            :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
-          )
-          users << auser
-        end
-        users
-      }
-
-      describe 'without filters' do
+      context 'without filters' do
         let(:payload) {{}}
-        let(:resource) { users_with_first_name[0].user }
 
         it_behaves_like 'a listable resource'
         it_behaves_like 'a paginated resource'
@@ -195,9 +153,22 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with last_name_begins_with filter' do
+      context 'with last_name_begins_with filter' do
         let(:payload) { {last_name_begins_with: last_name_begins_with} }
         let(:resource) { users_with_last_name[0].user }
+        let(:last_name_begins_with) { 'Abc' }
+        let!(:users_with_last_name) {
+          users = []
+          3.times do
+            nuser = FactoryBot.create(
+              :user_authentication_service,
+              :populated)
+            nuser.user.update(
+              last_name: "#{last_name_begins_with}#{Faker::Name.last_name}")
+            users << nuser
+          end
+          users
+        }
 
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { users_with_last_name.length }
@@ -237,9 +208,22 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with first_name_begins_with' do
+      context 'with first_name_begins_with' do
         let(:payload) { {first_name_begins_with: first_name_begins_with} }
         let(:resource) { users_with_first_name[0].user }
+        let(:first_name_begins_with) { 'Xyz' }
+        let!(:users_with_first_name) {
+          users = []
+          3.times do
+            nuser = FactoryBot.create(
+              :user_authentication_service,
+              :populated)
+            nuser.user.update(
+              :first_name => "#{first_name_begins_with}#{Faker::Name.first_name}")
+            users << nuser
+          end
+          users
+        }
 
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { users_with_first_name.length }
@@ -278,9 +262,21 @@ describe DDS::V1::UsersAPI do
         it_behaves_like 'a software_agent accessible resource'
       end
 
-      describe 'with full_name_contains' do
+      context 'with full_name_contains' do
         let(:payload) { {full_name_contains: full_name_contains} }
         let(:resource) { users_with_display_name[0].user }
+        let(:full_name_contains) { 'xxxx' }
+        let!(:users_with_display_name) {
+          users = []
+          3.times do
+            auser = FactoryBot.create(:user_authentication_service, :populated)
+            auser.user.update(
+              :display_name => "#{Faker::Name.first_name}#{full_name_contains} #{Faker::Name.last_name}"
+            )
+            users << auser
+          end
+          users
+        }
 
         it_behaves_like 'a listable resource' do
           let(:expected_list_length) { users_with_display_name.length }
@@ -317,6 +313,33 @@ describe DDS::V1::UsersAPI do
 
         it_behaves_like 'an authenticated resource'
         it_behaves_like 'a software_agent accessible resource'
+      end
+
+      context 'with username' do
+        let(:payload) { {username: resource.username} }
+
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { 1 }
+        end
+      end
+
+      context 'with email' do
+        let(:payload) { {email: resource.email} }
+        it_behaves_like 'a listable resource' do
+          let(:expected_list_length) { 1 }
+        end
+
+        context 'duplicate email exists' do
+          let(:payload) { {email: email_dup.email} }
+          let(:email_dup) { FactoryBot.create(:user, email: resource.email) }
+          it_behaves_like 'a listable resource' do
+            let(:expected_list_length) { 2 }
+            it 'should include user with email dup' do
+              is_expected.to eq(expected_response_status)
+              expect(response.body).to include(resource_serializer.new(email_dup).to_json)
+            end
+          end
+        end
       end
     end
   end
