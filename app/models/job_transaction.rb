@@ -5,7 +5,8 @@ class JobTransaction < ActiveRecord::Base
   validates :key, presence: true
   validates :request_id, presence: true
   validates :state, presence: true
-  scope :orphans, -> { where(state: ['created', 'updated']).where('(transactionable_id, request_id) not in (?)', select(:transactionable_id, :request_id).where.not(state: ['created', 'updated'])) }
+  scope :orphans, -> { where(request_id: select(:request_id).group(:request_id).having('count(*) = 1')) }
+  scope :logical_orphans, -> { where(state: ['created', 'updated']).where('(transactionable_id, request_id) not in (?)', select(:transactionable_id, :request_id).where.not(state: ['created', 'updated'])) }
 
   def self.oldest_completed_at
     reorder(:created_at).where(state: 'complete').first&.created_at
@@ -15,11 +16,19 @@ class JobTransaction < ActiveRecord::Base
     orphans.reorder(:created_at).first&.created_at
   end
 
+  def self.oldest_logical_orphan_created_at
+    logical_orphans.reorder(:created_at).first&.created_at
+  end
+
   def self.delete_all_complete_jobs(created_before: Time.now)
     where('(transactionable_type, transactionable_id, request_id, key) in (?)', select(:transactionable_type, :transactionable_id, :request_id, :key).where(state: 'complete').where('created_at < ?', created_before)).delete_all
   end
 
   def self.delete_all_orphans(created_before: Time.now)
     orphans.where('created_at < ?', created_before).delete_all
+  end
+
+  def self.delete_all_logical_orphans(created_before: Time.now)
+    logical_orphans.where('created_at < ?', created_before).delete_all
   end
 end
