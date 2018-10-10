@@ -130,6 +130,39 @@ RSpec.describe JobTransaction, type: :model do
         FactoryBot.create(:job_transaction, transactionable: orphan_jobs.first.transactionable, request_id: orphan_jobs.first.request_id)
         expect(oldest_orphan_created_at).to eq orphan_times.second
       end
+
+      it 'ignores logical orphans' do
+        FactoryBot.create(:job_transaction, transactionable: orphan_jobs.first.transactionable, request_id: orphan_jobs.first.request_id, state: 'updated')
+        expect(oldest_orphan_created_at).to eq orphan_times.second
+      end
+    end
+  end
+
+  describe '.oldest_logical_orphan_created_at' do
+    let(:oldest_logical_orphan_created_at) { described_class.oldest_logical_orphan_created_at }
+    it { expect(described_class).to respond_to(:oldest_logical_orphan_created_at) }
+    it { expect(oldest_logical_orphan_created_at).to be_nil }
+
+    context 'with multiple orphans' do
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      let(:orphan_times) { orphan_jobs.collect {|j| j.created_at} }
+      before(:each) do
+        expect(orphan_jobs).to be_a Array
+        orphan_jobs.each {|j| expect(j.reload).to be_truthy}
+      end
+      it { expect(orphan_times.uniq).to eq orphan_times }
+      it { expect(orphan_times.sort).to eq orphan_times }
+      it { expect(oldest_logical_orphan_created_at).to eq orphan_times.first }
+
+      it 'ignores non-orphans' do
+        FactoryBot.create(:job_transaction, transactionable: orphan_jobs.first.transactionable, request_id: orphan_jobs.first.request_id)
+        expect(oldest_logical_orphan_created_at).to eq orphan_times.second
+      end
+
+      it 'recognizes logical orphans' do
+        FactoryBot.create(:job_transaction, transactionable: orphan_jobs.first.transactionable, request_id: orphan_jobs.first.request_id, state: 'updated')
+        expect(oldest_logical_orphan_created_at).to eq orphan_times.first
+      end
     end
   end
 
@@ -140,7 +173,7 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(delete_all_orphans).to eq 0 }
 
     context 'with multiple orphans' do
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy) }
       before(:each) do
         expect(JobTransaction.count).to eq 0
         expect(orphan_jobs).to be_a Array
@@ -176,7 +209,68 @@ RSpec.describe JobTransaction, type: :model do
           FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id, state: 'updated')
         end
       end
-      it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-6) }
+      it { expect{delete_all_orphans}.not_to change{JobTransaction.count} }
+    end
+  end
+
+  describe '.delete_all_logical_orphans' do
+    let(:delete_all_logical_orphans) { described_class.delete_all_logical_orphans }
+    it { expect(described_class).to respond_to(:delete_all_logical_orphans).with(0).arguments }
+    it { expect(described_class).to respond_to(:delete_all_logical_orphans).with_keywords(:created_before) }
+    it { expect(delete_all_logical_orphans).to eq 0 }
+
+    context 'with multiple orphans' do
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy) }
+      before(:each) do
+        expect(JobTransaction.count).to eq 0
+        expect(orphan_jobs).to be_a Array
+      end
+      it { expect{delete_all_logical_orphans}.not_to change{JobTransaction.count} }
+
+      context 'created_before last orphan' do
+        let(:delete_all_logical_orphans) { described_class.delete_all_logical_orphans(created_before: orphan_jobs.last.created_at) }
+        it { expect{delete_all_logical_orphans}.not_to change{JobTransaction.count} }
+      end
+    end
+
+    context 'with multiple logical orphans' do
+      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      before(:each) do
+        expect(JobTransaction.count).to eq 0
+        expect(orphan_jobs).to be_a Array
+      end
+      it { expect{delete_all_logical_orphans}.to change{JobTransaction.count}.by(-3) }
+
+      context 'created_before last orphan' do
+        let(:delete_all_logical_orphans) { described_class.delete_all_logical_orphans(created_before: orphan_jobs.last.created_at) }
+        it { expect{delete_all_logical_orphans}.to change{JobTransaction.count}.by(-2) }
+      end
+    end
+
+    context 'with matching request and transactionable ids' do
+      let(:request_id) { SecureRandom.uuid }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      before(:each) do
+        expect(JobTransaction.count).to eq 0
+        expect(initial_jobs).to be_a Array
+        initial_jobs.each do |i|
+          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id)
+        end
+      end
+      it { expect{delete_all_logical_orphans}.not_to change{JobTransaction.count} }
+    end
+
+    context 'with matching request and transactionable ids and create/update state' do
+      let(:request_id) { SecureRandom.uuid }
+      let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      before(:each) do
+        expect(JobTransaction.count).to eq 0
+        expect(initial_jobs).to be_a Array
+        initial_jobs.each do |i|
+          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id, state: 'updated')
+        end
+      end
+      it { expect{delete_all_logical_orphans}.to change{JobTransaction.count}.by(-6) }
     end
   end
 end
