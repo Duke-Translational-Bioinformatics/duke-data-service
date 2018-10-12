@@ -79,6 +79,23 @@ describe 'job_transaction:clean_up:orphans' do
     it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[2]} orphan JobTransactions from 2 months ago./) }
     it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[3]} orphan JobTransactions from 1 month ago./) }
   end
+
+  context 'with BATCH_SIZE' do
+    include_context 'with env_override'
+    let(:batch_size) { 2 }
+    let(:env_override) { {
+      'BATCH_SIZE' => batch_size
+    } }
+    let(:a_month_ago) { Time.now - 1.month }
+    let(:oldest_orphan_created_at) { a_month_ago - 1.day }
+    let(:deleted_count) { 5 }
+    before(:each) do
+      expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago, limit: batch_size).and_return(batch_size).ordered
+      expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago, limit: batch_size).and_return(batch_size).ordered
+      expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago, limit: batch_size).and_return(1).ordered
+    end
+    it { invoke_task(expected_stdout: /---\nDeleted #{deleted_count} orphan JobTransactions from 1 month ago./) }
+  end
 end
 
 describe 'job_transaction:clean_up:logical_orphans' do
