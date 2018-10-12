@@ -44,6 +44,7 @@ describe 'job_transaction:clean_up:orphans' do
   include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
+  let(:default_batch_size) { 1000 }
   let(:oldest_orphan_created_at) { nil }
   around(:each) do |example|
     travel_to(Time.now) do #freeze_time
@@ -67,16 +68,16 @@ describe 'job_transaction:clean_up:orphans' do
 
   context 'when oldest orphan from 4 months ago' do
     let(:oldest_orphan_created_at) { Time.now - 4.month - 1.day }
-    let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 1000) } }
+    let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 999) } }
     before(:each) do
       4.times do |i|
-        expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: Time.now - (4 - i).months).and_return(deleted_counts[i]).ordered
+        expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: Time.now - (4 - i).months, limit: default_batch_size).and_return(deleted_counts[i]).ordered
       end
     end
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[0]} orphan JobTransactions from 4 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[1]} orphan JobTransactions from 3 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[2]} orphan JobTransactions from 2 months ago./) }
-    it { invoke_task(expected_stdout: /Deleted #{deleted_counts[3]} orphan JobTransactions from 1 month ago./) }
+    it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[0]} orphan JobTransactions from 4 months ago./) }
+    it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[1]} orphan JobTransactions from 3 months ago./) }
+    it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[2]} orphan JobTransactions from 2 months ago./) }
+    it { invoke_task(expected_stdout: /-\nDeleted #{deleted_counts[3]} orphan JobTransactions from 1 month ago./) }
   end
 end
 
@@ -124,6 +125,7 @@ describe 'job_transaction:clean_up:all' do
   include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
+  let(:default_batch_size) { 1000 }
   let(:a_month_ago) { Time.now - 1.month }
   let(:just_over_a_month_ago) { Time.now - 1.month - 1.day }
   around(:each) do |example|
@@ -136,7 +138,7 @@ describe 'job_transaction:clean_up:all' do
     expect(JobTransaction).to receive(:oldest_completed_at).and_return(just_over_a_month_ago).ordered
     expect(JobTransaction).to receive(:delete_all_complete_jobs).with(created_before: a_month_ago).and_return(1).ordered
     expect(JobTransaction).to receive(:oldest_orphan_created_at).and_return(just_over_a_month_ago).ordered
-    expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago).and_return(1).ordered
+    expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago, limit: default_batch_size).and_return(1).ordered
     expect(JobTransaction).to receive(:oldest_logical_orphan_created_at).and_return(just_over_a_month_ago).ordered
     expect(JobTransaction).to receive(:delete_all_logical_orphans).with(created_before: a_month_ago).and_return(1).ordered
     invoke_task
