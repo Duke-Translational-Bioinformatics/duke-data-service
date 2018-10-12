@@ -130,7 +130,7 @@ def create_missing_fingerprints
 end
 
 def migrate_nil_consistency_status
-  storage_provider = StorageProvider.first
+  storage_provider = StorageProvider.default
   updated_projects = 0
   updated_uploads = 0
   projects = Project.where(is_consistent: nil).where.not(is_deleted: true)

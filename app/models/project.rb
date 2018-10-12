@@ -44,7 +44,7 @@ class Project < ActiveRecord::Base
   end
 
   def initialize_storage
-    storage_provider = StorageProvider.first
+    storage_provider = StorageProvider.default
     ProjectStorageProviderInitializationJob.perform_later(
       job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
       storage_provider: storage_provider,
