@@ -4,6 +4,10 @@ class StorageProvider < ActiveRecord::Base
   validates :description, presence: true
   validates :name, presence: true
   validates :is_default, uniqueness: true, if: :is_default
+  validates :is_deprecated, inclusion: {
+    in: [false],
+    message: "The Default StorageProvider cannot be deprecated!"
+  }, if: :is_default
 
   def self.default
     find_by(is_default: true)

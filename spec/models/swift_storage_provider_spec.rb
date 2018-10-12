@@ -321,6 +321,20 @@ RSpec.describe SwiftStorageProvider, type: :model do
         expect(new_not_default_storage_provider).to be_valid
       end
     end
+
+    context 'is_deprecated' do
+      let(:not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
+      it {
+        is_expected.to be_valid
+        expect(not_default_storage_provider).to be_valid
+
+        subject.is_deprecated = true
+        is_expected.not_to be_valid
+
+        not_default_storage_provider.is_deprecated = true
+        expect(not_default_storage_provider).to be_valid
+      }
+    end
   end
 
   describe '.default' do
