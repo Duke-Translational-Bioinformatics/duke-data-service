@@ -5,6 +5,10 @@ class StorageProvider < ActiveRecord::Base
   validates :name, presence: true
   validates :is_default, uniqueness: true, if: :is_default
 
+  def self.default
+    find_by(is_default: true)
+  end
+
   ### TODO refactor these methods to be more abstract
   def signed_url_duration
     60*5 # 5 minutes

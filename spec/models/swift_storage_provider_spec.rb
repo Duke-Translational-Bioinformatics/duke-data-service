@@ -321,4 +321,18 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
   end
+
+  describe '.default' do
+    let(:default_storage_provider) { FactoryBot.create(:swift_storage_provider, :default) }
+    let(:not_default_storage_provider) { FactoryBot.create(:swift_storage_provider) }
+    subject { StorageProvider.default }
+    it { expect(described_class).to respond_to(:default) }
+    it {
+      expect(default_storage_provider).to be_persisted
+      expect(not_default_storage_provider).to be_persisted
+
+      is_expected.to eq(default_storage_provider)
+      is_expected.not_to eq(not_default_storage_provider)
+    }
+  end
 end
