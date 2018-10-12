@@ -308,5 +308,17 @@ RSpec.describe SwiftStorageProvider, type: :model do
       is_expected.to validate_presence_of :chunk_max_number
       is_expected.to validate_presence_of :chunk_max_size_bytes
     end
+
+    context 'is_default' do
+      let(:new_default_storage_provider) { FactoryBot.build(:swift_storage_provider, :default) }
+      let(:new_not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
+      it 'should allow only one default storage_provider' do
+        expect(new_default_storage_provider).to be_valid
+        expect(new_not_default_storage_provider).to be_valid
+        subject.update(is_default: true)
+        expect(new_default_storage_provider).not_to be_valid
+        expect(new_not_default_storage_provider).to be_valid
+      end
+    end
   end
 end

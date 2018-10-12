@@ -3,6 +3,7 @@ class StorageProvider < ActiveRecord::Base
   validates :display_name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :name, presence: true
+  validates :is_default, uniqueness: true, if: :is_default
 
   ### TODO refactor these methods to be more abstract
   def signed_url_duration
