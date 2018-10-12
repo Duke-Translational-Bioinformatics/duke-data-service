@@ -21,6 +21,7 @@ RSpec.describe JobTransaction, type: :model do
   describe '.oldest_completed_at' do
     let(:oldest_completed_at) { described_class.oldest_completed_at }
     it { expect(described_class).to respond_to(:oldest_completed_at) }
+    it { expect(described_class).to respond_to(:oldest_completed_at) }
     it { expect(oldest_completed_at).to be_nil }
 
     context 'with multiple completed' do
@@ -170,6 +171,7 @@ RSpec.describe JobTransaction, type: :model do
     let(:delete_all_orphans) { described_class.delete_all_orphans }
     it { expect(described_class).to respond_to(:delete_all_orphans).with(0).arguments }
     it { expect(described_class).to respond_to(:delete_all_orphans).with_keywords(:created_before) }
+    it { expect(described_class).to respond_to(:delete_all_orphans).with_keywords(:limit) }
     it { expect(delete_all_orphans).to eq 0 }
 
     context 'with multiple orphans' do
@@ -183,6 +185,11 @@ RSpec.describe JobTransaction, type: :model do
       context 'created_before last orphan' do
         let(:delete_all_orphans) { described_class.delete_all_orphans(created_before: orphan_jobs.last.created_at) }
         it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-2) }
+      end
+
+      context 'limit to 1' do
+        let(:delete_all_orphans) { described_class.delete_all_orphans(limit: 1) }
+        it { expect{delete_all_orphans}.to change{JobTransaction.count}.by(-1) }
       end
     end
 
