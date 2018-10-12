@@ -1,15 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe StorageProvider, type: :model do
+RSpec.describe SwiftStorageProvider, type: :model do
   let(:chunk) { FactoryBot.create(:chunk) }
-  let(:storage_provider) { FactoryBot.create(:storage_provider) }
-  let(:swift_storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+  let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
   let(:content_type) {'text/plain'}
   let(:filename) {'text_file.txt'}
   subject { storage_provider }
 
   describe 'methods that call swift api', :vcr do
-    subject { swift_storage_provider }
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
     let(:slo_name) { 'the_slo' }
@@ -209,7 +207,6 @@ RSpec.describe StorageProvider, type: :model do
   end
 
   describe 'methods for building signed urls' do
-    subject { storage_provider }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
 
     it 'should respond to signed_url_duration' do
@@ -242,8 +239,6 @@ RSpec.describe StorageProvider, type: :model do
   end
 
   describe 'a signed url' do
-    subject { storage_provider }
-
     # build_signed_url parameters
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Chunk, type: :model do
-  subject { FactoryBot.create(:chunk) }
+  subject { FactoryBot.create(:chunk, :swift) }
   let(:storage_provider) { subject.storage_provider }
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}

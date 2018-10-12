@@ -117,8 +117,8 @@ RSpec.describe DataFile, type: :model do
 
     describe '#upload' do
       subject { FactoryBot.build(:data_file, without_upload: true) }
-      let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
-      let(:different_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+      let(:completed_upload) { FactoryBot.create(:upload, :swift, :completed, :with_fingerprint, project: subject.project) }
+      let(:different_upload) { FactoryBot.create(:upload, :swift, :completed, :with_fingerprint, project: subject.project) }
 
       context 'before save' do
         it { expect(subject.upload).to be_nil }

@@ -19,49 +19,51 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc0e38daa043041209e8dc-0057b5e650
+      - txd98eee56e3cd454bac493-005bb7b56e
       Date:
-      - Thu, 18 Aug 2016 16:46:08 GMT
+      - Fri, 05 Oct 2018 19:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
+  recorded_at: Fri, 05 Oct 2018 19:03:10 GMT
 - request:
     method: put
-    uri: http://swift.local:12345/v1/AUTH_test/the_container
+    uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
     body:
       encoding: UTF-8
-      string: ''
+      string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
-      X-Container-Meta-Access-Control-Allow-Origin:
-      - "*"
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
   response:
     status:
-      code: 202
-      message: Accepted
+      code: 201
+      message: Created
     headers:
+      Last-Modified:
+      - Fri, 05 Oct 2018 19:03:11 GMT
       Content-Length:
-      - '76'
+      - '0'
+      Etag:
+      - '"70f457e8bdf12b30ed18c5b110740c2e"'
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx5a5acb531be144deaac4f-0057b5e650
+      - tx4ae98b74edf9444885411-005bb7b56e
       Date:
-      - Thu, 18 Aug 2016 16:46:08 GMT
+      - Fri, 05 Oct 2018 19:03:10 GMT
     body:
       encoding: UTF-8
-      string: "<html><h1>Accepted</h1><p>The request is accepted for processing.</p></html>"
+      string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Fri, 05 Oct 2018 19:03:10 GMT
+recorded_with: VCR 4.0.0

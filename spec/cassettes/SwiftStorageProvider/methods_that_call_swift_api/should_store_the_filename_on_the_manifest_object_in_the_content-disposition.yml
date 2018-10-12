@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
       Content-Length:
       - '0'
       X-Trans-Id:
-      - tx1d172cb87f7e4751a95bd-0057b5e650
+      - tx94dba04d792243eaa648a-005bb7b56e
       Date:
-      - Thu, 18 Aug 2016 16:46:08 GMT
+      - Fri, 05 Oct 2018 19:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:08 GMT
+  recorded_at: Fri, 05 Oct 2018 19:03:10 GMT
 - request:
     method: put
     uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
@@ -43,16 +43,16 @@ http_interactions:
       string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
-      Content-Type:
-      - text/plain
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
+      Content-Disposition:
+      - attachment; filename=text_file.txt
   response:
     status:
       code: 201
       message: Created
     headers:
       Last-Modified:
-      - Thu, 18 Aug 2016 16:46:09 GMT
+      - Fri, 05 Oct 2018 19:03:11 GMT
       Content-Length:
       - '0'
       Etag:
@@ -60,14 +60,14 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - txeaf3c3ffad3342ceb897a-0057b5e650
+      - tx2a557fcb57874b4d9bcea-005bb7b56e
       Date:
-      - Thu, 18 Aug 2016 16:46:09 GMT
+      - Fri, 05 Oct 2018 19:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:09 GMT
+  recorded_at: Fri, 05 Oct 2018 19:03:10 GMT
 - request:
     method: head
     uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo
@@ -76,7 +76,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tk4feef1f12df94cf8b61a30386401e7d4
+      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
   response:
     status:
       code: 200
@@ -84,25 +84,27 @@ http_interactions:
     headers:
       Content-Length:
       - '24'
+      Content-Disposition:
+      - attachment; filename=text_file.txt
       Accept-Ranges:
       - bytes
       Last-Modified:
-      - Thu, 18 Aug 2016 16:46:09 GMT
+      - Fri, 05 Oct 2018 19:03:11 GMT
       Etag:
       - '"70f457e8bdf12b30ed18c5b110740c2e"'
       X-Timestamp:
-      - '1471538768.99947'
+      - '1538766190.78624'
       X-Static-Large-Object:
       - 'True'
       Content-Type:
-      - text/plain
+      - application/x-www-form-urlencoded
       X-Trans-Id:
-      - tx79dc62bc37184d51be146-0057b5e651
+      - txec9330bfda094f8e826cc-005bb7b56e
       Date:
-      - Thu, 18 Aug 2016 16:46:09 GMT
+      - Fri, 05 Oct 2018 19:03:10 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Thu, 18 Aug 2016 16:46:09 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Fri, 05 Oct 2018 19:03:10 GMT
+recorded_with: VCR 4.0.0
