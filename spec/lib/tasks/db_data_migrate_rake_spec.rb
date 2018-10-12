@@ -125,6 +125,48 @@ describe "db:data:migrate" do
       }
     end
 
+    context 'with any storage providers' do
+      it {
+        expect(StorageProvider.any?).to be_falsey
+        expect {
+          invoke_task expected_stderr: /no storage_providers found/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'with a default storage provider' do
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      it {
+        expect(storage_provider).to be_persisted
+        expect(StorageProvider.where(is_default: true).any?).to be_truthy
+        expect {
+          invoke_task expected_stderr: /0 storage_provider default statuses changed/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'without any default storage providers' do
+      let(:not_default_storage_provider) {
+        FactoryBot.create(:swift_storage_provider, is_default: false)
+      }
+
+      it {
+        expect(StorageProvider.where(is_deprecated: true).any?).to be_falsey
+        expect(not_default_storage_provider.is_default?).to be_falsey
+        expect {
+          invoke_task expected_stderr: Regexp.new(/first storage_provider changed to default storage_provider/)
+        }.to change{
+          StorageProvider.where(is_default: true).count
+        }.by(1)
+        not_default_storage_provider.reload
+        expect(not_default_storage_provider.is_default?).to be_truthy
+      }
+    end
+
     shared_examples 'a consistency migration' do |prep_method_sym|
       let(:record_class) { record.class }
       before do

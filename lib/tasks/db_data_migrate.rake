@@ -208,6 +208,19 @@ def populate_nil_project_slugs
   puts " #{slug_count} Project slugs populated."
 end
 
+def set_default_storage_provider
+  if StorageProvider.any?
+    if StorageProvider.where(is_default: true).any?
+      $stderr.puts "0 storage_provider default statuses changed"
+    else
+      StorageProvider.first.update(is_default: true)
+      $stderr.puts "first storage_provider changed to default storage_provider"
+    end
+  else
+    $stderr.puts "no storage_providers found"
+  end
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -221,6 +234,7 @@ namespace :db do
       migrate_storage_provider_chunk_environment
       purge_deleted_objects
       populate_nil_project_slugs
+      set_default_storage_provider
     end
   end
 end
