@@ -6,7 +6,12 @@ class JobTransaction < ActiveRecord::Base
   validates :request_id, presence: true
   validates :state, presence: true
   scope :orphans, ->(limit: nil) { where(request_id: orphan_request_ids(limit: limit)) }
-  scope :logical_orphans, -> { where(state: ['created', 'updated']).where('(transactionable_id, request_id) not in (?)', select(:transactionable_id, :request_id).where.not(state: ['created', 'updated'])) }
+  scope :logical_orphans, -> { where(arel_table[:request_id].in(logical_orphan_request_ids)) }
+
+  def self.logical_orphan_request_ids
+    requests_without_orphans = select(:request_id).where.not(state: ['created', 'updated'])
+    arel_table.project(arel_table[:request_id]).except(requests_without_orphans)
+  end
 
   def self.orphan_request_ids(limit: nil)
     ids = select(:request_id).group(:request_id).having('count(*) = 1').order('min(created_at)')
