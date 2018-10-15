@@ -125,7 +125,7 @@ describe "db:data:migrate" do
       }
     end
 
-    context 'with any storage providers' do
+    context 'without any storage providers' do
       it {
         expect(StorageProvider.any?).to be_falsey
         expect {
