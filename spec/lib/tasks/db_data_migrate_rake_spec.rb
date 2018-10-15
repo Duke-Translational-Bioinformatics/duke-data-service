@@ -129,7 +129,7 @@ describe "db:data:migrate" do
       it {
         expect(StorageProvider.any?).to be_falsey
         expect {
-          invoke_task expected_stderr: /no storage_providers found/
+          invoke_task expected_stdout: /no storage_providers found/
         }.not_to change{
           StorageProvider.where(is_default: true).count
         }
@@ -142,7 +142,7 @@ describe "db:data:migrate" do
         expect(storage_provider).to be_persisted
         expect(StorageProvider.where(is_default: true).any?).to be_truthy
         expect {
-          invoke_task expected_stderr: /0 storage_provider default statuses changed/
+          invoke_task expected_stdout: /0 storage_provider default statuses changed/
         }.not_to change{
           StorageProvider.where(is_default: true).count
         }
@@ -158,7 +158,7 @@ describe "db:data:migrate" do
         expect(StorageProvider.where(is_deprecated: true).any?).to be_falsey
         expect(not_default_storage_provider.is_default?).to be_falsey
         expect {
-          invoke_task expected_stderr: Regexp.new(/first storage_provider changed to default storage_provider/)
+          invoke_task expected_stdout: Regexp.new(/first storage_provider changed to default storage_provider/)
         }.to change{
           StorageProvider.where(is_default: true).count
         }.by(1)

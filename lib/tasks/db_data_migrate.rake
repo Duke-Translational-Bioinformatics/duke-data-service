@@ -211,13 +211,13 @@ end
 def set_default_storage_provider
   if StorageProvider.any?
     if StorageProvider.where(is_default: true).any?
-      $stderr.puts "0 storage_provider default statuses changed"
+      puts "0 storage_provider default statuses changed"
     else
       StorageProvider.first.update(is_default: true)
-      $stderr.puts "first storage_provider changed to default storage_provider"
+      puts "first storage_provider changed to default storage_provider"
     end
   else
-    $stderr.puts "no storage_providers found"
+    puts "no storage_providers found"
   end
 end
 
