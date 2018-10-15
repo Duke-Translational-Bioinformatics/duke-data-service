@@ -44,7 +44,7 @@ describe 'job_transaction:clean_up:orphans' do
   include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
-  let(:default_batch_size) { 1000 }
+  let(:default_batch_size) { 50000 }
   let(:oldest_orphan_created_at) { nil }
   around(:each) do |example|
     travel_to(Time.now) do #freeze_time
@@ -142,7 +142,7 @@ describe 'job_transaction:clean_up:all' do
   include ActiveSupport::Testing::TimeHelpers
   include_context "rake"
 
-  let(:default_batch_size) { 1000 }
+  let(:default_batch_size) { 50000 }
   let(:a_month_ago) { Time.now - 1.month }
   let(:just_over_a_month_ago) { Time.now - 1.month - 1.day }
   around(:each) do |example|

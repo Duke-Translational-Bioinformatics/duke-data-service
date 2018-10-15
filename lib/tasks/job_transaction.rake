@@ -19,7 +19,7 @@ namespace :job_transaction do
 
     desc 'Removes orphan JobTransactions older than a month'
     task orphans: :environment do
-      batch_size = ENV['BATCH_SIZE']&.to_i || 1000
+      batch_size = ENV['BATCH_SIZE']&.to_i || 50000
       if oldest = JobTransaction.oldest_orphan_created_at
         months_ago = ((Time.now - oldest) / 1.month).floor
         if months_ago > 0
