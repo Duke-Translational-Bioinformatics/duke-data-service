@@ -21,7 +21,6 @@ RSpec.describe JobTransaction, type: :model do
   describe '.oldest_completed_at' do
     let(:oldest_completed_at) { described_class.oldest_completed_at }
     it { expect(described_class).to respond_to(:oldest_completed_at) }
-    it { expect(described_class).to respond_to(:oldest_completed_at) }
     it { expect(oldest_completed_at).to be_nil }
 
     context 'with multiple completed' do
