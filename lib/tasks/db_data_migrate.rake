@@ -50,6 +50,19 @@ def type_untyped_authentication_services
   puts "Fin!"
 end
 
+def type_untyped_storage_providers
+  default_type = "SwiftStorageProvider"
+  untyped = StorageProvider.where(type: nil)
+  pre_count = untyped.count
+  if pre_count > 0
+    changed = untyped.update_all(type: default_type)
+    $stderr.puts "#{changed} untyped storage_providers changed to #{default_type}"
+  else
+    $stderr.puts "0 untyped storage_providers changed"
+  end
+  puts "Fin!"
+end
+
 def fill_new_authentication_service_attributes
   if ENV["AUTH_SERVICE_SERVICE_ID"]
     new_attributes = [
@@ -117,7 +130,7 @@ def create_missing_fingerprints
 end
 
 def migrate_nil_consistency_status
-  storage_provider = StorageProvider.first
+  storage_provider = StorageProvider.default
   updated_projects = 0
   updated_uploads = 0
   projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
@@ -195,6 +208,19 @@ def populate_nil_project_slugs
   puts " #{slug_count} Project slugs populated."
 end
 
+def set_default_storage_provider
+  if StorageProvider.any?
+    if StorageProvider.where(is_default: true).any?
+      puts "0 storage_provider default statuses changed"
+    else
+      StorageProvider.first.update(is_default: true)
+      puts "first storage_provider changed to default storage_provider"
+    end
+  else
+    puts "no storage_providers found"
+  end
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -202,11 +228,13 @@ namespace :db do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_missing_fingerprints
       type_untyped_authentication_services
+      type_untyped_storage_providers
       migrate_nil_consistency_status
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
       purge_deleted_objects
       populate_nil_project_slugs
+      set_default_storage_provider
     end
   end
 end

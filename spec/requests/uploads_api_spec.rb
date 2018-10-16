@@ -4,7 +4,7 @@ describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
 
   let(:project) { FactoryBot.create(:project) }
-  let!(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+  let!(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
   let(:upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id, project: project) }
   let(:other_upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id) }
   let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }

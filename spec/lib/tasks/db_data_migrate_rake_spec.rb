@@ -59,6 +59,8 @@ describe "db:data:migrate" do
       let(:openid_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       it {
+        expect(duke_authentication_service).to be_persisted
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: /0 untyped authentication_services changed/
         }.not_to change{
@@ -76,6 +78,7 @@ describe "db:data:migrate" do
 
       it {
         expect(untyped_authentication_service).not_to be_a default_type
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: Regexp.new("1 untyped authentication_services changed to #{default_type}")
         }.to change{
@@ -85,6 +88,82 @@ describe "db:data:migrate" do
         expect(expected_to_be_typed_auth_service).to be_a default_type
         openid_authentication_service.reload
         expect(openid_authentication_service).to be_a OpenidAuthenticationService
+      }
+    end
+
+    context 'without untyped storage providers' do
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      it {
+        expect(storage_provider).to be_persisted
+        expect {
+          invoke_task expected_stderr: /0 untyped storage_providers changed/
+        }.not_to change{
+          StorageProvider.where(type: nil).count
+        }
+      }
+    end
+
+    context 'with untyped storage providers' do
+      let(:default_type) { SwiftStorageProvider }
+      let(:untyped_storage_provider) {
+        StorageProvider.create(FactoryBot.attributes_for(:swift_storage_provider))
+      }
+      let(:typed_storage_provider) { FactoryBot.create(:swift_storage_provider) }
+
+      it {
+        expect(untyped_storage_provider).not_to be_a default_type
+        expect(typed_storage_provider).to be_persisted
+        expect {
+          invoke_task expected_stderr: Regexp.new("1 untyped storage_providers changed to #{default_type}")
+        }.to change{
+          StorageProvider.where(type: nil).count
+        }.by(-1)
+        expected_to_be_typed_storage_provider = StorageProvider.find(untyped_storage_provider.id)
+        expect(expected_to_be_typed_storage_provider).to be_a default_type
+        typed_storage_provider.reload
+        expect(typed_storage_provider).to be_a SwiftStorageProvider
+      }
+    end
+
+    context 'without any storage providers' do
+      it {
+        expect(StorageProvider.any?).to be_falsey
+        expect {
+          invoke_task expected_stdout: /no storage_providers found/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'with a default storage provider' do
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      it {
+        expect(storage_provider).to be_persisted
+        expect(StorageProvider.where(is_default: true).any?).to be_truthy
+        expect {
+          invoke_task expected_stdout: /0 storage_provider default statuses changed/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'without any default storage providers' do
+      let(:not_default_storage_provider) {
+        FactoryBot.create(:swift_storage_provider, is_default: false)
+      }
+
+      it {
+        expect(StorageProvider.where(is_deprecated: true).any?).to be_falsey
+        expect(not_default_storage_provider.is_default?).to be_falsey
+        expect {
+          invoke_task expected_stdout: Regexp.new(/first storage_provider changed to default storage_provider/)
+        }.to change{
+          StorageProvider.where(is_default: true).count
+        }.by(1)
+        not_default_storage_provider.reload
+        expect(not_default_storage_provider.is_default?).to be_truthy
       }
     end
 
@@ -119,7 +198,7 @@ describe "db:data:migrate" do
     end
 
     describe 'consistency migration', :vcr do
-      let(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
 
       before do
         expect(storage_provider).to be_persisted
