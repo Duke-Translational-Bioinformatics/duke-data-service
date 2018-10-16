@@ -40,6 +40,10 @@ RSpec.describe Project, type: :model do
     it 'should have many containers' do
       should have_many(:containers)
     end
+
+    it 'should belong_to storage_provider' do
+      should belong_to(:storage_provider)
+    end
   end
 
   describe 'validations' do
