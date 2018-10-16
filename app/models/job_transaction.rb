@@ -8,8 +8,12 @@ class JobTransaction < ActiveRecord::Base
   scope :orphans, ->(limit: nil) { where(request_id: orphan_request_ids(limit: limit)) }
   scope :logical_orphans, -> { where(arel_table[:request_id].in(logical_orphan_request_ids)) }
 
+  def self.initial_states
+    ['updated', 'created', 'trashbin_migration']
+  end
+
   def self.logical_orphan_request_ids
-    requests_without_orphans = select(:request_id).where.not(state: ['created', 'updated'])
+    requests_without_orphans = select(:request_id).where.not(state: initial_states)
     arel_table.project(arel_table[:request_id]).except(requests_without_orphans)
   end
 

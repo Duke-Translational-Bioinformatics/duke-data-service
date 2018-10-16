@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe JobTransaction, type: :model do
   subject { FactoryBot.create(:job_transaction, :transactionable_dummy) }
+  let(:initial_states) { %w{created updated trashbin_migration} }
 
   # Transactionable objects automaticalaly create JobTransactions
   # Use :transactionable_dummy trait to create fewer objects.
@@ -16,6 +17,11 @@ RSpec.describe JobTransaction, type: :model do
       is_expected.to validate_presence_of(:key)
       is_expected.to validate_presence_of(:state)
     }
+  end
+
+  describe '.initial_states' do
+    it { expect(described_class).to respond_to(:initial_states) }
+    it { expect(described_class.initial_states).to contain_exactly *initial_states }
   end
 
   describe '.oldest_completed_at' do
@@ -144,7 +150,7 @@ RSpec.describe JobTransaction, type: :model do
     it { expect(oldest_logical_orphan_created_at).to be_nil }
 
     context 'with multiple orphans' do
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      let(:orphan_jobs) { initial_states.map {|state| FactoryBot.create(:job_transaction, :transactionable_dummy, state: state) } }
       let(:orphan_times) { orphan_jobs.collect {|j| j.created_at} }
       before(:each) do
         expect(orphan_jobs).to be_a Array
@@ -240,7 +246,7 @@ RSpec.describe JobTransaction, type: :model do
     end
 
     context 'with multiple logical orphans' do
-      let(:orphan_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
+      let(:orphan_jobs) { initial_states.map {|state| FactoryBot.create(:job_transaction, :transactionable_dummy, state: state) } }
       before(:each) do
         expect(JobTransaction.count).to eq 0
         expect(orphan_jobs).to be_a Array
@@ -266,14 +272,14 @@ RSpec.describe JobTransaction, type: :model do
       it { expect{delete_all_logical_orphans}.not_to change{JobTransaction.count} }
     end
 
-    context 'with matching request and transactionable ids and create/update state' do
+    context 'with matching request and transactionable ids and initial states' do
       let(:request_id) { SecureRandom.uuid }
       let(:initial_jobs) { FactoryBot.create_list(:job_transaction, 3, :transactionable_dummy, state: 'created') }
       before(:each) do
         expect(JobTransaction.count).to eq 0
         expect(initial_jobs).to be_a Array
         initial_jobs.each do |i|
-          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id, state: 'updated')
+          FactoryBot.create(:job_transaction, transactionable: i.transactionable, request_id: i.request_id, state: initial_states.sample)
         end
       end
       it { expect{delete_all_logical_orphans}.to change{JobTransaction.count}.by(-6) }
