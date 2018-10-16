@@ -308,5 +308,68 @@ RSpec.describe SwiftStorageProvider, type: :model do
       is_expected.to validate_presence_of :chunk_max_number
       is_expected.to validate_presence_of :chunk_max_size_bytes
     end
+
+    context 'is_default' do
+      let(:new_default_storage_provider) { FactoryBot.build(:swift_storage_provider, :default) }
+      let(:new_not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
+      it 'should allow only one default storage_provider' do
+        expect(subject.is_default?).to be_truthy
+        expect(new_default_storage_provider).not_to be_valid
+        expect(new_not_default_storage_provider).to be_valid
+        subject.update(is_default: false)
+        expect(new_default_storage_provider).to be_valid
+        expect(new_not_default_storage_provider).to be_valid
+      end
+    end
+
+    context 'is_deprecated' do
+      let(:not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
+      it {
+        is_expected.to be_valid
+        expect(not_default_storage_provider).to be_valid
+
+        subject.is_deprecated = true
+        is_expected.not_to be_valid
+
+        not_default_storage_provider.is_deprecated = true
+        expect(not_default_storage_provider).to be_valid
+      }
+    end
+  end
+
+  describe '.default' do
+    let(:default_storage_provider) { FactoryBot.create(:swift_storage_provider, :default) }
+    let(:not_default_storage_provider) { FactoryBot.create(:swift_storage_provider, is_default: false) }
+    subject { StorageProvider.default }
+
+    it { expect(described_class).to respond_to(:default) }
+
+    context 'without any storage_providers' do
+      it {
+        is_expected.to be_nil
+      }
+    end
+
+    context 'with a default storage_provider' do
+      before do
+        expect(default_storage_provider).to be_persisted
+        expect(not_default_storage_provider).to be_persisted
+      end
+
+      it {
+        is_expected.to eq(default_storage_provider)
+        is_expected.not_to eq(not_default_storage_provider)
+      }
+    end
+
+    context 'without a default storage_provider' do
+      before do
+        expect(not_default_storage_provider).to be_persisted
+      end
+
+      it {
+        is_expected.to be_nil
+      }
+    end
   end
 end

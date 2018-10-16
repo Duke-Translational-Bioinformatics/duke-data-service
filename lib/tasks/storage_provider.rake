@@ -50,7 +50,7 @@ namespace :storage_provider do
     end
     Rails.logger.level = 3
     Container.auditing_enabled = false
-    storage_provider = StorageProvider.first
+    storage_provider = StorageProvider.default
     Project.all.each do |project|
       project.data_files.each do |data_file|
         upload = data_file.upload
@@ -90,7 +90,7 @@ namespace :storage_provider do
   desc 'print storage_provider usage information'
   task usage: :environment do
     Rails.logger.level = 3
-    sp = StorageProvider.first
+    sp = StorageProvider.default
     puts sp.get_account_info.to_json
   end
 
@@ -103,7 +103,7 @@ namespace :storage_provider do
       chunks: []
     }
 
-    storage_provider = StorageProvider.first
+    storage_provider = StorageProvider.default
     storage_provider.get_containers.each do |container|
       unless Project.where(id: container).exists?
         to_prune[:projects] << container

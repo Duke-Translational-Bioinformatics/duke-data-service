@@ -26,8 +26,8 @@ module DDS
             logger.error 'authentication_service has not been created'
           end
 
-          #storage_provider must be created
-          sp = StorageProvider.first
+          #default storage_provider must be created
+          sp = StorageProvider.default
           if sp
             #storage_provider must be accessible over http without network or CORS issues
             sp_acct = sp.get_account_info
