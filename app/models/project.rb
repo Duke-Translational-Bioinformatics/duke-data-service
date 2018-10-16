@@ -7,6 +7,7 @@ class Project < ActiveRecord::Base
   audited
 
   belongs_to :creator, class_name: "User"
+  belongs_to :storage_provider
   has_many :folders
   has_many :project_permissions
   has_many :uploads

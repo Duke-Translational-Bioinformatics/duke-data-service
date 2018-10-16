@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181012171403) do
+ActiveRecord::Schema.define(version: 20181016134301) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(version: 20181012171403) do
     t.datetime "updated_at", null: false
     t.boolean "is_consistent"
     t.string "slug"
+    t.uuid "storage_provider_id"
   end
 
   create_table "properties", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
