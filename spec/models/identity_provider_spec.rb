@@ -10,7 +10,7 @@ RSpec.describe IdentityProvider, type: :model do
 
   describe 'interface' do
     describe '#affiliates' do
-      it { is_expected.to respond_to(:affiliates) }
+      it { is_expected.to respond_to(:affiliates).with(0).arguments }
       it { is_expected.to respond_to(:affiliates).with(1).argument }
       it { expect{ subject.affiliates }.to raise_error(NotImplementedError) }
       it { expect{ subject.affiliates('foo') }.to raise_error(NotImplementedError) }
