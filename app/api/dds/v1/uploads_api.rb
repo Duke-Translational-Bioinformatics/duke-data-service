@@ -26,7 +26,7 @@ module DDS
             upload_params = declared(params, include_missing: false)
             project = hide_logically_deleted Project.find(params[:project_id])
             check_consistency! project
-            storage_provider = StorageProvider.first
+            storage_provider = StorageProvider.default
             upload = project.uploads.build({
               name: upload_params[:name],
               size: upload_params[:size],

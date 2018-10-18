@@ -40,6 +40,10 @@ RSpec.describe Project, type: :model do
     it 'should have many containers' do
       should have_many(:containers)
     end
+
+    it 'should belong_to storage_provider' do
+      should belong_to(:storage_provider)
+    end
   end
 
   describe 'validations' do
@@ -98,7 +102,7 @@ RSpec.describe Project, type: :model do
   describe '#initialize_storage' do
     subject { FactoryBot.build(:project) }
     let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
-    let(:default_storage_provider) { FactoryBot.create(:storage_provider) }
+    let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
     it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
@@ -110,7 +114,7 @@ RSpec.describe Project, type: :model do
     it 'should enqueue a ProjectStorageProviderInitializationJob with the default StorageProvider' do
       #TODO change this when storage_providers become configurable
       expect(StorageProvider.count).to eq 1
-      expect(StorageProvider.first.id).to eq(default_storage_provider.id)
+      expect(StorageProvider.default.id).to eq(default_storage_provider.id)
       expect(subject).to receive(:initialize_storage).and_call_original
       expect {
         subject.save

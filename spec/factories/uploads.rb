@@ -18,7 +18,7 @@ FactoryBot.define do
     end
 
     trait :swift do
-      storage_provider { create(:storage_provider, :swift) }
+      storage_provider { create(:swift_storage_provider) }
     end
 
     trait :completed do
