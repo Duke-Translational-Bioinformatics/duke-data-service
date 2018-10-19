@@ -29,30 +29,24 @@ RSpec.describe LdapIdentityProvider, type: :model do
     context 'full_name_contains' do
       context 'not provided' do
         subject { auth_provider.identity_provider.affiliates }
-        it {
-          is_expected.to be_a Array
-          expect(subject.length).to eq 0
-        }
+        before { expect(auth_provider.identity_provider).not_to receive(:ldap_search) }
+        it { is_expected.to eq [] }
       end
 
       context 'less than 3 characters' do
         subject { auth_provider.identity_provider.affiliates(
           'a'*2
         ) }
-        it {
-          is_expected.to be_a Array
-          expect(subject.length).to eq 0
-        }
+        before { expect(auth_provider.identity_provider).not_to receive(:ldap_search) }
+        it { is_expected.to eq [] }
       end
 
       context 'is 3 characters' do
         let(:ldap_returns) { [test_user] }
         include_context 'mocked ldap', returns: :ldap_returns
         subject { auth_provider.identity_provider.affiliates('foo') }
-        it {
-          is_expected.to be_a Array
-          expect(subject.length).to be > 0
-        }
+        before { expect(auth_provider.identity_provider).to receive(:ldap_search).and_call_original }
+        it { is_expected.not_to be_empty }
       end
 
       context 'greater than 3 characters' do
