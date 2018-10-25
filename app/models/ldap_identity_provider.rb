@@ -36,11 +36,11 @@ class LdapIdentityProvider < IdentityProvider
     ) do |entry|
       if entry.attribute_names.include?(:uid)
         results << User.new(
-          username: entry.uid.first,
-          first_name: entry.givenName.first,
-          last_name: entry.sn.first,
-          email: entry.attribute_names.include?(:mail) ? entry.mail.first : nil,
-          display_name: entry.displayName.first
+          username: entry[:uid].first,
+          first_name: entry[:givenName].first,
+          last_name: entry[:sn].first,
+          email: entry[:mail].first,
+          display_name: entry[:displayName].first
         )
       end
     end

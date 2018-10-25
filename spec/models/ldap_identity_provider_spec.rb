@@ -50,38 +50,46 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'greater than 3 characters' do
-        context 'missing uid' do
-          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == :username } }
+        context 'incomplete record' do
+          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == missing_attr } }
           let(:ldap_returns) { [test_user] }
           include_context 'mocked ldap', returns: :ldap_returns
           subject { auth_provider.identity_provider.affiliates(
-            test_user[:last_name]
+            full_name_contains
           ) }
+          let(:full_name_contains) { test_user[:last_name] }
+          let(:affiliate) { subject.first }
+          context 'missing uid' do
+            let(:missing_attr) { :username }
+            it { is_expected.to eq [] }
+          end
 
-          it {
-            is_expected.to be_a Array
-            expect(subject.length).to eq 0
-          }
-        end
-
-        context 'missing mail' do
-          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == :email } }
-          let(:ldap_returns) { [test_user] }
-          include_context 'mocked ldap', returns: :ldap_returns
-          subject { auth_provider.identity_provider.affiliates(
-            test_user[:last_name]
-          ) }
-
-          it {
-            is_expected.to be_a Array
-            expect(subject.length).to be > 0
-            subject.each do |response|
-              expect(response).to be_a User
-              expect(response).not_to be_persisted
-              expect(response.display_name).to eq test_user[:display_name]
-              expect(response.email).not_to be
+          context 'is still valid' do
+            before(:example) do
+              is_expected.to be_a Array
+              expect(subject.length).to eq 1
+              expect(affiliate).to be_a(User)
+              expect(affiliate).not_to be_persisted
+              expect(affiliate.username).to eq test_user[:username]
             end
-          }
+            context 'when missing mail' do
+              let(:missing_attr) { :email }
+              it { expect(affiliate.email).to be_nil }
+            end
+            context 'when missing givenName' do
+              let(:missing_attr) { :first_name }
+              it { expect(affiliate.first_name).to be_nil }
+            end
+            context 'when missing sn' do
+              let(:full_name_contains) { test_user[:first_name] }
+              let(:missing_attr) { :last_name }
+              it { expect(affiliate.last_name).to be_nil }
+            end
+            context 'when missing displayName' do
+              let(:missing_attr) { :display_name }
+              it { expect(affiliate.display_name).to be_nil }
+            end
+          end
         end
 
         context 'complete record' do
