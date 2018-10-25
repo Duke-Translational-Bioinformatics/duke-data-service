@@ -1,13 +1,18 @@
 shared_context 'mocked ldap' do |returns:|
   let(:entry_users) { send(returns) }
+  let(:attr_map) {{
+    uid: :username,
+    givenName: :first_name,
+    sn: :last_name,
+    mail: :email,
+    displayName: :display_name
+  }}
   let(:expected_entries) {
     entry_users.map { |test_user|
       expected_entry = Net::LDAP::Entry.new
-      expected_entry[:uid] = test_user[:username] if test_user[:username]
-      expected_entry[:givenName] = test_user[:first_name]
-      expected_entry[:sn] = test_user[:last_name]
-      expected_entry[:mail] = test_user[:email] if test_user[:email]
-      expected_entry[:displayName] = test_user[:display_name]
+      attr_map.each_pair do |ldap_attr, model_attr|
+        expected_entry[ldap_attr] = test_user[model_attr] if test_user[model_attr]
+      end
       expected_entry
     }
   }
