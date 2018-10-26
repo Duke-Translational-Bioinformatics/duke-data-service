@@ -17,13 +17,14 @@ class LdapIdentityProvider < IdentityProvider
   end
 
   def ldap_filter(filter_hash)
-    filter_str = nil
+    filter_attr = nil
     if val = filter_hash[:username]
-      filter_str = "uid=#{val}"
+      filter_attr = "uid"
     elsif val = filter_hash[:full_name_contains]
-      filter_str = "displayName=*#{val}*"
+      filter_attr = "displayName"
+      val = "*#{val}*"
     end
-    Net::LDAP::Filter.construct(filter_str) if filter_str
+    Net::LDAP::Filter.eq(filter_attr, val) if filter_attr
   end
 
   def ldap_search(filter:)

@@ -112,4 +112,29 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
     end
   end
+
+  describe "#ldap_filter" do
+    let(:ldap_filter) { subject.ldap_filter(filter_hash) }
+    let(:filter_hash) { {} }
+    it { is_expected.to respond_to(:ldap_filter).with(1).argument }
+    it { is_expected.not_to respond_to(:ldap_filter).with(0).arguments }
+
+    context 'with empty filter hash' do
+      it { expect(ldap_filter).to eq nil }
+    end
+
+    context 'with username filter' do
+      let(:filter_hash) { {username: uid} }
+      let(:uid) { FactoryBot.attributes_for(:user)[:username] }
+      it { expect(ldap_filter).to be_a Net::LDAP::Filter }
+      it { expect(ldap_filter.to_s).to eq "(uid=#{uid})" }
+    end
+
+    context 'with full_name_contains filter' do
+      let(:filter_hash) { {full_name_contains: last_name} }
+      let(:last_name) { FactoryBot.attributes_for(:user)[:last_name] }
+      it { expect(ldap_filter).to be_a Net::LDAP::Filter }
+      it { expect(ldap_filter.to_s).to eq "(displayName=*#{last_name}*)" }
+    end
+  end
 end
