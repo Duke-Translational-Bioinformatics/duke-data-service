@@ -9,6 +9,79 @@ class SwiftStorageProvider < StorageProvider
   validates :chunk_max_number, presence: true
   validates :chunk_max_size_bytes, presence: true
 
+  # StorageProvider Implementation
+  def initialize_project(project)
+    put_container(project.id)
+  end
+
+  def single_file_upload_url(upload)
+    build_signed_url(
+      'POST',
+      upload.sub_path,
+      expiry
+    )
+  end
+
+  def initialize_chunked_upload(upload)
+    return # nothing to do in swift
+  end
+
+  def endpoint
+    url_root
+  end
+
+  def complete_chunked_upload(upload)
+    put_object_manifest(
+      upload.storage_container,
+      upload.id,
+      upload.manifest,
+      upload.content_type,
+      upload.name
+    )
+    meta = get_object_metadata(
+      upload.storage_container,
+      upload.id
+    )
+    unless meta["content-length"].to_i == upload.size
+      raise IntegrityException, "reported size does not match size computed by StorageProvider"
+    end
+  end
+
+  def chunk_upload_url(chunk)
+    build_signed_url(
+      'PUT',
+      chunk.sub_path,
+      expiry
+    )
+  end
+
+  def download_url(upload,filename=nil)
+    filename ||= upload.name
+    build_signed_url(
+      'GET',
+      upload.sub_path,
+      expiry,
+      filename
+    )
+  end
+
+  def purge(object)
+    raise "#{object} is not purgable" unless object.is_a?(Upload) || object.is_a?(Chunk)
+    begin
+      if object.is_a? Upload
+        delete_object_manifest(object.storage_container, object.id)
+      else
+        delete_object(object.storage_container, object.object_path)
+      end
+    rescue StorageProviderException => e
+      unless e.message.match /Not Found/
+        raise e
+      end
+    end
+  end
+
+  private
+
   def auth_token
     call_auth_uri['x-auth-token']
   end
@@ -121,7 +194,59 @@ class SwiftStorageProvider < StorageProvider
      resp.headers
   end
 
-  private
+  def root_path
+    root_path = ['',
+      provider_version,
+      name
+    ].join('/')
+  end
+
+  def digest
+    @digest ||= OpenSSL::Digest.new('sha1')
+  end
+
+  def build_signature(hmac_body, key = primary_key)
+    OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
+  end
+
+  def build_signed_url(http_verb, sub_path, expiry, filename=nil)
+    path = [root_path, sub_path].join('/')
+    hmac_body = [http_verb, expiry, path].join("\n")
+    signature = build_signature(hmac_body)
+    signed_url = URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
+    signed_url = signed_url + "&filename=#{URI.encode(filename)}" if filename
+    signed_url
+  end
+
+  def put_container(container)
+    resp = HTTParty.put(
+      "#{storage_url}/#{container}",
+      headers: auth_header.merge({
+        "X-Container-Meta-Access-Control-Allow-Origin" => "*"
+      })
+    )
+    ([201,202,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_object_manifest(container, object)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
+      headers: auth_header
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+  end
+
+  def delete_object(container, object)
+    resp = HTTParty.delete(
+      "#{storage_url}/#{container}/#{object}",
+      headers: auth_header
+    )
+    ([200,204].include?(resp.response.code.to_i)) ||
+      raise(StorageProviderException, resp.body)
+  end
+
   def call_auth_uri
     begin
       @auth_uri_resp ||= HTTParty.get(

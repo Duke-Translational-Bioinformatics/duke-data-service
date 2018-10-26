@@ -7,6 +7,130 @@ RSpec.describe SwiftStorageProvider, type: :model do
   let(:filename) {'text_file.txt'}
   subject { storage_provider }
 
+
+  describe 'StorageProvider Implementation' do
+    let(:expected_project_id) { SecureRandom.uuid }
+    let(:project) { instance_double("Project") }
+    let(:upload) { FactoryBot.create(:upload, :with_chunks) }
+    let(:expected_meta) {
+      {
+      "content-length" => "#{upload.size}"
+      }
+    }
+    let(:chunk) { FactoryBot.create(:chunk) }
+
+    it_behaves_like 'A StorageProvider'
+
+    it {
+      expect(project).to receive(:id)
+        .and_return(expected_project_id)
+      is_expected.to receive(:put_container)
+        .with(expected_project_id)
+
+      expect {
+        subject.initialize_project(project)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:build_signed_url)
+        .with(
+          'POST',
+          upload.sub_path,
+          subject.expiry
+        )
+      expect {
+        subject.single_file_upload_url(upload)
+      }.not_to raise_error
+    }
+
+    it {
+      expect {
+        subject.initialize_chunked_upload(upload)
+      }.not_to raise_error
+    }
+
+    it {
+      expect {
+        expect(subject.endpoint).to eq(subject.url_root)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:put_object_manifest)
+        .with(
+          upload.storage_container,
+          upload.id,
+          upload.manifest,
+          upload.content_type,
+          upload.name
+        )
+      is_expected.to receive(:get_object_metadata)
+        .with(
+          upload.storage_container,
+          upload.id
+        ).and_return(expected_meta)
+
+      expect {
+        subject.complete_chunked_upload(upload)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:build_signed_url)
+        .with(
+          'PUT',
+          chunk.sub_path,
+          subject.expiry
+        )
+      expect {
+        subject.chunk_upload_url(chunk)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:build_signed_url)
+        .with(
+          'GET',
+          upload.sub_path,
+          subject.expiry,
+          upload.name
+        )
+      expect {
+        subject.download_url(upload)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:delete_object_manifest)
+        .with(
+          upload.storage_container,
+          upload.id
+        )
+      expect {
+        subject.purge(upload)
+      }.not_to raise_error
+    }
+
+    it {
+      is_expected.to receive(:delete_object)
+        .with(
+          chunk.storage_container,
+          chunk.object_path
+        )
+
+      expect {
+        subject.purge(chunk)
+      }.not_to raise_error
+    }
+
+    it {
+      expect {
+        subject.purge(subject)
+      }.to raise_error("#{subject} is not purgable")
+    }
+  end
+
   describe 'methods that call swift api', :vcr do
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
