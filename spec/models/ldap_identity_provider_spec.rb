@@ -113,6 +113,25 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
   end
 
+  describe '#ldap_search' do
+    let(:ldap_search) { subject.ldap_search(filter: filter_hash) }
+    let(:filter_hash) { {} }
+    it { is_expected.to respond_to(:ldap_search).with_keywords(:filter) }
+    it { is_expected.not_to respond_to(:ldap_search).with(0).arguments }
+
+    context 'when called' do
+      let(:ldap_mock) { instance_double("Net::LDAP") }
+      let(:entry_mock) { instance_double("Net::LDAP::Entry") }
+      before(:example) do
+        is_expected.to receive(:ldap_conn).and_return(ldap_mock)
+        allow(entry_mock).to receive(:attribute_names).and_return([:uid])
+        allow(entry_mock).to receive('[]').and_return(['foo'])
+        allow(ldap_mock).to receive(:search).and_yield(entry_mock).and_return(true)
+      end
+      it { expect(ldap_search).to be_a Array }
+    end
+  end
+
   describe '#ldap_filter' do
     let(:ldap_filter) { subject.ldap_filter(filter_hash) }
     let(:filter_hash) { {} }
