@@ -29,7 +29,7 @@ class LdapIdentityProvider < IdentityProvider
 
   def ldap_search(filter:)
     results = []
-    success = ldap.search(
+    success = ldap_conn.search(
       filter: ldap_filter(filter),
       attributes: %w(uid duDukeID sn givenName mail displayName),
       size: 500,
@@ -45,14 +45,12 @@ class LdapIdentityProvider < IdentityProvider
         )
       end
     end
-    logger.warn "#{ldap.get_operation_result.inspect} results may have been truncated" unless success
+    logger.warn "#{ldap_conn.get_operation_result.inspect} results may have been truncated" unless success
     results
   end
 
-  private
-
-  def ldap
-    @ldap ||= Net::LDAP.new(
+  def ldap_conn
+    @ldap_conn ||= Net::LDAP.new(
         host: host,
         port: port,
         base: ldap_base

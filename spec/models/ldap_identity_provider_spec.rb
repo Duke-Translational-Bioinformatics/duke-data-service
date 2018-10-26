@@ -113,7 +113,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
   end
 
-  describe "#ldap_filter" do
+  describe '#ldap_filter' do
     let(:ldap_filter) { subject.ldap_filter(filter_hash) }
     let(:filter_hash) { {} }
     it { is_expected.to respond_to(:ldap_filter).with(1).argument }
@@ -135,6 +135,18 @@ RSpec.describe LdapIdentityProvider, type: :model do
       let(:last_name) { FactoryBot.attributes_for(:user)[:last_name] }
       it { expect(ldap_filter).to be_a Net::LDAP::Filter }
       it { expect(ldap_filter.to_s).to eq "(displayName=*#{last_name}*)" }
+    end
+  end
+
+  describe '#ldap_conn' do
+    let(:ldap_conn) { subject.ldap_conn }
+    it { is_expected.to respond_to(:ldap_conn).with(0).arguments }
+    it { expect(ldap_conn).to be_a Net::LDAP }
+    it { expect(ldap_conn.host).to eq subject.host }
+    it { expect(ldap_conn.port).to eq subject.port }
+    it { expect(ldap_conn.base).to eq subject.ldap_base }
+    it 'is cached' do
+      expect(ldap_conn).to eq subject.ldap_conn
     end
   end
 end
