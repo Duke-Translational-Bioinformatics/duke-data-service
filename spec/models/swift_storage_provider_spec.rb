@@ -56,25 +56,95 @@ RSpec.describe SwiftStorageProvider, type: :model do
       }.not_to raise_error
     }
 
-    it {
-      is_expected.to receive(:put_object_manifest)
-        .with(
-          upload.storage_container,
-          upload.id,
-          upload.manifest,
-          upload.content_type,
-          upload.name
-        )
-      is_expected.to receive(:get_object_metadata)
-        .with(
-          upload.storage_container,
-          upload.id
-        ).and_return(expected_meta)
+    describe '#complete_chunked_upload' do
+      context 'StorageProvider Exception' do
+        context 'Etag Mismatch' do
+          it {
+            is_expected.to receive(:put_object_manifest)
+              .with(
+                upload.storage_container,
+                upload.id,
+                upload.manifest,
+                upload.content_type,
+                upload.name
+              ).and_raise(StorageProviderException.new('Etag Mismatch'))
 
-      expect {
-        subject.complete_chunked_upload(upload)
-      }.not_to raise_error
-    }
+            expect {
+              subject.complete_chunked_upload(upload)
+            }.to raise_error(IntegrityException)
+          }
+        end
+
+        context 'unexpected' do
+          let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+
+          it {
+            is_expected.to receive(:put_object_manifest)
+              .with(
+                upload.storage_container,
+                upload.id,
+                upload.manifest,
+                upload.content_type,
+                upload.name
+              ).and_raise(unexpected_exception)
+
+            expect {
+              subject.complete_chunked_upload(upload)
+            }.to raise_error(unexpected_exception)
+          }
+        end
+      end
+
+      context 'size mismatch' do
+        let(:expected_meta) {
+          {
+          "content-length" => "#{upload.size - 10}"
+          }
+        }
+
+        it {
+          is_expected.to receive(:put_object_manifest)
+            .with(
+              upload.storage_container,
+              upload.id,
+              upload.manifest,
+              upload.content_type,
+              upload.name
+            )
+          is_expected.to receive(:get_object_metadata)
+            .with(
+              upload.storage_container,
+              upload.id
+            ).and_return(expected_meta)
+
+          expect {
+            subject.complete_chunked_upload(upload)
+          }.to raise_error(IntegrityException)
+        }
+      end
+
+      context 'success' do
+        it {
+          is_expected.to receive(:put_object_manifest)
+            .with(
+              upload.storage_container,
+              upload.id,
+              upload.manifest,
+              upload.content_type,
+              upload.name
+            )
+          is_expected.to receive(:get_object_metadata)
+            .with(
+              upload.storage_container,
+              upload.id
+            ).and_return(expected_meta)
+
+          expect {
+            subject.complete_chunked_upload(upload)
+          }.not_to raise_error
+        }
+      end
+    end
 
     it {
       is_expected.to receive(:build_signed_url)

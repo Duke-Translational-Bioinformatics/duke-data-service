@@ -31,13 +31,21 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
-    put_object_manifest(
-      upload.storage_container,
-      upload.id,
-      upload.manifest,
-      upload.content_type,
-      upload.name
-    )
+    begin
+      put_object_manifest(
+        upload.storage_container,
+        upload.id,
+        upload.manifest,
+        upload.content_type,
+        upload.name
+      )
+    rescue StorageProviderException => e
+      if e.message.match(/.*Etag.*Mismatch.*/)
+        raise IntegrityException, 'reported chunk hash does not match that computed by StorageProvider'
+      else
+        raise e
+      end
+    end
     meta = get_object_metadata(
       upload.storage_container,
       upload.id
