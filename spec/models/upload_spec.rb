@@ -1,12 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
-  subject { FactoryBot.create(:upload, :swift, :with_chunks) }
+  subject { FactoryBot.create(:upload, :with_chunks) }
+  include_context 'with mocked StorageProvider'
+
   let(:fingerprint) { FactoryBot.create(:fingerprint, upload: subject) }
-  let(:completed_upload) { FactoryBot.create(:upload, :swift, :with_chunks, :with_fingerprint, :completed) }
-  let(:upload_with_error) { FactoryBot.create(:upload, :swift, :with_chunks, :with_error) }
+  let(:completed_upload) { FactoryBot.create(:upload, :with_chunks, :with_fingerprint, :completed) }
+  let(:upload_with_error) { FactoryBot.create(:upload, :with_chunks, :with_error) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
+  let(:expected_chunk_max_number) { Faker::Number.between(100,1000) }
+  let(:expected_chunk_max_size_bytes) { Faker::Number.between(4368709122, 6368709122) }
+
+  before do
+    allow(storage_provider).to receive(:chunk_max_number)
+      .and_return(expected_chunk_max_number)
+    allow(storage_provider).to receive(:chunk_max_size_bytes)
+      .and_return(expected_chunk_max_size_bytes)
+  end
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
@@ -93,14 +104,6 @@ RSpec.describe Upload, type: :model do
 
     describe '#temporary_url' do
       it { is_expected.to respond_to :temporary_url }
-      it { expect(subject.temporary_url).to be_a String }
-      it { expect(subject.temporary_url).to include subject.name }
-      it { expect(subject.temporary_url).to include subject.storage_container }
-
-      context 'when filename is provided' do
-        let(:filename) { 'different-file-name.txt' }
-        it { expect(subject.temporary_url(filename)).to include filename }
-      end
 
       context 'when has_integrity_exception? true' do
         it {
@@ -121,6 +124,25 @@ RSpec.describe Upload, type: :model do
             subject.temporary_url
           }.to raise_error(ConsistencyException)
         }
+      end
+
+      context 'consistent and no integrity exceptions' do
+        let(:expected_url) { Faker::Internet.url }
+        before do
+          expect(storage_provider).to receive(:download_url)
+            .with(subject, expected_filename)
+            .and_return(expected_url)
+        end
+
+        context 'when filename is provided' do
+          let(:expected_filename) { 'different-file-name.txt' }
+          it { expect(subject.temporary_url(expected_filename)).to eq(expected_url) }
+        end
+
+        context 'without filename' do
+          let(:expected_filename) { nil }
+          it { expect(subject.temporary_url).to eq(expected_url) }
+        end
       end
     end
 
@@ -252,8 +274,6 @@ RSpec.describe Upload, type: :model do
 
   describe 'StorageProvider Methods' do
     let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
-
-    include_context 'with mocked StorageProvider'
 
     before do
       allow(subject).to receive(:max_size_bytes)
