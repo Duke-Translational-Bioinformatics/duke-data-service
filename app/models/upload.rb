@@ -78,18 +78,12 @@ class Upload < ActiveRecord::Base
     !error_at.nil?
   end
 
-  def create_and_validate_storage_manifest
+  def complete_and_validate_integrity
     begin
       storage_provider.complete_chunked_upload(self)
       update!({
         is_consistent: true
       })
-    rescue StorageProviderException => e
-      if e.message.match(/.*Etag.*Mismatch.*/)
-        integrity_exception("reported chunk hash does not match that computed by StorageProvider")
-      else
-        raise e
-      end
     rescue IntegrityException => e
       integrity_exception(e.message)
     end

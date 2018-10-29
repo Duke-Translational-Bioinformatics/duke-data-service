@@ -260,16 +260,16 @@ RSpec.describe Upload, type: :model do
         .and_return(subject.size + 1)
     end
 
-    describe '#create_and_validate_storage_manifest' do
+    describe '#complete_and_validate_integrity' do
       subject { FactoryBot.create(:upload, :with_chunks, is_consistent: false) }
 
-      it { is_expected.to respond_to :create_and_validate_storage_manifest }
+      it { is_expected.to respond_to :complete_and_validate_integrity }
 
       context 'with valid reported size and chunk hashes' do
         it 'should set is_consistent to true, leave error_at and error_message null' do
           expect(storage_provider).to receive(:complete_chunked_upload)
             .with(subject)
-          subject.create_and_validate_storage_manifest
+          subject.complete_and_validate_integrity
           subject.reload
           expect(subject.is_consistent).to be_truthy
           expect(subject.error_at).to be_nil
@@ -277,12 +277,12 @@ RSpec.describe Upload, type: :model do
         end
       end #with valid
 
-      context 'with reported size not equal to swift computed size' do
+      context 'IntegrityException' do
         it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
           expect(storage_provider).to receive(:complete_chunked_upload)
             .with(subject)
             .and_raise(IntegrityException)
-          subject.create_and_validate_storage_manifest
+          subject.complete_and_validate_integrity
           subject.reload
           expect(subject.is_consistent).to be_truthy
           expect(subject.error_at).not_to be_nil
@@ -290,29 +290,14 @@ RSpec.describe Upload, type: :model do
         end
       end #with reported size
 
-      context 'with reported chunk hash not equal to swift computed chunk etag' do
-        it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
-          expect(storage_provider).to receive(:complete_chunked_upload)
-            .with(subject)
-            .and_raise(StorageProviderException.new('Etag Mismatch'))
-          bad_chunk = subject.chunks.first
-          bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-          subject.create_and_validate_storage_manifest
-          subject.reload
-          expect(subject.is_consistent).to be_truthy
-          expect(subject.error_at).not_to be_nil
-          expect(subject.error_message).not_to be_nil
-        end
-      end #with reported chunk
-
-      context 'with unexpected StorageProvider Exception' do
+      context 'StorageProvider Exception' do
         it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
           expect(subject.is_consistent).not_to be_truthy
           expect(storage_provider).to receive(:complete_chunked_upload)
             .with(subject)
             .and_raise(unexpected_exception)
           expect {
-            subject.create_and_validate_storage_manifest
+            subject.complete_and_validate_integrity
           }.to raise_error(unexpected_exception)
           subject.reload
           expect(subject.is_consistent).not_to be_truthy
@@ -320,7 +305,7 @@ RSpec.describe Upload, type: :model do
           expect(subject.error_message).to be_nil
         end
       end
-    end #complete
+    end #complete_and_validate_integrity
 
     describe '#purge_storage' do
       subject { FactoryBot.create(:upload, :with_chunks) }
