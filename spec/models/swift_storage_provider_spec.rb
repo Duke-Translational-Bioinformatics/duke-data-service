@@ -161,6 +161,28 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
+    describe '#max_chunked_upload_size' do
+      let(:expected_max_chunk_upload_size) {
+        subject.chunk_max_number * subject.chunk_max_size_bytes
+      }
+      it {
+        expect {
+          expect(subject.max_chunked_upload_size).to eq(expected_max_chunk_upload_size)
+        }.not_to raise_error
+      }
+    end
+
+    describe '#suggested_minimum_chunk_size' do
+      let(:expected_suggested_minimum_chunk_size) {
+        (upload.size.to_f / subject.chunk_max_number).ceil
+      }
+      it {
+        expect {
+          expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+        }.not_to raise_error
+      }
+    end
+
     it {
       is_expected.to receive(:build_signed_url)
         .with(

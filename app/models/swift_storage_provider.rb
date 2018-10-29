@@ -34,6 +34,14 @@ class SwiftStorageProvider < StorageProvider
     chunk.upload.chunks.count < chunk_max_number
   end
 
+  def max_chunked_upload_size
+    chunk_max_number * chunk_max_size_bytes
+  end
+
+  def suggested_minimum_chunk_size(upload)
+    (upload.size.to_f / chunk_max_number).ceil
+  end
+
   def complete_chunked_upload(upload)
     begin
       put_object_manifest(
