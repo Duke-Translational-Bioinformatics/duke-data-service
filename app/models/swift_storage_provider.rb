@@ -30,6 +30,10 @@ class SwiftStorageProvider < StorageProvider
     url_root
   end
 
+  def chunk_max_exceeded?(chunk)
+    chunk.upload.chunks.count < chunk_max_number
+  end
+
   def complete_chunked_upload(upload)
     begin
       put_object_manifest(

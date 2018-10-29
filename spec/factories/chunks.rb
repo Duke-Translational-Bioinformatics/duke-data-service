@@ -9,5 +9,9 @@ FactoryBot.define do
     trait :swift do
       upload { create(:upload, :swift) }
     end
+
+    trait :no_validations do
+      to_create {|instance| instance.save(validate: false) }
+    end
   end
 end

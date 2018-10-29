@@ -11,13 +11,13 @@ RSpec.describe SwiftStorageProvider, type: :model do
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
-    let(:upload) { FactoryBot.create(:upload, :with_chunks) }
+    let(:upload) { FactoryBot.create(:upload) }
     let(:expected_meta) {
       {
       "content-length" => "#{upload.size}"
       }
     }
-    let(:chunk) { FactoryBot.create(:chunk) }
+    let(:chunk) { FactoryBot.create(:chunk, :no_validations) }
 
     it_behaves_like 'A StorageProvider'
 
@@ -55,6 +55,21 @@ RSpec.describe SwiftStorageProvider, type: :model do
         expect(subject.endpoint).to eq(subject.url_root)
       }.not_to raise_error
     }
+
+    describe '#chunk_max_exceeded?' do
+      context 'true' do
+        it {
+          expect(subject.chunk_max_exceeded?(chunk)).to be_truthy
+        }
+      end
+
+      context 'false' do
+        let(:storage_provider) { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
+        it {
+          expect(subject.chunk_max_exceeded?(chunk)).to be_falsey
+        }
+      end
+    end
 
     describe '#complete_chunked_upload' do
       context 'StorageProvider Exception' do
