@@ -7,17 +7,16 @@ RSpec.describe SwiftStorageProvider, type: :model do
   let(:filename) {'text_file.txt'}
   subject { storage_provider }
 
-
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
-    let(:upload) { FactoryBot.create(:upload) }
+    let(:upload) { FactoryBot.create(:upload, :skip_validation) }
     let(:expected_meta) {
       {
       "content-length" => "#{upload.size}"
       }
     }
-    let(:chunk) { FactoryBot.create(:chunk, :no_validations) }
+    let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
 
     it_behaves_like 'A StorageProvider'
 
