@@ -47,14 +47,8 @@ class LdapIdentityProvider < IdentityProvider
       size: 500,
       return_results: false
     ) do |entry|
-      if entry.attribute_names.include?(:uid)
-        results << User.new(
-          username: entry[:uid].first,
-          first_name: entry[:givenName].first,
-          last_name: entry[:sn].first,
-          email: entry[:mail].first,
-          display_name: entry[:displayName].first
-        )
+      if new_user = ldap_entry_to_user(entry)
+        results << new_user
       end
     end
     logger.warn "#{ldap_conn.get_operation_result.inspect} results may have been truncated" unless success
