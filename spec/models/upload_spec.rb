@@ -250,225 +250,129 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  describe 'swift methods', :vcr do
-    subject { FactoryBot.create(:upload, :swift, :with_chunks) }
+  describe 'StorageProvider Methods' do
+    let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+
+    include_context 'with mocked StorageProvider'
 
     before do
-      actual_size = 0
-      subject.storage_provider.put_container(subject.storage_container)
-      subject.chunks.each do |chunk|
-        body = 'this is a chunk'
-        subject.storage_provider.put_object(
-          subject.storage_container,
-          chunk.object_path,
-          body
-        )
-        chunk.update_attributes({
-          fingerprint_value: Digest::MD5.hexdigest(body),
-          size: body.length
-        })
-        actual_size = body.length + actual_size
-      end
-      subject.update_attribute(:size, actual_size)
-    end
-
-    after do
-      begin
-        subject.chunks.each do |chunk|
-          object = [subject.id, chunk.number].join('/')
-          subject.storage_provider.delete_object(subject.storage_container, object)
-        end
-        subject.storage_provider.delete_object_manifest(subject.storage_provider, subject.id)
-      rescue
-        # ignore
-      end
+      allow(subject).to receive(:max_size_bytes)
+        .and_return(subject.size + 1)
     end
 
     describe '#create_and_validate_storage_manifest' do
+      subject { FactoryBot.create(:upload, :with_chunks, is_consistent: false) }
+
       it { is_expected.to respond_to :create_and_validate_storage_manifest }
 
-      describe 'calls' do
-        describe 'with valid reported size and chunk hashes' do
-          it 'should set is_consistent to true, leave error_at and error_message null' do
-            subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).to be_nil
-            expect(subject.error_message).to be_nil
-          end
-        end #with valid
+      context 'with valid reported size and chunk hashes' do
+        it 'should set is_consistent to true, leave error_at and error_message null' do
+          expect(storage_provider).to receive(:complete_chunked_upload)
+            .with(subject)
+          subject.create_and_validate_storage_manifest
+          subject.reload
+          expect(subject.is_consistent).to be_truthy
+          expect(subject.error_at).to be_nil
+          expect(subject.error_message).to be_nil
+        end
+      end #with valid
 
-        describe 'with reported size not equal to swift computed size' do
-          it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
-            subject.update_attribute(:size, subject.size - 1)
-            subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).not_to be_nil
-            expect(subject.error_message).not_to be_nil
-          end
-        end #with reported size
+      context 'with reported size not equal to swift computed size' do
+        it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
+          expect(storage_provider).to receive(:complete_chunked_upload)
+            .with(subject)
+            .and_raise(IntegrityException)
+          subject.create_and_validate_storage_manifest
+          subject.reload
+          expect(subject.is_consistent).to be_truthy
+          expect(subject.error_at).not_to be_nil
+          expect(subject.error_message).not_to be_nil
+        end
+      end #with reported size
 
-        describe 'with reported chunk hash not equal to swift computed chunk etag' do
-          it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
-            bad_chunk = subject.chunks.first
-            bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
+      context 'with reported chunk hash not equal to swift computed chunk etag' do
+        it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+          expect(storage_provider).to receive(:complete_chunked_upload)
+            .with(subject)
+            .and_raise(StorageProviderException.new('Etag Mismatch'))
+          bad_chunk = subject.chunks.first
+          bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
+          subject.create_and_validate_storage_manifest
+          subject.reload
+          expect(subject.is_consistent).to be_truthy
+          expect(subject.error_at).not_to be_nil
+          expect(subject.error_message).not_to be_nil
+        end
+      end #with reported chunk
+
+      context 'with unexpected StorageProvider Exception' do
+        it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+          expect(subject.is_consistent).not_to be_truthy
+          expect(storage_provider).to receive(:complete_chunked_upload)
+            .with(subject)
+            .and_raise(unexpected_exception)
+          expect {
             subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).not_to be_nil
-            expect(subject.error_message).not_to be_nil
-          end
-        end #with reported chunk
-      end #calls
+          }.to raise_error(unexpected_exception)
+          subject.reload
+          expect(subject.is_consistent).not_to be_truthy
+          expect(subject.error_at).to be_nil
+          expect(subject.error_message).to be_nil
+        end
+      end
     end #complete
 
-    context '#purge_storage' do
+    describe '#purge_storage' do
+      subject { FactoryBot.create(:upload, :with_chunks) }
+      let(:original_chunks_count) { subject.chunks.count }
+
       it { is_expected.to respond_to :purge_storage }
 
-      context 'calls' do
-        before do
-          subject.create_and_validate_storage_manifest
-        end
-
-        context 'with StorageProviderException' do
-          context 'Object Not Found' do
-            it {
-              original_chunks = subject.chunks.all
-              subject.chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: subject.storage_provider.auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
-
-              expect {
-                subject.storage_provider.delete_object_manifest(subject.storage_container, subject.id)
-              }.not_to raise_error
-
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(404)
-
-              purge_time = DateTime.now
-              expect {
-                expect {
-                  subject.purge_storage
-                }.to change{Chunk.count}.by(-original_chunks.length)
-              }.not_to raise_error
-
-              subject.reload
-              expect(subject.purged_on).not_to be_nil
-              expect(subject.purged_on).to be >= purge_time
-              expect(subject.chunks.count).to eq(0)
-              original_chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: subject.storage_provider.auth_header
-                )
-                expect(resp.response.code.to_i).to eq(404)
-              end
-            }
+      context 'StorageProviderException' do
+        it {
+          subject.chunks.each do |chunk|
+            expect(chunk).to receive(:purge_storage)
           end
 
-          context 'Other Exception' do
-            let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
-            it {
-              #create authentication failure
-              original_auth_header = subject.storage_provider.auth_header
-              original_storage_url = subject.storage_provider.storage_url
-              expect(
-                subject.storage_provider.update(
-                  service_user: fake_storage_provider.service_user
-                )
-              ).to be_truthy
+          expect(storage_provider).to receive(:purge)
+            .with(subject)
+            .and_raise(unexpected_exception)
 
-              resp = HTTParty.head(
-                "#{original_storage_url}/#{subject.sub_path}",
-                headers: original_auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-
-              original_chunks = subject.chunks.all
-
-              subject.chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{original_storage_url}/#{chunk.sub_path}",
-                  headers: original_auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
-
-              subject.storage_provider.remove_instance_variable(:'@auth_uri_resp')
-              purge_time = DateTime.now
-              expect {
-                expect {
-                  subject.purge_storage
-                }.not_to change{Chunk.count}
-              }.to raise_error(StorageProviderException)
-
-              subject.reload
-              expect(subject.purged_on).to be_nil
-
-              resp = HTTParty.head(
-                "#{original_storage_url}/#{subject.sub_path}",
-                headers: original_auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-
-              original_chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{original_url}/#{chunk.sub_path}",
-                  headers: original_auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
-            }
-          end
-        end
-
-        context 'no StorageProviderException' do
-          it {
-            original_chunks = subject.chunks.all
-            resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-              headers: subject.storage_provider.auth_header
-            )
-            expect(resp.response.code.to_i).to eq(200)
-            subject.chunks.each do |chunk|
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-            end
-            purge_time = DateTime.now
+          expect {
             expect {
               subject.purge_storage
-            }.to change{Chunk.count}.by(-original_chunks.length)
-            subject.reload
-            expect(subject.purged_on).not_to be_nil
-            expect(subject.purged_on).to be >= purge_time
-            expect(subject.chunks.count).to eq(0)
+            }.to change{Chunk.count}.by(-original_chunks_count)
+          }.to raise_error(unexpected_exception)
 
-            resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-              headers: subject.storage_provider.auth_header
-            )
-            expect(resp.response.code.to_i).to eq(404)
-            original_chunks.each do |chunk|
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(404)
-            end
-          }
-        end
-      end #calls
+          subject.reload
+          expect(subject.purged_on).to be_nil
+          expect(subject.purged_on).to be_nil
+          expect(subject.chunks.count).to eq 0
+        }
+      end
+
+      context 'no StorageProviderException' do
+        it {
+          subject.chunks.each do |chunk|
+            expect(chunk).to receive(:purge_storage)
+          end
+
+          expect(storage_provider).to receive(:purge)
+            .with(subject)
+
+          purge_time = DateTime.now
+          expect {
+            expect {
+              subject.purge_storage
+            }.to change{Chunk.count}.by(-original_chunks_count)
+          }.not_to raise_error
+
+          subject.reload
+          expect(subject.purged_on).not_to be_nil
+          expect(subject.purged_on).to be >= purge_time
+          expect(subject.chunks.count).to eq(0)
+        }
+      end
     end #purge_storage
-  end #swift methods
+  end #StorageProvider Methods
 end

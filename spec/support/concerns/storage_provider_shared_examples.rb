@@ -1,3 +1,12 @@
+shared_context 'with mocked StorageProvider' do
+  let(:storage_provider) { instance_double("StorageProvider") }
+
+  before do
+    allow(subject).to receive(:storage_provider)
+      .and_return(storage_provider)
+  end
+end
+
 shared_examples 'A StorageProvider' do
   it { is_expected.to be_a StorageProvider }
 

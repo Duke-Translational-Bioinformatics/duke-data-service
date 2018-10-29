@@ -47,9 +47,7 @@ class Upload < ActiveRecord::Base
   def temporary_url(filename=nil)
     raise IntegrityException.new(error_message) if has_integrity_exception?
     raise ConsistencyException.new unless is_consistent?
-    expiry = Time.now.to_i + storage_provider.signed_url_duration
-    filename ||= name
-    storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
+    storage_provider.download_url(self, filename)
   end
 
   def manifest
@@ -82,11 +80,7 @@ class Upload < ActiveRecord::Base
 
   def create_and_validate_storage_manifest
     begin
-      response = storage_provider.put_object_manifest(storage_container, id, manifest, content_type, name)
-      meta = storage_provider.get_object_metadata(storage_container, id)
-      unless meta["content-length"].to_i == size
-        raise IntegrityException, "reported size does not match size computed by StorageProvider"
-      end
+      storage_provider.complete_chunked_upload(self)
       update!({
         is_consistent: true
       })
@@ -111,14 +105,7 @@ class Upload < ActiveRecord::Base
       chunk.purge_storage
       chunk.destroy
     end
-
-    begin
-      storage_provider.delete_object_manifest(storage_container, id)
-    rescue StorageProviderException => e
-      unless e.message.match /Not Found/
-        raise e
-      end
-    end
+    storage_provider.purge(self)
     self.update(purged_on: DateTime.now)
   end
 
