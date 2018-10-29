@@ -113,6 +113,41 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
   end
 
+  describe '#ldap_entry_to_user' do
+    it { is_expected.to respond_to(:ldap_entry_to_user).with(1).argument }
+    it { is_expected.not_to respond_to(:ldap_entry_to_user).with(0).arguments }
+
+    context 'when called' do
+      let(:ldap_entry_to_user) { subject.ldap_entry_to_user(ldap_entry) }
+      let(:ldap_entry) {
+        e = Net::LDAP::Entry.new
+        entry_hash.each_pair {|k, v| e[k] = v if v}
+        e
+      }
+      let(:entry_hash) {{
+        uid: user_attrs[:username],
+        givenname: user_attrs[:first_name],
+        sn: user_attrs[:last_name],
+        mail: user_attrs[:email],
+        displayname: user_attrs[:display_name]
+      }}
+      let(:user_attrs) { FactoryBot.attributes_for(:user) }
+      it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
+      it { expect(ldap_entry_to_user).to be_a(User) }
+      it { expect(ldap_entry_to_user.username).to eq entry_hash[:uid] }
+      it { expect(ldap_entry_to_user.first_name).to eq entry_hash[:givenname] }
+      it { expect(ldap_entry_to_user.last_name).to eq entry_hash[:sn] }
+      it { expect(ldap_entry_to_user.email).to eq entry_hash[:mail] }
+      it { expect(ldap_entry_to_user.display_name).to eq entry_hash[:displayname] }
+
+      context 'with entry without uid' do
+        let(:user_attrs) { FactoryBot.attributes_for(:user).reject {|k,v| k==:username} }
+        it { expect(user_attrs[:username]).to be_nil }
+        it { expect(ldap_entry_to_user).to be_nil }
+      end
+    end
+  end
+
   describe '#ldap_search' do
     let(:ldap_search) { subject.ldap_search(filter: filter_hash) }
     let(:filter_hash) { {} }

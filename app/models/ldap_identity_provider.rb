@@ -27,6 +27,18 @@ class LdapIdentityProvider < IdentityProvider
     Net::LDAP::Filter.eq(filter_attr, val) if filter_attr
   end
 
+  def ldap_entry_to_user(entry)
+    if entry.attribute_names.include?(:uid)
+      User.new(
+        username: entry[:uid].first,
+        first_name: entry[:givenName].first,
+        last_name: entry[:sn].first,
+        email: entry[:mail].first,
+        display_name: entry[:displayName].first
+      )
+    end
+  end
+
   def ldap_search(filter:)
     results = []
     success = ldap_conn.search(
