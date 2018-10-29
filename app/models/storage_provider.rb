@@ -46,6 +46,14 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement chunk_max_exceeded?.")
   end
 
+  def max_chunked_upload_size
+    raise NotImplementedError.new("You must implement complete_chunked_upload.")
+  end
+
+  def suggested_minimum_chunk_size(upload)
+    raise NotImplementedError.new("You must implement complete_chunked_upload.")
+  end
+
   def complete_chunked_upload(upload)
     raise NotImplementedError.new("You must implement complete_chunked_upload.")
   end

@@ -23,6 +23,8 @@ shared_examples 'A StorageProvider' do
   it { is_expected.to respond_to(:chunk_max_exceeded?).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }
+  it { is_expected.to respond_to(:max_chunked_upload_size) }
+  it { is_expected.to respond_to(:suggested_minimum_chunk_size).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(2).argument }
   it { is_expected.to respond_to(:purge).with(1).argument }
