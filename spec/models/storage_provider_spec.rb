@@ -35,6 +35,11 @@ RSpec.describe StorageProvider, type: :model do
   }
   it {
     expect {
+      subject.chunk_max_exceeded?(chunk)
+    }.to raise_error(NotImplementedError)
+  }
+  it {
+    expect {
       subject.complete_chunked_upload(upload)
     }.to raise_error(NotImplementedError)
   }
