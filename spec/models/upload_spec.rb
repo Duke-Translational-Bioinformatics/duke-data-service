@@ -95,7 +95,7 @@ RSpec.describe Upload, type: :model do
       FactoryBot.create(:chunk, :skip_validation, upload: subject, number: 1)
     end
 
-    it { should delegate_method(:url_root).to(:storage_provider) }
+    it { should delegate_method(:endpoint).to(:storage_provider) }
 
     it 'should have a http_verb method' do
       should respond_to :http_verb
