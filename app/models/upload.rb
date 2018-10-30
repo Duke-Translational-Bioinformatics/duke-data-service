@@ -79,7 +79,7 @@ class Upload < ActiveRecord::Base
   end
 
   def complete_and_validate_integrity
-    begin
+      begin
       storage_provider.complete_chunked_upload(self)
       update!({
         is_consistent: true
@@ -104,11 +104,11 @@ class Upload < ActiveRecord::Base
   end
 
   def max_size_bytes
-    storage_provider.chunk_max_number * storage_provider.chunk_max_size_bytes
+    storage_provider.max_chunked_upload_size
   end
 
   def minimum_chunk_size
-    (size.to_f / storage_provider.chunk_max_number).ceil
+    storage_provider.suggested_minimum_chunk_size(self)
   end
 
   private
