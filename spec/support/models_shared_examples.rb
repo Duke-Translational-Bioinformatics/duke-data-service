@@ -144,5 +144,7 @@ shared_examples 'an IdentityProvider' do
   it { is_expected.to be_an IdentityProvider }
   it { is_expected.to respond_to(:affiliates).with(0).arguments }
   it { is_expected.to respond_to(:affiliates).with_keywords(:full_name_contains) }
+  it { is_expected.to respond_to(:affiliates).with_keywords(:username) }
+
   it { is_expected.to respond_to(:affiliate).with(1).argument }
 end

@@ -26,6 +26,16 @@ RSpec.describe LdapIdentityProvider, type: :model do
   end
 
   describe '#affiliates' do
+    context 'username' do
+      let(:affiliates) { auth_provider.identity_provider.affiliates(username: username) }
+      let(:username) { 'foo' }
+      let(:array_of_users) { [User.new(username: username)] }
+      before(:example) do
+        expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {username: username}).and_return(array_of_users)
+      end
+      it { expect(affiliates).to eq array_of_users }
+    end
+
     context 'full_name_contains' do
       context 'not provided' do
         subject { auth_provider.identity_provider.affiliates }
