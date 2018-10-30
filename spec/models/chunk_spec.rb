@@ -152,4 +152,15 @@ RSpec.describe Chunk, type: :model do
       }
     end
   end
+
+  describe 'Default StorageProvider' do
+    it {
+      StorageProvider.delete_all
+      default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
+      expect(StorageProvider.default).not_to be_nil
+      upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
+      chunk = FactoryBot.create(:chunk, upload: upload)
+      expect(chunk).to be_valid
+    }
+  end
 end
