@@ -9,10 +9,12 @@ class LdapIdentityProvider < IdentityProvider
     ).first
   end
 
-  def affiliates(full_name_contains: nil, username: nil)
+  def affiliates(full_name_contains: nil, username: nil, email: nil)
     filter = {}
     if username
       filter[:username] = username
+    elsif email
+      filter[:email] = email
     elsif full_name_contains && full_name_contains.length >= 3
       filter[:full_name_contains] = full_name_contains
     else
@@ -25,6 +27,8 @@ class LdapIdentityProvider < IdentityProvider
     filter_attr = nil
     if val = filter_hash[:username]
       filter_attr = "uid"
+    elsif val = filter_hash[:email]
+      filter_attr = "mail"
     elsif val = filter_hash[:full_name_contains]
       filter_attr = "displayName"
       val = "*#{val}*"

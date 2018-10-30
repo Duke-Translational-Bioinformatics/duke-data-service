@@ -37,6 +37,17 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(affiliates).to eq array_of_users }
     end
 
+    context 'email' do
+      let(:affiliates) { auth_provider.identity_provider.affiliates(email: email) }
+      let(:email) { a_user.email }
+      let(:a_user) { FactoryBot.build(:user) }
+      let(:array_of_users) { [a_user] }
+      before(:example) do
+        expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {email: email}).and_return(array_of_users)
+      end
+      it { expect(affiliates).to eq array_of_users }
+    end
+
     context 'full_name_contains' do
       context 'not provided' do
         subject { auth_provider.identity_provider.affiliates }
@@ -198,6 +209,13 @@ RSpec.describe LdapIdentityProvider, type: :model do
       let(:uid) { FactoryBot.attributes_for(:user)[:username] }
       it { expect(ldap_filter).to be_a Net::LDAP::Filter }
       it { expect(ldap_filter.to_s).to eq "(uid=#{uid})" }
+    end
+
+    context 'with email filter' do
+      let(:filter_hash) { {email: mail} }
+      let(:mail) { FactoryBot.attributes_for(:user)[:email] }
+      it { expect(ldap_filter).to be_a Net::LDAP::Filter }
+      it { expect(ldap_filter.to_s).to eq "(mail=#{mail})" }
     end
 
     context 'with full_name_contains filter' do
