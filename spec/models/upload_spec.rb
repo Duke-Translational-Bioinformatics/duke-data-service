@@ -384,4 +384,14 @@ RSpec.describe Upload, type: :model do
       end
     end #purge_storage
   end #StorageProvider Methods
+
+  describe 'Default StorageProvider' do
+    it {
+      StorageProvider.delete_all
+      default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
+      expect(StorageProvider.default).not_to be_nil
+      upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
+      expect(upload).to be_valid
+    }
+  end
 end
