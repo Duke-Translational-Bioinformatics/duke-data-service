@@ -1,4 +1,40 @@
+shared_context 'mock all Uploads StorageProvider' do
+  # use this when uploads get created by other factories, and
+  # need their storage_provider mocked
+  let(:mocked_upload_storage_provider) { instance_double("StorageProvider") }
+  let(:mock_storage_provider_attributes) { FactoryBot.attributes_for(:storage_provider) }
+  let(:mock_chunk_max_number) { mock_storage_provider_attributes[:chunk_max_number] }
+  let(:mock_chunk_max_size_bytes) { mock_storage_provider_attributes[:chunk_max_size_bytes] }
+  let(:mock_max_chunked_upload_size) {  mock_chunk_max_number * mock_chunk_max_size_bytes }
+  let(:mock_storage_provider_id) { SecureRandom.uuid }
+  let(:expected_chunk_max_exceeded) { false }
+  let(:expected_endpoint) { Faker::Internet.url }
+
+  before do
+    allow_any_instance_of(Upload).to receive(:storage_provider)
+      .and_return(mocked_upload_storage_provider)
+    allow(mocked_upload_storage_provider).to receive(:max_chunked_upload_size)
+      .and_return(mock_max_chunked_upload_size)
+    allow(mocked_upload_storage_provider).to receive(:chunk_max_exceeded?)
+      .and_return(expected_chunk_max_exceeded)
+    allow(mocked_upload_storage_provider).to receive(:endpoint)
+      .and_return(expected_endpoint)
+    allow(mocked_upload_storage_provider).to receive(:read_attribute_for_serialization)
+     .with(:id)
+     .and_return(mock_storage_provider_id)
+    mock_storage_provider_attributes.keys.each do |k|
+      allow(mocked_upload_storage_provider).to receive(k.to_sym)
+        .and_return(mock_storage_provider_attributes[k])
+
+      allow(mocked_upload_storage_provider).to receive(:read_attribute_for_serialization)
+       .with(k.to_sym)
+       .and_return(mock_storage_provider_attributes[k])
+    end
+  end
+end
+
 shared_context 'with mocked StorageProvider' do
+  # use this when the subject has a storage_provider method
   let(:mocked_storage_provider) { instance_double("StorageProvider") }
 
   before do
