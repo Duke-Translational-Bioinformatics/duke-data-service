@@ -28,8 +28,9 @@ RSpec.describe LdapIdentityProvider, type: :model do
   describe '#affiliates' do
     context 'username' do
       let(:affiliates) { auth_provider.identity_provider.affiliates(username: username) }
-      let(:username) { 'foo' }
-      let(:array_of_users) { [User.new(username: username)] }
+      let(:username) { a_user.username }
+      let(:a_user) { FactoryBot.build(:user) }
+      let(:array_of_users) { [a_user] }
       before(:example) do
         expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {username: username}).and_return(array_of_users)
       end
