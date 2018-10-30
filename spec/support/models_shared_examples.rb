@@ -139,3 +139,10 @@ shared_context 'trashed resource' do |resource_sym=nil|
     expect(resource_to_trash.save).to be_truthy
   end
 end
+
+shared_examples 'an IdentityProvider' do
+  it { is_expected.to be_an IdentityProvider }
+  it { is_expected.to respond_to(:affiliates).with(0).arguments }
+  it { is_expected.to respond_to(:affiliates).with_keywords(:full_name_contains) }
+  it { is_expected.to respond_to(:affiliate).with(1).argument }
+end

@@ -9,7 +9,7 @@ class LdapIdentityProvider < IdentityProvider
     ).first
   end
 
-  def affiliates(full_name_contains=nil)
+  def affiliates(full_name_contains: nil)
     return [] unless full_name_contains && full_name_contains.length >= 3
     ldap_search(
       filter: {full_name_contains: full_name_contains}

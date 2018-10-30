@@ -6,7 +6,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
   let(:auth_provider) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
   let(:test_user) { FactoryBot.attributes_for(:user) }
 
-  it { is_expected.to be_an IdentityProvider }
+  it_behaves_like 'an IdentityProvider'
 
   describe 'validations' do
     it { is_expected.to validate_presence_of :ldap_base }
@@ -35,7 +35,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
       context 'less than 3 characters' do
         subject { auth_provider.identity_provider.affiliates(
-          'a'*2
+          full_name_contains: 'a'*2
         ) }
         before { expect(auth_provider.identity_provider).not_to receive(:ldap_search) }
         it { is_expected.to eq [] }
@@ -44,7 +44,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
       context 'is 3 characters' do
         let(:ldap_returns) { [test_user] }
         include_context 'mocked ldap', returns: :ldap_returns
-        subject { auth_provider.identity_provider.affiliates('foo') }
+        subject { auth_provider.identity_provider.affiliates(full_name_contains: 'foo') }
         before { expect(auth_provider.identity_provider).to receive(:ldap_search).and_call_original }
         it { is_expected.not_to be_empty }
       end
@@ -55,7 +55,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
           let(:ldap_returns) { [test_user] }
           include_context 'mocked ldap', returns: :ldap_returns
           subject { auth_provider.identity_provider.affiliates(
-            full_name_contains
+            full_name_contains: full_name_contains
           ) }
           let(:full_name_contains) { test_user[:last_name] }
           let(:affiliate) { subject.first }
@@ -96,7 +96,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
           let(:ldap_returns) { [test_user] }
           include_context 'mocked ldap', returns: :ldap_returns
           subject { auth_provider.identity_provider.affiliates(
-            test_user[:last_name]
+            full_name_contains: test_user[:last_name]
           ) }
 
           it {
