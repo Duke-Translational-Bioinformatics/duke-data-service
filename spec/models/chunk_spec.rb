@@ -1,15 +1,31 @@
 require 'rails_helper'
 
 RSpec.describe Chunk, type: :model do
-  subject { FactoryBot.create(:chunk, :swift) }
-  let(:storage_provider) { subject.storage_provider }
+  let(:upload) { FactoryBot.create(:upload, :skip_validation) }
+  let(:mocked_upload_storage_provider) { instance_double("StorageProvider") }
+  subject { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+  include_context 'with mocked StorageProvider'
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
-  let(:expected_expiry) { subject.updated_at.to_i + storage_provider.signed_url_duration }
-  let(:expected_url) { storage_provider.build_signed_url(subject.http_verb, expected_sub_path, expected_expiry) }
+  let(:expected_expiry) { subject.updated_at.to_i + (60*5) }
+  let(:expected_chunk_max_number) { Faker::Number.between(100,1000) }
+  let(:expected_chunk_max_size_bytes) { Faker::Number.between(4368709122, 6368709122) }
   let(:is_logically_deleted) { false }
+  let(:expected_chunk_max_exceeded) { false }
+  let(:expected_endpoint) { Faker::Internet.url }
   it_behaves_like 'an audited model'
+
+  before do
+    expect(upload).to be_persisted
+    expect(subject).to be_persisted
+    allow(mocked_storage_provider).to receive(:chunk_max_size_bytes)
+      .and_return(expected_chunk_max_size_bytes)
+    allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
+      .and_return(expected_chunk_max_exceeded)
+    allow(upload).to receive(:storage_provider)
+      .and_return(mocked_upload_storage_provider)
+  end
 
   describe 'associations' do
     it { is_expected.to belong_to(:upload) }
@@ -19,7 +35,9 @@ RSpec.describe Chunk, type: :model do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:upload_id) }
+    it {
+      is_expected.to validate_presence_of(:upload_id)
+    }
     it { is_expected.to validate_presence_of(:number) }
     it { is_expected.to validate_presence_of(:size) }
     it {
@@ -28,20 +46,24 @@ RSpec.describe Chunk, type: :model do
     }
     it { is_expected.to validate_presence_of(:fingerprint_value) }
     it { is_expected.to validate_presence_of(:fingerprint_algorithm) }
-    it { is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive }
+    it {
+      # this validation creates a new chunk, which needs to use the
+      # mocked_storage_provider for validation
+      allow_any_instance_of(Chunk).to receive(:storage_provider)
+        .and_return(mocked_storage_provider)
+      is_expected.to validate_uniqueness_of(:number).scoped_to(:upload_id).case_insensitive
+    }
 
     describe 'upload_chunk_maximum' do
-      let(:storage_provider) { FactoryBot.create(:storage_provider, chunk_max_number: 1) }
-      context '< storage_provider.chunk_max_number' do
-        let(:upload) { FactoryBot.create(:upload, storage_provider: storage_provider) }
-        subject { FactoryBot.build(:chunk, upload: upload) }
-        it { is_expected.to be_valid }
+      context 'storage_provider.chunk_max_exceeded? false' do
+        it {
+          is_expected.to be_valid
+        }
       end
 
-      context '>= storage_provider.chunk_max_number' do
-        let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: storage_provider) }
+      context 'storage_provider.chunk_max_exceeded? true' do
+        let(:expected_chunk_max_exceeded) { true }
         let(:expected_validation_message) { "maximum upload chunks exceeded." }
-        subject { FactoryBot.build(:chunk, upload: upload, number: 2) }
 
         it {
           is_expected.not_to be_valid
@@ -68,8 +90,10 @@ RSpec.describe Chunk, type: :model do
     end
 
     it 'is_expected.to have a host method' do
+      expect(mocked_storage_provider).to receive(:endpoint)
+        .and_return(expected_endpoint)
       is_expected.to respond_to :host
-      expect(subject.host).to eq storage_provider.url_root
+      expect(subject.host).to eq expected_endpoint
     end
 
     it 'is_expected.to have a http_headers method' do
@@ -83,111 +107,49 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
-  it 'is_expected.to have a url method' do
-    is_expected.to respond_to :url
-    expect(subject.url).to eq expected_url
+  describe '#url' do
+    let(:expected_url) { Faker::Internet.url }
+
+    it { is_expected.to respond_to :url }
+
+    it {
+      expect(mocked_storage_provider).to receive(:chunk_upload_url)
+        .and_return(expected_url)
+
+      expect(subject.url).to eq expected_url
+    }
   end
 
-  context '#purge_storage', :vcr do
+  describe '#purge_storage' do
+    let(:chunk_data) { 'some random chunk' }
+    subject {
+      FactoryBot.create(:chunk, :skip_validation, upload: upload, size: chunk_data.length, number: 1)
+    }
+
     it { is_expected.to respond_to :purge_storage }
 
-    context 'called' do
-      subject {
-        FactoryBot.create(:chunk, :swift, size: chunk_data.length, number: 1)
-      }
-      let(:storage_provider) { subject.storage_provider }
-      let(:chunk_data) { 'some random chunk' }
-      before do
-        storage_provider.register_keys
-        storage_provider.put_container(subject.storage_container)
-        storage_provider.put_object(
-          subject.storage_container,
-          subject.object_path,
-          chunk_data
-        )
-      end
-      after do
-        begin
-          storage_provider.delete_object(subject.storage_container, subject.object_path)
-        rescue
-          #ignore
-        end
-      end
+    context 'StorageProviderException' do
+      let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
 
-      context 'StorageProviderException' do
-        context 'Not Found' do
-          it {
-            expect {
-              subject.storage_provider.delete_object(subject.storage_container, subject.object_path)
-            }.not_to raise_error
-
-            resp = HTTParty.get(
-              "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-              headers: storage_provider.auth_header
-            )
-            expect(resp.response.code.to_i).to eq(404)
-
-            expect {
-              subject.purge_storage
-            }.not_to raise_error
-          }
-        end
-
-        context 'Other Exception' do
-          let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
-          it {
-            #create authentication failure
-            original_auth_header = storage_provider.auth_header
-            original_storage_url = storage_provider.storage_url
-            expect(
-              storage_provider.update(
-                service_user: fake_storage_provider.service_user
-              )
-            ).to be_truthy
-
-            resp = HTTParty.get(
-              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
-              headers: original_auth_header
-            )
-            expect(resp.response.code.to_i).to eq(200)
-            expect(resp.body).to eq(chunk_data)
-
-            storage_provider.remove_instance_variable(:'@auth_uri_resp')
-            expect {
-              subject.purge_storage
-            }.to raise_error(StorageProviderException)
-
-            resp = HTTParty.get(
-              "#{original_storage_url}/#{subject.storage_container}/#{subject.object_path}",
-              headers: original_auth_header
-            )
-            expect(resp.response.code.to_i).to eq(200)
-            expect(resp.body).to eq(chunk_data)
-          }
-        end
-      end
-
-      context 'No StorageProviderException' do
-        it {
-          resp = HTTParty.get(
-            "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-            headers: storage_provider.auth_header
-          )
-          expect(resp.response.code.to_i).to eq(200)
-          expect(resp.body).to eq(chunk_data)
+      it {
+        expect(mocked_storage_provider).to receive(:purge)
+          .with(subject)
+          .and_raise(unexpected_exception)
+        expect {
           subject.purge_storage
-          resp = HTTParty.get(
-            "#{storage_provider.storage_url}/#{subject.storage_container}/#{subject.object_path}",
-            headers: storage_provider.auth_header
-          )
-          expect(resp.response.code.to_i).to eq(404)
-        }
-      end
+        }.to raise_error(unexpected_exception)
+      }
     end
-  end
 
-  describe '#total_chunks' do
-    it { is_expected.to respond_to :total_chunks }
-    it { expect(subject.total_chunks).to eq(subject.upload.chunks.count ) }
+    context 'success' do
+      it {
+        expect(mocked_storage_provider).to receive(:purge)
+          .with(subject)
+
+        expect {
+          subject.purge_storage
+        }.not_to raise_error
+      }
+    end
   end
 end
