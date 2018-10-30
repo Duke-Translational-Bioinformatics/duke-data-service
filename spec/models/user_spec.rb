@@ -102,7 +102,7 @@ RSpec.describe User, type: :model do
     let(:uploads) {
       uploads = []
       projects.each do |project|
-        uploads << FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: project)
+        uploads << FactoryBot.create(:upload, :completed, :skip_validation, creator: subject, project: project)
       end
       uploads
     }
@@ -114,12 +114,19 @@ RSpec.describe User, type: :model do
       files
     }
     let!(:other_project) { FactoryBot.create(:project, creator: subject) }
-    let!(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject) }
+    let!(:other_upload) { FactoryBot.create(:upload, :completed, :skip_validation, creator: subject) }
     let!(:other_file) { FactoryBot.create(:data_file, upload: other_upload) }
     let!(:deleted_project) { FactoryBot.create(:project_permission, :deleted_project, user: subject).project }
-    let(:deleted_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: projects.first)}
+    let(:deleted_upload) { FactoryBot.create(:upload, :completed, :skip_validation, creator: subject, project: projects.first)}
     let!(:deleted_file) { FactoryBot.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
+    let(:mocked_storage_provider) { instance_double("StorageProvider") }
 
+    before do
+      uploads + [other_upload, deleted_upload].each do |u|
+        allow(u).to receive(:storage_provider)
+          .and_return(mocked_storage_provider)
+      end
+    end
     describe 'project_count' do
       let(:expected_count) { projects.count }
 
@@ -154,8 +161,10 @@ RSpec.describe User, type: :model do
       end
 
       context 'when another user has uploaded a new version' do
-        let(:another_user_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: files.last.project) }
+        let(:another_user_upload) { FactoryBot.create(:upload, :completed, :skip_validation, project: files.last.project) }
         before(:each) do
+          allow(another_user_upload).to receive(:storage_provider)
+            .and_return(mocked_storage_provider)
           files.last.upload = another_user_upload
           expect(files.last.save).to be_truthy
         end
