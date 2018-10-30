@@ -172,14 +172,42 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     describe '#suggested_minimum_chunk_size' do
-      let(:expected_suggested_minimum_chunk_size) {
-        (upload.size.to_f / subject.chunk_max_number).ceil
-      }
-      it {
-        expect {
-          expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
-        }.not_to raise_error
-      }
+      let(:upload) { FactoryBot.create(:upload, :skip_validation, size: size) }
+
+      context 'upload.size = 0' do
+        let(:size) { 0 }
+        let(:expected_suggested_minimum_chunk_size) { 0 }
+        it {
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        }
+      end
+
+      context 'upload.size < storage_provider.chunk_max_number' do
+        let(:size) { subject.chunk_max_number - 1 }
+
+        let(:expected_suggested_minimum_chunk_size) {
+          (upload.size.to_f / subject.chunk_max_number).ceil
+        }
+        it {
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        }
+      end
+
+      context 'upload.size > storage_provider.chunk_max_number' do
+        let(:size) { subject.chunk_max_number + 1 }
+        let(:expected_suggested_minimum_chunk_size) {
+          (upload.size.to_f / subject.chunk_max_number).ceil
+        }
+        it {
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        }
+      end      
     end
 
     it {
