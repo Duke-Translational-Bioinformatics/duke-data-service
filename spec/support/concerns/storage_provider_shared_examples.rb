@@ -37,13 +37,25 @@ shared_context 'mock all Uploads StorageProvider' do
   end
 end
 
-shared_context 'with mocked StorageProvider' do
-  # use this when the subject has a storage_provider method
+shared_context 'with mocked StorageProvider' do |on: []|
+  # use this when the subject, or multiple objects,
+  # have a storage_provider method that needs to be mocked
   let(:mocked_storage_provider) { instance_double("StorageProvider") }
+  let(:targets) {
+    if on.empty?
+      [subject]
+    else
+      on.map{|o|
+        send(o)
+      }
+    end
+  }
 
   before do
-    allow(subject).to receive(:storage_provider)
-      .and_return(mocked_storage_provider)
+    targets.each do |target|
+      allow(target).to receive(:storage_provider)
+        .and_return(mocked_storage_provider)
+    end
   end
 end
 
