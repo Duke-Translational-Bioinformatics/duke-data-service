@@ -2,9 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Chunk, type: :model do
   let(:upload) { FactoryBot.create(:upload, :skip_validation) }
-  let(:mocked_upload_storage_provider) { instance_double("StorageProvider") }
   subject { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-  include_context 'with mocked StorageProvider'
+  include_context 'with mocked StorageProvider', on: [:upload, :subject]
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
@@ -23,8 +22,6 @@ RSpec.describe Chunk, type: :model do
       .and_return(expected_chunk_max_size_bytes)
     allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
       .and_return(expected_chunk_max_exceeded)
-    allow(upload).to receive(:storage_provider)
-      .and_return(mocked_upload_storage_provider)
   end
 
   describe 'associations' do
