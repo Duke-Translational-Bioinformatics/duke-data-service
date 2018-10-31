@@ -19,6 +19,10 @@ shared_context 'mock all Uploads StorageProvider' do
       .and_return(expected_chunk_max_exceeded)
     allow(mocked_upload_storage_provider).to receive(:endpoint)
       .and_return(expected_endpoint)
+    allow(mocked_upload_storage_provider).to receive(:download_url) do |upload,filename=nil|
+      filename ||= upload.name
+      "#{Faker::Internet.url}/#{URI.encode(filename)}"
+    end
     allow(mocked_upload_storage_provider).to receive(:read_attribute_for_serialization)
      .with(:id)
      .and_return(mock_storage_provider_id)

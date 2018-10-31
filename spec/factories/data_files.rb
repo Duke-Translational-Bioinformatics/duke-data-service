@@ -12,7 +12,7 @@ FactoryBot.define do
 
     after(:build) do |f, evaluator|
       unless evaluator.without_upload
-        f.upload = evaluator.upload || create(:upload, :swift, :completed, :with_fingerprint)
+        f.upload = evaluator.upload || create(:upload, :completed, :skip_validation)
       end
     end
 
