@@ -4,6 +4,8 @@ RSpec.describe Fingerprint, type: :model do
   subject { FactoryBot.create(:fingerprint) }
   let(:algorithms) { %w{md5 sha256 sha1} }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
 
   describe 'associations' do
