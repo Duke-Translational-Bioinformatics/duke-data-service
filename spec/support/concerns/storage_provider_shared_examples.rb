@@ -21,7 +21,7 @@ shared_context 'mock all Uploads StorageProvider' do
       .and_return(expected_endpoint)
     allow(mocked_storage_provider).to receive(:download_url) do |upload,filename=nil|
       filename ||= upload.name
-      "#{Faker::Internet.url}/#{URI.encode(filename)}"
+      "#{expected_endpoint}/#{URI.encode(filename)}"
     end
     allow(mocked_storage_provider).to receive(:read_attribute_for_serialization)
      .with(:id)

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe DataFileSummarySerializer, type: :serializer do
+  include_context 'mock all Uploads StorageProvider'
   let(:resource) { FactoryBot.create(:data_file, :with_parent) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{
