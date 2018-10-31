@@ -40,7 +40,7 @@ end
 shared_context 'with mocked StorageProvider' do |on: []|
   # use this when the subject, or multiple objects,
   # have a storage_provider method that needs to be mocked
-  let(:mocked_storage_provider) { instance_double("StorageProvider") }
+  include_context 'StorageProvider Double'
   let(:targets) {
     if on.empty?
       [subject]
@@ -57,6 +57,10 @@ shared_context 'with mocked StorageProvider' do |on: []|
         .and_return(mocked_storage_provider)
     end
   end
+end
+
+shared_context 'StorageProvider Double' do
+  let(:mocked_storage_provider) { instance_double("StorageProvider") }
 end
 
 shared_examples 'A StorageProvider' do
