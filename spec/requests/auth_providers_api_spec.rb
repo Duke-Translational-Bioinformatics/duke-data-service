@@ -142,6 +142,24 @@ describe DDS::V1::AuthProvidersAPI do
             }
           end
         end
+
+        context 'with email param' do
+          let(:payload) {{
+            email: resource.email
+          }}
+          let(:id_provider_mock) { instance_double("IdentityProvider") }
+          before(:example) do
+            allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(id_provider_mock)
+            expect(id_provider_mock).to receive(:affiliates).with(email: payload[:email]).and_return(returned_users)
+          end
+          it_behaves_like 'a listable resource', persisted_resource: false do
+            let(:expected_resources) { returned_users }
+            let(:expected_list_length) { expected_resources.count }
+            let(:serializable_resource) {
+              resource
+            }
+          end
+        end
       end
     end
 

@@ -75,12 +75,13 @@ module DDS
         requires :id, type: String, desc: 'AuthenticationProvider UUID'
         optional :full_name_contains, type: String, desc: 'string contained in name(must be at least 3 characters)'
         optional :username, type: String, desc: 'filter by username (exact matches only)'
+        optional :email, type: String, desc: 'filter by email (exact matches only)'
       end
       params do
         use :pagination
       end
       get '/auth_providers/:id/affiliates', adapter: :json, root: 'results', each_serializer: AffiliateSerializer do
-        affiliate_params = declared(params, {include_missing: false}, [:full_name_contains, :username])
+        affiliate_params = declared(params, {include_missing: false}, [:full_name_contains, :username, :email])
         auth_service = AuthenticationService.find(params[:id])
         unsupported_affiliate_search_error! unless auth_service.identity_provider
         affiliates = auth_service.identity_provider.affiliates(**affiliate_params.symbolize_keys)
