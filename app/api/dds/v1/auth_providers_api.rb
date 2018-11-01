@@ -82,9 +82,6 @@ module DDS
         affiliate_params = declared(params, {include_missing: false}, [:full_name_contains])
         auth_service = AuthenticationService.find(params[:id])
         unsupported_affiliate_search_error! unless auth_service.identity_provider
-        affiliate_exists_error! if auth_service.user_authentication_services.where(
-          uid: affiliate_params[:uid]
-        ).exists?
         affiliates = auth_service.identity_provider.affiliates(full_name_contains: affiliate_params[:full_name_contains])
         affiliates = Kaminari.paginate_array(affiliates)
         paginate(affiliates)
