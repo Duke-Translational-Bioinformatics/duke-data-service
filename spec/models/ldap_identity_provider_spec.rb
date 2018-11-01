@@ -13,16 +13,15 @@ RSpec.describe LdapIdentityProvider, type: :model do
   end
 
   describe '#affiliate' do
-    let(:ldap_returns) { [test_user] }
-    include_context 'mocked ldap', returns: :ldap_returns
-    subject { auth_provider.identity_provider.affiliate(test_user[:username]) }
+    subject { auth_provider.identity_provider.affiliate(username) }
+    let(:username) { a_user.username }
+    let(:a_user) { FactoryBot.build(:user) }
+    let(:array_of_users) { [a_user] }
+    before(:example) do
+      expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {username: username}).and_return(array_of_users)
+    end
 
-    it {
-      is_expected.to be
-      is_expected.to be_a User
-      is_expected.not_to be_persisted
-      expect(subject.display_name).to eq test_user[:display_name]
-    }
+    it { is_expected.to eq a_user }
   end
 
   describe '#affiliates' do
