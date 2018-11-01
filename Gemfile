@@ -71,6 +71,7 @@ end
 
 group :development, :docker, :test do
   gem 'rspec-rails'
+  gem 'rspec-activemodel-mocks'
 end
 
 group :docker, :test do
