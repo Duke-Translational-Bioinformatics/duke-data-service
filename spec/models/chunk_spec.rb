@@ -1,27 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe Chunk, type: :model do
-  let(:upload) { FactoryBot.create(:upload, :skip_validation) }
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  let(:upload) { FactoryBot.create(:upload, :skip_validation, storage_provider: mocked_storage_provider) }
   subject { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-  include_context 'with mocked StorageProvider', on: [:upload, :subject]
+  include_context 'mock Chunk StorageProvider'
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
   let(:expected_expiry) { subject.updated_at.to_i + (60*5) }
-  let(:expected_chunk_max_number) { Faker::Number.between(100,1000) }
-  let(:expected_chunk_max_size_bytes) { Faker::Number.between(4368709122, 6368709122) }
   let(:is_logically_deleted) { false }
-  let(:expected_chunk_max_exceeded) { false }
-  let(:expected_endpoint) { Faker::Internet.url }
   it_behaves_like 'an audited model'
 
   before do
     expect(upload).to be_persisted
     expect(subject).to be_persisted
-    allow(mocked_storage_provider).to receive(:chunk_max_size_bytes)
-      .and_return(expected_chunk_max_size_bytes)
-    allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
-      .and_return(expected_chunk_max_exceeded)
   end
 
   describe 'associations' do

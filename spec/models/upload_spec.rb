@@ -1,35 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
-  subject { FactoryBot.create(:upload, :skip_validation) }
-  include_context 'with mocked StorageProvider'
-
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  subject { FactoryBot.create(:upload, :skip_validation, storage_provider: mocked_storage_provider) }
   let(:fingerprint) { FactoryBot.create(:fingerprint, upload: subject) }
-  let(:completed_upload) { FactoryBot.create(:upload, :completed, :skip_validation) }
-  let(:upload_with_error) { FactoryBot.create(:upload, :with_error, :skip_validation) }
+
+  let(:completed_upload) { FactoryBot.create(:upload, :completed, :skip_validation, storage_provider: mocked_storage_provider) }
+  let(:upload_with_error) { FactoryBot.create(:upload, :with_error, :skip_validation, storage_provider: mocked_storage_provider) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
-  let(:expected_chunk_max_number) { Faker::Number.between(100,1000) }
-  let(:expected_chunk_max_size_bytes) { Faker::Number.between(4368709122, 6368709122) }
-  let(:expected_max_chunked_upload_size) {
-    expected_chunk_max_number * expected_chunk_max_size_bytes
-  }
-
-  before do
-    FactoryBot.create(:fingerprint, upload: completed_upload)
-    allow(mocked_storage_provider).to receive(:chunk_max_number)
-      .and_return(expected_chunk_max_number)
-    allow(mocked_storage_provider).to receive(:chunk_max_size_bytes)
-      .and_return(expected_chunk_max_size_bytes)
-    allow(mocked_storage_provider).to receive(:max_chunked_upload_size)
-      .and_return(expected_max_chunked_upload_size)
-  end
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project) }
+    it {
+      is_expected.to belong_to(:project)
+    }
     it { is_expected.to belong_to(:storage_provider) }
     it { is_expected.to have_many(:chunks) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
@@ -91,9 +79,10 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'instance methods' do
-    before do
+    let(:chunk) {
       FactoryBot.create(:chunk, :skip_validation, upload: subject, number: 1)
-    end
+    }
+    include_context 'mock Chunk StorageProvider', on: [:chunk]
 
     it { should delegate_method(:endpoint).to(:storage_provider) }
 
@@ -226,7 +215,7 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to respond_to :set_storage_container }
 
     context 'upload creation' do
-      subject { FactoryBot.build(:upload) }
+      subject { FactoryBot.build(:upload, storage_provider: mocked_storage_provider) }
       it {
         expect(subject.storage_container).to be_nil
         subject.save
@@ -250,22 +239,14 @@ RSpec.describe Upload, type: :model do
   end
 
   describe '#max_size_bytes' do
-    let(:expected_max_size_bytes) { expected_chunk_max_number * expected_chunk_max_size_bytes }
     it { is_expected.to respond_to :max_size_bytes }
-    it { expect(subject.max_size_bytes).to eq(expected_max_size_bytes) }
+    it { expect(subject.max_size_bytes).to eq(mocked_storage_provider.max_chunked_upload_size) }
   end
 
   describe '#minimum_chunk_size' do
-    let(:expected_minimum_chunk_size) {
-      expected_chunk_max_number
-    }
-
     it { is_expected.to respond_to :minimum_chunk_size }
     it {
-      expect(mocked_storage_provider).to receive(:suggested_minimum_chunk_size)
-        .with(subject)
-        .and_return(expected_minimum_chunk_size)
-      expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size)
+      expect(subject.minimum_chunk_size).to eq(mocked_storage_provider.suggested_minimum_chunk_size(subject))
     }
   end
 
@@ -278,13 +259,9 @@ RSpec.describe Upload, type: :model do
     end
 
     describe '#complete_and_validate_integrity' do
-      subject { FactoryBot.create(:upload, :skip_validation, is_consistent: false) }
+      subject { FactoryBot.create(:upload, :skip_validation, :with_chunks, is_consistent: false, storage_provider: mocked_storage_provider) }
 
       it { is_expected.to respond_to :complete_and_validate_integrity }
-
-      before do
-        FactoryBot.create(:chunk, :skip_validation, upload: subject, number: 1)
-      end
 
       context 'with valid reported size and chunk hashes' do
         it 'should set is_consistent to true, leave error_at and error_message null' do
