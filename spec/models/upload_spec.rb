@@ -338,7 +338,7 @@ RSpec.describe Upload, type: :model do
       end
 
       context 'no StorageProviderException' do
-        it {
+        it 'should purge successfully' do
           subject.chunks.each do |chunk|
             expect(chunk).to receive(:purge_storage)
           end
@@ -357,18 +357,34 @@ RSpec.describe Upload, type: :model do
           expect(subject.purged_on).not_to be_nil
           expect(subject.purged_on).to be >= purge_time
           expect(subject.chunks.count).to eq(0)
-        }
+        end
       end
     end #purge_storage
   end #StorageProvider Methods
 
   describe 'Default StorageProvider' do
-    it {
-      StorageProvider.delete_all
-      default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
-      expect(StorageProvider.default).not_to be_nil
-      upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
-      expect(upload).to be_valid
-    }
+    context 'basic upload' do
+      it 'should be valid when created with a swift_storage_provider' do
+        StorageProvider.delete_all
+        default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
+        expect(StorageProvider.default).not_to be_nil
+        upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
+        expect(upload).to be_valid
+      end
+    end
+
+    context 'completed upload' do
+      it 'should be valid when created with a swift_storage_provider' do
+        StorageProvider.delete_all
+        default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
+        expect(StorageProvider.default).not_to be_nil
+        upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
+        expect(FactoryBot.create(:chunk, upload: upload)).to be_truthy
+        upload.reload
+        upload.completed_at = DateTime.now
+        upload.fingerprints_attributes = [FactoryBot.attributes_for(:fingerprint)]
+        expect(upload).to be_valid
+      end
+    end
   end
 end
