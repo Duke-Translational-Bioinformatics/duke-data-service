@@ -124,6 +124,24 @@ describe DDS::V1::AuthProvidersAPI do
             it_behaves_like 'an identified resource'
           end
         end
+
+        context 'with username param' do
+          let(:payload) {{
+            username: resource.username
+          }}
+          let(:id_provider_mock) { instance_double("IdentityProvider") }
+          before(:example) do
+            allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(id_provider_mock)
+            expect(id_provider_mock).to receive(:affiliates).with(username: payload[:username]).and_return(returned_users)
+          end
+          it_behaves_like 'a listable resource', persisted_resource: false do
+            let(:expected_resources) { returned_users }
+            let(:expected_list_length) { expected_resources.count }
+            let(:serializable_resource) {
+              resource
+            }
+          end
+        end
       end
     end
 

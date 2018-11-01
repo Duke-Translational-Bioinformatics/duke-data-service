@@ -73,16 +73,17 @@ module DDS
       end
       params do
         requires :id, type: String, desc: 'AuthenticationProvider UUID'
-        requires :full_name_contains, type: String, desc: 'string contained in name(must be at least 3 characters)'
+        optional :full_name_contains, type: String, desc: 'string contained in name(must be at least 3 characters)'
+        optional :username, type: String, desc: 'filter by username (exact matches only)'
       end
       params do
         use :pagination
       end
       get '/auth_providers/:id/affiliates', adapter: :json, root: 'results', each_serializer: AffiliateSerializer do
-        affiliate_params = declared(params, {include_missing: false}, [:full_name_contains])
+        affiliate_params = declared(params, {include_missing: false}, [:full_name_contains, :username])
         auth_service = AuthenticationService.find(params[:id])
         unsupported_affiliate_search_error! unless auth_service.identity_provider
-        affiliates = auth_service.identity_provider.affiliates(full_name_contains: affiliate_params[:full_name_contains])
+        affiliates = auth_service.identity_provider.affiliates(**affiliate_params.symbolize_keys)
         affiliates = Kaminari.paginate_array(affiliates)
         paginate(affiliates)
       end
