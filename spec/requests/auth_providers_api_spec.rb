@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe DDS::V1::AuthProvidersAPI do
-  before { allow_any_instance_of(Net::LDAP).to receive(:search).and_raise(Net::LDAP::Error) }
   include_context 'without authentication'
   let(:auth_providers) {[
       FactoryBot.create(:duke_authentication_service),
@@ -90,9 +89,16 @@ describe DDS::V1::AuthProvidersAPI do
     let(:resource_class) { User }
     let(:resource_uid) { resource.username }
     let(:returned_users) { [resource] }
+    let(:id_provider_mock) { instance_double("IdentityProvider") }
+    before(:example) do
+      allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(id_provider_mock)
+    end
 
     describe 'list' do
       include_context 'common headers'
+      before(:example) do
+        allow(id_provider_mock).to receive(:affiliates).with(payload).and_return(returned_users)
+      end
 
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates" }
       let(:resource_serializer) { AffiliateSerializer }
@@ -105,35 +111,28 @@ describe DDS::V1::AuthProvidersAPI do
 
         it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
 
-        it_behaves_like 'an identity provider', returns: :returned_users do
-          it_behaves_like 'a listable resource', persisted_resource: false do
-            let(:expected_resources) { returned_users }
-            let(:expected_list_length) { expected_resources.count }
-            let(:serializable_resource) {
-              resource
-            }
-          end
-          it_behaves_like 'a paginated resource' do
-            let(:returned_users) { extras + [resource] }
-            let(:extras) { FactoryBot.create_list(:user, 5) }
-            let(:expected_total_length) { returned_users.count }
-          end
-          context 'with invalid authentication_service_id' do
-            let(:authentication_service_id) { "doesNotExist" }
-            let(:resource_class) { AuthenticationService }
-            it_behaves_like 'an identified resource'
-          end
+        it_behaves_like 'a listable resource', persisted_resource: false do
+          let(:expected_resources) { returned_users }
+          let(:expected_list_length) { expected_resources.count }
+          let(:serializable_resource) {
+            resource
+          }
+        end
+        it_behaves_like 'a paginated resource' do
+          let(:returned_users) { extras + [resource] }
+          let(:extras) { FactoryBot.create_list(:user, 5) }
+          let(:expected_total_length) { returned_users.count }
+        end
+        context 'with invalid authentication_service_id' do
+          let(:authentication_service_id) { "doesNotExist" }
+          let(:resource_class) { AuthenticationService }
+          it_behaves_like 'an identified resource'
         end
 
         context 'with username param' do
           let(:payload) {{
             username: resource.username
           }}
-          let(:id_provider_mock) { instance_double("IdentityProvider") }
-          before(:example) do
-            allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(id_provider_mock)
-            expect(id_provider_mock).to receive(:affiliates).with(username: payload[:username]).and_return(returned_users)
-          end
           it_behaves_like 'a listable resource', persisted_resource: false do
             let(:expected_resources) { returned_users }
             let(:expected_list_length) { expected_resources.count }
@@ -147,11 +146,6 @@ describe DDS::V1::AuthProvidersAPI do
           let(:payload) {{
             email: resource.email
           }}
-          let(:id_provider_mock) { instance_double("IdentityProvider") }
-          before(:example) do
-            allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(id_provider_mock)
-            expect(id_provider_mock).to receive(:affiliates).with(email: payload[:email]).and_return(returned_users)
-          end
           it_behaves_like 'a listable resource', persisted_resource: false do
             let(:expected_resources) { returned_users }
             let(:expected_list_length) { expected_resources.count }
@@ -165,6 +159,9 @@ describe DDS::V1::AuthProvidersAPI do
 
     describe 'view' do
       include_context 'with authentication'
+      before(:example) do
+        allow(id_provider_mock).to receive(:affiliate).with(payload[:uid]).and_return(resource)
+      end
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates/#{resource_uid}" }
       let(:resource_serializer) { AffiliateSerializer }
       let(:payload) {{
@@ -174,20 +171,22 @@ describe DDS::V1::AuthProvidersAPI do
       subject { get(url, params: payload, headers: headers) }
 
       it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
-      it_behaves_like 'an identity provider', returns: :returned_users do
-        it_behaves_like 'an authenticated resource'
-        it_behaves_like 'a viewable resource'
-        context 'with invalid authentication_service_id' do
-          let(:authentication_service_id) { "doesNotExist" }
-          let(:resource_class) { AuthenticationService }
-          it_behaves_like 'an identified resource'
-        end
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a viewable resource'
+      context 'with invalid authentication_service_id' do
+        let(:authentication_service_id) { "doesNotExist" }
+        let(:resource_class) { AuthenticationService }
+        it_behaves_like 'an identified resource'
       end
       it_behaves_like 'an identified affiliate'
     end
 
     describe 'create' do
       include_context 'with authentication'
+      before(:example) do
+        allow(id_provider_mock).to receive(:affiliate).with(resource_uid).and_return(resource)
+      end
+      let(:resource) { FactoryBot.build(:user) }
       let(:url) { "/api/v1/auth_providers/#{authentication_service_id}/affiliates/#{resource_uid}/dds_user" }
       let(:resource_serializer) { UserSerializer }
       let(:expected_response_status) { 201 }
@@ -199,34 +198,32 @@ describe DDS::V1::AuthProvidersAPI do
 
       it_behaves_like 'an identity_provider dependant authentication_provider resource', authentication_provider_sym: :authentication_service
 
-      it_behaves_like 'an identity provider', returns: :returned_users do
-        it_behaves_like 'an authenticated resource'
-        it_behaves_like 'a software_agent accessible resource' do
-          let(:called_action) { 'POST' }
-          let(:expected_response_status) { 201 }
-          it_behaves_like 'an annotate_audits endpoint' do
-            let(:called_action) { 'POST' }
-            let(:expected_response_status) { 201 }
-          end
-        end
-        it_behaves_like 'a creatable resource' do
-          it 'should have a persisted user_authentication_service' do
-            expect {
-              is_expected.to eq(expected_response_status)
-            }.to change{UserAuthenticationService.count}.by(1)
-            expect(new_object).to be
-            expect(new_object.user_authentication_services.where(authentication_service_id: authentication_service_id)).to exist
-          end
-        end
+      it_behaves_like 'an authenticated resource'
+      it_behaves_like 'a software_agent accessible resource' do
+        let(:called_action) { 'POST' }
+        let(:expected_response_status) { 201 }
         it_behaves_like 'an annotate_audits endpoint' do
           let(:called_action) { 'POST' }
           let(:expected_response_status) { 201 }
         end
-        context 'with invalid authentication_service_id' do
-          let(:authentication_service_id) { "doesNotExist" }
-          let(:resource_class) { AuthenticationService }
-          it_behaves_like 'an identified resource'
+      end
+      it_behaves_like 'a creatable resource' do
+        it 'should have a persisted user_authentication_service' do
+          expect {
+            is_expected.to eq(expected_response_status)
+          }.to change{UserAuthenticationService.count}.by(1)
+          expect(new_object).to be
+          expect(new_object.user_authentication_services.where(authentication_service_id: authentication_service_id)).to exist
         end
+      end
+      it_behaves_like 'an annotate_audits endpoint' do
+        let(:called_action) { 'POST' }
+        let(:expected_response_status) { 201 }
+      end
+      context 'with invalid authentication_service_id' do
+        let(:authentication_service_id) { "doesNotExist" }
+        let(:resource_class) { AuthenticationService }
+        it_behaves_like 'an identified resource'
       end
       it_behaves_like 'an identified affiliate'
       context 'affiliate dds_user already exists' do
