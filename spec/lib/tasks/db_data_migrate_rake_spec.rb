@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe "db:data:migrate" do
   include_context "rake"
+  include_context 'mock all Uploads StorageProvider'
+
   let(:task_path) { "lib/tasks/db_data_migrate" }
   let(:current_user) { FactoryBot.create(:user) }
   let(:file_version_audits) { Audited.audit_class.where(auditable: FileVersion.all) }
@@ -197,36 +199,57 @@ describe "db:data:migrate" do
       end
     end
 
-    describe 'consistency migration', :vcr do
-      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
-
+    describe 'consistency migration' do
       before do
-        expect(storage_provider).to be_persisted
+        allow(StorageProvider).to receive(:default)
+          .and_return(mocked_storage_provider)
       end
 
       context 'for project' do
         let(:record) { FactoryBot.create(:project, is_consistent: nil) }
         let(:init_project_storage) {
-          storage_provider.put_container(record.id)
-          expect(storage_provider.get_container_meta(record.id)).not_to be_nil
+          expect(mocked_storage_provider).to receive(:is_initialized?)
+            .with(record)
+            .and_return(true)
         }
+
+        before do
+          # this should be overridden by init_project_storage when
+          # it is called
+          allow(mocked_storage_provider).to receive(:is_initialized?)
+            .with(record)
+            .and_return(false)
+        end
+
         it_behaves_like 'a consistency migration', :init_project_storage
 
         context 'with deleted project' do
-          before(:each) { FactoryBot.create(:project, :deleted, is_consistent: nil) }
-          it { expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count} }
+          before do
+            Project.delete_all
+            FactoryBot.create(:project, :deleted, is_consistent: nil)
+          end
+          it 'should not update the consistency status' do
+            expect(Project.where(is_consistent: nil)).to exist
+            expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count}
+          end
         end
       end
 
       context 'for upload' do
-        let(:record) { FactoryBot.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
+        let(:record) { FactoryBot.create(:upload, is_consistent: nil) }
         let(:init_upload) {
-          storage_provider.put_container(record.project.id)
-          expect(storage_provider.get_container_meta(record.project.id)).not_to be_nil
-          record.create_and_validate_storage_manifest
-          record.update_columns(is_consistent: nil)
-          expect(storage_provider.get_object_metadata(record.project.id, record.id)).not_to be_nil
+          expect(mocked_storage_provider).to receive(:is_complete_chunked_upload?)
+            .with(record)
+            .and_return(true)
         }
+
+        before do
+          # this should be overridden by init_upload when
+          # it is called
+          allow(mocked_storage_provider).to receive(:is_complete_chunked_upload?)
+            .with(record)
+            .and_return(false)
+        end
         it_behaves_like 'a consistency migration', :init_upload
       end
     end
