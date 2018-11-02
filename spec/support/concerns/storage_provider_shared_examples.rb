@@ -69,6 +69,7 @@ shared_examples 'A StorageProvider' do
   it { expect(subject.expiry).to eq Time.now.to_i + subject.signed_url_duration }
 
   it { is_expected.to respond_to(:initialize_project).with(1).argument }
+  it { is_expected.to respond_to(:is_initialized?).with(1).argument }
   it { is_expected.to respond_to(:single_file_upload_url).with(1).argument }
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:endpoint) }

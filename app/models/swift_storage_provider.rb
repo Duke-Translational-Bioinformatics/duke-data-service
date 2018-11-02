@@ -14,6 +14,10 @@ class SwiftStorageProvider < StorageProvider
     put_container(project.id)
   end
 
+  def is_initialized?(project)
+    return true if get_container_meta(project.id)
+  end
+
   def single_file_upload_url(upload)
     build_signed_url(
       'POST',

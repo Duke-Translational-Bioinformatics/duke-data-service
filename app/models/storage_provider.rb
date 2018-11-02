@@ -26,6 +26,10 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement initialize_project.")
   end
 
+  def is_initialized?(project)
+    raise NotImplementedError.new("You must implement is_initialized?.")
+  end
+
   def single_file_upload_url(upload)
     raise NotImplementedError.new("You must implement single_file_upload_url.")
   end

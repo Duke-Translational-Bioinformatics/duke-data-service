@@ -15,6 +15,11 @@ RSpec.describe StorageProvider, type: :model do
   }
   it {
     expect {
+      subject.is_initialized?(project)
+    }.to raise_error(NotImplementedError)
+  }
+  it {
+    expect {
       subject.single_file_upload_url(upload)
     }.to raise_error(NotImplementedError)
   }
