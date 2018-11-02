@@ -4,7 +4,9 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
   subject { auth_provider.identity_provider }
   let(:auth_provider) { FactoryBot.create(:openid_authentication_service, :with_ldap_identity_provider) }
-  let(:test_user) { FactoryBot.attributes_for(:user) }
+  let(:test_user) { FactoryBot.build(:user) }
+  let(:test_user_attrs) { test_user.attributes.symbolize_keys }
+  let(:array_of_users) { [test_user] }
 
   it_behaves_like 'an IdentityProvider'
 
@@ -14,22 +16,18 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
   describe '#affiliate' do
     subject { auth_provider.identity_provider.affiliate(username) }
-    let(:username) { a_user.username }
-    let(:a_user) { FactoryBot.build(:user) }
-    let(:array_of_users) { [a_user] }
+    let(:username) { test_user.username }
     before(:example) do
       expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {username: username}).and_return(array_of_users)
     end
 
-    it { is_expected.to eq a_user }
+    it { is_expected.to eq test_user }
   end
 
   describe '#affiliates' do
     context 'username' do
       let(:affiliates) { auth_provider.identity_provider.affiliates(username: username) }
-      let(:username) { a_user.username }
-      let(:a_user) { FactoryBot.build(:user) }
-      let(:array_of_users) { [a_user] }
+      let(:username) { test_user.username }
       before(:example) do
         expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {username: username}).and_return(array_of_users)
       end
@@ -38,9 +36,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
     context 'email' do
       let(:affiliates) { auth_provider.identity_provider.affiliates(email: email) }
-      let(:email) { a_user.email }
-      let(:a_user) { FactoryBot.build(:user) }
-      let(:array_of_users) { [a_user] }
+      let(:email) { test_user.email }
       before(:example) do
         expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {email: email}).and_return(array_of_users)
       end
@@ -63,73 +59,13 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'is 3 characters' do
-        let(:ldap_returns) { [test_user] }
-        include_context 'mocked ldap', returns: :ldap_returns
-        subject { auth_provider.identity_provider.affiliates(full_name_contains: 'foo') }
-        before { expect(auth_provider.identity_provider).to receive(:ldap_search).and_call_original }
-        it { is_expected.not_to be_empty }
-      end
-
-      context 'greater than 3 characters' do
-        context 'incomplete record' do
-          let(:test_user) { FactoryBot.attributes_for(:user).reject{|k| k == missing_attr } }
-          let(:ldap_returns) { [test_user] }
-          include_context 'mocked ldap', returns: :ldap_returns
-          subject { auth_provider.identity_provider.affiliates(
-            full_name_contains: full_name_contains
-          ) }
-          let(:full_name_contains) { test_user[:last_name] }
-          let(:affiliate) { subject.first }
-          context 'missing uid' do
-            let(:missing_attr) { :username }
-            it { is_expected.to eq [] }
-          end
-
-          context 'is still valid' do
-            before(:example) do
-              is_expected.to be_a Array
-              expect(subject.length).to eq 1
-              expect(affiliate).to be_a(User)
-              expect(affiliate).not_to be_persisted
-              expect(affiliate.username).to eq test_user[:username]
-            end
-            context 'when missing mail' do
-              let(:missing_attr) { :email }
-              it { expect(affiliate.email).to be_nil }
-            end
-            context 'when missing givenName' do
-              let(:missing_attr) { :first_name }
-              it { expect(affiliate.first_name).to be_nil }
-            end
-            context 'when missing sn' do
-              let(:full_name_contains) { test_user[:first_name] }
-              let(:missing_attr) { :last_name }
-              it { expect(affiliate.last_name).to be_nil }
-            end
-            context 'when missing displayName' do
-              let(:missing_attr) { :display_name }
-              it { expect(affiliate.display_name).to be_nil }
-            end
-          end
+        subject { auth_provider.identity_provider.affiliates(full_name_contains: test_user.last_name) }
+        let(:full_name_contains) { test_user.last_name[0,3] }
+        let(:array_of_users) { [test_user] }
+        before(:example) do
+          expect(auth_provider.identity_provider).to receive(:ldap_search).with(filter: {full_name_contains: test_user.last_name}).and_return(array_of_users)
         end
-
-        context 'complete record' do
-          let(:ldap_returns) { [test_user] }
-          include_context 'mocked ldap', returns: :ldap_returns
-          subject { auth_provider.identity_provider.affiliates(
-            full_name_contains: test_user[:last_name]
-          ) }
-
-          it {
-            is_expected.to be_a Array
-            expect(subject.length).to be > 0
-            subject.each do |response|
-              expect(response).to be_a User
-              expect(response).not_to be_persisted
-              expect(response.display_name).to eq test_user[:display_name]
-            end
-          }
-        end
+        it { is_expected.to eq array_of_users }
       end
     end
   end
@@ -152,7 +88,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
         mail: user_attrs[:email],
         displayname: user_attrs[:display_name]
       }}
-      let(:user_attrs) { FactoryBot.attributes_for(:user) }
+      let(:user_attrs) { test_user_attrs }
       it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
       it { expect(ldap_entry_to_user).to be_a(User) }
       it { expect(ldap_entry_to_user.username).to eq entry_hash[:uid] }
@@ -161,10 +97,41 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(ldap_entry_to_user.email).to eq entry_hash[:mail] }
       it { expect(ldap_entry_to_user.display_name).to eq entry_hash[:displayname] }
 
-      context 'with entry without uid' do
-        let(:user_attrs) { FactoryBot.attributes_for(:user).reject {|k,v| k==:username} }
-        it { expect(user_attrs[:username]).to be_nil }
-        it { expect(ldap_entry_to_user).to be_nil }
+      context 'incomplete entry' do
+        let(:user_attrs) { test_user_attrs.reject {|k,v| k == missing_attr} }
+        context 'with entry without uid' do
+          let(:missing_attr) { :username }
+          it { expect(ldap_entry[:uid]).to eq [] }
+          it { expect(ldap_entry_to_user).to be_nil }
+        end
+
+        context 'with entry without givenname' do
+          let(:missing_attr) { :first_name }
+          it { expect(ldap_entry[:givenname]).to eq [] }
+          it { expect(ldap_entry_to_user).to be_a(User) }
+          it { expect(ldap_entry_to_user.first_name).to be_nil }
+        end
+
+        context 'with entry without sn' do
+          let(:missing_attr) { :last_name }
+          it { expect(ldap_entry[:sn]).to eq [] }
+          it { expect(ldap_entry_to_user).to be_a(User) }
+          it { expect(ldap_entry_to_user.last_name).to be_nil }
+        end
+
+        context 'with entry without mail' do
+          let(:missing_attr) { :email }
+          it { expect(ldap_entry[:mail]).to eq [] }
+          it { expect(ldap_entry_to_user).to be_a(User) }
+          it { expect(ldap_entry_to_user.email).to be_nil }
+        end
+
+        context 'with entry without displayname' do
+          let(:missing_attr) { :display_name }
+          it { expect(ldap_entry[:displayname]).to eq [] }
+          it { expect(ldap_entry_to_user).to be_a(User) }
+          it { expect(ldap_entry_to_user.display_name).to be_nil }
+        end
       end
     end
   end
