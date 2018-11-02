@@ -22,6 +22,11 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
 
     it { is_expected.to eq test_user }
+
+    context 'search returns empty array' do
+      let(:array_of_users) {[]}
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#affiliates' do
