@@ -10,6 +10,23 @@ class SwiftStorageProvider < StorageProvider
   validates :chunk_max_size_bytes, presence: true
 
   # StorageProvider Implementation
+  def configure
+    register_keys
+  end
+
+  def is_ready?
+    #storage_provider must be accessible over http without network or CORS issues
+    sp_acct = get_account_info
+    # storage_provider must be configured
+    unless sp_acct.has_key?("x-account-meta-temp-url-key") &&
+           sp_acct.has_key?("x-account-meta-temp-url-key-2") &&
+           sp_acct["x-account-meta-temp-url-key"] == primary_key &&
+           sp_acct["x-account-meta-temp-url-key-2"] == secondary_key
+      raise StorageProviderException, 'storage_provider needs to be configured'
+    end
+    return true
+  end
+
   def initialize_project(project)
     put_container(project.id)
   end

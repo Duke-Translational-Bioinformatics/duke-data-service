@@ -9,6 +9,16 @@ RSpec.describe StorageProvider, type: :model do
   it_behaves_like 'A StorageProvider'
 
   it {
+    expect{
+      subject.configure
+    }.to raise_error(NotImplementedError)
+  }
+  it {
+    expect{
+      subject.is_ready?
+    }.to raise_error(NotImplementedError)
+  }
+  it {
     expect {
       subject.initialize_project(project)
     }.to raise_error(NotImplementedError)

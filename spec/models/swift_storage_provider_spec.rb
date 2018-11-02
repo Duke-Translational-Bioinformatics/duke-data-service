@@ -20,6 +20,67 @@ RSpec.describe SwiftStorageProvider, type: :model do
 
     it_behaves_like 'A StorageProvider'
 
+    describe '#configure' do
+      it 'should register_keys' do
+        is_expected.to receive(:register_keys)
+        expect {
+          subject.configure
+        }.not_to raise_error
+      end
+    end
+
+    describe '#is_ready?' do
+      context 'unexpected StorageProviderException' do
+        let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+        it 'should raise the StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_raise(unexpected_exception)
+          expect {
+            subject.is_ready?
+          }.to raise_error(unexpected_exception)
+        end
+      end
+
+      context 'not configured' do
+        let(:account_info) {{}}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException, 'storage_provider needs to be configured')
+        end
+      end
+
+      context 'keys do not match' do
+        let(:account_info) {{
+          "x-account-meta-temp-url-key" => 'wrong key',
+          "x-account-meta-temp-url-key-2" => 'wrong key'
+        }}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException, 'storage_provider needs to be configured')
+        end
+      end
+
+      context 'true' do
+        let(:account_info) {{
+          "x-account-meta-temp-url-key" => subject.primary_key,
+          "x-account-meta-temp-url-key-2" => subject.secondary_key
+        }}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            expect(subject.is_ready?).to be_truthy
+          }.not_to raise_error
+        end
+      end
+    end
+
     describe '#initialize_project' do
       it 'should create a container in swift with the project id' do
         expect(project).to receive(:id)

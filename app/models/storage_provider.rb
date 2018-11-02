@@ -22,6 +22,14 @@ class StorageProvider < ActiveRecord::Base
     Time.now.to_i + signed_url_duration
   end
 
+  def configure
+    raise NotImplementedError.new("You must implement configure.")
+  end
+
+  def is_ready?
+    raise NotImplementedError.new("You must implement is_ready?")
+  end
+
   def initialize_project(project)
     raise NotImplementedError.new("You must implement initialize_project.")
   end
