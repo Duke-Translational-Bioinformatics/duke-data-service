@@ -60,6 +60,11 @@ RSpec.describe StorageProvider, type: :model do
   }
   it {
     expect {
+      subject.is_complete_chunked_upload?(upload)
+    }.to raise_error(NotImplementedError)
+  }
+  it {
+    expect {
       subject.download_url(upload)
     }.to raise_error(NotImplementedError)
   }

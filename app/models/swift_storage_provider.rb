@@ -71,6 +71,10 @@ class SwiftStorageProvider < StorageProvider
     end
   end
 
+  def is_complete_chunked_upload?(upload)
+    return true if get_object_metadata(upload.storage_container, upload.id)
+  end
+
   def chunk_upload_url(chunk)
     build_signed_url(
       'PUT',
@@ -213,6 +217,7 @@ class SwiftStorageProvider < StorageProvider
       "#{storage_url}/#{container}/#{object}",
       headers: auth_header
     )
+    return if resp.response.code.to_i == 404
     ([200,204].include?(resp.response.code.to_i)) ||
       raise(StorageProviderException, resp.body)
      resp.headers

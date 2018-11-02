@@ -224,6 +224,47 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
+    describe '#is_complete_chunked_upload?(upload)' do
+      context 'object exists' do
+        let(:expected_meta) {
+          {
+            foo: 'bar'
+          }
+        }
+
+        it 'should return true' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+            .and_return(expected_meta)
+          expect {
+            expect(subject.is_complete_chunked_upload?(upload)).to be_truthy
+          }.not_to raise_error
+        end
+      end
+
+      context 'object does not exist' do
+        it 'should return false' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+          expect {
+            expect(subject.is_complete_chunked_upload?(upload)).to be_falsey
+          }.not_to raise_error
+        end
+      end
+
+      context 'unexpected StorageProviderException' do
+        let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+        it 'should return false' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+            .and_raise(unexpected_exception)
+          expect {
+            subject.is_complete_chunked_upload?(upload)
+          }.to raise_error(unexpected_exception)
+        end
+      end
+    end
+
     describe '#max_chunked_upload_size' do
       let(:expected_max_chunk_upload_size) {
         subject.chunk_max_number * subject.chunk_max_size_bytes

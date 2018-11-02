@@ -62,6 +62,10 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement complete_chunked_upload.")
   end
 
+  def is_complete_chunked_upload?(upload)
+    raise NotImplementedError.new("You must implement is_complete_chunked_upload?.")
+  end
+
   def download_url(upload,filename=nil)
     raise NotImplementedError.new("You must implement download_url.")
   end
