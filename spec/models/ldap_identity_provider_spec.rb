@@ -145,10 +145,16 @@ RSpec.describe LdapIdentityProvider, type: :model do
     context 'when called' do
       let(:ldap_mock) { instance_double("Net::LDAP") }
       let(:entry_mock) { instance_double("Net::LDAP::Entry") }
+      let(:filter_mock) { instance_double("Net::LDAP::Filter") }
       let(:user_mock) { instance_double("User") }
+      let(:ldap_attributes) { %w(uid duDukeID givenName sn mail displayName) }
       before(:example) do
         is_expected.to receive(:ldap_conn).and_return(ldap_mock)
-        expect(ldap_mock).to receive(:search).and_yield(entry_mock).and_return(true)
+        is_expected.to receive(:ldap_filter).with(filter_hash).and_return(filter_mock)
+        expect(ldap_mock).to receive(:search)
+          .with(filter: filter_mock, attributes: a_collection_containing_exactly(*ldap_attributes), size: 500, return_results: false)
+          .and_yield(entry_mock)
+          .and_return(true)
         is_expected.to receive(:ldap_entry_to_user).with(entry_mock).and_return(user_mock)
       end
       it { expect(ldap_search).to eq [user_mock] }
