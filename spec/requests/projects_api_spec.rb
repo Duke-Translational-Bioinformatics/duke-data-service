@@ -345,37 +345,6 @@ describe DDS::V1::ProjectsAPI do
 
         it_behaves_like 'a removable resource' do
           let(:resource_counter) { resource_class.where(is_deleted: false) }
-          let!(:storage_provider) { FactoryBot.create(:storage_provider) }
-
-          context 'with inline ActiveJob' do
-            include_context 'elasticsearch prep', [], []
-            before do
-              ActiveJob::Base.queue_adapter = :inline
-              allow_any_instance_of(StorageProvider).to receive(:put_container).and_return(true)
-              allow_any_instance_of(StorageProvider).to receive(:delete_object).and_return(true)
-              allow_any_instance_of(StorageProvider).to receive(:delete_object_manifest).and_return(true)
-            end
-
-            it {
-              expect(root_folder.is_deleted?).to be_falsey
-              expect(root_file.is_deleted?).to be_falsey
-              is_expected.to eq(204)
-              expect(root_folder.reload).to be_truthy
-              expect(root_folder.is_deleted?).to be_truthy
-              expect(root_file.reload).to be_truthy
-              expect(root_file.is_deleted?).to be_truthy
-            }
-          end
-
-          context 'with queued ActiveJob' do
-            it {
-              expect {
-                expect(root_folder.is_deleted?).to be_falsey
-                expect(root_file.is_deleted?).to be_falsey
-                is_expected.to eq(204)
-              }.to have_enqueued_job(ChildPurgationJob)
-            }
-          end
         end
       end
 
