@@ -30,6 +30,18 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     describe '#is_ready?' do
+      context 'network connectivity failure' do
+        before do
+          stub_request(:any, "#{subject.endpoint}#{subject.auth_uri}").to_timeout
+        end
+
+        it 'should raise a StorageProviderException' do
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException)
+        end
+      end
+
       context 'unexpected StorageProviderException' do
         let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
         it 'should raise the StorageProviderException' do
