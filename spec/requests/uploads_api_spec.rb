@@ -2,17 +2,17 @@ require 'rails_helper'
 
 describe DDS::V1::UploadsAPI do
   include_context 'with authentication'
+  include_context 'mock all Uploads StorageProvider'
 
   let(:project) { FactoryBot.create(:project) }
-  let!(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
-  let(:upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id, project: project) }
-  let(:other_upload) { FactoryBot.create(:upload, storage_provider_id: storage_provider.id) }
-  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, storage_provider_id: storage_provider.id, project: project) }
+  let(:upload) { FactoryBot.create(:upload, :skip_validation, project: project) }
+  let(:other_upload) { FactoryBot.create(:upload, :skip_validation) }
+  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, :skip_validation, project: project) }
 
-  let(:chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 1) }
+  let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload_id: upload.id, number: 1) }
 
   let(:user) { FactoryBot.create(:user) }
-  let(:upload_stub) { FactoryBot.build(:upload, storage_provider_id: storage_provider.id) }
+  let(:upload_stub) { FactoryBot.build(:upload) }
   let(:chunk_stub) { FactoryBot.build(:chunk, upload_id: upload.id) }
   let(:fingerprint_stub) { FactoryBot.build(:fingerprint) }
 
@@ -20,6 +20,11 @@ describe DDS::V1::UploadsAPI do
   let(:resource_serializer) { UploadSerializer }
   let!(:resource) { upload }
   let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
+
+  before do
+    allow_any_instance_of(Chunk).to receive(:storage_provider)
+      .and_return(mocked_storage_provider)
+  end
 
   describe 'Uploads collection' do
     let(:url) { "/api/v1/projects/#{project_id}/uploads" }
@@ -44,7 +49,7 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.uploads.count }
-        let(:extras) { FactoryBot.create_list(:upload, 5, project: project, storage_provider_id: storage_provider.id) }
+        let(:extras) { FactoryBot.create_list(:upload, 5, project: project) }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -171,23 +176,10 @@ describe DDS::V1::UploadsAPI do
 
         context 'retry' do
           let(:resource) {
-            chunk_stub.save
+            chunk_stub.save(validate: false)
             chunk_stub
           }
-          it_behaves_like 'an updatable resource' do
-            it 'updates the expiration on the signed url' do
-              expect(resource.updated_at).to eq(resource.created_at)
-              sleep 1
-              orig_obj = resource_serializer.new(resource).as_json
-              orig_temp_url_expires = URI.decode_www_form(URI.parse(orig_obj[:url]).query).assoc('temp_url_expires')[1]
-              is_expected.to eq(expected_response_status)
-              resource.reload
-              expect(resource.updated_at).not_to eq(resource.created_at)
-              new_obj = resource_serializer.new(resource).as_json
-              new_temp_url_expires = URI.decode_www_form(URI.parse(new_obj[:url]).query).assoc('temp_url_expires')[1]
-              expect(new_temp_url_expires).not_to eq(orig_temp_url_expires)
-            end
-          end
+          it_behaves_like 'a viewable resource'
         end
 
         context 'when chunk.number exists' do
@@ -247,7 +239,8 @@ describe DDS::V1::UploadsAPI do
       context 'storage_provider.chunk_max_number exceeded' do
         let(:other_chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 2) }
         before do
-          storage_provider.update(chunk_max_number: 1)
+          allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
+            .and_return(true)
         end
 
         it_behaves_like 'a validated resource' do
