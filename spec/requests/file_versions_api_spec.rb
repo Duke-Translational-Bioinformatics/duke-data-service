@@ -9,7 +9,7 @@ describe DDS::V1::FileVersionsAPI do
   let(:data_file) { FactoryBot.create(:data_file, project: project) }
   let(:file_version) { data_file.file_versions.first }
   let(:upload) { file_version.upload }
-  let(:new_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, :skip_validation, project: project, creator: current_user, is_consistent: true) }
+  let(:new_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
   let(:current_file_version) do
     expect(data_file.update(upload: new_upload)).to be_truthy
     data_file.current_file_version
