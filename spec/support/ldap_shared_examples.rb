@@ -1,23 +1,3 @@
-shared_context 'mocked ldap' do |returns:|
-  let(:entry_users) { send(returns) }
-  let(:expected_entries) {
-    entry_users.map { |test_user|
-      expected_entry = Net::LDAP::Entry.new
-      expected_entry[:uid] = test_user[:username] if test_user[:username]
-      expected_entry[:givenName] = test_user[:first_name]
-      expected_entry[:sn] = test_user[:last_name]
-      expected_entry[:mail] = test_user[:email] if test_user[:email]
-      expected_entry[:displayName] = test_user[:display_name]
-      expected_entry
-    }
-  }
-  before do
-    allow_any_instance_of(Net::LDAP).to receive(:search) { |&block|
-      expected_entries.each &block
-    }
-  end
-end
-
 shared_examples 'an identity_provider dependant authentication_provider resource' do |authentication_provider_sym:|
   let(:authentication_provider) { send(authentication_provider_sym) }
 
@@ -25,6 +5,10 @@ shared_examples 'an identity_provider dependant authentication_provider resource
     let(:expected_response_status) { 503 } #Service Unavailable
     let(:expected_reason) { "identity provider communication failure" }
     let(:expected_suggestion) { 'please try again in a few minutes, or report an issue' }
+    before(:example) do
+      allow(id_provider_mock).to receive(:affiliates).and_raise(Net::LDAP::Error)
+      allow(id_provider_mock).to receive(:affiliate).and_raise(Net::LDAP::Error)
+    end
 
     it {
       is_expected.to eq(expected_response_status)
@@ -48,8 +32,7 @@ shared_examples 'an identity_provider dependant authentication_provider resource
     let(:expected_suggestion) { 'perhaps you are using the wrong authentication provider' }
 
     before do
-      authentication_provider.identity_provider.destroy
-      authentication_provider.reload
+      allow_any_instance_of(AuthenticationService).to receive(:identity_provider).and_return(nil)
     end
 
     it {
@@ -70,18 +53,10 @@ shared_examples 'an identity_provider dependant authentication_provider resource
   end
 end
 
-shared_examples 'an identity provider' do |returns:|
-  include_context 'mocked ldap', returns: returns
-
-  it {
-    is_expected.to eq(expected_response_status)
-  }
-end
-
 shared_examples 'an identified affiliate' do
-  let(:empty_response) {[]}
-  include_context 'mocked ldap', returns: :empty_response
-
+  before(:example) do
+    allow(id_provider_mock).to receive(:affiliate).and_return(nil)
+  end
   it 'should return 404 with error when affiliate not found with uid' do
     is_expected.to eq(404)
     expect(response.body).to be
