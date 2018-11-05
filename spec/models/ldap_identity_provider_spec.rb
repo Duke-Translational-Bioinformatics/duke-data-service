@@ -30,7 +30,15 @@ RSpec.describe LdapIdentityProvider, type: :model do
   end
 
   describe '#affiliates' do
-    context 'username' do
+    context 'without arguments' do
+      let(:affiliates) { auth_provider.identity_provider.affiliates() }
+      before(:example) do
+        expect(auth_provider.identity_provider).not_to receive(:ldap_search)
+      end
+      it { expect(affiliates).to eq [] }
+    end
+
+    context 'with username' do
       let(:affiliates) { auth_provider.identity_provider.affiliates(username: username) }
       let(:username) { test_user.username }
       before(:example) do
@@ -39,7 +47,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(affiliates).to eq array_of_users }
     end
 
-    context 'email' do
+    context 'with email' do
       let(:affiliates) { auth_provider.identity_provider.affiliates(email: email) }
       let(:email) { test_user.email }
       before(:example) do
@@ -48,13 +56,7 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(affiliates).to eq array_of_users }
     end
 
-    context 'full_name_contains' do
-      context 'not provided' do
-        subject { auth_provider.identity_provider.affiliates }
-        before { expect(auth_provider.identity_provider).not_to receive(:ldap_search) }
-        it { is_expected.to eq [] }
-      end
-
+    context 'with full_name_contains' do
       context 'less than 3 characters' do
         subject { auth_provider.identity_provider.affiliates(
           full_name_contains: 'a'*2
