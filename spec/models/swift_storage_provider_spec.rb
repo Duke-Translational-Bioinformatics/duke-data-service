@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe SwiftStorageProvider, type: :model do
+  subject { FactoryBot.create(:swift_storage_provider) }
+
   describe 'StorageProvider Implementation' do
-    subject { FactoryBot.create(:swift_storage_provider) }
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
     let(:upload) { FactoryBot.create(:upload, :skip_validation) }
@@ -655,7 +656,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'methods for building signed urls' do
-    subject { FactoryBot.create(:swift_storage_provider) }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
 
     it 'should respond to signed_url_duration' do
@@ -688,7 +688,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'a signed url' do
-    subject { FactoryBot.create(:swift_storage_provider) }
     # build_signed_url parameters
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }
@@ -743,7 +742,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'validations' do
-    subject { FactoryBot.create(:swift_storage_provider) }
     it 'should require attributes' do
       is_expected.to validate_presence_of :name
       is_expected.to validate_presence_of :display_name
