@@ -1,13 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe SwiftStorageProvider, type: :model do
-  let(:chunk) { FactoryBot.create(:chunk) }
-  let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
-  let(:content_type) {'text/plain'}
-  let(:filename) {'text_file.txt'}
-  subject { storage_provider }
-
   describe 'StorageProvider Implementation' do
+    subject { FactoryBot.create(:swift_storage_provider) }
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
     let(:upload) { FactoryBot.create(:upload, :skip_validation) }
@@ -34,7 +29,9 @@ RSpec.describe SwiftStorageProvider, type: :model do
         before do
           stub_request(:any, "#{subject.endpoint}#{subject.auth_uri}").to_timeout
         end
-
+        after do
+          WebMock.reset!
+        end
         it 'should raise a StorageProviderException' do
           expect {
             subject.is_ready?
@@ -191,7 +188,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
 
       context 'chunk.upload.chunks.count = chunk_max_number' do
-        let(:storage_provider) { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count) }
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count) }
         it 'should return true' do
           expect(chunk.upload.chunks.count).to eq(subject.chunk_max_number)
           expect(subject.chunk_max_exceeded?(chunk)).to be_truthy
@@ -199,7 +196,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
 
       context 'chunk.upload.chunks.count = chunk_max_number' do
-        let(:storage_provider) { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
         it 'should return true' do
           expect(chunk.upload.chunks.count).to be > subject.chunk_max_number
           expect(subject.chunk_max_exceeded?(chunk)).to be_truthy
@@ -455,6 +452,10 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'methods that call swift api', :vcr do
+    let(:chunk) { FactoryBot.create(:chunk) }
+    subject { FactoryBot.create(:swift_storage_provider, :from_env) }
+    let(:content_type) {'text/plain'}
+    let(:filename) {'text_file.txt'}
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
     let(:slo_name) { 'the_slo' }
@@ -654,6 +655,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'methods for building signed urls' do
+    subject { FactoryBot.create(:swift_storage_provider) }
     let(:expected_root_path) { "/#{subject.provider_version}/#{subject.name}" }
 
     it 'should respond to signed_url_duration' do
@@ -686,6 +688,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'a signed url' do
+    subject { FactoryBot.create(:swift_storage_provider) }
     # build_signed_url parameters
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }
@@ -697,7 +700,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
     let(:expected_path) { "#{subject.root_path}/#{sub_path}" }
     let(:expected_hmac_body) { [http_verb, expiry, expected_path].join("\n") }
-    let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
+    let(:expected_signature) { subject.build_signature(expected_hmac_body) }
 
     it 'should return a valid url with query params' do
       expect(signed_url).to be_a String
@@ -740,6 +743,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
   end
 
   describe 'validations' do
+    subject { FactoryBot.create(:swift_storage_provider) }
     it 'should require attributes' do
       is_expected.to validate_presence_of :name
       is_expected.to validate_presence_of :display_name
