@@ -125,8 +125,6 @@ class SwiftStorageProvider < StorageProvider
     end
   end
 
-  private
-
   def auth_token
     call_auth_uri['x-auth-token']
   end
