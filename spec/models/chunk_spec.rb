@@ -8,8 +8,6 @@ RSpec.describe Chunk, type: :model do
   include_context 'mock Chunk StorageProvider'
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
-  let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
-  let(:expected_expiry) { subject.updated_at.to_i + (60*5) }
   let(:is_logically_deleted) { false }
   it_behaves_like 'an audited model'
 
@@ -26,9 +24,7 @@ RSpec.describe Chunk, type: :model do
   end
 
   describe 'validations' do
-    it {
-      is_expected.to validate_presence_of(:upload_id)
-    }
+    it { is_expected.to validate_presence_of(:upload_id) }
     it { is_expected.to validate_presence_of(:number) }
     it { is_expected.to validate_presence_of(:size) }
     it {
@@ -144,14 +140,14 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
-  describe 'Default StorageProvider' do
-    it {
+  context  'when created with the default StorageProvider' do
+    it 'should be valid' do
       StorageProvider.delete_all
       default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
       expect(StorageProvider.default).not_to be_nil
       upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
       chunk = FactoryBot.create(:chunk, upload: upload)
       expect(chunk).to be_valid
-    }
+    end
   end
 end
