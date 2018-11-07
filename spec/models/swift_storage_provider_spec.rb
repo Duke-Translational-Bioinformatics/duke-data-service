@@ -196,7 +196,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
         end
       end
 
-      context 'chunk.upload.chunks.count = chunk_max_number' do
+      context 'chunk.upload.chunks.count > chunk_max_number' do
         subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
         it 'should return true' do
           expect(chunk.upload.chunks.count).to be > subject.chunk_max_number
