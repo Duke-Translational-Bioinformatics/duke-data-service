@@ -8,7 +8,7 @@ class Chunk < ActiveRecord::Base
   has_one :project, through: :upload
   has_many :project_permissions, through: :upload
 
-  validates :upload_id, presence: true
+  validates :upload, presence: true
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true

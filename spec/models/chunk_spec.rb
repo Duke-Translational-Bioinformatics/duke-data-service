@@ -24,7 +24,7 @@ RSpec.describe Chunk, type: :model do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:upload_id) }
+    it { is_expected.to validate_presence_of(:upload) }
     it { is_expected.to validate_presence_of(:number) }
     it { is_expected.to validate_presence_of(:size) }
     it {
