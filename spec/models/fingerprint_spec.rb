@@ -13,7 +13,7 @@ RSpec.describe Fingerprint, type: :model do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:upload_id) }
+    it { is_expected.to validate_presence_of(:upload) }
     it { is_expected.to validate_presence_of(:value) }
     it { is_expected.to validate_presence_of(:algorithm) }
     it { is_expected.to validate_inclusion_of(:algorithm).in_array(algorithms) }
