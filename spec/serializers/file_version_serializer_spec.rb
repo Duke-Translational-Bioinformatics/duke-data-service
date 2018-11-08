@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe FileVersionSerializer, type: :serializer do
+  include_context 'mock all Uploads StorageProvider'
   let(:resource) { FactoryBot.create(:file_version) }
   let(:is_logically_deleted) { true }
   let(:expected_attributes) {{

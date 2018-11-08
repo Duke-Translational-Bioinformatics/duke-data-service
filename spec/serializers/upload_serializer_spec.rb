@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe UploadSerializer, type: :serializer do
   include_context 'mocked StorageProvider'
   include_context 'mocked StorageProvider Interface'
-  let(:resource) { FactoryBot.create(:upload, :with_chunks, :skip_validation, storage_provider: mocked_storage_provider) }
+  let(:resource) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
     'id' => resource.id,
@@ -33,21 +33,21 @@ RSpec.describe UploadSerializer, type: :serializer do
   end
 
   context 'with completed upload' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint, :skip_validation, storage_provider: mocked_storage_provider) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload has error' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error, :skip_validation, storage_provider: mocked_storage_provider) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload is purged' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :skip_validation, storage_provider: mocked_storage_provider, purged_on: DateTime.now) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider, purged_on: DateTime.now) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end

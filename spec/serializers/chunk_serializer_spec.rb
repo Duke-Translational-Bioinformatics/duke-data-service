@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe ChunkSerializer, type: :serializer do
   include_context 'mocked StorageProvider'
   include_context 'mocked StorageProvider Interface'
-  let(:upload) { FactoryBot.create(:upload, :skip_validation, storage_provider: mocked_storage_provider) }
-  let(:resource) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+  let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  let(:resource) { FactoryBot.create(:chunk, upload: upload) }
   include_context 'mock Chunk StorageProvider', on: [:resource]
 
   let(:expected_attributes) {{

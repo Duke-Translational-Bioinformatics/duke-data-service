@@ -1,8 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe ChunkPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryBot.create(:chunk, :skip_validation) }
-  include_context 'mock all Uploads StorageProvider'
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  let(:resource) { upload.chunks.first }
 
   let(:expected_attributes) {{
     'number' => resource.number,
