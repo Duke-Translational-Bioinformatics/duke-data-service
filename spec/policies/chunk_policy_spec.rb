@@ -2,13 +2,15 @@ require 'rails_helper'
 
 describe ChunkPolicy do
   include_context 'policy declarations'
-  include_context 'mock all Uploads StorageProvider'
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
 
   let(:auth_role) { FactoryBot.create(:auth_role) }
   let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryBot.create(:upload, :skip_validation, project: project_permission.project) }
-  let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-  let(:other_chunk) { FactoryBot.create(:chunk, :skip_validation) }
+  let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project_permission.project, storage_provider: mocked_storage_provider) }
+  let(:chunk) { upload.chunks.first }
+  let(:other_upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  let(:other_chunk) { other_upload.chunks.first }
 
   it_behaves_like 'system_permission can access', :chunk
   it_behaves_like 'system_permission can access', :other_chunk
