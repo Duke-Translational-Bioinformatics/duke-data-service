@@ -15,11 +15,11 @@ describe "db:data:migrate" do
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryBot.create(:fingerprint).upload }
       let(:incomplete_upload_with_fingerprint_value) { FactoryBot.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_fingerprint_value) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_capitalized_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
-      let(:upload_with_invalid_fingerprint_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
+      let(:upload_with_fingerprint_value) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5', storage_provider: mocked_storage_provider) }
+      let(:upload_with_capitalized_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5', storage_provider: mocked_storage_provider) }
+      let(:upload_with_invalid_fingerprint_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000', storage_provider: mocked_storage_provider) }
       context 'for upload without fingerprint_value' do
-        before { FactoryBot.create(:upload) }
+        before { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
       end
