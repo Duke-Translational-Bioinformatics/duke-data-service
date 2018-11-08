@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :fingerprint do
-    upload { create(:upload, :skip_validation) }
+    upload
     algorithm "md5"
     value { SecureRandom.hex(32) }
 

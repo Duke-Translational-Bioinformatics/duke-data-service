@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :chunk do
-    upload { create(:upload, :skip_validation) }
+    upload
     sequence(:number, 1000)
     size { Faker::Number.between(100, 1000) }
     fingerprint_value { SecureRandom.hex(32) }

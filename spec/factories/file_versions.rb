@@ -4,7 +4,7 @@ FactoryBot.define do
     label { Faker::Hacker.say_something_smart }
     is_deleted false
     is_purged false
-    association :upload, :completed, :skip_validation
+    association :upload, :completed, :with_fingerprint
 
     trait :deleted do
       is_deleted true

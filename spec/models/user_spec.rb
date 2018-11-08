@@ -4,6 +4,7 @@ require 'jwt'
 RSpec.describe User, type: :model do
   let(:user_authentication_service) { FactoryBot.create(:user_authentication_service, :populated) }
   subject { user_authentication_service.user }
+  include_context 'mock all Uploads StorageProvider'
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
@@ -102,7 +103,7 @@ RSpec.describe User, type: :model do
     let(:uploads) {
       uploads = []
       projects.each do |project|
-        uploads << FactoryBot.create(:upload, :completed, :skip_validation, creator: subject, project: project)
+        uploads << FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: project, storage_provider: mocked_storage_provider)
       end
       uploads
     }
@@ -114,19 +115,12 @@ RSpec.describe User, type: :model do
       files
     }
     let!(:other_project) { FactoryBot.create(:project, creator: subject) }
-    let!(:other_upload) { FactoryBot.create(:upload, :completed, :skip_validation, creator: subject) }
+    let!(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, storage_provider: mocked_storage_provider) }
     let!(:other_file) { FactoryBot.create(:data_file, upload: other_upload) }
     let!(:deleted_project) { FactoryBot.create(:project_permission, :deleted_project, user: subject).project }
-    let(:deleted_upload) { FactoryBot.create(:upload, :completed, :skip_validation, creator: subject, project: projects.first)}
+    let(:deleted_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: subject, project: projects.first, storage_provider: mocked_storage_provider)}
     let!(:deleted_file) { FactoryBot.create(:data_file, :deleted, project: deleted_upload.project, upload: deleted_upload) }
-    let(:mocked_storage_provider) { instance_double("StorageProvider") }
 
-    before do
-      uploads + [other_upload, deleted_upload].each do |u|
-        allow(u).to receive(:storage_provider)
-          .and_return(mocked_storage_provider)
-      end
-    end
     describe 'project_count' do
       let(:expected_count) { projects.count }
 
@@ -161,7 +155,7 @@ RSpec.describe User, type: :model do
       end
 
       context 'when another user has uploaded a new version' do
-        let(:another_user_upload) { FactoryBot.create(:upload, :completed, :skip_validation, project: files.last.project) }
+        let(:another_user_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: files.last.project, storage_provider: mocked_storage_provider) }
         before(:each) do
           allow(another_user_upload).to receive(:storage_provider)
             .and_return(mocked_storage_provider)

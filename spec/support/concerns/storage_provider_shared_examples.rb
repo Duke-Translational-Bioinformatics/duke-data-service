@@ -48,6 +48,7 @@ shared_context 'mock Chunk StorageProvider' do |on: []|
   }
 
   before do
+    expect(on).to be_a Array
     targets.each do |target|
       allow(target).to receive(:storage_provider)
         .and_return(mocked_storage_provider)
@@ -60,13 +61,18 @@ shared_context 'mocked StorageProvider' do
 end
 
 shared_examples 'A StorageProvider' do
+  include ActiveSupport::Testing::TimeHelpers
   it { is_expected.to be_a StorageProvider }
 
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 
   it { is_expected.to respond_to(:expiry) }
-  it { expect(subject.expiry).to eq Time.now.to_i + subject.signed_url_duration }
+  it {
+    travel_to(Time.now) do #freeze_time
+      expect(subject.expiry).to eq Time.now.to_i + subject.signed_url_duration
+    end
+  }
 
   it { is_expected.to respond_to(:configure) }
   it { is_expected.to respond_to(:is_ready?) }

@@ -28,8 +28,7 @@ RSpec.describe UploadPreviewSerializer, type: :serializer do
   context 'when upload has error' do
     let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error, :skip_validation, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
-      it {
-        is_expected.to include(expected_attributes) }
+      it { is_expected.to include(expected_attributes) }
     end
   end
 end

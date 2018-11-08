@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProvenanceGraphNode do
+  include_context 'mock all Uploads StorageProvider'
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let!(:object) {
     FactoryBot.create(:file_version, label: "OBJECT")

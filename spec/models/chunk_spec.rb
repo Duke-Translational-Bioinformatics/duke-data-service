@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe Chunk, type: :model do
   include_context 'mocked StorageProvider'
   include_context 'mocked StorageProvider Interface'
-  let(:upload) { FactoryBot.create(:upload, :skip_validation, storage_provider: mocked_storage_provider) }
-  subject { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+  let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  subject { upload.chunks.first }
   include_context 'mock Chunk StorageProvider'
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
@@ -109,9 +109,6 @@ RSpec.describe Chunk, type: :model do
 
   describe '#purge_storage' do
     let(:chunk_data) { 'some random chunk' }
-    subject {
-      FactoryBot.create(:chunk, :skip_validation, upload: upload, size: chunk_data.length, number: 1)
-    }
 
     it { is_expected.to respond_to :purge_storage }
 

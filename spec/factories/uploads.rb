@@ -10,11 +10,17 @@ FactoryBot.define do
     is_consistent { true }
 
     trait :with_chunks do
-      chunks { [ create(:chunk, :skip_validation, number: 1) ] }
+      after(:build) do |upload, evaluator|
+        chunk = build(:chunk, upload: upload, number: 1)
+        upload.association(:chunks).add_to_target(chunk)
+      end
     end
 
     trait :with_fingerprint do
-      fingerprints { [ create(:fingerprint, :skip_validation) ] }
+      after(:build) do |upload, evaluator|
+        fingerprint = build(:fingerprint, upload: upload)
+        upload.association(:fingerprints).add_to_target(fingerprint)
+      end
     end
 
     trait :completed do
