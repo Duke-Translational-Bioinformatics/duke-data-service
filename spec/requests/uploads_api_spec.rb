@@ -5,11 +5,11 @@ describe DDS::V1::UploadsAPI do
   include_context 'mock all Uploads StorageProvider'
 
   let(:project) { FactoryBot.create(:project) }
-  let(:upload) { FactoryBot.create(:upload, :skip_validation, project: project) }
-  let(:other_upload) { FactoryBot.create(:upload, :skip_validation) }
-  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, :skip_validation, project: project) }
+  let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project, storage_provider: mocked_storage_provider) }
+  let(:chunk) { upload.chunks.first }
 
-  let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload_id: upload.id, number: 1) }
+  let(:other_upload) { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, project: project, storage_provider: mocked_storage_provider) }
 
   let(:user) { FactoryBot.create(:user) }
   let(:upload_stub) { FactoryBot.build(:upload) }
@@ -65,6 +65,11 @@ describe DDS::V1::UploadsAPI do
         content_type: upload_stub.content_type,
         size: upload_stub.size
       }}
+
+      before do
+        allow(StorageProvider).to receive(:default)
+          .and_return(mocked_storage_provider)
+      end
 
       it_behaves_like 'a POST request' do
         let(:expected_response_headers) {{
