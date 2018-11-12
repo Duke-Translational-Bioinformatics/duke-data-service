@@ -39,14 +39,14 @@ end
 namespace :storage_provider do
   desc "creates a storage_provider using ENV"
   task create: :environment do
-    unless ENV['STORAGE_PROVIDER_TYPE']
-      $stderr.puts "YOU MUST SET ENV[STORAGE_PROVIDER_TYPE]"
-      exit
-    end
-
     supported_storage_provider_types = %w(
       swift
     )
+    unless ENV['STORAGE_PROVIDER_TYPE']
+      $stderr.puts "YOU MUST SET ENV[STORAGE_PROVIDER_TYPE] with one of #{supported_storage_provider_types.join(' ')}"
+      exit
+    end
+
     if supported_storage_provider_types.include?(ENV['STORAGE_PROVIDER_TYPE'].downcase)
       create_swift_storage_provider
     else

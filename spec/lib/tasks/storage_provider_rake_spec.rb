@@ -8,7 +8,7 @@ describe "storage_provider" do
     context 'missing ENV[STORAGE_PROVIDER_TYPE]' do
       it {
         expect {
-          invoke_task epected_stderr: /YOU MUST SET ENV\[STORAGE_PROVIDER_TYPE\]/
+          invoke_task epected_stderr: /YOU MUST SET ENV\[STORAGE_PROVIDER_TYPE\] with one of #{expected_supported_storage_provider_types.join(' ')}/
         }.to raise_error(StandardError)
       }
     end
