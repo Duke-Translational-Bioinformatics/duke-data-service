@@ -244,7 +244,7 @@ describe DDS::V1::UploadsAPI do
       context 'storage_provider.chunk_max_number exceeded' do
         let(:other_chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 2) }
         before do
-          allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
+          allow(mocked_storage_provider).to receive(:chunk_max_reached?)
             .and_return(true)
         end
 

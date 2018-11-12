@@ -42,13 +42,13 @@ RSpec.describe Chunk, type: :model do
     }
 
     describe 'upload_chunk_maximum' do
-      context 'storage_provider.chunk_max_exceeded? false' do
+      context 'storage_provider.chunk_max_reached? false' do
         it {
           is_expected.to be_valid
         }
       end
 
-      context 'storage_provider.chunk_max_exceeded? true' do
+      context 'storage_provider.chunk_max_reached? true' do
         let(:expected_chunk_max_exceeded) { true }
         let(:expected_validation_message) { "maximum upload chunks exceeded." }
 

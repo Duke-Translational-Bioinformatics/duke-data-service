@@ -58,7 +58,7 @@ class Chunk < ActiveRecord::Base
   private
 
   def upload_chunk_maximum
-    if storage_provider.chunk_max_exceeded?(self)
+    if storage_provider.chunk_max_reached?(self)
       errors[:base] << 'maximum upload chunks exceeded.'
     end
   end

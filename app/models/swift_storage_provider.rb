@@ -51,7 +51,7 @@ class SwiftStorageProvider < StorageProvider
     url_root
   end
 
-  def chunk_max_exceeded?(chunk)
+  def chunk_max_reached?(chunk)
     chunk.upload.chunks.count >= chunk_max_number
   end
 

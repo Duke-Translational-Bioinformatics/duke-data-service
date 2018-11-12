@@ -9,7 +9,7 @@ shared_context 'mocked StorageProvider Interface' do
       .and_return(
         mocked_storage_provider.chunk_max_number * mocked_storage_provider.chunk_max_size_bytes
       )
-    allow(mocked_storage_provider).to receive(:chunk_max_exceeded?)
+    allow(mocked_storage_provider).to receive(:chunk_max_reached?)
       .and_return(expected_chunk_max_exceeded)
     allow(mocked_storage_provider).to receive(:endpoint)
       .and_return(expected_endpoint)
@@ -82,7 +82,7 @@ shared_examples 'A StorageProvider' do
   it { is_expected.to respond_to(:single_file_upload_url).with(1).argument }
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:endpoint) }
-  it { is_expected.to respond_to(:chunk_max_exceeded?).with(1).argument }
+  it { is_expected.to respond_to(:chunk_max_reached?).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }

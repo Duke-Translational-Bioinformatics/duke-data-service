@@ -54,8 +54,8 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement chunk_upload_url.")
   end
 
-  def chunk_max_exceeded?(chunk)
-    raise NotImplementedError.new("You must implement chunk_max_exceeded?.")
+  def chunk_max_reached?(chunk)
+    raise NotImplementedError.new("You must implement chunk_max_reached?.")
   end
 
   def max_chunked_upload_size

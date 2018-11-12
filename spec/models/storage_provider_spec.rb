@@ -50,7 +50,7 @@ RSpec.describe StorageProvider, type: :model do
   }
   it {
     expect {
-      subject.chunk_max_exceeded?(chunk)
+      subject.chunk_max_reached?(chunk)
     }.to raise_error(NotImplementedError)
   }
   it {

@@ -180,11 +180,11 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
-    describe '#chunk_max_exceeded?' do
+    describe '#chunk_max_reached?' do
       context 'chunk.upload.chunks.count < chunk_max_number' do
         it 'should return false' do
           expect(chunk.upload.chunks.count).to be < subject.chunk_max_number
-          expect(subject.chunk_max_exceeded?(chunk)).to be_falsey
+          expect(subject.chunk_max_reached?(chunk)).to be_falsey
         end
       end
 
@@ -192,7 +192,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
         subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count) }
         it 'should return true' do
           expect(chunk.upload.chunks.count).to eq(subject.chunk_max_number)
-          expect(subject.chunk_max_exceeded?(chunk)).to be_truthy
+          expect(subject.chunk_max_reached?(chunk)).to be_truthy
         end
       end
 
@@ -200,7 +200,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
         subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
         it 'should return true' do
           expect(chunk.upload.chunks.count).to be > subject.chunk_max_number
-          expect(subject.chunk_max_exceeded?(chunk)).to be_truthy
+          expect(subject.chunk_max_reached?(chunk)).to be_truthy
         end
       end
     end
