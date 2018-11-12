@@ -43,10 +43,6 @@ class Chunk < ActiveRecord::Base
     [storage_container, object_path].join('/')
   end
 
-  def expiry
-    storage_provider.expiry
-  end
-
   def url
     storage_provider.chunk_upload_url(self)
   end
