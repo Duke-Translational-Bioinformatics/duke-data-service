@@ -153,7 +153,11 @@ RSpec.describe LdapIdentityProvider, type: :model do
         displayname: user_attrs[:display_name]
       }}
       let(:user_attrs) { test_user_attrs }
-      it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
+      let(:entry_validity) { true }
+      before(:example) do
+        is_expected.to receive(:valid_ldap_entry?).with(ldap_entry).and_return(entry_validity)
+        expect(ldap_entry.attribute_names).to include(*entry_hash.keys)
+      end
       it { expect(ldap_entry_to_user).to be_a(User) }
       it { expect(ldap_entry_to_user.username).to eq entry_hash[:uid] }
       it { expect(ldap_entry_to_user.first_name).to eq entry_hash[:givenname] }
@@ -161,41 +165,27 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(ldap_entry_to_user.email).to eq entry_hash[:mail] }
       it { expect(ldap_entry_to_user.display_name).to eq entry_hash[:displayname] }
 
+      context 'invalid entry' do
+        let(:entry_validity) { false }
+        it { expect(ldap_entry_to_user).to be_nil }
+      end
+
       context 'incomplete entry' do
-        let(:user_attrs) { test_user_attrs.reject {|k,v| k == missing_attr} }
-        context 'with entry without uid' do
-          let(:missing_attr) { :username }
-          it { expect(ldap_entry[:uid]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_nil }
+        let(:entry_hash) { {} }
+        before(:example) do
+          expect(ldap_entry[:uid]).to eq []
+          expect(ldap_entry[:givenname]).to eq []
+          expect(ldap_entry[:sn]).to eq []
+          expect(ldap_entry[:mail]).to eq []
+          expect(ldap_entry[:displayname]).to eq []
         end
 
-        context 'with entry without givenname' do
-          let(:missing_attr) { :first_name }
-          it { expect(ldap_entry[:givenname]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.first_name).to be_nil }
-        end
-
-        context 'with entry without sn' do
-          let(:missing_attr) { :last_name }
-          it { expect(ldap_entry[:sn]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.last_name).to be_nil }
-        end
-
-        context 'with entry without mail' do
-          let(:missing_attr) { :email }
-          it { expect(ldap_entry[:mail]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.email).to be_nil }
-        end
-
-        context 'with entry without displayname' do
-          let(:missing_attr) { :display_name }
-          it { expect(ldap_entry[:displayname]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.display_name).to be_nil }
-        end
+        it { expect(ldap_entry_to_user).to be_a(User) }
+        it { expect(ldap_entry_to_user.username).to be_nil }
+        it { expect(ldap_entry_to_user.first_name).to be_nil }
+        it { expect(ldap_entry_to_user.last_name).to be_nil }
+        it { expect(ldap_entry_to_user.email).to be_nil }
+        it { expect(ldap_entry_to_user.display_name).to be_nil }
       end
     end
   end

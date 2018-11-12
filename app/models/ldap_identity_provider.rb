@@ -41,7 +41,7 @@ class LdapIdentityProvider < IdentityProvider
   end
 
   def ldap_entry_to_user(entry)
-    if entry.attribute_names.include?(:uid)
+    if valid_ldap_entry? entry
       User.new(
         username: entry[:uid].first,
         first_name: entry[:givenName].first,
