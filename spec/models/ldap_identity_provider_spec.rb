@@ -77,6 +77,63 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
   end
 
+  describe '#valid_ldap_entry?' do
+    it { is_expected.to respond_to(:valid_ldap_entry?).with(1).argument }
+    it { is_expected.not_to respond_to(:valid_ldap_entry?).with(0).arguments }
+
+    context 'when called' do
+      let(:valid_ldap_entry?) { subject.valid_ldap_entry?(ldap_entry) }
+      let(:ldap_entry) {
+        e = Net::LDAP::Entry.new
+        entry_hash.each_pair {|k, v| e[k] = v if v}
+        e
+      }
+      let(:entry_hash) {{
+        uid: user_attrs[:username],
+        givenname: user_attrs[:first_name],
+        sn: user_attrs[:last_name],
+        mail: user_attrs[:email],
+        displayname: user_attrs[:display_name]
+      }}
+      let(:user_attrs) { test_user_attrs }
+      it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
+      it { expect(valid_ldap_entry?).to be_truthy }
+
+      context 'incomplete entry' do
+        let(:user_attrs) { test_user_attrs.reject {|k,v| k == missing_attr} }
+        context 'with entry without uid' do
+          let(:missing_attr) { :username }
+          it { expect(ldap_entry[:uid]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_falsey }
+        end
+
+        context 'with entry without givenname' do
+          let(:missing_attr) { :first_name }
+          it { expect(ldap_entry[:givenname]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without sn' do
+          let(:missing_attr) { :last_name }
+          it { expect(ldap_entry[:sn]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without mail' do
+          let(:missing_attr) { :email }
+          it { expect(ldap_entry[:mail]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without displayname' do
+          let(:missing_attr) { :display_name }
+          it { expect(ldap_entry[:displayname]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+      end
+    end
+  end
+
   describe '#ldap_entry_to_user' do
     it { is_expected.to respond_to(:ldap_entry_to_user).with(1).argument }
     it { is_expected.not_to respond_to(:ldap_entry_to_user).with(0).arguments }

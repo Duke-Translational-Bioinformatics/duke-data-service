@@ -36,6 +36,10 @@ class LdapIdentityProvider < IdentityProvider
     Net::LDAP::Filter.eq(filter_attr, val) if filter_attr
   end
 
+  def valid_ldap_entry?(entry)
+    entry.attribute_names.include?(:uid)
+  end
+
   def ldap_entry_to_user(entry)
     if entry.attribute_names.include?(:uid)
       User.new(
