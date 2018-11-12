@@ -41,15 +41,13 @@ class LdapIdentityProvider < IdentityProvider
   end
 
   def ldap_entry_to_user(entry)
-    if valid_ldap_entry? entry
-      User.new(
-        username: entry[:uid].first,
-        first_name: entry[:givenName].first,
-        last_name: entry[:sn].first,
-        email: entry[:mail].first,
-        display_name: entry[:displayName].first
-      )
-    end
+    User.new(
+      username: entry[:uid].first,
+      first_name: entry[:givenName].first,
+      last_name: entry[:sn].first,
+      email: entry[:mail].first,
+      display_name: entry[:displayName].first
+    )
   end
 
   def ldap_search(filter:)
@@ -60,8 +58,8 @@ class LdapIdentityProvider < IdentityProvider
       size: 500,
       return_results: false
     ) do |entry|
-      if new_user = ldap_entry_to_user(entry)
-        results << new_user
+      if valid_ldap_entry? entry
+        results << ldap_entry_to_user(entry)
       end
     end
     logger.warn "#{ldap_conn.get_operation_result.inspect} results may have been truncated" unless success
