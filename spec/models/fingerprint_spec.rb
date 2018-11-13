@@ -4,6 +4,8 @@ RSpec.describe Fingerprint, type: :model do
   subject { FactoryBot.create(:fingerprint) }
   let(:algorithms) { %w{md5 sha256 sha1} }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
 
   describe 'associations' do
@@ -11,7 +13,7 @@ RSpec.describe Fingerprint, type: :model do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:upload_id) }
+    it { is_expected.to validate_presence_of(:upload) }
     it { is_expected.to validate_presence_of(:value) }
     it { is_expected.to validate_presence_of(:algorithm) }
     it { is_expected.to validate_inclusion_of(:algorithm).in_array(algorithms) }

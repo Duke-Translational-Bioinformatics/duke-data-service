@@ -2,10 +2,11 @@ require 'rails_helper'
 
 describe ContainerPolicy do
   include_context 'policy declarations'
+  include_context 'mock all Uploads StorageProvider'
 
   let(:auth_role) { FactoryBot.create(:auth_role) }
   let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project) }
+  let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, creator: user, project: project_permission.project, storage_provider: mocked_storage_provider) }
   let(:data_file) { FactoryBot.create(:data_file, project: project_permission.project, upload: upload) }
   let(:data_file_without_upload) { FactoryBot.create(:data_file, project: project_permission.project) }
   let(:other_data_file) { FactoryBot.create(:data_file) }

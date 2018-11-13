@@ -137,9 +137,13 @@ def migrate_nil_consistency_status
   puts "#{projects.count} projects with nil consistency_status."
   projects.find_in_batches do |project_batch|
     project_batch.each do |p|
-      if storage_provider.get_container_meta(p.id)
-        p.update_columns(is_consistent: true)
-      else
+      begin
+        if storage_provider.is_initialized?(p)
+          p.update_columns(is_consistent: true)
+        else
+          p.update_columns(is_consistent: false)
+        end
+      rescue StorageProviderException
         p.update_columns(is_consistent: false)
       end
       print '.'
@@ -153,8 +157,10 @@ def migrate_nil_consistency_status
   uploads.find_in_batches do |upload_batch|
     upload_batch.each do |u|
       begin
-        if storage_provider.get_object_metadata(u.project.id, u.id)
+        if storage_provider.is_complete_chunked_upload?(u)
           u.update_columns(is_consistent: true)
+        else
+          u.update_columns(is_consistent: false)
         end
       rescue StorageProviderException
         u.update_columns(is_consistent: false)

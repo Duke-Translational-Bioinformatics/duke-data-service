@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe DDS::V1::RelationsAPI do
+  include_context 'mock all Uploads StorageProvider'
   include_context 'with authentication'
 
   let(:viewable_project) { FactoryBot.create(:project) }

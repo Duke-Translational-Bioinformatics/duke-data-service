@@ -38,7 +38,7 @@ class FileVersion < ActiveRecord::Base
   delegate :http_verb, to: :upload
 
   def host
-    upload.url_root
+    upload.endpoint
   end
 
   def url

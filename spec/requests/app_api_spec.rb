@@ -12,17 +12,21 @@ describe DDS::V1::AppAPI do
     before { expect(authentication_service).to be_persisted }
   end
   shared_context 'storage_provider setup' do
-    let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
+    include_context 'mocked StorageProvider'
+    include_context 'mocked StorageProvider Interface'
 
     before do
-      swift_storage_provider.register_keys
+      allow(StorageProvider).to receive(:default)
+        .and_return(mocked_storage_provider)
+      allow(mocked_storage_provider).to receive(:is_ready?)
+        .and_return(true)
     end
   end
   before do
     ENV["GRAPHENEDB_URL"] = 'http://neo4j.db.host:7474'
   end
 
-  describe 'app status', :vcr do
+  describe 'app status' do
     context 'when properly integrated' do
       include_context 'seeded rdbms'
       include_context 'authentication_service created'
@@ -81,36 +85,14 @@ describe DDS::V1::AppAPI do
         it_behaves_like 'a status error', :status_error
       end
 
-      context 'has not registered its keys' do
-        let(:status_error) { 'storage_provider has not registered its keys' }
-        let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
-        before do
-          expect(swift_storage_provider).to be_persisted
-          #vcr records storage_provider.get_account_info with keys not registered
-          resp = HTTParty.post(
-            swift_storage_provider.storage_url,
-            headers: swift_storage_provider.auth_header.merge({
-              'X-Remove-Account-Meta-Temp-URL-Key' => 'yes',
-              'X-Remove-Account-Meta-Temp-URL-Key-2' => 'yes'
-            })
-          )
-        end
-        it_behaves_like 'a status error', :status_error
-      end
+      context 'StorageProviderException' do
+        let(:raised_error) { 'Some Error' }
+        let(:status_error) { "StorageProvider error #{raised_error}" }
+        include_context 'storage_provider setup'
 
-      context 'is not connected' do
-        let(:status_error) { 'storage_provider is not connected' }
-        let(:swift_storage_provider) { FactoryBot.create(:swift_storage_provider) }
-        let!(:auth_roles) { FactoryBot.create_list(:auth_role, 4) }
-        let(:authentication_service) { FactoryBot.create(:duke_authentication_service)}
         before do
-          stub_request(:any, "#{swift_storage_provider.url_root}#{swift_storage_provider.auth_uri}").to_timeout
-          expect(swift_storage_provider).to be_persisted
-          expect(authentication_service).to be_persisted
-          allow(Rails.logger).to receive(:error).with(/^StorageProvider error/)
-        end
-        after do
-          WebMock.reset!
+          expect(mocked_storage_provider).to receive(:is_ready?)
+            .and_raise(StorageProviderException, raised_error)
         end
         it_behaves_like 'a status error', :status_error
       end

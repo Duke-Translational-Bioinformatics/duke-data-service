@@ -1,7 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe UploadPreviewSerializer, type: :serializer do
-  let(:resource) { FactoryBot.create(:upload, :with_chunks) }
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  let(:resource) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+
   let(:expected_attributes) {{
     'id' => resource.id,
     'size' => resource.size
@@ -16,14 +19,14 @@ RSpec.describe UploadPreviewSerializer, type: :serializer do
   end
 
   context 'with completed upload' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload has error' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end

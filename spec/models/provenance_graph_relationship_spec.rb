@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProvenanceGraphRelationship do
+  include_context 'mock all Uploads StorageProvider'
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   # (activity)-(used)->(focus)
   let!(:focus) {
