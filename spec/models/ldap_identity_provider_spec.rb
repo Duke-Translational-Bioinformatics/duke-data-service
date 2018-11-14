@@ -192,9 +192,9 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
     context 'when called' do
       let(:ldap_mock) { instance_double("Net::LDAP") }
-      let(:entry_mock) { instance_double("Net::LDAP::Entry") }
       let(:filter_mock) { instance_double("Net::LDAP::Filter") }
-      let(:user_mock) { instance_double("User") }
+      let(:entry_mocks) { 3.times.map { instance_double("Net::LDAP::Entry") } }
+      let(:user_mocks) { 3.times.map { instance_double("User") } }
       let(:ldap_attributes) { %w(uid duDukeID givenName sn mail displayName) }
       let(:entry_validity) { true }
       before(:example) do
@@ -202,12 +202,18 @@ RSpec.describe LdapIdentityProvider, type: :model do
         is_expected.to receive(:ldap_filter).with(filter_hash).and_return(filter_mock)
         expect(ldap_mock).to receive(:search)
           .with(filter: filter_mock, attributes: a_collection_containing_exactly(*ldap_attributes), size: 500, return_results: false)
-          .and_yield(entry_mock)
+          .and_yield(entry_mocks[0])
+          .and_yield(entry_mocks[1])
+          .and_yield(entry_mocks[2])
           .and_return(true)
-        is_expected.to receive(:valid_ldap_entry?).with(entry_mock).and_return(entry_validity)
-        allow(subject).to receive(:ldap_entry_to_user).with(entry_mock).and_return(user_mock)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[0]).and_return(entry_validity)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[1]).and_return(entry_validity)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[2]).and_return(entry_validity)
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[0]).and_return(user_mocks[0])
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[1]).and_return(user_mocks[1])
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[2]).and_return(user_mocks[2])
       end
-      it { expect(ldap_search).to eq [user_mock] }
+      it { expect(ldap_search).to eq user_mocks }
 
       context 'invalid entry' do
         let(:entry_validity) { false }
@@ -215,8 +221,8 @@ RSpec.describe LdapIdentityProvider, type: :model do
       end
 
       context 'and #ldap_entry_to_user returns nil' do
-        let(:user_mock) { nil }
-        it { expect(ldap_search).to eq [nil] }
+        let(:user_mocks) { [nil, nil, nil] }
+        it { expect(ldap_search).to eq user_mocks }
       end
     end
   end
