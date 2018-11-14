@@ -233,6 +233,10 @@ RSpec.describe LdapIdentityProvider, type: :model do
       context 'and #affiliates_offset is set' do
         before(:example) { subject.affiliates_offset = 1 }
         it { expect(ldap_search).to eq [nil, user_mocks[1], user_mocks[2]] }
+        context 'and #affiliates_limit is set' do
+          before(:example) { subject.affiliates_limit = 1 }
+          it { expect(ldap_search).to eq [nil, user_mocks[1], nil] }
+        end
       end
     end
   end
