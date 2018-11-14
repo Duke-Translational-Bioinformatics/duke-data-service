@@ -59,7 +59,11 @@ class LdapIdentityProvider < IdentityProvider
       return_results: false
     ) do |entry|
       if valid_ldap_entry? entry
-        results << ldap_entry_to_user(entry)
+        if affiliates_limit && results.length >= affiliates_limit
+          results << nil
+        else
+          results << ldap_entry_to_user(entry)
+        end
       end
     end
     logger.warn "#{ldap_conn.get_operation_result.inspect} results may have been truncated" unless success

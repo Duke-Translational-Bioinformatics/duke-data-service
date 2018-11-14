@@ -224,6 +224,11 @@ RSpec.describe LdapIdentityProvider, type: :model do
         let(:user_mocks) { [nil, nil, nil] }
         it { expect(ldap_search).to eq user_mocks }
       end
+
+      context 'and #affiliates_limit is set' do
+        before(:example) { subject.affiliates_limit = 2 }
+        it { expect(ldap_search).to eq [user_mocks[0], user_mocks[1], nil] }
+      end
     end
   end
 
