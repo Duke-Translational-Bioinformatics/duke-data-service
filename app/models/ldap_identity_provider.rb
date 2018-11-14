@@ -59,7 +59,7 @@ class LdapIdentityProvider < IdentityProvider
       return_results: false
     ) do |entry|
       if valid_ldap_entry? entry
-        if affiliates_limit && results.length >= affiliates_limit
+        if results.length < affiliates_offset.to_i || affiliates_limit && results.length >= affiliates_limit
           results << nil
         else
           results << ldap_entry_to_user(entry)
