@@ -77,6 +77,63 @@ RSpec.describe LdapIdentityProvider, type: :model do
     end
   end
 
+  describe '#valid_ldap_entry?' do
+    it { is_expected.to respond_to(:valid_ldap_entry?).with(1).argument }
+    it { is_expected.not_to respond_to(:valid_ldap_entry?).with(0).arguments }
+
+    context 'when called' do
+      let(:valid_ldap_entry?) { subject.valid_ldap_entry?(ldap_entry) }
+      let(:ldap_entry) {
+        e = Net::LDAP::Entry.new
+        entry_hash.each_pair {|k, v| e[k] = v if v}
+        e
+      }
+      let(:entry_hash) {{
+        uid: user_attrs[:username],
+        givenname: user_attrs[:first_name],
+        sn: user_attrs[:last_name],
+        mail: user_attrs[:email],
+        displayname: user_attrs[:display_name]
+      }}
+      let(:user_attrs) { test_user_attrs }
+      it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
+      it { expect(valid_ldap_entry?).to be_truthy }
+
+      context 'incomplete entry' do
+        let(:user_attrs) { test_user_attrs.reject {|k,v| k == missing_attr} }
+        context 'with entry without uid' do
+          let(:missing_attr) { :username }
+          it { expect(ldap_entry[:uid]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_falsey }
+        end
+
+        context 'with entry without givenname' do
+          let(:missing_attr) { :first_name }
+          it { expect(ldap_entry[:givenname]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without sn' do
+          let(:missing_attr) { :last_name }
+          it { expect(ldap_entry[:sn]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without mail' do
+          let(:missing_attr) { :email }
+          it { expect(ldap_entry[:mail]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+
+        context 'with entry without displayname' do
+          let(:missing_attr) { :display_name }
+          it { expect(ldap_entry[:displayname]).to eq [] }
+          it { expect(valid_ldap_entry?).to be_truthy }
+        end
+      end
+    end
+  end
+
   describe '#ldap_entry_to_user' do
     it { is_expected.to respond_to(:ldap_entry_to_user).with(1).argument }
     it { is_expected.not_to respond_to(:ldap_entry_to_user).with(0).arguments }
@@ -96,7 +153,10 @@ RSpec.describe LdapIdentityProvider, type: :model do
         displayname: user_attrs[:display_name]
       }}
       let(:user_attrs) { test_user_attrs }
-      it { expect(ldap_entry.attribute_names).to include(*entry_hash.keys) }
+      before(:example) do
+        is_expected.not_to receive(:valid_ldap_entry?)
+        expect(ldap_entry.attribute_names).to include(*entry_hash.keys)
+      end
       it { expect(ldap_entry_to_user).to be_a(User) }
       it { expect(ldap_entry_to_user.username).to eq entry_hash[:uid] }
       it { expect(ldap_entry_to_user.first_name).to eq entry_hash[:givenname] }
@@ -105,40 +165,21 @@ RSpec.describe LdapIdentityProvider, type: :model do
       it { expect(ldap_entry_to_user.display_name).to eq entry_hash[:displayname] }
 
       context 'incomplete entry' do
-        let(:user_attrs) { test_user_attrs.reject {|k,v| k == missing_attr} }
-        context 'with entry without uid' do
-          let(:missing_attr) { :username }
-          it { expect(ldap_entry[:uid]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_nil }
+        let(:entry_hash) { {} }
+        before(:example) do
+          expect(ldap_entry[:uid]).to eq []
+          expect(ldap_entry[:givenname]).to eq []
+          expect(ldap_entry[:sn]).to eq []
+          expect(ldap_entry[:mail]).to eq []
+          expect(ldap_entry[:displayname]).to eq []
         end
 
-        context 'with entry without givenname' do
-          let(:missing_attr) { :first_name }
-          it { expect(ldap_entry[:givenname]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.first_name).to be_nil }
-        end
-
-        context 'with entry without sn' do
-          let(:missing_attr) { :last_name }
-          it { expect(ldap_entry[:sn]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.last_name).to be_nil }
-        end
-
-        context 'with entry without mail' do
-          let(:missing_attr) { :email }
-          it { expect(ldap_entry[:mail]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.email).to be_nil }
-        end
-
-        context 'with entry without displayname' do
-          let(:missing_attr) { :display_name }
-          it { expect(ldap_entry[:displayname]).to eq [] }
-          it { expect(ldap_entry_to_user).to be_a(User) }
-          it { expect(ldap_entry_to_user.display_name).to be_nil }
-        end
+        it { expect(ldap_entry_to_user).to be_a(User) }
+        it { expect(ldap_entry_to_user.username).to be_nil }
+        it { expect(ldap_entry_to_user.first_name).to be_nil }
+        it { expect(ldap_entry_to_user.last_name).to be_nil }
+        it { expect(ldap_entry_to_user.email).to be_nil }
+        it { expect(ldap_entry_to_user.display_name).to be_nil }
       end
     end
   end
@@ -151,24 +192,51 @@ RSpec.describe LdapIdentityProvider, type: :model do
 
     context 'when called' do
       let(:ldap_mock) { instance_double("Net::LDAP") }
-      let(:entry_mock) { instance_double("Net::LDAP::Entry") }
       let(:filter_mock) { instance_double("Net::LDAP::Filter") }
-      let(:user_mock) { instance_double("User") }
+      let(:entry_mocks) { 3.times.map { instance_double("Net::LDAP::Entry") } }
+      let(:user_mocks) { 3.times.map { instance_double("User") } }
       let(:ldap_attributes) { %w(uid duDukeID givenName sn mail displayName) }
+      let(:entry_validity) { true }
       before(:example) do
         is_expected.to receive(:ldap_conn).and_return(ldap_mock)
         is_expected.to receive(:ldap_filter).with(filter_hash).and_return(filter_mock)
         expect(ldap_mock).to receive(:search)
           .with(filter: filter_mock, attributes: a_collection_containing_exactly(*ldap_attributes), size: 500, return_results: false)
-          .and_yield(entry_mock)
+          .and_yield(entry_mocks[0])
+          .and_yield(entry_mocks[1])
+          .and_yield(entry_mocks[2])
           .and_return(true)
-        is_expected.to receive(:ldap_entry_to_user).with(entry_mock).and_return(user_mock)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[0]).and_return(entry_validity)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[1]).and_return(entry_validity)
+        is_expected.to receive(:valid_ldap_entry?).with(entry_mocks[2]).and_return(entry_validity)
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[0]).and_return(user_mocks[0])
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[1]).and_return(user_mocks[1])
+        allow(subject).to receive(:ldap_entry_to_user).with(entry_mocks[2]).and_return(user_mocks[2])
       end
-      it { expect(ldap_search).to eq [user_mock] }
+      it { expect(ldap_search).to eq user_mocks }
+
+      context 'invalid entry' do
+        let(:entry_validity) { false }
+        it { expect(ldap_search).to eq [] }
+      end
 
       context 'and #ldap_entry_to_user returns nil' do
-        let(:user_mock) { nil }
-        it { expect(ldap_search).to eq [] }
+        let(:user_mocks) { [nil, nil, nil] }
+        it { expect(ldap_search).to eq user_mocks }
+      end
+
+      context 'and #affiliates_limit is set' do
+        before(:example) { subject.affiliates_limit = 2 }
+        it { expect(ldap_search).to eq [user_mocks[0], user_mocks[1], nil] }
+      end
+
+      context 'and #affiliates_offset is set' do
+        before(:example) { subject.affiliates_offset = 1 }
+        it { expect(ldap_search).to eq [nil, user_mocks[1], user_mocks[2]] }
+        context 'and #affiliates_limit is set' do
+          before(:example) { subject.affiliates_limit = 1 }
+          it { expect(ldap_search).to eq [nil, user_mocks[1], nil] }
+        end
       end
     end
   end
