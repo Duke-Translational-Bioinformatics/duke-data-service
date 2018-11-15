@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe UploadPolicy do
   include_context 'policy declarations'
+  include_context 'mock all Uploads StorageProvider'
 
   let(:auth_role) { FactoryBot.create(:auth_role) }
   let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }

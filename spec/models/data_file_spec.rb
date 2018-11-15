@@ -13,6 +13,8 @@ RSpec.describe DataFile, type: :model do
   let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
   let(:uri_encoded_name) { URI.encode(subject.name) }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
     let(:expected_kind) { 'dds-file' }
@@ -108,7 +110,7 @@ RSpec.describe DataFile, type: :model do
 
   describe 'instance methods' do
     it { should delegate_method(:http_verb).to(:upload) }
-    it { should delegate_method(:host).to(:upload).as(:url_root) }
+    it { should delegate_method(:host).to(:upload).as(:endpoint) }
     it { should delegate_method(:url).to(:upload).as(:temporary_url) }
 
     describe '#url' do
@@ -117,8 +119,8 @@ RSpec.describe DataFile, type: :model do
 
     describe '#upload' do
       subject { FactoryBot.build(:data_file, without_upload: true) }
-      let(:completed_upload) { FactoryBot.create(:upload, :swift, :completed, :with_fingerprint, project: subject.project) }
-      let(:different_upload) { FactoryBot.create(:upload, :swift, :completed, :with_fingerprint, project: subject.project) }
+      let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
+      let(:different_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: subject.project) }
 
       context 'before save' do
         it { expect(subject.upload).to be_nil }

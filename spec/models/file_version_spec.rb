@@ -9,6 +9,8 @@ RSpec.describe FileVersion, type: :model do
   let(:upload) { file_version.upload }
   let(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint) }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
     let(:expected_kind) { 'dds-file-version' }
@@ -95,7 +97,7 @@ RSpec.describe FileVersion, type: :model do
   describe 'instance methods' do
     it { should delegate_method(:name).to(:data_file) }
     it { should delegate_method(:http_verb).to(:upload) }
-    it { should delegate_method(:host).to(:upload).as(:url_root) }
+    it { should delegate_method(:host).to(:upload).as(:endpoint) }
     it { should delegate_method(:url).to(:upload).as(:temporary_url) }
 
     describe '#url' do

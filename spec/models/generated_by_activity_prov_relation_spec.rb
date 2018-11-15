@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GeneratedByActivityProvRelation, type: :model do
+  include_context 'mock all Uploads StorageProvider'
   subject { FactoryBot.create(:generated_by_activity_prov_relation) }
   let(:resource_serializer) { GeneratedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-generated-by' }

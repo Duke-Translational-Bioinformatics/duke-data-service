@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Folder, type: :model do
+  include_context 'mock all Uploads StorageProvider'
   subject { FactoryBot.create(:folder, :with_parent) }
   let(:immediate_child_folder) { FactoryBot.create(:folder, parent: subject) }
   let(:immediate_child_file) { FactoryBot.create(:data_file, parent: subject) }
