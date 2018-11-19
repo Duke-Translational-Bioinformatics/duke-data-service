@@ -6,3 +6,5 @@ build:
   stage: build
   script:
     - '[ -n "${PIPELINE_TRIGGERED}" ] || ./bin/ci/build'
+  tags:
+      - dds
