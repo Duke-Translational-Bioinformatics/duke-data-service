@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo "hello from the build"
-oc --version
-jq --version
+echo "hello from kubernetes"
+#oc --version
+#jq --version
