@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo "hello from docker"
-#oc --version
-#jq --version
+oc --version
+jq --version
