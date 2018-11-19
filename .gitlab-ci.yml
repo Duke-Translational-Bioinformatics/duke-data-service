@@ -5,6 +5,7 @@ stages:
 build:
   stage: build
   script:
+    - 'hello from gitlabci'
     - '[ -n "${PIPELINE_TRIGGERED}" ] || ./bin/ci/build'
   tags:
       - dds
