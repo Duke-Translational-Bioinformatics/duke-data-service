@@ -12,7 +12,6 @@ RUN wget ${LATEST_NODE_URL} && \
     mv ${LATEST_NODE}/lib/node_modules /usr/lib/node_modules && \
     rm -rf ${LATEST_NODE} && \
     rm ${LATEST_NODE}.tar.gz && \
-    npm install -g bower && \
     yum install --setopt=tsflags=nodocs -y --nogpgcheck postgresql postgresql-devel && \
     yum clean all && \
     rm -rf /var/cache/yum
