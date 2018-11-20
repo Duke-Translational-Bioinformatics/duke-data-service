@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: List
+metadata:
+  labels:
+    used-by: gitlab-ci-runners
+items:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: gitlab-ci-runner
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    name: gitlab-ci-runner
+  roleRef:
+    name: edit
+  subjects:
+  - kind: ServiceAccount
+    name: gitlab-ci-runner
+    namespace: duke-data-service
+  userNames:
+  - system:serviceaccount:duke-data-service:gitlab-ci-runner
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ori-rad-ruby
+    labels:
+      builder: ori-rad-ruby
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: duke-data-service
+    labels:
+      app: duke-data-service
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ori-rad-ruby
+    labels:
+      builder: ori-rad-ruby
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ori-rad-ruby:2.3
+    postCommit: {}
+    resources: {}
+    source:
+      git:
+        uri: ssh://git@gitlab.oit.duke.edu/ori-rad/openshift_builder_images.git
+      type: Git
+      contextDir: ori-rad-ruby
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ruby:2.3
+          namespace: openshift
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: dds-ruby
+    labels:
+      builder: dds-ruby
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: dds-ruby
+    labels:
+      builder: dds-ruby
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: dds-ruby:2.3
+    postCommit: {}
+    resources: {}
+    source:
+      git:
+        uri: https://github.com/dmlond/duke-data-service.git
+        ref: gitlab_ci
+      type: Git
+      contextDir: openshift/docker
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ori-rad-ruby:2.3
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
