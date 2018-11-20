@@ -1,5 +1,130 @@
 #!/bin/bash
+raise()
+{
+  echo "${1}" >&2
+}
 
-echo "hello from docker"
-oc --version
-jq --version
+check_required_environment() {
+  required_env="CI_COMMIT_REF_NAME CI_COMMIT_REF_SLUG CI_PROJECT_NAME OPENSHIFT_API_URL OPENSHIFT_API_TOKEN OPENSHIFT_PROJECT CI_REPOSITORY_URL BUILDER_IMAGE_NAME"
+
+  for reqvar in $required_env
+  do
+    if [ -z ${!reqvar} ]
+    then
+      raise "missing ENVIRONMENT ${reqvar}!"
+      return 1
+    fi
+  done
+}
+
+login() {
+  oc login "${OPENSHIFT_API_URL}" ${OC_PARAMETERS} --token="${OPENSHIFT_API_TOKEN}"
+  if [ $? -gt 0 ]
+  then
+    raise "Could not login"
+    return 1
+  fi
+  oc ${OC_PARAMETERS} whoami
+  oc ${OC_PARAMETERS} project "${OPENSHIFT_PROJECT}"
+}
+
+initialize_build_config() {
+  local application_name="${1}"
+  local environment="${2}"
+  local build_config="${3}"
+
+  EXTRA_BUILD_PARAMS=""
+  extra_build_params_var="$(echo "${CI_COMMIT_REF_SLUG}" | sed "s/\-deployment.*//")_EXTRA_BUILD_PARAMS"
+  if [ -n "${!extra_build_params_var}" ]
+  then
+    EXTRA_BUILD_PARAMS=${!extra_build_params_var}
+  fi
+  # do not store git-ci-token in buildconfig, use openshift deployment secret instead
+  git_repo_url=$(echo "${CI_REPOSITORY_URL}" | sed "s/https\:\/\/.*\@/ssh\:\/\/git@/")
+  oc ${OC_PARAMETERS} process build-${application_name} \
+    --param=APPLICATION_NAME=${application_name} \
+    --param=APPLICATION_ENVIRONMENT="${environment}" \
+    --param=GIT_REPO_URL=${git_repo_url} \
+    --param=GIT_REF="${CI_COMMIT_REF_NAME}" \
+    --param=BUILDER_IMAGE_NAME=${BUILDER_IMAGE_NAME} \
+    --param=BUILDER_IMAGE_NAMESPACE=${BUILDER_IMAGE_NAMESPACE} \
+    ${EXTRA_BUILD_PARAMS} | oc ${OC_PARAMETERS} create -f - >&2
+  oc ${OC_PARAMETERS} delete build -l buildconfig=${build_config} >&2
+}
+
+cleanup_previous_deployment_builds() {
+  if [ -n "${CI_COMMIT_TAG}" ]
+  then
+    local application_name="${1}"
+    local environment="${2}"
+    echo "cleaning up previous ${application_name} ${environment} deployment buildconfig" >&2
+    oc ${OC_PARAMETERS} delete bc -l app=${application_name},environment=${environment} >&2
+  fi
+}
+
+last_complete_build_for() {
+  local application_name="${1}"
+  local environment="${2}"
+  local build_config="${3}"
+
+  bc_source_ref=$(oc ${OC_PARAMETERS} get bc -l app=${application_name},environment=${environment} -o json | jq -r '.items[-1].spec.source.git.ref')
+  # for deployment environments this will not change from
+  # build to build, for other branches and tags,
+  # this will be null since cleanup removes the bc after the unit_test
+  if [ "${bc_source_ref}" != "${CI_COMMIT_REF_NAME}" ]
+  then
+    echo "${bc_source_ref} differs from ${CI_COMMIT_REF_NAME}" >&2
+    cleanup_previous_deployment_builds "${application_name}" "${environment}"
+    initialize_build_config "${application_name}" "${environment}" "${build_config}"
+  fi
+  oc ${OC_PARAMETERS} get builds -l buildconfig=${build_config} -o json | jq -rc '.items | map(select(.status.phase == "Complete")) | sort_by(.status.completionTimestamp) | .[-1]'
+}
+
+new_build() {
+  local build_config="${1}"
+  current_build_name=$(oc ${OC_PARAMETERS} start-build bc/${build_config} --env SKIP_TRIGGER=true --wait -o name)
+  if [ $? -gt 0 ]
+  then
+    echo "build ${current_build_name} failed!" >&2
+    oc ${OC_PARAMETERS} logs ${current_build_name} >&2
+    echo "Failed"
+  else
+    echo "build ${current_build_name} Complete!" >&2
+    oc ${OC_PARAMETERS} logs ${current_build_name} >&2
+    echo "Complete"
+  fi
+}
+
+run_main() {
+  check_required_environment || exit 1
+  login || exit 1
+
+  environment=$(echo "${CI_COMMIT_REF_SLUG}" | sed "s/\-deployment.*//" | sed "s/\_/\-/g")
+  application=$(echo "${CI_PROJECT_NAME}" | sed "s/\_/\-/g")
+  application_id="${application}-${environment}"
+
+  last_complete_build=$(last_complete_build_for "${application}" "${environment}" "${application_id}")
+  last_build_status=$(echo "${last_complete_build}" | jq -r '.status.phase')
+  last_commit=""
+  if [ "${last_complete_build}" != "null" ]
+  then
+    last_commit=$(echo "${last_complete_build}" | jq -r '.spec.revision.git.commit' )
+  fi
+
+  if [ "${last_commit}" != "${CI_COMMIT_SHA}" ]
+  then
+    echo "Building new commits." >&2
+    last_build_status=$(new_build "${application_id}")
+  fi
+
+  if [ "${last_build_status}" != "Complete" ]
+  then
+    raise "Build Failed ${last_build_status}"
+    exit 1
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+  run_main
+fi
