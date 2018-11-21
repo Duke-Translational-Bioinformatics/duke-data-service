@@ -1,0 +1,95 @@
+#!/bin/sh
+raise()
+{
+  echo "${1}" >&2
+}
+
+check_required_environment() {
+  required_env="CI_COMMIT_REF_SLUG CI_PROJECT_NAME OPENSHIFT_API_URL OPENSHIFT_API_TOKEN OPENSHIFT_PROJECT"
+
+  for reqvar in $required_env
+  do
+    if [ -z ${!reqvar} ]
+    then
+      raise "missing ENVIRONMENT ${reqvar}!"
+      return 1
+    fi
+  done
+}
+
+login() {
+  oc login "${OPENSHIFT_API_URL}" ${OC_PARAMETERS} --token="${OPENSHIFT_API_TOKEN}"
+  if [ $? -gt 0 ]
+  then
+    raise "Could not login"
+    return 1
+  fi
+  oc ${OC_PARAMETERS} whoami
+  oc ${OC_PARAMETERS} project "${OPENSHIFT_PROJECT}"
+}
+
+pod_status() {
+  local pod_name="${1}"
+  #have to use the api to get the pod status
+  curl -k -H "Authorization: Bearer ${OPENSHIFT_API_TOKEN}" -H "accept: application/json" "${OPENSHIFT_API_URL}/api/v1/namespaces/${OPENSHIFT_PROJECT}/pods/${pod_name#*'/'}/status" 2>/dev/null | jq -r '.status.phase'
+}
+
+wait_while_pod() {
+  local pod_name="${1}"
+  local poll_if_status="${2}"
+  local wait_message="${3}"
+
+  pod_status=$(pod_status "${pod_name}")
+  while [ "${pod_status}" == "${poll_if_status}" ]
+  do
+    echo "${wait_message}" >&2
+    sleep 2
+    pod_status=$(pod_status "${pod_name}")
+  done
+  echo "${pod_status}"
+}
+
+run_sync() {
+  local application="${1}"
+  local environment="${2}"
+  oc ${OC_PARAMETERS} process dds-sync-bot --param=APPLICATION_NAME=${application} --param=APPLICATION_ENVIRONMENT=${environment} --param=MERGE_FROM=${CI_COMMIT_REF_SLUG} | oc ${OC_PARAMETERS} create -f - -o name
+}
+
+run_main() {
+  check_required_environment || exit 1
+  login || exit 1
+
+  environment=$(echo "${CI_COMMIT_REF_SLUG}" | sed "s/\-deployment.*//" | sed "s/\_/\-/g")
+  application=$(echo "${CI_PROJECT_NAME}" | sed "s/\_/\-/g")
+
+  pod_name=$(run_sync "${application}" "${environment}")
+  if [ $? -gt 0 ]
+  then
+    raise "Failed to run_sync"
+    exit 1
+  fi
+
+  wait_while_pod "${pod_name}" "Pending" "waiting for pod to start" > /dev/null
+  oc ${OC_PARAMETERS} logs -f "${pod_name}" >&2
+  if [ $? -gt 0 ]
+  then
+    raise "Could not get ${pod_name} logs"
+    exit 1
+  fi
+  final_status=$(wait_while_pod "${pod_name}" "Running" "waiting for pod to finish")
+  oc ${OC_PARAMETERS} delete ${pod_name}
+  if [ $? -gt 0 ]
+  then
+    raise "Could not delete ${pod_name}"
+    exit 1
+  fi
+  if [ "${final_status}" != "Succeeded" ]
+  then
+    exit 1
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+  run_main
+fi

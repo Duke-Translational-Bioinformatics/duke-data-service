@@ -1,0 +1,42 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: dds-sync-bot
+labels:
+   createdBy: dds-sync-bot
+objects:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: "dds-sync-bot"
+    labels:
+      app: "${APPLICATION_NAME}"
+      environment: "${APPLICATION_ENVIRONMENT}"
+  spec:
+    containers:
+      - name: "dds-sync-bot"
+        env:
+          - name: MERGE_FROM
+            value: "${MERGE_FROM}"
+        envFrom:
+          - secretRef:
+              name: dds-sync-bot-environment
+        image: "${APPLICATION_NAME}:${APPLICATION_ENVIRONMENT}"
+        command:
+        - /bin/bash
+        - -c
+        - bundle exec bots/sync_pr.rb
+    restartPolicy: Never
+parameters:
+- description: The Name of the Application being synced
+  displayName: Application Name
+  name: APPLICATION_NAME
+  required: true
+- description: Application Environment to run sync-bot within. Branch, or generic environment (development, ua_test, production, etc.). Generic environments typically link to a git ref matching a regular expression, such as development-deployment-10 for development. Default is trunk.
+  displayName: Application Environment
+  name: APPLICATION_ENVIRONMENT
+  value: trunk
+- description: The branch to create a Pull Request from
+  displayName: Merge From
+  name: MERGE_FROM
+  required: true

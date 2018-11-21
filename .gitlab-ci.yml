@@ -1,10 +1,20 @@
 image: gitlab-registry.oit.duke.edu/londo003/openshift-gitlabci/centos7/oc:3.9
 stages:
   - build
+  - sync_bot
 
 build:
   stage: build
   script:
-    - '[ -n "${PIPELINE_TRIGGERED}" ] || ./bin/ci/build'
+    - ./bin/ci/build
+  tags:
+      - dds
+
+sync_bot:
+  stage: sync_bot
+  script:
+    - ./bin/ci/sync_bot
+  only:
+    - gitlab_ci
   tags:
       - dds
