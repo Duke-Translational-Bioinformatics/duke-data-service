@@ -5,7 +5,7 @@ raise()
 }
 
 check_required_environment() {
-  required_env="CI_COMMIT_REF_SLUG CI_PROJECT_NAME OPENSHIFT_API_URL OPENSHIFT_API_TOKEN OPENSHIFT_PROJECT"
+  required_env="CI_COMMIT_REF_SLUG CI_COMMIT_REF_NAME CI_PROJECT_NAME OPENSHIFT_API_URL OPENSHIFT_API_TOKEN OPENSHIFT_PROJECT"
 
   for reqvar in $required_env
   do
@@ -52,7 +52,7 @@ wait_while_pod() {
 run_sync() {
   local application="${1}"
   local environment="${2}"
-  oc ${OC_PARAMETERS} process dds-sync-bot --param=APPLICATION_NAME=${application} --param=APPLICATION_ENVIRONMENT=${environment} --param=MERGE_FROM=${CI_COMMIT_REF_SLUG} | oc ${OC_PARAMETERS} create -f - -o name
+  oc ${OC_PARAMETERS} process dds-sync-bot --param=APPLICATION_NAME=${application} --param=APPLICATION_ENVIRONMENT=${environment} --param=MERGE_FROM=${CI_COMMIT_REF_NAME} | oc ${OC_PARAMETERS} create -f - -o name
 }
 
 run_main() {
