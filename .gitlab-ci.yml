@@ -13,7 +13,6 @@ build:
 sync_bot:
   stage: sync_bot
   script:
-    - git diff-tree --no-commit-id --name-only -r "${CI_COMMIT_SHA}"
     - ./bin/ci/sync_bot
   only:
     - gitlab_ci
