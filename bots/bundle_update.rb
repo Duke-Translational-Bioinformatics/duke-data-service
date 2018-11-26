@@ -201,6 +201,8 @@ def publish_changes
   return if @exit_code > 0
 
   begin
+    working_repo.config('user.name',@bot_name)
+    working_repo.config('user.email',"#{@bot_name}@duke.edu")
     working_repo.add('Gemfile.lock')
     working_repo.commit("#{@bot_name} detected updates to bundled gems")
     working_repo.push('origin',@update_branch)
