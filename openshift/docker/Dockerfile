@@ -14,6 +14,7 @@ RUN wget ${LATEST_NODE_URL} && \
     rm ${LATEST_NODE}.tar.gz && \
     yum install --setopt=tsflags=nodocs -y --nogpgcheck postgresql postgresql-devel && \
     yum clean all && \
-    rm -rf /var/cache/yum
+    rm -rf /var/cache/yum && \
+    chmod -R g=u /etc/passwd
 
 USER 1001
