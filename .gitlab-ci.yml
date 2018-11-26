@@ -15,6 +15,6 @@ sync_bot:
   script:
     - ./bin/ci/sync_bot
   only:
-    - gitlab_ci
+    - production
   tags:
       - dds
