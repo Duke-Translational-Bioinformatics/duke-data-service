@@ -94,7 +94,7 @@ items:
     resources: {}
     source:
       git:
-        uri: https://github.com/dmlond/duke-data-service.git
+        uri: https://github.com/rad-bot/duke-data-service.git
         ref: gitlab_ci
       type: Git
       contextDir: openshift/docker
