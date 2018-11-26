@@ -66,6 +66,7 @@ gem "faker"
 
 # Bot Gems
 gem "octokit", "~> 4.0"
+gem 'git'
 
 group :development, :docker do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
