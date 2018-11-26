@@ -184,7 +184,7 @@ def updates_exist
     # essentially the same as running bundle update, but bundle
     # update does not let me specify a local install path
     File.unlink 'Gemfile.lock'
-    system 'bundle install --no-deployment --path vendor/bundle'
+    Bundler.clean_system 'bundle install --no-deployment --path vendor/bundle'
     diff = working_repo.diff('Gemfile.lock')
     if diff.size > 0
       updated = true
