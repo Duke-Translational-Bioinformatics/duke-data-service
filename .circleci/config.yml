@@ -16,7 +16,7 @@ jobs:
 
     docker:
       # Copied from rails circle demo
-      - image: ruby:2.3.3
+      - image: ruby:2.3.6
         environment:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
