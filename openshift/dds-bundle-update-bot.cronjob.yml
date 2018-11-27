@@ -1,0 +1,40 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    parent: schedule-dds-bundle-update-bot
+  name: schedule-dds-bundle-update-bot
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: schedule-dds-bundle-update-bot
+        spec:
+          containers:
+            - name: dds-bundle-update-bot
+              envFrom:
+                - secretRef:
+                    name: dds-bundle-update-bot-environment
+              image: duke-data-service:gitlab-ci
+              command:
+                - /bin/bash
+                - -c
+                - /opt/app-root/src/bots/bundle_update.sh
+              volumeMounts:
+                - name: dds-bundle-update-bot-config-mount
+                  mountPath: /opt/app-root/src/.ssh
+                  readOnly: true
+                - name: dds-bundle-update-bot-working-directory
+                  mountPath: /opt/app-root/bot_working_directory
+          volumes:
+            - emptyDir: {}
+              name: dds-bundle-update-bot-working-directory
+            - name: dds-bundle-update-bot-config-mount
+              secret:
+                secretName: dds-bundle-update-bot-config
+          restartPolicy: Never
+  schedule: '31 * * * *'
+status: {}
