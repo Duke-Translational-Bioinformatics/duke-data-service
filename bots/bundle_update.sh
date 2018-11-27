@@ -9,4 +9,4 @@ if ! whoami &> /dev/null; then
     echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
   fi
 fi
-bundle exec bin/bundle_update.rb
+bundle exec bots/bundle_update.rb
