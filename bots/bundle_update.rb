@@ -24,8 +24,8 @@ def get_bot_name
   @bot_name
 end
 
-def get_upstream_repository_name
-  @upstream_repository_name
+def get_upstream_repository_owner
+  @upstream_repository_owner
 end
 
 def get_upstream_branch
@@ -93,9 +93,9 @@ def initialize_environment
     @bot_name = ENV['BOT_NAME']
   end
 
-  @upstream_repository_name = @bot_name
-  if ENV['UPSTREAM_REPOSITORY_NAME']
-    @upstream_repository_name = ENV['UPSTREAM_REPOSITORY_NAME']
+  @upstream_repository_owner = @bot_name
+  if ENV['UPSTREAM_REPOSITORY_OWNER']
+    @upstream_repository_owner = ENV['UPSTREAM_REPOSITORY_OWNER']
   end
 
   @upstream_branch = 'develop'
@@ -113,7 +113,7 @@ def initialize_environment
     @bot_working_directory = ENV['BOT_WORKING_DIRECTORY']
   end
 
-  @upstream_repository = "#{@upstream_repository_name}/#{@repo_name}"
+  @upstream_repository = "#{@upstream_repository_owner}/#{@repo_name}"
   @upstream_repository_uri = "git@github.com:#{@upstream_repository}.git"
   @update_repository = "#{@bot_name}/#{@repo_name}"
   @update_repository_uri = "git@github.com:#{@update_repository}.git"
