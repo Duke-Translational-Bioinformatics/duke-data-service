@@ -109,6 +109,7 @@ GEM
       faraday_middleware
       multi_json
     ffi (1.9.23)
+    git (1.5.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     grape (1.1.0)
@@ -197,6 +198,8 @@ GEM
     nio4r (2.2.0)
     nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
+    octokit (4.13.0)
+      sawyer (~> 0.8.0, >= 0.5.3)
     orm_adapter (0.5.0)
     pg (1.0.0)
     platform-api (2.1.0)
@@ -282,6 +285,9 @@ GEM
       rspec-core (>= 2, < 4, != 2.12.0)
     ruby-graphviz (1.2.3)
     safe_yaml (1.0.4)
+    sawyer (0.8.1)
+      addressable (>= 2.3.5, < 2.6)
+      faraday (~> 0.8, < 1.0)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
     shoulda-callback-matchers (1.1.4)
@@ -343,6 +349,7 @@ DEPENDENCIES
   elasticsearch-rails (~> 5.0)
   factory_bot_rails
   faker
+  git
   grape
   grape-active_model_serializers
   grape-kaminari
@@ -357,6 +364,7 @@ DEPENDENCIES
   net-ldap
   netrc
   newrelic_rpm
+  octokit (~> 4.0)
   pg
   platform-api
   pry-byebug
