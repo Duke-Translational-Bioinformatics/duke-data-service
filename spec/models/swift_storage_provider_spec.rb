@@ -1,13 +1,462 @@
 require 'rails_helper'
 
 RSpec.describe SwiftStorageProvider, type: :model do
-  let(:chunk) { FactoryBot.create(:chunk) }
-  let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
-  let(:content_type) {'text/plain'}
-  let(:filename) {'text_file.txt'}
-  subject { storage_provider }
+  subject { FactoryBot.create(:swift_storage_provider) }
+
+  describe 'StorageProvider Implementation' do
+    let(:expected_project_id) { SecureRandom.uuid }
+    let(:project) { instance_double("Project") }
+    let(:upload) { FactoryBot.create(:upload, :skip_validation) }
+    let(:expected_meta) {
+      {
+      "content-length" => "#{upload.size}"
+      }
+    }
+    let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+
+    it_behaves_like 'A StorageProvider'
+
+    describe '#configure' do
+      it 'should register_keys' do
+        is_expected.to receive(:register_keys)
+        expect {
+          subject.configure
+        }.not_to raise_error
+      end
+    end
+
+    describe '#is_ready?' do
+      context 'network connectivity failure' do
+        before do
+          stub_request(:any, "#{subject.endpoint}#{subject.auth_uri}").to_timeout
+        end
+        after do
+          WebMock.reset!
+        end
+        it 'should raise a StorageProviderException' do
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException)
+        end
+      end
+
+      context 'unexpected StorageProviderException' do
+        let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+        it 'should raise the StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_raise(unexpected_exception)
+          expect {
+            subject.is_ready?
+          }.to raise_error(unexpected_exception)
+        end
+      end
+
+      context 'not configured' do
+        let(:account_info) {{}}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException, 'storage_provider needs to be configured')
+        end
+      end
+
+      context 'keys do not match' do
+        let(:account_info) {{
+          "x-account-meta-temp-url-key" => 'wrong key',
+          "x-account-meta-temp-url-key-2" => 'wrong key'
+        }}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            subject.is_ready?
+          }.to raise_error(StorageProviderException, 'storage_provider needs to be configured')
+        end
+      end
+
+      context 'true' do
+        let(:account_info) {{
+          "x-account-meta-temp-url-key" => subject.primary_key,
+          "x-account-meta-temp-url-key-2" => subject.secondary_key
+        }}
+        it 'should raise StorageProviderException' do
+          is_expected.to receive(:get_account_info)
+            .and_return(account_info)
+          expect {
+            expect(subject.is_ready?).to be_truthy
+          }.not_to raise_error
+        end
+      end
+    end
+
+    describe '#initialize_project' do
+      it 'should create a container in swift with the project id' do
+        expect(project).to receive(:id)
+          .and_return(expected_project_id)
+        is_expected.to receive(:put_container)
+          .with(expected_project_id)
+        expect {
+          subject.initialize_project(project)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#is_initialized?(project)' do
+      before do
+        expect(project).to receive(:id)
+          .and_return(expected_project_id)
+      end
+
+      context 'project container exists' do
+        let(:expected_meta) {
+          {
+            foo: 'bar',
+            baz: 'stuff'
+          }
+        }
+        it 'should return true' do
+          is_expected.to receive(:get_container_meta)
+            .with(expected_project_id)
+            .and_return(expected_meta)
+          expect {
+            expect(subject.is_initialized?(project)).to be_truthy
+          }.not_to raise_error
+        end
+      end
+
+      context 'project container does not exist' do
+        it 'should return false' do
+          is_expected.to receive(:get_container_meta)
+            .with(expected_project_id)
+          expect {
+            expect(subject.is_initialized?(project)).to be_falsey
+          }.not_to raise_error
+        end
+      end
+
+      context 'unexpected StorageProviderException' do
+        let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+        it 'should raise the original exception' do
+          is_expected.to receive(:get_container_meta)
+            .with(expected_project_id)
+            .and_raise(unexpected_exception)
+          expect {
+            subject.is_initialized?(project)
+          }.to raise_error(unexpected_exception)
+        end
+      end
+    end
+
+    describe '#single_file_upload_url(upload)' do
+      let(:expected_url) { Faker::Internet.url }
+      it 'should return a signed url to POST the upload' do
+        is_expected.to receive(:build_signed_url)
+          .with(
+            'POST',
+            upload.sub_path,
+            subject.expiry
+          ).and_return(expected_url)
+        expect {
+          expect(subject.single_file_upload_url(upload)).to eq(expected_url)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#initialize_chunked_upload' do
+      it 'should not do anything to initialize a chunked upload in swift' do
+        expect {
+          subject.initialize_chunked_upload(upload)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#endpoint' do
+      it 'should return the swift url_root' do
+        expect {
+          expect(subject.endpoint).to eq(subject.url_root)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#chunk_max_reached?' do
+      context 'chunk.upload.chunks.count < chunk_max_number' do
+        it 'should return false' do
+          expect(chunk.upload.chunks.count).to be < subject.chunk_max_number
+          expect(subject.chunk_max_reached?(chunk)).to be_falsey
+        end
+      end
+
+      context 'chunk.upload.chunks.count = chunk_max_number' do
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count) }
+        it 'should return true' do
+          expect(chunk.upload.chunks.count).to eq(subject.chunk_max_number)
+          expect(subject.chunk_max_reached?(chunk)).to be_truthy
+        end
+      end
+
+      context 'chunk.upload.chunks.count > chunk_max_number' do
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
+        it 'should return true' do
+          expect(chunk.upload.chunks.count).to be > subject.chunk_max_number
+          expect(subject.chunk_max_reached?(chunk)).to be_truthy
+        end
+      end
+    end
+
+    describe '#complete_chunked_upload' do
+      context 'StorageProvider Exception' do
+        context 'Etag Mismatch' do
+          it 'should raise an IntegrityException' do
+            is_expected.to receive(:put_object_manifest)
+              .with(
+                upload.storage_container,
+                upload.id,
+                upload.manifest,
+                upload.content_type,
+                upload.name
+              ).and_raise(StorageProviderException.new('Etag Mismatch'))
+
+            expect {
+              subject.complete_chunked_upload(upload)
+            }.to raise_error(IntegrityException)
+          end
+        end
+
+        context 'unexpected' do
+          let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+
+          it 'should raise the original StorageProviderException' do
+            is_expected.to receive(:put_object_manifest)
+              .with(
+                upload.storage_container,
+                upload.id,
+                upload.manifest,
+                upload.content_type,
+                upload.name
+              ).and_raise(unexpected_exception)
+
+            expect {
+              subject.complete_chunked_upload(upload)
+            }.to raise_error(unexpected_exception)
+          end
+        end
+      end
+
+      context 'size mismatch' do
+        let(:expected_meta) {
+          {
+          "content-length" => "#{upload.size - 10}"
+          }
+        }
+
+        it 'should raise an IntegrityException' do
+          is_expected.to receive(:put_object_manifest)
+            .with(
+              upload.storage_container,
+              upload.id,
+              upload.manifest,
+              upload.content_type,
+              upload.name
+            )
+          is_expected.to receive(:get_object_metadata)
+            .with(
+              upload.storage_container,
+              upload.id
+            ).and_return(expected_meta)
+
+          expect {
+            subject.complete_chunked_upload(upload)
+          }.to raise_error(IntegrityException)
+        end
+      end
+
+      context 'success' do
+        it 'should not raise any Exceptions' do
+          is_expected.to receive(:put_object_manifest)
+            .with(
+              upload.storage_container,
+              upload.id,
+              upload.manifest,
+              upload.content_type,
+              upload.name
+            )
+          is_expected.to receive(:get_object_metadata)
+            .with(
+              upload.storage_container,
+              upload.id
+            ).and_return(expected_meta)
+
+          expect {
+            subject.complete_chunked_upload(upload)
+          }.not_to raise_error
+        end
+      end
+    end
+
+    describe '#is_complete_chunked_upload?(upload)' do
+      context 'object exists' do
+        let(:expected_meta) {
+          {
+            foo: 'bar'
+          }
+        }
+
+        it 'should return true' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+            .and_return(expected_meta)
+          expect {
+            expect(subject.is_complete_chunked_upload?(upload)).to be_truthy
+          }.not_to raise_error
+        end
+      end
+
+      context 'object does not exist' do
+        it 'should return false' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+          expect {
+            expect(subject.is_complete_chunked_upload?(upload)).to be_falsey
+          }.not_to raise_error
+        end
+      end
+
+      context 'unexpected StorageProviderException' do
+        let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+        it 'should return false' do
+          is_expected.to receive(:get_object_metadata)
+            .with(upload.storage_container, upload.id)
+            .and_raise(unexpected_exception)
+          expect {
+            subject.is_complete_chunked_upload?(upload)
+          }.to raise_error(unexpected_exception)
+        end
+      end
+    end
+
+    describe '#max_chunked_upload_size' do
+      let(:expected_max_chunk_upload_size) {
+        subject.chunk_max_number * subject.chunk_max_size_bytes
+      }
+      it 'should retrn the swift expected_max_chunk_upload_size' do
+        expect {
+          expect(subject.max_chunked_upload_size).to eq(expected_max_chunk_upload_size)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#suggested_minimum_chunk_size' do
+      let(:upload) { FactoryBot.create(:upload, :skip_validation, size: size) }
+
+      context 'upload.size = 0' do
+        let(:size) { 0 }
+        let(:expected_suggested_minimum_chunk_size) { 0 }
+        it 'should return 0' do
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        end
+      end
+
+      context 'upload.size < storage_provider.chunk_max_number' do
+        let(:size) { subject.chunk_max_number - 1 }
+
+        let(:expected_suggested_minimum_chunk_size) {
+          (upload.size.to_f / subject.chunk_max_number).ceil
+        }
+        it 'should return the upload size divided by the chunk_max_number rounded up to the next integer' do
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        end
+      end
+
+      context 'upload.size > storage_provider.chunk_max_number' do
+        let(:size) { subject.chunk_max_number + 1 }
+        let(:expected_suggested_minimum_chunk_size) {
+          (upload.size.to_f / subject.chunk_max_number).ceil
+        }
+        it 'should return the upload size divided by the chunk_max_number rounded up to the next integer' do
+          expect {
+            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+          }.not_to raise_error
+        end
+      end
+    end
+
+    describe '#chunk_upload_url(chunk)' do
+      it 'should return a signed url to PUT the chunk' do
+        is_expected.to receive(:build_signed_url)
+          .with(
+            'PUT',
+            chunk.sub_path,
+            subject.expiry
+          )
+        expect {
+          subject.chunk_upload_url(chunk)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#download_url' do
+      it 'should return a signed url to download the upload' do
+        is_expected.to receive(:build_signed_url)
+          .with(
+            'GET',
+            upload.sub_path,
+            subject.expiry,
+            upload.name
+          )
+        expect {
+          subject.download_url(upload)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#purge' do
+      context 'upload' do
+        it 'should delete the SLO manifest' do
+          is_expected.to receive(:delete_object_manifest)
+            .with(
+              upload.storage_container,
+              upload.id
+            )
+          expect {
+            subject.purge(upload)
+          }.not_to raise_error
+        end
+      end
+
+      context 'chunk' do
+        it 'should delete the object' do
+          is_expected.to receive(:delete_object)
+            .with(
+              chunk.storage_container,
+              chunk.object_path
+            )
+          expect {
+            subject.purge(chunk)
+          }.not_to raise_error
+        end
+      end
+
+      context 'unsupported object' do
+        it 'should raise an Exception' do
+          expect {
+            subject.purge(subject)
+          }.to raise_error("#{subject} is not purgable")
+        end
+      end
+    end
+  end
 
   describe 'methods that call swift api', :vcr do
+    let(:chunk) { FactoryBot.create(:chunk) }
+    subject { FactoryBot.create(:swift_storage_provider, :from_env) }
+    let(:content_type) {'text/plain'}
+    let(:filename) {'text_file.txt'}
     let(:container_name) { 'the_container' }
     let(:object_name) { 'the_object' }
     let(:slo_name) { 'the_slo' }
@@ -250,7 +699,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     let(:decoded_query) { URI.decode_www_form(parsed_url.query) }
     let(:expected_path) { "#{subject.root_path}/#{sub_path}" }
     let(:expected_hmac_body) { [http_verb, expiry, expected_path].join("\n") }
-    let(:expected_signature) { storage_provider.build_signature(expected_hmac_body) }
+    let(:expected_signature) { subject.build_signature(expected_hmac_body) }
 
     it 'should return a valid url with query params' do
       expect(signed_url).to be_a String

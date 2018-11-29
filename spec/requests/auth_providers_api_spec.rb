@@ -122,6 +122,31 @@ describe DDS::V1::AuthProvidersAPI do
           let(:returned_users) { extras + [resource] }
           let(:extras) { FactoryBot.create_list(:user, 5) }
           let(:expected_total_length) { returned_users.count }
+          context 'LDAP pagination' do
+            let(:feature_key) { 'FF_LDAP_PAGINATION' }
+            context 'feature OFF' do
+              before(:example) do
+                expect(ENV[feature_key]).to be_nil
+                expect(id_provider_mock).not_to receive(:affiliates_offset=)
+                expect(id_provider_mock).not_to receive(:affiliates_limit=)
+              end
+              it { is_expected.to eq(expected_response_status) }
+            end
+            context 'featuer ON' do
+              include_context 'with env_override'
+              let(:env_override) { {feature_key => 'ON'} }
+              let(:expected_offset) { (pagination_parameters[:page] - 1) * expected_limit }
+              let(:expected_limit) { pagination_parameters[:per_page] }
+              before(:example) do
+                expect(ENV[feature_key]).to be_truthy
+                expect(id_provider_mock).to receive(:affiliates_offset=)
+                  .with(expected_offset).and_return(expected_offset)
+                expect(id_provider_mock).to receive(:affiliates_limit=)
+                  .with(expected_limit).and_return(expected_limit)
+              end
+              it { is_expected.to eq(expected_response_status) }
+            end
+          end
         end
         context 'with invalid authentication_service_id' do
           let(:authentication_service_id) { "doesNotExist" }

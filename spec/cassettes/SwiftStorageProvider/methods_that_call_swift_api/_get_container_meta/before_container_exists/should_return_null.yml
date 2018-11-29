@@ -19,22 +19,22 @@ http_interactions:
       X-Storage-Url:
       - http://swift.local:12345/v1/AUTH_test
       X-Auth-Token:
-      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
       Content-Type:
       - text/html; charset=UTF-8
       X-Storage-Token:
-      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
       Content-Length:
       - '0'
       X-Trans-Id:
-      - txc1358f84a5d24f8497d92-005bb7b56f
+      - tx109702bb210c410c836bb-005be1b594
       Date:
-      - Fri, 05 Oct 2018 19:03:11 GMT
+      - Tue, 06 Nov 2018 15:39:00 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 05 Oct 2018 19:03:11 GMT
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
 - request:
     method: head
     uri: http://swift.local:12345/v1/AUTH_test/the_container
@@ -43,7 +43,7 @@ http_interactions:
       string: ''
     headers:
       X-Auth-Token:
-      - AUTH_tkf3019dce4f6046f495a995ad0ca60a7e
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
   response:
     status:
       code: 404
@@ -54,12 +54,12 @@ http_interactions:
       Content-Type:
       - text/html; charset=UTF-8
       X-Trans-Id:
-      - tx8c27ef086db0473d86fb6-005bb7b56f
+      - tx962be8980f9f4fe8808e3-005be1b594
       Date:
-      - Fri, 05 Oct 2018 19:03:11 GMT
+      - Tue, 06 Nov 2018 15:39:00 GMT
     body:
       encoding: UTF-8
       string: ''
     http_version: 
-  recorded_at: Fri, 05 Oct 2018 19:03:11 GMT
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
 recorded_with: VCR 4.0.0

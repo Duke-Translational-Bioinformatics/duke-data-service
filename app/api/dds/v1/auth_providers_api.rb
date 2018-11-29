@@ -84,6 +84,11 @@ module DDS
         affiliate_params = declared(params, {include_missing: false}, [:full_name_contains, :username, :email])
         auth_service = AuthenticationService.find(params[:id])
         unsupported_affiliate_search_error! unless auth_service.identity_provider
+        if ENV['FF_LDAP_PAGINATION']
+          p = paginate(Kaminari.paginate_array(Array.new(500)))
+          auth_service.identity_provider.affiliates_offset = p.offset_value
+          auth_service.identity_provider.affiliates_limit = p.limit_value
+        end
         affiliates = auth_service.identity_provider.affiliates(**affiliate_params.symbolize_keys)
         affiliates = Kaminari.paginate_array(affiliates)
         paginate(affiliates)

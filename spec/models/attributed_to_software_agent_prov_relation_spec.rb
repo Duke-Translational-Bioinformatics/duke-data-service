@@ -4,6 +4,9 @@ RSpec.describe AttributedToSoftwareAgentProvRelation, type: :model do
   subject { FactoryBot.create(:attributed_to_software_agent_prov_relation) }
   let(:resource_serializer) { AttributedToSoftwareAgentProvRelationSerializer }
   let(:expected_relationship_type) { 'was-attributed-to' }
+
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'a ProvRelation' do
     let(:expected_kind) { 'dds-relation-was-attributed-to' }
     let(:serialized_kind) { true }

@@ -29,16 +29,8 @@ module DDS
           #default storage_provider must be created
           sp = StorageProvider.default
           if sp
-            #storage_provider must be accessible over http without network or CORS issues
-            sp_acct = sp.get_account_info
-            # storage_provider must register_keys
-            unless sp_acct.has_key?("x-account-meta-temp-url-key") &&
-                   sp_acct.has_key?("x-account-meta-temp-url-key-2") &&
-                   sp_acct["x-account-meta-temp-url-key"] &&
-                   sp_acct["x-account-meta-temp-url-key-2"]
-              status[:status] = 'error'
-              logger.error 'storage_provider has not registered its keys'
-            end
+            # this raises a StorageProviderException or returns true
+            sp.is_ready?
           else
             status[:status] = 'error'
             logger.error 'storage_provider has not been created'
@@ -93,7 +85,6 @@ module DDS
         rescue StorageProviderException => e
           logger.error("StorageProvider error #{e.message}")
           status[:status] = 'error'
-          logger.error "storage_provider is not connected"
           error!(status,503)
         rescue Bunny::TCPConnectionFailedForAllHosts => e
           logger.error("RabbitMQ Connection error #{e.message}")

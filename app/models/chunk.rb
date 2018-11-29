@@ -8,7 +8,7 @@ class Chunk < ActiveRecord::Base
   has_one :project, through: :upload
   has_many :project_permissions, through: :upload
 
-  validates :upload_id, presence: true
+  validates :upload, presence: true
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :size, presence: true
@@ -28,7 +28,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def host
-    storage_provider.url_root
+    storage_provider.endpoint
   end
 
   def http_headers
@@ -43,32 +43,18 @@ class Chunk < ActiveRecord::Base
     [storage_container, object_path].join('/')
   end
 
-  def expiry
-    updated_at.to_i + storage_provider.signed_url_duration
-  end
-
   def url
-    storage_provider.build_signed_url(http_verb, sub_path, expiry)
+    storage_provider.chunk_upload_url(self)
   end
 
   def purge_storage
-    begin
-      storage_provider.delete_object(storage_container, object_path)
-    rescue StorageProviderException => e
-      unless e.message.match /Not Found/
-        raise e
-      end
-    end
-  end
-
-  def total_chunks
-    upload.chunks.count
+    storage_provider.purge(self)
   end
 
   private
 
   def upload_chunk_maximum
-    unless total_chunks < storage_provider.chunk_max_number
+    if storage_provider.chunk_max_reached?(self)
       errors[:base] << 'maximum upload chunks exceeded.'
     end
   end

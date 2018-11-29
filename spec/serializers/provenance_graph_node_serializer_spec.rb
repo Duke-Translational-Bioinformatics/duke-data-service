@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProvenanceGraphNodeSerializer, type: :serializer do
+  include_context 'mock all Uploads StorageProvider'
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let!(:focus) {
     FactoryBot.create(:file_version, label: "FOCUS")

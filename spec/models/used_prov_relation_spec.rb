@@ -11,6 +11,8 @@ RSpec.describe UsedProvRelation, type: :model do
     let(:kinded_class) { UsedProvRelation }
   end
 
+  include_context 'mock all Uploads StorageProvider'
+  
   describe 'validations' do
     include_context 'performs enqueued jobs', only: GraphPersistenceJob
     it { is_expected.to allow_value('Activity').for(:relatable_from_type) }

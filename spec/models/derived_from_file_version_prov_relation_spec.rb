@@ -5,6 +5,8 @@ RSpec.describe DerivedFromFileVersionProvRelation, type: :model do
   let(:resource_serializer) { DerivedFromFileVersionProvRelationSerializer }
   let(:expected_relationship_type) { 'was-derived-from' }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'a ProvRelation' do
     let(:expected_kind) { 'dds-relation-was-derived-from' }
     let(:serialized_kind) { true }

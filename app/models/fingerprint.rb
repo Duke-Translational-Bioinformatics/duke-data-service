@@ -2,7 +2,7 @@ class Fingerprint < ActiveRecord::Base
   audited
   belongs_to :upload
 
-  validates :upload_id, presence: true
+  validates :upload, presence: true
   validates :value, presence: true
   validates :algorithm, presence: true, inclusion: {in: :available_algorithms}
 

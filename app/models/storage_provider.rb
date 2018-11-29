@@ -13,61 +13,72 @@ class StorageProvider < ActiveRecord::Base
     find_by(is_default: true)
   end
 
-  ### TODO refactor these methods to be more abstract
+  ### Interface Methods
   def signed_url_duration
     60*5 # 5 minutes
   end
 
-  def root_path
-    root_path = ['',
-      provider_version,
-      name
-    ].join('/')
+  def expiry
+    Time.now.to_i + signed_url_duration
   end
 
-  def digest
-    @digest ||= OpenSSL::Digest.new('sha1')
+  def configure
+    raise NotImplementedError.new("You must implement configure.")
   end
 
-  def build_signature(hmac_body, key = primary_key)
-    OpenSSL::HMAC.hexdigest(digest, key, hmac_body)
+  def is_ready?
+    raise NotImplementedError.new("You must implement is_ready?")
   end
 
-  def build_signed_url(http_verb, sub_path, expiry, filename=nil)
-    path = [root_path, sub_path].join('/')
-    hmac_body = [http_verb, expiry, path].join("\n")
-    signature = build_signature(hmac_body)
-    signed_url = URI.encode("#{path}?temp_url_sig=#{signature}&temp_url_expires=#{expiry}")
-    signed_url = signed_url + "&filename=#{URI.encode(filename)}" if filename
-    signed_url
+  def initialize_project(project)
+    raise NotImplementedError.new("You must implement initialize_project.")
   end
 
-  def put_container(container)
-    resp = HTTParty.put(
-      "#{storage_url}/#{container}",
-      headers: auth_header.merge({
-        "X-Container-Meta-Access-Control-Allow-Origin" => "*"
-      })
-    )
-    ([201,202,204].include?(resp.response.code.to_i)) ||
-      raise(StorageProviderException, resp.body)
+  def is_initialized?(project)
+    raise NotImplementedError.new("You must implement is_initialized?.")
   end
 
-  def delete_object_manifest(container, object)
-    resp = HTTParty.delete(
-      "#{storage_url}/#{container}/#{object}?multipart-manifest=delete",
-      headers: auth_header
-    )
-    ([200,204].include?(resp.response.code.to_i)) ||
-      raise(StorageProviderException, resp.body)
+  def single_file_upload_url(upload)
+    raise NotImplementedError.new("You must implement single_file_upload_url.")
   end
 
-  def delete_object(container, object)
-    resp = HTTParty.delete(
-      "#{storage_url}/#{container}/#{object}",
-      headers: auth_header
-    )
-    ([200,204].include?(resp.response.code.to_i)) ||
-      raise(StorageProviderException, resp.body)
+  def initialize_chunked_upload(upload)
+    raise NotImplementedError.new("You must implement initialize_chunked_upload.")
+  end
+
+  def endpoint
+    raise NotImplementedError.new("You must implement endpoint.")
+  end
+
+  def chunk_upload_url(chunk)
+    raise NotImplementedError.new("You must implement chunk_upload_url.")
+  end
+
+  def chunk_max_reached?(chunk)
+    raise NotImplementedError.new("You must implement chunk_max_reached?.")
+  end
+
+  def max_chunked_upload_size
+    raise NotImplementedError.new("You must implement max_chunked_upload_size.")
+  end
+
+  def suggested_minimum_chunk_size(upload)
+    raise NotImplementedError.new("You must implement suggested_minimum_chunk_size.")
+  end
+
+  def complete_chunked_upload(upload)
+    raise NotImplementedError.new("You must implement complete_chunked_upload.")
+  end
+
+  def is_complete_chunked_upload?(upload)
+    raise NotImplementedError.new("You must implement is_complete_chunked_upload?.")
+  end
+
+  def download_url(upload,filename=nil)
+    raise NotImplementedError.new("You must implement download_url.")
+  end
+
+  def purge(upload)
+    raise NotImplementedError.new("You must implement purge.")
   end
 end

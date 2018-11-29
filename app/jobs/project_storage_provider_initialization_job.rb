@@ -3,7 +3,7 @@ class ProjectStorageProviderInitializationJob < ApplicationJob
 
   def perform(job_transaction:, storage_provider:, project:)
     self.class.start_job job_transaction
-    storage_provider.put_container(project.id)
+    storage_provider.initialize_project(project)
     project.update!(is_consistent: true)
     self.class.complete_job job_transaction
   end
