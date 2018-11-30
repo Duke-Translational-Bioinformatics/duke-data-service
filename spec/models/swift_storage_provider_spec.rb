@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe SwiftStorageProvider, type: :model do
   subject { FactoryBot.create(:swift_storage_provider) }
 
+  it_behaves_like 'A StorageProvider implementation'
+
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
@@ -13,8 +15,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
       }
     }
     let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-
-    it_behaves_like 'A StorageProvider'
 
     describe '#configure' do
       it 'should register_keys' do
