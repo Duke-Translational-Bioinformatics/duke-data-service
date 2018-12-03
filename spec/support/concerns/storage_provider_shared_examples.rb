@@ -118,6 +118,10 @@ shared_examples 'A StorageProvider implementation' do
     it { expect { subject.is_initialized?(nil) }.not_to raise_error(NotImplementedError) }
   end
 
+  describe '#single_file_upload_url(upload)' do
+    it { expect { subject.single_file_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
   describe '#initialize_chunked_upload' do
     it { expect { subject.initialize_chunked_upload(nil) }.not_to raise_error(NotImplementedError) }
   end
@@ -140,6 +144,14 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#chunk_upload_url(chunk)' do
     it { expect { subject.chunk_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#complete_chunked_upload(upload)' do
+    it { expect { subject.complete_chunked_upload(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#is_complete_chunked_upload?(upload)' do
+    it { expect { subject.is_complete_chunked_upload?(nil) }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#download_url' do

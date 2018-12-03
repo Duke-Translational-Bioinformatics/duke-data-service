@@ -11,6 +11,9 @@ class S3StorageProvider < StorageProvider
   def is_initialized?(project)
   end
 
+  def single_file_upload_url(upload)
+  end
+
   def initialize_chunked_upload(upload)
   end
 
@@ -24,6 +27,12 @@ class S3StorageProvider < StorageProvider
   end
 
   def suggested_minimum_chunk_size(upload)
+  end
+
+  def complete_chunked_upload(upload)
+  end
+
+  def is_complete_chunked_upload?(upload)
   end
 
   def chunk_upload_url(chunk)
