@@ -1,5 +1,7 @@
 class S3StorageProvider < StorageProvider
   def configure
+    # Nothing to configure
+    true
   end
 
   def is_ready?

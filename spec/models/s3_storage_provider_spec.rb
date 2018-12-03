@@ -7,4 +7,8 @@ RSpec.describe S3StorageProvider, type: :model do
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
 
   it_behaves_like 'A StorageProvider implementation'
+
+  describe '#configure' do
+    it { expect(subject.configure).to eq true }
+  end
 end
