@@ -45,4 +45,23 @@ class S3StorageProvider < StorageProvider
 
   def purge(object)
   end
+
+  # S3 Interface
+  def client
+  end
+
+  def list_buckets
+  end
+
+  def create_bucket(bucket_name)
+  end
+
+  def create_multipart_upload(bucket, object_key)
+  end
+
+  def complete_multipart_upload(bucket, object_key, upload_id:, parts:)
+  end
+
+  def presigned_url(method, bucket:, object_key:, **params)
+  end
 end
