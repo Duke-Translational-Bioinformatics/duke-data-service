@@ -66,6 +66,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def create_bucket(bucket_name)
+    client.create_bucket(bucket: bucket_name).to_h
   end
 
   def create_multipart_upload(bucket, object_key)

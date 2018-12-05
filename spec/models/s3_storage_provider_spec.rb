@@ -58,9 +58,20 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  it { is_expected.not_to respond_to(:create_bucket).with(0).arguments }
+  it { is_expected.to respond_to(:create_bucket).with(1).argument }
   describe '#create_bucket' do
-    it { is_expected.not_to respond_to(:create_bucket).with(0).arguments }
-    it { is_expected.to respond_to(:create_bucket).with(1).argument }
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:expected_response) { { location: "/#{bucket_name}" } }
+    before(:example) do
+      subject.client.stub_responses(:create_bucket, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+    end
+    it { expect(subject.create_bucket(bucket_name)).to eq(expected_response) }
   end
 
   describe '#create_multipart_upload' do
