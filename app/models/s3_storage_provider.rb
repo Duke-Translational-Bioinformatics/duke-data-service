@@ -1,4 +1,8 @@
 class S3StorageProvider < StorageProvider
+  validates :url_root, presence: true, format: { with: /\Ahttps?:\/\// }
+  validates :service_user, presence: true
+  validates :service_pass, presence: true
+
   def configure
     # Nothing to configure
     true

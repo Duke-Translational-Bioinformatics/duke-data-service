@@ -4,7 +4,7 @@ FactoryBot.define do
     sequence(:display_name) { |n| "#{Faker::Name.name}_#{n}" }
     description { Faker::Company.catch_phrase }
     is_default { !StorageProvider.where(is_default: true).any? }
-    url_root { Faker::Internet.domain_name }
+    url_root { "http://#{Faker::Internet.domain_name}" }
     provider_version { Faker::App.version }
     auth_uri { Faker::Internet.url }
     service_user { Faker::Internet.user_name }
