@@ -29,15 +29,18 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   # S3 Interface
+  it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
     let(:uri_parsed_url_root) { URI.parse(subject.url_root) }
-    it { is_expected.to respond_to(:client).with(0).arguments }
     it { expect(subject.client).to be_a Aws::S3::Client }
     it { expect(subject.client.config.region).to eq 'us-east-1' }
     it { expect(subject.client.config.force_path_style).to eq true }
     it { expect(subject.client.config.access_key_id).to eq subject.service_user }
     it { expect(subject.client.config.secret_access_key).to eq subject.service_pass }
     it { expect(subject.client.config.endpoint).to eq uri_parsed_url_root }
+    it 'reuses the same client object' do
+      expect(subject.client).to eq(subject.client)
+    end
   end
 
   it { is_expected.to respond_to(:list_buckets).with(0).arguments }
