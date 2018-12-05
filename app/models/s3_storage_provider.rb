@@ -52,6 +52,13 @@ class S3StorageProvider < StorageProvider
 
   # S3 Interface
   def client
+    Aws::S3::Client.new(
+      region: 'us-east-1',
+      force_path_style: true,
+      access_key_id: service_user,
+      secret_access_key: service_pass,
+      endpoint: url_root
+    )
   end
 
   def list_buckets

@@ -23,17 +23,14 @@ RSpec.describe S3StorageProvider, type: :model do
 
   # S3 Interface
   describe '#client' do
-    let(:expected_client) {
-      Aws::S3::Client.new(
-        region: 'us-east-1',
-        force_path_style: true,
-        access_key_id: subject.service_user,
-        secret_access_key: subject.service_pass,
-        endpoint: subject.url_root
-      )
-    }
+    let(:uri_parsed_url_root) { URI.parse(subject.url_root) }
     it { is_expected.to respond_to(:client).with(0).arguments }
-    it { expect { expected_client }.not_to raise_error }
+    it { expect(subject.client).to be_a Aws::S3::Client }
+    it { expect(subject.client.config.region).to eq 'us-east-1' }
+    it { expect(subject.client.config.force_path_style).to eq true }
+    it { expect(subject.client.config.access_key_id).to eq subject.service_user }
+    it { expect(subject.client.config.secret_access_key).to eq subject.service_pass }
+    it { expect(subject.client.config.endpoint).to eq uri_parsed_url_root }
   end
 
   describe '#list_buckets' do
