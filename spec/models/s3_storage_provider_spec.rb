@@ -7,6 +7,13 @@ RSpec.describe S3StorageProvider, type: :model do
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
   let(:domain) { Faker::Internet.domain_name }
 
+  shared_context 'stubbed subject#client' do
+    let(:stubbed_client) {
+      Aws::S3::Client.new(stub_responses: true)
+    }
+    before { allow(subject).to receive(:client).and_return(stubbed_client) }
+  end
+
   it_behaves_like 'A StorageProvider implementation'
 
   # Validations
@@ -33,8 +40,19 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.client.config.endpoint).to eq uri_parsed_url_root }
   end
 
+  it { is_expected.to respond_to(:list_buckets).with(0).arguments }
   describe '#list_buckets' do
-    it { is_expected.to respond_to(:list_buckets).with(0).arguments }
+    include_context 'stubbed subject#client'
+
+    it { expect(subject.list_buckets).to eq([]) }
+
+    context 'with buckets' do
+      let(:bucket_array) { [{ name: SecureRandom.uuid }] }
+      before(:example) do
+        subject.client.stub_responses(:list_buckets, { buckets: bucket_array })
+      end
+      it { expect(subject.list_buckets).to eq(bucket_array) }
+    end
   end
 
   describe '#create_bucket' do
