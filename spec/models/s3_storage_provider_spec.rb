@@ -74,9 +74,27 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.create_bucket(bucket_name)).to eq(expected_response) }
   end
 
+  it { is_expected.not_to respond_to(:create_multipart_upload).with(0..1).arguments }
+  it { is_expected.to respond_to(:create_multipart_upload).with(2).arguments }
   describe '#create_multipart_upload' do
-    it { is_expected.not_to respond_to(:create_multipart_upload).with(0..1).arguments }
-    it { is_expected.to respond_to(:create_multipart_upload).with(2).arguments }
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:object_key) { SecureRandom.uuid }
+    let(:expected_upload_id) { Faker::Lorem.characters(88) }
+    let(:expected_response) { {
+      bucket: bucket_name,
+      key: object_key,
+      upload_id: expected_upload_id
+    } }
+    before(:example) do
+      subject.client.stub_responses(:create_multipart_upload, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+      expect(subject.client.api_requests.first[:params][:key]).to eq(object_key)
+    end
+    it { expect(subject.create_multipart_upload(bucket_name, object_key)).to eq(expected_upload_id) }
   end
 
   describe '#complete_multipart_upload' do
