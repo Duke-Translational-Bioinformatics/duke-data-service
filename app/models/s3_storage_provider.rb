@@ -79,6 +79,6 @@ class S3StorageProvider < StorageProvider
 
   def presigned_url(method, bucket_name:, object_key:, **params)
     @signer ||= Aws::S3::Presigner.new(client: client)
-    @signer.presigned_url(method, bucket: bucket_name, key: object_key, expires_in: signed_url_duration)
+    @signer.presigned_url(method, bucket: bucket_name, key: object_key, expires_in: signed_url_duration, **params)
   end
 end

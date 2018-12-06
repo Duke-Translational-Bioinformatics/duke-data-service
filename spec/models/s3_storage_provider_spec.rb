@@ -134,7 +134,6 @@ RSpec.describe S3StorageProvider, type: :model do
   it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket_name, :object_key) }
   it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket_name, :object_key, :upload_id, :part_number, :content_length) }
   describe '#presigned_url' do
-    include_context 'stubbed subject#client'
     around(:example) do |example|
       travel_to(Time.now) do #freeze_time
         example.run
@@ -154,6 +153,24 @@ RSpec.describe S3StorageProvider, type: :model do
         )
       }
       it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key)).to eq expected_url }
+    end
+
+    context 'sign :upload_part' do
+      let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+      let(:part_number) { Faker::Number.between(1, 100) }
+      let(:part_size) { Faker::Number.between(1000, 10000) }
+      let(:expected_url) {
+        signer.presigned_url(
+          :upload_part,
+          bucket: bucket_name,
+          key: object_key,
+          upload_id: multipart_upload_id,
+          part_number: part_number,
+          content_length: part_size,
+          expires_in: subject.signed_url_duration
+        )
+      }
+      it { expect(subject.presigned_url(:upload_part, bucket_name: bucket_name, object_key: object_key, upload_id: multipart_upload_id, part_number: part_number, content_length: part_size)).to eq expected_url }
     end
   end
 end
