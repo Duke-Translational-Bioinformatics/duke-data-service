@@ -10,7 +10,7 @@ not fit into the CircleCI structure.
 #### Gitlab Github Mirroring
 For this to work, a project must be created in a Gitlab host that
 supports GitHub mirroring (this is an Enterprise feature). The project
-must mirror the github owner/repo to a GitHub owner/repo. **NOTE**
+must mirror the GitHub owner/repo to a gitlab owner/repo. **NOTE**
 THE REPO NAME IN GITHUB MUST MATCH THE REPO NAME IN GITLAB.
 
 #### Gitlab CI Pipeline Setup

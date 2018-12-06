@@ -1,5 +1,5 @@
 APPLICATION_NAME=duke-data-service
-GIT_REPO_URL=https://github.com/dmlond/duke-data-service.git
+GIT_REPO_URL=https://github.com/Duke-Translational-Bioinformatics/duke-data-service.git
 BUILDER_IMAGE_NAME=dds-ruby:2.3
 BUILDER_IMAGE_NAMESPACE=duke-data-service
 GIT_REF=gitlab_ci
