@@ -77,6 +77,8 @@ class S3StorageProvider < StorageProvider
     client.complete_multipart_upload(bucket: bucket_name, key: object_key, upload_id: upload_id, multipart_upload: { parts: parts }).to_h
   end
 
-  def presigned_url(method, bucket:, object_key:, **params)
+  def presigned_url(method, bucket_name:, object_key:, **params)
+    @signer ||= Aws::S3::Presigner.new(client: client)
+    @signer.presigned_url(method, bucket: bucket_name, key: object_key, expires_in: signed_url_duration)
   end
 end

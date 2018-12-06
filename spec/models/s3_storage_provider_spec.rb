@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe S3StorageProvider, type: :model do
+  include ActiveSupport::Testing::TimeHelpers
   subject { FactoryBot.build(:s3_storage_provider) }
   let(:project) { stub_model(Project, id: SecureRandom.uuid) }
   let(:upload) { FactoryBot.create(:upload, :skip_validation) }
@@ -128,10 +129,31 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)).to eq(expected_response) }
   end
 
+  it { is_expected.not_to respond_to(:presigned_url).with(0).arguments }
+  it { is_expected.not_to respond_to(:presigned_url).with(1).argument }
+  it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket_name, :object_key) }
+  it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket_name, :object_key, :upload_id, :part_number, :content_length) }
   describe '#presigned_url' do
-    it { is_expected.not_to respond_to(:presigned_url).with(0).arguments }
-    it { is_expected.not_to respond_to(:presigned_url).with(1).argument }
-    it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket, :object_key) }
-    it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket, :object_key, :upload_id, :part_number, :content_length) }
+    include_context 'stubbed subject#client'
+    around(:example) do |example|
+      travel_to(Time.now) do #freeze_time
+        example.run
+      end
+    end
+    let(:signer) { Aws::S3::Presigner.new(client: subject.client) }
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:object_key) { SecureRandom.uuid }
+
+    context 'sign :get_object' do
+      let(:expected_url) {
+        signer.presigned_url(
+          :get_object,
+          bucket: bucket_name,
+          key: object_key,
+          expires_in: subject.signed_url_duration
+        )
+      }
+      it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key)).to eq expected_url }
+    end
   end
 end
