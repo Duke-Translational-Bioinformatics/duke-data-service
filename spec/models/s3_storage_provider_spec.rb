@@ -97,10 +97,35 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.create_multipart_upload(bucket_name, object_key)).to eq(expected_upload_id) }
   end
 
+  it { is_expected.not_to respond_to(:complete_multipart_upload).with(0..1).arguments }
+  it { is_expected.not_to respond_to(:complete_multipart_upload).with(2).arguments }
+  it { is_expected.to respond_to(:complete_multipart_upload).with(2).arguments.and_keywords(:upload_id, :parts) }
   describe '#complete_multipart_upload' do
-    it { is_expected.not_to respond_to(:complete_multipart_upload).with(0..1).arguments }
-    it { is_expected.not_to respond_to(:complete_multipart_upload).with(2).arguments }
-    it { is_expected.to respond_to(:complete_multipart_upload).with(2).arguments.and_keywords(:upload_id, :parts) }
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:object_key) { SecureRandom.uuid }
+    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:parts) { [
+      { etag: "\"#{Faker::Crypto.md5}\"", part_number: 1 },
+      { etag: "\"#{Faker::Crypto.md5}\"", part_number: 2 }
+    ] }
+    let(:expected_response) { {
+      bucket: bucket_name,
+      etag: "\"#{Faker::Crypto.md5}\"",
+      key: object_key,
+      location: "/#{bucket_name}"
+    } }
+    before(:example) do
+      subject.client.stub_responses(:complete_multipart_upload, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+      expect(subject.client.api_requests.first[:params][:key]).to eq(object_key)
+      expect(subject.client.api_requests.first[:params][:upload_id]).to eq(multipart_upload_id)
+      expect(subject.client.api_requests.first[:params][:multipart_upload]).to eq({parts: parts})
+    end
+    it { expect(subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)).to eq(expected_response) }
   end
 
   describe '#presigned_url' do
