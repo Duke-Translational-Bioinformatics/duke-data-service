@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe InvalidatedByActivityProvRelation, type: :model do
+  include_context 'mock all Uploads StorageProvider'
   subject { FactoryBot.create(:invalidated_by_activity_prov_relation) }
   let(:resource_serializer) { InvalidatedByActivityProvRelationSerializer }
   let(:expected_relationship_type) { 'was-invalidated-by' }

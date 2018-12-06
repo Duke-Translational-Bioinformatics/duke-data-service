@@ -2,7 +2,9 @@ class IdentityProvider < ActiveRecord::Base
   validates :host, presence: true
   validates :port, presence: true
 
-  def affiliates(full_name_contains=nil)
+  attr_accessor :affiliates_offset, :affiliates_limit
+
+  def affiliates(full_name_contains: nil, username: nil, email: nil)
     raise NotImplementedError
   end
 

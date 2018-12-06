@@ -139,3 +139,43 @@ shared_context 'trashed resource' do |resource_sym=nil|
     expect(resource_to_trash.save).to be_truthy
   end
 end
+
+shared_examples 'an IdentityProvider' do
+  it { is_expected.to be_an IdentityProvider }
+  it { is_expected.to respond_to(:affiliates).with(0).arguments }
+  it { is_expected.to respond_to(:affiliates).with_keywords(:full_name_contains) }
+  it { is_expected.to respond_to(:affiliates).with_keywords(:username) }
+  it { is_expected.to respond_to(:affiliates).with_keywords(:email) }
+
+  it { is_expected.to respond_to(:affiliates_offset).with(0).arguments }
+  it { is_expected.to respond_to(:affiliates_offset=).with(1).arguments }
+  describe '#affiliates_offset attr_accessor' do
+    let(:offset_value) { (1..100).to_a.sample }
+    let(:set_affiliates_offset) { subject.affiliates_offset = offset_value }
+    let(:get_affiliates_offset) { subject.affiliates_offset }
+    it { expect(set_affiliates_offset).to eq offset_value }
+    it { expect(get_affiliates_offset).to be_nil }
+
+    context 'once set' do
+      before(:example) { expect(set_affiliates_offset).to eq offset_value }
+      it { expect(get_affiliates_offset).to eq offset_value }
+    end
+  end
+
+  it { is_expected.to respond_to(:affiliates_limit).with(0).arguments }
+  it { is_expected.to respond_to(:affiliates_limit=).with(1).arguments }
+  describe '#affiliates_limit attr_accessor' do
+    let(:limit_value) { (1..100).to_a.sample }
+    let(:set_affiliates_limit) { subject.affiliates_limit = limit_value }
+    let(:get_affiliates_limit) { subject.affiliates_limit }
+    it { expect(set_affiliates_limit).to eq limit_value }
+    it { expect(get_affiliates_limit).to be_nil }
+
+    context 'once set' do
+      before(:example) { expect(set_affiliates_limit).to eq limit_value }
+      it { expect(get_affiliates_limit).to eq limit_value }
+    end
+  end
+
+  it { is_expected.to respond_to(:affiliate).with(1).argument }
+end

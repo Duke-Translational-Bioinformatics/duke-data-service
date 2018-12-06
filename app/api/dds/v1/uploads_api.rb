@@ -114,7 +114,6 @@ module DDS
             upload = Upload.find(params[:id])
             if chunk = Chunk.find_by(upload: upload, number: chunk_params[:number])
               authorize chunk, :update?
-              chunk.touch
             else
               chunk = Chunk.new({upload: upload, number: chunk_params[:number]})
               authorize chunk, :create?

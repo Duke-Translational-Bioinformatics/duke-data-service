@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UploadStorageRemovalJob, type: :job do
+  include_context 'mock all Uploads StorageProvider'
   let(:upload) { FactoryBot.create(:upload) }
   let(:job_transaction) { described_class.initialize_job(upload) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }

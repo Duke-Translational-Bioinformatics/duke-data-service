@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
+  include_context 'mock all Uploads StorageProvider'
+
   let(:project) { FactoryBot.create(:project, :inconsistent) }
-  let!(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
   let(:job_transaction) { described_class.initialize_job(project) }
@@ -21,7 +22,7 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
 
   it {
     expect {
-      described_class.perform_now(storage_provider: storage_provider)
+      described_class.perform_now(storage_provider: mocked_storage_provider)
     }.to raise_error(ArgumentError)
   }
 
@@ -33,20 +34,20 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
 
   it {
     expect {
-      described_class.perform_now(project: project, storage_provider: storage_provider)
+      described_class.perform_now(project: project, storage_provider: mocked_storage_provider)
     }.to raise_error(ArgumentError)
   }
 
-  context 'perform_now', :vcr do
+  context 'perform_now' do
     include_context 'tracking job', :job_transaction
     it 'should create the container for the project' do
-      expect(storage_provider.get_container_meta(project.id)).to be_nil
+      expect(mocked_storage_provider).to receive(:initialize_project)
+        .with(project)
       described_class.perform_now(
         job_transaction: job_transaction,
-        storage_provider: storage_provider,
+        storage_provider: mocked_storage_provider,
         project: project
       )
-      expect(storage_provider.get_container_meta(project.id)).to be
       project.reload
       expect(project).to be_is_consistent
     end

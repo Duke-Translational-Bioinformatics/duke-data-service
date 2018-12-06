@@ -30,6 +30,7 @@ RSpec.describe ProvenanceGraphSerializer, type: :serializer do
     end
   end
 
+  include_context 'mock all Uploads StorageProvider'
   let(:policy_scope) { Proc.new {|scope| scope } }
 
   context 'SearchProvenanceGraph' do

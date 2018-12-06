@@ -1,4 +1,4 @@
-FROM ruby:2.3.3
+FROM ruby:2.3.6
 MAINTAINER Darin London <darin.london@duke.edu>
 
 RUN ["mkdir", "-p", "/root/installs"]

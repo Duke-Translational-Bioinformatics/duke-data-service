@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Graph::WasAttributedTo do
+  include_context 'mock all Uploads StorageProvider'
   before(:example) { resource.create_graph_relation }
   subject { resource.graph_model_object }
   context 'Attributed To User' do

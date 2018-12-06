@@ -24,7 +24,7 @@ machine:
   # Version of ruby to use
   ruby:
     version:
-      2.3.3
+      2.3.6
 
 dependencies:
   cache_directories:

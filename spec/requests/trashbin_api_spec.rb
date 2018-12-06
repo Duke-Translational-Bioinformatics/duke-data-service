@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::TrashbinAPI do
   include_context 'with authentication'
+  include_context 'mock all Uploads StorageProvider'
 
   let(:upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, project: project, creator: current_user, is_consistent: true) }
   let(:project) { FactoryBot.create(:project) }

@@ -570,6 +570,7 @@ RSpec.describe Project, type: :model do
       end
 
       context 'when child is not a Container' do
+        include_context 'mock all Uploads StorageProvider'
         let(:incompatible_child) { FactoryBot.create(:file_version) }
         it {
           expect {
