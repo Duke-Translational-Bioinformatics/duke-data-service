@@ -16,6 +16,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def is_initialized?(project)
+    head_bucket(project.id)
   end
 
   def single_file_upload_url(upload)

@@ -39,6 +39,23 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#is_initialized?(project)' do
+    before(:example) do
+      is_expected.to receive(:head_bucket)
+        .with(project.id)
+        .and_return(head_bucket_response)
+    end
+    context 'project container exists' do
+      let(:head_bucket_response) { {} }
+      it { expect(subject.is_initialized?(project)).to be_truthy }
+    end
+
+    context 'project container does not exist' do
+      let(:head_bucket_response) { false }
+      it { expect(subject.is_initialized?(project)).to be_falsey }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
