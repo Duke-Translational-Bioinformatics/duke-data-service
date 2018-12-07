@@ -72,7 +72,7 @@ class S3StorageProvider < StorageProvider
 
   def head_bucket(bucket_name)
     begin
-      client.head_bucket(bucket: bucket_name)
+      client.head_bucket(bucket: bucket_name).to_h
     rescue Aws::S3::Errors::NoSuchBucket
       false
     end

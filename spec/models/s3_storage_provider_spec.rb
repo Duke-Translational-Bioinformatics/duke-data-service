@@ -98,7 +98,7 @@ RSpec.describe S3StorageProvider, type: :model do
       expect(subject.client.api_requests.first).not_to be_nil
       expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
     end
-    it { expect(subject.head_bucket(bucket_name)).to be_truthy }
+    it { expect(subject.head_bucket(bucket_name)).to eq(expected_response) }
 
     context 'when bucket does not exist' do
       let(:expected_response) { 'NoSuchBucket' }
