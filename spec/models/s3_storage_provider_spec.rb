@@ -85,6 +85,31 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.create_bucket(bucket_name)).to eq(expected_response) }
   end
 
+  it { is_expected.not_to respond_to(:head_bucket).with(0).arguments }
+  it { is_expected.to respond_to(:head_bucket).with(1).argument }
+  describe '#head_bucket' do
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:expected_response) { {} }
+    before(:example) do
+      subject.client.stub_responses(:head_bucket, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+    end
+    it { expect(subject.head_bucket(bucket_name)).to be_truthy }
+
+    context 'when bucket does not exist' do
+      let(:expected_response) { 'NoSuchBucket' }
+      it 'rescues from NoSuchBucket exception and returns false' do
+        expect {
+          expect(subject.head_bucket(bucket_name)).to be_falsey
+        }.not_to raise_error
+      end
+    end
+  end
+
   it { is_expected.not_to respond_to(:create_multipart_upload).with(0..1).arguments }
   it { is_expected.to respond_to(:create_multipart_upload).with(2).arguments }
   describe '#create_multipart_upload' do

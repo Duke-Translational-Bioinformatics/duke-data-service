@@ -70,6 +70,14 @@ class S3StorageProvider < StorageProvider
     client.create_bucket(bucket: bucket_name).to_h
   end
 
+  def head_bucket(bucket_name)
+    begin
+      client.head_bucket(bucket: bucket_name)
+    rescue Aws::S3::Errors::NoSuchBucket
+      false
+    end
+  end
+
   def create_multipart_upload(bucket_name, object_key)
     client.create_multipart_upload(bucket: bucket_name, key: object_key).upload_id
   end
