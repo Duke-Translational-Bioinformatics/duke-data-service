@@ -29,6 +29,16 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.configure).to eq true }
   end
 
+  describe '#initialize_project' do
+    let(:bucket_location) { "/#{project.id}" }
+    it 'should create a bucket with the project id' do
+      is_expected.to receive(:create_bucket)
+        .with(project.id)
+        .and_return({ location: bucket_location })
+      expect(subject.initialize_project(project)).to eq(bucket_location)
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do

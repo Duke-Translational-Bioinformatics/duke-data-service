@@ -12,6 +12,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def initialize_project(project)
+    create_bucket(project.id)[:location]
   end
 
   def is_initialized?(project)
