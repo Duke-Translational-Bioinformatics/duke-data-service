@@ -479,7 +479,9 @@ shared_examples 'an authentication_service_serializer serializable resource' do
     'name' => resource.name,
     'login_initiation_url' => resource.login_initiation_url,
     'is_deprecated' => resource.is_deprecated,
-    'is_default' => resource.is_default
+    'is_default' => resource.is_default,
+    'base_uri' => resource.base_uri,
+    'login_response_type' => resource.login_response_type
   }}
 
   it_behaves_like 'a json serializer' do
