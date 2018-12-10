@@ -68,7 +68,12 @@ RSpec.describe S3StorageProvider, type: :model do
         .with(upload.project.id, upload.id)
         .and_return(cmu_response)
     end
-    it { expect(subject.initialize_chunked_upload(upload)).to be_truthy }
+    it 'sets and persists upload#multipart_upload_id' do
+      expect(upload.multipart_upload_id).to be_nil
+      expect(subject.initialize_chunked_upload(upload)).to be_truthy
+      expect(upload.reload).to be_truthy
+      expect(upload.multipart_upload_id).to eq(multipart_upload_id)
+    end
   end
 
   # S3 Interface
