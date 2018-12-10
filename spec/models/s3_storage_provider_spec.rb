@@ -56,6 +56,21 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#initialize_chunked_upload' do
+    let(:cmu_response) { {
+      bucket: upload.project.id,
+      key: upload.id,
+      upload_id: multipart_upload_id
+    } }
+    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    before(:example) do
+      is_expected.to receive(:create_multipart_upload)
+        .with(upload.project.id, upload.id)
+        .and_return(cmu_response)
+    end
+    it { expect(subject.initialize_chunked_upload(upload)).to be_truthy }
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do

@@ -23,6 +23,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def initialize_chunked_upload(upload)
+    create_multipart_upload(upload.project.id, upload.id)
   end
 
   def endpoint
