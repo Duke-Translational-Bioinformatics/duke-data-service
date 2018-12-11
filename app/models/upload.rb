@@ -30,7 +30,7 @@ class Upload < ActiveRecord::Base
   validates :fingerprints, presence: true, if: :completed_at
   validates :fingerprints, absence: true, unless: :completed_at
 
-  delegate :endpoint, to: :storage_provider
+  delegate :url_root, to: :storage_provider
 
   def object_path
     id

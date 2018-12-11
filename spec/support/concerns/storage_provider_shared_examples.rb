@@ -1,6 +1,6 @@
 shared_context 'mocked StorageProvider Interface' do
   let(:expected_chunk_max_exceeded) { false }
-  let(:expected_endpoint) { Faker::Internet.url }
+  let(:expected_url_root) { Faker::Internet.url }
 
   before do
     allow(mocked_storage_provider).to receive(:complete_chunked_upload)
@@ -11,14 +11,14 @@ shared_context 'mocked StorageProvider Interface' do
       )
     allow(mocked_storage_provider).to receive(:chunk_max_reached?)
       .and_return(expected_chunk_max_exceeded)
-    allow(mocked_storage_provider).to receive(:endpoint)
-      .and_return(expected_endpoint)
+    allow(mocked_storage_provider).to receive(:url_root)
+      .and_return(expected_url_root)
     allow(mocked_storage_provider).to receive(:download_url) do |upload,filename=nil|
       filename ||= upload.name
-      "#{expected_endpoint}/#{URI.encode(filename)}"
+      "#{expected_url_root}/#{URI.encode(filename)}"
     end
     allow(mocked_storage_provider).to receive(:chunk_upload_url) do |chunk|
-      "#{expected_endpoint}/#{chunk.sub_path}"
+      "#{expected_url_root}/#{chunk.sub_path}"
     end
     allow(mocked_storage_provider).to receive(:suggested_minimum_chunk_size) do |upload|
       (upload.size.to_f / mocked_storage_provider.chunk_max_number).ceil
@@ -81,7 +81,7 @@ shared_context 'A StorageProvider' do
   it { is_expected.to respond_to(:is_initialized?).with(1).argument }
   it { is_expected.to respond_to(:single_file_upload_url).with(1).argument }
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
-  it { is_expected.to respond_to(:endpoint) }
+  it { is_expected.to respond_to(:url_root) }
   it { is_expected.to respond_to(:chunk_max_reached?).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
@@ -124,10 +124,6 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#initialize_chunked_upload' do
     it { expect { subject.initialize_chunked_upload(nil) }.not_to raise_error(NotImplementedError) }
-  end
-
-  describe '#endpoint' do
-    it { expect { subject.endpoint }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#chunk_max_reached?' do

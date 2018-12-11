@@ -46,10 +46,6 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement initialize_chunked_upload.")
   end
 
-  def endpoint
-    raise NotImplementedError.new("You must implement endpoint.")
-  end
-
   def chunk_upload_url(chunk)
     raise NotImplementedError.new("You must implement chunk_upload_url.")
   end

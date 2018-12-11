@@ -28,7 +28,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def host
-    storage_provider.endpoint
+    storage_provider.url_root
   end
 
   def http_headers

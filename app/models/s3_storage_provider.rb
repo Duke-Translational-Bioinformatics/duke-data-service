@@ -27,9 +27,6 @@ class S3StorageProvider < StorageProvider
     upload.update_attribute(:multipart_upload_id, resp[:upload_id])
   end
 
-  def endpoint
-  end
-
   def chunk_max_reached?(chunk)
   end
 
