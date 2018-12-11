@@ -101,6 +101,25 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#suggested_minimum_chunk_size' do
+    let(:upload) { stub_model(Upload, size: size) }
+
+    context 'upload.size = 0' do
+      let(:size) { 0 }
+      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(0) }
+    end
+
+    context 'upload.size < storage_provider.chunk_max_number' do
+      let(:size) { subject.chunk_max_number - 1 }
+      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(1) }
+    end
+
+    context 'upload.size > storage_provider.chunk_max_number' do
+      let(:size) { subject.chunk_max_number + 1 }
+      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(2) }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do

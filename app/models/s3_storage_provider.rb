@@ -36,6 +36,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def suggested_minimum_chunk_size(upload)
+    (upload.size.to_f / chunk_max_number).ceil
   end
 
   def complete_chunked_upload(upload)
