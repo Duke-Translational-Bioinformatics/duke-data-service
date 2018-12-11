@@ -40,6 +40,15 @@ class S3StorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
+    parts = upload.chunks.reorder(:number).collect do |chunk|
+      { etag: "\"#{chunk.fingerprint_value}\"", part_number: chunk.number }
+    end
+    complete_multipart_upload(
+      upload.storage_container,
+      upload.id,
+      upload_id: upload.multipart_upload_id,
+      parts: parts
+    )
   end
 
   def is_complete_chunked_upload?(upload)

@@ -120,6 +120,33 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#complete_chunked_upload' do
+    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+    let(:chunks) { [
+      FactoryBot.create(:chunk, :skip_validation, upload: upload, number: 1),
+      FactoryBot.create(:chunk, :skip_validation, upload: upload, number: 2),
+    ] }
+    let(:bucket_name) { upload.storage_container }
+    let(:object_key) { upload.id }
+    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:parts) { [
+      { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
+      { etag: "\"#{chunks[1].fingerprint_value}\"", part_number: 2 }
+    ] }
+    let(:cmu_response) { {
+      bucket: bucket_name,
+      etag: "\"#{Faker::Crypto.md5}\"",
+      key: object_key,
+      location: "/#{bucket_name}"
+    } }
+    before(:example) do
+      is_expected.to receive(:complete_multipart_upload)
+        .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)
+        .and_return(cmu_response)
+    end
+    it { expect { subject.complete_chunked_upload(upload) }.not_to raise_error }
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
