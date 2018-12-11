@@ -32,6 +32,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def max_chunked_upload_size
+    9223372036854775807 # max value for 8 byte signed integer
   end
 
   def suggested_minimum_chunk_size(upload)

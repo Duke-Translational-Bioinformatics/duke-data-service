@@ -94,6 +94,13 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#max_chunked_upload_size' do
+    let(:big_int_max_value) { 9223372036854775807 }
+    it 'returns the max value that Upload#size can store' do
+      expect(subject.max_chunked_upload_size).to eq(big_int_max_value)
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
