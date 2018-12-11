@@ -28,6 +28,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def chunk_max_reached?(chunk)
+    chunk.number > chunk_max_number
   end
 
   def max_chunked_upload_size

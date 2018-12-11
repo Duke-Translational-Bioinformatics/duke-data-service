@@ -76,6 +76,24 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#chunk_max_reached?' do
+    before(:example) { chunk.number = chunk_number }
+    context 'chunk.number < chunk_max_number' do
+      let(:chunk_number) { subject.chunk_max_number - 1 }
+      it { expect(subject.chunk_max_reached?(chunk)).to be_falsey }
+    end
+
+    context 'chunk.number = chunk_max_number' do
+      let(:chunk_number) { subject.chunk_max_number }
+      it { expect(subject.chunk_max_reached?(chunk)).to be_falsey }
+    end
+
+    context 'chunk.number > chunk_max_number' do
+      let(:chunk_number) { subject.chunk_max_number + 1 }
+      it { expect(subject.chunk_max_reached?(chunk)).to be_truthy }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
