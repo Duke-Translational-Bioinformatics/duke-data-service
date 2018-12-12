@@ -129,6 +129,7 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:bucket_name) { upload.storage_container }
     let(:object_key) { upload.id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:content_length) { upload.size }
     let(:parts) { [
       { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
       { etag: "\"#{chunks[1].fingerprint_value}\"", part_number: 2 }
@@ -139,12 +140,26 @@ RSpec.describe S3StorageProvider, type: :model do
       key: object_key,
       location: "/#{bucket_name}"
     } }
+    let(:ho_response) { {
+      content_length: content_length,
+      etag: "\"#{Faker::Crypto.md5}\"",
+      metadata: {}
+    } }
     before(:example) do
       is_expected.to receive(:complete_multipart_upload)
         .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)
         .and_return(cmu_response)
+      is_expected.to receive(:head_object)
+        .with(bucket_name, object_key)
+        .and_return(ho_response)
     end
     it { expect { subject.complete_chunked_upload(upload) }.not_to raise_error }
+
+    context 'size mismatch' do
+      let(:content_length) { upload.size - 10 }
+
+      it { expect { subject.complete_chunked_upload(upload) }.to raise_error(IntegrityException) }
+    end
   end
 
   # S3 Interface

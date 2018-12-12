@@ -49,6 +49,10 @@ class S3StorageProvider < StorageProvider
       upload_id: upload.multipart_upload_id,
       parts: parts
     )
+    meta = head_object(upload.storage_container, upload.id)
+    unless meta[:content_length] == upload.size
+      raise IntegrityException, "reported size does not match size computed by StorageProvider"
+    end
   end
 
   def is_complete_chunked_upload?(upload)
