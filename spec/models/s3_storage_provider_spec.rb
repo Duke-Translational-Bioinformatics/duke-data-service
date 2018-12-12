@@ -218,6 +218,38 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  it { is_expected.not_to respond_to(:head_object).with(0).arguments }
+  it { is_expected.not_to respond_to(:head_object).with(1).arguments }
+  it { is_expected.to respond_to(:head_object).with(2).argument }
+  describe '#head_object' do
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:object_key) { SecureRandom.uuid }
+    let(:expected_response) { {
+      content_length: Faker::Number.between(1000, 10000),
+      etag: "\"#{Faker::Crypto.md5}\"",
+      metadata: {}
+    } }
+    before(:example) do
+      subject.client.stub_responses(:head_object, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+      expect(subject.client.api_requests.first[:params][:key]).to eq(object_key)
+    end
+    it { expect(subject.head_object(bucket_name, object_key)).to eq(expected_response) }
+
+    context 'when object does not exist' do
+      let(:expected_response) { 'NoSuchKey' }
+      it 'rescues from NoSuchKey exception and returns false' do
+        expect {
+          expect(subject.head_object(bucket_name, object_key)).to be_falsey
+        }.not_to raise_error
+      end
+    end
+  end
+
   it { is_expected.not_to respond_to(:create_multipart_upload).with(0..1).arguments }
   it { is_expected.to respond_to(:create_multipart_upload).with(2).arguments }
   describe '#create_multipart_upload' do
