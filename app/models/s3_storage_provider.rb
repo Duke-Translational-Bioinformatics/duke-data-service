@@ -107,7 +107,12 @@ class S3StorageProvider < StorageProvider
   end
 
   def complete_multipart_upload(bucket_name, object_key, upload_id:, parts:)
-    client.complete_multipart_upload(bucket: bucket_name, key: object_key, upload_id: upload_id, multipart_upload: { parts: parts }).to_h
+    begin
+      resp = client.complete_multipart_upload(bucket: bucket_name, key: object_key, upload_id: upload_id, multipart_upload: { parts: parts })
+    rescue => e
+      raise(StorageProviderException, e.message)
+    end
+    resp.to_h
   end
 
   def presigned_url(method, bucket_name:, object_key:, **params)

@@ -317,6 +317,17 @@ RSpec.describe S3StorageProvider, type: :model do
       expect(subject.client.api_requests.first[:params][:multipart_upload]).to eq({parts: parts})
     end
     it { expect(subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)).to eq(expected_response) }
+
+    context 'when multipart upload does not exist' do
+      let(:expected_response) { 'NoSuchUpload' }
+      it 'raises a StorageProviderException' do
+        expect { subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) }.to raise_error { |error|
+          expect(error).to be_a StorageProviderException
+          expect(error.cause).to be_a Aws::S3::Errors::NoSuchUpload
+          expect(error.message).to eq(error.cause.message)
+        }
+      end
+    end
   end
 
   it { is_expected.not_to respond_to(:presigned_url).with(0).arguments }
