@@ -147,13 +147,23 @@ RSpec.describe S3StorageProvider, type: :model do
     } }
     before(:example) do
       is_expected.to receive(:complete_multipart_upload)
-        .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)
-        .and_return(cmu_response)
-      is_expected.to receive(:head_object)
+        .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) { cmu_response }
+      allow(subject).to receive(:head_object)
         .with(bucket_name, object_key)
         .and_return(ho_response)
     end
     it { expect { subject.complete_chunked_upload(upload) }.not_to raise_error }
+
+    context 'StorageProviderException raised' do
+      let(:cmu_response) { raise StorageProviderException }
+      it 'raises an IntegrityException' do
+        expect { subject.complete_chunked_upload(upload) }.to raise_error { |error|
+          expect(error).to be_an IntegrityException
+          expect(error.cause).to be_a StorageProviderException
+          expect(error.message).to eq(error.cause.message)
+        }
+      end
+    end
 
     context 'size mismatch' do
       let(:content_length) { upload.size - 10 }

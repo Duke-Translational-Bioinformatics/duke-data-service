@@ -43,12 +43,16 @@ class S3StorageProvider < StorageProvider
     parts = upload.chunks.reorder(:number).collect do |chunk|
       { etag: "\"#{chunk.fingerprint_value}\"", part_number: chunk.number }
     end
-    complete_multipart_upload(
-      upload.storage_container,
-      upload.id,
-      upload_id: upload.multipart_upload_id,
-      parts: parts
-    )
+    begin
+      complete_multipart_upload(
+        upload.storage_container,
+        upload.id,
+        upload_id: upload.multipart_upload_id,
+        parts: parts
+      )
+    rescue StorageProviderException => e
+      raise(IntegrityException, e.message)
+    end
     meta = head_object(upload.storage_container, upload.id)
     unless meta[:content_length] == upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
