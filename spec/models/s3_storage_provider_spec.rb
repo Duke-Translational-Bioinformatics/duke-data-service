@@ -15,6 +15,14 @@ RSpec.describe S3StorageProvider, type: :model do
     before { allow(subject).to receive(:client).and_return(stubbed_client) }
   end
 
+  def storage_provider_exception_wrapped_s3_error(aws_error)
+    Proc.new do |error|
+      expect(error).to be_a StorageProviderException
+      expect(error.cause).to be_a "Aws::S3::Errors::#{aws_error}".constantize
+      expect(error.message).to eq(error.cause.message)
+    end
+  end
+
   it_behaves_like 'A StorageProvider implementation'
 
   # Validations
@@ -241,6 +249,13 @@ RSpec.describe S3StorageProvider, type: :model do
         }.not_to raise_error
       end
     end
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.head_bucket(bucket_name) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
   end
 
   it { is_expected.not_to respond_to(:head_object).with(0).arguments }
@@ -273,6 +288,13 @@ RSpec.describe S3StorageProvider, type: :model do
         }.not_to raise_error
       end
     end
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.head_object(bucket_name, object_key) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
   end
 
   it { is_expected.not_to respond_to(:create_multipart_upload).with(0..1).arguments }
@@ -296,6 +318,13 @@ RSpec.describe S3StorageProvider, type: :model do
       expect(subject.client.api_requests.first[:params][:key]).to eq(object_key)
     end
     it { expect(subject.create_multipart_upload(bucket_name, object_key)).to eq(expected_upload_id) }
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.create_multipart_upload(bucket_name, object_key) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
   end
 
   it { is_expected.not_to respond_to(:complete_multipart_upload).with(0..1).arguments }
@@ -328,14 +357,10 @@ RSpec.describe S3StorageProvider, type: :model do
     end
     it { expect(subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts)).to eq(expected_response) }
 
-    context 'when multipart upload does not exist' do
-      let(:expected_response) { 'NoSuchUpload' }
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
       it 'raises a StorageProviderException' do
-        expect { subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) }.to raise_error { |error|
-          expect(error).to be_a StorageProviderException
-          expect(error.cause).to be_a Aws::S3::Errors::NoSuchUpload
-          expect(error.message).to eq(error.cause.message)
-        }
+        expect { subject.complete_multipart_upload(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
       end
     end
   end

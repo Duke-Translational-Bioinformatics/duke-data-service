@@ -95,6 +95,8 @@ class S3StorageProvider < StorageProvider
       client.head_bucket(bucket: bucket_name).to_h
     rescue Aws::S3::Errors::NoSuchBucket
       false
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
     end
   end
 
@@ -103,11 +105,17 @@ class S3StorageProvider < StorageProvider
       client.head_object(bucket: bucket_name, key: object_key).to_h
     rescue Aws::S3::Errors::NoSuchKey
       false
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
     end
   end
 
   def create_multipart_upload(bucket_name, object_key)
-    client.create_multipart_upload(bucket: bucket_name, key: object_key).upload_id
+    begin
+      client.create_multipart_upload(bucket: bucket_name, key: object_key).upload_id
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
+    end
   end
 
   def complete_multipart_upload(bucket_name, object_key, upload_id:, parts:)
