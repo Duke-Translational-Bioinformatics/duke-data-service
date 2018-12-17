@@ -113,7 +113,7 @@ class S3StorageProvider < StorageProvider
   def complete_multipart_upload(bucket_name, object_key, upload_id:, parts:)
     begin
       resp = client.complete_multipart_upload(bucket: bucket_name, key: object_key, upload_id: upload_id, multipart_upload: { parts: parts })
-    rescue => e
+    rescue Aws::Errors::ServiceError => e
       raise(StorageProviderException, e.message)
     end
     resp.to_h
