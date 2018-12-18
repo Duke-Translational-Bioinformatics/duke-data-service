@@ -426,6 +426,7 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:signer) { Aws::S3::Presigner.new(client: subject.client) }
     let(:bucket_name) { SecureRandom.uuid }
     let(:object_key) { SecureRandom.uuid }
+    let(:file_name) { Faker::File.file_name }
 
     context 'sign :get_object' do
       let(:expected_url) {
@@ -433,10 +434,11 @@ RSpec.describe S3StorageProvider, type: :model do
           :get_object,
           bucket: bucket_name,
           key: object_key,
+          response_content_disposition: "attachment; file_name=#{file_name}",
           expires_in: subject.signed_url_duration
         )
       }
-      it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key)).to eq expected_url }
+      it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key, response_content_disposition: "attachment; file_name=#{file_name}")).to eq expected_url }
     end
 
     context 'sign :upload_part' do
