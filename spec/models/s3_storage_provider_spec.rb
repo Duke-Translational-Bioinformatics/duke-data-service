@@ -207,6 +207,27 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#chunk_upload_url(chunk)' do
+    let(:bucket_name) { chunk.upload.storage_container }
+    let(:object_key) { chunk.upload.id }
+    let(:multipart_upload_id) { chunk.upload.multipart_upload_id }
+    let(:part_number) { chunk.number }
+    let(:part_size) { chunk.size }
+    let(:expected_url) { Faker::Internet.url }
+    before(:example) do
+      is_expected.to receive(:presigned_url)
+        .with(
+          :upload_part,
+          bucket_name: bucket_name,
+          object_key: object_key,
+          upload_id: multipart_upload_id,
+          part_number: part_number,
+          content_length: part_size
+        ).and_return(expected_url)
+    end
+    it { expect(subject.chunk_upload_url(chunk)).to eq expected_url }
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
