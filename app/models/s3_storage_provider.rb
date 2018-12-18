@@ -75,6 +75,15 @@ class S3StorageProvider < StorageProvider
   end
 
   def download_url(upload, filename=nil)
+    params = {
+      bucket_name: upload.storage_container,
+      object_key: upload.id
+    }
+    params[:response_content_disposition] = 'attachment; file_name='+filename if filename
+    presigned_url(
+      :get_object,
+      **params
+    )
   end
 
   def purge(object)

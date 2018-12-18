@@ -228,6 +228,38 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.chunk_upload_url(chunk)).to eq expected_url }
   end
 
+  describe '#download_url' do
+    let(:bucket_name) { upload.storage_container }
+    let(:object_key) { upload.id }
+    let(:expected_url) { Faker::Internet.url }
+    let(:file_name) { Faker::File.file_name }
+
+    context 'without filename argument set' do
+      before(:example) do
+        is_expected.to receive(:presigned_url)
+          .with(
+            :get_object,
+            bucket_name: bucket_name,
+            object_key: object_key
+          ).and_return(expected_url)
+      end
+      it { expect(subject.download_url(upload)).to eq expected_url }
+    end
+
+    context 'with filename argument set' do
+      before(:example) do
+        is_expected.to receive(:presigned_url)
+          .with(
+            :get_object,
+            bucket_name: bucket_name,
+            object_key: object_key,
+            response_content_disposition: "attachment; file_name=#{file_name}"
+          ).and_return(expected_url)
+      end
+      it { expect(subject.download_url(upload, file_name)).to eq expected_url }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
