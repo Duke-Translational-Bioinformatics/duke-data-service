@@ -180,6 +180,33 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#is_complete_chunked_upload?(upload)' do
+    let(:bucket_name) { upload.storage_container }
+    let(:object_key) { upload.id }
+    let(:content_length) { upload.size }
+    let(:ho_response) { {
+      content_length: content_length,
+      etag: "\"#{Faker::Crypto.md5}\"",
+      metadata: {}
+    } }
+    before(:example) do
+      allow(subject).to receive(:head_object)
+        .with(bucket_name, object_key) { ho_response }
+    end
+
+    it { expect(subject.is_complete_chunked_upload?(upload)).to be_truthy }
+
+    context 'object does not exist' do
+      let(:ho_response) { false }
+      it { expect(subject.is_complete_chunked_upload?(upload)).to be_falsey }
+    end
+
+    context 'unexpected StorageProviderException' do
+      let(:ho_response) { raise StorageProviderException.new('Unexpected') }
+      it { expect { subject.is_complete_chunked_upload?(upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do

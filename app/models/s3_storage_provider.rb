@@ -60,6 +60,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def is_complete_chunked_upload?(upload)
+    head_object(upload.storage_container, upload.id)
   end
 
   def chunk_upload_url(chunk)
