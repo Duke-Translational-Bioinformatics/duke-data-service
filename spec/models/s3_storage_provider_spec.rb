@@ -445,6 +445,32 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  it { is_expected.not_to respond_to(:delete_object).with(0).arguments }
+  it { is_expected.not_to respond_to(:delete_object).with(1).arguments }
+  it { is_expected.to respond_to(:delete_object).with(2).argument }
+  describe '#delete_object' do
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:object_key) { SecureRandom.uuid }
+    let(:expected_response) { {} }
+    before(:example) do
+      subject.client.stub_responses(:delete_object, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+      expect(subject.client.api_requests.first[:params][:key]).to eq(object_key)
+    end
+    it { expect(subject.delete_object(bucket_name, object_key)).to eq(expected_response) }
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.delete_object(bucket_name, object_key) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
+  end
+
   it { is_expected.not_to respond_to(:presigned_url).with(0).arguments }
   it { is_expected.not_to respond_to(:presigned_url).with(1).argument }
   it { is_expected.to respond_to(:presigned_url).with(1).argument.and_keywords(:bucket_name, :object_key) }

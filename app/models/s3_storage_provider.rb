@@ -145,6 +145,14 @@ class S3StorageProvider < StorageProvider
     resp.to_h
   end
 
+  def delete_object(bucket_name, object_key)
+    begin
+      client.delete_object(bucket: bucket_name, key: object_key).to_h
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
+    end
+  end
+
   def presigned_url(method, bucket_name:, object_key:, **params)
     @signer ||= Aws::S3::Presigner.new(client: client)
     @signer.presigned_url(method, bucket: bucket_name, key: object_key, expires_in: signed_url_duration, **params)
