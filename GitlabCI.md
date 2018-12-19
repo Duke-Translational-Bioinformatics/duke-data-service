@@ -29,7 +29,7 @@ gitlab-ci-runner service account. See [Service Accounts](https://docs.okd.io/lat
 
 #### Gitlab Runner
 The .gitlab-ci.yml tasks use a tag 'dds' to specify a Specific
-Gitlab Runner. This runner should be hosted and configured with the
+Gitlab Runner. This runner should be [hosted](https://docs.gitlab.com/runner/install/index.html) and [registered](https://docs.gitlab.com/runner/register/index.html) with the
 token from the Gitlab Github mirror project.
 
 #### Openshift
