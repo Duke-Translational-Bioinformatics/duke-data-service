@@ -87,6 +87,13 @@ class S3StorageProvider < StorageProvider
   end
 
   def purge(object)
+    if object.is_a? Upload
+      delete_object(object.storage_container, object.id)
+    elsif object.is_a? Chunk
+      true
+    else
+      raise "#{object} is not purgable"
+    end
   end
 
   # S3 Interface

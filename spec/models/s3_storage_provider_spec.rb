@@ -260,6 +260,42 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#purge' do
+    context 'upload' do
+      let(:bucket_name) { upload.storage_container }
+      let(:object_key) { upload.id }
+      let(:response) { {} }
+      before(:example) do
+        expect(subject).to receive(:delete_object)
+          .with(bucket_name, object_key) { response }
+      end
+
+      it { expect(subject.purge(upload)).to be_truthy }
+
+      context 'unexpected StorageProviderException' do
+        let(:response) { raise StorageProviderException.new('Unexpected') }
+        it { expect { subject.purge(upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+      end
+    end
+
+    context 'chunk' do
+      before(:example) do
+        expect(subject).not_to receive(:delete_object)
+      end
+
+      it { expect(subject.purge(chunk)).to be_truthy }
+    end
+
+    context 'unsupported object' do
+      before(:example) do
+        expect(subject).not_to receive(:delete_object)
+      end
+
+      let(:expected_exception) { "NotPurgable is not purgable" }
+      it { expect { subject.purge("NotPurgable") }.to raise_error(expected_exception) }
+    end
+  end
+
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
