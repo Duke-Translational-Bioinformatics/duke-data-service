@@ -64,6 +64,19 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#is_ready?' do
+    let(:response) { { buckets: [] } }
+    before(:example) do
+      is_expected.to receive(:list_buckets) { response }
+    end
+    it { expect(subject.is_ready?).to be_truthy }
+
+    context 'StorageProviderException raised' do
+      let(:response) { raise StorageProviderException }
+      it { expect(subject.is_ready?).to be_falsey }
+    end
+  end
+
   describe '#initialize_chunked_upload' do
     let(:cmu_response) { {
       bucket: upload.project.id,

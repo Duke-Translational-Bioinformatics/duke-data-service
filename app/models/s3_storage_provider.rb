@@ -9,6 +9,11 @@ class S3StorageProvider < StorageProvider
   end
 
   def is_ready?
+    begin
+      !!list_buckets
+    rescue StorageProviderException
+      false
+    end
   end
 
   def initialize_project(project)
