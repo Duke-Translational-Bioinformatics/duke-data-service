@@ -108,11 +108,19 @@ class S3StorageProvider < StorageProvider
   end
 
   def list_buckets
-    client.list_buckets.to_h[:buckets]
+    begin
+      client.list_buckets.to_h[:buckets]
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
+    end
   end
 
   def create_bucket(bucket_name)
-    client.create_bucket(bucket: bucket_name).to_h
+    begin
+      client.create_bucket(bucket: bucket_name).to_h
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
+    end
   end
 
   def head_bucket(bucket_name)

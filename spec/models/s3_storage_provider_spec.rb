@@ -314,15 +314,24 @@ RSpec.describe S3StorageProvider, type: :model do
   it { is_expected.to respond_to(:list_buckets).with(0).arguments }
   describe '#list_buckets' do
     include_context 'stubbed subject#client'
+    let(:bucket_array) { [] }
+    let(:expected_response) { { buckets: bucket_array } }
+    before(:example) do
+      subject.client.stub_responses(:list_buckets, expected_response)
+    end
 
     it { expect(subject.list_buckets).to eq([]) }
 
     context 'with buckets' do
       let(:bucket_array) { [{ name: SecureRandom.uuid }] }
-      before(:example) do
-        subject.client.stub_responses(:list_buckets, { buckets: bucket_array })
-      end
       it { expect(subject.list_buckets).to eq(bucket_array) }
+    end
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.list_buckets }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
     end
   end
 
@@ -340,6 +349,13 @@ RSpec.describe S3StorageProvider, type: :model do
       expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
     end
     it { expect(subject.create_bucket(bucket_name)).to eq(expected_response) }
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.create_bucket(bucket_name) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
   end
 
   it { is_expected.not_to respond_to(:head_bucket).with(0).arguments }
