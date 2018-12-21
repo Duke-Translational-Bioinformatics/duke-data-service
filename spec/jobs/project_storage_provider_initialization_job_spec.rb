@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
-  include_context 'mock all Uploads StorageProvider'
+  include_context 'mocked StorageProvider'
 
   let(:project) { FactoryBot.create(:project, :inconsistent) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
