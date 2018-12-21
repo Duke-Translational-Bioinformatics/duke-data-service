@@ -77,10 +77,10 @@ RSpec.describe Chunk, type: :model do
     end
 
     it 'is_expected.to have a host method' do
-      expect(mocked_storage_provider).to receive(:endpoint)
-        .and_return(expected_endpoint)
+      expect(mocked_storage_provider).to receive(:url_root)
+        .and_return(expected_url_root)
       is_expected.to respond_to :host
-      expect(subject.host).to eq expected_endpoint
+      expect(subject.host).to eq expected_url_root
     end
 
     it 'is_expected.to have a http_headers method' do

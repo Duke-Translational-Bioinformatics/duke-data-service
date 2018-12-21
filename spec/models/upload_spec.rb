@@ -45,6 +45,7 @@ RSpec.describe Upload, type: :model do
 
     it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
     it { is_expected.not_to validate_presence_of :fingerprints }
+    it { is_expected.not_to validate_presence_of :multipart_upload_id }
 
     context 'when completed_at is set' do
       before { subject.completed_at = Faker::Time.forward(1) }
@@ -81,7 +82,7 @@ RSpec.describe Upload, type: :model do
   end
 
   describe 'instance methods' do
-    it { should delegate_method(:endpoint).to(:storage_provider) }
+    it { should delegate_method(:url_root).to(:storage_provider) }
 
     it 'should have a http_verb method' do
       should respond_to :http_verb

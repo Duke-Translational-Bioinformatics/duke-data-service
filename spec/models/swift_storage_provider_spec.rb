@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe SwiftStorageProvider, type: :model do
   subject { FactoryBot.create(:swift_storage_provider) }
 
+  it_behaves_like 'A StorageProvider implementation'
+
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
@@ -13,8 +15,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
       }
     }
     let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-
-    it_behaves_like 'A StorageProvider'
 
     describe '#configure' do
       it 'should register_keys' do
@@ -28,7 +28,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     describe '#is_ready?' do
       context 'network connectivity failure' do
         before do
-          stub_request(:any, "#{subject.endpoint}#{subject.auth_uri}").to_timeout
+          stub_request(:any, "#{subject.url_root}#{subject.auth_uri}").to_timeout
         end
         after do
           WebMock.reset!
@@ -168,14 +168,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
       it 'should not do anything to initialize a chunked upload in swift' do
         expect {
           subject.initialize_chunked_upload(upload)
-        }.not_to raise_error
-      end
-    end
-
-    describe '#endpoint' do
-      it 'should return the swift url_root' do
-        expect {
-          expect(subject.endpoint).to eq(subject.url_root)
         }.not_to raise_error
       end
     end

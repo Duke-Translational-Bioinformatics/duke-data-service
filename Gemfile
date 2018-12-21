@@ -47,6 +47,9 @@ gem 'uglifier'
 gem 'pundit'
 gem 'httparty'
 
+# AWS S3 Support
+gem 'aws-sdk-s3'
+
 # use heroku platform-api to set heroku environment variables for secrets
 gem 'platform-api'
 gem 'netrc'

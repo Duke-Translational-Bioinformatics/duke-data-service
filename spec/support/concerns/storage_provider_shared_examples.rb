@@ -1,6 +1,6 @@
 shared_context 'mocked StorageProvider Interface' do
   let(:expected_chunk_max_exceeded) { false }
-  let(:expected_endpoint) { Faker::Internet.url }
+  let(:expected_url_root) { Faker::Internet.url }
 
   before do
     allow(mocked_storage_provider).to receive(:complete_chunked_upload)
@@ -11,14 +11,14 @@ shared_context 'mocked StorageProvider Interface' do
       )
     allow(mocked_storage_provider).to receive(:chunk_max_reached?)
       .and_return(expected_chunk_max_exceeded)
-    allow(mocked_storage_provider).to receive(:endpoint)
-      .and_return(expected_endpoint)
+    allow(mocked_storage_provider).to receive(:url_root)
+      .and_return(expected_url_root)
     allow(mocked_storage_provider).to receive(:download_url) do |upload,filename=nil|
       filename ||= upload.name
-      "#{expected_endpoint}/#{URI.encode(filename)}"
+      "#{expected_url_root}/#{URI.encode(filename)}"
     end
     allow(mocked_storage_provider).to receive(:chunk_upload_url) do |chunk|
-      "#{expected_endpoint}/#{chunk.sub_path}"
+      "#{expected_url_root}/#{chunk.sub_path}"
     end
     allow(mocked_storage_provider).to receive(:suggested_minimum_chunk_size) do |upload|
       (upload.size.to_f / mocked_storage_provider.chunk_max_number).ceil
@@ -60,7 +60,7 @@ shared_context 'mocked StorageProvider' do
   let!(:mocked_storage_provider) { stub_model(StorageProvider, FactoryBot.attributes_for(:storage_provider).merge({id: SecureRandom.uuid})) }
 end
 
-shared_examples 'A StorageProvider' do
+shared_context 'A StorageProvider' do
   include ActiveSupport::Testing::TimeHelpers
   it { is_expected.to be_a StorageProvider }
 
@@ -81,7 +81,7 @@ shared_examples 'A StorageProvider' do
   it { is_expected.to respond_to(:is_initialized?).with(1).argument }
   it { is_expected.to respond_to(:single_file_upload_url).with(1).argument }
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
-  it { is_expected.to respond_to(:endpoint) }
+  it { is_expected.to respond_to(:url_root) }
   it { is_expected.to respond_to(:chunk_max_reached?).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
@@ -91,4 +91,70 @@ shared_examples 'A StorageProvider' do
   it { is_expected.to respond_to(:download_url).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(2).argument }
   it { is_expected.to respond_to(:purge).with(1).argument }
+end
+
+shared_examples 'A StorageProvider implementation' do
+  include_context 'A StorageProvider'
+
+  around(:example) do |example|
+    false_positive_config = RSpec::Expectations.configuration.on_potential_false_positives
+    RSpec::Expectations.configuration.on_potential_false_positives = :nothing
+    example.run
+    RSpec::Expectations.configuration.on_potential_false_positives = false_positive_config
+  end
+  describe '#configure' do
+    it { expect { subject.configure }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#is_ready?' do
+    it { expect { subject.is_ready? }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#initialize_project' do
+    it { expect { subject.initialize_project(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#is_initialized?(project)' do
+    it { expect { subject.is_initialized?(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#single_file_upload_url(upload)' do
+    it { expect { subject.single_file_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#initialize_chunked_upload' do
+    it { expect { subject.initialize_chunked_upload(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#chunk_max_reached?' do
+    it { expect { subject.chunk_max_reached?(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#max_chunked_upload_size' do
+    it { expect { subject.max_chunked_upload_size }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#suggested_minimum_chunk_size' do
+    it { expect { subject.suggested_minimum_chunk_size(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#chunk_upload_url(chunk)' do
+    it { expect { subject.chunk_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#complete_chunked_upload(upload)' do
+    it { expect { subject.complete_chunked_upload(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#is_complete_chunked_upload?(upload)' do
+    it { expect { subject.is_complete_chunked_upload?(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#download_url' do
+    it { expect { subject.download_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#purge' do
+    it { expect { subject.purge(nil) }.not_to raise_error(NotImplementedError) }
+  end
 end
