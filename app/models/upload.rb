@@ -60,6 +60,14 @@ class Upload < ActiveRecord::Base
     end
   end
 
+  def initialize_storage
+    UploadStorageProviderInitializationJob.perform_later(
+      job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      upload: self
+    )
+  end
+
   def complete
     transaction do
       self.completed_at = DateTime.now

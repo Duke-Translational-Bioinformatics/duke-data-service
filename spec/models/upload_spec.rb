@@ -164,6 +164,19 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :initialize_storage }
+  describe '#initialize_storage' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+
+    it 'enqueues a UploadStorageProviderInitializationJob' do
+      expect {
+        subject.initialize_storage
+      }.to have_enqueued_job(UploadStorageProviderInitializationJob)
+        .with(job_transaction: instance_of(JobTransaction), storage_provider: subject.storage_provider, upload: subject)
+    end
+  end
+
   describe '#complete' do
     let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
     before { subject.fingerprints_attributes = [fingerprint_attributes] }
