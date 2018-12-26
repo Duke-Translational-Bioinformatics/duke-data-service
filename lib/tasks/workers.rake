@@ -14,6 +14,13 @@ namespace :workers do
     end
   end
 
+  namespace :initialize_upload_storage do
+    desc 'run a UploadStorageProviderInitializationJob'
+    task run: :environment do
+      JobsRunner.new(UploadStorageProviderInitializationJob).run
+    end
+  end
+
   namespace :update_project_container_elasticsearch do
     desc 'run a ProjectContainerElasticsearchUpdateJob'
     task run: :environment do
