@@ -227,6 +227,7 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
     let(:expected_url) { Faker::Internet.url }
+    let(:pu_response) { expected_url }
     before(:example) do
       is_expected.to receive(:presigned_url)
         .with(
@@ -236,9 +237,20 @@ RSpec.describe S3StorageProvider, type: :model do
           upload_id: multipart_upload_id,
           part_number: part_number,
           content_length: part_size
-        ).and_return(expected_url)
+        ) { pu_response }
     end
     it { expect(subject.chunk_upload_url(chunk)).to eq expected_url }
+
+    context 'when ArgumentError raised' do
+      let(:pu_response) { raise ArgumentError, 'missing required parameter params[:upload_id]' }
+      it 'raises a StorageProviderException' do
+        expect { subject.chunk_upload_url(chunk) }.to raise_error { |error|
+          expect(error).to be_a StorageProviderException
+          expect(error.cause).to be_an ArgumentError
+          expect(error.message).to eq('Upload is not ready')
+        }
+      end
+    end
   end
 
   describe '#download_url' do
@@ -580,6 +592,10 @@ RSpec.describe S3StorageProvider, type: :model do
         )
       }
       it { expect(subject.presigned_url(:upload_part, bucket_name: bucket_name, object_key: object_key, upload_id: multipart_upload_id, part_number: part_number, content_length: part_size)).to eq expected_url }
+
+      context 'with nil :upload_id' do
+        it { expect { subject.presigned_url(:upload_part, bucket_name: bucket_name, object_key: object_key, upload_id: nil, part_number: part_number, content_length: part_size) }.to raise_error(ArgumentError, 'missing required parameter params[:upload_id]') }
+      end
     end
   end
 end
