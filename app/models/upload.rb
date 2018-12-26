@@ -10,6 +10,7 @@ class Upload < ActiveRecord::Base
   has_many :fingerprints
 
   before_create :set_storage_container
+  after_create :initialize_storage
 
   accepts_nested_attributes_for :fingerprints
 

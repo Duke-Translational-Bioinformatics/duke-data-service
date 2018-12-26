@@ -79,6 +79,7 @@ RSpec.describe Upload, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_storage_container).before(:create) }
+    it { is_expected.to callback(:initialize_storage).after(:create) }
   end
 
   describe 'instance methods' do
