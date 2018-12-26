@@ -222,6 +222,13 @@ describe DDS::V1::UploadsAPI do
         end
       end
 
+      context 'chunk#url raises ConsistencyException' do
+        before(:example) do
+          allow_any_instance_of(Chunk).to receive(:url).and_raise(ConsistencyException)
+        end
+        it { is_expected.to eq(404) }
+      end
+
       context 'chunk size too large' do
         before do
           chunk_stub.size = chunk_stub.chunk_max_size_bytes + 1

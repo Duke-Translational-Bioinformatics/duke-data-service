@@ -123,7 +123,7 @@ module DDS
               fingerprint_value: chunk_params[:hash][:value],
               fingerprint_algorithm: chunk_params[:hash][:algorithm],
             }
-            if chunk.save
+            if chunk.url && chunk.save
               chunk
             else
               validation_error!(chunk)
