@@ -68,6 +68,9 @@ class S3StorageProvider < StorageProvider
     head_object(upload.storage_container, upload.id)
   end
 
+  def chunk_upload_ready?(chunk)
+  end
+
   def chunk_upload_url(chunk)
     begin
       presigned_url(
