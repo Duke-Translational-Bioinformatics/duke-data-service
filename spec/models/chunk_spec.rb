@@ -94,6 +94,20 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :check_upload_readiness! }
+  describe '#check_upload_readiness!' do
+    let(:readiness) { true }
+    before(:example) do
+      allow(subject).to receive(:upload_ready?).and_return(readiness)
+    end
+    it { expect(subject.check_upload_readiness!).to be_truthy }
+
+    context 'when not ready' do
+      let(:readiness) { false }
+      it { expect { subject.check_upload_readiness! }.to raise_error ConsistencyException, 'Upload is not ready' }
+    end
+  end
+
   it { is_expected.to respond_to :upload_ready? }
   describe '#upload_ready?' do
     let(:upload_ready) { true }

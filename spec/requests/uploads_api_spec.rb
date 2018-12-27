@@ -222,11 +222,14 @@ describe DDS::V1::UploadsAPI do
         end
       end
 
-      context 'chunk#url raises ConsistencyException' do
+      context 'chunk#upload_ready? is false' do
         before(:example) do
-          allow_any_instance_of(Chunk).to receive(:url).and_raise(ConsistencyException)
+          allow_any_instance_of(Chunk).to receive(:upload_ready?).and_return(false)
         end
-        it { is_expected.to eq(404) }
+        it 'returns 404 with a consistency error message' do
+          is_expected.to eq(404)
+          expect(response.body).to include 'resource_not_consistent'
+        end
       end
 
       context 'chunk size too large' do

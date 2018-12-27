@@ -43,6 +43,10 @@ class Chunk < ActiveRecord::Base
     [storage_container, object_path].join('/')
   end
 
+  def check_upload_readiness!
+    upload_ready? or raise ConsistencyException, 'Upload is not ready'
+  end
+
   def upload_ready?
     storage_provider.chunk_upload_ready?(self)
   end
