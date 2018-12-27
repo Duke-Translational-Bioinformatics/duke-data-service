@@ -221,9 +221,10 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#chunk_upload_url(chunk)' do
+    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
     let(:bucket_name) { chunk.upload.storage_container }
     let(:object_key) { chunk.upload.id }
-    let(:multipart_upload_id) { chunk.upload.multipart_upload_id }
+    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
     let(:expected_url) { Faker::Internet.url }
