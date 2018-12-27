@@ -378,6 +378,10 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
+    describe '#chunk_upload_ready?(chunk)' do
+      it { expect(subject.chunk_upload_ready?(chunk)).to be_truthy }
+    end
+
     describe '#chunk_upload_url(chunk)' do
       it 'should return a signed url to PUT the chunk' do
         is_expected.to receive(:build_signed_url)

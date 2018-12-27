@@ -89,6 +89,7 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def chunk_upload_ready?(chunk)
+    true
   end
 
   def chunk_upload_url(chunk)
