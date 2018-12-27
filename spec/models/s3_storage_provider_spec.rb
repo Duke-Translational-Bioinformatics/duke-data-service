@@ -220,6 +220,17 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#chunk_upload_ready?(chunk)' do
+    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    it { expect(subject.chunk_upload_ready?(chunk)).to eq true }
+
+    context 'when upload.multipart_upload_id is nil' do
+      let(:multipart_upload_id) { nil }
+      it { expect(subject.chunk_upload_ready?(chunk)).to eq false }
+    end
+  end
+
   describe '#chunk_upload_url(chunk)' do
     let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
     let(:bucket_name) { chunk.upload.storage_container }

@@ -69,6 +69,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def chunk_upload_ready?(chunk)
+    !!chunk.upload.multipart_upload_id
   end
 
   def chunk_upload_url(chunk)
