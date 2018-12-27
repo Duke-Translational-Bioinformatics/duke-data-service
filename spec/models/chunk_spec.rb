@@ -129,7 +129,7 @@ RSpec.describe Chunk, type: :model do
     let(:sp_response) { expected_url }
 
     before(:example) do
-      expect(mocked_storage_provider).to receive(:chunk_upload_url) { sp_response }
+      expect(mocked_storage_provider).to receive(:chunk_upload_url).with(subject) { sp_response }
     end
 
     it { expect(subject.url).to eq expected_url }
