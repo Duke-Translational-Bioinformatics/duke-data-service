@@ -43,6 +43,10 @@ class Chunk < ActiveRecord::Base
     [storage_container, object_path].join('/')
   end
 
+  def upload_ready?
+    storage_provider.chunk_upload_ready?(self)
+  end
+
   def url
     begin
       storage_provider.chunk_upload_url(self)

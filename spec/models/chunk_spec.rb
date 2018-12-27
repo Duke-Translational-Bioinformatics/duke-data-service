@@ -94,6 +94,21 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :upload_ready? }
+  describe '#upload_ready?' do
+    let(:upload_ready) { true }
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
+    end
+
+    it { expect(subject.upload_ready?).to eq true }
+
+    context 'when upload is not ready' do
+      let(:upload_ready) { false }
+      it { expect(subject.upload_ready?).to eq false }
+    end
+  end
+
   it { is_expected.to respond_to :url }
   describe '#url' do
     let(:expected_url) { Faker::Internet.url }
