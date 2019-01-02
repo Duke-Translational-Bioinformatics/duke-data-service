@@ -69,6 +69,10 @@ class Upload < ActiveRecord::Base
     )
   end
 
+  def ready_for_chunks?
+    storage_provider.chunk_upload_ready?(self)
+  end
+
   def complete
     transaction do
       self.completed_at = DateTime.now

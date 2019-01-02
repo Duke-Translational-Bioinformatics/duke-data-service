@@ -178,6 +178,23 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :ready_for_chunks? }
+  describe '#ready_for_chunks?' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+    let(:upload_ready) { true }
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
+    end
+
+    it { expect(subject.ready_for_chunks?).to eq true }
+
+    context 'when upload is not ready' do
+      let(:upload_ready) { false }
+      it { expect(subject.ready_for_chunks?).to eq false }
+    end
+  end
+
   describe '#complete' do
     let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
     before { subject.fingerprints_attributes = [fingerprint_attributes] }
