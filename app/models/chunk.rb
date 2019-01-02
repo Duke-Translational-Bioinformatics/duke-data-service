@@ -48,7 +48,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def upload_ready?
-    storage_provider.chunk_upload_ready?(self)
+    storage_provider.chunk_upload_ready?(self.upload)
   end
 
   def url

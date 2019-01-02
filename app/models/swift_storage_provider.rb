@@ -88,7 +88,7 @@ class SwiftStorageProvider < StorageProvider
     return true if get_object_metadata(upload.storage_container, upload.id)
   end
 
-  def chunk_upload_ready?(chunk)
+  def chunk_upload_ready?(upload)
     true
   end
 

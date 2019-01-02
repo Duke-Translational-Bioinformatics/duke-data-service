@@ -112,7 +112,7 @@ RSpec.describe Chunk, type: :model do
   describe '#upload_ready?' do
     let(:upload_ready) { true }
     before(:example) do
-      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
+      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(upload) { upload_ready }
     end
 
     it { expect(subject.upload_ready?).to eq true }

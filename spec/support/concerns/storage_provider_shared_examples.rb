@@ -140,7 +140,7 @@ shared_examples 'A StorageProvider implementation' do
     it { expect { subject.suggested_minimum_chunk_size(nil) }.not_to raise_error(NotImplementedError) }
   end
 
-  describe '#chunk_upload_ready?(chunk)' do
+  describe '#chunk_upload_ready?(upload)' do
     it { expect { subject.chunk_upload_ready?(nil) }.not_to raise_error(NotImplementedError) }
   end
 

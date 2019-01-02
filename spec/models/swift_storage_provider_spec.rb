@@ -378,8 +378,8 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
-    describe '#chunk_upload_ready?(chunk)' do
-      it { expect(subject.chunk_upload_ready?(chunk)).to be_truthy }
+    describe '#chunk_upload_ready?(upload)' do
+      it { expect(subject.chunk_upload_ready?(upload)).to be_truthy }
     end
 
     describe '#chunk_upload_url(chunk)' do
