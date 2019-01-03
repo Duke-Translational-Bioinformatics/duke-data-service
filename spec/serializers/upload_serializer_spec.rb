@@ -16,6 +16,7 @@ RSpec.describe UploadSerializer, type: :serializer do
       'initiated_on' => resource.created_at.as_json,
       'ready_for_chunks' => resource.ready_for_chunks?.as_json,
       'completed_on' => resource.completed_at.as_json,
+      'is_consistent' => resource.is_consistent.as_json,
       'purged_on' => resource.purged_on.as_json,
       'error_on' => resource.error_at.as_json,
       'error_message' => resource.error_message
@@ -35,6 +36,13 @@ RSpec.describe UploadSerializer, type: :serializer do
 
   context 'with completed upload' do
     let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint, storage_provider: mocked_storage_provider) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
+  end
+
+  context 'with inconsistent upload' do
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :inconsistent, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
