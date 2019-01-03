@@ -73,6 +73,10 @@ class Upload < ActiveRecord::Base
     storage_provider.chunk_upload_ready?(self)
   end
 
+  def check_readiness!
+    ready_for_chunks? or raise ConsistencyException, 'Upload is not ready'
+  end
+
   def complete
     transaction do
       self.completed_at = DateTime.now
