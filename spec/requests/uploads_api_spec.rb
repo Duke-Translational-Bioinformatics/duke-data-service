@@ -222,9 +222,9 @@ describe DDS::V1::UploadsAPI do
         end
       end
 
-      context 'chunk#upload_ready? is false' do
+      context 'upload#ready_for_chunks? is false' do
         before(:example) do
-          allow_any_instance_of(Chunk).to receive(:upload_ready?).and_return(false)
+          allow_any_instance_of(Upload).to receive(:ready_for_chunks?).and_return(false)
         end
         it 'returns 404 with a consistency error message' do
           is_expected.to eq(404)
