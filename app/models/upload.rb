@@ -75,6 +75,7 @@ class Upload < ActiveRecord::Base
 
   def check_readiness!
     raise(ConsistencyException, 'Upload is not ready') unless ready_for_chunks?
+    true
   end
 
   def complete
