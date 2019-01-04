@@ -14,6 +14,7 @@ RSpec.describe StorageProvider, type: :model do
   it { expect { subject.is_initialized?(project) }.to raise_error(NotImplementedError) }
   it { expect { subject.single_file_upload_url(upload) }.to raise_error(NotImplementedError) }
   it { expect { subject.initialize_chunked_upload(upload) }.to raise_error(NotImplementedError) }
+  it { expect { subject.chunk_upload_ready?(upload) }.to raise_error(NotImplementedError) }
   it { expect { subject.chunk_upload_url(chunk) }.to raise_error(NotImplementedError) }
   it { expect { subject.chunk_max_reached?(chunk) }.to raise_error(NotImplementedError) }
   it { expect { subject.max_chunked_upload_size }.to raise_error(NotImplementedError) }

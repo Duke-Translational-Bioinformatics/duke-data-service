@@ -88,6 +88,10 @@ class SwiftStorageProvider < StorageProvider
     return true if get_object_metadata(upload.storage_container, upload.id)
   end
 
+  def chunk_upload_ready?(upload)
+    true
+  end
+
   def chunk_upload_url(chunk)
     build_signed_url(
       'PUT',

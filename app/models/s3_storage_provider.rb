@@ -68,15 +68,23 @@ class S3StorageProvider < StorageProvider
     head_object(upload.storage_container, upload.id)
   end
 
+  def chunk_upload_ready?(upload)
+    !!upload.multipart_upload_id
+  end
+
   def chunk_upload_url(chunk)
-    presigned_url(
-      :upload_part,
-      bucket_name: chunk.upload.storage_container,
-      object_key: chunk.upload.id,
-      upload_id: chunk.upload.multipart_upload_id,
-      part_number: chunk.number,
-      content_length: chunk.size
-    )
+    begin
+      presigned_url(
+        :upload_part,
+        bucket_name: chunk.upload.storage_container,
+        object_key: chunk.upload.id,
+        upload_id: chunk.upload.multipart_upload_id,
+        part_number: chunk.number,
+        content_length: chunk.size
+      )
+    rescue ArgumentError
+      raise StorageProviderException, 'Upload is not ready'
+    end
   end
 
   def download_url(upload, filename=nil)

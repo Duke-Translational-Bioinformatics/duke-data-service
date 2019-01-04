@@ -17,6 +17,7 @@ shared_context 'mocked StorageProvider Interface' do
       filename ||= upload.name
       "#{expected_url_root}/#{URI.encode(filename)}"
     end
+    allow(mocked_storage_provider).to receive(:chunk_upload_ready?).and_return(true)
     allow(mocked_storage_provider).to receive(:chunk_upload_url) do |chunk|
       "#{expected_url_root}/#{chunk.sub_path}"
     end
@@ -86,6 +87,7 @@ shared_context 'A StorageProvider' do
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }
+  it { is_expected.to respond_to(:chunk_upload_ready?).with(1).argument }
   it { is_expected.to respond_to(:max_chunked_upload_size) }
   it { is_expected.to respond_to(:suggested_minimum_chunk_size).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(1).argument }
@@ -136,6 +138,10 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#suggested_minimum_chunk_size' do
     it { expect { subject.suggested_minimum_chunk_size(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#chunk_upload_ready?(upload)' do
+    it { expect { subject.chunk_upload_ready?(nil) }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#chunk_upload_url(chunk)' do

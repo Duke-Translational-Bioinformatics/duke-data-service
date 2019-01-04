@@ -112,6 +112,7 @@ module DDS
             authenticate!
             chunk_params = declared(params, include_missing: false)
             upload = Upload.find(params[:id])
+            upload.check_readiness!
             if chunk = Chunk.find_by(upload: upload, number: chunk_params[:number])
               authorize chunk, :update?
             else

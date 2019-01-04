@@ -44,7 +44,15 @@ class Chunk < ActiveRecord::Base
   end
 
   def url
-    storage_provider.chunk_upload_url(self)
+    begin
+      storage_provider.chunk_upload_url(self)
+    rescue StorageProviderException => e
+      if e.message == 'Upload is not ready'
+        raise ConsistencyException, e.message if e.message == 'Upload is not ready'
+      else
+        raise e
+      end
+    end
   end
 
   def purge_storage
