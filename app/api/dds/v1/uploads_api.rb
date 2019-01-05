@@ -18,19 +18,27 @@ module DDS
         requires :name, type: String, desc: "The name of the client file to upload."
         requires :content_type, type: String, desc: "Valid Media Type"
         requires :size, type: Integer, desc: "The size in bytes"
+        optional :storage_provider, type: Hash, desc: "Storage Provider" do
+          requires :id, type: String, desc: "Storage Provider UUID"
+        end
       end
       post '/projects/:project_id/uploads', root: false do
         authenticate!
         upload_params = declared(params, include_missing: false)
         project = hide_logically_deleted Project.find(params[:project_id])
         check_consistency! project
-        storage_provider = StorageProvider.default
+        storage_provider =
+          if upload_params[:storage_provider]
+            StorageProvider.find(upload_params[:storage_provider][:id])
+          else
+            StorageProvider.default
+          end
         upload = project.uploads.build({
           name: upload_params[:name],
           size: upload_params[:size],
           etag: SecureRandom.hex,
           content_type: upload_params[:content_type],
-          storage_provider_id: storage_provider.id,
+          storage_provider: storage_provider,
           creator: current_user
         })
         authorize upload, :create?
