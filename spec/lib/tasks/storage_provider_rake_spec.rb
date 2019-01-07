@@ -4,28 +4,24 @@ describe "storage_provider" do
   describe "storage_provider:create" do
     include_context "rake"
     let(:task_name) { "storage_provider:create" }
+    let(:expected_supported_storage_provider_types) { %w(
+      swift
+    ) }
 
     context 'missing ENV[STORAGE_PROVIDER_TYPE]' do
       it {
-        expect {
-          invoke_task epected_stderr: /YOU MUST SET ENV\[STORAGE_PROVIDER_TYPE\] with one of #{expected_supported_storage_provider_types.join(' ')}/
-        }.to raise_error(StandardError)
+        invoke_task(expected_stderr: /YOU MUST SET ENV\[STORAGE_PROVIDER_TYPE\] with one of #{expected_supported_storage_provider_types.join(' ')}/)
       }
     end
 
     context 'unsupported STORAGE_PROVIDER_TYPE' do
-      let(:expected_supported_storage_provider_types) { %w(
-        swift
-      ) }
       let(:unsupported_type) { 'unsupported' }
       include_context 'with env_override'
       let(:env_override) { {
         'STORAGE_PROVIDER_TYPE' => unsupported_type
       } }
       it {
-        expect {
-          invoke_task epected_stderr: /STORAGE_PROVIDER_TYPE must be one of #{expected_supported_storage_provider_types.join(' ')}/
-        }.to raise_error(StandardError)
+        invoke_task(expected_stderr: /STORAGE_PROVIDER_TYPE must be one of #{expected_supported_storage_provider_types.join(' ')}/)
       }
     end
 
@@ -36,9 +32,7 @@ describe "storage_provider" do
           'STORAGE_PROVIDER_TYPE' => 'swift'
         } }
         it {
-          expect {
-            invoke_task epected_stderr: /YOU DO NOT HAVE YOUR SWIFT ENVIRONMENT VARIABLES SET/
-          }.to raise_error(StandardError)
+          invoke_task(expected_stderr: /YOU DO NOT HAVE YOUR SWIFT ENVIRONMENT VARIABLES SET/)
         }
       end
 
@@ -67,9 +61,7 @@ describe "storage_provider" do
             }
           }
           it {
-            expect {
-              invoke_task epected_stderr: /Validation Error.*/
-            }.to raise_error(StandardError)
+            invoke_task(expected_stderr: /Validation Error.*/)
           }
         end
 
