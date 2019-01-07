@@ -123,6 +123,28 @@ describe DDS::V1::UploadsAPI do
           let(:deleted_resource) { project }
         end
         it_behaves_like 'an eventually consistent resource', :project
+
+        context 'with storage_provider param' do
+          let(:storage_provider_id) { FactoryBot.create(:storage_provider).id }
+          let!(:payload) {{
+            name: upload_stub.name,
+            content_type: upload_stub.content_type,
+            size: upload_stub.size,
+            storage_provider: { id: storage_provider_id }
+          }}
+          it_behaves_like 'a creatable resource' do
+            it 'should set storage_provider' do
+              is_expected.to eq(expected_response_status)
+              expect(new_object.storage_provider_id).to eq(storage_provider_id)
+            end
+          end
+
+          context 'when StorageProvider does not exist' do
+            let(:storage_provider_id) { 'doesNotExist' }
+            let(:resource_class) { "StorageProvider" }
+            it_behaves_like 'an identified resource'
+          end
+        end
       end
     end
   end
