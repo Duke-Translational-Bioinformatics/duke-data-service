@@ -36,15 +36,41 @@ def create_swift_storage_provider
   end
 end
 
+def create_s3_storage_provider
+  if ENV['S3_ACCT']
+    unless S3StorageProvider.where(name: ENV['S3_ACCT']).exists?
+      sp = S3StorageProvider.create(
+        display_name: ENV['S3_DISPLAY_NAME'],
+        description: ENV['S3_DESCRIPTION'],
+        name: ENV['S3_ACCT'],
+        url_root: ENV['S3_URL_ROOT'],
+        service_user: ENV["S3_USER"],
+        service_pass: ENV['S3_PASS']
+      )
+      if sp.valid?
+        configure_storage_provider(sp)
+      else
+        $stderr.puts "Validation Error: #{ sp.errors.to_json }"
+      end
+    end
+  else
+    $stderr.puts "YOU DO NOT HAVE YOUR S3 ENVIRONMENT VARIABLES SET"
+  end
+end
+
 namespace :storage_provider do
   desc "creates a storage_provider using ENV"
   task create: :environment do
     supported_storage_provider_types = %w(
       swift
+      s3
     )
     if ENV['STORAGE_PROVIDER_TYPE']
-      if supported_storage_provider_types.include?(ENV['STORAGE_PROVIDER_TYPE'].downcase)
+      case ENV['STORAGE_PROVIDER_TYPE'].downcase
+      when 'swift'
         create_swift_storage_provider
+      when 's3'
+        create_s3_storage_provider
       else
         $stderr.puts "STORAGE_PROVIDER_TYPE must be one of #{supported_storage_provider_types.join(' ')}"
       end
