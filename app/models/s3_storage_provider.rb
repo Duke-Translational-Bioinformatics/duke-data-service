@@ -3,6 +3,8 @@ class S3StorageProvider < StorageProvider
   validates :service_user, presence: true
   validates :service_pass, presence: true
 
+  BIG_INT_MAX = 9223372036854775807 # max value for 8 byte signed integer
+
   def configure
     # Nothing to configure
     true
@@ -36,8 +38,12 @@ class S3StorageProvider < StorageProvider
     chunk.number > chunk_max_number
   end
 
+  def chunk_max_size_bytes
+    BIG_INT_MAX
+  end
+
   def max_chunked_upload_size
-    9223372036854775807 # max value for 8 byte signed integer
+    BIG_INT_MAX
   end
 
   def suggested_minimum_chunk_size(upload)
