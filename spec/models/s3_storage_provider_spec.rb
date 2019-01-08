@@ -7,6 +7,7 @@ RSpec.describe S3StorageProvider, type: :model do
   let(:upload) { FactoryBot.create(:upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
   let(:domain) { Faker::Internet.domain_name }
+  let(:int_max_value) { 2147483647 }
   let(:big_int_max_value) { 9223372036854775807 }
 
   shared_context 'stubbed subject#client' do
@@ -33,6 +34,10 @@ RSpec.describe S3StorageProvider, type: :model do
   it { is_expected.not_to allow_value(domain).for(:url_root) }
   it { is_expected.to validate_presence_of :service_user }
   it { is_expected.to validate_presence_of :service_pass }
+
+  describe '#chunk_max_number' do
+    it { expect(subject.chunk_max_number).to eq int_max_value }
+  end
 
   describe '#chunk_max_size_bytes' do
     it { expect(subject.chunk_max_size_bytes).to eq big_int_max_value }
