@@ -92,7 +92,7 @@ class S3StorageProvider < StorageProvider
         upload_id: chunk.upload.multipart_upload_id,
         part_number: chunk.number,
         content_length: chunk.size
-      )
+      ).sub(url_root, '')
     rescue ArgumentError
       raise StorageProviderException, 'Upload is not ready'
     end
@@ -107,7 +107,7 @@ class S3StorageProvider < StorageProvider
     presigned_url(
       :get_object,
       **params
-    )
+    ).sub(url_root, '')
   end
 
   def purge(object)
