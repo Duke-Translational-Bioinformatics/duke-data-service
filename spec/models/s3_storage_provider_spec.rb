@@ -78,11 +78,7 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#initialize_chunked_upload' do
-    let(:cmu_response) { {
-      bucket: upload.project.id,
-      key: upload.id,
-      upload_id: multipart_upload_id
-    } }
+    let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     before(:example) do
       is_expected.to receive(:create_multipart_upload)

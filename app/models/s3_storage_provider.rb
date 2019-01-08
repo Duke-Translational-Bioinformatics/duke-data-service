@@ -29,7 +29,7 @@ class S3StorageProvider < StorageProvider
 
   def initialize_chunked_upload(upload)
     resp = create_multipart_upload(upload.project.id, upload.id)
-    upload.update_attribute(:multipart_upload_id, resp[:upload_id])
+    upload.update_attribute(:multipart_upload_id, resp)
   end
 
   def chunk_max_reached?(chunk)
