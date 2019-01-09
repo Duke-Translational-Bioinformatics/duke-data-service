@@ -296,7 +296,7 @@ RSpec.describe S3StorageProvider, type: :model do
             :get_object,
             bucket_name: bucket_name,
             object_key: object_key,
-            response_content_disposition: "attachment; file_name=#{file_name}"
+            response_content_disposition: "attachment; filename=#{file_name}"
           ).and_return(expected_url)
       end
       it { expect(subject.download_url(upload, file_name)).to eq expected_url }
@@ -587,11 +587,11 @@ RSpec.describe S3StorageProvider, type: :model do
           :get_object,
           bucket: bucket_name,
           key: object_key,
-          response_content_disposition: "attachment; file_name=#{file_name}",
+          response_content_disposition: "attachment; filename=#{file_name}",
           expires_in: subject.signed_url_duration
         )
       }
-      it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key, response_content_disposition: "attachment; file_name=#{file_name}")).to eq expected_url }
+      it { expect(subject.presigned_url(:get_object, bucket_name: bucket_name, object_key: object_key, response_content_disposition: "attachment; filename=#{file_name}")).to eq expected_url }
     end
 
     context 'sign :upload_part' do
