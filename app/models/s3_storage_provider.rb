@@ -103,7 +103,7 @@ class S3StorageProvider < StorageProvider
       bucket_name: upload.storage_container,
       object_key: upload.id
     }
-    params[:response_content_disposition] = 'attachment; file_name='+filename if filename
+    params[:response_content_disposition] = 'attachment; filename='+filename if filename
     presigned_url(
       :get_object,
       **params
