@@ -7,6 +7,8 @@ RSpec.describe S3StorageProvider, type: :model do
   let(:upload) { FactoryBot.create(:upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
   let(:domain) { Faker::Internet.domain_name }
+  let(:int_max_value) { 2147483647 }
+  let(:big_int_max_value) { 9223372036854775807 }
 
   shared_context 'stubbed subject#client' do
     let(:stubbed_client) {
@@ -32,6 +34,14 @@ RSpec.describe S3StorageProvider, type: :model do
   it { is_expected.not_to allow_value(domain).for(:url_root) }
   it { is_expected.to validate_presence_of :service_user }
   it { is_expected.to validate_presence_of :service_pass }
+
+  describe '#chunk_max_number' do
+    it { expect(subject.chunk_max_number).to eq int_max_value }
+  end
+
+  describe '#chunk_max_size_bytes' do
+    it { expect(subject.chunk_max_size_bytes).to eq big_int_max_value }
+  end
 
   describe '#configure' do
     it { expect(subject.configure).to eq true }
@@ -78,11 +88,7 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#initialize_chunked_upload' do
-    let(:cmu_response) { {
-      bucket: upload.project.id,
-      key: upload.id,
-      upload_id: multipart_upload_id
-    } }
+    let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     before(:example) do
       is_expected.to receive(:create_multipart_upload)
@@ -116,7 +122,6 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#max_chunked_upload_size' do
-    let(:big_int_max_value) { 9223372036854775807 }
     it 'returns the max value that Upload#size can store' do
       expect(subject.max_chunked_upload_size).to eq(big_int_max_value)
     end
@@ -238,8 +243,8 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
-    let(:expected_url) { Faker::Internet.url }
-    let(:pu_response) { expected_url }
+    let(:expected_url) { '/' + Faker::Internet.user_name }
+    let(:pu_response) { subject.url_root + expected_url }
     before(:example) do
       is_expected.to receive(:presigned_url)
         .with(
@@ -268,8 +273,9 @@ RSpec.describe S3StorageProvider, type: :model do
   describe '#download_url' do
     let(:bucket_name) { upload.storage_container }
     let(:object_key) { upload.id }
-    let(:expected_url) { Faker::Internet.url }
+    let(:expected_url) { '/' + Faker::Internet.user_name }
     let(:file_name) { Faker::File.file_name }
+    let(:pu_response) { subject.url_root + expected_url }
 
     context 'without filename argument set' do
       before(:example) do
@@ -278,7 +284,7 @@ RSpec.describe S3StorageProvider, type: :model do
             :get_object,
             bucket_name: bucket_name,
             object_key: object_key
-          ).and_return(expected_url)
+          ).and_return(pu_response)
       end
       it { expect(subject.download_url(upload)).to eq expected_url }
     end
