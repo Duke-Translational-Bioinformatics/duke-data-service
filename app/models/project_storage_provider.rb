@@ -1,0 +1,2 @@
+class ProjectStorageProvider < ApplicationRecord
+end
