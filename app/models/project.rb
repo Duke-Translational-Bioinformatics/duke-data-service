@@ -47,15 +47,9 @@ class Project < ActiveRecord::Base
   end
 
   def initialize_storage
-    storage_provider = StorageProvider.default
     StorageProvider.all.each do |sp|
       self.project_storage_providers.create(storage_provider: sp)
     end
-    ProjectStorageProviderInitializationJob.perform_later(
-      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
-      storage_provider: storage_provider,
-      project: self
-    )
   end
 
   def manage_container_index_project
