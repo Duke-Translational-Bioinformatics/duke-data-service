@@ -77,11 +77,12 @@ RSpec.describe Project, type: :model do
     end
   end
 
+  it { is_expected.to respond_to(:initialize_storage).with(0).arguments }
+  it { is_expected.to callback(:initialize_storage).after(:create) }
   describe '#initialize_storage' do
     subject { FactoryBot.build(:project) }
     let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
     let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
-    it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
       expect(default_storage_provider).to be_persisted
@@ -104,6 +105,26 @@ RSpec.describe Project, type: :model do
       expect{
         expect{subject.save}.to raise_error("boom!")
       }.not_to change{described_class.count}
+    end
+
+    it 'creates a ProjectStorageProvider' do
+      expect { subject.save }.to change {
+        ProjectStorageProvider.where(
+          project: subject,
+          storage_provider: default_storage_provider
+        ).count }.by(1)
+    end
+
+    context 'with multiple storage providers' do
+      let(:second_sp) { FactoryBot.create(:storage_provider) }
+      before(:example) { expect(second_sp).to be_persisted }
+      it 'creates both ProjectStorageProvider' do
+        expect { subject.save }.to change {
+          ProjectStorageProvider.where(
+            project: subject,
+            storage_provider: [default_storage_provider, second_sp]
+          ).count }.by(2)
+      end
     end
   end
 
