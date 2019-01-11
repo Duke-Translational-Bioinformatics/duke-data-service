@@ -12,39 +12,15 @@ RSpec.describe Project, type: :model do
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a job_transactionable model'
 
-  describe 'associations' do
-    it 'should have many project permissions' do
-      should have_many(:project_permissions)
-    end
-
-    it 'should have many data_files' do
-      should have_many(:data_files)
-    end
-
-    it 'should have a creator' do
-      should belong_to(:creator)
-    end
-
-    it 'should have many uploads' do
-      should have_many(:uploads)
-    end
-
-    it 'should have many affiliations' do
-      should have_many(:affiliations)
-    end
-
-    it 'should have many children' do
-      should have_many(:children).class_name('Container').conditions(parent_id: nil)
-    end
-
-    it 'should have many containers' do
-      should have_many(:containers)
-    end
-
-    it 'should belong_to storage_provider' do
-      should belong_to(:storage_provider)
-    end
-  end
+  # Associations
+  it { is_expected.to have_many(:project_permissions) }
+  it { is_expected.to have_many(:data_files) }
+  it { is_expected.to belong_to(:creator) }
+  it { is_expected.to have_many(:uploads) }
+  it { is_expected.to have_many(:affiliations) }
+  it { is_expected.to have_many(:children).class_name('Container').conditions(parent_id: nil) }
+  it { is_expected.to have_many(:containers) }
+  it { is_expected.to belong_to(:storage_provider) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
