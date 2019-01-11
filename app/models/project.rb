@@ -15,6 +15,8 @@ class Project < ActiveRecord::Base
   has_many :data_files
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
+  has_many :project_storage_providers
+  has_many :storage_providers, through: :project_storage_providers
 
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted

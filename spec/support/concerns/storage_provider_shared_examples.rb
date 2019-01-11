@@ -65,6 +65,9 @@ shared_context 'A StorageProvider' do
   include ActiveSupport::Testing::TimeHelpers
   it { is_expected.to be_a StorageProvider }
 
+  # Associations
+  it { is_expected.to have_many(:project_storage_providers) }
+
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 

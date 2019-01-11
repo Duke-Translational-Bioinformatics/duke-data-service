@@ -21,6 +21,8 @@ RSpec.describe Project, type: :model do
   it { is_expected.to have_many(:children).class_name('Container').conditions(parent_id: nil) }
   it { is_expected.to have_many(:containers) }
   it { is_expected.to belong_to(:storage_provider) }
+  it { is_expected.to have_many(:project_storage_providers) }
+  it { is_expected.to have_many(:storage_providers).through(:project_storage_providers) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
