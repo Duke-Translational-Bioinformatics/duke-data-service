@@ -7,8 +7,7 @@ class ProjectStorageProvider < ApplicationRecord
   def initialize_storage
     ProjectStorageProviderInitializationJob.perform_later(
       job_transaction: ProjectStorageProviderInitializationJob.initialize_job(project),
-      storage_provider: storage_provider,
-      project: project
+      project_storage_provider: self
     )
   end
 end

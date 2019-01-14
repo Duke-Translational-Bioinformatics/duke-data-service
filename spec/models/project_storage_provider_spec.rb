@@ -23,7 +23,7 @@ RSpec.describe ProjectStorageProvider, type: :model do
       expect {
         subject.save
       }.to have_enqueued_job(ProjectStorageProviderInitializationJob)
-        .with(job_transaction: instance_of(JobTransaction), project: project, storage_provider: storage_provider)
+        .with(job_transaction: instance_of(JobTransaction), project_storage_provider: subject)
     end
 
     it 'rollsback when ProjectStorageProviderInitializationJob::perform_later raises an error' do
