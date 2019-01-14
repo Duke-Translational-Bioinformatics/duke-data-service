@@ -19,10 +19,12 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
   it { expect { described_class.perform_now }.to raise_error(ArgumentError, "missing keywords: job_transaction, project_storage_provider") }
 
   context 'perform_now' do
-    include_context 'tracking job', :job_transaction
-    it 'should create the container for the project' do
+    before(:example) do
       allow_any_instance_of(Project).to receive(:initialize_storage)
       allow_any_instance_of(ProjectStorageProvider).to receive(:initialize_storage)
+    end
+    include_context 'tracking job', :job_transaction
+    it 'should create the container for the project' do
       expect(mocked_storage_provider).to receive(:initialize_project)
         .with(project)
       described_class.perform_now(
