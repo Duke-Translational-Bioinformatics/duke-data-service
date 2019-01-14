@@ -117,10 +117,10 @@ shared_context 'with concurrent calls' do |object_list:, method:|
   self.use_transactional_tests = false
   let(:objects) { send(object_list) }
   after do
-    ActiveRecord::Base.subclasses.each(&:delete_all)
+    ApplicationRecord.subclasses.each(&:delete_all)
   end
   before do
-    expect(ActiveRecord::Base.connection.pool.size).to be > 4
+    expect(ApplicationRecord.connection.pool.size).to be > 4
 
     threads = objects.collect do |object|
       Thread.new do

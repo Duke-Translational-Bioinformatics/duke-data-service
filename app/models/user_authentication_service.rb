@@ -1,4 +1,4 @@
-class UserAuthenticationService < ActiveRecord::Base
+class UserAuthenticationService < ApplicationRecord
   default_scope { order('created_at DESC') }
   belongs_to :user
   belongs_to :authentication_service

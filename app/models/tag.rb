@@ -1,4 +1,4 @@
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   default_scope { order('created_at DESC') }
   audited
 

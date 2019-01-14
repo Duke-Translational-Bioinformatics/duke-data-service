@@ -1,4 +1,4 @@
-class StorageProvider < ActiveRecord::Base
+class StorageProvider < ApplicationRecord
   default_scope { order('created_at DESC') }
 
   has_many :project_storage_providers

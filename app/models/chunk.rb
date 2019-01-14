@@ -1,4 +1,4 @@
-class Chunk < ActiveRecord::Base
+class Chunk < ApplicationRecord
   default_scope { order('created_at DESC') }
   audited
   after_destroy :update_upload_etag

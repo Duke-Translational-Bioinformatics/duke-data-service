@@ -1,4 +1,4 @@
-class IdentityProvider < ActiveRecord::Base
+class IdentityProvider < ApplicationRecord
   validates :host, presence: true
   validates :port, presence: true
 

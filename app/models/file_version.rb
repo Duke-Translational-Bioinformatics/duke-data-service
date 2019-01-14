@@ -1,4 +1,4 @@
-class FileVersion < ActiveRecord::Base
+class FileVersion < ApplicationRecord
   include Kinded
   include Graphed::Node
   include JobTransactionable

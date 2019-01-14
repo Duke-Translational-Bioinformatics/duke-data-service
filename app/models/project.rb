@@ -1,4 +1,4 @@
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   default_scope { order('created_at DESC') }
   include Kinded
   include ChildMinder

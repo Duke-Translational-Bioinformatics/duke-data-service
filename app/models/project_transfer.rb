@@ -1,4 +1,4 @@
-class ProjectTransfer < ActiveRecord::Base
+class ProjectTransfer < ApplicationRecord
   audited
 
   belongs_to :project
