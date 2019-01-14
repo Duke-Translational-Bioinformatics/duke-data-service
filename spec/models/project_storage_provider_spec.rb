@@ -5,6 +5,15 @@ RSpec.describe ProjectStorageProvider, type: :model do
   it { is_expected.to belong_to(:project) }
   it { is_expected.to belong_to(:storage_provider) }
 
+  # Validations
+  it { is_expected.to validate_presence_of(:project) }
+  it { is_expected.to validate_presence_of(:storage_provider) }
+  it 'validates uniqueness of storage_provider and project' do
+    # intercepting initialize_storage callback to prevent error
+    allow_any_instance_of(described_class).to receive(:initialize_storage)
+    is_expected.to validate_uniqueness_of(:storage_provider_id).scoped_to(:project_id)
+  end
+
   it { is_expected.to respond_to(:initialize_storage).with(0).arguments }
   it { is_expected.to callback(:initialize_storage).after(:create) }
   describe '#initialize_storage' do
