@@ -1,6 +1,19 @@
 require 'rails_helper'
 
 RSpec.describe ProjectStorageProvider, type: :model do
+  let(:project) { FactoryBot.create(:project) }
+  let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
+  let(:storage_provider) { FactoryBot.create(:storage_provider) }
+
+  before(:example) do
+    # Keep Project from automatically creating ProjectStorageProviders
+    allow_any_instance_of(Project).to receive(:initialize_storage)
+  end
+
+  it_behaves_like 'a job_transactionable model' do
+    subject { FactoryBot.create(:project_storage_provider, project: project, storage_provider: storage_provider) }
+  end
+
   # Associations
   it { is_expected.to belong_to(:project) }
   it { is_expected.to belong_to(:storage_provider) }
@@ -18,14 +31,6 @@ RSpec.describe ProjectStorageProvider, type: :model do
   it { is_expected.to callback(:initialize_storage).after(:create) }
   describe '#initialize_storage' do
     subject { FactoryBot.build(:project_storage_provider, project: project, storage_provider: storage_provider) }
-    let(:project) { FactoryBot.create(:project) }
-    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
-    let(:storage_provider) { FactoryBot.create(:storage_provider) }
-
-    before(:example) do
-      allow_any_instance_of(Project).to receive(:initialize_storage)
-      expect(subject).not_to be_persisted
-    end
 
     it 'should enqueue a ProjectStorageProviderInitializationJob with project and storage_provider' do
       expect(subject).to receive(:initialize_storage).and_call_original

@@ -1,4 +1,6 @@
 class ProjectStorageProvider < ApplicationRecord
+  include JobTransactionable
+
   belongs_to :project
   belongs_to :storage_provider
 
@@ -10,7 +12,7 @@ class ProjectStorageProvider < ApplicationRecord
 
   def initialize_storage
     ProjectStorageProviderInitializationJob.perform_later(
-      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(project),
+      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
       project_storage_provider: self
     )
   end
