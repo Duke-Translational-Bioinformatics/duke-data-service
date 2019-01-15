@@ -22,17 +22,35 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
     before(:example) do
       allow_any_instance_of(Project).to receive(:initialize_storage)
       allow_any_instance_of(ProjectStorageProvider).to receive(:initialize_storage)
-    end
-    include_context 'tracking job', :job_transaction
-    it 'should create the container for the project' do
       expect(mocked_storage_provider).to receive(:initialize_project)
-        .with(project)
+        .with(project) { initialize_project_response }
+    end
+    let(:initialize_project_response) { true }
+    let(:call_perform_now) {
       described_class.perform_now(
         job_transaction: job_transaction,
         project_storage_provider: project_storage_provider
       )
-      project.reload
-      expect(project).to be_is_consistent
+    }
+    context 'with StorageProvider#initialize_project success' do
+      include_context 'tracking job', :job_transaction
+      it 'sets project#is_consistent to true' do
+        expect(call_perform_now).to be_truthy
+        project.reload
+        expect(project).to be_is_consistent
+      end
+    end
+
+    context 'when StorageProvider#initialize_project raises StorageProviderException' do
+      include_context 'tracking failed job', :job_transaction
+      let(:initialize_project_response) { raise(StorageProviderException, 'boom!') }
+
+      it 'raises the exception and project#is_consistent remains false' do
+        expect(described_class).not_to receive(:complete_job)
+        expect { call_perform_now }.to raise_error(StorageProviderException, 'boom!')
+        project.reload
+        expect(project).not_to be_is_consistent
+      end
     end
   end
 end
