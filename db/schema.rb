@@ -198,7 +198,7 @@ ActiveRecord::Schema.define(version: 20190110235737) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "project_storage_providers", force: :cascade do |t|
+  create_table "project_storage_providers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "project_id"
     t.uuid "storage_provider_id"
     t.boolean "is_initialized"
