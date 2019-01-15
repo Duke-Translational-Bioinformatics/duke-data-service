@@ -5,6 +5,7 @@ describe DDS::V1::UploadsAPI do
   include_context 'mock all Uploads StorageProvider'
 
   let(:project) { FactoryBot.create(:project) }
+  let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
   let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project, storage_provider: mocked_storage_provider) }
   let(:chunk) { upload.chunks.first }
 
@@ -22,6 +23,7 @@ describe DDS::V1::UploadsAPI do
   let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   before do
+    expect(default_storage_provider).to be_persisted
     allow_any_instance_of(Chunk).to receive(:storage_provider)
       .and_return(mocked_storage_provider)
   end
@@ -122,7 +124,21 @@ describe DDS::V1::UploadsAPI do
         it_behaves_like 'a logically deleted resource' do
           let(:deleted_resource) { project }
         end
-        it_behaves_like 'an eventually consistent resource', :project
+        context 'when project storage is not initialized' do
+          let(:response_json) { JSON.parse(response.body) }
+          let(:expected_response) { {
+            'error' => '404',
+            'code' => "resource_not_consistent",
+            'reason' => "resource changes are still being processed by system",
+            'suggestion' => "this is a temporary state that will eventually be resolved by the system; please retry request"
+          } }
+          it 'should return 404 with error when resource found is not consistent' do
+            expect(project.project_storage_providers.destroy_all).to be_truthy
+            is_expected.to eq(404)
+            expect { response_json }.not_to raise_error
+            expect(response_json).to eq expected_response
+          end
+        end
 
         context 'with storage_provider param' do
           let(:storage_provider_id) { FactoryBot.create(:storage_provider).id }
