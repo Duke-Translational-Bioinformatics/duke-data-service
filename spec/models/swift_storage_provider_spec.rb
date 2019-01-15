@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SwiftStorageProvider, type: :model do
-  subject { FactoryBot.create(:swift_storage_provider) }
+  subject { FactoryBot.build(:swift_storage_provider) }
 
   it_behaves_like 'A StorageProvider implementation'
 
@@ -755,6 +755,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     context 'is_default' do
+      subject { FactoryBot.create(:swift_storage_provider) }
       let(:new_default_storage_provider) { FactoryBot.build(:swift_storage_provider, :default) }
       let(:new_not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
       it 'should allow only one default storage_provider' do
@@ -768,6 +769,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     context 'is_deprecated' do
+      subject { FactoryBot.create(:swift_storage_provider) }
       let(:not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
       it {
         is_expected.to be_valid

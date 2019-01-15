@@ -12,8 +12,16 @@ class StorageProvider < ApplicationRecord
     message: "The Default StorageProvider cannot be deprecated!"
   }, if: :is_default
 
+  after_create :initialize_projects
+
   def self.default
     find_by(is_default: true)
+  end
+
+  def initialize_projects
+    Project.all.each do |project|
+      project_storage_providers.create(project: project)
+    end
   end
 
   ### Interface Methods

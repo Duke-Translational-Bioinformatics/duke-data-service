@@ -6,8 +6,10 @@ RSpec.describe ProjectStorageProvider, type: :model do
   let(:storage_provider) { FactoryBot.create(:storage_provider) }
 
   before(:example) do
-    # Keep Project from automatically creating ProjectStorageProviders
+    # Keep Project and StorageProvider from automatically
+    # creating ProjectStorageProviders
     allow_any_instance_of(Project).to receive(:initialize_storage)
+    allow_any_instance_of(StorageProvider).to receive(:initialize_projects)
   end
 
   it_behaves_like 'a job_transactionable model' do
