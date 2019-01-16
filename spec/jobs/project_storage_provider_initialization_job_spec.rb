@@ -36,8 +36,8 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
       include_context 'tracking job', :job_transaction
       it 'sets project#is_consistent to true' do
         expect(call_perform_now).to be_truthy
-        project.reload
-        expect(project).to be_is_consistent
+        project_storage_provider.reload
+        expect(project_storage_provider).to be_is_initialized
       end
     end
 
@@ -48,8 +48,8 @@ RSpec.describe ProjectStorageProviderInitializationJob, type: :job do
       it 'raises the exception and project#is_consistent remains false' do
         expect(described_class).not_to receive(:complete_job)
         expect { call_perform_now }.to raise_error(StorageProviderException, 'boom!')
-        project.reload
-        expect(project).not_to be_is_consistent
+        project_storage_provider.reload
+        expect(project_storage_provider).not_to be_is_initialized
       end
     end
   end
