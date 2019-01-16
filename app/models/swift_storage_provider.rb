@@ -47,10 +47,6 @@ class SwiftStorageProvider < StorageProvider
     return # nothing to do in swift
   end
 
-  def endpoint
-    url_root
-  end
-
   def chunk_max_reached?(chunk)
     chunk.upload.chunks.count >= chunk_max_number
   end
@@ -90,6 +86,10 @@ class SwiftStorageProvider < StorageProvider
 
   def is_complete_chunked_upload?(upload)
     return true if get_object_metadata(upload.storage_container, upload.id)
+  end
+
+  def chunk_upload_ready?(upload)
+    true
   end
 
   def chunk_upload_url(chunk)

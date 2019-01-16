@@ -1,5 +1,8 @@
-class StorageProvider < ActiveRecord::Base
+class StorageProvider < ApplicationRecord
   default_scope { order('created_at DESC') }
+
+  has_many :project_storage_providers
+
   validates :display_name, presence: true, uniqueness: true
   validates :description, presence: true
   validates :name, presence: true
@@ -9,8 +12,16 @@ class StorageProvider < ActiveRecord::Base
     message: "The Default StorageProvider cannot be deprecated!"
   }, if: :is_default
 
+  after_create :initialize_projects
+
   def self.default
     find_by(is_default: true)
+  end
+
+  def initialize_projects
+    Project.all.each do |project|
+      project_storage_providers.create(project: project)
+    end
   end
 
   ### Interface Methods
@@ -46,8 +57,8 @@ class StorageProvider < ActiveRecord::Base
     raise NotImplementedError.new("You must implement initialize_chunked_upload.")
   end
 
-  def endpoint
-    raise NotImplementedError.new("You must implement endpoint.")
+  def chunk_upload_ready?(upload)
+    raise NotImplementedError.new("You must implement chunk_upload_ready?.")
   end
 
   def chunk_upload_url(chunk)

@@ -1,0 +1,75 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: build-duke-data-service
+labels:
+   createdBy: build-duke-data-service
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      environment: ${APPLICATION_ENVIRONMENT}
+    name: ${APPLICATION_NAME}-${APPLICATION_ENVIRONMENT}
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APPLICATION_NAME}:${APPLICATION_ENVIRONMENT}
+    resources: {}
+    source:
+      git:
+        uri: ${GIT_REPO_URL}
+        ref: ${GIT_REF}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+          - name: DISABLE_ASSET_COMPILATION
+            value: ${DISABLE_ASSET_COMPILATION}
+          - name: BUNDLE_WITHOUT
+            value: ${BUNDLE_WITHOUT}
+        from:
+          kind: ImageStreamTag
+          name: ${BUILDER_IMAGE_NAME}
+          namespace: ${BUILDER_IMAGE_NAMESPACE}
+      type: Source
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+  status: {}
+parameters:
+- description: The Name of the Application Being Built
+  displayName: Application Name
+  name: APPLICATION_NAME
+  required: true
+- description: The git repository url (for clone)
+  displayName: Git Repo URL
+  name: GIT_REPO_URL
+  required: true
+- description: Actual Ref (tag, branch) of the Git repository to build, default is trunk
+  displayName: Git Ref
+  name: GIT_REF
+  value: trunk
+- description: Application Environment to test. Branch, or generic environment (development, ua_test, production, etc.). Generic environments typically link to a git ref matching a regular expression, such as development-deployment-10 for development. Default is trunk.
+  displayName: Application Environment
+  name: APPLICATION_ENVIRONMENT
+  value: trunk
+- description: Builder image to use to build your Source
+  displayName: Builder Image Name
+  name: BUILDER_IMAGE_NAME
+  required: true
+- description: Openshift namespace containing the Builder Image. Default is to use the current project namespace.
+  displayName: Builder Image Namespace
+  name: BUILDER_IMAGE_NAMESPACE
+  value: null
+- description: If true, assets will not be precompiled. Default is true. Use false for production environment.
+  diplayName: Disable Asset Compilation
+  name: DISABLE_ASSET_COMPILATION
+  value: "true"
+- description: String used in bundle --without. Default is empty (e.g. bundle gems for all environments). Use development:test for production environment.
+  diplayName: Bundle Without
+  name: BUNDLE_WITHOUT
+  value: ""

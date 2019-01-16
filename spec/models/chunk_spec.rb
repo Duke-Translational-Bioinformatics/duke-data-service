@@ -77,10 +77,10 @@ RSpec.describe Chunk, type: :model do
     end
 
     it 'is_expected.to have a host method' do
-      expect(mocked_storage_provider).to receive(:endpoint)
-        .and_return(expected_endpoint)
+      expect(mocked_storage_provider).to receive(:url_root)
+        .and_return(expected_url_root)
       is_expected.to respond_to :host
-      expect(subject.host).to eq expected_endpoint
+      expect(subject.host).to eq expected_url_root
     end
 
     it 'is_expected.to have a http_headers method' do
@@ -94,17 +94,26 @@ RSpec.describe Chunk, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :url }
   describe '#url' do
     let(:expected_url) { Faker::Internet.url }
+    let(:sp_response) { expected_url }
 
-    it { is_expected.to respond_to :url }
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:chunk_upload_url).with(subject) { sp_response }
+    end
 
-    it {
-      expect(mocked_storage_provider).to receive(:chunk_upload_url)
-        .and_return(expected_url)
+    it { expect(subject.url).to eq expected_url }
 
-      expect(subject.url).to eq expected_url
-    }
+    context 'Upload not ready exception raised' do
+      let(:sp_response) { raise StorageProviderException, 'Upload is not ready' }
+      it { expect { subject.url }.to raise_error ConsistencyException, 'Upload is not ready' }
+    end
+
+    context 'Unexpected exception raised' do
+      let(:sp_response) { raise StorageProviderException, 'Unexpected' }
+      it { expect { subject.url }.to raise_error StorageProviderException, 'Unexpected' }
+    end
   end
 
   describe '#purge_storage' do

@@ -1,4 +1,4 @@
-class Chunk < ActiveRecord::Base
+class Chunk < ApplicationRecord
   default_scope { order('created_at DESC') }
   audited
   after_destroy :update_upload_etag
@@ -28,7 +28,7 @@ class Chunk < ActiveRecord::Base
   end
 
   def host
-    storage_provider.endpoint
+    storage_provider.url_root
   end
 
   def http_headers
@@ -44,7 +44,15 @@ class Chunk < ActiveRecord::Base
   end
 
   def url
-    storage_provider.chunk_upload_url(self)
+    begin
+      storage_provider.chunk_upload_url(self)
+    rescue StorageProviderException => e
+      if e.message == 'Upload is not ready'
+        raise ConsistencyException, e.message if e.message == 'Upload is not ready'
+      else
+        raise e
+      end
+    end
   end
 
   def purge_storage

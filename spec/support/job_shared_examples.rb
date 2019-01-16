@@ -202,3 +202,15 @@ shared_context 'tracking job' do |tracked_job_sym|
       .and_call_original
   end
 end
+
+shared_context 'tracking failed job' do |tracked_job_sym|
+  let(:tracked_job) { send(tracked_job_sym) }
+  before do
+    expect(described_class).to receive(:start_job)
+      .with(tracked_job)
+      .and_call_original
+    expect(described_class).not_to receive(:complete_job)
+      .with(tracked_job)
+      .and_call_original
+  end
+end

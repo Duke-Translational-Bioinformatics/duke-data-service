@@ -110,7 +110,7 @@ RSpec.describe DataFile, type: :model do
 
   describe 'instance methods' do
     it { should delegate_method(:http_verb).to(:upload) }
-    it { should delegate_method(:host).to(:upload).as(:endpoint) }
+    it { should delegate_method(:host).to(:upload).as(:url_root) }
     it { should delegate_method(:url).to(:upload).as(:temporary_url) }
 
     describe '#url' do

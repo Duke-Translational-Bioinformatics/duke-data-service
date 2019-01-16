@@ -1,4 +1,4 @@
-class AuthenticationService < ActiveRecord::Base
+class AuthenticationService < ApplicationRecord
   has_many :user_authentication_services
   belongs_to :identity_provider
 

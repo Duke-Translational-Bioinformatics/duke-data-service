@@ -1,4 +1,4 @@
-class MetaTemplate < ActiveRecord::Base
+class MetaTemplate < ApplicationRecord
   audited
   belongs_to :templatable, polymorphic: true, touch: true
   belongs_to :template

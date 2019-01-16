@@ -1,4 +1,4 @@
-class ProvRelation < ActiveRecord::Base
+class ProvRelation < ApplicationRecord
   default_scope { order('created_at DESC') }
   before_validation :set_relationship_type
 
