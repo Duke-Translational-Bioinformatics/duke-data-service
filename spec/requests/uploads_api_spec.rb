@@ -5,6 +5,7 @@ describe DDS::V1::UploadsAPI do
   include_context 'mock all Uploads StorageProvider'
 
   let(:project) { FactoryBot.create(:project) }
+  let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
   let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project, storage_provider: mocked_storage_provider) }
   let(:chunk) { upload.chunks.first }
 
@@ -22,6 +23,7 @@ describe DDS::V1::UploadsAPI do
   let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   before do
+    expect(default_storage_provider).to be_persisted
     allow_any_instance_of(Chunk).to receive(:storage_provider)
       .and_return(mocked_storage_provider)
   end
@@ -65,10 +67,10 @@ describe DDS::V1::UploadsAPI do
         content_type: upload_stub.content_type,
         size: upload_stub.size
       }}
+      let(:storage_is_initialized) { true }
 
       before do
-        allow(StorageProvider).to receive(:default)
-          .and_return(mocked_storage_provider)
+        expect(StorageProvider.default.project_storage_providers.update_all(is_initialized: storage_is_initialized)).to be_truthy
       end
 
       it_behaves_like 'a POST request' do
@@ -122,16 +124,31 @@ describe DDS::V1::UploadsAPI do
         it_behaves_like 'a logically deleted resource' do
           let(:deleted_resource) { project }
         end
-        it_behaves_like 'an eventually consistent resource', :project
+        context 'when project storage is missing' do
+          before(:example) do
+            expect(project.project_storage_providers.destroy_all).to be_truthy
+          end
+          it_behaves_like 'an inconsistent resource'
+        end
+        context 'when project storage is not initialized' do
+          let(:storage_is_initialized) { false }
+          it_behaves_like 'an inconsistent resource'
+        end
 
         context 'with storage_provider param' do
-          let(:storage_provider_id) { FactoryBot.create(:storage_provider).id }
+          let(:new_storage_provider) { FactoryBot.create(:storage_provider) }
+          let(:storage_provider_id) { new_storage_provider.id }
           let!(:payload) {{
             name: upload_stub.name,
             content_type: upload_stub.content_type,
             size: upload_stub.size,
             storage_provider: { id: storage_provider_id }
           }}
+          let(:new_storage_is_initialized) { true }
+          before(:example) do
+            expect(new_storage_provider).not_to be_is_default
+            expect(new_storage_provider.project_storage_providers.update_all(is_initialized: new_storage_is_initialized)).to be_truthy
+          end
           it_behaves_like 'a creatable resource' do
             it 'should set storage_provider' do
               is_expected.to eq(expected_response_status)
@@ -143,6 +160,11 @@ describe DDS::V1::UploadsAPI do
             let(:storage_provider_id) { 'doesNotExist' }
             let(:resource_class) { "StorageProvider" }
             it_behaves_like 'an identified resource'
+          end
+
+          context 'when project storage is not initialized' do
+            let(:new_storage_is_initialized) { false }
+            it_behaves_like 'an inconsistent resource'
           end
         end
       end

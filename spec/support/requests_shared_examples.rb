@@ -546,6 +546,21 @@ shared_examples 'a status error' do |expected_error_sym|
   }
 end
 
+shared_examples 'an inconsistent resource' do
+  let(:response_json) { JSON.parse(response.body) }
+  let(:expected_response) { {
+    'error' => '404',
+    'code' => "resource_not_consistent",
+    'reason' => "resource changes are still being processed by system",
+    'suggestion' => "this is a temporary state that will eventually be resolved by the system; please retry request"
+  } }
+  it 'returns 404 with resource_not_consistent error' do
+    is_expected.to eq(404)
+    expect { response_json }.not_to raise_error
+    expect(response_json).to eq expected_response
+  end
+end
+
 shared_examples 'an eventually consistent resource' do |eventually_consistent_resource_sym|
   let(:inconsistent_resource) { send(eventually_consistent_resource_sym) }
   it 'should return 404 with error when resource found is not consistent' do

@@ -475,5 +475,42 @@ describe "db:data:migrate" do
         expect(slugged_project.slug).to eq original_slug
       end
     end
+
+    describe 'create_project_storage_providers' do
+      let(:projects) { FactoryBot.create_list(:project, 2) }
+      let(:storage_provider) { FactoryBot.create(:storage_provider) }
+      before(:example) do
+        expect(projects).to all(be_persisted)
+        expect(storage_provider).to be_persisted
+      end
+      context 'when ProjetStorageProvider exists' do
+        before(:example) { expect(storage_provider.project_storage_providers).not_to be_empty }
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:\n0 projects initialized")
+          }.not_to change { ProjectStorageProvider.count }
+        end
+      end
+      context 'when a ProjetStorageProvider does not exist' do
+        before(:example) do
+          expect(ProjectStorageProvider.last.destroy).to be_truthy
+        end
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:.\n1 projects initialized.")
+          }.to change { ProjectStorageProvider.count }.by(1)
+        end
+      end
+      context 'when no ProjetStorageProviders exist' do
+        before(:example) do
+          expect(ProjectStorageProvider.destroy_all).to be_truthy
+        end
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:..\n2 projects initialized.")
+          }.to change { ProjectStorageProvider.count }.by(2)
+        end
+      end
+    end
   end
 end

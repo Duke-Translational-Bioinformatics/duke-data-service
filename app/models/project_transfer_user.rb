@@ -1,4 +1,4 @@
-class ProjectTransferUser < ActiveRecord::Base
+class ProjectTransferUser < ApplicationRecord
   belongs_to :project_transfer
   belongs_to :to_user, class_name: 'User'
 

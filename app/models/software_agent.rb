@@ -1,4 +1,4 @@
-class SoftwareAgent < ActiveRecord::Base
+class SoftwareAgent < ApplicationRecord
   audited
   include Kinded
   include Graphed::Node

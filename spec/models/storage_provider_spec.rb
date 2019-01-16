@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe StorageProvider, type: :model do
-  subject { StorageProvider.new }
+  subject { FactoryBot.build(:storage_provider) }
   let(:project) { instance_double("Project") }
   let(:upload) { instance_double("Upload") }
   let(:chunk) { instance_double("Chunk") }

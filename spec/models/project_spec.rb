@@ -12,39 +12,17 @@ RSpec.describe Project, type: :model do
   it_behaves_like 'a logically deleted model'
   it_behaves_like 'a job_transactionable model'
 
-  describe 'associations' do
-    it 'should have many project permissions' do
-      should have_many(:project_permissions)
-    end
-
-    it 'should have many data_files' do
-      should have_many(:data_files)
-    end
-
-    it 'should have a creator' do
-      should belong_to(:creator)
-    end
-
-    it 'should have many uploads' do
-      should have_many(:uploads)
-    end
-
-    it 'should have many affiliations' do
-      should have_many(:affiliations)
-    end
-
-    it 'should have many children' do
-      should have_many(:children).class_name('Container').conditions(parent_id: nil)
-    end
-
-    it 'should have many containers' do
-      should have_many(:containers)
-    end
-
-    it 'should belong_to storage_provider' do
-      should belong_to(:storage_provider)
-    end
-  end
+  # Associations
+  it { is_expected.to have_many(:project_permissions) }
+  it { is_expected.to have_many(:data_files) }
+  it { is_expected.to belong_to(:creator) }
+  it { is_expected.to have_many(:uploads) }
+  it { is_expected.to have_many(:affiliations) }
+  it { is_expected.to have_many(:children).class_name('Container').conditions(parent_id: nil) }
+  it { is_expected.to have_many(:containers) }
+  it { is_expected.to belong_to(:storage_provider) }
+  it { is_expected.to have_many(:project_storage_providers) }
+  it { is_expected.to have_many(:storage_providers).through(:project_storage_providers) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
@@ -99,11 +77,12 @@ RSpec.describe Project, type: :model do
     end
   end
 
+  it { is_expected.to respond_to(:initialize_storage).with(0).arguments }
+  it { is_expected.to callback(:initialize_storage).after(:create) }
   describe '#initialize_storage' do
     subject { FactoryBot.build(:project) }
     let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
     let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
-    it { is_expected.to callback(:initialize_storage).after(:create) }
 
     before do
       expect(default_storage_provider).to be_persisted
@@ -126,6 +105,26 @@ RSpec.describe Project, type: :model do
       expect{
         expect{subject.save}.to raise_error("boom!")
       }.not_to change{described_class.count}
+    end
+
+    it 'creates a ProjectStorageProvider' do
+      expect { subject.save }.to change {
+        ProjectStorageProvider.where(
+          project: subject,
+          storage_provider: default_storage_provider
+        ).count }.by(1)
+    end
+
+    context 'with multiple storage providers' do
+      let(:second_sp) { FactoryBot.create(:storage_provider) }
+      before(:example) { expect(second_sp).to be_persisted }
+      it 'creates both ProjectStorageProvider' do
+        expect { subject.save }.to change {
+          ProjectStorageProvider.where(
+            project: subject,
+            storage_provider: [default_storage_provider, second_sp]
+          ).count }.by(2)
+      end
     end
   end
 

@@ -1,4 +1,4 @@
-class Fingerprint < ActiveRecord::Base
+class Fingerprint < ApplicationRecord
   audited
   belongs_to :upload
 

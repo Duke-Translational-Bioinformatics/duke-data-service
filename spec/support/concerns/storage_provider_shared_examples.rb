@@ -65,6 +65,29 @@ shared_context 'A StorageProvider' do
   include ActiveSupport::Testing::TimeHelpers
   it { is_expected.to be_a StorageProvider }
 
+  # Associations
+  it { is_expected.to have_many(:project_storage_providers) }
+
+  it { is_expected.to respond_to(:initialize_projects).with(0).arguments }
+  it { is_expected.to callback(:initialize_projects).after(:create) }
+  describe '#initialize_projects' do
+    let(:project_count) { 2 }
+    let(:projects) { FactoryBot.create_list(:project, project_count) }
+    let!(:auth_role) { FactoryBot.create(:auth_role, :project_admin) }
+    before(:example) do
+      expect(subject).not_to be_persisted
+      expect(projects).to all( be_persisted )
+    end
+    it 'creates a ProjectStorageProvider for all projects' do
+      expect(subject).to receive(:initialize_projects).and_call_original
+      expect { subject.save }.to change {
+        ProjectStorageProvider.where(
+          project: projects,
+          storage_provider: subject
+        ).count }.by(project_count)
+    end
+  end
+
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 

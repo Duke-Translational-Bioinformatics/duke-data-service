@@ -1,4 +1,4 @@
-class JobTransaction < ActiveRecord::Base
+class JobTransaction < ApplicationRecord
   belongs_to :transactionable, polymorphic: true
   validates :transactionable_id, presence: true
   validates :transactionable_type, presence: true

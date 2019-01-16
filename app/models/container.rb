@@ -1,4 +1,4 @@
-class Container < ActiveRecord::Base
+class Container < ApplicationRecord
   default_scope { order('created_at DESC') }
   include Kinded
   include Restorable
