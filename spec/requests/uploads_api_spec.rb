@@ -67,10 +67,11 @@ describe DDS::V1::UploadsAPI do
         content_type: upload_stub.content_type,
         size: upload_stub.size
       }}
+      let(:storage_is_initialized) { true }
 
       before do
-        allow(StorageProvider).to receive(:default)
-          .and_return(mocked_storage_provider)
+        allow_any_instance_of(ProjectStorageProvider).to receive(:is_initialized?)
+          .and_return(storage_is_initialized)
       end
 
       it_behaves_like 'a POST request' do
@@ -124,20 +125,15 @@ describe DDS::V1::UploadsAPI do
         it_behaves_like 'a logically deleted resource' do
           let(:deleted_resource) { project }
         end
-        context 'when project storage is not initialized' do
-          let(:response_json) { JSON.parse(response.body) }
-          let(:expected_response) { {
-            'error' => '404',
-            'code' => "resource_not_consistent",
-            'reason' => "resource changes are still being processed by system",
-            'suggestion' => "this is a temporary state that will eventually be resolved by the system; please retry request"
-          } }
-          it 'should return 404 with error when resource found is not consistent' do
+        context 'when project storage is missing' do
+          before(:example) do
             expect(project.project_storage_providers.destroy_all).to be_truthy
-            is_expected.to eq(404)
-            expect { response_json }.not_to raise_error
-            expect(response_json).to eq expected_response
           end
+          it_behaves_like 'an inconsistent resource'
+        end
+        context 'when project storage is not initialized' do
+          let(:storage_is_initialized) { false }
+          it_behaves_like 'an inconsistent resource'
         end
 
         context 'with storage_provider param' do

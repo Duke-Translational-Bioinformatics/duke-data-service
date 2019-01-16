@@ -32,7 +32,7 @@ module DDS
           else
             StorageProvider.default
           end
-        raise ConsistencyException.new unless project.project_storage_providers.any?
+        raise ConsistencyException.new if project.project_storage_providers.none? &:is_initialized?
         upload = project.uploads.build({
           name: upload_params[:name],
           size: upload_params[:size],
