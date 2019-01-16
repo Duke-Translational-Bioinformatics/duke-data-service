@@ -70,8 +70,7 @@ describe DDS::V1::UploadsAPI do
       let(:storage_is_initialized) { true }
 
       before do
-        allow_any_instance_of(ProjectStorageProvider).to receive(:is_initialized?)
-          .and_return(storage_is_initialized)
+        expect(StorageProvider.default.project_storage_providers.update_all(is_initialized: storage_is_initialized)).to be_truthy
       end
 
       it_behaves_like 'a POST request' do
@@ -137,13 +136,19 @@ describe DDS::V1::UploadsAPI do
         end
 
         context 'with storage_provider param' do
-          let(:storage_provider_id) { FactoryBot.create(:storage_provider).id }
+          let(:new_storage_provider) { FactoryBot.create(:storage_provider) }
+          let(:storage_provider_id) { new_storage_provider.id }
           let!(:payload) {{
             name: upload_stub.name,
             content_type: upload_stub.content_type,
             size: upload_stub.size,
             storage_provider: { id: storage_provider_id }
           }}
+          let(:new_storage_is_initialized) { true }
+          before(:example) do
+            expect(new_storage_provider).not_to be_is_default
+            expect(new_storage_provider.project_storage_providers.update_all(is_initialized: new_storage_is_initialized)).to be_truthy
+          end
           it_behaves_like 'a creatable resource' do
             it 'should set storage_provider' do
               is_expected.to eq(expected_response_status)
@@ -155,6 +160,11 @@ describe DDS::V1::UploadsAPI do
             let(:storage_provider_id) { 'doesNotExist' }
             let(:resource_class) { "StorageProvider" }
             it_behaves_like 'an identified resource'
+          end
+
+          context 'when project storage is not initialized' do
+            let(:new_storage_is_initialized) { false }
+            it_behaves_like 'an inconsistent resource'
           end
         end
       end
