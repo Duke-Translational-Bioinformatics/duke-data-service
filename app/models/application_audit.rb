@@ -42,6 +42,14 @@ class ApplicationAudit < Audited::Audit
     ::Audited.store[:current_comment]
   end
 
+  def self.set_current_env_from_request_uuid(request_uuid)
+    request_audit = ApplicationAudit.where(request_uuid: request_uuid).last
+    ApplicationAudit.current_request_uuid = request_uuid
+    ApplicationAudit.current_user = request_audit&.user
+    ApplicationAudit.current_remote_address = request_audit&.remote_address
+    ApplicationAudit.current_comment = request_audit&.comment
+  end
+
   def self.clear_store
     [:audited_user, :current_request_uuid, :current_remote_address, :current_comment].each { |k| ::Audited.store.delete(k) }
   end
