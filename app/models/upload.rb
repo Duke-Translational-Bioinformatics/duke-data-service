@@ -1,4 +1,4 @@
-class Upload < ActiveRecord::Base
+class Upload < ApplicationRecord
   include JobTransactionable
   default_scope { order('created_at DESC') }
   audited
@@ -10,6 +10,7 @@ class Upload < ActiveRecord::Base
   has_many :fingerprints
 
   before_create :set_storage_container
+  after_create :initialize_storage
 
   accepts_nested_attributes_for :fingerprints
 
@@ -47,9 +48,7 @@ class Upload < ActiveRecord::Base
   def temporary_url(filename=nil)
     raise IntegrityException.new(error_message) if has_integrity_exception?
     raise ConsistencyException.new unless is_consistent?
-    expiry = Time.now.to_i + storage_provider.signed_url_duration
-    filename ||= name
-    storage_provider.build_signed_url(http_verb, sub_path, expiry, filename)
+    storage_provider.download_url(self, filename)
   end
 
   def manifest
@@ -60,6 +59,23 @@ class Upload < ActiveRecord::Base
         size_bytes: chunk.size
       }
     end
+  end
+
+  def initialize_storage
+    UploadStorageProviderInitializationJob.perform_later(
+      job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      upload: self
+    )
+  end
+
+  def ready_for_chunks?
+    storage_provider.chunk_upload_ready?(self)
+  end
+
+  def check_readiness!
+    raise(ConsistencyException, 'Upload is not ready') unless ready_for_chunks?
+    true
   end
 
   def complete
@@ -80,22 +96,12 @@ class Upload < ActiveRecord::Base
     !error_at.nil?
   end
 
-  def create_and_validate_storage_manifest
-    begin
-      response = storage_provider.put_object_manifest(storage_container, id, manifest, content_type, name)
-      meta = storage_provider.get_object_metadata(storage_container, id)
-      unless meta["content-length"].to_i == size
-        raise IntegrityException, "reported size does not match size computed by StorageProvider"
-      end
+  def complete_and_validate_integrity
+      begin
+      storage_provider.complete_chunked_upload(self)
       update!({
         is_consistent: true
       })
-    rescue StorageProviderException => e
-      if e.message.match(/.*Etag.*Mismatch.*/)
-        integrity_exception("reported chunk hash does not match that computed by StorageProvider")
-      else
-        raise e
-      end
     rescue IntegrityException => e
       integrity_exception(e.message)
     end
@@ -111,23 +117,16 @@ class Upload < ActiveRecord::Base
       chunk.purge_storage
       chunk.destroy
     end
-
-    begin
-      storage_provider.delete_object_manifest(storage_container, id)
-    rescue StorageProviderException => e
-      unless e.message.match /Not Found/
-        raise e
-      end
-    end
+    storage_provider.purge(self)
     self.update(purged_on: DateTime.now)
   end
 
   def max_size_bytes
-    storage_provider.chunk_max_number * storage_provider.chunk_max_size_bytes
+    storage_provider.max_chunked_upload_size
   end
 
   def minimum_chunk_size
-    (size.to_f / storage_provider.chunk_max_number).ceil
+    storage_provider.suggested_minimum_chunk_size(self)
   end
 
   private

@@ -1,4 +1,4 @@
-class MetaProperty < ActiveRecord::Base
+class MetaProperty < ApplicationRecord
   attr_accessor :key
 
   audited

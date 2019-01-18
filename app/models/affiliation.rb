@@ -1,4 +1,4 @@
-class Affiliation < ActiveRecord::Base
+class Affiliation < ApplicationRecord
   include ProjectUpdater
   default_scope { order('created_at DESC') }
   audited

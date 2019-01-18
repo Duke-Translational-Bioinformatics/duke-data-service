@@ -104,7 +104,7 @@ module DDS
         end
         if tag_params[:object_kind]
           object_kind = KindnessFactory.by_kind(tag_params[:object_kind])
-          scoped_tags = scoped_tags.where(taggable: object_kind.all)
+          scoped_tags = scoped_tags.where(taggable_type: object_kind.base_class.name)
         end
         scoped_tags.tag_labels
       end

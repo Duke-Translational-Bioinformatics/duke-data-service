@@ -403,7 +403,7 @@ Generates a secret key for the current user that can be used to access the API a
 ## Group Users
 Represents registered users.
 
-## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with}]
+## Users collection [/users{?full_name_contains,first_name_begins_with,last_name_begins_with,username,email}]
 
 ### List users [GET]
 >**Permission:** authenticated
@@ -417,6 +417,8 @@ Represents registered users.
     + full_name_contains (string, optional, `gardner`) ... Returns users where their full name contains the specified string.
     + first_name_begins_with (string, optional, `mat`) ... Returns users where their first name begins with the specified string.
     + last_name_begins_with (string, optional, `gar`) ... Returns users where their last name begins with the specified string.
+    + username (string, optional, `mrgardener01`) ... Returns users where their username matches the specified string.
+    + email (string, optional, `mrgardner01@duke.edu`) ... Returns users where their email matches the specified string.
 
 + Response 200 (application/json)
 
@@ -428,6 +430,7 @@ Represents registered users.
                     "first_name": "Matthew",
                     "last_name": "Gardner",
                     "full_name": "Matthew Gardner",
+                    "email": "mrgardner01@duke.edu",
                     "auth_provider": {
                         "id": "3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c",
                         "name": "duke",
@@ -519,10 +522,14 @@ Represents the authentication providers (services) that are supported by DDS.
 
 ### Group Auth Provider Affiliates
 
-## List auth provider affiliates [GET /auth_providers/{id}/affiliates{?full_name_contains}]
+## List auth provider affiliates [GET /auth_providers/{id}/affiliates{?username,email,full_name_contains}]
 Get a list of affiliates (potential users), for a supported authentication provider.
 >**Permission:** authenticated
 - - - - -
+
+>**Rules**
+- - - - -
++ An empty array is returned if none of the filter parameters are provided.
 
 **Response messages:**
 * 200: Success
@@ -530,7 +537,9 @@ Get a list of affiliates (potential users), for a supported authentication provi
 
 + Parameters
     + id (string, required, `3f2cb4ea-dc03-4e2e-90a8-ca26f04ec62c`) ... The unique `id` of the authentication provider.
-    + full_name_contains (string, required, `gard`) ... Returns affiliates where their full name contains the specified string; the supplied string must have a minimum length of three characters, otherwise an empty array is returned.
+    + username (string, optional, `gard`) ... Returns affiliates where their username exactly matches the specified string.
+    + email (string, optional, `gard`) ... Returns affiliates where their email exactly matches the specified string.
+    + full_name_contains (string, optional, `gard`) ... Returns affiliates where their full name contains the specified string; the supplied string must have a minimum length of three characters, otherwise an empty array is returned.
 
 + Response 200 (application/json)
 
@@ -546,6 +555,7 @@ Get a list of affiliates (potential users), for a supported authentication provi
                     }
                 ]
         }
+
 
 ### View auth provider affiliate [GET /auth_providers/{id}/affiliates/{uid}]
 >**Permission:** authenticated

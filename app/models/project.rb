@@ -1,4 +1,4 @@
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   default_scope { order('created_at DESC') }
   include Kinded
   include ChildMinder
@@ -7,6 +7,7 @@ class Project < ActiveRecord::Base
   audited
 
   belongs_to :creator, class_name: "User"
+  belongs_to :storage_provider
   has_many :folders
   has_many :project_permissions
   has_many :uploads
@@ -14,6 +15,8 @@ class Project < ActiveRecord::Base
   has_many :data_files
   has_many :children, -> { where parent_id: nil }, class_name: "Container", autosave: true
   has_many :containers
+  has_many :project_storage_providers
+  has_many :storage_providers, through: :project_storage_providers
 
   validates :name, presence: true, unless: :is_deleted
   validates :description, presence: true, unless: :is_deleted
@@ -44,12 +47,9 @@ class Project < ActiveRecord::Base
   end
 
   def initialize_storage
-    storage_provider = StorageProvider.first
-    ProjectStorageProviderInitializationJob.perform_later(
-      job_transaction: ProjectStorageProviderInitializationJob.initialize_job(self),
-      storage_provider: storage_provider,
-      project: self
-    )
+    StorageProvider.all.each do |sp|
+      self.project_storage_providers.create(storage_provider: sp)
+    end
   end
 
   def manage_container_index_project

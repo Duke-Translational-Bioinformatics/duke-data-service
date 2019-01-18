@@ -9,6 +9,8 @@ RSpec.describe FileVersion, type: :model do
   let(:upload) { file_version.upload }
   let(:other_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint) }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
     let(:expected_kind) { 'dds-file-version' }

@@ -1,7 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe UploadSerializer, type: :serializer do
-  let(:resource) { FactoryBot.create(:upload, :with_chunks) }
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  let(:resource) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
   let(:is_logically_deleted) { false }
   let(:expected_attributes) {{
     'id' => resource.id,
@@ -12,7 +14,9 @@ RSpec.describe UploadSerializer, type: :serializer do
     'etag' => resource.etag,
     'status' => {
       'initiated_on' => resource.created_at.as_json,
+      'ready_for_chunks' => resource.ready_for_chunks?.as_json,
       'completed_on' => resource.completed_at.as_json,
+      'is_consistent' => resource.is_consistent.as_json,
       'purged_on' => resource.purged_on.as_json,
       'error_on' => resource.error_at.as_json,
       'error_message' => resource.error_message
@@ -31,21 +35,37 @@ RSpec.describe UploadSerializer, type: :serializer do
   end
 
   context 'with completed upload' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :completed, :with_fingerprint, storage_provider: mocked_storage_provider) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
+  end
+
+  context 'with inconsistent upload' do
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :inconsistent, storage_provider: mocked_storage_provider) }
+    it_behaves_like 'a json serializer' do
+      it { is_expected.to include(expected_attributes) }
+    end
+  end
+
+  context 'when upload is not ready for chunks' do
+    before(:example) do
+      allow(resource).to receive(:ready_for_chunks?).and_return(false)
+    end
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload has error' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, :with_error, storage_provider: mocked_storage_provider) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end
   end
 
   context 'when upload is purged' do
-    let(:resource) { FactoryBot.create(:upload, :with_chunks, purged_on: DateTime.now) }
+    let(:resource) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider, purged_on: DateTime.now) }
     it_behaves_like 'a json serializer' do
       it { is_expected.to include(expected_attributes) }
     end

@@ -10,15 +10,17 @@ FactoryBot.define do
     is_consistent { true }
 
     trait :with_chunks do
-      chunks { [ build(:chunk, number: 1) ] }
+      after(:build) do |upload, evaluator|
+        chunk = build(:chunk, upload: upload, number: 1)
+        upload.association(:chunks).add_to_target(chunk)
+      end
     end
 
     trait :with_fingerprint do
-      fingerprints { [ build(:fingerprint) ] }
-    end
-
-    trait :swift do
-      storage_provider { create(:storage_provider, :swift) }
+      after(:build) do |upload, evaluator|
+        fingerprint = build(:fingerprint, upload: upload)
+        upload.association(:fingerprints).add_to_target(fingerprint)
+      end
     end
 
     trait :completed do

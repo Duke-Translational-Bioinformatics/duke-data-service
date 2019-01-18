@@ -1,4 +1,4 @@
-class ApiKey < ActiveRecord::Base
+class ApiKey < ApplicationRecord
   audited
 
   belongs_to :user

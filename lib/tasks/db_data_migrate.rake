@@ -50,6 +50,19 @@ def type_untyped_authentication_services
   puts "Fin!"
 end
 
+def type_untyped_storage_providers
+  default_type = "SwiftStorageProvider"
+  untyped = StorageProvider.where(type: nil)
+  pre_count = untyped.count
+  if pre_count > 0
+    changed = untyped.update_all(type: default_type)
+    $stderr.puts "#{changed} untyped storage_providers changed to #{default_type}"
+  else
+    $stderr.puts "0 untyped storage_providers changed"
+  end
+  puts "Fin!"
+end
+
 def fill_new_authentication_service_attributes
   if ENV["AUTH_SERVICE_SERVICE_ID"]
     new_attributes = [
@@ -117,16 +130,20 @@ def create_missing_fingerprints
 end
 
 def migrate_nil_consistency_status
-  storage_provider = StorageProvider.first
+  storage_provider = StorageProvider.default
   updated_projects = 0
   updated_uploads = 0
   projects = Project.where(is_consistent: nil).where.not(is_deleted: true)
   puts "#{projects.count} projects with nil consistency_status."
   projects.find_in_batches do |project_batch|
     project_batch.each do |p|
-      if storage_provider.get_container_meta(p.id)
-        p.update_columns(is_consistent: true)
-      else
+      begin
+        if storage_provider.is_initialized?(p)
+          p.update_columns(is_consistent: true)
+        else
+          p.update_columns(is_consistent: false)
+        end
+      rescue StorageProviderException
         p.update_columns(is_consistent: false)
       end
       print '.'
@@ -140,8 +157,10 @@ def migrate_nil_consistency_status
   uploads.find_in_batches do |upload_batch|
     upload_batch.each do |u|
       begin
-        if storage_provider.get_object_metadata(u.project.id, u.id)
+        if storage_provider.is_complete_chunked_upload?(u)
           u.update_columns(is_consistent: true)
+        else
+          u.update_columns(is_consistent: false)
         end
       rescue StorageProviderException
         u.update_columns(is_consistent: false)
@@ -195,6 +214,30 @@ def populate_nil_project_slugs
   puts " #{slug_count} Project slugs populated."
 end
 
+def set_default_storage_provider
+  if StorageProvider.any?
+    if StorageProvider.where(is_default: true).any?
+      puts "0 storage_provider default statuses changed"
+    else
+      StorageProvider.first.update(is_default: true)
+      puts "first storage_provider changed to default storage_provider"
+    end
+  else
+    puts "no storage_providers found"
+  end
+end
+
+def create_storage_providers
+  total = 0
+  print 'Initialize project storage:'
+  Project.unscope(:order).eager_load(:project_storage_providers).where('project_storage_providers.id is NULL').each do |project|
+    project.initialize_storage
+    total += 1
+    print '.'
+  end
+  puts "\n#{total} projects initialized."
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -202,11 +245,14 @@ namespace :db do
       Rails.logger.level = 3 unless Rails.env == 'test'
       create_missing_fingerprints
       type_untyped_authentication_services
+      type_untyped_storage_providers
       migrate_nil_consistency_status
       migrate_nil_storage_container
       migrate_storage_provider_chunk_environment
       purge_deleted_objects
       populate_nil_project_slugs
+      set_default_storage_provider
+      create_storage_providers
     end
   end
 end

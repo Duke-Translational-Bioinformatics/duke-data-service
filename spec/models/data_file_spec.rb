@@ -13,6 +13,8 @@ RSpec.describe DataFile, type: :model do
   let(:other_folder) { FactoryBot.create(:folder, project: other_project) }
   let(:uri_encoded_name) { URI.encode(subject.name) }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'an audited model'
   it_behaves_like 'a kind' do
     let(:expected_kind) { 'dds-file' }

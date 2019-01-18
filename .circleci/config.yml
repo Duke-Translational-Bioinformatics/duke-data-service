@@ -16,7 +16,7 @@ jobs:
 
     docker:
       # Copied from rails circle demo
-      - image: ruby:2.3.3
+      - image: ruby:2.3.6
         environment:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
@@ -60,7 +60,7 @@ jobs:
             0.0.0.0       rabbitmq.local
             ' | tee -a /etc/hosts
 
-      - run: gem install bundler
+      - run: gem install bundler -v '~> 1.17.0'
       - run:
           name: Which bundler?
           command: bundle -v

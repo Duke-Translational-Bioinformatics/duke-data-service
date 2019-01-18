@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe OriginProvenanceGraph do
+  include_context 'mock all Uploads StorageProvider'
   include_context 'performs enqueued jobs', only: GraphPersistenceJob
   let(:policy_scope) { Proc.new {|scope| scope } }
 

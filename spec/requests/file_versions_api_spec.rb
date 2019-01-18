@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe DDS::V1::FileVersionsAPI do
   include_context 'with authentication'
+  include_context 'mock all Uploads StorageProvider'
 
   let(:project) { FactoryBot.create(:project) }
   let(:project_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
@@ -149,7 +150,13 @@ describe DDS::V1::FileVersionsAPI do
     let(:resource_serializer) { FileVersionUrlSerializer }
 
     describe 'GET' do
+      let(:fingerprint) { FactoryBot.create(:fingerprint, upload: upload) }
       subject { get(url, headers: headers) }
+
+      before do
+        expect(fingerprint).to be_persisted
+        expect(upload).to be_valid
+      end
 
       it_behaves_like 'a viewable resource'
       it_behaves_like 'an authenticated resource'

@@ -1,6 +1,6 @@
 require 'jwt'
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Kinded
   include Graphed::Node
 

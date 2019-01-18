@@ -1,0 +1,38 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx258a6c53e2374b8ab914a-005be1b592
+      Date:
+      - Tue, 06 Nov 2018 15:38:58 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:38:58 GMT
+recorded_with: VCR 4.0.0

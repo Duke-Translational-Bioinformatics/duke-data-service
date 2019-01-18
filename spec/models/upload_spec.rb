@@ -1,18 +1,24 @@
 require 'rails_helper'
 
 RSpec.describe Upload, type: :model do
-  subject { FactoryBot.create(:upload, :with_chunks) }
-  let(:fingerprint) { FactoryBot.create(:fingerprint, upload: subject) }
-  let(:completed_upload) { FactoryBot.create(:upload, :with_chunks, :with_fingerprint, :completed) }
-  let(:upload_with_error) { FactoryBot.create(:upload, :with_chunks, :with_error) }
+  include ActiveSupport::Testing::TimeHelpers
+  include_context 'mocked StorageProvider'
+  include_context 'mocked StorageProvider Interface'
+  subject { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
+
+  let(:completed_upload) { FactoryBot.create(:upload, :completed, :with_fingerprint, :with_chunks, storage_provider: mocked_storage_provider) }
+  let(:upload_with_error) { FactoryBot.create(:upload, :with_error, storage_provider: mocked_storage_provider) }
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
+  let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
 
   describe 'associations' do
-    it { is_expected.to belong_to(:project) }
+    it {
+      is_expected.to belong_to(:project)
+    }
     it { is_expected.to belong_to(:storage_provider) }
     it { is_expected.to have_many(:chunks) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
@@ -39,6 +45,7 @@ RSpec.describe Upload, type: :model do
 
     it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
     it { is_expected.not_to validate_presence_of :fingerprints }
+    it { is_expected.not_to validate_presence_of :multipart_upload_id }
 
     context 'when completed_at is set' do
       before { subject.completed_at = Faker::Time.forward(1) }
@@ -46,6 +53,7 @@ RSpec.describe Upload, type: :model do
     end
 
     context 'when completed_at is nil' do
+      let(:fingerprint) { FactoryBot.create(:fingerprint, upload: completed_upload) }
       it { is_expected.not_to be_completed_at }
       it { is_expected.not_to allow_value([fingerprint]).for(:fingerprints) }
     end
@@ -71,6 +79,7 @@ RSpec.describe Upload, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_storage_container).before(:create) }
+    it { is_expected.to callback(:initialize_storage).after(:create) }
   end
 
   describe 'instance methods' do
@@ -93,14 +102,6 @@ RSpec.describe Upload, type: :model do
 
     describe '#temporary_url' do
       it { is_expected.to respond_to :temporary_url }
-      it { expect(subject.temporary_url).to be_a String }
-      it { expect(subject.temporary_url).to include subject.name }
-      it { expect(subject.temporary_url).to include subject.storage_container }
-
-      context 'when filename is provided' do
-        let(:filename) { 'different-file-name.txt' }
-        it { expect(subject.temporary_url(filename)).to include filename }
-      end
 
       context 'when has_integrity_exception? true' do
         it {
@@ -122,6 +123,25 @@ RSpec.describe Upload, type: :model do
           }.to raise_error(ConsistencyException)
         }
       end
+
+      context 'consistent and no integrity exceptions' do
+        let(:expected_url) { Faker::Internet.url }
+        before do
+          expect(mocked_storage_provider).to receive(:download_url)
+            .with(subject, expected_filename)
+            .and_return(expected_url)
+        end
+
+        context 'when filename is provided' do
+          let(:expected_filename) { 'different-file-name.txt' }
+          it { expect(subject.temporary_url(expected_filename)).to eq(expected_url) }
+        end
+
+        context 'without filename' do
+          let(:expected_filename) { nil }
+          it { expect(subject.temporary_url).to eq(expected_url) }
+        end
+      end
     end
 
     it 'should have a completed_at attribute' do
@@ -142,6 +162,50 @@ RSpec.describe Upload, type: :model do
         }
         expect(subject.manifest[chunk.number - 1]).to eq chunk_manifest
       end
+    end
+  end
+
+  it { is_expected.to respond_to :initialize_storage }
+  describe '#initialize_storage' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+
+    it 'enqueues a UploadStorageProviderInitializationJob' do
+      expect {
+        subject.initialize_storage
+      }.to have_enqueued_job(UploadStorageProviderInitializationJob)
+        .with(job_transaction: instance_of(JobTransaction), storage_provider: subject.storage_provider, upload: subject)
+    end
+  end
+
+  it { is_expected.to respond_to :ready_for_chunks? }
+  describe '#ready_for_chunks?' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+    let(:upload_ready) { true }
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
+    end
+
+    it { expect(subject.ready_for_chunks?).to eq true }
+
+    context 'when upload is not ready' do
+      let(:upload_ready) { false }
+      it { expect(subject.ready_for_chunks?).to eq false }
+    end
+  end
+
+  it { is_expected.to respond_to :check_readiness! }
+  describe '#check_readiness!' do
+    let(:readiness) { true }
+    before(:example) do
+      allow(subject).to receive(:ready_for_chunks?).and_return(readiness)
+    end
+    it { expect(subject.check_readiness!).to be_truthy }
+
+    context 'when not ready' do
+      let(:readiness) { false }
+      it { expect { subject.check_readiness! }.to raise_error ConsistencyException, 'Upload is not ready' }
     end
   end
 
@@ -194,7 +258,7 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to respond_to :set_storage_container }
 
     context 'upload creation' do
-      subject { FactoryBot.build(:upload) }
+      subject { FactoryBot.build(:upload, storage_provider: mocked_storage_provider) }
       it {
         expect(subject.storage_container).to be_nil
         subject.save
@@ -203,7 +267,6 @@ RSpec.describe Upload, type: :model do
     end
 
     context 'upload update' do
-      subject { FactoryBot.create(:upload) }
       let(:original_storage_container) { subject.storage_container }
       let(:other_project) { completed_upload.project }
 
@@ -219,256 +282,136 @@ RSpec.describe Upload, type: :model do
   end
 
   describe '#max_size_bytes' do
-    let(:expected_max_size_bytes) { subject.storage_provider.chunk_max_number * subject.storage_provider.chunk_max_size_bytes }
     it { is_expected.to respond_to :max_size_bytes }
-    it { expect(subject.max_size_bytes).to eq(expected_max_size_bytes) }
+    it { expect(subject.max_size_bytes).to eq(mocked_storage_provider.max_chunked_upload_size) }
   end
 
   describe '#minimum_chunk_size' do
-    let(:storage_provider) { FactoryBot.create(:storage_provider) }
-    let(:size) { storage_provider.chunk_max_number }
-    subject { FactoryBot.create(:upload, storage_provider: storage_provider, size: size) }
-    let(:expected_minimum_chunk_size) {
-      (subject.size.to_f / subject.storage_provider.chunk_max_number).ceil
-    }
-
     it { is_expected.to respond_to :minimum_chunk_size }
-
-    context 'size = 0' do
-      let(:size) { 0 }
-      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
-    end
-
-    context 'size < storage_provider.chunk_max_number' do
-      let(:size) { storage_provider.chunk_max_number - 1 }
-      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
-    end
-
-    context 'size > storage_provider.chunk_max_number' do
-      let(:size) { storage_provider.chunk_max_number + 1 }
-      it { expect(subject.minimum_chunk_size).to eq(expected_minimum_chunk_size) }
-    end
+    it {
+      expect(subject.minimum_chunk_size).to eq(mocked_storage_provider.suggested_minimum_chunk_size(subject))
+    }
   end
 
-  describe 'swift methods', :vcr do
-    subject { FactoryBot.create(:upload, :swift, :with_chunks) }
+  describe '#complete_and_validate_integrity' do
+    subject { FactoryBot.create(:upload, :with_chunks, is_consistent: false, storage_provider: mocked_storage_provider) }
 
-    before do
-      actual_size = 0
-      subject.storage_provider.put_container(subject.storage_container)
-      subject.chunks.each do |chunk|
-        body = 'this is a chunk'
-        subject.storage_provider.put_object(
-          subject.storage_container,
-          chunk.object_path,
-          body
-        )
-        chunk.update_attributes({
-          fingerprint_value: Digest::MD5.hexdigest(body),
-          size: body.length
-        })
-        actual_size = body.length + actual_size
+    it { is_expected.to respond_to :complete_and_validate_integrity }
+
+    context 'with valid reported size and chunk hashes' do
+      it 'should set is_consistent to true, leave error_at and error_message null' do
+        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
+          .with(subject)
+        subject.complete_and_validate_integrity
+        subject.reload
+        expect(subject.is_consistent).to be_truthy
+        expect(subject.error_at).to be_nil
+        expect(subject.error_message).to be_nil
       end
-      subject.update_attribute(:size, actual_size)
-    end
+    end #with valid
 
-    after do
-      begin
+    context 'IntegrityException' do
+      it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
+        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
+          .with(subject)
+          .and_raise(IntegrityException)
+        subject.complete_and_validate_integrity
+        subject.reload
+        expect(subject.is_consistent).to be_truthy
+        expect(subject.error_at).not_to be_nil
+        expect(subject.error_message).not_to be_nil
+      end
+    end #with reported size
+
+    context 'StorageProvider Exception' do
+      it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
+        expect(subject.is_consistent).not_to be_truthy
+        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
+          .with(subject)
+          .and_raise(unexpected_exception)
+        expect {
+          subject.complete_and_validate_integrity
+        }.to raise_error(unexpected_exception)
+        subject.reload
+        expect(subject.is_consistent).not_to be_truthy
+        expect(subject.error_at).to be_nil
+        expect(subject.error_message).to be_nil
+      end
+    end
+  end #complete_and_validate_integrity
+
+  describe '#purge_storage' do
+    let(:original_chunks_count) { subject.chunks.count }
+
+    it { is_expected.to respond_to :purge_storage }
+
+    context 'StorageProviderException' do
+      it 'should raise the exception and not purge' do
+        expect(subject.chunks).not_to be_empty
         subject.chunks.each do |chunk|
-          object = [subject.id, chunk.number].join('/')
-          subject.storage_provider.delete_object(subject.storage_container, object)
+          expect(chunk).to receive(:purge_storage)
         end
-        subject.storage_provider.delete_object_manifest(subject.storage_provider, subject.id)
-      rescue
-        # ignore
+
+        expect(mocked_storage_provider).to receive(:purge)
+          .with(subject)
+          .and_raise(unexpected_exception)
+
+        expect {
+          expect {
+            subject.purge_storage
+          }.to change{Chunk.count}.by(-original_chunks_count)
+        }.to raise_error(unexpected_exception)
+
+        subject.reload
+        expect(subject.purged_on).to be_nil
+        expect(subject.chunks.count).to eq 0
       end
     end
 
-    describe '#create_and_validate_storage_manifest' do
-      it { is_expected.to respond_to :create_and_validate_storage_manifest }
-
-      describe 'calls' do
-        describe 'with valid reported size and chunk hashes' do
-          it 'should set is_consistent to true, leave error_at and error_message null' do
-            subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).to be_nil
-            expect(subject.error_message).to be_nil
-          end
-        end #with valid
-
-        describe 'with reported size not equal to swift computed size' do
-          it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
-            subject.update_attribute(:size, subject.size - 1)
-            subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).not_to be_nil
-            expect(subject.error_message).not_to be_nil
-          end
-        end #with reported size
-
-        describe 'with reported chunk hash not equal to swift computed chunk etag' do
-          it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
-            bad_chunk = subject.chunks.first
-            bad_chunk.update_attribute(:fingerprint_value, "NOTTHECOMPUTEDHASH")
-            subject.create_and_validate_storage_manifest
-            subject.reload
-            expect(subject.is_consistent).to be_truthy
-            expect(subject.error_at).not_to be_nil
-            expect(subject.error_message).not_to be_nil
-          end
-        end #with reported chunk
-      end #calls
-    end #complete
-
-    context '#purge_storage' do
-      it { is_expected.to respond_to :purge_storage }
-
-      context 'calls' do
-        before do
-          subject.create_and_validate_storage_manifest
+    context 'no StorageProviderException' do
+      around(:each) do |example|
+        travel_to(Time.now) do #freeze_time
+          example.run
+        end
+      end
+      it 'should purge successfully' do
+        expect(subject.chunks).not_to be_empty
+        subject.chunks.each do |chunk|
+          expect(chunk).to receive(:purge_storage)
         end
 
-        context 'with StorageProviderException' do
-          context 'Object Not Found' do
-            it {
-              original_chunks = subject.chunks.all
-              subject.chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: subject.storage_provider.auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
+        expect(mocked_storage_provider).to receive(:purge)
+          .with(subject)
 
-              expect {
-                subject.storage_provider.delete_object_manifest(subject.storage_container, subject.id)
-              }.not_to raise_error
+        purge_time = DateTime.now
+        expect {
+          expect {
+            subject.purge_storage
+          }.to change{Chunk.count}.by(-original_chunks_count)
+        }.not_to raise_error
 
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(404)
+        subject.reload
+        expect(subject.purged_on).to eq purge_time
+        expect(subject.chunks.count).to eq(0)
+      end
+    end
+  end #purge_storage
 
-              purge_time = DateTime.now
-              expect {
-                expect {
-                  subject.purge_storage
-                }.to change{Chunk.count}.by(-original_chunks.length)
-              }.not_to raise_error
+  context 'when created with the Default StorageProvider' do
+    let(:default_storage_provider) { FactoryBot.create(:swift_storage_provider, :default) }
+    before(:example) do
+      StorageProvider.delete_all
+      expect(default_storage_provider).to be_persisted
+      expect(StorageProvider.default).to eq default_storage_provider
+    end
+    context 'basic upload' do
+      subject { FactoryBot.build(:upload, storage_provider: StorageProvider.default) }
+      it { is_expected.to be_valid }
+    end
 
-              subject.reload
-              expect(subject.purged_on).not_to be_nil
-              expect(subject.purged_on).to be >= purge_time
-              expect(subject.chunks.count).to eq(0)
-              original_chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                  headers: subject.storage_provider.auth_header
-                )
-                expect(resp.response.code.to_i).to eq(404)
-              end
-            }
-          end
-
-          context 'Other Exception' do
-            let(:fake_storage_provider) { FactoryBot.create(:storage_provider) }
-            it {
-              #create authentication failure
-              original_auth_header = subject.storage_provider.auth_header
-              original_storage_url = subject.storage_provider.storage_url
-              expect(
-                subject.storage_provider.update(
-                  service_user: fake_storage_provider.service_user
-                )
-              ).to be_truthy
-
-              resp = HTTParty.head(
-                "#{original_storage_url}/#{subject.sub_path}",
-                headers: original_auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-
-              original_chunks = subject.chunks.all
-
-              subject.chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{original_storage_url}/#{chunk.sub_path}",
-                  headers: original_auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
-
-              subject.storage_provider.remove_instance_variable(:'@auth_uri_resp')
-              purge_time = DateTime.now
-              expect {
-                expect {
-                  subject.purge_storage
-                }.not_to change{Chunk.count}
-              }.to raise_error(StorageProviderException)
-
-              subject.reload
-              expect(subject.purged_on).to be_nil
-
-              resp = HTTParty.head(
-                "#{original_storage_url}/#{subject.sub_path}",
-                headers: original_auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-
-              original_chunks.each do |chunk|
-                resp = HTTParty.head(
-                  "#{original_url}/#{chunk.sub_path}",
-                  headers: original_auth_header
-                )
-                expect(resp.response.code.to_i).to eq(200)
-              end
-            }
-          end
-        end
-
-        context 'no StorageProviderException' do
-          it {
-            original_chunks = subject.chunks.all
-            resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-              headers: subject.storage_provider.auth_header
-            )
-            expect(resp.response.code.to_i).to eq(200)
-            subject.chunks.each do |chunk|
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(200)
-            end
-            purge_time = DateTime.now
-            expect {
-              subject.purge_storage
-            }.to change{Chunk.count}.by(-original_chunks.length)
-            subject.reload
-            expect(subject.purged_on).not_to be_nil
-            expect(subject.purged_on).to be >= purge_time
-            expect(subject.chunks.count).to eq(0)
-
-            resp = HTTParty.head(
-              "#{subject.storage_provider.storage_url}/#{subject.sub_path}",
-              headers: subject.storage_provider.auth_header
-            )
-            expect(resp.response.code.to_i).to eq(404)
-            original_chunks.each do |chunk|
-              resp = HTTParty.head(
-                "#{subject.storage_provider.storage_url}/#{chunk.sub_path}",
-                headers: subject.storage_provider.auth_header
-              )
-              expect(resp.response.code.to_i).to eq(404)
-            end
-          }
-        end
-      end #calls
-    end #purge_storage
-  end #swift methods
+    context 'completed upload' do
+      subject { FactoryBot.build(:upload, :with_chunks, :with_fingerprint, :completed, storage_provider: StorageProvider.default) }
+      it { is_expected.to be_valid }
+    end
+  end
 end

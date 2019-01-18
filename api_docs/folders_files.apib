@@ -299,6 +299,7 @@ This is the first step in uploading a large file. An upload objects is created a
 + **name (string, required)** - The name of the client file to upload.
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
++ **storage_provider.id (string, optional)** - The unique id for a storage provider.
 
 >**Response Properties**
 - - - - -
@@ -317,7 +318,10 @@ This is the first step in uploading a large file. An upload objects is created a
         {
             "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
             "content_type": "application/octet-stream",
-            "size": 30024000
+            "size": 30024000,
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33"
+            }
         }
 
 + Response 201 (application/json)

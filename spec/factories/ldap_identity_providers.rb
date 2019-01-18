@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :ldap_identity_provider do
-    host { Faker::Internet.url }
-    port { Faker::Address.zip_code }
-    ldap_base { SecureRandom.hex }
+    host { Faker::Internet.domain_name }
+    port { Faker::Number.number(5) }
+    ldap_base { "dc=#{Faker::Internet.domain_word},dc=#{Faker::Internet.domain_suffix}" }
   end
 end

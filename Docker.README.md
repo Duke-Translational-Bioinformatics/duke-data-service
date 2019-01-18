@@ -334,14 +334,15 @@ Connecting to an Openstack Swift Object Store
 ===
 Currently, DDS is designed to support a single Openstack Swift object storage,
 using [version 1](http://developer.openstack.org/api-ref-objectstorage-v1.html) of the Swift API.
-A StorageProvider object must be created for the target Swift service.
+A SwiftStorageProvider object must be created for the target Swift service.
 
 Configuration
 ---
 The following Environment Variables must be set on the host server to configure
-a StorageProvider object with information about the live Swift storage provider
+a SwiftStorageProvider object with information about the live Swift storage provider
 for the DDS service:
 
+* STORAGE_PROVIDER_TYPE: swift
 * SWIFT_URL_ROOT: The base URL to the swift service.
 The full URL for the swift account used by the DDS
 is `${SWIFT_URL_ROOT}/${SWIFT_AUTH_URI}/${SWIFT_ACCT}`
@@ -377,7 +378,6 @@ in the same way as the SWIFT_PRIMARY_KEY.
 
 A rake task, storage_provider:create, has been created to facilitate the
 creation of a StorageProvider. It uses these Environment variables.
-You can destroy the storage_provider with the rake task storage_provider:destroy.
 
 This repo includes an empty_swift.env file which is symlinked to swift.env,
 and a swift.local.env which specifies these environment variables for the

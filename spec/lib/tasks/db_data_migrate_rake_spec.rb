@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe "db:data:migrate" do
   include_context "rake"
+  include_context 'mock all Uploads StorageProvider'
+
   let(:task_path) { "lib/tasks/db_data_migrate" }
   let(:current_user) { FactoryBot.create(:user) }
   let(:file_version_audits) { Audited.audit_class.where(auditable: FileVersion.all) }
@@ -13,11 +15,11 @@ describe "db:data:migrate" do
     context 'when creating fingerprints' do
       let(:fingerprint_upload) { FactoryBot.create(:fingerprint).upload }
       let(:incomplete_upload_with_fingerprint_value) { FactoryBot.create(:upload, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_fingerprint_value) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5') }
-      let(:upload_with_capitalized_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5') }
-      let(:upload_with_invalid_fingerprint_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000') }
+      let(:upload_with_fingerprint_value) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5', storage_provider: mocked_storage_provider) }
+      let(:upload_with_capitalized_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'MD5', storage_provider: mocked_storage_provider) }
+      let(:upload_with_invalid_fingerprint_algorithm) { FactoryBot.create(:upload, :completed, :skip_validation, fingerprint_value: SecureRandom.hex, fingerprint_algorithm: 'md5000', storage_provider: mocked_storage_provider) }
       context 'for upload without fingerprint_value' do
-        before { FactoryBot.create(:upload) }
+        before { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
         it { expect {invoke_task}.not_to change{Fingerprint.count} }
         it { expect {invoke_task}.not_to change{Audited.audit_class.count} }
       end
@@ -59,6 +61,8 @@ describe "db:data:migrate" do
       let(:openid_authentication_service) { FactoryBot.create(:openid_authentication_service) }
 
       it {
+        expect(duke_authentication_service).to be_persisted
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: /0 untyped authentication_services changed/
         }.not_to change{
@@ -76,6 +80,7 @@ describe "db:data:migrate" do
 
       it {
         expect(untyped_authentication_service).not_to be_a default_type
+        expect(openid_authentication_service).to be_persisted
         expect {
           invoke_task expected_stderr: Regexp.new("1 untyped authentication_services changed to #{default_type}")
         }.to change{
@@ -85,6 +90,82 @@ describe "db:data:migrate" do
         expect(expected_to_be_typed_auth_service).to be_a default_type
         openid_authentication_service.reload
         expect(openid_authentication_service).to be_a OpenidAuthenticationService
+      }
+    end
+
+    context 'without untyped storage providers' do
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      it {
+        expect(storage_provider).to be_persisted
+        expect {
+          invoke_task expected_stderr: /0 untyped storage_providers changed/
+        }.not_to change{
+          StorageProvider.where(type: nil).count
+        }
+      }
+    end
+
+    context 'with untyped storage providers' do
+      let(:default_type) { SwiftStorageProvider }
+      let(:untyped_storage_provider) {
+        StorageProvider.create(FactoryBot.attributes_for(:swift_storage_provider))
+      }
+      let(:typed_storage_provider) { FactoryBot.create(:swift_storage_provider) }
+
+      it {
+        expect(untyped_storage_provider).not_to be_a default_type
+        expect(typed_storage_provider).to be_persisted
+        expect {
+          invoke_task expected_stderr: Regexp.new("1 untyped storage_providers changed to #{default_type}")
+        }.to change{
+          StorageProvider.where(type: nil).count
+        }.by(-1)
+        expected_to_be_typed_storage_provider = StorageProvider.find(untyped_storage_provider.id)
+        expect(expected_to_be_typed_storage_provider).to be_a default_type
+        typed_storage_provider.reload
+        expect(typed_storage_provider).to be_a SwiftStorageProvider
+      }
+    end
+
+    context 'without any storage providers' do
+      it {
+        expect(StorageProvider.any?).to be_falsey
+        expect {
+          invoke_task expected_stdout: /no storage_providers found/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'with a default storage provider' do
+      let(:storage_provider) { FactoryBot.create(:swift_storage_provider) }
+      it {
+        expect(storage_provider).to be_persisted
+        expect(StorageProvider.where(is_default: true).any?).to be_truthy
+        expect {
+          invoke_task expected_stdout: /0 storage_provider default statuses changed/
+        }.not_to change{
+          StorageProvider.where(is_default: true).count
+        }
+      }
+    end
+
+    context 'without any default storage providers' do
+      let(:not_default_storage_provider) {
+        FactoryBot.create(:swift_storage_provider, is_default: false)
+      }
+
+      it {
+        expect(StorageProvider.where(is_deprecated: true).any?).to be_falsey
+        expect(not_default_storage_provider.is_default?).to be_falsey
+        expect {
+          invoke_task expected_stdout: Regexp.new(/first storage_provider changed to default storage_provider/)
+        }.to change{
+          StorageProvider.where(is_default: true).count
+        }.by(1)
+        not_default_storage_provider.reload
+        expect(not_default_storage_provider.is_default?).to be_truthy
       }
     end
 
@@ -118,36 +199,57 @@ describe "db:data:migrate" do
       end
     end
 
-    describe 'consistency migration', :vcr do
-      let(:storage_provider) { FactoryBot.create(:storage_provider, :swift) }
-
+    describe 'consistency migration' do
       before do
-        expect(storage_provider).to be_persisted
+        allow(StorageProvider).to receive(:default)
+          .and_return(mocked_storage_provider)
       end
 
       context 'for project' do
         let(:record) { FactoryBot.create(:project, is_consistent: nil) }
         let(:init_project_storage) {
-          storage_provider.put_container(record.id)
-          expect(storage_provider.get_container_meta(record.id)).not_to be_nil
+          expect(mocked_storage_provider).to receive(:is_initialized?)
+            .with(record)
+            .and_return(true)
         }
+
+        before do
+          # this should be overridden by init_project_storage when
+          # it is called
+          allow(mocked_storage_provider).to receive(:is_initialized?)
+            .with(record)
+            .and_return(false)
+        end
+
         it_behaves_like 'a consistency migration', :init_project_storage
 
         context 'with deleted project' do
-          before(:each) { FactoryBot.create(:project, :deleted, is_consistent: nil) }
-          it { expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count} }
+          before do
+            Project.delete_all
+            FactoryBot.create(:project, :deleted, is_consistent: nil)
+          end
+          it 'should not update the consistency status' do
+            expect(Project.where(is_consistent: nil)).to exist
+            expect {invoke_task}.not_to change{Project.where(is_consistent: nil).count}
+          end
         end
       end
 
       context 'for upload' do
-        let(:record) { FactoryBot.create(:upload, is_consistent: nil, storage_provider: storage_provider) }
+        let(:record) { FactoryBot.create(:upload, is_consistent: nil) }
         let(:init_upload) {
-          storage_provider.put_container(record.project.id)
-          expect(storage_provider.get_container_meta(record.project.id)).not_to be_nil
-          record.create_and_validate_storage_manifest
-          record.update_columns(is_consistent: nil)
-          expect(storage_provider.get_object_metadata(record.project.id, record.id)).not_to be_nil
+          expect(mocked_storage_provider).to receive(:is_complete_chunked_upload?)
+            .with(record)
+            .and_return(true)
         }
+
+        before do
+          # this should be overridden by init_upload when
+          # it is called
+          allow(mocked_storage_provider).to receive(:is_complete_chunked_upload?)
+            .with(record)
+            .and_return(false)
+        end
         it_behaves_like 'a consistency migration', :init_upload
       end
     end
@@ -371,6 +473,43 @@ describe "db:data:migrate" do
       it 'leaves existing slugs alone' do
         expect(slugged_project.reload).to be_truthy
         expect(slugged_project.slug).to eq original_slug
+      end
+    end
+
+    describe 'create_project_storage_providers' do
+      let(:projects) { FactoryBot.create_list(:project, 2) }
+      let(:storage_provider) { FactoryBot.create(:storage_provider) }
+      before(:example) do
+        expect(projects).to all(be_persisted)
+        expect(storage_provider).to be_persisted
+      end
+      context 'when ProjetStorageProvider exists' do
+        before(:example) { expect(storage_provider.project_storage_providers).not_to be_empty }
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:\n0 projects initialized")
+          }.not_to change { ProjectStorageProvider.count }
+        end
+      end
+      context 'when a ProjetStorageProvider does not exist' do
+        before(:example) do
+          expect(ProjectStorageProvider.last.destroy).to be_truthy
+        end
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:.\n1 projects initialized.")
+          }.to change { ProjectStorageProvider.count }.by(1)
+        end
+      end
+      context 'when no ProjetStorageProviders exist' do
+        before(:example) do
+          expect(ProjectStorageProvider.destroy_all).to be_truthy
+        end
+        it 'does not create a ProjectStorageProvider' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Initialize project storage:..\n2 projects initialized.")
+          }.to change { ProjectStorageProvider.count }.by(2)
+        end
       end
     end
   end

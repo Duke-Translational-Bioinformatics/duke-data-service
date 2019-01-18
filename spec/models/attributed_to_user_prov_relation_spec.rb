@@ -5,6 +5,8 @@ RSpec.describe AttributedToUserProvRelation, type: :model do
   let(:resource_serializer) { AttributedToUserProvRelationSerializer }
   let(:expected_relationship_type) { 'was-attributed-to' }
 
+  include_context 'mock all Uploads StorageProvider'
+
   it_behaves_like 'a ProvRelation' do
     let(:expected_kind) { 'dds-relation-was-attributed-to' }
     let(:serialized_kind) { true }

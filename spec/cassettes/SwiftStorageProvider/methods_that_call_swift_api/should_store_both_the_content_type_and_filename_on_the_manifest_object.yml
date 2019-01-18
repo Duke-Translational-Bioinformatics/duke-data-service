@@ -1,0 +1,112 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx0a3ebf079fa7435ea8ec2-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo?multipart-manifest=put
+    body:
+      encoding: UTF-8
+      string: '[{"path":"the_container/the_object/1","etag":"9e42a695a672299a8fd4e9b5195e7d70","size_bytes":24}]'
+    headers:
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Type:
+      - text/plain
+      Content-Disposition:
+      - attachment; filename=text_file.txt
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Last-Modified:
+      - Tue, 06 Nov 2018 15:39:01 GMT
+      Content-Length:
+      - '0'
+      Etag:
+      - '"70f457e8bdf12b30ed18c5b110740c2e"'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx505ff56ff7874d34b03be-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+- request:
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/the_container/the_slo
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Length:
+      - '24'
+      Content-Disposition:
+      - attachment; filename=text_file.txt
+      Accept-Ranges:
+      - bytes
+      Last-Modified:
+      - Tue, 06 Nov 2018 15:39:01 GMT
+      Etag:
+      - '"70f457e8bdf12b30ed18c5b110740c2e"'
+      X-Timestamp:
+      - '1541518740.18138'
+      X-Static-Large-Object:
+      - 'True'
+      Content-Type:
+      - text/plain
+      X-Trans-Id:
+      - txcc745e3550c44c78bbf53-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+recorded_with: VCR 4.0.0

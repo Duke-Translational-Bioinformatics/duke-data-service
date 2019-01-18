@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180403120319) do
+ActiveRecord::Schema.define(version: 20190110235737) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -198,6 +198,14 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "project_storage_providers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "project_id"
+    t.uuid "storage_provider_id"
+    t.boolean "is_initialized"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "project_transfer_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "project_transfer_id"
     t.uuid "to_user_id"
@@ -224,6 +232,7 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.datetime "updated_at", null: false
     t.boolean "is_consistent"
     t.string "slug"
+    t.uuid "storage_provider_id"
   end
 
   create_table "properties", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -279,6 +288,8 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.string "chunk_hash_algorithm", default: "md5"
     t.integer "chunk_max_number"
     t.bigint "chunk_max_size_bytes"
+    t.string "type"
+    t.boolean "is_default"
   end
 
   create_table "system_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -324,6 +335,7 @@ ActiveRecord::Schema.define(version: 20180403120319) do
     t.boolean "is_consistent"
     t.string "storage_container"
     t.datetime "purged_on"
+    t.string "multipart_upload_id"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

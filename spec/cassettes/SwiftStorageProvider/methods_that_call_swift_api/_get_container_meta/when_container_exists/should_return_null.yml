@@ -1,0 +1,104 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://swift.local:12345/auth/v1.0
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-User:
+      - test:tester
+      X-Auth-Key:
+      - testing
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Storage-Url:
+      - http://swift.local:12345/v1/AUTH_test
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Storage-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      Content-Length:
+      - '0'
+      X-Trans-Id:
+      - tx03be8a4da65a4991b23a2-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+- request:
+    method: put
+    uri: http://swift.local:12345/v1/AUTH_test/the_container
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=UTF-8
+      X-Trans-Id:
+      - tx6f1f055810c848dda015f-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+- request:
+    method: head
+    uri: http://swift.local:12345/v1/AUTH_test/the_container
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      X-Auth-Token:
+      - AUTH_tk6807c98598334c24a17372449e19ffd6
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Length:
+      - '0'
+      X-Container-Object-Count:
+      - '0'
+      Accept-Ranges:
+      - bytes
+      X-Timestamp:
+      - '1541516957.96626'
+      X-Container-Meta-Access-Control-Allow-Origin:
+      - "*"
+      X-Container-Bytes-Used:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Trans-Id:
+      - tx0cbf9af4d1d34a8d93110-005be1b594
+      Date:
+      - Tue, 06 Nov 2018 15:39:00 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Tue, 06 Nov 2018 15:39:00 GMT
+recorded_with: VCR 4.0.0

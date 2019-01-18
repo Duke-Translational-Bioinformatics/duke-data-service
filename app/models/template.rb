@@ -1,4 +1,4 @@
-class Template < ActiveRecord::Base
+class Template < ApplicationRecord
   audited
   belongs_to :creator, class_name: 'User'
   has_many :properties

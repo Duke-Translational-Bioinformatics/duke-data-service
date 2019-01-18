@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe DeprecatedElasticsearchResponse do
+  include_context 'mock all Uploads StorageProvider'
+
   it { expect(described_class).to respond_to 'indexed_models' }
 
   let(:policy_scope) { Proc.new {|scope| scope } }
