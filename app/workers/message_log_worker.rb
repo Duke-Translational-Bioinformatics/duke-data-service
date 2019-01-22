@@ -5,7 +5,7 @@ class MessageLogWorker
 
   def work_with_params(msg, delivery_info, metadata)
     begin
-      index_queue_message(msg, delivery_info, metadata)
+      index_queue_message(msg, delivery_info, metadata) unless ENV['MESSAGE_LOG_WORKER_INDEXING_DISABlED']
     rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
       Elasticsearch::Model.client.indices.create(
         index: index_name,

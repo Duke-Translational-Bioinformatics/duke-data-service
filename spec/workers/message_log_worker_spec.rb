@@ -17,6 +17,7 @@ RSpec.describe MessageLogWorker do
   it { is_expected.to respond_to(:work_with_params).with(3).arguments }
 
   describe '#work_with_params' do
+    include_context 'with env_override'
     let(:message) { {job_info: Faker::Lorem.words(5)} }
     let(:routing_key) { Faker::Internet.slug }
     let(:delivery_info) { expected_delivery_info }
@@ -61,6 +62,13 @@ RSpec.describe MessageLogWorker do
         let(:delivery_info) { expected_delivery_info.merge({connection: 'x'}) }
 
         it { expect(document["_source"]).to eq(log_message) }
+      end
+
+      context 'with env MESSAGE_LOG_WORKER_INDEXING_DISABlED set' do
+        let(:env_override) { {
+          'MESSAGE_LOG_WORKER_INDEXING_DISABlED' => 'yes'
+        } }
+        it { expect(new_documents).to be_empty }
       end
     end
   end
