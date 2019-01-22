@@ -64,9 +64,9 @@ RSpec.describe MessageLogWorker do
         it { expect(document["_source"]).to eq(log_message) }
       end
 
-      context 'with env MESSAGE_LOG_WORKER_INDEXING_DISABlED set' do
+      context 'with env MESSAGE_LOG_WORKER_INDEXING_DISABLED set' do
         let(:env_override) { {
-          'MESSAGE_LOG_WORKER_INDEXING_DISABlED' => 'yes'
+          'MESSAGE_LOG_WORKER_INDEXING_DISABLED' => 'yes'
         } }
         it { expect(new_documents).to be_empty }
       end
