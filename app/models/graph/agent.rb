@@ -1,7 +1,7 @@
 class Graph::Agent
   include Graphed::NodeModel
 
-  property :model_id, index: :exact
-  property :model_kind, index: :exact
+  property :model_id
+  property :model_kind
   self.mapped_label_name = 'Agent'
 end
