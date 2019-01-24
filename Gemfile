@@ -6,7 +6,7 @@ gem 'rails', '~> 5.1'
 gem "pg"
 
 # Use neo4j for PROV graph relationships
-gem 'neo4j', '~> 8.0'
+gem 'neo4j', '~> 9.0'
 
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers', '~> 2.5.0'
