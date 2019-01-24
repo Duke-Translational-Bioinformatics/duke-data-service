@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :upload do
     project
     sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
-    content_type "text/plain"
+    content_type { "text/plain" }
     size { Faker::Number.number(2) }
     etag { SecureRandom.hex }
     storage_provider

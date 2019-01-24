@@ -5,7 +5,7 @@ FactoryBot.define do
     association :creator, factory: :user
 
     trait :deleted do
-      is_deleted true
+      is_deleted { true }
     end
   end
 end

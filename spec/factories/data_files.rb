@@ -1,14 +1,14 @@
 FactoryBot.define do
   factory :data_file do
     transient do
-      without_upload false
+      without_upload { false }
     end
 
     name { Faker::Team.name }
     label { Faker::Hacker.say_something_smart }
     parent_id { SecureRandom.uuid }
     project
-    is_deleted false
+    is_deleted { false }
 
     after(:build) do |f, evaluator|
       unless evaluator.without_upload
@@ -22,16 +22,16 @@ FactoryBot.define do
     end
 
     trait :root do
-      parent_id nil
+      parent_id { nil }
     end
 
     trait :deleted do
-      is_deleted true
+      is_deleted { true }
     end
 
     trait :purged do
-      is_deleted true
-      is_purged true
+      is_deleted { true }
+      is_purged { true }
     end
 
     trait :invalid do
