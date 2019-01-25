@@ -9,7 +9,7 @@ gem "pg"
 gem 'neo4j', '~> 9.0'
 
 # Use sneakers(RabbitMQ) for background jobs
-gem 'sneakers', '~> 2.5.0'
+gem 'sneakers', '~> 2.6.0'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
