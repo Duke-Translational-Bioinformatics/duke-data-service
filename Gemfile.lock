@@ -47,7 +47,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
-    amq-protocol (2.2.0)
+    amq-protocol (2.3.0)
     arel (8.0.0)
     audited (4.8.0)
       activerecord (>= 4.0, < 5.3)
@@ -71,8 +71,8 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     builder (3.2.3)
-    bunny (2.7.4)
-      amq-protocol (~> 2.2.0)
+    bunny (2.13.0)
+      amq-protocol (~> 2.3, >= 2.3.0)
     bunny-mock (1.7.0)
       bunny (>= 1.7)
     byebug (10.0.2)
@@ -308,17 +308,18 @@ GEM
       rspec-core (>= 2, < 4, != 2.12.0)
     ruby-graphviz (1.2.4)
     safe_yaml (1.0.4)
-    serverengine (1.5.11)
+    serverengine (2.0.7)
       sigdump (~> 0.2.2)
     shoulda-callback-matchers (1.1.4)
       activesupport (>= 3)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
     sigdump (0.2.4)
-    sneakers (2.6.0)
-      bunny (~> 2.7.0)
+    sneakers (2.11.0)
+      bunny (~> 2.12)
       concurrent-ruby (~> 1.0)
-      serverengine (~> 1.5.11)
+      rake
+      serverengine (~> 2.0.5)
       thor
     spring (2.0.2)
       activesupport (>= 4.2)
@@ -399,7 +400,7 @@ DEPENDENCIES
   rspec_junit_formatter
   shoulda-callback-matchers (~> 1.1, >= 1.1.3)
   shoulda-matchers
-  sneakers (~> 2.6.0)
+  sneakers (~> 2.11.0)
   spring
   spring-commands-rspec
   turbolinks
