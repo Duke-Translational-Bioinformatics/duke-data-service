@@ -7,7 +7,7 @@ FactoryBot.define do
     is_consistent { true }
 
     trait :deleted do
-      is_deleted true
+      is_deleted { true }
     end
 
     trait :invalid do

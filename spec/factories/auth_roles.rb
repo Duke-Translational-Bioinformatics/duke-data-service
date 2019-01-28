@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :auth_role do
     transient do
-      without_permissions false
+      without_permissions { false }
     end
 
     sequence(:id) { |n| "#{Faker::Internet.domain_word}_#{n}" }
@@ -18,24 +18,24 @@ FactoryBot.define do
     }
 
     trait :system do
-      contexts %w(system)
+      contexts { %w(system) }
       permissions { AuthRole.available_permissions(:system) }
     end
 
     trait :project_admin do
-      id "project_admin"
-      name "Project Admin"
-      description "Can update project details, delete project, manage project level permissions and perform all file operations"
-      contexts %w(project)
+      id { "project_admin" }
+      name { "Project Admin" }
+      description { "Can update project details, delete project, manage project level permissions and perform all file operations" }
+      contexts { %w(project) }
       permissions { AuthRole.available_permissions(:project) }
     end
 
     trait :project_viewer do
-      id "project_viewer"
-      name "Project Viewer"
-      description "Can only view project and file meta-data"
-      contexts %w(project)
-      permissions %w(view_project)
+      id { "project_viewer" }
+      name { "Project Viewer" }
+      description { "Can only view project and file meta-data" }
+      contexts { %w(project) }
+      permissions { %w(view_project) }
     end
     
     trait :random_id do
@@ -43,8 +43,7 @@ FactoryBot.define do
     end
 
     trait :deprecated do
-      is_deprecated true
+      is_deprecated { true }
     end
   end
-
 end
