@@ -65,7 +65,7 @@ module DDS
         if meta_template.save
           meta_template
         else
-          if meta_template.errors.added? :template, :taken
+          if meta_template.errors.added? :template, :taken, value: template
             error!({
               error: '409',
               code: "not_provided",
