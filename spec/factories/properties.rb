@@ -7,7 +7,7 @@ FactoryBot.define do
     data_type { 'string' }
 
     trait :deprecated do
-      is_deprecated true
+      is_deprecated { true }
     end
   end
 end

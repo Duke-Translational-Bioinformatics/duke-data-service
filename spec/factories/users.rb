@@ -9,9 +9,9 @@ FactoryBot.define do
     last_login_at { Faker::Time.backward(14, :evening) }
 
     trait :delong do
-      display_name 'Mark Randall DeLong'
-      first_name 'Mark'
-      last_name 'DeLong'
+      display_name { 'Mark Randall DeLong' }
+      first_name { 'Mark' }
+      last_name { 'DeLong' }
     end
 
     trait :with_key do

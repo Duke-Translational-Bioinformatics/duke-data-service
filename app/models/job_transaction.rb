@@ -14,11 +14,13 @@ class JobTransaction < ApplicationRecord
 
   def self.logical_orphan_request_ids
     requests_without_orphans = select(:request_id).where.not(state: initial_states)
-    arel_table.project(arel_table[:request_id]).except(requests_without_orphans)
+    arel_table
+      .project(arel_table[:request_id])
+      .except(requests_without_orphans.arel)
   end
 
   def self.orphan_request_ids(limit: nil)
-    ids = select(:request_id).group(:request_id).having('count(*) = 1').order('min(created_at)')
+    ids = select(:request_id).group(:request_id).having('count(*) = 1').order(Arel.sql('min(created_at)'))
     ids = ids.limit(limit) if limit
     ids
   end

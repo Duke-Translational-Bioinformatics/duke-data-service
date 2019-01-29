@@ -20,6 +20,7 @@ module JobTracking
         initial_transaction,
         'in progress'
       )
+      ApplicationAudit.set_current_env_from_request_uuid(initial_transaction.request_id)
     end
 
     def self.complete_job(initial_transaction)

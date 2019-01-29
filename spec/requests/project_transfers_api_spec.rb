@@ -321,7 +321,7 @@ describe DDS::V1::ProjectTransfersAPI do
           it_behaves_like 'a validated resource'
           it 'should retain current permissions' do
             expect(resource.project.project_permissions).not_to be_empty
-            expect {is_expected.to eq(400)}.not_to change{ProjectPermission.all}
+            expect { is_expected.to eq(400) }.not_to change{ ProjectPermission.all.collect(&:attributes) }
           end
         end
 
