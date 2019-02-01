@@ -12,28 +12,6 @@ class ApplicationJob < ActiveJob::Base
     end
   end
 
-  rescue_from(ActiveJob::DeserializationError) do |e|
-    if @deserialization_error_retried
-      raise e
-    else
-      @deserialization_error_retried = true
-      self.class.wait ApplicationJob.deserialization_error_retry_interval
-      self.perform_now
-    end
-  end
-
-  def self.deserialization_error_retry_interval=(val)
-    @deserialization_error_retry_interval = Integer(val)
-  end
-
-  def self.deserialization_error_retry_interval
-    @deserialization_error_retry_interval || 1
-  end
-
-  def self.wait(interval)
-    sleep interval
-  end
-
   def self.distributor_exchange_name
     'active_jobs'
   end
