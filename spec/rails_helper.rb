@@ -126,4 +126,11 @@ module BunnyMock
       r
     end
   end
+
+  class Exchange
+    def add_route(key, xchg_or_queue)
+      @routes[key] ||= []
+      @routes[key] << xchg_or_queue unless @routes[key].include?(xchg_or_queue)
+    end
+  end
 end
