@@ -41,7 +41,11 @@ class ApplicationJob < ActiveJob::Base
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
       from_queue klass.queue_name,
-        arguments: {'x-dead-letter-exchange': "#{klass.queue_name}-retry"},
+        backoff_function: -> (attempt_number) { 2 ** attempt_number },
+        arguments: {
+          'x-dead-letter-exchange' => "#{klass.queue_name}.dlx",
+          'x-dead-letter-routing-key' => "#{klass.queue_name}"
+        },
         exchange: klass.distributor_exchange_name,
         exchange_type: klass.distributor_exchange_type
     end

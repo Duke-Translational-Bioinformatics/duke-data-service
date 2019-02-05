@@ -77,15 +77,15 @@ RSpec.describe ApplicationJob, type: :job do
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
     # Maxretry queue and exchange names
-    let(:retry_exchange_name) { prefixed_queue_name + '-retry' }
-    let(:requeue_exchange_name) { prefixed_queue_name + '-retry-requeue' }
-    let(:error_exchange_name) { 'active_jobs-error' }
-    let(:retry_queue_name) { retry_exchange_name }
-    let(:error_queue_name) { error_exchange_name }
+    let(:error_exchange_name) { prefixed_queue_name + '.dlx' }
+    let(:error_queue_name) { prefixed_queue_name + '.error' }
     let(:child_class_queue) {
       channel.queue(prefixed_queue_name,
         durable: true,
-        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
+        arguments: {
+          'x-dead-letter-exchange' => "#{child_class.queue_name}.dlx",
+          'x-dead-letter-routing-key' => "#{child_class.queue_name}"
+        },
       )
     }
     let(:child_class_name) {|example| "application_job_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
@@ -115,12 +115,9 @@ RSpec.describe ApplicationJob, type: :job do
       bunny_session.with_channel do |channel|
         if channel.respond_to? :queue_delete
           channel.queue_delete(prefixed_queue_name)
-          channel.queue_delete(retry_queue_name)
           channel.queue_delete(error_queue_name)
         end
         if channel.respond_to? :exchange_delete
-          channel.exchange_delete(retry_exchange_name)
-          channel.exchange_delete(requeue_exchange_name)
           channel.exchange_delete(error_exchange_name)
         end
       end
@@ -161,7 +158,10 @@ RSpec.describe ApplicationJob, type: :job do
     describe '::job_wrapper' do
       let(:job_wrapper) { child_class.job_wrapper }
       let(:queue_opts) {{
-        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"},
+        arguments: {
+          'x-dead-letter-exchange' => "#{child_class.queue_name}.dlx",
+          'x-dead-letter-routing-key' => "#{child_class.queue_name}"
+        },
         exchange: distributor_exchange_name,
         exchange_type: distributor_exchange_type
       }}
@@ -178,14 +178,11 @@ RSpec.describe ApplicationJob, type: :job do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
 
-        it { expect(job_wrapper_instance.opts[:handler]).to eq Sneakers::Handlers::Maxretry }
+        it { expect(job_wrapper_instance.opts[:handler]).to eq SneakersHandlers::ExponentialBackoffHandler }
         it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
-        it { expect(bunny_session.queue_exists?(retry_queue_name)).to be_truthy }
         it { expect(bunny_session.queue_exists?(error_queue_name)).to be_truthy }
-        it { expect(bunny_session.exchange_exists?(retry_exchange_name)).to be_truthy }
-        it { expect(bunny_session.exchange_exists?(requeue_exchange_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(error_exchange_name)).to be_truthy }
         it { expect{child_class.perform_later}.not_to raise_error }
         it { expect{

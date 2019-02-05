@@ -19,8 +19,7 @@ Sneakers.configure(
   :exchange_options => {
     :type => :fanout
   },
-  :handler => Sneakers::Handlers::Maxretry,
-  :retry_error_exchange => 'active_jobs-error',
+  :handler => SneakersHandlers::ExponentialBackoffHandler,
 
   # runner
   #:runner_config_file => nil,
