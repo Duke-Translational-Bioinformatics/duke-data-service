@@ -10,6 +10,7 @@ gem 'neo4j', '~> 9.0'
 
 # Use sneakers(RabbitMQ) for background jobs
 gem 'sneakers', '~> 2.11.0'
+gem 'sneakers_handlers', '~> 0.0.6'
 
 # User ldap for ldap_identity_provider searches
 gem 'net-ldap'
