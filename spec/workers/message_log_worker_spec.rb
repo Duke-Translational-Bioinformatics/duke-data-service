@@ -3,7 +3,10 @@ require 'rails_helper'
 RSpec.describe MessageLogWorker do
   let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
   let(:queue_name) { 'message_log' }
-  let(:error_exchange) { "#{queue_name}-error" }
+  let(:queue_arguments) { {
+    'x-dead-letter-exchange' => "#{queue_name}.dlx",
+    'x-dead-letter-routing-key' => queue_name
+  } }
 
   it { expect(described_class).to include(Sneakers::Worker) }
   it { expect(subject.queue.name).to eq(queue_name) }
@@ -11,7 +14,7 @@ RSpec.describe MessageLogWorker do
   it { expect(subject.opts[:exchange_options][:type]).to eq(:fanout) }
   it { expect(subject.opts[:exchange_options][:durable]).to be_truthy }
   it { expect(subject.opts[:exchange_options][:durable]).to be_truthy }
-  it { expect(subject.opts[:retry_error_exchange]).to eq(error_exchange) }
+  it { expect(subject.opts[:queue_options][:arguments]).to eq(queue_arguments) }
 
   it { is_expected.not_to respond_to(:work) }
   it { is_expected.to respond_to(:work_with_params).with(3).arguments }
