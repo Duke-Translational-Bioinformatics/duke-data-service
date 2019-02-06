@@ -178,15 +178,15 @@ RSpec.describe ApplicationJob, type: :job do
       describe 'instance max_retries' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         let(:max_retries) { job_wrapper_instance.opts[:max_retries] }
-        it { expect(max_retries).to eq(10) }
+        it { expect(max_retries).to eq(6) }
       end
 
       describe 'instance backoff_function' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         let(:backoff_function) { job_wrapper_instance.opts[:backoff_function] }
-        let(:backoff_seq) { [1, 2, 4, 8, 16] }
+        let(:backoff_seq) { [1, 5, 25, 125, 625] }
         it { expect(backoff_function).to respond_to(:call).with(1).argument }
-        # 2^x
+        # 5^x
         it { expect(backoff_function.call(0)).to eq(backoff_seq[0]) }
         it { expect(backoff_function.call(1)).to eq(backoff_seq[1]) }
         it { expect(backoff_function.call(2)).to eq(backoff_seq[2]) }
