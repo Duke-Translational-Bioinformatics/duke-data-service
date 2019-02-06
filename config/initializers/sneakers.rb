@@ -20,6 +20,7 @@ Sneakers.configure(
     :type => :fanout
   },
   :handler => SneakersHandlers::ExponentialBackoffHandler,
+  :max_retries => 6,
 
   # runner
   #:runner_config_file => nil,
