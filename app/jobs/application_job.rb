@@ -41,6 +41,7 @@ class ApplicationJob < ActiveJob::Base
     klass = self
     Class.new(ActiveJob::QueueAdapters::SneakersAdapter::JobWrapper) do
       from_queue klass.queue_name,
+        max_retries: 10,
         backoff_function: -> (attempt_number) { 2 ** attempt_number },
         arguments: {
           'x-dead-letter-exchange' => "#{klass.queue_name}.dlx",

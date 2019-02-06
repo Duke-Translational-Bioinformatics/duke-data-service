@@ -174,7 +174,14 @@ RSpec.describe ApplicationJob, type: :job do
         job_wrapper
       end
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
-      context 'instance backoff_function' do
+
+      describe 'instance max_retries' do
+        let(:job_wrapper_instance) { child_class.job_wrapper.new }
+        let(:max_retries) { job_wrapper_instance.opts[:max_retries] }
+        it { expect(max_retries).to eq(10) }
+      end
+
+      describe 'instance backoff_function' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         let(:backoff_function) { job_wrapper_instance.opts[:backoff_function] }
         let(:backoff_seq) { [1, 2, 4, 8, 16] }
@@ -186,6 +193,7 @@ RSpec.describe ApplicationJob, type: :job do
         it { expect(backoff_function.call(3)).to eq(backoff_seq[3]) }
         it { expect(backoff_function.call(4)).to eq(backoff_seq[4]) }
       end
+
       context 'instance created and run' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
