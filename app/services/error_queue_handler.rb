@@ -1,5 +1,6 @@
 class ErrorQueueHandler
   def message_count
+    raise "ErrorQueueHandler is deprecated due to incompatibilities with the ExponentialBackoffHandler."
     count = 0
     with_error_queue do |error_queue|
       count = error_queue.message_count
@@ -8,6 +9,7 @@ class ErrorQueueHandler
   end
 
   def messages(routing_key: nil, limit: nil)
+    raise "ErrorQueueHandler is deprecated due to incompatibilities with the ExponentialBackoffHandler."
     msgs = []
     each_error_queue_message do |msg|
       msgs << serialize_message(msg) unless routing_key &&
@@ -18,6 +20,7 @@ class ErrorQueueHandler
   end
 
   def requeue_message(id)
+    raise "ErrorQueueHandler is deprecated due to incompatibilities with the ExponentialBackoffHandler."
     message = nil
     msgs = []
     each_error_queue_message do |msg, channel, delivery_tags|
@@ -33,6 +36,7 @@ class ErrorQueueHandler
   end
 
   def requeue_all
+    raise "ErrorQueueHandler is deprecated due to incompatibilities with the ExponentialBackoffHandler."
     msgs = []
     each_error_queue_message do |msg, channel, delivery_tags|
       msgs << serialize_message(msg)
@@ -43,6 +47,7 @@ class ErrorQueueHandler
   end
 
   def requeue_messages(routing_key:, limit: nil)
+    raise "ErrorQueueHandler is deprecated due to incompatibilities with the ExponentialBackoffHandler."
     msgs = []
     each_error_queue_message do |msg, channel, delivery_tags|
       if msg.first[:routing_key] == routing_key

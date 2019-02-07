@@ -1,7 +1,10 @@
 class MessageLogWorker
   include Sneakers::Worker
   from_queue 'message_log',
-    :retry_error_exchange => 'message_log-error'
+    arguments: {
+      'x-dead-letter-exchange' => "message_log.dlx",
+      'x-dead-letter-routing-key' => "message_log"
+    }
 
   def work_with_params(msg, delivery_info, metadata)
     begin
