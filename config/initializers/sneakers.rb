@@ -12,8 +12,6 @@ sneakers_timeout_job_after = ENV['SNEAKERS_TIMEOUT_JOB_AFTER'] || 60
 sneakers_connection_threaded = ENV['SNEAKERS_SINGLE_THREADED_CONNECTION'] ? false : true
 sneakers_connection_continuation_timeout = ENV['SNEAKERS_CONNECTION_CONTINUATION'] || 4000
 
-ApplicationJob.deserialization_error_retry_interval = ENV['APPLICATION_JOB_DESERIALIZATION_ERROR_RETRY_INTERVAL'] if ENV['APPLICATION_JOB_DESERIALIZATION_ERROR_RETRY_INTERVAL']
-
 Sneakers.configure(
   :exchange => 'message_gateway',
   :exchange_options => {
