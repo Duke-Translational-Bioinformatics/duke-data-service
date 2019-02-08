@@ -120,11 +120,8 @@ describe DDS::V1::AppAPI do
       include_context 'storage_provider setup'
 
       let(:gateway_exchange_name) { Sneakers::CONFIG[:exchange] }
-      let(:retry_error_exchange_name) { Sneakers::CONFIG[:retry_error_exchange] }
       let(:distributor_exchange_name) { ApplicationJob.distributor_exchange_name }
       let(:message_log_worker_queue_name) { MessageLogWorker.new.queue.name }
-      let(:message_log_worker_retry_queue_name) { "#{MessageLogWorker.new.queue.name}-retry" }
-      let(:retry_error_queue_name) { Sneakers::CONFIG[:retry_error_exchange] }
 
       context 'environment is not set' do
         let(:status_error) { 'queue environment is not set' }
@@ -149,15 +146,12 @@ describe DDS::V1::AppAPI do
       end
 
       it_behaves_like 'it requires exchange', :gateway_exchange_name
-      it_behaves_like 'it requires exchange', :retry_error_exchange_name
       it_behaves_like 'it requires exchange', :distributor_exchange_name
 
       it_behaves_like 'it requires queue', :message_log_worker_queue_name
-      it_behaves_like 'it requires queue', :message_log_worker_retry_queue_name
-      it_behaves_like 'it requires queue', :retry_error_queue_name
 
       (ApplicationJob.descendants.collect {|d|
-        [d.queue_name, "#{d.queue_name}-retry"]
+        [d.queue_name]
       }).flatten.uniq.each do |this_queue|
         let(:job_queue) { this_queue }
         it_behaves_like 'it requires queue', :job_queue
