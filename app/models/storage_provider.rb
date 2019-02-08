@@ -25,6 +25,10 @@ class StorageProvider < ApplicationRecord
   end
 
   ### Interface Methods
+  def minimum_chunk_number
+    0
+  end
+
   def signed_url_duration
     60*5 # 5 minutes
   end

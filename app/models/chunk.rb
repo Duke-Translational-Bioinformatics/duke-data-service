@@ -11,6 +11,9 @@ class Chunk < ApplicationRecord
   validates :upload, presence: true
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
+  validates :number, numericality:  {
+    greater_than_or_equal_to: :minimum_chunk_number
+  }, if: :storage_provider
   validates :size, presence: true
   validates :size, numericality:  {
     less_than: :chunk_max_size_bytes
@@ -21,7 +24,7 @@ class Chunk < ApplicationRecord
   validate :upload_chunk_maximum, if: :storage_provider
 
   delegate :project_id, :minimum_chunk_size, :storage_container, to: :upload
-  delegate :chunk_max_size_bytes, to: :storage_provider
+  delegate :chunk_max_size_bytes, :minimum_chunk_number, to: :storage_provider
 
   def http_verb
     'PUT'

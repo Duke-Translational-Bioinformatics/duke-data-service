@@ -5,6 +5,8 @@ RSpec.describe SwiftStorageProvider, type: :model do
 
   it_behaves_like 'A StorageProvider implementation'
 
+  it { expect(subject.minimum_chunk_number).to eq 0 }
+
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
