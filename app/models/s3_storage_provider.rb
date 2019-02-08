@@ -39,6 +39,10 @@ class S3StorageProvider < StorageProvider
     chunk.number > chunk_max_number
   end
 
+  def minimum_chunk_number
+    1
+  end
+
   def chunk_max_number
     INT_MAX
   end
