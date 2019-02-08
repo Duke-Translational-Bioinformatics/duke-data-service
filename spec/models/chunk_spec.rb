@@ -26,6 +26,7 @@ RSpec.describe Chunk, type: :model do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:upload) }
     it { is_expected.to validate_presence_of(:number) }
+    it { is_expected.to validate_numericality_of(:number).is_greater_than_or_equal_to(subject.minimum_chunk_number) }
     it { is_expected.to validate_presence_of(:size) }
     it {
       is_expected.to validate_numericality_of(:size)
@@ -70,6 +71,7 @@ RSpec.describe Chunk, type: :model do
 
     it { is_expected.to delegate_method(:chunk_max_size_bytes).to(:storage_provider) }
     it { is_expected.to delegate_method(:minimum_chunk_size).to(:upload) }
+    it { is_expected.to delegate_method(:minimum_chunk_number).to(:storage_provider) }
 
     it 'is_expected.to have a http_verb method' do
       is_expected.to respond_to :http_verb
