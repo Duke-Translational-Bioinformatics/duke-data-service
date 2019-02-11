@@ -35,6 +35,10 @@ RSpec.describe S3StorageProvider, type: :model do
   it { is_expected.to validate_presence_of :service_user }
   it { is_expected.to validate_presence_of :service_pass }
 
+  describe '#minimum_chunk_number' do
+    it { expect(subject.minimum_chunk_number).to eq 1 }
+  end
+
   describe '#chunk_max_number' do
     it { expect(subject.chunk_max_number).to eq int_max_value }
   end

@@ -8,6 +8,7 @@ RSpec.describe StorageProvider, type: :model do
 
   include_context 'A StorageProvider'
 
+  it { expect(subject.minimum_chunk_number).to eq 0 }
   it { expect { subject.configure }.to raise_error(NotImplementedError) }
   it { expect { subject.is_ready?  }.to raise_error(NotImplementedError) }
   it { expect { subject.initialize_project(project) }.to raise_error(NotImplementedError) }

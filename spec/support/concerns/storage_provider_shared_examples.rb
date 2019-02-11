@@ -88,6 +88,8 @@ shared_context 'A StorageProvider' do
     end
   end
 
+  it { is_expected.to respond_to(:minimum_chunk_number) }
+
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 
