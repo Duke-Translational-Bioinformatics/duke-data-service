@@ -227,6 +227,17 @@ def set_default_storage_provider
   end
 end
 
+def create_storage_providers
+  total = 0
+  print 'Initialize project storage:'
+  Project.unscope(:order).eager_load(:project_storage_providers).where('project_storage_providers.id is NULL').each do |project|
+    project.initialize_storage
+    total += 1
+    print '.'
+  end
+  puts "\n#{total} projects initialized."
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -241,6 +252,7 @@ namespace :db do
       purge_deleted_objects
       populate_nil_project_slugs
       set_default_storage_provider
+      create_storage_providers
     end
   end
 end

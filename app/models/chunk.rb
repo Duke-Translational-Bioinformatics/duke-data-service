@@ -1,4 +1,4 @@
-class Chunk < ActiveRecord::Base
+class Chunk < ApplicationRecord
   default_scope { order('created_at DESC') }
   audited
   after_destroy :update_upload_etag
@@ -11,6 +11,9 @@ class Chunk < ActiveRecord::Base
   validates :upload, presence: true
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
+  validates :number, numericality:  {
+    greater_than_or_equal_to: :minimum_chunk_number
+  }, if: :storage_provider
   validates :size, presence: true
   validates :size, numericality:  {
     less_than: :chunk_max_size_bytes
@@ -21,14 +24,14 @@ class Chunk < ActiveRecord::Base
   validate :upload_chunk_maximum, if: :storage_provider
 
   delegate :project_id, :minimum_chunk_size, :storage_container, to: :upload
-  delegate :chunk_max_size_bytes, to: :storage_provider
+  delegate :chunk_max_size_bytes, :minimum_chunk_number, to: :storage_provider
 
   def http_verb
     'PUT'
   end
 
   def host
-    storage_provider.endpoint
+    storage_provider.url_root
   end
 
   def http_headers
@@ -44,7 +47,15 @@ class Chunk < ActiveRecord::Base
   end
 
   def url
-    storage_provider.chunk_upload_url(self)
+    begin
+      storage_provider.chunk_upload_url(self)
+    rescue StorageProviderException => e
+      if e.message == 'Upload is not ready'
+        raise ConsistencyException, e.message if e.message == 'Upload is not ready'
+      else
+        raise e
+      end
+    end
   end
 
   def purge_storage

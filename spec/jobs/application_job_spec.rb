@@ -77,15 +77,15 @@ RSpec.describe ApplicationJob, type: :job do
     let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
     # Maxretry queue and exchange names
-    let(:retry_exchange_name) { prefixed_queue_name + '-retry' }
-    let(:requeue_exchange_name) { prefixed_queue_name + '-retry-requeue' }
-    let(:error_exchange_name) { 'active_jobs-error' }
-    let(:retry_queue_name) { retry_exchange_name }
-    let(:error_queue_name) { error_exchange_name }
+    let(:error_exchange_name) { prefixed_queue_name + '.dlx' }
+    let(:error_queue_name) { prefixed_queue_name + '.error' }
     let(:child_class_queue) {
       channel.queue(prefixed_queue_name,
         durable: true,
-        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"}
+        arguments: {
+          'x-dead-letter-exchange' => "#{child_class.queue_name}.dlx",
+          'x-dead-letter-routing-key' => "#{child_class.queue_name}"
+        },
       )
     }
     let(:child_class_name) {|example| "application_job_spec#{example.metadata[:scoped_id].gsub(':','x')}_job".classify }
@@ -115,12 +115,9 @@ RSpec.describe ApplicationJob, type: :job do
       bunny_session.with_channel do |channel|
         if channel.respond_to? :queue_delete
           channel.queue_delete(prefixed_queue_name)
-          channel.queue_delete(retry_queue_name)
           channel.queue_delete(error_queue_name)
         end
         if channel.respond_to? :exchange_delete
-          channel.exchange_delete(retry_exchange_name)
-          channel.exchange_delete(requeue_exchange_name)
           channel.exchange_delete(error_exchange_name)
         end
       end
@@ -130,55 +127,6 @@ RSpec.describe ApplicationJob, type: :job do
     it { expect(child_class.queue_name).to eq(prefixed_queue_name) }
 
     it { expect{child_class.perform_now}.not_to raise_error }
-
-    describe '::deserialization_error_retry_interval' do
-      let(:interval) { Faker::Number.digit }
-      it { expect(described_class).to respond_to(:deserialization_error_retry_interval=).with(1).argument }
-      it { expect(described_class).to respond_to(:deserialization_error_retry_interval) }
-      it { expect(described_class.deserialization_error_retry_interval).to eq(1) }
-      it 'stores the interval string and returns integer' do
-        described_class.deserialization_error_retry_interval = interval
-        expect(interval).to be_a String
-        expect(described_class.deserialization_error_retry_interval).to eq(interval.to_i)
-      end
-    end
-
-    describe '::wait' do
-      it { expect(described_class).to respond_to(:wait).with(1).argument }
-      it 'calls sleep with argument' do
-        interval = 5
-        expect(described_class).to receive(:sleep).with(interval)
-        expect{described_class.wait(interval)}.not_to raise_error
-      end
-    end
-
-    describe '::execute' do
-      let(:job) { child_class.new }
-      let(:job_data) { job.serialize }
-      let(:retry_interval) { Faker::Number.between(1,10) }
-      it { expect{child_class.execute(job_data)}.not_to raise_error }
-      context 'when RecordNotFound raised' do
-        let(:project_role) { FactoryBot.create(:project_role) }
-        let(:job) { child_class.new(project_role) }
-        before(:each) do
-          described_class.deserialization_error_retry_interval = retry_interval
-          expect(ProjectRole).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
-          expect(child_class).to receive(:wait).with(retry_interval).ordered
-        end
-
-        it 'retries the first time' do
-          expect(ProjectRole).to receive(:find).and_call_original.ordered
-          expect(child_class).to receive(:run_count=).ordered
-
-          child_class.execute(job_data)
-        end
-        it 'fails the second time' do
-          expect(ProjectRole).to receive(:find).and_raise(ActiveRecord::RecordNotFound).ordered
-
-          expect{child_class.execute(job_data)}.to raise_error(ActiveJob::DeserializationError)
-        end
-      end
-    end
 
     it { expect(child_class).to respond_to :run_count }
     describe '::run_count' do
@@ -210,7 +158,10 @@ RSpec.describe ApplicationJob, type: :job do
     describe '::job_wrapper' do
       let(:job_wrapper) { child_class.job_wrapper }
       let(:queue_opts) {{
-        arguments: {'x-dead-letter-exchange': "#{child_class.queue_name}-retry"},
+        arguments: {
+          'x-dead-letter-exchange' => "#{child_class.queue_name}.dlx",
+          'x-dead-letter-routing-key' => "#{child_class.queue_name}"
+        },
         exchange: distributor_exchange_name,
         exchange_type: distributor_exchange_type
       }}
@@ -223,18 +174,35 @@ RSpec.describe ApplicationJob, type: :job do
         job_wrapper
       end
       it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_falsey }
+
+      describe 'instance max_retries' do
+        let(:job_wrapper_instance) { child_class.job_wrapper.new }
+        let(:max_retries) { job_wrapper_instance.opts[:max_retries] }
+        it { expect(max_retries).to eq(6) }
+      end
+
+      describe 'instance backoff_function' do
+        let(:job_wrapper_instance) { child_class.job_wrapper.new }
+        let(:backoff_function) { job_wrapper_instance.opts[:backoff_function] }
+        let(:backoff_seq) { [1, 5, 25, 125, 625] }
+        it { expect(backoff_function).to respond_to(:call).with(1).argument }
+        # 5^x
+        it { expect(backoff_function.call(0)).to eq(backoff_seq[0]) }
+        it { expect(backoff_function.call(1)).to eq(backoff_seq[1]) }
+        it { expect(backoff_function.call(2)).to eq(backoff_seq[2]) }
+        it { expect(backoff_function.call(3)).to eq(backoff_seq[3]) }
+        it { expect(backoff_function.call(4)).to eq(backoff_seq[4]) }
+      end
+
       context 'instance created and run' do
         let(:job_wrapper_instance) { child_class.job_wrapper.new }
         before { job_wrapper_instance.run }
 
-        it { expect(job_wrapper_instance.opts[:handler]).to eq Sneakers::Handlers::Maxretry }
+        it { expect(job_wrapper_instance.opts[:handler]).to eq SneakersHandlers::ExponentialBackoffHandler }
         it { expect(bunny_session.queue_exists?(prefixed_queue_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(distributor_exchange_name)).to be_truthy }
         it { expect(child_class_queue).to be_bound_to(distributor_exchange) }
-        it { expect(bunny_session.queue_exists?(retry_queue_name)).to be_truthy }
         it { expect(bunny_session.queue_exists?(error_queue_name)).to be_truthy }
-        it { expect(bunny_session.exchange_exists?(retry_exchange_name)).to be_truthy }
-        it { expect(bunny_session.exchange_exists?(requeue_exchange_name)).to be_truthy }
         it { expect(bunny_session.exchange_exists?(error_exchange_name)).to be_truthy }
         it { expect{child_class.perform_later}.not_to raise_error }
         it { expect{

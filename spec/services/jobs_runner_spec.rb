@@ -16,6 +16,7 @@ RSpec.describe JobsRunner do
   let(:workers_registry_hash) { {
     message_logger: MessageLogWorker,
     initialize_project_storage: ProjectStorageProviderInitializationJob,
+    initialize_upload_storage: UploadStorageProviderInitializationJob,
     delete_children: ChildDeletionJob,
     index_documents: ElasticsearchIndexJob,
     update_project_container_elasticsearch: ProjectContainerElasticsearchUpdateJob,

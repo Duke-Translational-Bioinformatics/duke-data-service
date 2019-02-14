@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe SwiftStorageProvider, type: :model do
-  subject { FactoryBot.create(:swift_storage_provider) }
+  subject { FactoryBot.build(:swift_storage_provider) }
+
+  it_behaves_like 'A StorageProvider implementation'
+
+  it { expect(subject.minimum_chunk_number).to eq 0 }
 
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
@@ -13,8 +17,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
       }
     }
     let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
-
-    it_behaves_like 'A StorageProvider'
 
     describe '#configure' do
       it 'should register_keys' do
@@ -28,7 +30,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     describe '#is_ready?' do
       context 'network connectivity failure' do
         before do
-          stub_request(:any, "#{subject.endpoint}#{subject.auth_uri}").to_timeout
+          stub_request(:any, "#{subject.url_root}#{subject.auth_uri}").to_timeout
         end
         after do
           WebMock.reset!
@@ -168,14 +170,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
       it 'should not do anything to initialize a chunked upload in swift' do
         expect {
           subject.initialize_chunked_upload(upload)
-        }.not_to raise_error
-      end
-    end
-
-    describe '#endpoint' do
-      it 'should return the swift url_root' do
-        expect {
-          expect(subject.endpoint).to eq(subject.url_root)
         }.not_to raise_error
       end
     end
@@ -384,6 +378,10 @@ RSpec.describe SwiftStorageProvider, type: :model do
           }.not_to raise_error
         end
       end
+    end
+
+    describe '#chunk_upload_ready?(upload)' do
+      it { expect(subject.chunk_upload_ready?(upload)).to be_truthy }
     end
 
     describe '#chunk_upload_url(chunk)' do
@@ -759,6 +757,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     context 'is_default' do
+      subject { FactoryBot.create(:swift_storage_provider) }
       let(:new_default_storage_provider) { FactoryBot.build(:swift_storage_provider, :default) }
       let(:new_not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
       it 'should allow only one default storage_provider' do
@@ -772,6 +771,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     context 'is_deprecated' do
+      subject { FactoryBot.create(:swift_storage_provider) }
       let(:not_default_storage_provider) { FactoryBot.build(:swift_storage_provider) }
       it {
         is_expected.to be_valid

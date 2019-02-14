@@ -45,6 +45,7 @@ RSpec.describe Upload, type: :model do
 
     it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
     it { is_expected.not_to validate_presence_of :fingerprints }
+    it { is_expected.not_to validate_presence_of :multipart_upload_id }
 
     context 'when completed_at is set' do
       before { subject.completed_at = Faker::Time.forward(1) }
@@ -78,10 +79,11 @@ RSpec.describe Upload, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_storage_container).before(:create) }
+    it { is_expected.to callback(:initialize_storage).after(:create) }
   end
 
   describe 'instance methods' do
-    it { should delegate_method(:endpoint).to(:storage_provider) }
+    it { should delegate_method(:url_root).to(:storage_provider) }
 
     it 'should have a http_verb method' do
       should respond_to :http_verb
@@ -160,6 +162,50 @@ RSpec.describe Upload, type: :model do
         }
         expect(subject.manifest[chunk.number - 1]).to eq chunk_manifest
       end
+    end
+  end
+
+  it { is_expected.to respond_to :initialize_storage }
+  describe '#initialize_storage' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+
+    it 'enqueues a UploadStorageProviderInitializationJob' do
+      expect {
+        subject.initialize_storage
+      }.to have_enqueued_job(UploadStorageProviderInitializationJob)
+        .with(job_transaction: instance_of(JobTransaction), storage_provider: subject.storage_provider, upload: subject)
+    end
+  end
+
+  it { is_expected.to respond_to :ready_for_chunks? }
+  describe '#ready_for_chunks?' do
+    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+    let(:upload_ready) { true }
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
+    end
+
+    it { expect(subject.ready_for_chunks?).to eq true }
+
+    context 'when upload is not ready' do
+      let(:upload_ready) { false }
+      it { expect(subject.ready_for_chunks?).to eq false }
+    end
+  end
+
+  it { is_expected.to respond_to :check_readiness! }
+  describe '#check_readiness!' do
+    let(:readiness) { true }
+    before(:example) do
+      allow(subject).to receive(:ready_for_chunks?).and_return(readiness)
+    end
+    it { expect(subject.check_readiness!).to be_truthy }
+
+    context 'when not ready' do
+      let(:readiness) { false }
+      it { expect { subject.check_readiness! }.to raise_error ConsistencyException, 'Upload is not ready' }
     end
   end
 

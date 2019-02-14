@@ -2,6 +2,7 @@ web: bundle exec puma -C config/puma.rb
 all_workers: bundle exec rake workers:all:run
 message_log_worker: bundle exec rake workers:message_logger:run
 project_storage_init_job: bundle exec rake workers:initialize_project_storage:run
+upload_storage_init_job: bundle exec rake workers:initialize_upload_storage:run
 child_deletion_job: bundle exec rake workers:delete_children:run
 child_purgation_job: bundle exec rake workers:purge_children:run
 child_restoration_job: bundle exec rake workers:restore_children:run

@@ -1,11 +1,14 @@
 class MessageLogWorker
   include Sneakers::Worker
   from_queue 'message_log',
-    :retry_error_exchange => 'message_log-error'
+    arguments: {
+      'x-dead-letter-exchange' => "message_log.dlx",
+      'x-dead-letter-routing-key' => "message_log"
+    }
 
   def work_with_params(msg, delivery_info, metadata)
     begin
-      index_queue_message(msg, delivery_info, metadata)
+      index_queue_message(msg, delivery_info, metadata) unless ENV['MESSAGE_LOG_WORKER_INDEXING_DISABLED']
     rescue Elasticsearch::Transport::Transport::Errors::NotFound => e
       Elasticsearch::Model.client.indices.create(
         index: index_name,

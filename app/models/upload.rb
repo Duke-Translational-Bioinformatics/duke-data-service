@@ -1,4 +1,4 @@
-class Upload < ActiveRecord::Base
+class Upload < ApplicationRecord
   include JobTransactionable
   default_scope { order('created_at DESC') }
   audited
@@ -10,6 +10,7 @@ class Upload < ActiveRecord::Base
   has_many :fingerprints
 
   before_create :set_storage_container
+  after_create :initialize_storage
 
   accepts_nested_attributes_for :fingerprints
 
@@ -30,7 +31,7 @@ class Upload < ActiveRecord::Base
   validates :fingerprints, presence: true, if: :completed_at
   validates :fingerprints, absence: true, unless: :completed_at
 
-  delegate :endpoint, to: :storage_provider
+  delegate :url_root, to: :storage_provider
 
   def object_path
     id
@@ -58,6 +59,23 @@ class Upload < ActiveRecord::Base
         size_bytes: chunk.size
       }
     end
+  end
+
+  def initialize_storage
+    UploadStorageProviderInitializationJob.perform_later(
+      job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      upload: self
+    )
+  end
+
+  def ready_for_chunks?
+    storage_provider.chunk_upload_ready?(self)
+  end
+
+  def check_readiness!
+    raise(ConsistencyException, 'Upload is not ready') unless ready_for_chunks?
+    true
   end
 
   def complete

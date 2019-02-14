@@ -12,19 +12,19 @@ FactoryBot.define do
     end
 
     trait :pending do
-      status 'pending'
+      status { 'pending' }
     end
 
     trait :accepted do
-      status 'accepted'
+      status { 'accepted' }
     end
 
     trait :rejected do
-      status 'rejected'
+      status { 'rejected' }
     end
 
     trait :canceled do
-      status 'canceled'
+      status { 'canceled' }
     end
 
     trait :skip_validation do

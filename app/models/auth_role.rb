@@ -1,4 +1,4 @@
-class AuthRole < ActiveRecord::Base
+class AuthRole < ApplicationRecord
   has_one :user, through: :system_permission
 
   self.primary_key = 'id'

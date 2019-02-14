@@ -10,7 +10,9 @@ class UploadSerializer < ActiveModel::Serializer
   def status
     {
       initiated_on: object.created_at,
+      ready_for_chunks: object.ready_for_chunks?,
       completed_on: object.completed_at,
+      is_consistent: object.is_consistent,
       purged_on: object.purged_on,
       error_on: object.error_at,
       error_message: object.error_message

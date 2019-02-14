@@ -5,7 +5,7 @@ FactoryBot.define do
     description { Faker::Lorem.sentence }
 
     trait :deprecated do
-      is_deprecated true
+      is_deprecated { true }
     end
   end
 end

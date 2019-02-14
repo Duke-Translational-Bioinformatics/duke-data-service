@@ -55,7 +55,7 @@ class DataFile < Container
   end
 
   def host
-    upload.endpoint
+    upload.url_root
   end
 
   def url

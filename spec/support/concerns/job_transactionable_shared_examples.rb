@@ -20,6 +20,7 @@ shared_examples 'a job_transactionable model' do
     let(:transaction_state) {'testing'}
 
     context 'with nil current_transaction' do
+      let(:audit_current_request_uuid) { ApplicationAudit.generate_current_request_uuid }
       it {
         subject.current_transaction = nil
         expect(subject.current_transaction).to be_nil
@@ -27,6 +28,8 @@ shared_examples 'a job_transactionable model' do
         expect(subject.current_transaction).not_to be_nil
         expect(subject.current_transaction).not_to be_persisted
         expect(subject.current_transaction.state).to eq(transaction_state)
+        expect(audit_current_request_uuid).not_to be_nil
+        expect(subject.current_transaction.request_id).to eq(audit_current_request_uuid)
       }
     end
 

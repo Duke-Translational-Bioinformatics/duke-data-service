@@ -27,34 +27,6 @@ shared_context 'creation' do |with_software_agent|
   end
 end
 
-shared_context 'with update' do |with_software_agent|
-  include_context 'with auditor'
-  let(:update_attribute) { 'updated_at' }
-  let(:update_value) { DateTime.now }
-  let(:update_action) { '/update' }
-
-  if with_software_agent
-    include_context 'with software_agent'
-    let(:updated) {
-      Audited.audit_class.as_user(auditor) do
-        resource.update_attributes!(
-          update_attribute => update_value,
-          :audit_comment => {"action": update_action, "software_agent_id": software_agent.id }
-        )
-      end
-     }
-  else
-    let(:updated) {
-      Audited.audit_class.as_user(auditor) do
-        resource.update_attributes!(
-          update_attribute => update_value,
-          :audit_comment => {"action": update_action}
-        )
-      end
-     }
-  end
-end
-
 shared_context 'with destroy' do |with_software_agent|
   include_context 'with auditor'
   let(:destroy_action) { '/destroy' }
@@ -172,12 +144,23 @@ shared_examples 'a serializer with a serialized audit' do
   end
 
   context 'for an updated resource' do
-    before do
-      expect(updated).to be_truthy
+    include_context 'with auditor'
+    let(:update_attribute) { 'updated_at' }
+    let(:update_value) { DateTime.now }
+    let(:update_action) { '/update' }
+    before(:each) do
+      ApplicationAudit.current_comment = audit_comment
+      ApplicationAudit.current_user = auditor
+      resource.update_attributes!(
+        update_attribute => update_value,
+        :audit_comment => audit_comment
+      )
     end
 
     context 'with browser client' do
-      include_context 'with update'
+      let(:audit_comment) { {
+        "action": update_action
+      } }
 
       it 'should report last_updated_on and last_updated_by' do
         is_expected.to have_key('audit')
@@ -198,7 +181,11 @@ shared_examples 'a serializer with a serialized audit' do
     end
 
     context 'with software_agent' do
-      include_context 'with update', 'with software_agent'
+      include_context 'with software_agent'
+      let(:audit_comment) { {
+        "action": update_action,
+        "software_agent_id": software_agent.id
+      } }
 
       it 'should report agent in last_updated_by' do
         is_expected.to have_key('audit')
