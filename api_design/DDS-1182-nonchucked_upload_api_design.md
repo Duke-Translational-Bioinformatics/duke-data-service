@@ -21,6 +21,11 @@ endpoint must be called. The hash algorithm may need to be validated to work wit
 the upload's storage provider. Once the upload has been completed, the payload for
 `GET /uploads/{id}` will no longer include a signed url for uploading.
 
+These changes should speed up client interactions by removing the need to call the
+`PUT /uploads/{id}/chunks` endpoint to create a signed url for uploading. Also,
+since the DDS API does not need to interact with an external service to create
+signed urls, latency introduced by the eventual consistency model is also removed.
+
 ## Implementation View
 
 #### Summary of impacted APIs
