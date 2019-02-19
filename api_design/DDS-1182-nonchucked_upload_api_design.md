@@ -47,8 +47,6 @@ the upload's storage provider. Once the upload has been completed, the payload f
 - *storage_provider.id (string, optional)* - The unique id for a storage provider.
 - *non_chunked (boolean, optional)* - When true, a signed upload url is returned with the payload
 
-###### Rules
-
 ###### Request Example
 
 ```JSON
