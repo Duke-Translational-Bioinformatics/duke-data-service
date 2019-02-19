@@ -25,6 +25,8 @@ These changes should speed up client interactions by removing the need to call t
 `PUT /uploads/{id}/chunks` endpoint to create a signed url for uploading. Also,
 since the DDS API does not need to interact with an external service to create
 signed urls, latency introduced by the eventual consistency model is also removed.
+All changes should be backwards compatible and responses will remain consistent
+with the previous version when not utilizing the new functionality.
 
 ## Implementation View
 
@@ -49,7 +51,7 @@ signed urls, latency introduced by the eventual consistency model is also remove
 - *content_type (string, optional)* - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 - *size (number, required)* - The size in bytes of entire file (computed by client).
 - *storage_provider.id (string, optional)* - The unique id for a storage provider.
-- *non_chunked (boolean, optional)* - Default false. When true, a signed upload url is returned with the payload
+- *non_chunked (boolean, optional)* - The default is false, returning the established chunked upload payload. When true, chunks are omitted and a signed upload url is returned with the payload.
 
 ###### Request Example
 
