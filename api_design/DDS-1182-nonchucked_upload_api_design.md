@@ -90,7 +90,7 @@ the upload's storage provider. Once the upload has been completed, the payload f
       "http_headers": [
         { "Content-Length": "30024000" }
       ]
-  }
+  },
   "audit": { }
 }
 ```
@@ -130,7 +130,7 @@ the upload's storage provider. Once the upload has been completed, the payload f
       "http_headers": [
         { "Content-Length": "30024000" }
       ]
-  }
+  },
   "audit": { }
 }
 ```
