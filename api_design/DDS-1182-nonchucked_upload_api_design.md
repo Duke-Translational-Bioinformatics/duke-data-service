@@ -5,8 +5,7 @@
 #### Background
 
 Chunked uploads are useful when dealing with large files. The overhead of the chunked
-upload process is not ideal for small files. In addition, AWS S3 documentation
-requires that multipart uploads be greater than 5mb.
+upload process is not ideal for small files.
 
 #### Proposal
 
