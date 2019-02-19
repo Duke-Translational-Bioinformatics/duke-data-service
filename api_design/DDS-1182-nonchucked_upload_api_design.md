@@ -85,7 +85,7 @@ the upload's storage provider. Once the upload has been completed, the payload f
     "error_on": null,
     "error_message": null
   },
-  signed_url: {
+  "signed_url": {
       "http_verb": "PUT",
       "host": "duke_data_service_prod.s3.amazonaws.com",
       "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
@@ -125,7 +125,7 @@ the upload's storage provider. Once the upload has been completed, the payload f
     "error_on": null,
     "error_message": null
   },
-  signed_url: {
+  "signed_url": {
       "http_verb": "PUT",
       "host": "duke_data_service_prod.s3.amazonaws.com",
       "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
