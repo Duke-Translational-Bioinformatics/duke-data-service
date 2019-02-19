@@ -49,7 +49,7 @@ signed urls, latency introduced by the eventual consistency model is also remove
 - *content_type (string, optional)* - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 - *size (number, required)* - The size in bytes of entire file (computed by client).
 - *storage_provider.id (string, optional)* - The unique id for a storage provider.
-- *non_chunked (boolean, optional)* - When true, a signed upload url is returned with the payload
+- *non_chunked (boolean, optional)* - Default false. When true, a signed upload url is returned with the payload
 
 ###### Request Example
 
