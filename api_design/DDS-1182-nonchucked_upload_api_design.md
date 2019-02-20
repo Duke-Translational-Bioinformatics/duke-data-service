@@ -9,11 +9,11 @@ upload process is not ideal for small files.
 
 #### Proposal
 
-Add a `non_chunked` boolean attribute to the `POST /projects/{id}/uploads` endpoint.
-When `non_chunked` is true, the returned payload will include a signed url for
+Add a `chunked` boolean attribute to the `POST /projects/{id}/uploads` endpoint.
+When `chunked` is false, the returned payload will include a signed url for
 uploading data.
 
-For uploads created with a truthy `non_chunked` attribute, the payload for the
+For uploads created with a false `chunked` attribute, the payload for the
 `GET /uploads/{id}` endpoint will include a signed url for uploading data.
 
 When the client is finished uploading data, the `PUT /uploads/{id}/complete`
@@ -51,7 +51,7 @@ with the previous version when not utilizing the new functionality.
 - *content_type (string, optional)* - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 - *size (number, required)* - The size in bytes of entire file (computed by client).
 - *storage_provider.id (string, optional)* - The unique id for a storage provider.
-- *non_chunked (boolean, optional)* - The default is false, returning the established chunked upload payload. When true, chunks are omitted and a signed upload url is returned with the payload.
+- *chunked (boolean, optional)* - The default is true, returning the established chunked upload payload. When false, chunks are omitted and a signed upload url is returned with the payload.
 
 ###### Request Example
 
@@ -63,7 +63,7 @@ with the previous version when not utilizing the new functionality.
   "storage_provider": {
     "id": "g5579f73-0558-4f96-afc7-9d251e65bv33"
   },
-  "non_chunked": true
+  "chunked": false
 }
 ```
 
