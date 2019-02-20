@@ -1,0 +1,2 @@
+class ChunkedUpload < Upload
+end
