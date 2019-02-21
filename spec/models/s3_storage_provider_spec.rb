@@ -4,8 +4,8 @@ RSpec.describe S3StorageProvider, type: :model do
   include ActiveSupport::Testing::TimeHelpers
   subject { FactoryBot.build(:s3_storage_provider) }
   let(:project) { stub_model(Project, id: SecureRandom.uuid) }
-  let(:upload) { FactoryBot.create(:upload, :skip_validation) }
-  let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+  let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
+  let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
   let(:domain) { Faker::Internet.domain_name }
   let(:int_max_value) { 2147483647 }
   let(:big_int_max_value) { 9223372036854775807 }
@@ -96,14 +96,14 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     before(:example) do
       is_expected.to receive(:create_multipart_upload)
-        .with(upload.project.id, upload.id)
+        .with(chunked_upload.project.id, chunked_upload.id)
         .and_return(cmu_response)
     end
-    it 'sets and persists upload#multipart_upload_id' do
-      expect(upload.multipart_upload_id).to be_nil
-      expect(subject.initialize_chunked_upload(upload)).to be_truthy
-      expect(upload.reload).to be_truthy
-      expect(upload.multipart_upload_id).to eq(multipart_upload_id)
+    it 'sets and persists chunked_upload#multipart_upload_id' do
+      expect(chunked_upload.multipart_upload_id).to be_nil
+      expect(subject.initialize_chunked_upload(chunked_upload)).to be_truthy
+      expect(chunked_upload.reload).to be_truthy
+      expect(chunked_upload.multipart_upload_id).to eq(multipart_upload_id)
     end
   end
 
@@ -132,34 +132,34 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#suggested_minimum_chunk_size' do
-    let(:upload) { stub_model(Upload, size: size) }
+    let(:chunked_upload) { stub_model(ChunkedUpload, size: size) }
 
-    context 'upload.size = 0' do
+    context 'chunked_upload.size = 0' do
       let(:size) { 0 }
-      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(0) }
+      it { expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(0) }
     end
 
-    context 'upload.size < storage_provider.chunk_max_number' do
+    context 'chunked_upload.size < storage_provider.chunk_max_number' do
       let(:size) { subject.chunk_max_number - 1 }
-      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(1) }
+      it { expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(1) }
     end
 
-    context 'upload.size > storage_provider.chunk_max_number' do
+    context 'chunked_upload.size > storage_provider.chunk_max_number' do
       let(:size) { subject.chunk_max_number + 1 }
-      it { expect(subject.suggested_minimum_chunk_size(upload)).to eq(2) }
+      it { expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(2) }
     end
   end
 
   describe '#complete_chunked_upload' do
-    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+    let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
     let(:chunks) { [
-      FactoryBot.create(:chunk, :skip_validation, upload: upload, number: 1),
-      FactoryBot.create(:chunk, :skip_validation, upload: upload, number: 2),
+      FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 1),
+      FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 2),
     ] }
-    let(:bucket_name) { upload.storage_container }
-    let(:object_key) { upload.id }
+    let(:bucket_name) { chunked_upload.storage_container }
+    let(:object_key) { chunked_upload.id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
-    let(:content_length) { upload.size }
+    let(:content_length) { chunked_upload.size }
     let(:parts) { [
       { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
       { etag: "\"#{chunks[1].fingerprint_value}\"", part_number: 2 }
@@ -182,12 +182,12 @@ RSpec.describe S3StorageProvider, type: :model do
         .with(bucket_name, object_key)
         .and_return(ho_response)
     end
-    it { expect { subject.complete_chunked_upload(upload) }.not_to raise_error }
+    it { expect { subject.complete_chunked_upload(chunked_upload) }.not_to raise_error }
 
     context 'StorageProviderException raised' do
       let(:cmu_response) { raise StorageProviderException }
       it 'raises an IntegrityException' do
-        expect { subject.complete_chunked_upload(upload) }.to raise_error { |error|
+        expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error { |error|
           expect(error).to be_an IntegrityException
           expect(error.cause).to be_a StorageProviderException
           expect(error.message).to eq(error.cause.message)
@@ -196,16 +196,16 @@ RSpec.describe S3StorageProvider, type: :model do
     end
 
     context 'size mismatch' do
-      let(:content_length) { upload.size - 10 }
+      let(:content_length) { chunked_upload.size - 10 }
 
-      it { expect { subject.complete_chunked_upload(upload) }.to raise_error(IntegrityException) }
+      it { expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error(IntegrityException) }
     end
   end
 
-  describe '#is_complete_chunked_upload?(upload)' do
-    let(:bucket_name) { upload.storage_container }
-    let(:object_key) { upload.id }
-    let(:content_length) { upload.size }
+  describe '#is_complete_chunked_upload?(chunked_upload)' do
+    let(:bucket_name) { chunked_upload.storage_container }
+    let(:object_key) { chunked_upload.id }
+    let(:content_length) { chunked_upload.size }
     let(:ho_response) { {
       content_length: content_length,
       etag: "\"#{Faker::Crypto.md5}\"",
@@ -216,34 +216,34 @@ RSpec.describe S3StorageProvider, type: :model do
         .with(bucket_name, object_key) { ho_response }
     end
 
-    it { expect(subject.is_complete_chunked_upload?(upload)).to be_truthy }
+    it { expect(subject.is_complete_chunked_upload?(chunked_upload)).to be_truthy }
 
     context 'object does not exist' do
       let(:ho_response) { false }
-      it { expect(subject.is_complete_chunked_upload?(upload)).to be_falsey }
+      it { expect(subject.is_complete_chunked_upload?(chunked_upload)).to be_falsey }
     end
 
     context 'unexpected StorageProviderException' do
       let(:ho_response) { raise StorageProviderException.new('Unexpected') }
-      it { expect { subject.is_complete_chunked_upload?(upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+      it { expect { subject.is_complete_chunked_upload?(chunked_upload) }.to raise_error(StorageProviderException, 'Unexpected') }
     end
   end
 
-  describe '#chunk_upload_ready?(upload)' do
-    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+  describe '#chunk_upload_ready?(chunked_upload)' do
+    let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
-    it { expect(subject.chunk_upload_ready?(upload)).to eq true }
+    it { expect(subject.chunk_upload_ready?(chunked_upload)).to eq true }
 
     context 'when upload.multipart_upload_id is nil' do
       let(:multipart_upload_id) { nil }
-      it { expect(subject.chunk_upload_ready?(upload)).to eq false }
+      it { expect(subject.chunk_upload_ready?(chunked_upload)).to eq false }
     end
   end
 
   describe '#chunk_upload_url(chunk)' do
-    let(:upload) { FactoryBot.create(:upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
-    let(:bucket_name) { chunk.upload.storage_container }
-    let(:object_key) { chunk.upload.id }
+    let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+    let(:bucket_name) { chunk.chunked_upload.storage_container }
+    let(:object_key) { chunk.chunked_upload.id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
@@ -275,8 +275,8 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#download_url' do
-    let(:bucket_name) { upload.storage_container }
-    let(:object_key) { upload.id }
+    let(:bucket_name) { chunked_upload.storage_container }
+    let(:object_key) { chunked_upload.id }
     let(:expected_url) { '/' + Faker::Internet.user_name }
     let(:file_name) { Faker::File.file_name }
     let(:pu_response) { subject.url_root + expected_url }
@@ -290,7 +290,7 @@ RSpec.describe S3StorageProvider, type: :model do
             object_key: object_key
           ).and_return(pu_response)
       end
-      it { expect(subject.download_url(upload)).to eq expected_url }
+      it { expect(subject.download_url(chunked_upload)).to eq expected_url }
     end
 
     context 'with filename argument set' do
@@ -303,25 +303,25 @@ RSpec.describe S3StorageProvider, type: :model do
             response_content_disposition: "attachment; filename=#{file_name}"
           ).and_return(expected_url)
       end
-      it { expect(subject.download_url(upload, file_name)).to eq expected_url }
+      it { expect(subject.download_url(chunked_upload, file_name)).to eq expected_url }
     end
   end
 
   describe '#purge' do
-    context 'upload' do
-      let(:bucket_name) { upload.storage_container }
-      let(:object_key) { upload.id }
+    context 'chunked_upload' do
+      let(:bucket_name) { chunked_upload.storage_container }
+      let(:object_key) { chunked_upload.id }
       let(:response) { {} }
       before(:example) do
         expect(subject).to receive(:delete_object)
           .with(bucket_name, object_key) { response }
       end
 
-      it { expect(subject.purge(upload)).to be_truthy }
+      it { expect(subject.purge(chunked_upload)).to be_truthy }
 
       context 'unexpected StorageProviderException' do
         let(:response) { raise StorageProviderException.new('Unexpected') }
-        it { expect { subject.purge(upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+        it { expect { subject.purge(chunked_upload) }.to raise_error(StorageProviderException, 'Unexpected') }
       end
     end
 

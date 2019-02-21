@@ -91,9 +91,9 @@ class S3StorageProvider < StorageProvider
     begin
       presigned_url(
         :upload_part,
-        bucket_name: chunk.upload.storage_container,
-        object_key: chunk.upload.id,
-        upload_id: chunk.upload.multipart_upload_id,
+        bucket_name: chunk.chunked_upload.storage_container,
+        object_key: chunk.chunked_upload.id,
+        upload_id: chunk.chunked_upload.multipart_upload_id,
         part_number: chunk.number,
         content_length: chunk.size
       ).sub(url_root, '')
