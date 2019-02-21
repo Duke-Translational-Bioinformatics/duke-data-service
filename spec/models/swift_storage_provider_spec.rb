@@ -11,6 +11,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
+    let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
     let(:expected_meta) {
       {
       "content-length" => "#{chunked_upload.size}"
@@ -437,6 +438,14 @@ RSpec.describe SwiftStorageProvider, type: :model do
           expect {
             subject.purge(chunk)
           }.not_to raise_error
+        end
+      end
+
+      context 'non_chunked_upload' do
+        it 'should raise an Exception' do
+          expect {
+            subject.purge(non_chunked_upload)
+          }.to raise_error("#{non_chunked_upload} is not purgable")
         end
       end
 
