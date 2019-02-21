@@ -50,16 +50,6 @@ class Upload < ApplicationRecord
     storage_provider.download_url(self, filename)
   end
 
-  def manifest
-    chunks.reorder(:number).collect do |chunk|
-      {
-        path: chunk.sub_path,
-        etag: chunk.fingerprint_value,
-        size_bytes: chunk.size
-      }
-    end
-  end
-
   def initialize_storage
     UploadStorageProviderInitializationJob.perform_later(
       job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
@@ -109,15 +99,6 @@ class Upload < ApplicationRecord
   def set_storage_container
     self.storage_container = project_id
     storage_container
-  end
-
-  def purge_storage
-    chunks.each do |chunk|
-      chunk.purge_storage
-      chunk.destroy
-    end
-    storage_provider.purge(self)
-    self.update(purged_on: DateTime.now)
   end
 
   def max_size_bytes

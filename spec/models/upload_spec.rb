@@ -150,6 +150,10 @@ RSpec.describe Upload, type: :model do
     end
   end
 
+  # Instance methods implemented in subclasses
+  it { is_expected.not_to respond_to :manifest }
+  it { is_expected.not_to respond_to :purge_storage }
+
   it { is_expected.to respond_to :initialize_storage }
   describe '#initialize_storage' do
     subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
