@@ -10,9 +10,9 @@ FactoryBot.define do
     is_consistent { true }
 
     trait :with_chunks do
-      after(:build) do |upload, evaluator|
-        chunk = build(:chunk, upload: upload, number: 1)
-        upload.association(:chunks).add_to_target(chunk)
+      after(:build) do |chunked_upload, evaluator|
+        chunk = build(:chunk, chunked_upload: chunked_upload, number: 1)
+        chunked_upload.association(:chunks).add_to_target(chunk)
       end
     end
 
