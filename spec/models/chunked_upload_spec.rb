@@ -10,6 +10,9 @@ RSpec.describe ChunkedUpload, type: :model do
 
   it { is_expected.to be_an Upload }
 
+  # Associations
+  it { is_expected.to have_many(:chunks).with_foreign_key('upload_id') }
+
   it 'should have a manifest method' do
     is_expected.to respond_to 'manifest'
     expect(subject.manifest).to be_a Array

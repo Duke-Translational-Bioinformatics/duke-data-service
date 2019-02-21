@@ -4,7 +4,6 @@ class Upload < ApplicationRecord
   audited
   belongs_to :project
   belongs_to :storage_provider
-  has_many :chunks
   has_many :project_permissions, through: :project
   belongs_to :creator, class_name: 'User'
   has_many :fingerprints

@@ -20,7 +20,7 @@ RSpec.describe Upload, type: :model do
       is_expected.to belong_to(:project)
     }
     it { is_expected.to belong_to(:storage_provider) }
-    it { is_expected.to have_many(:chunks) }
+    it { is_expected.not_to have_many(:chunks) }
     it { is_expected.to have_many(:project_permissions).through(:project) }
     it { is_expected.to belong_to(:creator).class_name('User') }
     it { is_expected.to have_many(:fingerprints) }
