@@ -9,13 +9,6 @@ FactoryBot.define do
     association :creator, factory: :user
     is_consistent { true }
 
-    trait :with_chunks do
-      after(:build) do |upload, evaluator|
-        chunk = build(:chunk, upload: upload, number: 1)
-        upload.association(:chunks).add_to_target(chunk)
-      end
-    end
-
     trait :with_fingerprint do
       after(:build) do |upload, evaluator|
         fingerprint = build(:fingerprint, upload: upload)
