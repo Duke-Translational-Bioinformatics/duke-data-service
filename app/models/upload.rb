@@ -67,33 +67,9 @@ class Upload < ApplicationRecord
     true
   end
 
-  def complete
-    transaction do
-      self.completed_at = DateTime.now
-      if save
-        UploadCompletionJob.perform_later(
-          UploadCompletionJob.initialize_job(self),
-          self.id
-        )
-        self
-      end
-    end
-  end
-
   def has_integrity_exception?
     # this is currently the only use of the error attributes
     !error_at.nil?
-  end
-
-  def complete_and_validate_integrity
-      begin
-      storage_provider.complete_chunked_upload(self)
-      update!({
-        is_consistent: true
-      })
-    rescue IntegrityException => e
-      integrity_exception(e.message)
-    end
   end
 
   def set_storage_container

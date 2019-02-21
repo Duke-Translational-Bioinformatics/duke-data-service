@@ -19,4 +19,28 @@ class ChunkedUpload < Upload
     storage_provider.purge(self)
     self.update(purged_on: DateTime.now)
   end
+
+  def complete
+    transaction do
+      self.completed_at = DateTime.now
+      if save
+        UploadCompletionJob.perform_later(
+          UploadCompletionJob.initialize_job(self),
+          self.id
+        )
+        self
+      end
+    end
+  end
+
+  def complete_and_validate_integrity
+      begin
+      storage_provider.complete_chunked_upload(self)
+      update!({
+        is_consistent: true
+      })
+    rescue IntegrityException => e
+      integrity_exception(e.message)
+    end
+  end
 end

@@ -198,20 +198,7 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  describe '#complete' do
-    let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
-    before { subject.fingerprints_attributes = [fingerprint_attributes] }
-
-    it { is_expected.to respond_to :complete }
-    it {
-      expect(subject.completed_at).to be_nil
-      expect {
-        expect(subject.complete).to be_truthy
-      }.to have_enqueued_job(UploadCompletionJob)
-      subject.reload
-      expect(subject.completed_at).not_to be_nil
-    }
-  end
+  it { is_expected.not_to respond_to :complete }
 
   describe '#has_integrity_exception?' do
     it { is_expected.to respond_to :has_integrity_exception? }
@@ -282,52 +269,7 @@ RSpec.describe Upload, type: :model do
     }
   end
 
-  describe '#complete_and_validate_integrity' do
-    subject { FactoryBot.create(:upload, is_consistent: false, storage_provider: mocked_storage_provider) }
-
-    it { is_expected.to respond_to :complete_and_validate_integrity }
-
-    context 'with valid reported size and chunk hashes' do
-      it 'should set is_consistent to true, leave error_at and error_message null' do
-        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
-          .with(subject)
-        subject.complete_and_validate_integrity
-        subject.reload
-        expect(subject.is_consistent).to be_truthy
-        expect(subject.error_at).to be_nil
-        expect(subject.error_message).to be_nil
-      end
-    end #with valid
-
-    context 'IntegrityException' do
-      it 'should set is_consistent to true, set integrity_exception message as error_message, and set error_at' do
-        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
-          .with(subject)
-          .and_raise(IntegrityException)
-        subject.complete_and_validate_integrity
-        subject.reload
-        expect(subject.is_consistent).to be_truthy
-        expect(subject.error_at).not_to be_nil
-        expect(subject.error_message).not_to be_nil
-      end
-    end #with reported size
-
-    context 'StorageProvider Exception' do
-      it 'should update completed_at, error_at and error_message and raise an IntegrityException' do
-        expect(subject.is_consistent).not_to be_truthy
-        expect(mocked_storage_provider).to receive(:complete_chunked_upload)
-          .with(subject)
-          .and_raise(unexpected_exception)
-        expect {
-          subject.complete_and_validate_integrity
-        }.to raise_error(unexpected_exception)
-        subject.reload
-        expect(subject.is_consistent).not_to be_truthy
-        expect(subject.error_at).to be_nil
-        expect(subject.error_message).to be_nil
-      end
-    end
-  end #complete_and_validate_integrity
+  it { is_expected.not_to respond_to :complete_and_validate_integrity }
 
   context 'when created with the Default StorageProvider' do
     let(:default_storage_provider) { FactoryBot.create(:swift_storage_provider, :default) }
