@@ -5,6 +5,7 @@ RSpec.describe S3StorageProvider, type: :model do
   subject { FactoryBot.build(:s3_storage_provider) }
   let(:project) { stub_model(Project, id: SecureRandom.uuid) }
   let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
+  let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
   let(:domain) { Faker::Internet.domain_name }
   let(:int_max_value) { 2147483647 }
@@ -95,15 +96,23 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     before(:example) do
+      allow(subject).to receive(:create_multipart_upload)
+    end
+    it 'sets and persists chunked_upload#multipart_upload_id' do
       is_expected.to receive(:create_multipart_upload)
         .with(chunked_upload.project.id, chunked_upload.id)
         .and_return(cmu_response)
-    end
-    it 'sets and persists chunked_upload#multipart_upload_id' do
       expect(chunked_upload.multipart_upload_id).to be_nil
       expect(subject.initialize_chunked_upload(chunked_upload)).to be_truthy
       expect(chunked_upload.reload).to be_truthy
       expect(chunked_upload.multipart_upload_id).to eq(multipart_upload_id)
+    end
+
+    context 'with a non-chunked upload' do
+      let(:expected_exception) { "#{non_chunked_upload} is not a ChunkedUpload" }
+      it 'raises an exception' do
+        expect { subject.initialize_chunked_upload(non_chunked_upload) }.to raise_error(expected_exception)
+      end
     end
   end
 
@@ -151,54 +160,60 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#complete_chunked_upload' do
-    let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
-    let(:chunks) { [
-      FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 1),
-      FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 2),
-    ] }
-    let(:bucket_name) { chunked_upload.storage_container }
-    let(:object_key) { chunked_upload.id }
-    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
-    let(:content_length) { chunked_upload.size }
-    let(:parts) { [
-      { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
-      { etag: "\"#{chunks[1].fingerprint_value}\"", part_number: 2 }
-    ] }
-    let(:cmu_response) { {
-      bucket: bucket_name,
-      etag: "\"#{Faker::Crypto.md5}\"",
-      key: object_key,
-      location: "/#{bucket_name}"
-    } }
-    let(:ho_response) { {
-      content_length: content_length,
-      etag: "\"#{Faker::Crypto.md5}\"",
-      metadata: {}
-    } }
-    before(:example) do
-      is_expected.to receive(:complete_multipart_upload)
-        .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) { cmu_response }
-      allow(subject).to receive(:head_object)
-        .with(bucket_name, object_key)
-        .and_return(ho_response)
-    end
-    it { expect { subject.complete_chunked_upload(chunked_upload) }.not_to raise_error }
+    context 'with ChunkedUpload' do
+      let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
+      let(:chunks) { [
+        FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 1),
+        FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 2),
+      ] }
+      let(:bucket_name) { chunked_upload.storage_container }
+      let(:object_key) { chunked_upload.id }
+      let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+      let(:content_length) { chunked_upload.size }
+      let(:parts) { [
+        { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
+        { etag: "\"#{chunks[1].fingerprint_value}\"", part_number: 2 }
+      ] }
+      let(:cmu_response) { {
+        bucket: bucket_name,
+        etag: "\"#{Faker::Crypto.md5}\"",
+        key: object_key,
+        location: "/#{bucket_name}"
+      } }
+      let(:ho_response) { {
+        content_length: content_length,
+        etag: "\"#{Faker::Crypto.md5}\"",
+        metadata: {}
+      } }
+      before(:example) do
+        is_expected.to receive(:complete_multipart_upload)
+          .with(bucket_name, object_key, upload_id: multipart_upload_id, parts: parts) { cmu_response }
+        allow(subject).to receive(:head_object)
+          .with(bucket_name, object_key)
+          .and_return(ho_response)
+      end
+      it { expect { subject.complete_chunked_upload(chunked_upload) }.not_to raise_error }
 
-    context 'StorageProviderException raised' do
-      let(:cmu_response) { raise StorageProviderException }
-      it 'raises an IntegrityException' do
-        expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error { |error|
-          expect(error).to be_an IntegrityException
-          expect(error.cause).to be_a StorageProviderException
-          expect(error.message).to eq(error.cause.message)
-        }
+      context 'StorageProviderException raised' do
+        let(:cmu_response) { raise StorageProviderException }
+        it 'raises an IntegrityException' do
+          expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error { |error|
+            expect(error).to be_an IntegrityException
+            expect(error.cause).to be_a StorageProviderException
+            expect(error.message).to eq(error.cause.message)
+          }
+        end
+      end
+
+      context 'size mismatch' do
+        let(:content_length) { chunked_upload.size - 10 }
+
+        it { expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error(IntegrityException) }
       end
     end
-
-    context 'size mismatch' do
-      let(:content_length) { chunked_upload.size - 10 }
-
-      it { expect { subject.complete_chunked_upload(chunked_upload) }.to raise_error(IntegrityException) }
+    context 'with non-chunked upload' do
+      let(:expected_exception) { "#{non_chunked_upload} is not a ChunkedUpload" }
+      it { expect { subject.complete_chunked_upload(non_chunked_upload) }.to raise_error(expected_exception) }
     end
   end
 

@@ -60,6 +60,7 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
+    raise("#{upload} is not a ChunkedUpload") unless upload.is_a? ChunkedUpload
     begin
       put_object_manifest(
         upload.storage_container,

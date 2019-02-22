@@ -31,8 +31,12 @@ class S3StorageProvider < StorageProvider
   end
 
   def initialize_chunked_upload(upload)
-    resp = create_multipart_upload(upload.project.id, upload.id)
-    upload.update_attribute(:multipart_upload_id, resp)
+    if upload.is_a? ChunkedUpload
+      resp = create_multipart_upload(upload.project.id, upload.id)
+      upload.update_attribute(:multipart_upload_id, resp)
+    else
+      raise "#{upload} is not a ChunkedUpload"
+    end
   end
 
   def chunk_max_reached?(chunk)
@@ -60,6 +64,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
+    raise("#{upload} is not a ChunkedUpload") unless upload.is_a? ChunkedUpload
     parts = upload.chunks.reorder(:number).collect do |chunk|
       { etag: "\"#{chunk.fingerprint_value}\"", part_number: chunk.number }
     end

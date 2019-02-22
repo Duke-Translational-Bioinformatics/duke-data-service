@@ -201,8 +201,52 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     describe '#complete_chunked_upload' do
-      context 'StorageProvider Exception' do
-        context 'Etag Mismatch' do
+      context 'with ChunkedUpload' do
+        context 'StorageProvider Exception' do
+          context 'Etag Mismatch' do
+            it 'should raise an IntegrityException' do
+              is_expected.to receive(:put_object_manifest)
+                .with(
+                  chunked_upload.storage_container,
+                  chunked_upload.id,
+                  chunked_upload.manifest,
+                  chunked_upload.content_type,
+                  chunked_upload.name
+                ).and_raise(StorageProviderException.new('Etag Mismatch'))
+
+              expect {
+                subject.complete_chunked_upload(chunked_upload)
+              }.to raise_error(IntegrityException)
+            end
+          end
+
+          context 'unexpected' do
+            let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+
+            it 'should raise the original StorageProviderException' do
+              is_expected.to receive(:put_object_manifest)
+                .with(
+                  chunked_upload.storage_container,
+                  chunked_upload.id,
+                  chunked_upload.manifest,
+                  chunked_upload.content_type,
+                  chunked_upload.name
+                ).and_raise(unexpected_exception)
+
+              expect {
+                subject.complete_chunked_upload(chunked_upload)
+              }.to raise_error(unexpected_exception)
+            end
+          end
+        end
+
+        context 'size mismatch' do
+          let(:expected_meta) {
+            {
+            "content-length" => "#{chunked_upload.size - 10}"
+            }
+          }
+
           it 'should raise an IntegrityException' do
             is_expected.to receive(:put_object_manifest)
               .with(
@@ -211,7 +255,12 @@ RSpec.describe SwiftStorageProvider, type: :model do
                 chunked_upload.manifest,
                 chunked_upload.content_type,
                 chunked_upload.name
-              ).and_raise(StorageProviderException.new('Etag Mismatch'))
+              )
+            is_expected.to receive(:get_object_metadata)
+              .with(
+                chunked_upload.storage_container,
+                chunked_upload.id
+              ).and_return(expected_meta)
 
             expect {
               subject.complete_chunked_upload(chunked_upload)
@@ -219,10 +268,8 @@ RSpec.describe SwiftStorageProvider, type: :model do
           end
         end
 
-        context 'unexpected' do
-          let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
-
-          it 'should raise the original StorageProviderException' do
+        context 'success' do
+          it 'should not raise any Exceptions' do
             is_expected.to receive(:put_object_manifest)
               .with(
                 chunked_upload.storage_container,
@@ -230,63 +277,23 @@ RSpec.describe SwiftStorageProvider, type: :model do
                 chunked_upload.manifest,
                 chunked_upload.content_type,
                 chunked_upload.name
-              ).and_raise(unexpected_exception)
+              )
+            is_expected.to receive(:get_object_metadata)
+              .with(
+                chunked_upload.storage_container,
+                chunked_upload.id
+              ).and_return(expected_meta)
 
             expect {
               subject.complete_chunked_upload(chunked_upload)
-            }.to raise_error(unexpected_exception)
+            }.not_to raise_error
           end
         end
       end
 
-      context 'size mismatch' do
-        let(:expected_meta) {
-          {
-          "content-length" => "#{chunked_upload.size - 10}"
-          }
-        }
-
-        it 'should raise an IntegrityException' do
-          is_expected.to receive(:put_object_manifest)
-            .with(
-              chunked_upload.storage_container,
-              chunked_upload.id,
-              chunked_upload.manifest,
-              chunked_upload.content_type,
-              chunked_upload.name
-            )
-          is_expected.to receive(:get_object_metadata)
-            .with(
-              chunked_upload.storage_container,
-              chunked_upload.id
-            ).and_return(expected_meta)
-
-          expect {
-            subject.complete_chunked_upload(chunked_upload)
-          }.to raise_error(IntegrityException)
-        end
-      end
-
-      context 'success' do
-        it 'should not raise any Exceptions' do
-          is_expected.to receive(:put_object_manifest)
-            .with(
-              chunked_upload.storage_container,
-              chunked_upload.id,
-              chunked_upload.manifest,
-              chunked_upload.content_type,
-              chunked_upload.name
-            )
-          is_expected.to receive(:get_object_metadata)
-            .with(
-              chunked_upload.storage_container,
-              chunked_upload.id
-            ).and_return(expected_meta)
-
-          expect {
-            subject.complete_chunked_upload(chunked_upload)
-          }.not_to raise_error
-        end
+      context 'with non_chunked_upload' do
+        let(:expected_exception) { "#{non_chunked_upload} is not a ChunkedUpload" }
+        it { expect { subject.complete_chunked_upload(non_chunked_upload) }.to raise_error(expected_exception) }
       end
     end
 
