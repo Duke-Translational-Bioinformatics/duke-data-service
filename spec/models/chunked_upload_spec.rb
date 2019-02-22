@@ -13,6 +13,10 @@ RSpec.describe ChunkedUpload, type: :model do
   # Associations
   it { is_expected.to have_many(:chunks).with_foreign_key('upload_id') }
 
+  # Callbacks
+  it { is_expected.to callback(:initialize_storage).after(:create) }
+
+  # Instance methods
   it 'should have a manifest method' do
     is_expected.to respond_to 'manifest'
     expect(subject.manifest).to be_a Array
@@ -84,6 +88,19 @@ RSpec.describe ChunkedUpload, type: :model do
       end
     end
   end #purge_storage
+
+  it { is_expected.to respond_to :initialize_storage }
+  describe '#initialize_storage' do
+    subject { FactoryBot.create(:chunked_upload, storage_provider: mocked_storage_provider) }
+    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
+
+    it 'enqueues a UploadStorageProviderInitializationJob' do
+      expect {
+        subject.initialize_storage
+      }.to have_enqueued_job(UploadStorageProviderInitializationJob)
+        .with(job_transaction: instance_of(JobTransaction), storage_provider: subject.storage_provider, upload: subject)
+    end
+  end
 
   it { is_expected.to respond_to :ready_for_chunks? }
   describe '#ready_for_chunks?' do

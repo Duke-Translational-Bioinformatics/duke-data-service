@@ -9,7 +9,6 @@ class Upload < ApplicationRecord
   has_many :fingerprints
 
   before_create :set_storage_container
-  after_create :initialize_storage
 
   accepts_nested_attributes_for :fingerprints
 
@@ -48,14 +47,6 @@ class Upload < ApplicationRecord
     raise IntegrityException.new(error_message) if has_integrity_exception?
     raise ConsistencyException.new unless is_consistent?
     storage_provider.download_url(self, filename)
-  end
-
-  def initialize_storage
-    UploadStorageProviderInitializationJob.perform_later(
-      job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
-      storage_provider: storage_provider,
-      upload: self
-    )
   end
 
   def has_integrity_exception?

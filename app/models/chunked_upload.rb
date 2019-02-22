@@ -1,6 +1,8 @@
 class ChunkedUpload < Upload
   has_many :chunks, foreign_key: 'upload_id'
 
+  after_create :initialize_storage
+
   def manifest
     chunks.reorder(:number).collect do |chunk|
       {
@@ -18,6 +20,14 @@ class ChunkedUpload < Upload
     end
     storage_provider.purge(self)
     self.update(purged_on: DateTime.now)
+  end
+
+  def initialize_storage
+    UploadStorageProviderInitializationJob.perform_later(
+      job_transaction: UploadStorageProviderInitializationJob.initialize_job(self),
+      storage_provider: storage_provider,
+      upload: self
+    )
   end
 
   def ready_for_chunks?

@@ -79,7 +79,6 @@ RSpec.describe Upload, type: :model do
 
   describe 'callbacks' do
     it { is_expected.to callback(:set_storage_container).before(:create) }
-    it { is_expected.to callback(:initialize_storage).after(:create) }
   end
 
   describe 'instance methods' do
@@ -153,20 +152,7 @@ RSpec.describe Upload, type: :model do
   # Instance methods implemented in subclasses
   it { is_expected.not_to respond_to :manifest }
   it { is_expected.not_to respond_to :purge_storage }
-
-  it { is_expected.to respond_to :initialize_storage }
-  describe '#initialize_storage' do
-    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
-    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
-
-    it 'enqueues a UploadStorageProviderInitializationJob' do
-      expect {
-        subject.initialize_storage
-      }.to have_enqueued_job(UploadStorageProviderInitializationJob)
-        .with(job_transaction: instance_of(JobTransaction), storage_provider: subject.storage_provider, upload: subject)
-    end
-  end
-
+  it { is_expected.not_to respond_to :initialize_storage }
   it { is_expected.not_to respond_to :ready_for_chunks? }
   it { is_expected.not_to respond_to :check_readiness! }
   it { is_expected.not_to respond_to :complete }
