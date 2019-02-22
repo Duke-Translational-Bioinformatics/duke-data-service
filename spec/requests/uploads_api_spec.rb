@@ -13,7 +13,7 @@ describe DDS::V1::UploadsAPI do
   let(:completed_chunked_upload) { FactoryBot.create(:chunked_upload, :with_fingerprint, :completed, project: project, storage_provider: mocked_storage_provider) }
 
   let(:user) { FactoryBot.create(:user) }
-  let(:upload_stub) { FactoryBot.build(:upload) }
+  let(:upload_stub) { FactoryBot.build(:chunked_upload) }
   let(:chunk_stub) { FactoryBot.build(:chunk, chunked_upload: chunked_upload) }
   let(:fingerprint_stub) { FactoryBot.build(:fingerprint) }
 

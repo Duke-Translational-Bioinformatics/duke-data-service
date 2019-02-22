@@ -148,6 +148,13 @@ RSpec.describe ChunkedUpload, type: :model do
     }
   end
 
+  it { is_expected.to respond_to :minimum_chunk_size }
+  describe '#minimum_chunk_size' do
+    it {
+      expect(subject.minimum_chunk_size).to eq(mocked_storage_provider.suggested_minimum_chunk_size(subject))
+    }
+  end
+
   it { is_expected.to respond_to :complete_and_validate_integrity }
   describe '#complete_and_validate_integrity' do
     subject { FactoryBot.create(:chunked_upload, is_consistent: false, storage_provider: mocked_storage_provider) }

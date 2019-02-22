@@ -63,10 +63,6 @@ class Upload < ApplicationRecord
     storage_provider.max_chunked_upload_size
   end
 
-  def minimum_chunk_size
-    storage_provider.suggested_minimum_chunk_size(self)
-  end
-
   private
   def integrity_exception(message)
     exactly_now = DateTime.now

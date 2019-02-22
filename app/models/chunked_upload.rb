@@ -62,4 +62,8 @@ class ChunkedUpload < Upload
       integrity_exception(e.message)
     end
   end
+
+  def minimum_chunk_size
+    storage_provider.suggested_minimum_chunk_size(self)
+  end
 end

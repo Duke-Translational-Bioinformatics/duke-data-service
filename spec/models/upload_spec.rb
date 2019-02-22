@@ -219,13 +219,7 @@ RSpec.describe Upload, type: :model do
     it { expect(subject.max_size_bytes).to eq(mocked_storage_provider.max_chunked_upload_size) }
   end
 
-  describe '#minimum_chunk_size' do
-    it { is_expected.to respond_to :minimum_chunk_size }
-    it {
-      expect(subject.minimum_chunk_size).to eq(mocked_storage_provider.suggested_minimum_chunk_size(subject))
-    }
-  end
-
+  it { is_expected.not_to respond_to :minimum_chunk_size }
   it { is_expected.not_to respond_to :complete_and_validate_integrity }
 
   context 'when created with the Default StorageProvider' do
