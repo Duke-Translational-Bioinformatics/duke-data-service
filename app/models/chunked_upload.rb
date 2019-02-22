@@ -20,6 +20,15 @@ class ChunkedUpload < Upload
     self.update(purged_on: DateTime.now)
   end
 
+  def ready_for_chunks?
+    storage_provider.chunk_upload_ready?(self)
+  end
+
+  def check_readiness!
+    raise(ConsistencyException, 'Upload is not ready') unless ready_for_chunks?
+    true
+  end
+
   def complete
     transaction do
       self.completed_at = DateTime.now

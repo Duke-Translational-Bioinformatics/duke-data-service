@@ -58,15 +58,6 @@ class Upload < ApplicationRecord
     )
   end
 
-  def ready_for_chunks?
-    storage_provider.chunk_upload_ready?(self)
-  end
-
-  def check_readiness!
-    raise(ConsistencyException, 'Upload is not ready') unless ready_for_chunks?
-    true
-  end
-
   def has_integrity_exception?
     # this is currently the only use of the error attributes
     !error_at.nil?

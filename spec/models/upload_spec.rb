@@ -167,37 +167,8 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  it { is_expected.to respond_to :ready_for_chunks? }
-  describe '#ready_for_chunks?' do
-    subject { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
-    let(:mocked_storage_provider) { FactoryBot.create(:storage_provider, :default) }
-    let(:upload_ready) { true }
-    before(:example) do
-      expect(mocked_storage_provider).to receive(:chunk_upload_ready?).with(subject) { upload_ready }
-    end
-
-    it { expect(subject.ready_for_chunks?).to eq true }
-
-    context 'when upload is not ready' do
-      let(:upload_ready) { false }
-      it { expect(subject.ready_for_chunks?).to eq false }
-    end
-  end
-
-  it { is_expected.to respond_to :check_readiness! }
-  describe '#check_readiness!' do
-    let(:readiness) { true }
-    before(:example) do
-      allow(subject).to receive(:ready_for_chunks?).and_return(readiness)
-    end
-    it { expect(subject.check_readiness!).to be_truthy }
-
-    context 'when not ready' do
-      let(:readiness) { false }
-      it { expect { subject.check_readiness! }.to raise_error ConsistencyException, 'Upload is not ready' }
-    end
-  end
-
+  it { is_expected.not_to respond_to :ready_for_chunks? }
+  it { is_expected.not_to respond_to :check_readiness! }
   it { is_expected.not_to respond_to :complete }
 
   describe '#has_integrity_exception?' do
