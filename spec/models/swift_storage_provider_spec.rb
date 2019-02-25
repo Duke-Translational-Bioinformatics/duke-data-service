@@ -10,13 +10,14 @@ RSpec.describe SwiftStorageProvider, type: :model do
   describe 'StorageProvider Implementation' do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
-    let(:upload) { FactoryBot.create(:upload, :skip_validation) }
+    let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
+    let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
     let(:expected_meta) {
       {
-      "content-length" => "#{upload.size}"
+      "content-length" => "#{chunked_upload.size}"
       }
     }
-    let(:chunk) { FactoryBot.create(:chunk, :skip_validation, upload: upload) }
+    let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
 
     describe '#configure' do
       it 'should register_keys' do
@@ -157,11 +158,11 @@ RSpec.describe SwiftStorageProvider, type: :model do
         is_expected.to receive(:build_signed_url)
           .with(
             'POST',
-            upload.sub_path,
+            chunked_upload.sub_path,
             subject.expiry
           ).and_return(expected_url)
         expect {
-          expect(subject.single_file_upload_url(upload)).to eq(expected_url)
+          expect(subject.single_file_upload_url(chunked_upload)).to eq(expected_url)
         }.not_to raise_error
       end
     end
@@ -169,127 +170,134 @@ RSpec.describe SwiftStorageProvider, type: :model do
     describe '#initialize_chunked_upload' do
       it 'should not do anything to initialize a chunked upload in swift' do
         expect {
-          subject.initialize_chunked_upload(upload)
+          subject.initialize_chunked_upload(chunked_upload)
         }.not_to raise_error
       end
     end
 
     describe '#chunk_max_reached?' do
-      context 'chunk.upload.chunks.count < chunk_max_number' do
+      context 'chunk.chunked_upload.chunks.count < chunk_max_number' do
         it 'should return false' do
-          expect(chunk.upload.chunks.count).to be < subject.chunk_max_number
+          expect(chunk.chunked_upload.chunks.count).to be < subject.chunk_max_number
           expect(subject.chunk_max_reached?(chunk)).to be_falsey
         end
       end
 
-      context 'chunk.upload.chunks.count = chunk_max_number' do
-        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count) }
+      context 'chunk.chunked_upload.chunks.count = chunk_max_number' do
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.chunked_upload.chunks.count) }
         it 'should return true' do
-          expect(chunk.upload.chunks.count).to eq(subject.chunk_max_number)
+          expect(chunk.chunked_upload.chunks.count).to eq(subject.chunk_max_number)
           expect(subject.chunk_max_reached?(chunk)).to be_truthy
         end
       end
 
-      context 'chunk.upload.chunks.count > chunk_max_number' do
-        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.upload.chunks.count - 1) }
+      context 'chunk.chunked_upload.chunks.count > chunk_max_number' do
+        subject { FactoryBot.create(:swift_storage_provider, chunk_max_number: chunk.chunked_upload.chunks.count - 1) }
         it 'should return true' do
-          expect(chunk.upload.chunks.count).to be > subject.chunk_max_number
+          expect(chunk.chunked_upload.chunks.count).to be > subject.chunk_max_number
           expect(subject.chunk_max_reached?(chunk)).to be_truthy
         end
       end
     end
 
     describe '#complete_chunked_upload' do
-      context 'StorageProvider Exception' do
-        context 'Etag Mismatch' do
+      context 'with ChunkedUpload' do
+        context 'StorageProvider Exception' do
+          context 'Etag Mismatch' do
+            it 'should raise an IntegrityException' do
+              is_expected.to receive(:put_object_manifest)
+                .with(
+                  chunked_upload.storage_container,
+                  chunked_upload.id,
+                  chunked_upload.manifest,
+                  chunked_upload.content_type,
+                  chunked_upload.name
+                ).and_raise(StorageProviderException.new('Etag Mismatch'))
+
+              expect {
+                subject.complete_chunked_upload(chunked_upload)
+              }.to raise_error(IntegrityException)
+            end
+          end
+
+          context 'unexpected' do
+            let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+
+            it 'should raise the original StorageProviderException' do
+              is_expected.to receive(:put_object_manifest)
+                .with(
+                  chunked_upload.storage_container,
+                  chunked_upload.id,
+                  chunked_upload.manifest,
+                  chunked_upload.content_type,
+                  chunked_upload.name
+                ).and_raise(unexpected_exception)
+
+              expect {
+                subject.complete_chunked_upload(chunked_upload)
+              }.to raise_error(unexpected_exception)
+            end
+          end
+        end
+
+        context 'size mismatch' do
+          let(:expected_meta) {
+            {
+            "content-length" => "#{chunked_upload.size - 10}"
+            }
+          }
+
           it 'should raise an IntegrityException' do
             is_expected.to receive(:put_object_manifest)
               .with(
-                upload.storage_container,
-                upload.id,
-                upload.manifest,
-                upload.content_type,
-                upload.name
-              ).and_raise(StorageProviderException.new('Etag Mismatch'))
+                chunked_upload.storage_container,
+                chunked_upload.id,
+                chunked_upload.manifest,
+                chunked_upload.content_type,
+                chunked_upload.name
+              )
+            is_expected.to receive(:get_object_metadata)
+              .with(
+                chunked_upload.storage_container,
+                chunked_upload.id
+              ).and_return(expected_meta)
 
             expect {
-              subject.complete_chunked_upload(upload)
+              subject.complete_chunked_upload(chunked_upload)
             }.to raise_error(IntegrityException)
           end
         end
 
-        context 'unexpected' do
-          let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
-
-          it 'should raise the original StorageProviderException' do
+        context 'success' do
+          it 'should not raise any Exceptions' do
             is_expected.to receive(:put_object_manifest)
               .with(
-                upload.storage_container,
-                upload.id,
-                upload.manifest,
-                upload.content_type,
-                upload.name
-              ).and_raise(unexpected_exception)
+                chunked_upload.storage_container,
+                chunked_upload.id,
+                chunked_upload.manifest,
+                chunked_upload.content_type,
+                chunked_upload.name
+              )
+            is_expected.to receive(:get_object_metadata)
+              .with(
+                chunked_upload.storage_container,
+                chunked_upload.id
+              ).and_return(expected_meta)
 
             expect {
-              subject.complete_chunked_upload(upload)
-            }.to raise_error(unexpected_exception)
+              subject.complete_chunked_upload(chunked_upload)
+            }.not_to raise_error
           end
         end
       end
 
-      context 'size mismatch' do
-        let(:expected_meta) {
-          {
-          "content-length" => "#{upload.size - 10}"
-          }
-        }
-
-        it 'should raise an IntegrityException' do
-          is_expected.to receive(:put_object_manifest)
-            .with(
-              upload.storage_container,
-              upload.id,
-              upload.manifest,
-              upload.content_type,
-              upload.name
-            )
-          is_expected.to receive(:get_object_metadata)
-            .with(
-              upload.storage_container,
-              upload.id
-            ).and_return(expected_meta)
-
-          expect {
-            subject.complete_chunked_upload(upload)
-          }.to raise_error(IntegrityException)
-        end
-      end
-
-      context 'success' do
-        it 'should not raise any Exceptions' do
-          is_expected.to receive(:put_object_manifest)
-            .with(
-              upload.storage_container,
-              upload.id,
-              upload.manifest,
-              upload.content_type,
-              upload.name
-            )
-          is_expected.to receive(:get_object_metadata)
-            .with(
-              upload.storage_container,
-              upload.id
-            ).and_return(expected_meta)
-
-          expect {
-            subject.complete_chunked_upload(upload)
-          }.not_to raise_error
-        end
+      context 'with non_chunked_upload' do
+        let(:expected_exception) { "#{non_chunked_upload} is not a ChunkedUpload" }
+        it { expect { subject.complete_chunked_upload(non_chunked_upload) }.to raise_error(expected_exception) }
       end
     end
 
-    describe '#is_complete_chunked_upload?(upload)' do
+    describe '#is_complete_chunked_upload?(chunked_upload)' do
       context 'object exists' do
         let(:expected_meta) {
           {
@@ -299,10 +307,10 @@ RSpec.describe SwiftStorageProvider, type: :model do
 
         it 'should return true' do
           is_expected.to receive(:get_object_metadata)
-            .with(upload.storage_container, upload.id)
+            .with(chunked_upload.storage_container, chunked_upload.id)
             .and_return(expected_meta)
           expect {
-            expect(subject.is_complete_chunked_upload?(upload)).to be_truthy
+            expect(subject.is_complete_chunked_upload?(chunked_upload)).to be_truthy
           }.not_to raise_error
         end
       end
@@ -310,9 +318,9 @@ RSpec.describe SwiftStorageProvider, type: :model do
       context 'object does not exist' do
         it 'should return false' do
           is_expected.to receive(:get_object_metadata)
-            .with(upload.storage_container, upload.id)
+            .with(chunked_upload.storage_container, chunked_upload.id)
           expect {
-            expect(subject.is_complete_chunked_upload?(upload)).to be_falsey
+            expect(subject.is_complete_chunked_upload?(chunked_upload)).to be_falsey
           }.not_to raise_error
         end
       end
@@ -321,10 +329,10 @@ RSpec.describe SwiftStorageProvider, type: :model do
         let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
         it 'should return false' do
           is_expected.to receive(:get_object_metadata)
-            .with(upload.storage_container, upload.id)
+            .with(chunked_upload.storage_container, chunked_upload.id)
             .and_raise(unexpected_exception)
           expect {
-            subject.is_complete_chunked_upload?(upload)
+            subject.is_complete_chunked_upload?(chunked_upload)
           }.to raise_error(unexpected_exception)
         end
       end
@@ -342,46 +350,46 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     describe '#suggested_minimum_chunk_size' do
-      let(:upload) { FactoryBot.create(:upload, :skip_validation, size: size) }
+      let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, size: size) }
 
-      context 'upload.size = 0' do
+      context 'chunked_upload.size = 0' do
         let(:size) { 0 }
         let(:expected_suggested_minimum_chunk_size) { 0 }
         it 'should return 0' do
           expect {
-            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+            expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(expected_suggested_minimum_chunk_size)
           }.not_to raise_error
         end
       end
 
-      context 'upload.size < storage_provider.chunk_max_number' do
+      context 'chunked_upload.size < storage_provider.chunk_max_number' do
         let(:size) { subject.chunk_max_number - 1 }
 
         let(:expected_suggested_minimum_chunk_size) {
-          (upload.size.to_f / subject.chunk_max_number).ceil
+          (chunked_upload.size.to_f / subject.chunk_max_number).ceil
         }
-        it 'should return the upload size divided by the chunk_max_number rounded up to the next integer' do
+        it 'should return the chunked_upload size divided by the chunk_max_number rounded up to the next integer' do
           expect {
-            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+            expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(expected_suggested_minimum_chunk_size)
           }.not_to raise_error
         end
       end
 
-      context 'upload.size > storage_provider.chunk_max_number' do
+      context 'chunked_upload.size > storage_provider.chunk_max_number' do
         let(:size) { subject.chunk_max_number + 1 }
         let(:expected_suggested_minimum_chunk_size) {
-          (upload.size.to_f / subject.chunk_max_number).ceil
+          (chunked_upload.size.to_f / subject.chunk_max_number).ceil
         }
-        it 'should return the upload size divided by the chunk_max_number rounded up to the next integer' do
+        it 'should return the chunked_upload size divided by the chunk_max_number rounded up to the next integer' do
           expect {
-            expect(subject.suggested_minimum_chunk_size(upload)).to eq(expected_suggested_minimum_chunk_size)
+            expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(expected_suggested_minimum_chunk_size)
           }.not_to raise_error
         end
       end
     end
 
-    describe '#chunk_upload_ready?(upload)' do
-      it { expect(subject.chunk_upload_ready?(upload)).to be_truthy }
+    describe '#chunk_upload_ready?(chunked_upload)' do
+      it { expect(subject.chunk_upload_ready?(chunked_upload)).to be_truthy }
     end
 
     describe '#chunk_upload_url(chunk)' do
@@ -403,26 +411,26 @@ RSpec.describe SwiftStorageProvider, type: :model do
         is_expected.to receive(:build_signed_url)
           .with(
             'GET',
-            upload.sub_path,
+            chunked_upload.sub_path,
             subject.expiry,
-            upload.name
+            chunked_upload.name
           )
         expect {
-          subject.download_url(upload)
+          subject.download_url(chunked_upload)
         }.not_to raise_error
       end
     end
 
     describe '#purge' do
-      context 'upload' do
+      context 'chunked_upload' do
         it 'should delete the SLO manifest' do
           is_expected.to receive(:delete_object_manifest)
             .with(
-              upload.storage_container,
-              upload.id
+              chunked_upload.storage_container,
+              chunked_upload.id
             )
           expect {
-            subject.purge(upload)
+            subject.purge(chunked_upload)
           }.not_to raise_error
         end
       end
@@ -437,6 +445,14 @@ RSpec.describe SwiftStorageProvider, type: :model do
           expect {
             subject.purge(chunk)
           }.not_to raise_error
+        end
+      end
+
+      context 'non_chunked_upload' do
+        it 'should raise an Exception' do
+          expect {
+            subject.purge(non_chunked_upload)
+          }.to raise_error("#{non_chunked_upload} is not purgable")
         end
       end
 

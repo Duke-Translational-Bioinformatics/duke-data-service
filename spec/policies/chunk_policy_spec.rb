@@ -7,10 +7,10 @@ describe ChunkPolicy do
 
   let(:auth_role) { FactoryBot.create(:auth_role) }
   let(:project_permission) { FactoryBot.create(:project_permission, auth_role: auth_role) }
-  let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project_permission.project, storage_provider: mocked_storage_provider) }
-  let(:chunk) { upload.chunks.first }
-  let(:other_upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
-  let(:other_chunk) { other_upload.chunks.first }
+  let(:chunked_upload) { FactoryBot.create(:chunked_upload, :with_chunks, project: project_permission.project, storage_provider: mocked_storage_provider) }
+  let(:chunk) { chunked_upload.chunks.first }
+  let(:other_chunked_upload) { FactoryBot.create(:chunked_upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  let(:other_chunk) { other_chunked_upload.chunks.first }
 
   it_behaves_like 'system_permission can access', :chunk
   it_behaves_like 'system_permission can access', :other_chunk

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190110235737) do
+ActiveRecord::Schema.define(version: 2019_02_19_200627) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -336,6 +336,7 @@ ActiveRecord::Schema.define(version: 20190110235737) do
     t.string "storage_container"
     t.datetime "purged_on"
     t.string "multipart_upload_id"
+    t.string "type"
   end
 
   create_table "user_authentication_services", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

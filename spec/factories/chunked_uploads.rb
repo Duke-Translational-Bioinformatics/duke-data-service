@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :upload do
+  factory :chunked_upload do
     project
     sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
     content_type { "text/plain" }
@@ -8,6 +8,13 @@ FactoryBot.define do
     storage_provider
     association :creator, factory: :user
     is_consistent { true }
+
+    trait :with_chunks do
+      after(:build) do |chunked_upload, evaluator|
+        chunk = build(:chunk, chunked_upload: chunked_upload, number: 1)
+        chunked_upload.association(:chunks).add_to_target(chunk)
+      end
+    end
 
     trait :with_fingerprint do
       after(:build) do |upload, evaluator|

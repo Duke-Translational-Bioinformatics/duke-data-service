@@ -33,12 +33,13 @@ module DDS
             StorageProvider.default
           end
         raise ConsistencyException.new if project.project_storage_providers.where(storage_provider: storage_provider).none? &:is_initialized?
-        upload = project.uploads.build({
+        upload = ChunkedUpload.new({
           name: upload_params[:name],
           size: upload_params[:size],
           etag: SecureRandom.hex,
           content_type: upload_params[:content_type],
           storage_provider: storage_provider,
+          project: project,
           creator: current_user
         })
         authorize upload, :create?
@@ -115,10 +116,10 @@ module DDS
         chunk_params = declared(params, include_missing: false)
         upload = Upload.find(params[:id])
         upload.check_readiness!
-        if chunk = Chunk.find_by(upload: upload, number: chunk_params[:number])
+        if chunk = Chunk.find_by(chunked_upload: upload, number: chunk_params[:number])
           authorize chunk, :update?
         else
-          chunk = Chunk.new({upload: upload, number: chunk_params[:number]})
+          chunk = Chunk.new({chunked_upload: upload, number: chunk_params[:number]})
           authorize chunk, :create?
         end
         chunk.attributes = {

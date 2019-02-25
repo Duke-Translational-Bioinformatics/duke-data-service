@@ -3,12 +3,12 @@ class Chunk < ApplicationRecord
   audited
   after_destroy :update_upload_etag
 
-  belongs_to :upload
-  has_one :storage_provider, through: :upload
-  has_one :project, through: :upload
-  has_many :project_permissions, through: :upload
+  belongs_to :chunked_upload, foreign_key: 'upload_id'
+  has_one :storage_provider, through: :chunked_upload
+  has_one :project, through: :chunked_upload
+  has_many :project_permissions, through: :chunked_upload
 
-  validates :upload, presence: true
+  validates :chunked_upload, presence: true
   validates :number, presence: true,
     uniqueness: {scope: [:upload_id], case_sensitive: false}
   validates :number, numericality:  {
@@ -23,7 +23,7 @@ class Chunk < ApplicationRecord
   validates :fingerprint_algorithm, presence: true
   validate :upload_chunk_maximum, if: :storage_provider
 
-  delegate :project_id, :minimum_chunk_size, :storage_container, to: :upload
+  delegate :project_id, :minimum_chunk_size, :storage_container, to: :chunked_upload
   delegate :chunk_max_size_bytes, :minimum_chunk_number, to: :storage_provider
 
   def http_verb
@@ -73,8 +73,8 @@ class Chunk < ApplicationRecord
   def update_upload_etag
     last_audit = self.audits.last
     new_comment = last_audit.comment ? last_audit.comment.merge({raised_by_audit: last_audit.id}) : {raised_by_audit: last_audit.id}
-    self.upload.update(etag: SecureRandom.hex, audit_comment: new_comment)
-    last_parent_audit = self.upload.audits.last
+    self.chunked_upload.update(etag: SecureRandom.hex, audit_comment: new_comment)
+    last_parent_audit = self.chunked_upload.audits.last
     last_parent_audit.update(request_uuid: last_audit.request_uuid)
   end
 end

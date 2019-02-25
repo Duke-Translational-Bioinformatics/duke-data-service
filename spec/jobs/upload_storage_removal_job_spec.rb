@@ -2,15 +2,15 @@ require 'rails_helper'
 
 RSpec.describe UploadStorageRemovalJob, type: :job do
   include_context 'mock all Uploads StorageProvider'
-  let(:upload) { FactoryBot.create(:upload) }
-  let(:job_transaction) { described_class.initialize_job(upload) }
+  let(:chunked_upload) { FactoryBot.create(:chunked_upload) }
+  let(:job_transaction) { described_class.initialize_job(chunked_upload) }
   let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
   let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
 
   it { expect(described_class.should_be_registered_worker?).to be_truthy }
 
   before do
-    expect(upload).to be_persisted
+    expect(chunked_upload).to be_persisted
   end
 
   it { is_expected.to be_an ApplicationJob }
@@ -29,9 +29,9 @@ RSpec.describe UploadStorageRemovalJob, type: :job do
   context 'perform_now' do
     include_context 'tracking job', :job_transaction
     it 'should purge_storage of the upload' do
-      expect(Upload).to receive(:find).with(upload.id).and_return(upload)
-      expect(upload).to receive(:purge_storage).and_return(true)
-      described_class.perform_now(job_transaction, upload.id)
+      expect(Upload).to receive(:find).with(chunked_upload.id).and_return(chunked_upload)
+      expect(chunked_upload).to receive(:purge_storage).and_return(true)
+      described_class.perform_now(job_transaction, chunked_upload.id)
     end
   end
 end
