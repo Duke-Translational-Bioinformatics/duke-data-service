@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe Chunk, type: :model do
   include_context 'mocked StorageProvider'
   include_context 'mocked StorageProvider Interface'
-  let(:upload) { FactoryBot.create(:upload, :with_chunks, storage_provider: mocked_storage_provider) }
-  subject { upload.chunks.first }
+  let(:chunked_upload) { FactoryBot.create(:chunked_upload, :with_chunks, storage_provider: mocked_storage_provider) }
+  subject { chunked_upload.chunks.first }
   include_context 'mock Chunk StorageProvider'
 
   let(:expected_object_path) { [subject.upload_id, subject.number].join('/')}
@@ -12,19 +12,19 @@ RSpec.describe Chunk, type: :model do
   it_behaves_like 'an audited model'
 
   before do
-    expect(upload).to be_persisted
+    expect(chunked_upload).to be_persisted
     expect(subject).to be_persisted
   end
 
   describe 'associations' do
-    it { is_expected.to belong_to(:upload) }
-    it { is_expected.to have_one(:storage_provider).through(:upload) }
-    it { is_expected.to have_one(:project).through(:upload) }
-    it { is_expected.to have_many(:project_permissions).through(:upload) }
+    it { is_expected.to belong_to(:chunked_upload).with_foreign_key('upload_id') }
+    it { is_expected.to have_one(:storage_provider).through(:chunked_upload) }
+    it { is_expected.to have_one(:project).through(:chunked_upload) }
+    it { is_expected.to have_many(:project_permissions).through(:chunked_upload) }
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:upload) }
+    it { is_expected.to validate_presence_of(:chunked_upload) }
     it { is_expected.to validate_presence_of(:number) }
     it { is_expected.to validate_numericality_of(:number).is_greater_than_or_equal_to(subject.minimum_chunk_number) }
     it { is_expected.to validate_presence_of(:size) }
@@ -63,14 +63,14 @@ RSpec.describe Chunk, type: :model do
 
   describe 'instance methods' do
     it 'should delegate #project_id and #storage_container to upload' do
-      is_expected.to delegate_method(:project_id).to(:upload)
-      expect(subject.project_id).to eq(subject.upload.project_id)
-      is_expected.to delegate_method(:storage_container).to(:upload)
-      expect(subject.storage_container).to eq(subject.upload.storage_container)
+      is_expected.to delegate_method(:project_id).to(:chunked_upload)
+      expect(subject.project_id).to eq(subject.chunked_upload.project_id)
+      is_expected.to delegate_method(:storage_container).to(:chunked_upload)
+      expect(subject.storage_container).to eq(subject.chunked_upload.storage_container)
     end
 
     it { is_expected.to delegate_method(:chunk_max_size_bytes).to(:storage_provider) }
-    it { is_expected.to delegate_method(:minimum_chunk_size).to(:upload) }
+    it { is_expected.to delegate_method(:minimum_chunk_size).to(:chunked_upload) }
     it { is_expected.to delegate_method(:minimum_chunk_number).to(:storage_provider) }
 
     it 'is_expected.to have a http_verb method' do
@@ -153,8 +153,8 @@ RSpec.describe Chunk, type: :model do
       StorageProvider.delete_all
       default_storage_provider = FactoryBot.create(:swift_storage_provider, :default)
       expect(StorageProvider.default).not_to be_nil
-      upload = FactoryBot.create(:upload, storage_provider: StorageProvider.default)
-      chunk = FactoryBot.create(:chunk, upload: upload)
+      chunked_upload = FactoryBot.create(:chunked_upload, storage_provider: StorageProvider.default)
+      chunk = FactoryBot.create(:chunk, chunked_upload: chunked_upload)
       expect(chunk).to be_valid
     end
   end

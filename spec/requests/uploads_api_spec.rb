@@ -6,20 +6,20 @@ describe DDS::V1::UploadsAPI do
 
   let(:project) { FactoryBot.create(:project) }
   let(:default_storage_provider) { FactoryBot.create(:storage_provider, :default) }
-  let(:upload) { FactoryBot.create(:upload, :with_chunks, project: project, storage_provider: mocked_storage_provider) }
-  let(:chunk) { upload.chunks.first }
+  let(:chunked_upload) { FactoryBot.create(:chunked_upload, :with_chunks, project: project, storage_provider: mocked_storage_provider) }
+  let(:chunk) { chunked_upload.chunks.first }
 
-  let(:other_upload) { FactoryBot.create(:upload, storage_provider: mocked_storage_provider) }
-  let(:completed_upload) { FactoryBot.create(:upload, :with_fingerprint, :completed, project: project, storage_provider: mocked_storage_provider) }
+  let(:other_chunked_upload) { FactoryBot.create(:chunked_upload, storage_provider: mocked_storage_provider) }
+  let(:completed_chunked_upload) { FactoryBot.create(:chunked_upload, :with_fingerprint, :completed, project: project, storage_provider: mocked_storage_provider) }
 
   let(:user) { FactoryBot.create(:user) }
-  let(:upload_stub) { FactoryBot.build(:upload) }
-  let(:chunk_stub) { FactoryBot.build(:chunk, upload_id: upload.id) }
+  let(:upload_stub) { FactoryBot.build(:chunked_upload) }
+  let(:chunk_stub) { FactoryBot.build(:chunk, chunked_upload: chunked_upload) }
   let(:fingerprint_stub) { FactoryBot.build(:fingerprint) }
 
   let(:resource_class) { Upload }
-  let(:resource_serializer) { UploadSerializer }
-  let!(:resource) { upload }
+  let(:resource_serializer) { ChunkedUploadSerializer }
+  let!(:resource) { chunked_upload }
   let!(:resource_permission) { FactoryBot.create(:project_permission, :project_admin, user: current_user, project: project) }
 
   before do
@@ -37,7 +37,7 @@ describe DDS::V1::UploadsAPI do
     it_behaves_like 'a GET request' do
       it_behaves_like 'a listable resource' do
         let(:unexpected_resources) { [
-          other_upload
+          other_chunked_upload
         ] }
       end
 
@@ -51,7 +51,7 @@ describe DDS::V1::UploadsAPI do
 
       it_behaves_like 'a paginated resource' do
         let(:expected_total_length) { project.uploads.count }
-        let(:extras) { FactoryBot.create_list(:upload, 5, project: project) }
+        let(:extras) { FactoryBot.create_list(:chunked_upload, 5, project: project) }
       end
 
       it_behaves_like 'a logically deleted resource' do
@@ -194,7 +194,7 @@ describe DDS::V1::UploadsAPI do
     let(:resource_serializer) { ChunkSerializer }
     let!(:resource) { chunk }
     let!(:url) { "/api/v1/uploads/#{upload_id}/chunks" }
-    let(:upload_id) { upload.id }
+    let(:upload_id) { chunked_upload.id }
     let(:payload) {{
       number: payload_chunk_number,
       size: chunk_stub.size,
@@ -210,7 +210,7 @@ describe DDS::V1::UploadsAPI do
         let(:expected_response_status) {200}
         let(:new_object) {
           resource_class.where(
-            upload_id: upload.id,
+            upload_id: chunked_upload.id,
             number: payload[:number],
             size: payload[:size],
             fingerprint_value: payload[:hash][:value],
@@ -266,9 +266,9 @@ describe DDS::V1::UploadsAPI do
         end
       end
 
-      context 'upload#ready_for_chunks? is false' do
+      context 'chunked_upload#ready_for_chunks? is false' do
         before(:example) do
-          allow_any_instance_of(Upload).to receive(:ready_for_chunks?).and_return(false)
+          allow_any_instance_of(ChunkedUpload).to receive(:ready_for_chunks?).and_return(false)
         end
         it 'returns 404 with a consistency error message' do
           is_expected.to eq(404)
@@ -291,7 +291,7 @@ describe DDS::V1::UploadsAPI do
       end
 
       context 'storage_provider.chunk_max_number exceeded' do
-        let(:other_chunk) { FactoryBot.create(:chunk, upload_id: upload.id, number: 2) }
+        let(:other_chunk) { FactoryBot.create(:chunk, upload_id: chunked_upload.id, number: 2) }
         before do
           allow(mocked_storage_provider).to receive(:chunk_max_reached?)
             .and_return(true)
@@ -337,7 +337,7 @@ describe DDS::V1::UploadsAPI do
     end
 
     context 'with completed upload' do
-      let(:upload) { completed_upload }
+      let(:chunked_upload) { completed_chunked_upload }
       it_behaves_like 'a validated resource'
     end
 
@@ -360,7 +360,7 @@ describe DDS::V1::UploadsAPI do
   describe 'Report upload hash' do
     subject { put(url, params: payload.to_json, headers: headers) }
     let(:url) { "/api/v1/uploads/#{parent_id}/hashes" }
-    let!(:parent_id) { completed_upload.id }
+    let!(:parent_id) { completed_chunked_upload.id }
     let(:called_action) { "PUT" }
     let!(:payload) {{
       value: fingerprint_stub.value,
@@ -370,7 +370,7 @@ describe DDS::V1::UploadsAPI do
 
     it_behaves_like 'a creatable resource' do
       let(:expected_response_status) {200}
-      let(:new_object) { completed_upload.reload }
+      let(:new_object) { completed_chunked_upload.reload }
     end
     it_behaves_like 'an authenticated resource'
     it_behaves_like 'an authorized resource'
@@ -400,7 +400,7 @@ describe DDS::V1::UploadsAPI do
     end
 
     context 'with incomplete upload' do
-      let(:parent_id) { upload.id }
+      let(:parent_id) { chunked_upload.id }
       it_behaves_like 'a validated resource'
       it 'should not persist changes' do
         expect {

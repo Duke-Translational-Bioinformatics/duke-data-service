@@ -48,7 +48,7 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def chunk_max_reached?(chunk)
-    chunk.upload.chunks.count >= chunk_max_number
+    chunk.chunked_upload.chunks.count >= chunk_max_number
   end
 
   def max_chunked_upload_size
@@ -60,6 +60,7 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
+    raise("#{upload} is not a ChunkedUpload") unless upload.is_a? ChunkedUpload
     begin
       put_object_manifest(
         upload.storage_container,
@@ -111,9 +112,9 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def purge(object)
-    raise "#{object} is not purgable" unless object.is_a?(Upload) || object.is_a?(Chunk)
+    raise "#{object} is not purgable" unless object.is_a?(ChunkedUpload) || object.is_a?(Chunk)
     begin
-      if object.is_a? Upload
+      if object.is_a? ChunkedUpload
         delete_object_manifest(object.storage_container, object.id)
       else
         delete_object(object.storage_container, object.object_path)
