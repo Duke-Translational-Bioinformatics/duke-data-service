@@ -1,0 +1,2 @@
+class NonChunkedUpload < Upload
+end
