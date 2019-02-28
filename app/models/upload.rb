@@ -17,12 +17,6 @@ class Upload < ApplicationRecord
   validates :name, presence: true
   validates :storage_provider_id, presence: true
   validates :size, presence: true
-  validates :size, numericality:  {
-    less_than: :max_size_bytes,
-    message: ->(object, data) do
-      "File size is currently not supported - maximum size is #{object.max_size_bytes}"
-    end
-  }, if: :storage_provider
   validates :creator_id, presence: true
   validates :completed_at, immutable: true, if: :completed_at_was
   validates :completed_at, immutable: true, if: :error_at_was
@@ -57,10 +51,6 @@ class Upload < ApplicationRecord
   def set_storage_container
     self.storage_container = project_id
     storage_container
-  end
-
-  def max_size_bytes
-    storage_provider.max_chunked_upload_size
   end
 
   private

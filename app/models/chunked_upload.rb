@@ -3,6 +3,13 @@ class ChunkedUpload < Upload
 
   after_create :initialize_storage
 
+  validates :size, numericality:  {
+    less_than: :max_size_bytes,
+    message: ->(object, data) do
+      "File size is currently not supported - maximum size is #{object.max_size_bytes}"
+    end
+  }, if: :storage_provider
+
   def manifest
     chunks.reorder(:number).collect do |chunk|
       {
@@ -50,6 +57,10 @@ class ChunkedUpload < Upload
         self
       end
     end
+  end
+
+  def max_size_bytes
+    storage_provider.max_chunked_upload_size
   end
 
   def complete_and_validate_integrity
