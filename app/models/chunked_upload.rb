@@ -46,19 +46,6 @@ class ChunkedUpload < Upload
     true
   end
 
-  def complete
-    transaction do
-      self.completed_at = DateTime.now
-      if save
-        UploadCompletionJob.perform_later(
-          UploadCompletionJob.initialize_job(self),
-          self.id
-        )
-        self
-      end
-    end
-  end
-
   def max_size_bytes
     storage_provider.max_chunked_upload_size
   end

@@ -150,7 +150,21 @@ RSpec.describe Upload, type: :model do
   it { is_expected.not_to respond_to :initialize_storage }
   it { is_expected.not_to respond_to :ready_for_chunks? }
   it { is_expected.not_to respond_to :check_readiness! }
-  it { is_expected.not_to respond_to :complete }
+
+  it { is_expected.to respond_to :complete }
+  describe '#complete' do
+    let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
+    before { subject.fingerprints_attributes = [fingerprint_attributes] }
+
+    it {
+      expect(subject.completed_at).to be_nil
+      expect {
+        expect(subject.complete).to be_truthy
+      }.to have_enqueued_job(UploadCompletionJob)
+      subject.reload
+      expect(subject.completed_at).not_to be_nil
+    }
+  end
 
   describe '#has_integrity_exception?' do
     it { is_expected.to respond_to :has_integrity_exception? }

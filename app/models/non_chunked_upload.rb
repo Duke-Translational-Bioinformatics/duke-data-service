@@ -13,9 +13,6 @@ class NonChunkedUpload < Upload
   def purge_storage
   end
 
-  def complete
-  end
-
   def complete_and_validate_integrity
   end
 end

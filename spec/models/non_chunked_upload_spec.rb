@@ -15,6 +15,5 @@ RSpec.describe NonChunkedUpload, type: :model do
   end
 
   it { is_expected.to respond_to :purge_storage }
-  it { is_expected.to respond_to :complete }
   it { is_expected.to respond_to :complete_and_validate_integrity }
 end

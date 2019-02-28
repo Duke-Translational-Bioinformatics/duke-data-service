@@ -53,6 +53,19 @@ class Upload < ApplicationRecord
     storage_container
   end
 
+  def complete
+    transaction do
+      self.completed_at = DateTime.now
+      if save
+        UploadCompletionJob.perform_later(
+          UploadCompletionJob.initialize_job(self),
+          self.id
+        )
+        self
+      end
+    end
+  end
+
   private
   def integrity_exception(message)
     exactly_now = DateTime.now
