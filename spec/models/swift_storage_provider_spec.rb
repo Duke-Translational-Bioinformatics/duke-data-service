@@ -342,9 +342,20 @@ RSpec.describe SwiftStorageProvider, type: :model do
       let(:expected_max_chunk_upload_size) {
         subject.chunk_max_number * subject.chunk_max_size_bytes
       }
-      it 'should retrn the swift expected_max_chunk_upload_size' do
+      it 'should return the swift expected_max_chunk_upload_size' do
         expect {
           expect(subject.max_chunked_upload_size).to eq(expected_max_chunk_upload_size)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#max_upload_size' do
+      let(:expected_max_upload_size) {
+        subject.chunk_max_size_bytes
+      }
+      it 'should return the swift expected_max_upload_size' do
+        expect {
+          expect(subject.max_upload_size).to eq(expected_max_upload_size)
         }.not_to raise_error
       end
     end

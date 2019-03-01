@@ -59,6 +59,10 @@ class S3StorageProvider < StorageProvider
     BIG_INT_MAX
   end
 
+  def max_upload_size
+    BIG_INT_MAX
+  end
+
   def suggested_minimum_chunk_size(upload)
     (upload.size.to_f / chunk_max_number).ceil
   end

@@ -9,6 +9,10 @@ shared_context 'mocked StorageProvider Interface' do
       .and_return(
         mocked_storage_provider.chunk_max_number * mocked_storage_provider.chunk_max_size_bytes
       )
+    allow(mocked_storage_provider).to receive(:max_upload_size)
+      .and_return(
+        mocked_storage_provider.chunk_max_size_bytes
+      )
     allow(mocked_storage_provider).to receive(:chunk_max_reached?)
       .and_return(expected_chunk_max_exceeded)
     allow(mocked_storage_provider).to receive(:url_root)
@@ -114,6 +118,7 @@ shared_context 'A StorageProvider' do
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_ready?).with(1).argument }
   it { is_expected.to respond_to(:max_chunked_upload_size) }
+  it { is_expected.to respond_to(:max_upload_size) }
   it { is_expected.to respond_to(:suggested_minimum_chunk_size).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(2).argument }
@@ -159,6 +164,10 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#max_chunked_upload_size' do
     it { expect { subject.max_chunked_upload_size }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#max_upload_size' do
+    it { expect { subject.max_upload_size }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#suggested_minimum_chunk_size' do

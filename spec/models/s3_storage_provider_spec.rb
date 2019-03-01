@@ -135,8 +135,14 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#max_chunked_upload_size' do
-    it 'returns the max value that Upload#size can store' do
+    it 'returns the max value that ChunkedUpload#size can store' do
       expect(subject.max_chunked_upload_size).to eq(big_int_max_value)
+    end
+  end
+
+  describe '#max_upload_size' do
+    it 'returns the max value that NonChunkedUpload#size can store' do
+      expect(subject.max_upload_size).to eq(big_int_max_value)
     end
   end
 
