@@ -8,8 +8,10 @@ RSpec.describe S3StorageProvider, type: :model do
   let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
   let(:domain) { Faker::Internet.domain_name }
-  let(:int_max_value) { 2147483647 }
-  let(:big_int_max_value) { 9223372036854775807 }
+  let(:s3_part_max_number) { 10_000 }
+  let(:s3_part_max_size) { 5_368_709_120 } # 5GB
+  let(:s3_multipart_upload_max_size) { 5_497_558_138_880 } # 5TB
+  let(:s3_upload_max_size) { 5_368_709_120 } # 5GB
 
   shared_context 'stubbed subject#client' do
     let(:stubbed_client) {
@@ -41,11 +43,11 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#chunk_max_number' do
-    it { expect(subject.chunk_max_number).to eq int_max_value }
+    it { expect(subject.chunk_max_number).to eq s3_part_max_number }
   end
 
   describe '#chunk_max_size_bytes' do
-    it { expect(subject.chunk_max_size_bytes).to eq big_int_max_value }
+    it { expect(subject.chunk_max_size_bytes).to eq s3_part_max_size }
   end
 
   describe '#configure' do
@@ -136,13 +138,13 @@ RSpec.describe S3StorageProvider, type: :model do
 
   describe '#max_chunked_upload_size' do
     it 'returns the max value that ChunkedUpload#size can store' do
-      expect(subject.max_chunked_upload_size).to eq(big_int_max_value)
+      expect(subject.max_chunked_upload_size).to eq(s3_multipart_upload_max_size)
     end
   end
 
   describe '#max_upload_size' do
     it 'returns the max value that NonChunkedUpload#size can store' do
-      expect(subject.max_upload_size).to eq(big_int_max_value)
+      expect(subject.max_upload_size).to eq(s3_upload_max_size)
     end
   end
 
