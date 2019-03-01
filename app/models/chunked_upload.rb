@@ -51,7 +51,7 @@ class ChunkedUpload < Upload
   end
 
   def complete_and_validate_integrity
-      begin
+    begin
       storage_provider.complete_chunked_upload(self)
       update!({
         is_consistent: true
