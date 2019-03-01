@@ -7,7 +7,7 @@ class NonChunkedUpload < Upload
   }
 
   def max_size_bytes
-    1
+    storage_provider&.max_upload_size
   end
 
   def purge_storage
