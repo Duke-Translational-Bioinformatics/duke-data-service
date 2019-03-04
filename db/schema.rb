@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_19_200627) do
+ActiveRecord::Schema.define(version: 2019_03_04_211844) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -290,6 +290,7 @@ ActiveRecord::Schema.define(version: 2019_02_19_200627) do
     t.bigint "chunk_max_size_bytes"
     t.string "type"
     t.boolean "is_default"
+    t.boolean "force_path_style"
   end
 
   create_table "system_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
