@@ -11,6 +11,8 @@ class NonChunkedUpload < Upload
   end
 
   def purge_storage
+    storage_provider.purge(self)
+    self.update(purged_on: DateTime.now)
   end
 
   def complete_and_validate_integrity
