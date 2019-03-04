@@ -26,7 +26,7 @@ describe 'job_transaction:clean_up:completed' do
   end
 
   context 'when oldest completed from 4 months ago' do
-    let(:oldest_completed_at) { Time.now - 4.month - 1.day }
+    let(:oldest_completed_at) { Time.now - 4.month - 2.day }
     let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 1000) } }
     before(:each) do
       4.times do |i|
@@ -67,7 +67,7 @@ describe 'job_transaction:clean_up:orphans' do
   end
 
   context 'when oldest orphan from 4 months ago' do
-    let(:oldest_orphan_created_at) { Time.now - 4.month - 1.day }
+    let(:oldest_orphan_created_at) { Time.now - 4.month - 2.day }
     let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 999) } }
     before(:each) do
       4.times do |i|
@@ -87,7 +87,7 @@ describe 'job_transaction:clean_up:orphans' do
       'BATCH_SIZE' => batch_size
     } }
     let(:a_month_ago) { Time.now - 1.month }
-    let(:oldest_orphan_created_at) { a_month_ago - 1.day }
+    let(:oldest_orphan_created_at) { a_month_ago - 3.day }
     let(:deleted_count) { 5 }
     before(:each) do
       expect(JobTransaction).to receive(:delete_all_orphans).with(created_before: a_month_ago, limit: batch_size).and_return(batch_size).ordered
@@ -124,7 +124,7 @@ describe 'job_transaction:clean_up:logical_orphans' do
   end
 
   context 'when oldest logical orphan from 4 months ago' do
-    let(:oldest_logical_orphan_created_at) { Time.now - 4.month - 1.day }
+    let(:oldest_logical_orphan_created_at) { Time.now - 4.month - 2.day }
     let(:deleted_counts) { Array.new(4) { Faker::Number.between(0, 1000) } }
     before(:each) do
       4.times do |i|
@@ -144,7 +144,7 @@ describe 'job_transaction:clean_up:all' do
 
   let(:default_batch_size) { 50000 }
   let(:a_month_ago) { Time.now - 1.month }
-  let(:just_over_a_month_ago) { Time.now - 1.month - 1.day }
+  let(:just_over_a_month_ago) { Time.now - 1.month - 3.day }
   around(:each) do |example|
     travel_to(Time.now) do #freeze_time
       example.run
