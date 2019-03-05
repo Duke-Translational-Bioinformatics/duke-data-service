@@ -133,7 +133,7 @@ class S3StorageProvider < StorageProvider
   def client
     @client ||= Aws::S3::Client.new(
       region: 'us-east-1',
-      force_path_style: true,
+      force_path_style: force_path_style.nil? || force_path_style,
       access_key_id: service_user,
       secret_access_key: service_pass,
       endpoint: url_root
