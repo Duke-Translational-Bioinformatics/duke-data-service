@@ -368,6 +368,21 @@ RSpec.describe S3StorageProvider, type: :model do
     it { expect(subject.client.config.access_key_id).to eq subject.service_user }
     it { expect(subject.client.config.secret_access_key).to eq subject.service_pass }
     it { expect(subject.client.config.endpoint).to eq uri_parsed_url_root }
+    context 'with #force_path_style' do
+      before(:example) { subject.force_path_style = path_style }
+      context 'set to true' do
+        let(:path_style) { true }
+        it { expect(subject.client.config.force_path_style).to be_truthy }
+      end
+      context 'set to false' do
+        let(:path_style) { false }
+        it { expect(subject.client.config.force_path_style).to be_falsey  }
+      end
+      context 'set to nil' do
+        let(:path_style) { nil }
+        it { expect(subject.client.config.force_path_style).to be_truthy }
+      end
+    end
     it 'reuses the same client object' do
       expect(subject.client).to eq(subject.client)
     end
