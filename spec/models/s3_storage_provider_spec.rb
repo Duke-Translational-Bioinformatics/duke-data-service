@@ -167,6 +167,9 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#verify_upload_integrity' do
+  end
+
   describe '#complete_chunked_upload' do
     context 'with ChunkedUpload' do
       let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }

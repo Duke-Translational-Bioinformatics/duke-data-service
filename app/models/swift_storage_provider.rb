@@ -63,6 +63,9 @@ class SwiftStorageProvider < StorageProvider
     (upload.size.to_f / chunk_max_number).ceil
   end
 
+  def verify_upload_integrity(upload)
+  end
+
   def complete_chunked_upload(upload)
     raise("#{upload} is not a ChunkedUpload") unless upload.is_a? ChunkedUpload
     begin

@@ -85,6 +85,10 @@ class StorageProvider < ApplicationRecord
     raise NotImplementedError.new("You must implement suggested_minimum_chunk_size.")
   end
 
+  def verify_upload_integrity(upload)
+    raise NotImplementedError.new("You must implement verify_upload_integrity.")
+  end
+
   def complete_chunked_upload(upload)
     raise NotImplementedError.new("You must implement complete_chunked_upload.")
   end

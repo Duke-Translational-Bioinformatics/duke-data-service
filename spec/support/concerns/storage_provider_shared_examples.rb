@@ -3,6 +3,8 @@ shared_context 'mocked StorageProvider Interface' do
   let(:expected_url_root) { Faker::Internet.url }
 
   before do
+    allow(mocked_storage_provider).to receive(:verify_upload_integrity)
+      .and_return(true)
     allow(mocked_storage_provider).to receive(:complete_chunked_upload)
       .and_return(true)
     allow(mocked_storage_provider).to receive(:max_chunked_upload_size)
@@ -113,6 +115,7 @@ shared_context 'A StorageProvider' do
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:url_root) }
   it { is_expected.to respond_to(:chunk_max_reached?).with(1).argument }
+  it { is_expected.to respond_to(:verify_upload_integrity).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }
@@ -180,6 +183,10 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#chunk_upload_url(chunk)' do
     it { expect { subject.chunk_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#verify_upload_integrity(upload)' do
+    it { expect { subject.verify_upload_integrity(nil) }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#complete_chunked_upload(upload)' do

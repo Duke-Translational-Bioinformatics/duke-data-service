@@ -200,6 +200,9 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
+    describe '#verify_upload_integrity' do
+    end
+
     describe '#complete_chunked_upload' do
       context 'with ChunkedUpload' do
         context 'StorageProvider Exception' do
