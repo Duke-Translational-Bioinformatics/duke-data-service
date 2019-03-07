@@ -1,4 +1,4 @@
-class UploadSerializer < ActiveModel::Serializer
+class ChunkedUploadSerializer < ActiveModel::Serializer
   include AuditSummarySerializer
   attributes :id, :name, :content_type, :size, :etag, :storage_container, :chunks, :status, :audit
 

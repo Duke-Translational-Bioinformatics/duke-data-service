@@ -512,5 +512,33 @@ describe "db:data:migrate" do
         end
       end
     end
+
+    describe 'populate_nil_upload_types' do
+      context 'with nil type uploads' do
+        let(:uploads) { FactoryBot.create_list(:upload, 2) }
+        before(:example) do
+          expect(uploads).to all(be_persisted)
+          expect(uploads).to all(satisfy { |v| v.type.nil? })
+        end
+        it 'sets nil upload types to ChunkedUpload' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Populate nil Upload types: 2 uploads updated.")
+          }.to change { ChunkedUpload.count }.by(2)
+        end
+      end
+
+      context 'without nil type uploads' do
+        let(:chunked_uploads) { FactoryBot.create_list(:chunked_upload, 2) }
+        before(:example) do
+          expect(chunked_uploads).to all(be_persisted)
+          expect(chunked_uploads).to all(satisfy { |v| !v.type.nil? })
+        end
+        it 'does nothing' do
+          expect {
+            invoke_task expected_stdout: Regexp.new("Populate nil Upload types: 0 uploads updated.")
+          }.not_to change { ChunkedUpload.count }
+        end
+      end
+    end
   end
 end

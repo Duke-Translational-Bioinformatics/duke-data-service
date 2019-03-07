@@ -31,8 +31,12 @@ class S3StorageProvider < StorageProvider
   end
 
   def initialize_chunked_upload(upload)
-    resp = create_multipart_upload(upload.project.id, upload.id)
-    upload.update_attribute(:multipart_upload_id, resp)
+    if upload.is_a? ChunkedUpload
+      resp = create_multipart_upload(upload.project.id, upload.id)
+      upload.update_attribute(:multipart_upload_id, resp)
+    else
+      raise "#{upload} is not a ChunkedUpload"
+    end
   end
 
   def chunk_max_reached?(chunk)
@@ -60,6 +64,7 @@ class S3StorageProvider < StorageProvider
   end
 
   def complete_chunked_upload(upload)
+    raise("#{upload} is not a ChunkedUpload") unless upload.is_a? ChunkedUpload
     parts = upload.chunks.reorder(:number).collect do |chunk|
       { etag: "\"#{chunk.fingerprint_value}\"", part_number: chunk.number }
     end
@@ -91,9 +96,9 @@ class S3StorageProvider < StorageProvider
     begin
       presigned_url(
         :upload_part,
-        bucket_name: chunk.upload.storage_container,
-        object_key: chunk.upload.id,
-        upload_id: chunk.upload.multipart_upload_id,
+        bucket_name: chunk.chunked_upload.storage_container,
+        object_key: chunk.chunked_upload.id,
+        upload_id: chunk.chunked_upload.multipart_upload_id,
         part_number: chunk.number,
         content_length: chunk.size
       ).sub(url_root, '')
@@ -128,7 +133,7 @@ class S3StorageProvider < StorageProvider
   def client
     @client ||= Aws::S3::Client.new(
       region: 'us-east-1',
-      force_path_style: true,
+      force_path_style: force_path_style.nil? || force_path_style,
       access_key_id: service_user,
       secret_access_key: service_pass,
       endpoint: url_root

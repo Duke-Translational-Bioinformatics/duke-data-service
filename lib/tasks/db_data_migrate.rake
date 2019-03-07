@@ -238,6 +238,12 @@ def create_storage_providers
   puts "\n#{total} projects initialized."
 end
 
+def populate_nil_upload_types
+  print 'Populate nil Upload types: '
+  changed = Upload.where(type: nil).update_all(type: 'ChunkedUpload')
+  puts "#{changed} uploads updated."
+end
+
 namespace :db do
   namespace :data do
     desc "Migrate existing data to fit current business rules"
@@ -253,6 +259,7 @@ namespace :db do
       populate_nil_project_slugs
       set_default_storage_provider
       create_storage_providers
+      populate_nil_upload_types
     end
   end
 end
