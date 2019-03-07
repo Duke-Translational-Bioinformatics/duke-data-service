@@ -181,6 +181,7 @@ RSpec.describe S3StorageProvider, type: :model do
         metadata: {}
       } }
       before(:example) do
+        expect(fingerprint).to be_persisted
         allow(subject).to receive(:head_object)
           .with(bucket_name, object_key)
           .and_return(ho_response)
@@ -190,6 +191,11 @@ RSpec.describe S3StorageProvider, type: :model do
       context 'size mismatch' do
         let(:content_length) { non_chunked_upload.size + 1 }
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
+      end
+
+      context 'fingerprint mismatch' do
+        let(:etag) { SecureRandom.hex(32) }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
       end
     end
   end
