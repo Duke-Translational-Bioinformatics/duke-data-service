@@ -193,6 +193,12 @@ RSpec.describe S3StorageProvider, type: :model do
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
       end
 
+      context 'fingerprints missing' do
+        before(:example) { non_chunked_upload.fingerprints.destroy_all }
+        let(:etag) { SecureRandom.hex(32) }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+      end
+
       context 'fingerprint mismatch' do
         let(:etag) { SecureRandom.hex(32) }
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }

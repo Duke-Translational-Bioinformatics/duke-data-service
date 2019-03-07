@@ -73,7 +73,7 @@ class S3StorageProvider < StorageProvider
     meta = head_object(upload.storage_container, upload.id)
     if meta[:content_length] != upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
-    elsif meta[:etag] != '"'+upload.fingerprints.first.value+'"'
+    elsif upload.fingerprints.none? {|f| meta[:etag] == '"'+f.value+'"'}
       raise IntegrityException, "reported hash value does not match size computed by StorageProvider"
     end
   end
