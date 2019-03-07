@@ -168,6 +168,30 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#verify_upload_integrity' do
+    context 'with NonChunkedUpload' do
+      let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
+      let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
+      let(:bucket_name) { non_chunked_upload.storage_container }
+      let(:object_key) { non_chunked_upload.id }
+      let(:content_length) { non_chunked_upload.size }
+      let(:etag) { fingerprint.value }
+      let(:ho_response) { {
+        content_length: content_length,
+        etag: "\"#{etag}\"",
+        metadata: {}
+      } }
+      before(:example) do
+        allow(subject).to receive(:head_object)
+          .with(bucket_name, object_key)
+          .and_return(ho_response)
+      end
+      it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
+
+      context 'size mismatch' do
+        let(:content_length) { non_chunked_upload.size + 1 }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
+      end
+    end
   end
 
   describe '#complete_chunked_upload' do
