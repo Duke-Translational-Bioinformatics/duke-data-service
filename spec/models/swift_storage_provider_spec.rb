@@ -11,7 +11,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
-    let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
+    let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
     let(:expected_meta) {
       {
       "content-length" => "#{chunked_upload.size}"
@@ -201,6 +201,45 @@ RSpec.describe SwiftStorageProvider, type: :model do
     end
 
     describe '#verify_upload_integrity' do
+      context 'with NonChunkedUpload' do
+        let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
+        let(:container_name) { non_chunked_upload.storage_container }
+        let(:object_name) { non_chunked_upload.id }
+        let(:content_length) { non_chunked_upload.size }
+        let(:etag) { fingerprint.value }
+        let(:gom_response) { {
+          "content_length" => "#{content_length}",
+          "etag" => "#{etag}"
+        } }
+        before(:example) do
+          expect(fingerprint).to be_persisted
+          allow(subject).to receive(:get_object_metadata)
+            .with(container_name, object_name)
+            .and_return(gom_response)
+        end
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
+
+        context 'size mismatch' do
+          let(:content_length) { non_chunked_upload.size + 1 }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
+        end
+
+        context 'fingerprints missing' do
+          before(:example) { non_chunked_upload.fingerprints.destroy_all }
+          let(:etag) { SecureRandom.hex(32) }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+        end
+
+        context 'fingerprint mismatch' do
+          let(:etag) { SecureRandom.hex(32) }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+        end
+      end
+
+      context 'with ChunkedUpload' do
+        let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+        it { expect { subject.verify_upload_integrity(chunked_upload) }.to raise_error(expected_exception) }
+      end
     end
 
     describe '#complete_chunked_upload' do
