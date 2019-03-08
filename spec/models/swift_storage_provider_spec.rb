@@ -214,8 +214,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
         before(:example) do
           expect(fingerprint).to be_persisted
           allow(subject).to receive(:get_object_metadata)
-            .with(container_name, object_name)
-            .and_return(gom_response)
+            .with(container_name, object_name) { gom_response }
         end
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
 
@@ -233,6 +232,16 @@ RSpec.describe SwiftStorageProvider, type: :model do
         context 'fingerprint mismatch' do
           let(:etag) { SecureRandom.hex(32) }
           it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+        end
+
+        context 'object_key does not exist' do
+          let(:gom_response) { nil }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /not found in object store/) }
+        end
+
+        context '#get_object_metadata raises StorageProviderException' do
+          let(:gom_response) { raise StorageProviderException }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(StorageProviderException) }
         end
       end
 

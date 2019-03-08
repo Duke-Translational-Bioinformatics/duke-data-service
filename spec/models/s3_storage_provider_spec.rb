@@ -182,8 +182,7 @@ RSpec.describe S3StorageProvider, type: :model do
       before(:example) do
         expect(fingerprint).to be_persisted
         allow(subject).to receive(:head_object)
-          .with(bucket_name, object_key)
-          .and_return(ho_response)
+          .with(bucket_name, object_key) { ho_response }
       end
       it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
 
@@ -201,6 +200,16 @@ RSpec.describe S3StorageProvider, type: :model do
       context 'fingerprint mismatch' do
         let(:etag) { SecureRandom.hex(32) }
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+      end
+
+      context 'object_key does not exist' do
+        let(:ho_response) { false }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /not found in object store/) }
+      end
+
+      context '#head_object raises StorageProviderException' do
+        let(:ho_response) { raise StorageProviderException }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(StorageProviderException) }
       end
     end
 

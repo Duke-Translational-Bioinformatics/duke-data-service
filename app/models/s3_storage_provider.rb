@@ -71,7 +71,8 @@ class S3StorageProvider < StorageProvider
 
   def verify_upload_integrity(upload)
     raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
-    meta = head_object(upload.storage_container, upload.id)
+    meta = head_object(upload.storage_container, upload.id) ||
+      raise(IntegrityException, "NonChunkedUpload not found in object store")
     if meta[:content_length] != upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
     elsif upload.fingerprints.none? {|f| meta[:etag] == '"'+f.value+'"'}
