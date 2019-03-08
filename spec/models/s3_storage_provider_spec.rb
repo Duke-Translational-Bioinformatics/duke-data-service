@@ -5,7 +5,7 @@ RSpec.describe S3StorageProvider, type: :model do
   subject { FactoryBot.build(:s3_storage_provider) }
   let(:project) { stub_model(Project, id: SecureRandom.uuid) }
   let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
-  let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
+  let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
   let(:domain) { Faker::Internet.domain_name }
   let(:s3_part_max_number) { 10_000 }
@@ -169,7 +169,6 @@ RSpec.describe S3StorageProvider, type: :model do
 
   describe '#verify_upload_integrity' do
     context 'with NonChunkedUpload' do
-      let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
       let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
       let(:bucket_name) { non_chunked_upload.storage_container }
       let(:object_key) { non_chunked_upload.id }
@@ -203,6 +202,11 @@ RSpec.describe S3StorageProvider, type: :model do
         let(:etag) { SecureRandom.hex(32) }
         it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
       end
+    end
+
+    context 'with ChunkedUpload' do
+      let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+      it { expect { subject.verify_upload_integrity(chunked_upload) }.to raise_error(expected_exception) }
     end
   end
 
