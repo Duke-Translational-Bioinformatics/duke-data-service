@@ -34,6 +34,31 @@ RSpec.describe NonChunkedUpload, type: :model do
     end
   end
 
+  it { is_expected.to respond_to :single_file_upload_url }
+  describe '#single_file_upload_url' do
+    subject { FactoryBot.create(:non_chunked_upload, storage_provider: subject_storage_provider) }
+    let(:sp_response) { '/' + Faker::Internet.user_name }
+    before(:example) do
+      allow(subject_storage_provider).to receive(:single_file_upload_url)
+        .with(subject) { sp_response }
+    end
+    it { expect(subject.single_file_upload_url).to eq(sp_response) }
+  end
+
+  it { is_expected.to respond_to :signed_url }
+  describe '#signed_url' do
+    subject { FactoryBot.create(:non_chunked_upload, storage_provider: subject_storage_provider) }
+    let(:expected_url) { '/' + Faker::Internet.user_name }
+    let(:signed_url_hash) { {
+      http_verb: "PUT",
+      host: subject_storage_provider.url_root,
+      url: expected_url,
+      http_headers: []
+    } }
+    before(:example) { is_expected.to receive(:single_file_upload_url) { expected_url } }
+    it { expect(subject.signed_url).to eq(signed_url_hash) }
+  end
+
   it { is_expected.to respond_to :purge_storage }
   describe '#purge_storage' do
     subject { FactoryBot.create(:non_chunked_upload, storage_provider: subject_storage_provider) }

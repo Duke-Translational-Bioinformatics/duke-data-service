@@ -10,6 +10,19 @@ class NonChunkedUpload < Upload
     storage_provider&.max_upload_size
   end
 
+  def single_file_upload_url
+    storage_provider.single_file_upload_url(self)
+  end
+
+  def signed_url
+    {
+      http_verb: "PUT",
+      host: storage_provider.url_root,
+      url: single_file_upload_url,
+      http_headers: []
+    }
+  end
+
   def purge_storage
     storage_provider.purge(self)
     self.update(purged_on: DateTime.now)
