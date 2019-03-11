@@ -163,6 +163,11 @@ RSpec.describe SwiftStorageProvider, type: :model do
           ).and_return(expected_url)
         expect(subject.single_file_upload_url(non_chunked_upload)).to eq(expected_url)
       end
+
+      context 'with ChunkedUpload' do
+        let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+        it { expect { subject.single_file_upload_url(chunked_upload) }.to raise_error(expected_exception) }
+      end
     end
 
     describe '#initialize_chunked_upload' do

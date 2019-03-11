@@ -36,6 +36,7 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def single_file_upload_url(upload)
+    raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
     build_signed_url(
       'PUT',
       upload.sub_path,
