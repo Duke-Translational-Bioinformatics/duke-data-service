@@ -94,6 +94,29 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#single_file_upload_url(non_chunked_upload)' do
+    let(:bucket_name) { non_chunked_upload.storage_container }
+    let(:object_key) { non_chunked_upload.id }
+    let(:object_size) { non_chunked_upload.size }
+    let(:expected_url) { '/' + Faker::Internet.user_name }
+    let(:pu_response) { subject.url_root + expected_url }
+    before(:example) do
+      allow(subject).to receive(:presigned_url)
+        .with(
+          :put_object,
+          bucket_name: bucket_name,
+          object_key: object_key,
+          content_length: object_size
+        ) { pu_response }
+    end
+    it { expect(subject.single_file_upload_url(non_chunked_upload)).to eq expected_url }
+
+    context 'with ChunkedUpload' do
+      let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+      it { expect { subject.single_file_upload_url(chunked_upload) }.to raise_error(expected_exception) }
+    end
+  end
+
   describe '#initialize_chunked_upload' do
     let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
@@ -708,6 +731,20 @@ RSpec.describe S3StorageProvider, type: :model do
       context 'with nil :upload_id' do
         it { expect { subject.presigned_url(:upload_part, bucket_name: bucket_name, object_key: object_key, upload_id: nil, part_number: part_number, content_length: part_size) }.to raise_error(ArgumentError, 'missing required parameter params[:upload_id]') }
       end
+    end
+
+    context 'sign :put_object' do
+      let(:object_size) { Faker::Number.between(1000, 10000) }
+      let(:expected_url) {
+        signer.presigned_url(
+          :put_object,
+          bucket: bucket_name,
+          key: object_key,
+          content_length: object_size,
+          expires_in: subject.signed_url_duration
+        )
+      }
+      it { expect(subject.presigned_url(:put_object, bucket_name: bucket_name, object_key: object_key, content_length: object_size)).to eq expected_url }
     end
   end
 end

@@ -30,6 +30,16 @@ class S3StorageProvider < StorageProvider
   end
 
   def single_file_upload_url(upload)
+    if upload.is_a? NonChunkedUpload
+      presigned_url(
+        :put_object,
+        bucket_name: upload.storage_container,
+        object_key: upload.id,
+        content_length: upload.size
+      ).sub(url_root, '')
+    else
+      raise("#{upload} is not a NonChunkedUpload")
+    end
   end
 
   def initialize_chunked_upload(upload)
