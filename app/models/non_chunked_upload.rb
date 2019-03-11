@@ -16,5 +16,11 @@ class NonChunkedUpload < Upload
   end
 
   def complete_and_validate_integrity
+    begin
+      storage_provider.verify_upload_integrity(self)
+      update!({ is_consistent: true })
+    rescue IntegrityException => e
+      integrity_exception(e.message)
+    end
   end
 end

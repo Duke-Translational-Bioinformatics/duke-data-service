@@ -68,4 +68,53 @@ RSpec.describe NonChunkedUpload, type: :model do
   end
 
   it { is_expected.to respond_to :complete_and_validate_integrity }
+  describe '#complete_and_validate_integrity' do
+    subject { FactoryBot.create(:non_chunked_upload, is_consistent: false, storage_provider: subject_storage_provider) }
+    let(:vui_response) { true }
+
+    before(:example) do
+      expect(mocked_storage_provider).to receive(:verify_upload_integrity).with(subject) { vui_response }
+      expect(subject.is_consistent).to be_falsey
+    end
+
+    context 'with verified upload' do
+      before(:example) do
+        expect { subject.complete_and_validate_integrity }.not_to raise_error
+        expect(subject.reload).to be_truthy
+      end
+      it { expect(subject.is_consistent).to be_truthy }
+      it { expect(subject.error_at).to be_nil }
+      it { expect(subject.error_message).to be_nil }
+    end
+
+    context 'with IntegrityException' do
+      let(:vui_response) { raise IntegrityException, exception_message }
+      let(:exception_message) { Faker::Hacker.say_something_smart }
+      let(:now) { Time.now }
+
+      around(:each) do |example|
+        travel_to(now) do #freeze_time
+          example.run
+        end
+      end
+      before(:example) do
+        expect { subject.complete_and_validate_integrity }.not_to raise_error
+        expect(subject.reload).to be_truthy
+      end
+      it { expect(subject.is_consistent).to be_truthy }
+      it { expect(subject.error_at.to_i).to eq now.to_i }
+      it { expect(subject.error_message).to include(exception_message) }
+    end
+
+    context 'with StorageProviderException' do
+      let(:vui_response) { raise unexpected_exception }
+      before(:example) do
+        expect { subject.complete_and_validate_integrity }.to raise_error unexpected_exception
+        expect(subject.reload).to be_truthy
+      end
+      it { expect(subject.is_consistent).to be_falsey }
+      it { expect(subject.error_at).to be_nil }
+      it { expect(subject.error_message).to be_nil }
+    end
+  end
 end
