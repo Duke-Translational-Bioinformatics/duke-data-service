@@ -37,7 +37,7 @@ class SwiftStorageProvider < StorageProvider
 
   def single_file_upload_url(upload)
     build_signed_url(
-      'POST',
+      'PUT',
       upload.sub_path,
       expiry
     )

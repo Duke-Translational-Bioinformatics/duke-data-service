@@ -152,18 +152,16 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
-    describe '#single_file_upload_url(upload)' do
+    describe '#single_file_upload_url(non_chunked_upload)' do
       let(:expected_url) { Faker::Internet.url }
       it 'should return a signed url to POST the upload' do
         is_expected.to receive(:build_signed_url)
           .with(
-            'POST',
-            chunked_upload.sub_path,
+            'PUT',
+            non_chunked_upload.sub_path,
             subject.expiry
           ).and_return(expected_url)
-        expect {
-          expect(subject.single_file_upload_url(chunked_upload)).to eq(expected_url)
-        }.not_to raise_error
+        expect(subject.single_file_upload_url(non_chunked_upload)).to eq(expected_url)
       end
     end
 
