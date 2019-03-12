@@ -5,6 +5,13 @@ class NonChunkedUpload < Upload
       "File size is currently not supported - maximum size is #{object.max_size_bytes}"
     end
   }
+  validate :fingerprints_contain_storage_provider_compatible_algorithm, if: :completed_at
+
+  def fingerprints_contain_storage_provider_compatible_algorithm
+    unless fingerprints.any? { |f| f.algorithm == storage_provider.fingerprint_algorithm }
+      errors.add(:fingerprints, "must contain storage provider compatible algorithm: #{storage_provider.fingerprint_algorithm}")
+    end
+  end
 
   def max_size_bytes
     storage_provider&.max_upload_size

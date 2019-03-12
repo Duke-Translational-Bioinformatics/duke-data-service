@@ -99,6 +99,11 @@ shared_context 'A StorageProvider' do
 
   it { is_expected.to respond_to(:minimum_chunk_number) }
 
+  it { is_expected.to respond_to(:fingerprint_algorithm) }
+  describe '#fingerprint_algorithm' do
+    it { expect(subject.fingerprint_algorithm).to eq 'md5' }
+  end
+
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 

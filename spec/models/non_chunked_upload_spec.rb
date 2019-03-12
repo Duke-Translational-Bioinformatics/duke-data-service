@@ -22,6 +22,16 @@ RSpec.describe NonChunkedUpload, type: :model do
     it { expect { is_expected.not_to validate_numericality_of(:size) }.not_to raise_error }
   end
 
+  context 'with completed_at set' do
+    let(:compatible_fingerprint) { FactoryBot.build(:fingerprint, algorithm: subject_storage_provider.fingerprint_algorithm) }
+    let(:incompatible_fingerprint) { FactoryBot.build(:fingerprint, algorithm: 'sha256') }
+    before { subject.completed_at = Faker::Time.forward(1) }
+
+    it { is_expected.to allow_value([compatible_fingerprint]).for(:fingerprints) }
+    it { is_expected.not_to allow_value([incompatible_fingerprint]).for(:fingerprints) }
+    it { is_expected.to allow_value([compatible_fingerprint, incompatible_fingerprint]).for(:fingerprints) }
+  end
+
   # Instance methods
   it { is_expected.to respond_to :max_size_bytes }
   describe '#max_size_bytes' do

@@ -29,6 +29,10 @@ class StorageProvider < ApplicationRecord
     0
   end
 
+  def fingerprint_algorithm
+    'md5'
+  end
+
   def signed_url_duration
     60*5 # 5 minutes
   end
