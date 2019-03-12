@@ -49,6 +49,8 @@ module DDS
           if upload.is_a? ChunkedUpload
             header 'X-MIN-CHUNK-UPLOAD-SIZE', upload.minimum_chunk_size
             header 'X-MAX-CHUNK-UPLOAD-SIZE', upload.max_size_bytes
+          else
+            header 'X-MAX-UPLOAD-SIZE', upload.max_size_bytes
           end
           upload
         else
