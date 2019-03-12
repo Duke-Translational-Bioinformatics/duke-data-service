@@ -21,6 +21,7 @@ module DDS
         optional :storage_provider, type: Hash, desc: "Storage Provider" do
           requires :id, type: String, desc: "Storage Provider UUID"
         end
+        optional :chunked, type: Boolean, default: true, desc: 'The default is true, returning the established chunked upload payload. When false, chunks are omitted and a signed upload url is returned with the payload.'
       end
       post '/projects/:project_id/uploads', root: false do
         authenticate!
@@ -33,7 +34,8 @@ module DDS
             StorageProvider.default
           end
         raise ConsistencyException.new if project.project_storage_providers.where(storage_provider: storage_provider).none? &:is_initialized?
-        upload = ChunkedUpload.new({
+        upload_class = upload_params[:chunked] ? ChunkedUpload : NonChunkedUpload
+        upload = upload_class.new({
           name: upload_params[:name],
           size: upload_params[:size],
           etag: SecureRandom.hex,
@@ -44,8 +46,10 @@ module DDS
         })
         authorize upload, :create?
         if upload.save
-          header 'X-MIN-CHUNK-UPLOAD-SIZE', upload.minimum_chunk_size
-          header 'X-MAX-CHUNK-UPLOAD-SIZE', upload.max_size_bytes
+          if upload.is_a? ChunkedUpload
+            header 'X-MIN-CHUNK-UPLOAD-SIZE', upload.minimum_chunk_size
+            header 'X-MAX-CHUNK-UPLOAD-SIZE', upload.max_size_bytes
+          end
           upload
         else
           validation_error!(upload)

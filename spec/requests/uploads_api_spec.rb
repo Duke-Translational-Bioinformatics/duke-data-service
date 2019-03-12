@@ -90,6 +90,18 @@ describe DDS::V1::UploadsAPI do
           end
         end
 
+        context 'with chunked set to false' do
+          let!(:payload) {{
+            name: upload_stub.name,
+            content_type: upload_stub.content_type,
+            size: upload_stub.size,
+            chunked: false
+          }}
+          let(:resource_class) { NonChunkedUpload }
+          let(:resource_serializer) { NonChunkedUploadSerializer }
+          it_behaves_like 'a creatable resource'
+        end
+
         it_behaves_like 'a validated resource' do
           let(:payload) {{
             name: nil,

@@ -24,6 +24,9 @@ shared_context 'mocked StorageProvider Interface' do
       "#{expected_url_root}/#{URI.encode(filename)}"
     end
     allow(mocked_storage_provider).to receive(:chunk_upload_ready?).and_return(true)
+    allow(mocked_storage_provider).to receive(:single_file_upload_url) do |upload|
+      "/#{upload.sub_path}"
+    end
     allow(mocked_storage_provider).to receive(:chunk_upload_url) do |chunk|
       "#{expected_url_root}/#{chunk.sub_path}"
     end
