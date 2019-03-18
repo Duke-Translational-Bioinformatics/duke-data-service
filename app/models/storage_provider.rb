@@ -29,6 +29,10 @@ class StorageProvider < ApplicationRecord
     0
   end
 
+  def fingerprint_algorithm
+    'md5'
+  end
+
   def signed_url_duration
     60*5 # 5 minutes
   end
@@ -77,8 +81,16 @@ class StorageProvider < ApplicationRecord
     raise NotImplementedError.new("You must implement max_chunked_upload_size.")
   end
 
+  def max_upload_size
+    raise NotImplementedError.new("You must implement max_upload_size.")
+  end
+
   def suggested_minimum_chunk_size(upload)
     raise NotImplementedError.new("You must implement suggested_minimum_chunk_size.")
+  end
+
+  def verify_upload_integrity(upload)
+    raise NotImplementedError.new("You must implement verify_upload_integrity.")
   end
 
   def complete_chunked_upload(upload)

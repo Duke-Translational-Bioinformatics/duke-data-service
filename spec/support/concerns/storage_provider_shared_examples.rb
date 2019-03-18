@@ -3,11 +3,17 @@ shared_context 'mocked StorageProvider Interface' do
   let(:expected_url_root) { Faker::Internet.url }
 
   before do
+    allow(mocked_storage_provider).to receive(:verify_upload_integrity)
+      .and_return(true)
     allow(mocked_storage_provider).to receive(:complete_chunked_upload)
       .and_return(true)
     allow(mocked_storage_provider).to receive(:max_chunked_upload_size)
       .and_return(
         mocked_storage_provider.chunk_max_number * mocked_storage_provider.chunk_max_size_bytes
+      )
+    allow(mocked_storage_provider).to receive(:max_upload_size)
+      .and_return(
+        mocked_storage_provider.chunk_max_size_bytes
       )
     allow(mocked_storage_provider).to receive(:chunk_max_reached?)
       .and_return(expected_chunk_max_exceeded)
@@ -18,6 +24,9 @@ shared_context 'mocked StorageProvider Interface' do
       "#{expected_url_root}/#{URI.encode(filename)}"
     end
     allow(mocked_storage_provider).to receive(:chunk_upload_ready?).and_return(true)
+    allow(mocked_storage_provider).to receive(:single_file_upload_url) do |upload|
+      "/#{upload.sub_path}"
+    end
     allow(mocked_storage_provider).to receive(:chunk_upload_url) do |chunk|
       "#{expected_url_root}/#{chunk.sub_path}"
     end
@@ -90,6 +99,11 @@ shared_context 'A StorageProvider' do
 
   it { is_expected.to respond_to(:minimum_chunk_number) }
 
+  it { is_expected.to respond_to(:fingerprint_algorithm) }
+  describe '#fingerprint_algorithm' do
+    it { expect(subject.fingerprint_algorithm).to eq 'md5' }
+  end
+
   it { is_expected.to respond_to(:signed_url_duration) }
   it { expect(subject.signed_url_duration).to eq 60*5 } # 5 minutes
 
@@ -109,11 +123,13 @@ shared_context 'A StorageProvider' do
   it { is_expected.to respond_to(:initialize_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:url_root) }
   it { is_expected.to respond_to(:chunk_max_reached?).with(1).argument }
+  it { is_expected.to respond_to(:verify_upload_integrity).with(1).argument }
   it { is_expected.to respond_to(:complete_chunked_upload).with(1).argument }
   it { is_expected.to respond_to(:is_complete_chunked_upload?).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_url).with(1).argument }
   it { is_expected.to respond_to(:chunk_upload_ready?).with(1).argument }
   it { is_expected.to respond_to(:max_chunked_upload_size) }
+  it { is_expected.to respond_to(:max_upload_size) }
   it { is_expected.to respond_to(:suggested_minimum_chunk_size).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(1).argument }
   it { is_expected.to respond_to(:download_url).with(2).argument }
@@ -161,6 +177,10 @@ shared_examples 'A StorageProvider implementation' do
     it { expect { subject.max_chunked_upload_size }.not_to raise_error(NotImplementedError) }
   end
 
+  describe '#max_upload_size' do
+    it { expect { subject.max_upload_size }.not_to raise_error(NotImplementedError) }
+  end
+
   describe '#suggested_minimum_chunk_size' do
     it { expect { subject.suggested_minimum_chunk_size(nil) }.not_to raise_error(NotImplementedError) }
   end
@@ -171,6 +191,10 @@ shared_examples 'A StorageProvider implementation' do
 
   describe '#chunk_upload_url(chunk)' do
     it { expect { subject.chunk_upload_url(nil) }.not_to raise_error(NotImplementedError) }
+  end
+
+  describe '#verify_upload_integrity(upload)' do
+    it { expect { subject.verify_upload_integrity(nil) }.not_to raise_error(NotImplementedError) }
   end
 
   describe '#complete_chunked_upload(upload)' do
