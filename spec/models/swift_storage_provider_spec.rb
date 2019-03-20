@@ -211,7 +211,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
         let(:content_length) { non_chunked_upload.size }
         let(:etag) { fingerprint.value }
         let(:gom_response) { {
-          "content_length" => "#{content_length}",
+          "content-length" => "#{content_length}",
           "etag" => "#{etag}"
         } }
         before(:example) do

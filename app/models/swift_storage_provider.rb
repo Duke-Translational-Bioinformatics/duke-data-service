@@ -68,7 +68,7 @@ class SwiftStorageProvider < StorageProvider
     raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
     meta = get_object_metadata(upload.storage_container, upload.id) ||
       raise(IntegrityException, "NonChunkedUpload not found in object store")
-    if meta["content_length"].to_i != upload.size
+    if meta["content-length"].to_i != upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
     elsif upload.fingerprints.none? {|f| meta["etag"] == f.value}
       raise IntegrityException, "reported hash value does not match size computed by StorageProvider"
