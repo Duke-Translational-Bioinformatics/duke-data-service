@@ -5,11 +5,13 @@ RSpec.describe S3StorageProvider, type: :model do
   subject { FactoryBot.build(:s3_storage_provider) }
   let(:project) { stub_model(Project, id: SecureRandom.uuid) }
   let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
-  let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
+  let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
   let(:chunk) { FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload) }
   let(:domain) { Faker::Internet.domain_name }
-  let(:int_max_value) { 2147483647 }
-  let(:big_int_max_value) { 9223372036854775807 }
+  let(:s3_part_max_number) { 10_000 }
+  let(:s3_part_max_size) { 5_368_709_120 } # 5GB
+  let(:s3_multipart_upload_max_size) { 5_497_558_138_880 } # 5TB
+  let(:s3_upload_max_size) { 5_368_709_120 } # 5GB
 
   shared_context 'stubbed subject#client' do
     let(:stubbed_client) {
@@ -41,11 +43,11 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#chunk_max_number' do
-    it { expect(subject.chunk_max_number).to eq int_max_value }
+    it { expect(subject.chunk_max_number).to eq s3_part_max_number }
   end
 
   describe '#chunk_max_size_bytes' do
-    it { expect(subject.chunk_max_size_bytes).to eq big_int_max_value }
+    it { expect(subject.chunk_max_size_bytes).to eq s3_part_max_size }
   end
 
   describe '#configure' do
@@ -92,6 +94,29 @@ RSpec.describe S3StorageProvider, type: :model do
     end
   end
 
+  describe '#single_file_upload_url(non_chunked_upload)' do
+    let(:bucket_name) { non_chunked_upload.storage_container }
+    let(:object_key) { non_chunked_upload.id }
+    let(:object_size) { non_chunked_upload.size }
+    let(:expected_url) { '/' + Faker::Internet.user_name }
+    let(:pu_response) { subject.url_root + expected_url }
+    before(:example) do
+      allow(subject).to receive(:presigned_url)
+        .with(
+          :put_object,
+          bucket_name: bucket_name,
+          object_key: object_key,
+          content_length: object_size
+        ) { pu_response }
+    end
+    it { expect(subject.single_file_upload_url(non_chunked_upload)).to eq expected_url }
+
+    context 'with ChunkedUpload' do
+      let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+      it { expect { subject.single_file_upload_url(chunked_upload) }.to raise_error(expected_exception) }
+    end
+  end
+
   describe '#initialize_chunked_upload' do
     let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
@@ -135,8 +160,14 @@ RSpec.describe S3StorageProvider, type: :model do
   end
 
   describe '#max_chunked_upload_size' do
-    it 'returns the max value that Upload#size can store' do
-      expect(subject.max_chunked_upload_size).to eq(big_int_max_value)
+    it 'returns the max value that ChunkedUpload#size can store' do
+      expect(subject.max_chunked_upload_size).to eq(s3_multipart_upload_max_size)
+    end
+  end
+
+  describe '#max_upload_size' do
+    it 'returns the max value that NonChunkedUpload#size can store' do
+      expect(subject.max_upload_size).to eq(s3_upload_max_size)
     end
   end
 
@@ -156,6 +187,58 @@ RSpec.describe S3StorageProvider, type: :model do
     context 'chunked_upload.size > storage_provider.chunk_max_number' do
       let(:size) { subject.chunk_max_number + 1 }
       it { expect(subject.suggested_minimum_chunk_size(chunked_upload)).to eq(2) }
+    end
+  end
+
+  describe '#verify_upload_integrity' do
+    context 'with NonChunkedUpload' do
+      let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
+      let(:bucket_name) { non_chunked_upload.storage_container }
+      let(:object_key) { non_chunked_upload.id }
+      let(:content_length) { non_chunked_upload.size }
+      let(:etag) { fingerprint.value }
+      let(:ho_response) { {
+        content_length: content_length,
+        etag: "\"#{etag}\"",
+        metadata: {}
+      } }
+      before(:example) do
+        expect(fingerprint).to be_persisted
+        allow(subject).to receive(:head_object)
+          .with(bucket_name, object_key) { ho_response }
+      end
+      it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
+
+      context 'size mismatch' do
+        let(:content_length) { non_chunked_upload.size + 1 }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
+      end
+
+      context 'fingerprints missing' do
+        before(:example) { non_chunked_upload.fingerprints.destroy_all }
+        let(:etag) { SecureRandom.hex(32) }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+      end
+
+      context 'fingerprint mismatch' do
+        let(:etag) { SecureRandom.hex(32) }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+      end
+
+      context 'object_key does not exist' do
+        let(:ho_response) { false }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /not found in object store/) }
+      end
+
+      context '#head_object raises StorageProviderException' do
+        let(:ho_response) { raise StorageProviderException }
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(StorageProviderException) }
+      end
+    end
+
+    context 'with ChunkedUpload' do
+      let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+      it { expect { subject.verify_upload_integrity(chunked_upload) }.to raise_error(expected_exception) }
     end
   end
 
@@ -648,6 +731,20 @@ RSpec.describe S3StorageProvider, type: :model do
       context 'with nil :upload_id' do
         it { expect { subject.presigned_url(:upload_part, bucket_name: bucket_name, object_key: object_key, upload_id: nil, part_number: part_number, content_length: part_size) }.to raise_error(ArgumentError, 'missing required parameter params[:upload_id]') }
       end
+    end
+
+    context 'sign :put_object' do
+      let(:object_size) { Faker::Number.between(1000, 10000) }
+      let(:expected_url) {
+        signer.presigned_url(
+          :put_object,
+          bucket: bucket_name,
+          key: object_key,
+          content_length: object_size,
+          expires_in: subject.signed_url_duration
+        )
+      }
+      it { expect(subject.presigned_url(:put_object, bucket_name: bucket_name, object_key: object_key, content_length: object_size)).to eq expected_url }
     end
   end
 end

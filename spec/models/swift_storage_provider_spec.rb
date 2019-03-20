@@ -11,7 +11,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     let(:expected_project_id) { SecureRandom.uuid }
     let(:project) { instance_double("Project") }
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation) }
-    let(:non_chunked_upload) { FactoryBot.create(:upload, :skip_validation) }
+    let(:non_chunked_upload) { FactoryBot.create(:non_chunked_upload, :skip_validation) }
     let(:expected_meta) {
       {
       "content-length" => "#{chunked_upload.size}"
@@ -152,18 +152,21 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
     end
 
-    describe '#single_file_upload_url(upload)' do
+    describe '#single_file_upload_url(non_chunked_upload)' do
       let(:expected_url) { Faker::Internet.url }
       it 'should return a signed url to POST the upload' do
         is_expected.to receive(:build_signed_url)
           .with(
-            'POST',
-            chunked_upload.sub_path,
+            'PUT',
+            non_chunked_upload.sub_path,
             subject.expiry
           ).and_return(expected_url)
-        expect {
-          expect(subject.single_file_upload_url(chunked_upload)).to eq(expected_url)
-        }.not_to raise_error
+        expect(subject.single_file_upload_url(non_chunked_upload)).to eq(expected_url)
+      end
+
+      context 'with ChunkedUpload' do
+        let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+        it { expect { subject.single_file_upload_url(chunked_upload) }.to raise_error(expected_exception) }
       end
     end
 
@@ -197,6 +200,57 @@ RSpec.describe SwiftStorageProvider, type: :model do
           expect(chunk.chunked_upload.chunks.count).to be > subject.chunk_max_number
           expect(subject.chunk_max_reached?(chunk)).to be_truthy
         end
+      end
+    end
+
+    describe '#verify_upload_integrity' do
+      context 'with NonChunkedUpload' do
+        let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
+        let(:container_name) { non_chunked_upload.storage_container }
+        let(:object_name) { non_chunked_upload.id }
+        let(:content_length) { non_chunked_upload.size }
+        let(:etag) { fingerprint.value }
+        let(:gom_response) { {
+          "content_length" => "#{content_length}",
+          "etag" => "#{etag}"
+        } }
+        before(:example) do
+          expect(fingerprint).to be_persisted
+          allow(subject).to receive(:get_object_metadata)
+            .with(container_name, object_name) { gom_response }
+        end
+        it { expect { subject.verify_upload_integrity(non_chunked_upload) }.not_to raise_error }
+
+        context 'size mismatch' do
+          let(:content_length) { non_chunked_upload.size + 1 }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /size does not match/) }
+        end
+
+        context 'fingerprints missing' do
+          before(:example) { non_chunked_upload.fingerprints.destroy_all }
+          let(:etag) { SecureRandom.hex(32) }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+        end
+
+        context 'fingerprint mismatch' do
+          let(:etag) { SecureRandom.hex(32) }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /hash value does not match/) }
+        end
+
+        context 'object_key does not exist' do
+          let(:gom_response) { nil }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(IntegrityException, /not found in object store/) }
+        end
+
+        context '#get_object_metadata raises StorageProviderException' do
+          let(:gom_response) { raise StorageProviderException }
+          it { expect { subject.verify_upload_integrity(non_chunked_upload) }.to raise_error(StorageProviderException) }
+        end
+      end
+
+      context 'with ChunkedUpload' do
+        let(:expected_exception) { "#{chunked_upload} is not a NonChunkedUpload" }
+        it { expect { subject.verify_upload_integrity(chunked_upload) }.to raise_error(expected_exception) }
       end
     end
 
@@ -342,9 +396,20 @@ RSpec.describe SwiftStorageProvider, type: :model do
       let(:expected_max_chunk_upload_size) {
         subject.chunk_max_number * subject.chunk_max_size_bytes
       }
-      it 'should retrn the swift expected_max_chunk_upload_size' do
+      it 'should return the swift expected_max_chunk_upload_size' do
         expect {
           expect(subject.max_chunked_upload_size).to eq(expected_max_chunk_upload_size)
+        }.not_to raise_error
+      end
+    end
+
+    describe '#max_upload_size' do
+      let(:expected_max_upload_size) {
+        subject.chunk_max_size_bytes
+      }
+      it 'should return the swift expected_max_upload_size' do
+        expect {
+          expect(subject.max_upload_size).to eq(expected_max_upload_size)
         }.not_to raise_error
       end
     end

@@ -13,6 +13,11 @@ RSpec.describe ChunkedUpload, type: :model do
   # Associations
   it { is_expected.to have_many(:chunks).with_foreign_key('upload_id') }
 
+  # Validations
+  it { is_expected.to validate_numericality_of(:size)
+    .is_less_than(subject.max_size_bytes)
+    .with_message("File size is currently not supported - maximum size is #{subject.max_size_bytes}") }
+
   # Callbacks
   it { is_expected.to callback(:initialize_storage).after(:create) }
 
@@ -133,19 +138,9 @@ RSpec.describe ChunkedUpload, type: :model do
     end
   end
 
-  it { is_expected.to respond_to :complete }
-  describe '#complete' do
-    let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
-    before { subject.fingerprints_attributes = [fingerprint_attributes] }
-
-    it {
-      expect(subject.completed_at).to be_nil
-      expect {
-        expect(subject.complete).to be_truthy
-      }.to have_enqueued_job(UploadCompletionJob)
-      subject.reload
-      expect(subject.completed_at).not_to be_nil
-    }
+  it { is_expected.to respond_to :max_size_bytes }
+  describe '#max_size_bytes' do
+    it { expect(subject.max_size_bytes).to eq(mocked_storage_provider.max_chunked_upload_size) }
   end
 
   it { is_expected.to respond_to :minimum_chunk_size }
