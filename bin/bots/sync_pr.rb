@@ -42,6 +42,6 @@ if diff.status == "ahead" || diff.status == "diverged"
     exit
   end
   reviewers = diff.commits.map{ |c| c.author.login }.reject{|c| c == client.user.login }.uniq
-  client.request_pull_request_review(repo.id, this_pr.number, reviewers)
+  client.request_pull_request_review(repo.id, this_pr.number, reviewers: reviewers)
 end
 exit

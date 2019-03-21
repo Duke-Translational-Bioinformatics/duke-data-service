@@ -229,4 +229,4 @@ workflows:
           filters:
             branches:
               only:
-                - production
+                - sync_bot_circle
