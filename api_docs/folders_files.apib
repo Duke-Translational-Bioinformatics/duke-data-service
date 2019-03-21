@@ -283,14 +283,13 @@ of the project trash bin.
         }
 
 ## Group Uploads
-All files must be uploaded using a multi-part/chunked upload process.  Although this places more burden on clients to divide larger files into chunks and send each chunk separately, the result is a more robust process that allows failed chunks to be resent.  The following actions must be used by the client to manage the chunked upload process.
 
 ## Uploads collection [/projects/{id}/uploads]
 + Parameters
     + id (required, string, `d5ae02a4-b9e6-473d-87c4-66f4c881ae7a`) ... Globally unique `id` of the project.
 
-### Initiate chunked upload [POST]
-This is the first step in uploading a large file. An upload objects is created along with a composite status object that can be polled by client agents to track the progress of the chunked upload.
+### Initiate upload [POST]
+This is the first step in uploading a file. An upload object is created along with a composite status object that can be polled by client agents to track the progress of the upload.
 >**Permission:** create_file
 - - - - -
 
@@ -300,12 +299,14 @@ This is the first step in uploading a large file. An upload objects is created a
 + **content_type (string, optional)** - Valid content type per [media types](https://en.wikipedia.org/wiki/Internet_media_type).
 + **size (number, required)** - The size in bytes of entire file (computed by client).
 + **storage_provider.id (string, optional)** - The unique id for a storage provider.
++ **chunked (boolean, optional)** - The default is true, returning the established chunked upload payload. When false, chunks are omitted and a signed upload url is returned with the payload.
 
 >**Response Properties**
 - - - - -
-+ **chunks (object)** - The chunks the client has requested to upload.
++ **chunks (object)** - The chunks the client has requested to upload, when chunked is true.
 + **storage_location (object)** - Object that contains target storage details.
 + **status (object)** - Object used to track status of overall file upload.
++ **signed_url (object)** - Object that contains url upload information for non-chunked uploads.
 
 **Response messages:**
 * 200: This will never happen
@@ -349,7 +350,51 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
-### List chunked uploads [GET]
++ Request (application/json)
+
+        {
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33"
+            },
+            "chunked": false
+        }
+
++ Response 201 (application/json)
+
+        {
+            "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+            "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+            "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+            "content_type": "application/octet-stream",
+            "size": 30024000,
+            "hashes": [ ],
+            "storage_provider": {
+                "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+                "name": "duke_oit_swift", "description":
+                "Duke OIT Storage"
+            },
+            "status": {
+                "initiated_on": "2015-07-10T13:00:00Z",
+                "completed_on": null,
+                "purged_on": null,
+                "error_on": null,
+                "error_message": null
+            },
+            "signed_url": {
+                "http_verb": "PUT",
+                "host": "duke_data_service_prod.s3.amazonaws.com",
+                "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
+                "http_headers": [
+                  { "Content-Length": "30024000" }
+                ]
+            },
+            "audit": { }
+        }
+
+### List uploads [GET]
 >**Permission:** view_project
 - - - - -
 **Response messages:**
@@ -389,7 +434,7 @@ This is the first step in uploading a large file. An upload objects is created a
 + Parameters
     + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
 
-### View chunked upload [GET]
+### View upload [GET]
 >**Permission:** view_project
 - - - - -
 **Response messages:**
@@ -432,8 +477,40 @@ This is the first step in uploading a large file. An upload objects is created a
             "audit": { }
         }
 
++ Response 200 (application/json)
+
+        {
+          "id": "666be35a-98e0-4c2e-9a17-7bc009f9bb23",
+          "project": {"id": "d5ae02a4-b9e6-473d-87c4-66f4c881ae7a"},
+          "name": "RSEM_Normalized_PI3K_RNASeq_Matrix.Rdata",
+          "content_type": "application/octet-stream",
+          "size": 30024000,
+          "hashes": [ ],
+          "storage_provider": {
+            "id": "g5579f73-0558-4f96-afc7-9d251e65bv33",
+            "name": "duke_oit_swift", "description":
+            "Duke OIT Storage"
+          },
+          "status": {
+            "initiated_on": "2015-07-10T13:00:00Z",
+            "completed_on": null,
+            "purged_on": null,
+            "error_on": null,
+            "error_message": null
+          },
+          "signed_url": {
+              "http_verb": "PUT",
+              "host": "duke_data_service_prod.s3.amazonaws.com",
+              "url": "/666be35a-98e0-4c2e-9a17-7bc009f9bb23?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN...",
+              "http_headers": [
+                { "Content-Length": "30024000" }
+              ]
+          },
+          "audit": { }
+        }
+
 ## Get pre-signed chunk URL  [PUT /uploads/{id}/chunks]
-Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk uploads fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
+Generates and returns a pre-signed URL that can be used by client to upload a file chunk to the storage provider. This step is repeated for each chunk.  If the chunk's upload fails, the client must call this action again to get a new pre-signed URL for the chunk number, then retry the chunk upload.
 >**Permission:** create_file
 - - - - -
 
@@ -458,7 +535,7 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
 * 500: Unexpected StorageProviderException experienced
 
 + Parameters
-    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the upload.
+    + id (string, required, `666be35a-98e0-4c2e-9a17-7bc009f9bb23`) ... The unique `id` of the chunked upload.
 
 + Request (application/json)
 
@@ -482,8 +559,8 @@ Generates and returns a pre-signed URL that can be used by client to upload a fi
             ]
         }
 
-## Complete chunked file upload [PUT /uploads/{id}/complete]
-This operation is called by the client after all file chunks have been successfully uploaded to the storage provider.
+## Complete file upload [PUT /uploads/{id}/complete]
+This operation is called by the client after file has been successfully uploaded to the storage provider.
 >**Permission:** create_file
 - - - - -
 
@@ -499,6 +576,7 @@ This operation is called by the client after all file chunks have been successfu
 + The client hash for each chunk must equal the storage provider hash for the same chunk, or an upload error is reported.
 + The client reported file size (bytes) must equal the storage provider reported file size, or an upload error is reported.
 + If there are no errors, the `upload_status.completed_on` is set to the current timestamp.
++ When completing a non-chunked upload, the hash.algorithm must work with the upload's storage provider, which is currently md5 for all existing storage providers.
 
 **Response messages:**
 * 200: Success

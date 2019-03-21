@@ -90,6 +90,27 @@ describe DDS::V1::UploadsAPI do
           end
         end
 
+        context 'with chunked set to false' do
+          let(:upload_stub) { FactoryBot.build(:non_chunked_upload) }
+          let!(:payload) {{
+            name: upload_stub.name,
+            content_type: upload_stub.content_type,
+            size: upload_stub.size,
+            chunked: false
+          }}
+          let(:expected_response_headers) {{
+            'X-MAX-UPLOAD-SIZE' => upload_stub.max_size_bytes
+          }}
+          let(:resource_class) { NonChunkedUpload }
+          let(:resource_serializer) { NonChunkedUploadSerializer }
+          it_behaves_like 'a creatable resource' do
+            it 'should return chunk-upload-size response headers' do
+               is_expected.to eq(expected_response_status)
+               expect(response.headers.to_h).to include(expected_response_headers)
+            end
+          end
+        end
+
         it_behaves_like 'a validated resource' do
           let(:payload) {{
             name: nil,

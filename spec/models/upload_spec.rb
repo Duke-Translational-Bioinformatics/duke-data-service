@@ -32,11 +32,6 @@ RSpec.describe Upload, type: :model do
     it { is_expected.to validate_presence_of :project_id }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :size }
-    it {
-      is_expected.to validate_numericality_of(:size)
-      .is_less_than(subject.max_size_bytes)
-      .with_message("File size is currently not supported - maximum size is #{subject.max_size_bytes}")
-    }
     it { is_expected.to validate_presence_of :storage_provider_id }
     it { is_expected.to validate_presence_of :creator_id }
 
@@ -155,7 +150,21 @@ RSpec.describe Upload, type: :model do
   it { is_expected.not_to respond_to :initialize_storage }
   it { is_expected.not_to respond_to :ready_for_chunks? }
   it { is_expected.not_to respond_to :check_readiness! }
-  it { is_expected.not_to respond_to :complete }
+
+  it { is_expected.to respond_to :complete }
+  describe '#complete' do
+    let(:fingerprint_attributes) { FactoryBot.attributes_for(:fingerprint) }
+    before { subject.fingerprints_attributes = [fingerprint_attributes] }
+
+    it {
+      expect(subject.completed_at).to be_nil
+      expect {
+        expect(subject.complete).to be_truthy
+      }.to have_enqueued_job(UploadCompletionJob)
+      subject.reload
+      expect(subject.completed_at).not_to be_nil
+    }
+  end
 
   describe '#has_integrity_exception?' do
     it { is_expected.to respond_to :has_integrity_exception? }
@@ -214,11 +223,7 @@ RSpec.describe Upload, type: :model do
     end
   end
 
-  describe '#max_size_bytes' do
-    it { is_expected.to respond_to :max_size_bytes }
-    it { expect(subject.max_size_bytes).to eq(mocked_storage_provider.max_chunked_upload_size) }
-  end
-
+  it { is_expected.not_to respond_to :max_size_bytes }
   it { is_expected.not_to respond_to :minimum_chunk_size }
   it { is_expected.not_to respond_to :complete_and_validate_integrity }
 
