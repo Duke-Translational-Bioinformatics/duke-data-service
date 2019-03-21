@@ -35,8 +35,12 @@ jobs:
             - vendor/bundle
 
       - run:
+          name: Which Branch?
+          command: echo ${CIRCLE_BRANCH}
+
+      - run:
           name: Sync Bot
-          command: bundle exec bin/bots/sync_pr.rb
+          command: MERGE_FROM=${CIRCLE_BRANCH} bundle exec bin/bots/sync_pr.rb
 
   build:
     parallelism: 4
