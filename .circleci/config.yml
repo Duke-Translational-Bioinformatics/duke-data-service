@@ -35,6 +35,10 @@ jobs:
             - vendor/bundle
 
       - run:
+          name: How to Set Repository?
+          command: echo ${CIRCLE_PROJECT_REPONAME}
+
+      - run:
           name: Sync Bot
           command: bundle exec bin/bots/sync_pr.rb
 
