@@ -36,8 +36,9 @@ class SwiftStorageProvider < StorageProvider
   end
 
   def single_file_upload_url(upload)
+    raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
     build_signed_url(
-      'POST',
+      'PUT',
       upload.sub_path,
       expiry
     )
@@ -55,8 +56,23 @@ class SwiftStorageProvider < StorageProvider
     chunk_max_number * chunk_max_size_bytes
   end
 
+  def max_upload_size
+    chunk_max_size_bytes
+  end
+
   def suggested_minimum_chunk_size(upload)
     (upload.size.to_f / chunk_max_number).ceil
+  end
+
+  def verify_upload_integrity(upload)
+    raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
+    meta = get_object_metadata(upload.storage_container, upload.id) ||
+      raise(IntegrityException, "NonChunkedUpload not found in object store")
+    if meta["content-length"].to_i != upload.size
+      raise IntegrityException, "reported size does not match size computed by StorageProvider"
+    elsif upload.fingerprints.none? {|f| meta["etag"] == f.value}
+      raise IntegrityException, "reported hash value does not match size computed by StorageProvider"
+    end
   end
 
   def complete_chunked_upload(upload)
