@@ -10,9 +10,6 @@ jobs:
           RAILS_ENV: develop
     steps:
       - checkout
-      - run:
-          name: install dockerize
-          command: wget https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/dockerize-latest.tar.gz && tar -C /usr/local/bin -xzvf dockerize-latest.tar.gz && rm dockerize-latest.tar.gz
       - run: gem install bundler -v '~> 1.17.0'
       - run:
           name: Which bundler?
