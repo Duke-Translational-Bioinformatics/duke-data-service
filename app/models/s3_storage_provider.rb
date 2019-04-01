@@ -22,7 +22,9 @@ class S3StorageProvider < StorageProvider
   end
 
   def initialize_project(project)
-    create_bucket(project.id)[:location]
+    location = create_bucket(project.id)[:location]
+    put_bucket_cors(project.id)
+    location
   end
 
   def is_initialized?(project)
@@ -178,6 +180,22 @@ class S3StorageProvider < StorageProvider
   def create_bucket(bucket_name)
     begin
       client.create_bucket(bucket: bucket_name).to_h
+    rescue Aws::Errors::ServiceError => e
+      raise(StorageProviderException, e.message)
+    end
+  end
+
+  def put_bucket_cors(bucket_name)
+    begin
+      client.put_bucket_cors(
+        bucket: bucket_name,
+        cors_configuration: {
+          cors_rules: [{
+            allowed_methods: ['GET','PUT','HEAD','POST','DELETE'],
+            allowed_origins: ['*']
+          }]
+        }
+      ).to_h
     rescue Aws::Errors::ServiceError => e
       raise(StorageProviderException, e.message)
     end
