@@ -65,6 +65,11 @@ gem 'newrelic_rpm'
 gem "factory_bot_rails"
 gem "faker"
 
+group :bots do
+  # Bot Gems
+  gem "octokit", "~> 4.0"
+end
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
