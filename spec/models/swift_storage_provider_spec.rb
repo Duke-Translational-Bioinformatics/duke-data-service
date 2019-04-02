@@ -500,6 +500,19 @@ RSpec.describe SwiftStorageProvider, type: :model do
         end
       end
 
+      context 'non_chunked_upload' do
+        it 'should delete the SLO manifest' do
+          is_expected.to receive(:delete_object_manifest)
+            .with(
+              non_chunked_upload.storage_container,
+              non_chunked_upload.id
+            )
+          expect {
+            subject.purge(non_chunked_upload)
+          }.not_to raise_error
+        end
+      end
+
       context 'chunk' do
         it 'should delete the object' do
           is_expected.to receive(:delete_object)
@@ -510,14 +523,6 @@ RSpec.describe SwiftStorageProvider, type: :model do
           expect {
             subject.purge(chunk)
           }.not_to raise_error
-        end
-      end
-
-      context 'non_chunked_upload' do
-        it 'should raise an Exception' do
-          expect {
-            subject.purge(non_chunked_upload)
-          }.to raise_error("#{non_chunked_upload} is not purgable")
         end
       end
 

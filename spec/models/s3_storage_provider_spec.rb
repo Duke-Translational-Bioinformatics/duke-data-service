@@ -443,6 +443,23 @@ RSpec.describe S3StorageProvider, type: :model do
       end
     end
 
+    context 'non_chunked_upload' do
+      let(:bucket_name) { non_chunked_upload.storage_container }
+      let(:object_key) { non_chunked_upload.id }
+      let(:response) { {} }
+      before(:example) do
+        expect(subject).to receive(:delete_object)
+          .with(bucket_name, object_key) { response }
+      end
+
+      it { expect(subject.purge(non_chunked_upload)).to be_truthy }
+
+      context 'unexpected StorageProviderException' do
+        let(:response) { raise StorageProviderException.new('Unexpected') }
+        it { expect { subject.purge(non_chunked_upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+      end
+    end
+
     context 'chunk' do
       before(:example) do
         expect(subject).not_to receive(:delete_object)
