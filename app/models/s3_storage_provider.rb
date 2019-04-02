@@ -191,6 +191,7 @@ class S3StorageProvider < StorageProvider
         bucket: bucket_name,
         cors_configuration: {
           cors_rules: [{
+            allowed_headers: ['*'],
             allowed_methods: ['GET','PUT','HEAD','POST','DELETE'],
             allowed_origins: ['*']
           }]
