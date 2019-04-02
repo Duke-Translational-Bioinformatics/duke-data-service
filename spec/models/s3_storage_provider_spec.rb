@@ -544,6 +544,7 @@ RSpec.describe S3StorageProvider, type: :model do
     include_context 'stubbed subject#client'
     let(:bucket_name) { SecureRandom.uuid }
     let(:cors_rule) { {
+      allowed_headers: ['*'],
       allowed_methods: %w(GET PUT HEAD POST DELETE),
       allowed_origins: ['*']
     } }
