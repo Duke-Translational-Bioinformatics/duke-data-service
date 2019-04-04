@@ -56,11 +56,31 @@ RSpec.describe S3StorageProvider, type: :model do
 
   describe '#initialize_project' do
     let(:bucket_location) { "/#{project.id}" }
-    it 'should create a bucket with the project id' do
+    let(:cb_response) { { location: bucket_location } }
+    before(:example) do
       is_expected.to receive(:create_bucket)
-        .with(project.id)
-        .and_return({ location: bucket_location })
+        .with(project.id) { cb_response }
+    end
+    it 'creates a bucket with the project id' do
+      is_expected.to receive(:put_bucket_cors).with(project.id).and_return({})
       expect(subject.initialize_project(project)).to eq(bucket_location)
+    end
+
+    context 'when #create_bucket raises exception' do
+      let(:cb_response) { raise StorageProviderException }
+      it 'does not call #put_bucket_cors and raises the exception' do
+        is_expected.not_to receive(:put_bucket_cors)
+        expect { subject.initialize_project(project) }.to raise_error(StorageProviderException)
+      end
+    end
+
+    context 'when #put_bucket_cors raises exception' do
+      before(:example) do
+        is_expected.to receive(:put_bucket_cors)
+          .with(project.id)
+          .and_raise(StorageProviderException)
+      end
+      it { expect { subject.initialize_project(project) }.to raise_error(StorageProviderException) }
     end
   end
 
@@ -423,6 +443,23 @@ RSpec.describe S3StorageProvider, type: :model do
       end
     end
 
+    context 'non_chunked_upload' do
+      let(:bucket_name) { non_chunked_upload.storage_container }
+      let(:object_key) { non_chunked_upload.id }
+      let(:response) { {} }
+      before(:example) do
+        expect(subject).to receive(:delete_object)
+          .with(bucket_name, object_key) { response }
+      end
+
+      it { expect(subject.purge(non_chunked_upload)).to be_truthy }
+
+      context 'unexpected StorageProviderException' do
+        let(:response) { raise StorageProviderException.new('Unexpected') }
+        it { expect { subject.purge(non_chunked_upload) }.to raise_error(StorageProviderException, 'Unexpected') }
+      end
+    end
+
     context 'chunk' do
       before(:example) do
         expect(subject).not_to receive(:delete_object)
@@ -514,6 +551,35 @@ RSpec.describe S3StorageProvider, type: :model do
       let(:expected_response) { 'Unexpected' }
       it 'raises a StorageProviderException' do
         expect { subject.create_bucket(bucket_name) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
+      end
+    end
+  end
+
+  it { is_expected.not_to respond_to(:put_bucket_cors).with(0).arguments }
+  it { is_expected.to respond_to(:put_bucket_cors).with(1).argument }
+  describe '#put_bucket_cors' do
+    include_context 'stubbed subject#client'
+    let(:bucket_name) { SecureRandom.uuid }
+    let(:cors_rule) { {
+      allowed_headers: ['*'],
+      allowed_methods: %w(GET PUT HEAD POST DELETE),
+      allowed_origins: ['*']
+    } }
+    let(:expected_response) { {} }
+    before(:example) do
+      subject.client.stub_responses(:put_bucket_cors, expected_response)
+    end
+    after(:example) do
+      expect(subject.client.api_requests.first).not_to be_nil
+      expect(subject.client.api_requests.first[:params][:bucket]).to eq(bucket_name)
+      expect(subject.client.api_requests.first[:params][:cors_configuration][:cors_rules]).to include(cors_rule)
+    end
+    it { expect(subject.put_bucket_cors(bucket_name)).to eq(expected_response) }
+
+    context 'when an unexpected S3 error is thrown' do
+      let(:expected_response) { 'Unexpected' }
+      it 'raises a StorageProviderException' do
+        expect { subject.put_bucket_cors(bucket_name) }.to raise_error storage_provider_exception_wrapped_s3_error(expected_response)
       end
     end
   end

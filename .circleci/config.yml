@@ -1,5 +1,44 @@
 version: 2
 jobs:
+  sync_bot:
+    docker:
+      - image: ruby:2.3.6
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          RAILS_ENV: develop
+    steps:
+      - checkout
+      - run: gem install bundler -v '~> 1.17.0'
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      # Restore bundle cache
+      - restore_cache:
+          keys:
+            - duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+            - duke-data-service-bundle-
+
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+
+      # Store bundle cache
+      - save_cache:
+          key: duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Which Branch?
+          command: echo ${CIRCLE_BRANCH}
+
+      - run:
+          name: Sync Bot
+          command: MERGE_FROM=${CIRCLE_BRANCH} bundle exec bin/bots/sync_pr.rb
+
   build:
     parallelism: 4
     environment:
@@ -179,4 +218,12 @@ workflows:
               only:
                 - develop
                 - ua_test
+                - production
+  sync:
+    jobs:
+      - sync_bot:
+          context: sync_bot
+          filters:
+            branches:
+              only:
                 - production
