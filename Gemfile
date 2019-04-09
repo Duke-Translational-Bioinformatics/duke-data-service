@@ -95,6 +95,7 @@ group :test do
   gem 'vcr'
   gem 'webmock'
   gem 'bunny-mock'
+  gem 'simplecov', require: false
 end
 
 group :docker do
