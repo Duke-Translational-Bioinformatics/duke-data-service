@@ -270,6 +270,7 @@ workflows:
     jobs:
       - build
       - coverage:
+          context: coverage
           requires:
             - build
       - deploy:
