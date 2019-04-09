@@ -173,6 +173,59 @@ jobs:
           path: /tmp/circleci-artifacts
       - store_artifacts:
           path: /tmp/circleci-test-results
+
+      - run:
+          name: Stash Coverage Results
+          command: |
+            mkdir coverage_results
+            cp coverage/.resultset.json coverage_results/.resultset-${CIRCLE_NODE_INDEX}.json
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage_results
+
+  coverage:
+    docker:
+      - image: ruby:2.3.6
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          RAILS_ENV: develop
+          COVERAGE_OUTPUT_DIR: /tmp/coverage
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run: gem install bundler -v '~> 1.17.0'
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      # Restore bundle cache
+      - restore_cache:
+          keys:
+            - duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+            - duke-data-service-bundle-
+
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+
+      # Store bundle cache
+      - save_cache:
+          key: duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Merge and check coverage
+          command: |
+            bundle exec .circleci/report_coverage.rb
+      - store_artifacts:
+          path: /tmp/coverage
+          destination: coverage
+
   deploy:
     machine:
       enabled: true
@@ -210,6 +263,9 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - coverage:
+          requires:
+            - build
       - deploy:
           requires:
             - build
