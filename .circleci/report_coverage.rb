@@ -4,7 +4,7 @@ require 'simplecov'
 
 base_dir = ENV.fetch("COVERAGE_BASE_DIR", "./coverage_results")
 file_pattern = ENV.fetch("COVERAGE_NAME_PATTERN", ".resultset*.json")
-coverage_dir = ENV.fetch("COVERAGE_OUTPUT_DIR")
+coverage_dir = ENV["COVERAGE_OUTPUT_DIR"]
 
 all_results = Dir["#{base_dir}/#{file_pattern}"]
 SimpleCov.coverage_dir(coverage_dir) if coverage_dir

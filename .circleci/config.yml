@@ -77,6 +77,10 @@ jobs:
 
     steps:
       - checkout
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - .
       - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: chmod +x docker/includes/install_node.sh
       - run: mkdir -p /root/installs
@@ -196,6 +200,8 @@ jobs:
     steps:
       - attach_workspace:
           at: .
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
 
       - run: gem install bundler -v '~> 1.17.0'
       - run:
