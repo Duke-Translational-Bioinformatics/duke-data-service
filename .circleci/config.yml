@@ -231,7 +231,7 @@ jobs:
       - run:
           name: Upload coverage results
           command: |
-            bash <(curl -s https://codecov.io/bash) -s coverage_results
+            bash <(curl -s https://codecov.io/bash) -s 'coverage_results/.resultset*.json'
       - store_artifacts:
           path: /tmp/coverage
           destination: coverage
