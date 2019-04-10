@@ -1,6 +1,4 @@
-version: 2.1
-orbs:
-  codecov: codecov/codecov@1.0.2
+version: 2.0
 jobs:
   sync_bot:
     docker:
@@ -230,8 +228,10 @@ jobs:
           name: Merge and check coverage
           command: |
             bundle exec .circleci/report_coverage.rb
-      - codecov/upload:
-          file: /tmp/coverage/.resultset.json
+      - run:
+          name: Upload coverage results
+          command: |
+            bash <(curl -s https://codecov.io/bash) -f /tmp/coverage/.resultset.json
       - store_artifacts:
           path: /tmp/coverage
           destination: coverage
