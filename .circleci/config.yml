@@ -195,7 +195,7 @@ jobs:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
           BUNDLE_PATH: vendor/bundle
-          RAILS_ENV: develop
+          RAILS_ENV: test
           COVERAGE_OUTPUT_DIR: /tmp/coverage
     steps:
       - attach_workspace:
@@ -228,13 +228,22 @@ jobs:
           name: Merge and check coverage
           command: |
             bundle exec .circleci/report_coverage.rb
+      - store_artifacts:
+          path: /tmp/coverage
+          destination: coverage
+
+  upload_coverage:
+    docker:
+      - image: ruby:2.3.6
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           name: Upload coverage results
           command: |
             bash <(curl -s https://codecov.io/bash) -s coverage_results -f '.resultset*.json'
-      - store_artifacts:
-          path: /tmp/coverage
-          destination: coverage
 
   deploy:
     machine:
@@ -275,6 +284,9 @@ workflows:
       - build
       - coverage:
           context: coverage
+          requires:
+            - build
+      - upload_coverage:
           requires:
             - build
       - deploy:
