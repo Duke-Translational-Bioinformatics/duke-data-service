@@ -344,6 +344,9 @@ shared_examples 'an authentication_service:create task' do |
   authentication_service_class_sym: :resource_class,
   expected_env_keys_sym: :required_env|
 
+  require 'active_support/testing/stream'
+  include ActiveSupport::Testing::Stream
+
   let(:task_name) { send(rake_task_name_sym) }
   let(:authentication_service_class) { send(authentication_service_class_sym) }
   let(:expected_env_keys) { send(expected_env_keys_sym) }
@@ -432,6 +435,9 @@ end
 shared_examples 'an authentication_service:destroy task' do |
   rake_task_name_sym: :rake_task_name,
   authentication_service_class_sym: :resource_class|
+
+  require 'active_support/testing/stream'
+  include ActiveSupport::Testing::Stream
 
   let(:task_name) { send(rake_task_name_sym) }
   let(:authentication_service_class) { send(authentication_service_class_sym) }
