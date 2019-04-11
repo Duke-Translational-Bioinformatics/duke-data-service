@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "auth_service", :if => ENV['TEST_RAKE_AUTH_SERVICE'] do
+describe "auth_service" do
 
   describe "auth_service:duke:create" do
     include_context "rake"
