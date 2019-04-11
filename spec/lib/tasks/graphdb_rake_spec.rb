@@ -3,8 +3,7 @@ require 'rails_helper'
 describe "graphdb" do
   let(:current_user) { FactoryBot.create(:user) }
 
-  before(:all) do
-    Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
+  before(:each) do
     AssociatedWithUserProvRelation.destroy_all
     AssociatedWithSoftwareAgentProvRelation.destroy_all
     AttributedToUserProvRelation.destroy_all
@@ -53,16 +52,14 @@ describe "graphdb" do
         relatable_from: sa,
         relatable_to: sa_activity)
     end
+    Neo4j::ActiveBase.current_session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
   end
 
   describe "graphdb:build" do
     include_context "rake"
+    include_context 'performs enqueued jobs', only: GraphPersistenceJob
     let(:task_name) { "graphdb:build" }
     it { expect(subject.prerequisites).to  include("environment") }
-
-    before do
-      Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
-    end
 
     it 'should build all graph_nodes, prov_relations, and graph_relations' do
       invoke_task
@@ -92,10 +89,10 @@ describe "graphdb" do
     it 'should remove all graph nodes and relationships' do
       invoke_task
       expect(
-        Neo4j::Session.query.match('(n)').pluck(:n).count
+        Neo4j::ActiveBase.current_session.query('MATCH (n) RETURN COUNT(n)').first["COUNT(n)"]
       ).to eq(0)
       expect(
-        Neo4j::Session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN r').count
+        Neo4j::ActiveBase.current_session.query('MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN r').count
       ).to eq(0)
     end
   end
