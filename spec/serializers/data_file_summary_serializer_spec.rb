@@ -24,12 +24,6 @@ RSpec.describe DataFileSummarySerializer, type: :serializer do
       'name' => a.name,
     }
   }}
-  let(:expected_fingerprints) { resource.upload.fingerprints.collect {|f|
-    {
-      'value' => f.value,
-      'algorithm' => f.algorithm
-    }
-  }}
 
   it_behaves_like 'a json serializer' do
     it { is_expected.to include(expected_attributes) }
