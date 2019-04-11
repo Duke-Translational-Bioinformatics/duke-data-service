@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "graphdb", :if => ENV['TEST_RAKE_GRAPHDB'] do
+describe "graphdb" do
   let(:current_user) { FactoryBot.create(:user) }
 
   before(:all) do

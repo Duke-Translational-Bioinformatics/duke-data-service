@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "identity_provider", :if => ENV['TEST_RAKE_IDENTITY_PROVIDER'] do
+describe "identity_provider" do
   describe "identity_provider:ldap:create" do
     include_context "rake"
     let(:task_name) { "identity_provider:ldap:create" }
