@@ -5,12 +5,6 @@ describe "identity_provider" do
     include_context "rake"
     let(:task_name) { "identity_provider:ldap:create" }
     let(:resource_class) { LdapIdentityProvider }
-    let(:required_env) { %w(
-        IDENTITY_PROVIDER_HOST
-        IDENTITY_PROVIDER_PORT
-        IDENTITY_PROVIDER_LDAP_BASE
-      )
-    }
     let(:identity_provider_attributes) { FactoryBot.attributes_for(:ldap_identity_provider) }
 
     context 'missing ENV[IDENTITY_PROVIDER_HOST]' do
