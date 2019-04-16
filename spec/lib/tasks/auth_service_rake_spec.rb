@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe "auth_service" do
-
   describe "auth_service:duke:create" do
     include_context "rake"
     let(:rake_task_name) { "auth_service:duke:create" }
@@ -152,9 +151,7 @@ describe "auth_service" do
 
     context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
       it {
-        expect {
-          invoke_task epected_stderr: /AUTH_SERVICE_SERVICE_ID environment variable is required/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/AUTH_SERVICE_SERVICE_ID environment variable is required/)
       }
     end
 
@@ -214,9 +211,7 @@ describe "auth_service" do
 
     context 'missing ENV[AUTH_SERVICE_SERVICE_ID]' do
       it {
-        expect {
-          invoke_task epected_stderr: /AUTH_SERVICE_SERVICE_ID environment variable is required/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/AUTH_SERVICE_SERVICE_ID environment variable is required/)
       }
     end
 
@@ -263,21 +258,18 @@ describe "auth_service" do
 
   describe 'auth_service:identity_provider:register' do
     include_context "rake"
+    include_context 'with env_override'
     let(:task_name) { "auth_service:identity_provider:register" }
 
     context 'missing ENV[AUTH_SERVICE_ID]' do
       it {
-        expect {
-          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/)
       }
     end
 
     context 'missing ENV[IDENTITY_PROVIDER_ID]' do
       it {
-        expect {
-          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required/)
       }
     end
 
@@ -289,9 +281,7 @@ describe "auth_service" do
       end
 
       it {
-        expect {
-          invoke_task epected_stderr: /authentication_service does not exist/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/authentication_service does not exist/)
       }
     end
 
@@ -303,9 +293,7 @@ describe "auth_service" do
       end
 
       it {
-        expect {
-          invoke_task epected_stderr: /identity_provider does not exist/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/identity_provider does not exist/)
       }
     end
 
@@ -334,9 +322,7 @@ describe "auth_service" do
         end
 
         it {
-          expect {
-            invoke_task epected_stderr: /AUTH_SERVICE_ID service is registered to a different identity_provider, use auth_service:identity_provider:remove/
-          }.to raise_error(StandardError)
+          expect { invoke_task }.to raise_error(/AUTH_SERVICE_ID service is registered to a different identity_provider, use auth_service:identity_provider:remove/)
         }
       end
     end
@@ -367,9 +353,7 @@ describe "auth_service" do
 
     context 'missing ENV[AUTH_SERVICE_ID]' do
       it {
-        expect {
-          invoke_task epected_stderr: /ENV\[AUTH_SERVICE_ID\] is required/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/ENV\[AUTH_SERVICE_ID\] is required/)
       }
     end
 
@@ -379,9 +363,7 @@ describe "auth_service" do
       end
 
       it {
-        expect {
-          invoke_task epected_stderr: /authentication_service does not exist/
-        }.to raise_error(StandardError)
+        expect { invoke_task }.to raise_error(/authentication_service does not exist/)
       }
     end
 
