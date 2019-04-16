@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ElasticsearchHandler do
+  let(:verbose_subject) { described_class.new(verbose: true) }
   it {
     expect(ElasticsearchHandler.new.verbose).to be_falsey
     expect(ElasticsearchHandler.new.has_errors).to be_falsey
@@ -60,18 +61,88 @@ RSpec.describe ElasticsearchHandler do
 
     context 'with existing documents not already indexed' do
       include_context 'elasticsearch prep', [:indexed_data_file, :indexed_folder], []
-
-      it {
-        client = Elasticsearch::Model.client
+      let(:client) { Elasticsearch::Model.client }
+      before(:example) do
         expect(DataFile.__elasticsearch__.search(indexed_data_file.name).count).to eq 0
         expect(Folder.__elasticsearch__.search(indexed_folder.name).count).to eq 0
+      end
 
+      it {
         subject.index_documents
 
         client.indices.flush
         expect(DataFile.__elasticsearch__.search(indexed_data_file.name).count).to eq 1
         expect(Folder.__elasticsearch__.search(indexed_folder.name).count).to eq 1
       }
+      context 'in verbose mode' do
+        subject { verbose_subject }
+        it { expect { subject.index_documents( client ) }.not_to output(/ids not loaded after 5 tries:/i).to_stderr }
+        it { expect { subject.index_documents }.to output(/^\+\+$/).to_stderr }
+      end
+
+      context 'when bulk fails' do
+        let(:fail_count) { 1 }
+        before(:example) do
+          expect(client).to receive(:bulk).exactly(fail_count) do |body:|
+            results = {"index" => { "result" => "not_found", "status" => 404 } }
+            items = body.map {|i| i.deep_stringify_keys.deep_merge(results) }
+            { "errors" => true, "items" => items }
+          end
+        end
+        context '... one time' do
+          before(:example) do
+            expect(client).to receive(:bulk).twice.and_call_original
+          end
+          it 'retries bulk job' do
+            subject.index_documents( client )
+
+            client.indices.flush
+            expect(DataFile.__elasticsearch__.search(indexed_data_file.name).count).to eq 1
+            expect(Folder.__elasticsearch__.search(indexed_folder.name).count).to eq 1
+          end
+          context 'in verbose mode' do
+            subject { verbose_subject }
+            it { expect { subject.index_documents( client ) }.not_to output(/ids not loaded after 5 tries:/i).to_stderr }
+            it { expect { subject.index_documents( client ) }.to output(/^\+\+$/).to_stderr }
+          end
+        end
+
+        context '... 5 times' do
+          let(:fail_count) { 5 }
+          before(:example) do
+            expect(client).to receive(:bulk).once.and_call_original
+          end
+          it 'skips 1 bulk job' do
+            subject.index_documents( client )
+
+            client.indices.flush
+            expect(DataFile.__elasticsearch__.search(indexed_data_file.name).count).to eq 0
+            expect(Folder.__elasticsearch__.search(indexed_folder.name).count).to eq 1
+          end
+          context 'in verbose mode' do
+            subject { verbose_subject }
+            it { expect { subject.index_documents( client ) }.to output(/ids not loaded after 5 tries:/i).to_stderr }
+            it { expect { subject.index_documents( client ) }.not_to output(/(.*ids not loaded after 5 tries:){2}/im).to_stderr }
+            it { expect { subject.index_documents( client ) }.to output(/\n\+$/).to_stderr }
+          end
+        end
+
+        context '... 10 times' do
+          let(:fail_count) { 10 }
+          it 'skips both bulk jobs' do
+            subject.index_documents( client )
+
+            client.indices.flush
+            expect(DataFile.__elasticsearch__.search(indexed_data_file.name).count).to eq 0
+            expect(Folder.__elasticsearch__.search(indexed_folder.name).count).to eq 0
+          end
+          context 'in verbose mode' do
+            subject { verbose_subject }
+            it { expect { subject.index_documents( client ) }.to output(/(.*ids not loaded after 5 tries:){2}/im).to_stderr }
+            it { expect { subject.index_documents( client ) }.not_to output('\+').to_stderr }
+          end
+        end
+      end
     end
 
     describe 'with existing documents indexed already' do
