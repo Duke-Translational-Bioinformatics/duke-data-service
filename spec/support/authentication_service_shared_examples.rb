@@ -447,9 +447,6 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'default authentication_service' do
     before do
-      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
       FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
     end
 
@@ -464,9 +461,6 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'non default authentication_service' do
     before do
-      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
       FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
     end
 

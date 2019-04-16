@@ -14,7 +14,7 @@ namespace :auth_service do
   task transfer_default: :environment do
     raise 'please set ENV[FROM_AUTH_SERVICE_ID] and ENV[TO_AUTH_SERVICE_ID]' unless ENV['FROM_AUTH_SERVICE_ID'] && ENV['TO_AUTH_SERVICE_ID']
     from_auth_service = AuthenticationService.find_by!(service_id: ENV['FROM_AUTH_SERVICE_ID'])
-    raise '#{from_auth_service.service_id} is not default' unless from_auth_service.is_default?
+    raise "#{from_auth_service.service_id} is not default" unless from_auth_service.is_default?
 
     to_auth_service = AuthenticationService.find_by!(service_id: ENV['TO_AUTH_SERVICE_ID'])
 
@@ -133,7 +133,7 @@ namespace :auth_service do
     task register: :environment do
       auth_service_id = ENV['AUTH_SERVICE_ID']
       identity_provider_id = ENV['IDENTITY_PROVIDER_ID']
-      raise 'ENV\[AUTH_SERVICE_ID\] and ENV\[IDENTITY_PROVIDER_ID\] are required' unless( auth_service_id && identity_provider_id )
+      raise 'ENV[AUTH_SERVICE_ID] and ENV[IDENTITY_PROVIDER_ID] are required' unless( auth_service_id && identity_provider_id )
 
       auth_service = AuthenticationService.find_by(id: auth_service_id)
       raise 'authentication_service does not exist' unless auth_service
@@ -162,7 +162,7 @@ namespace :auth_service do
       identified authentication_service does not exist\n"
     task remove: :environment do
       auth_service_id = ENV['AUTH_SERVICE_ID']
-      raise 'ENV\[AUTH_SERVICE_ID\] is required' unless auth_service_id
+      raise 'ENV[AUTH_SERVICE_ID] is required' unless auth_service_id
 
       auth_service = AuthenticationService.find_by(id: auth_service_id)
       raise 'authentication_service does not exist' unless auth_service
