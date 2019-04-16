@@ -275,10 +275,10 @@ describe "auth_service" do
 
     context 'unknown AUTH_SERVICE_ID' do
       let(:identity_provider) { FactoryBot.create(:ldap_identity_provider) }
-      before do
-        ENV['AUTH_SERVICE_ID'] = SecureRandom.uuid
-        ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
-      end
+      let(:env_override) { {
+        'AUTH_SERVICE_ID' => SecureRandom.uuid,
+        'IDENTITY_PROVIDER_ID' => "#{identity_provider.id}"
+      } }
 
       it {
         expect { invoke_task }.to raise_error(/authentication_service does not exist/)
@@ -287,10 +287,10 @@ describe "auth_service" do
 
     context 'unknown IDENTITY_PROVIDER_ID' do
       let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
-      before do
-        ENV['AUTH_SERVICE_ID'] = authentication_service.id
-        ENV['IDENTITY_PROVIDER_ID'] = "#{SecureRandom.random_number}"
-      end
+      let(:env_override) { {
+        'AUTH_SERVICE_ID' => authentication_service.id,
+        'IDENTITY_PROVIDER_ID' => "#{SecureRandom.random_number}"
+      } }
 
       it {
         expect { invoke_task }.to raise_error(/identity_provider does not exist/)
@@ -302,10 +302,10 @@ describe "auth_service" do
       let(:identity_provider) { authentication_service.identity_provider }
 
       context 'to requested identity_provider' do
-        before do
-          ENV['AUTH_SERVICE_ID'] = authentication_service.id
-          ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
-        end
+        let(:env_override) { {
+          'AUTH_SERVICE_ID' => authentication_service.id,
+          'IDENTITY_PROVIDER_ID' => "#{identity_provider.id}"
+        } }
 
         it {
           expect {
@@ -316,10 +316,10 @@ describe "auth_service" do
 
       context 'to a different identity_provider than the requested identity_provider' do
         let(:other_identity_provider) { FactoryBot.create(:ldap_identity_provider) }
-        before do
-          ENV['AUTH_SERVICE_ID'] = authentication_service.id
-          ENV['IDENTITY_PROVIDER_ID'] = "#{other_identity_provider.id}"
-        end
+        let(:env_override) { {
+          'AUTH_SERVICE_ID' => authentication_service.id,
+          'IDENTITY_PROVIDER_ID' => "#{other_identity_provider.id}"
+        } }
 
         it {
           expect { invoke_task }.to raise_error(/AUTH_SERVICE_ID service is registered to a different identity_provider, use auth_service:identity_provider:remove/)
@@ -330,10 +330,10 @@ describe "auth_service" do
     context 'identity_provder not set' do
       let(:authentication_service) { FactoryBot.create(:openid_authentication_service) }
       let(:identity_provider) { FactoryBot.create(:ldap_identity_provider) }
-      before do
-        ENV['AUTH_SERVICE_ID'] = authentication_service.id
-        ENV['IDENTITY_PROVIDER_ID'] = "#{identity_provider.id}"
-      end
+      let(:env_override) { {
+        'AUTH_SERVICE_ID' => authentication_service.id,
+        'IDENTITY_PROVIDER_ID' => "#{identity_provider.id}"
+      } }
 
       it {
         expect(authentication_service.identity_provider).to be_nil
