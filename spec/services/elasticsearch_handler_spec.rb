@@ -791,6 +791,7 @@ RSpec.describe ElasticsearchHandler do
     context 'with errors' do
       let(:first_scroll_id) { SecureRandom.hex }
       let(:second_scroll_id) { SecureRandom.hex }
+      let(:failed_id) { SecureRandom.uuid }
       let(:expected_first_response) {{
         '_scroll_id' => first_scroll_id,
         'hits' => {
@@ -803,7 +804,7 @@ RSpec.describe ElasticsearchHandler do
       let(:first_batch_response) {{
         "errors" => true,
         "items" => [
-          {"index" => { "status" => 403, "_id" => SecureRandom.uuid }}
+          {"index" => { "status" => 403, "_id" => failed_id }}
         ]
       }}
       let(:expected_second_response) {{
@@ -821,8 +822,9 @@ RSpec.describe ElasticsearchHandler do
           'hits' => []
         }
       }}
+      let(:call_fast_reindex) { subject.fast_reindex(source_client, source_index, target_client, target_index) }
 
-      it {
+      before(:example) do
         is_expected.to receive(:start_scroll)
           .with(source_client, source_index)
           .and_return(expected_first_response)
@@ -850,10 +852,14 @@ RSpec.describe ElasticsearchHandler do
         is_expected.to receive(:next_scroll)
           .with(source_client)
           .and_return(empty_response)
+      end
 
-        subject.fast_reindex(source_client, source_index, target_client, target_index)
-        expect(subject.has_errors).to be_truthy
-      }
+      it { expect { call_fast_reindex }.to change { subject.has_errors }.from(false).to(true) }
+
+      context 'in verbose mode' do
+        subject { verbose_subject }
+        it { expect { call_fast_reindex }.to output(/^errors:\n."*#{failed_id}".*$/im).to_stderr }
+      end
     end
 
     context 'retry' do
