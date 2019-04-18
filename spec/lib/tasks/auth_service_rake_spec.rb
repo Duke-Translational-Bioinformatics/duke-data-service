@@ -163,11 +163,7 @@ describe "auth_service" do
       let(:env_override) { {
         'AUTH_SERVICE_SERVICE_ID' => SecureRandom.uuid
       } }
-      it {
-        expect {
-          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
-        }.to raise_error(StandardError)
-      }
+      it { expect { invoke_task }.to raise_error(/AUTH_SERVICE_SERVICE_ID is not a registered service/) }
     end
 
     context 'specified service is already default' do
@@ -192,11 +188,7 @@ describe "auth_service" do
 
       context 'another default service already exists' do
         let(:default_authentication_service) { FactoryBot.create(:duke_authentication_service, :default) }
-        it {
-          expect {
-            invoke_task expected_stderr: Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")
-          }.to raise_error(StandardError)
-        }
+        it { expect { invoke_task }.to raise_error(Regexp.new("Service #{default_authentication_service.service_id} is already default. Use auth_service_transfer_default instead")) }
       end
 
       context 'no default service exists' do
@@ -223,11 +215,7 @@ describe "auth_service" do
       let(:env_override) { {
         'AUTH_SERVICE_SERVICE_ID' => SecureRandom.uuid
       } }
-      it {
-        expect {
-          invoke_task expected_stderr: /AUTH_SERVICE_SERVICE_ID is not a registered service/
-        }.to raise_error(StandardError)
-      }
+      it { expect { invoke_task }.to raise_error(/AUTH_SERVICE_SERVICE_ID is not a registered service/) }
     end
 
     context 'specified service is already deprecated' do
