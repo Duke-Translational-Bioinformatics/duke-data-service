@@ -21,6 +21,7 @@ RSpec.describe StorageProvider, type: :model do
   it { expect { subject.max_chunked_upload_size }.to raise_error(NotImplementedError) }
   it { expect { subject.max_upload_size }.to raise_error(NotImplementedError) }
   it { expect { subject.suggested_minimum_chunk_size(upload) }.to raise_error(NotImplementedError) }
+  it { expect { subject.verify_upload_integrity(upload) }.to raise_error(NotImplementedError) }
   it { expect { subject.complete_chunked_upload(upload) }.to raise_error(NotImplementedError) }
   it { expect { subject.is_complete_chunked_upload?(upload) }.to raise_error(NotImplementedError) }
   it { expect { subject.download_url(upload) }.to raise_error(NotImplementedError) }
