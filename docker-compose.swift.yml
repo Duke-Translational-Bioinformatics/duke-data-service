@@ -1,3 +1,8 @@
+# To add this config to your current environment:
+#   export COMPOSE_FILE='docker-compose.yml:docker-compose.override.yml:docker-compose.swift.yml'
+#
+# Also, update the env symlink:
+#   ln -fs swift.local.env swift.env
 version: '2'
 services:
   swift:
@@ -6,88 +11,24 @@ services:
       - 12345:12345
     volumes:
       - swiftvol:/srv
+  server:
+    links:
+      - swift:swift.local
   rspec:
-    image: dukedataservice_server
-    environment:
-      - RAILS_ENV=test
-      - OPENID_CLIENT_ID=test
-      - OPENID_CLIENT_SECRET=testpass
-      - OPENID_URL=http://oit.oauth.edu
-    volumes_from:
-      - localdev
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
-      - elasticsearch:elastic.local
-      - rabbitmq:rabbitmq.host
-    env_file:
-      - webapp.env
-      - swift.env
-      - neo4j.client.env
-      - elastic.client.env
-      - rabbitmq.client.env
-    entrypoint: ['rspec']
-    command: spec
   rails:
-    image: dukedataservice_server
-    volumes_from:
-      - localdev
-    entrypoint: ['rails']
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
-      - elasticsearch:elastic.local
-      - rabbitmq:rabbitmq.host
-    env_file:
-      - webapp.env
-      - swift.env
-      - neo4j.client.env
-      - elastic.client.env
-      - rabbitmq.client.env
   worker:
-    image: dukedataservice_server
-    volumes_from:
-      - localdev
-    entrypoint: ['rake', 'workers:run']
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
-      - elasticsearch:elastic.local
-      - rabbitmq:rabbitmq.host
-    env_file:
-      - webapp.env
-      - swift.env
-      - neo4j.client.env
-      - elastic.client.env
-      - rabbitmq.client.env
   rake:
-    image: dukedataservice_server
-    volumes_from:
-      - localdev
-    entrypoint: ['rake']
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
-      - elasticsearch:elastic.local
-      - rabbitmq:rabbitmq.host
-    env_file:
-      - webapp.env
-      - swift.env
-      - neo4j.client.env
-      - elastic.client.env
-      - rabbitmq.client.env
   dredd:
-    build: ./docker/builds/dredd
     links:
-      - server:dds.host
       - swift:swift.local
-    volumes:
-      - ./docker/builds/dredd/dredd_scripts:/home/dredd_scripts/
-      - ./apiary.apib:/home/dredd_scripts/apiary.apib
 volumes:
   swiftvol:
     driver: local
