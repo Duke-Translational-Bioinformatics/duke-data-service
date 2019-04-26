@@ -559,6 +559,11 @@ RSpec.describe SwiftStorageProvider, type: :model do
       expect(subject.auth_token).to be_a String
     end
 
+    context 'with invalid auth' do
+      subject { FactoryBot.create(:swift_storage_provider, :from_env, service_pass: 'bad_password') }
+      it { expect { subject.auth_token }.to raise_error(StorageProviderException, /^Auth Failure: /) }
+    end
+
     it 'should respond to auth_header' do
       is_expected.to respond_to :auth_header
       expect { subject.auth_header }.not_to raise_error

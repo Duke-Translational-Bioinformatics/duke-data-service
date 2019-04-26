@@ -1,6 +1,7 @@
 namespace :identity_provider do
   desc "destroy identity_provider using ENV[IDENTITY_PROVIDER_ID]\nfails if any authentication_service is registered to the identity_provider\n"
   task destroy: :environment do
+    raise "ENV\[IDENTITY_PROVIDER_ID\] is required" unless ENV['IDENTITY_PROVIDER_ID']
     identity_provider = IdentityProvider.find_by(id: ENV['IDENTITY_PROVIDER_ID'])
     if identity_provider
       if AuthenticationService.where(identity_provider_id: identity_provider.id).exists?
