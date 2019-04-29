@@ -1,3 +1,8 @@
+# To add this config to your current environment:
+#   export COMPOSE_FILE='docker-compose.yml:docker-compose.override.yml:docker-compose.swift.yml'
+#
+# Also, update the env symlink:
+#   ln -fs swift.local.env swift.env
 version: '2'
 services:
   swift:
@@ -8,32 +13,21 @@ services:
       - swiftvol:/srv
   server:
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
   rspec:
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
   rails:
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
   worker:
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
   rake:
     links:
-      - db:postgres.db.host
-      - neo4j:neo4j.db.host
       - swift:swift.local
   dredd:
     links:
-      - server:dds.host
       - swift:swift.local
 volumes:
   swiftvol:

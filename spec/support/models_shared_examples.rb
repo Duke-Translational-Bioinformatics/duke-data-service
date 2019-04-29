@@ -18,7 +18,7 @@ shared_examples 'a kind' do
   end
 
   it 'should be registered in KindnessFactory.kinded_models' do
-    expect(KindnessFactory.kinded_models).to include(kinded_class)
+    expect(KindnessFactory.is_kinded_model?(kinded_class)).to be_truthy
   end
 
   it 'should be returned by KindnessFactory.by_kind(expected_kind)' do

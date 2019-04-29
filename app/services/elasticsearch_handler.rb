@@ -50,10 +50,15 @@ class ElasticsearchHandler
   end
 
   # index_documents
+  #
+  # arguments:
+  #   client: optional. Must be an instance of
+  #           Elasticsearch::Transport::Client
+  #           default: Elasticsearch::Model.client
   #   Very slow method of loading batches of 500 documents from ActiveRecord
   #   to elasticsearch.
   #  TODO refactor
-  def index_documents
+  def index_documents(client=Elasticsearch::Model.client)
     batch_size = 500
     FolderFilesResponse.indexed_models.each do |indexed_model|
       indexed_model.paginates_per batch_size
@@ -71,7 +76,7 @@ class ElasticsearchHandler
         trys = 0
         error_ids = []
         while trys < 5
-          bulk_response = Elasticsearch::Model.client.bulk body: current_batch
+          bulk_response = client.bulk body: current_batch
           if bulk_response["errors"]
             trys += 1
             error_ids = bulk_response["items"].select {|item|
@@ -82,6 +87,7 @@ class ElasticsearchHandler
             current_batch = current_batch.select {|b| error_ids.include? b[:index][:_id] }
           else
             trys = 5
+            error_ids = []
           end
         end
         if @verbose
@@ -111,8 +117,7 @@ class ElasticsearchHandler
   #  - attempts fast_reindex if migration_version matches. If error occurrs, reports has_erros
   #  - if errrors do not occur, drops old alias, creates alias index_name -> versioned_index_name
   #    drops old version index, and reports reindexed inforamtion
-  def smart_reindex_indices
-    client = Elasticsearch::Model.client
+  def smart_reindex_indices(client=Elasticsearch::Model.client)
     reindex_information = {
       skipped: [],
       reindexed: {},
