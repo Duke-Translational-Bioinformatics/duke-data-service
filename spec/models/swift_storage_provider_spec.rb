@@ -501,8 +501,9 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
 
       context 'non_chunked_upload' do
-        it 'should delete the SLO manifest' do
-          is_expected.to receive(:delete_object_manifest)
+        it 'should delete the object' do
+          is_expected.not_to receive(:delete_object_manifest)
+          is_expected.to receive(:delete_object)
             .with(
               non_chunked_upload.storage_container,
               non_chunked_upload.id
