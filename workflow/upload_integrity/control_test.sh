@@ -45,3 +45,38 @@ echo Get download url for file id: ${file_id}
 resp=$(dds_curl GET "/files/${file_id}/url")
 echo "${resp}" | jq
 download_data ${download_location} ${resp}
+
+downloaded_file_size=`wc -c ${upload_location} | cut -f1 -d' '`
+downloaded_file_md5=`md5sum ${upload_location} | cut -f1 -d' '`
+
+echo Test total file size
+echo Download: ${downloaded_file_size}
+echo Original: ${upload_size}
+
+echo Test file MD5
+echo Download: ${downloaded_file_md5}
+echo Original: ${upload_md5}
+
+echo Test Chunk 1 MD5
+offset=0
+downloaded_chunk_1_md5=`dd skip=${offset} count=${chunk_1_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
+echo Download: ${downloaded_chunk_1_md5}
+echo Original: ${chunk_1_md5}
+
+echo Test Chunk 2 MD5
+offset=$((offset + chunk_1_size))
+downloaded_chunk_2_md5=`dd skip=${offset} count=${chunk_2_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
+echo Download: ${downloaded_chunk_2_md5}
+echo Original: ${chunk_2_md5}
+
+echo Test Chunk 3 MD5
+offset=$((offset + chunk_2_size))
+downloaded_chunk_2_md5=`dd skip=${offset} count=${chunk_3_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
+echo Download: ${downloaded_chunk_2_md5}
+echo Original: ${chunk_3_md5}
+
+echo Test Chunk 4 MD5
+offset=$((offset + chunk_3_size))
+downloaded_chunk_2_md5=`dd skip=${offset} count=${chunk_4_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
+echo Download: ${downloaded_chunk_2_md5}
+echo Original: ${chunk_4_md5}
