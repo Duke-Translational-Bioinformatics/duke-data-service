@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source includes/curl_functions.sh
+source includes/integrity_functions.sh
 source includes/common_usage.sh
 source includes/default_variables.sh
 
@@ -11,10 +12,10 @@ echo "Chunk #	| Size  | Expected MD5                     | Actual MD5"
 echo "-------	| ----- | ------------                     | ----------"
 offset=0
 for chunk in $(echo "${upload_get_resp}" | jq --compact-output '.chunks | sort_by(.number)[]'); do
-  chunk_number=$(echo "${chunk}" | jq '.number')
-  chunk_size=$(echo "${chunk}" | jq '.size')
-  expected_md5=$(echo "${chunk}" | jq '.hash.value')
-  actual_md5=`dd skip=${offset} count=${chunk_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
+  chunk_number=$(echo "${chunk}" | jq -r '.number')
+  chunk_size=$(echo "${chunk}" | jq -r '.size')
+  expected_md5=$(echo "${chunk}" | jq -r '.hash.value')
+  actual_md5=$(chunk_md5sum "${chunk}" ${download_location})
   echo "${chunk_number}	| ${chunk_size}	| ${expected_md5} | ${actual_md5}"
   offset=$((offset + chunk_size))
 done
