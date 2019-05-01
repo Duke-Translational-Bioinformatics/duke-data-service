@@ -8,6 +8,7 @@ source includes/run_upload_workflow.sh
 
 echo Test chunks:
 echo "Chunk #	| Size  | Expected MD5                     | Actual MD5"
+echo "-------	| ----- | ------------                     | ----------"
 offset=0
 for i in $(echo "${upload_get_resp}" | jq -r '.chunks | sort_by(.number)[] | [(.number | tostring), (.size | tostring), .hash.value] | join(",")'); do
   chunk_number=$(echo $i | cut -d, -f1)
@@ -23,5 +24,6 @@ downloaded_file_md5=`md5sum ${upload_location} | cut -f1 -d' '`
 
 echo Test total file:
 echo "         | Size	| MD5"
+echo "-------- | ----	| ---"
 echo "Expected | ${upload_size}	| ${upload_md5}"
 echo "Actual   | ${downloaded_file_size}	| ${downloaded_file_md5}"
