@@ -6,52 +6,52 @@ source includes/default_variables.sh
 
 echo "${upload_create_payload}" | jq
 echo Create upload with: ${upload_create_payload}
-resp=$(dds_curl POST "/projects/${project_id}/uploads" ${upload_create_payload})
-echo "${resp}" | jq
+upload_create_resp=$(dds_curl POST "/projects/${project_id}/uploads" ${upload_create_payload})
+echo "${upload_create_resp}" | jq
 
-upload_id=`echo "${resp}" | jq -r '.id'`
+upload_id=`echo "${upload_create_resp}" | jq -r '.id'`
 
 echo Create chunk_1 with: ${chunk_1_payload}
-resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_1_payload})
-echo "${resp}" | jq
-upload_data ${chunk_1_location} ${resp}
+chunk_1_create_resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_1_payload})
+echo "${chunk_1_create_resp}" | jq
+upload_data ${chunk_1_location} ${chunk_1_create_resp}
 
 echo Create chunk_2 with: ${chunk_2_payload}
-resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_2_payload})
-echo "${resp}" | jq
-upload_data ${chunk_2_location} ${resp}
+chunk_2_create_resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_2_payload})
+echo "${chunk_2_create_resp}" | jq
+upload_data ${chunk_2_location} ${chunk_2_create_resp}
 
 echo Create chunk_3 with: ${chunk_3_payload}
-resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_3_payload})
-echo "${resp}" | jq
-upload_data ${chunk_3_location} ${resp}
+chunk_3_create_resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_3_payload})
+echo "${chunk_3_create_resp}" | jq
+upload_data ${chunk_3_location} ${chunk_3_create_resp}
 
 echo Create chunk_4 with: ${chunk_4_payload}
-resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_4_payload})
-echo "${resp}" | jq
-upload_data ${chunk_4_location} ${resp}
+chunk_4_create_resp=$(dds_curl PUT "/uploads/${upload_id}/chunks" ${chunk_4_payload})
+echo "${chunk_4_create_resp}" | jq
+upload_data ${chunk_4_location} ${chunk_4_create_resp}
 
 echo Complete upload with: ${upload_complete_payload}
-resp=$(dds_curl PUT "/uploads/${upload_id}/complete" ${upload_complete_payload})
-echo "${resp}" | jq
+upload_complete_resp=$(dds_curl PUT "/uploads/${upload_id}/complete" ${upload_complete_payload})
+echo "${upload_complete_resp}" | jq
 
 file_create_payload='{"parent":{"kind":"dds-project","id":"'${project_id}'"},"upload":{"id":"'${upload_id}'"}}'
 echo Complete upload with: ${file_create_payload}
-resp=$(dds_curl POST "/files" ${file_create_payload})
-echo "${resp}" | jq
-file_id=`echo "${resp}" | jq -r '.id'`
+file_create_resp=$(dds_curl POST "/files" ${file_create_payload})
+echo "${file_create_resp}" | jq
+file_id=`echo "${file_create_resp}" | jq -r '.id'`
 
 echo Get download url for file id: ${file_id}
-resp=$(dds_curl GET "/files/${file_id}/url")
-echo "${resp}" | jq
-download_data ${download_location} ${resp}
+file_url_resp=$(dds_curl GET "/files/${file_id}/url")
+echo "${file_url_resp}" | jq
+download_data ${download_location} ${file_url_resp}
 
 echo Get Upload info: ${upload_id}
-resp=$(dds_curl GET "/uploads/${upload_id}")
-echo "${resp}" | jq
+upload_get_resp=$(dds_curl GET "/uploads/${upload_id}")
+echo "${upload_get_resp}" | jq
 
 offset=0
-for i in $(echo "${resp}" | jq -r '.chunks | sort_by(.number)[] | [(.number | tostring), (.size | tostring), .hash.value] | join(",")'); do
+for i in $(echo "${upload_get_resp}" | jq -r '.chunks | sort_by(.number)[] | [(.number | tostring), (.size | tostring), .hash.value] | join(",")'); do
   chunk_number=$(echo $i | cut -d, -f1)
   chunk_size=$(echo $i | cut -d, -f2)
   expected_md5=$(echo $i | cut -d, -f3)
