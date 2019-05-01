@@ -17,7 +17,7 @@ dds_curl() {
     fi
     if [ $? -gt 0 ]
     then
-      echo "Problem!" >&2
+      echo "Curl error. ${curl_resp}" >&2
       exit 1
     fi
     error=`echo "${curl_resp}" | jq '.error'`
