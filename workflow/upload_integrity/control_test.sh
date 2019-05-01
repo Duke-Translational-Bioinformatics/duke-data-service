@@ -10,10 +10,10 @@ echo Test chunks:
 echo "Chunk #	| Size  | Expected MD5                     | Actual MD5"
 echo "-------	| ----- | ------------                     | ----------"
 offset=0
-for i in $(echo "${upload_get_resp}" | jq -r '.chunks | sort_by(.number)[] | [(.number | tostring), (.size | tostring), .hash.value] | join(",")'); do
-  chunk_number=$(echo $i | cut -d, -f1)
-  chunk_size=$(echo $i | cut -d, -f2)
-  expected_md5=$(echo $i | cut -d, -f3)
+for chunk in $(echo "${upload_get_resp}" | jq --compact-output '.chunks | sort_by(.number)[]'); do
+  chunk_number=$(echo "${chunk}" | jq '.number')
+  chunk_size=$(echo "${chunk}" | jq '.size')
+  expected_md5=$(echo "${chunk}" | jq '.hash.value')
   actual_md5=`dd skip=${offset} count=${chunk_size} if=${download_location} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '`
   echo "${chunk_number}	| ${chunk_size}	| ${expected_md5} | ${actual_md5}"
   offset=$((offset + chunk_size))
