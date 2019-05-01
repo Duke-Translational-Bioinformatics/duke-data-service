@@ -33,7 +33,7 @@ dds_curl() {
         echo 'waiting...' >&2
         sleep 1
       else
-        echo "${curl_resp}" | jq >&2
+        echo "${curl_resp}"
         exit 1
       fi
     fi
