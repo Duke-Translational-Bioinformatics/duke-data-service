@@ -20,10 +20,10 @@ dds_curl() {
       echo "Problem!" >&2
       exit 1
     fi
-    error=`echo ${curl_resp} | jq '.error'`
+    error=`echo "${curl_resp}" | jq '.error'`
     if [ ${error} = null ]
     then
-      echo ${curl_resp} # | jq
+      echo "${curl_resp}"
       success='yes'
     else
       error_code=`echo ${curl_resp} | jq '.code'`
@@ -33,8 +33,7 @@ dds_curl() {
         echo 'waiting...' >&2
         sleep 1
       else
-        echo ${curl_resp} | jq >&2
-        echo "Problem!" >&2
+        echo "${curl_resp}" | jq >&2
         exit 1
       fi
     fi
