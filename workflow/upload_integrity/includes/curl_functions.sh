@@ -44,7 +44,7 @@ upload_data() {
   file=$1
   host=`echo $2 | jq -r '.host'`
   put_url=`echo $2 | jq -r '.url'`
-  echo "Uploading data from ${file} to ${host}${put_url}"
+  echo "Uploading data from ${file} to ${host}${put_url}" >&2
   curl -k -s -T ${file} "${host}${put_url}"
 }
 
@@ -52,6 +52,6 @@ download_data() {
   file=$1
   host=`echo $2 | jq -r '.host'`
   put_url=`echo $2 | jq -r '.url'`
-  echo "Downloading data from ${host}${put_url} to ${file}"
+  echo "Downloading data from ${host}${put_url} to ${file}" >&2
   curl -k -s -o ${file} "${host}${put_url}"
 }
