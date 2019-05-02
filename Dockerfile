@@ -1,4 +1,6 @@
-FROM ruby:2.3.6
+# Heroku-16 is based on Ubuntu 16.4
+# Debian Stretch is the upstream of Ubuntu 16.4
+FROM ruby:2.6.3-stretch
 MAINTAINER Darin London <darin.london@duke.edu>
 
 RUN ["mkdir", "-p", "/root/installs"]

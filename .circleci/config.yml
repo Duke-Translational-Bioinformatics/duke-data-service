@@ -2,7 +2,7 @@ version: 2.0
 jobs:
   sync_bot:
     docker:
-      - image: ruby:2.3.6
+      - image: ruby:2.6.3-stretch
         environment:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
@@ -55,7 +55,7 @@ jobs:
 
     docker:
       # Copied from rails circle demo
-      - image: ruby:2.3.6
+      - image: ruby:2.6.3-stretch
         environment:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
@@ -190,7 +190,7 @@ jobs:
 
   coverage:
     docker:
-      - image: ruby:2.3.6
+      - image: ruby:2.6.3-stretch
         environment:
           BUNDLE_JOBS: 3
           BUNDLE_RETRY: 3
@@ -234,7 +234,7 @@ jobs:
 
   upload_coverage:
     docker:
-      - image: ruby:2.3.6
+      - image: ruby:2.6.3-stretch
     steps:
       - attach_workspace:
           at: .
