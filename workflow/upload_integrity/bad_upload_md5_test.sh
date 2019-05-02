@@ -8,7 +8,7 @@ source includes/default_variables.sh
 echo '# Bad Upload MD5'
 
 upload_complete_payload='{"hash":{"value":"thisisabadmd5yo","algorithm":"md5"}}'
-echo "Complete Upload payload: ${upload_complete_payload}"
+echo "Complete Upload payload: \`${upload_complete_payload}\`"
 
 source includes/run_upload_workflow.sh
 

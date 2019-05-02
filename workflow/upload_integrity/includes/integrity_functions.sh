@@ -15,7 +15,8 @@ chunk_md5sum() {
 test_chunks_table() {
   upload=$1
   file_location=$2
-  echo Test chunks:
+  echo '### Test chunks'
+  echo
   echo "Chunk #	| Size  | Expected MD5                     | Actual MD5"
   echo "-------	| ----- | ------------                     | ----------"
   offset=0
@@ -27,6 +28,7 @@ test_chunks_table() {
     echo "${chunk_number}	| ${chunk_size}	| ${expected_md5} | ${actual_md5}"
     offset=$((offset + chunk_size))
   done
+  echo
 }
 
 test_file_table() {
@@ -37,20 +39,26 @@ test_file_table() {
   downloaded_file_size=`wc -c ${file_location} | cut -f1 -d' '`
   downloaded_file_md5=`md5sum ${file_location} | cut -f1 -d' '`
 
-  echo Test total file:
-  echo "         | Size	| MD5"
+  echo '### Test total file'
+  echo
+  echo ".        | Size	| MD5"
   echo "-------- | ----	| ---"
   echo "Expected | ${expected_file_size}	| ${expected_file_md5}"
   echo "Actual   | ${downloaded_file_size}	| ${downloaded_file_md5}"
+  echo
 }
 
 show_test_results() {
   upload=$1
   file_location=$2
+  echo '## Results'
+  echo '### Upload status'
+  echo '```'
   echo "${upload}" | jq '.status'
+  echo '```'
   test_chunks_table "${upload}" "${file_location}"
   test_file_table "${upload}" "${file_location}"
-  echo "Contents of '${file_location}':"
+  echo "### Contents of downloaded file"
   echo '```'
   cat "${file_location}"
   echo '```'
