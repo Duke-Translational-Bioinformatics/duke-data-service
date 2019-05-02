@@ -3,6 +3,7 @@
 usage() {
   echo "usage: $0 data_dir"
   echo 'Requires environment variables: DDS_URL DDS_AUTH_TOKEN DDS_PROJECT_ID'
+  echo 'Verbose output is directed to file descriptor 7'
   exit 1
 }
 data_dir=$1

@@ -1,10 +1,14 @@
 # Functions for checking data integrity
 
+# Verbose output goes to file descriptor 7,
+# which is directed to /dev/null by default
+2>&- >&7 || exec 7>/dev/null
+
 chunk_md5sum() {
   offset=$1
   chunk_size=$2
   input_file=$3
-  echo "chunk_md5sum '${offset}' '${chunk_size}' '${input_file}'" >&2
+  echo "chunk_md5sum '${offset}' '${chunk_size}' '${input_file}'" >&7
   dd skip=${offset} count=${chunk_size} if=${input_file} of=/dev/stdout bs=1 status=none | md5sum | cut -f1 -d' '
 }
 
@@ -47,5 +51,7 @@ show_test_results() {
   test_chunks_table "${upload}" "${file_location}"
   test_file_table "${upload}" "${file_location}"
   echo "Contents of '${file_location}':"
+  echo '```'
   cat "${file_location}"
+  echo '```'
 }
