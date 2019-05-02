@@ -39,3 +39,13 @@ test_file_table() {
   echo "Expected | ${expected_file_size}	| ${expected_file_md5}"
   echo "Actual   | ${downloaded_file_size}	| ${downloaded_file_md5}"
 }
+
+show_test_results() {
+  upload=$1
+  file_location=$2
+  echo "${upload}" | jq '.status'
+  test_chunks_table "${upload}" "${file_location}"
+  test_file_table "${upload}" "${file_location}"
+  echo "Contents of '${file_location}':"
+  cat "${file_location}"
+}
