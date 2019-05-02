@@ -9,6 +9,4 @@ echo '# Upload without errors'
 
 source includes/run_upload_workflow.sh
 
-echo "${upload_get_resp}" | jq '.status'
-test_chunks_table "${upload_get_resp}" "${download_location}"
-test_file_table "${upload_get_resp}" "${download_location}"
+show_test_results "${upload_get_resp}" "${download_location}"
