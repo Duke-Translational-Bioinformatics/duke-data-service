@@ -501,8 +501,9 @@ RSpec.describe SwiftStorageProvider, type: :model do
       end
 
       context 'non_chunked_upload' do
-        it 'should delete the SLO manifest' do
-          is_expected.to receive(:delete_object_manifest)
+        it 'should delete the object' do
+          is_expected.not_to receive(:delete_object_manifest)
+          is_expected.to receive(:delete_object)
             .with(
               non_chunked_upload.storage_container,
               non_chunked_upload.id
@@ -557,6 +558,11 @@ RSpec.describe SwiftStorageProvider, type: :model do
       is_expected.to respond_to :auth_token
       expect { subject.auth_token }.not_to raise_error
       expect(subject.auth_token).to be_a String
+    end
+
+    context 'with invalid auth' do
+      subject { FactoryBot.create(:swift_storage_provider, :from_env, service_pass: 'bad_password') }
+      it { expect { subject.auth_token }.to raise_error(StorageProviderException, /^Auth Failure: /) }
     end
 
     it 'should respond to auth_header' do

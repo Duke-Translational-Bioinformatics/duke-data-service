@@ -1,4 +1,4 @@
-version: 2
+version: 2.0
 jobs:
   sync_bot:
     docker:
@@ -77,6 +77,10 @@ jobs:
 
     steps:
       - checkout
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - .
       - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
       - run: chmod +x docker/includes/install_node.sh
       - run: mkdir -p /root/installs
@@ -173,6 +177,74 @@ jobs:
           path: /tmp/circleci-artifacts
       - store_artifacts:
           path: /tmp/circleci-test-results
+
+      - run:
+          name: Stash Coverage Results
+          command: |
+            mkdir coverage_results
+            cp coverage/.resultset.json coverage_results/.resultset-${CIRCLE_NODE_INDEX}.json
+      - persist_to_workspace:
+          root: .
+          paths:
+            - coverage_results
+
+  coverage:
+    docker:
+      - image: ruby:2.3.6
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          RAILS_ENV: test
+          COVERAGE_OUTPUT_DIR: /tmp/coverage
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+
+      - run: gem install bundler -v '~> 1.17.0'
+      - run:
+          name: Which bundler?
+          command: bundle -v
+
+      # Restore bundle cache
+      - restore_cache:
+          keys:
+            - duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+            - duke-data-service-bundle-
+
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+
+      # Store bundle cache
+      - save_cache:
+          key: duke-data-service-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Merge and check coverage
+          command: |
+            bundle exec .circleci/report_coverage.rb
+      - store_artifacts:
+          path: /tmp/coverage
+          destination: coverage
+
+  upload_coverage:
+    docker:
+      - image: ruby:2.3.6
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          name: Upload coverage results
+          command: |
+            bash <(curl -s https://codecov.io/bash) -s coverage_results -f '.resultset*.json'
+
   deploy:
     machine:
       enabled: true
@@ -210,6 +282,13 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - coverage:
+          context: coverage
+          requires:
+            - build
+      - upload_coverage:
+          requires:
+            - build
       - deploy:
           requires:
             - build

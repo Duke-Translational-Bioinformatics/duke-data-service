@@ -130,7 +130,7 @@ class SwiftStorageProvider < StorageProvider
   def purge(object)
     raise "#{object} is not purgable" unless object.is_a?(Upload) || object.is_a?(Chunk)
     begin
-      if object.is_a? Upload
+      if object.is_a? ChunkedUpload
         delete_object_manifest(object.storage_container, object.id)
       else
         delete_object(object.storage_container, object.object_path)

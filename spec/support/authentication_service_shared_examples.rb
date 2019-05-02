@@ -344,6 +344,9 @@ shared_examples 'an authentication_service:create task' do |
   authentication_service_class_sym: :resource_class,
   expected_env_keys_sym: :required_env|
 
+  require 'active_support/testing/stream'
+  include ActiveSupport::Testing::Stream
+
   let(:task_name) { send(rake_task_name_sym) }
   let(:authentication_service_class) { send(authentication_service_class_sym) }
   let(:expected_env_keys) { send(expected_env_keys_sym) }
@@ -397,15 +400,16 @@ shared_examples 'an authentication_service:create task' do |
       ENV['AUTH_SERVICE_IS_DEFAULT'] = 'true'
     end
     context 'with existing default authentication service' do
+      let(:default_auth_service) { FactoryBot.create(authentication_service_class.name.underscore.to_sym, :default) }
       it {
-        FactoryBot.create(authentication_service_class.name.underscore.to_sym, :default)
+        expect(default_auth_service).to be_persisted
         expected_env_keys.each do |expected_env_key|
           expect(ENV[expected_env_key]).to be_truthy
         end
         expect {
           expect {
             invoke_task
-          }.to raise_error(StandardError)
+          }.to raise_error(/"#{default_auth_service.id}".* is already the default authentication_service/)
         }.not_to change{authentication_service_class.count}
       }
     end
@@ -433,6 +437,9 @@ shared_examples 'an authentication_service:destroy task' do |
   rake_task_name_sym: :rake_task_name,
   authentication_service_class_sym: :resource_class|
 
+  require 'active_support/testing/stream'
+  include ActiveSupport::Testing::Stream
+
   let(:task_name) { send(rake_task_name_sym) }
   let(:authentication_service_class) { send(authentication_service_class_sym) }
 
@@ -441,9 +448,6 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'default authentication_service' do
     before do
-      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
       FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env, :default)
     end
 
@@ -458,9 +462,6 @@ shared_examples 'an authentication_service:destroy task' do |
 
   context 'non default authentication_service' do
     before do
-      FactoryBot.attributes_for(authentication_service_class.name.underscore.to_sym).each do |key,value|
-        ENV["AUTH_SERVICE_#{key.upcase}"] = value
-      end
       FactoryBot.create(authentication_service_class.name.underscore.to_sym, :from_auth_service_env)
     end
 

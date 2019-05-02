@@ -6,7 +6,7 @@ RSpec.describe ApiToken do
   it 'should require a User' do
     expect {
       ApiToken.new
-    }.to raise_error(RuntimeError)
+    }.to raise_error('a User is required')
   end
 
   context 'with UserAuthenticationService Authenticated User' do
@@ -23,7 +23,7 @@ RSpec.describe ApiToken do
     it 'should require a User and UserAuthenticationService' do
       expect {
         ApiToken.new(user: user)
-      }.to raise_error(RuntimeError)
+      }.to raise_error('UserAuthenticationService or SoftwareAgent is required')
     end
 
     describe 'api_token and expires_on methods' do
@@ -66,7 +66,7 @@ RSpec.describe ApiToken do
     it 'should require a User and SoftwareAgent' do
       expect {
         ApiToken.new(user: user)
-      }.to raise_error(RuntimeError)
+      }.to raise_error('UserAuthenticationService or SoftwareAgent is required')
     end
 
     describe 'api_token and expires_on methods' do

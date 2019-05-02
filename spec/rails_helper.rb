@@ -1,4 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'simplecov'
+
 ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
 require File.expand_path('../../config/environment', __FILE__)
@@ -9,6 +11,10 @@ require 'vcr'
 require 'pundit/rspec'
 require 'uri'
 require 'bunny-mock'
+
+# Load rake tasks so they can be tested.
+Rake.application = Rake::Application.new
+Rails.application.load_tasks
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
