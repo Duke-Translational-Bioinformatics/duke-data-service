@@ -1,4 +1,19 @@
-# Upload without errors
+# Introduction
+
+
+# File sizes and MD5s
+
+A test file was developed, and split into chunks, for use in the different scenarios:
+
+Description | Contents | Size | MD5
+----------- | -------- | ---- | ---
+test\_file.txt | THIS<br />IS<br />A<br />TEST<br /> | 15 | 19af6b658424206d13f90ccd9b49fadf
+chunk 1 | THIS<br /> | 5 | 8f99594aa44f8617fa505d20f3d32ec2
+chunk 2 | IS<br /> | 3 | 7c0c0577834d29be479910502833588a
+chunk 3 | A<br /> | 2 | bf072e9119077b4e76437a93986787ef
+chunk 4 | TEST<br /> | 5 | 2debfdcf79f03e4a65a667d21ef9de14
+
+# Scenario: Upload without errors
 This is the baseline run. Sizes, hashes, and chunk order are all inline with the test file.
 
 Upload create payload: `{"name":"test_file.txt","content_type":"text%2Fplain","size":"15"}`
@@ -16,9 +31,9 @@ Complete Upload payload: `{"hash":{"value":"19af6b658424206d13f90ccd9b49fadf","a
 ### Upload status
 ```
 {
-  "initiated_on": "2019-05-03T19:04:33.500Z",
+  "initiated_on": "2019-05-08T15:52:23.386Z",
   "ready_for_chunks": true,
-  "completed_on": "2019-05-03T19:04:45.585Z",
+  "completed_on": "2019-05-08T15:52:32.980Z",
   "is_consistent": true,
   "purged_on": null,
   "error_on": null,
@@ -48,15 +63,15 @@ IS
 A
 TEST
 ```
-# Bad Upload MD5
+# Scenario: Client reports an incorrect MD5 that does not match the actual MD5 of the file being uploaded
 Complete Upload payload: `{"hash":{"value":"thisisabadmd5yo","algorithm":"md5"}}`
 ## Results
 ### Upload status
 ```
 {
-  "initiated_on": "2019-05-03T19:04:55.196Z",
+  "initiated_on": "2019-05-08T15:53:00.570Z",
   "ready_for_chunks": true,
-  "completed_on": "2019-05-03T19:05:04.039Z",
+  "completed_on": "2019-05-08T15:53:10.342Z",
   "is_consistent": true,
   "purged_on": null,
   "error_on": null,
@@ -86,19 +101,20 @@ IS
 A
 TEST
 ```
-# Upload missing chunk 1
+# Scenario: Client fails to register a chunk and reports the actual size of the file for the upload
+This can happen if the client just skips a chunk, or if the client reports chunk 1 as chunk 2, and then reports chunk 2 as chunk 2, which will overwrite the chunk 2 values reported for chunk 1.
 Chunk 1 payload: `{"number":"2","size":"5","hash":{"value":"8f99594aa44f8617fa505d20f3d32ec2","algorithm":"md5"}}`
-(This chunk will be overwritten when Chunk 2 is submitted.)
+Chunk 2 payload: `{"number":"2","size":"3","hash":{"value":"7c0c0577834d29be479910502833588a","algorithm":"md5"}}`
 ## Results
 ### Upload status
 ```
 {
-  "initiated_on": "2019-05-03T19:05:13.266Z",
+  "initiated_on": "2019-05-08T15:53:30.744Z",
   "ready_for_chunks": true,
-  "completed_on": "2019-05-03T19:05:16.659Z",
+  "completed_on": "2019-05-08T15:53:41.808Z",
   "is_consistent": true,
   "purged_on": null,
-  "error_on": "2019-05-03T19:05:16.896Z",
+  "error_on": "2019-05-08T15:53:42.117Z",
   "error_message": "reported size does not match size computed by StorageProvider"
 }
 ```
@@ -120,17 +136,17 @@ Actual   | 0	| d41d8cd98f00b204e9800998ecf8427e
 ### Contents of downloaded file
 ```
 ```
-# Upload missing chunk 1 and size calculated from chunks 2-4
-Chunk 1 payload: `{"number":"2","size":"5","hash":{"value":"8f99594aa44f8617fa505d20f3d32ec2","algorithm":"md5"}}`
-(This chunk will be overwritten when Chunk 2 is submitted.)
+# Scenario: Client fails to register a chunk but reports the size calculated from chunks 2-4 for the upload
 Upload create payload: `{"name":"test_file.txt","content_type":"text%2Fplain","size":"10"}`
+Chunk 1 payload: `{"number":"2","size":"5","hash":{"value":"8f99594aa44f8617fa505d20f3d32ec2","algorithm":"md5"}}`
+Chunk 2 payload: `{"number":"2","size":"3","hash":{"value":"7c0c0577834d29be479910502833588a","algorithm":"md5"}}`
 ## Results
 ### Upload status
 ```
 {
-  "initiated_on": "2019-05-03T19:05:25.870Z",
+  "initiated_on": "2019-05-08T15:53:48.986Z",
   "ready_for_chunks": true,
-  "completed_on": "2019-05-03T19:05:28.485Z",
+  "completed_on": "2019-05-08T15:53:51.815Z",
   "is_consistent": true,
   "purged_on": null,
   "error_on": null,
@@ -158,16 +174,18 @@ IS
 A
 TEST
 ```
-# Upload chunks are out of order
+# Scenario: Client registers the chunks in the wrong order
 Chunk 1 payload: `{"number":"5","size":"5","hash":{"value":"8f99594aa44f8617fa505d20f3d32ec2","algorithm":"md5"}}`
 Chunk 2 payload: `{"number":"6","size":"3","hash":{"value":"7c0c0577834d29be479910502833588a","algorithm":"md5"}}`
+Chunk 3 payload: `{"number":"3","size":"2","hash":{"value":"bf072e9119077b4e76437a93986787ef","algorithm":"md5"}}`
+Chunk 4 payload: `{"number":"4","size":"5","hash":{"value":"2debfdcf79f03e4a65a667d21ef9de14","algorithm":"md5"}}`
 ## Results
 ### Upload status
 ```
 {
-  "initiated_on": "2019-05-03T19:05:37.774Z",
+  "initiated_on": "2019-05-08T15:53:56.020Z",
   "ready_for_chunks": true,
-  "completed_on": "2019-05-03T19:05:41.428Z",
+  "completed_on": "2019-05-08T15:54:10.613Z",
   "is_consistent": true,
   "purged_on": null,
   "error_on": null,
