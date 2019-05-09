@@ -10,7 +10,9 @@ echo 'This can happen if the client just skips a chunk, or if the client reports
 
 chunk_1_payload='{"number":"2","size":"'${chunk_1_size}'","hash":{"value":"'${chunk_1_md5}'","algorithm":"md5"}}'
 echo "Chunk 1 payload: \`${chunk_1_payload}\`"
+echo
 echo "Chunk 2 payload: \`${chunk_2_payload}\`"
+echo
 
 source includes/run_upload_workflow.sh
 

@@ -19,6 +19,7 @@ echo
 echo "Chunk 4 payload: \`${chunk_4_payload}\`"
 echo
 echo "Complete Upload payload: \`${upload_complete_payload}\`"
+echo
 
 source includes/run_upload_workflow.sh
 

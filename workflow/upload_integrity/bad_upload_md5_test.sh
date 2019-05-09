@@ -9,6 +9,7 @@ echo '# Scenario: Client reports an incorrect MD5 that does not match the actual
 
 upload_complete_payload='{"hash":{"value":"thisisabadmd5yo","algorithm":"md5"}}'
 echo "Complete Upload payload: \`${upload_complete_payload}\`"
+echo
 
 source includes/run_upload_workflow.sh
 
