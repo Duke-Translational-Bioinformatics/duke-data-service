@@ -36,7 +36,7 @@ upload_complete_resp=$(dds_curl PUT "/uploads/${upload_id}/complete" ${upload_co
 echo "${upload_complete_resp}" | jq '.' >&7
 
 file_create_payload='{"parent":{"kind":"dds-project","id":"'${project_id}'"},"upload":{"id":"'${upload_id}'"}}'
-echo Complete upload with: ${file_create_payload} >&7
+echo Create file with: ${file_create_payload} >&7
 file_create_resp=$(dds_curl POST "/files" ${file_create_payload})
 echo "${file_create_resp}" | jq '.' >&7
 file_id=`echo "${file_create_resp}" | jq -r '.id'`
