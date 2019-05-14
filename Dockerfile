@@ -3,22 +3,9 @@
 FROM ruby:2.6.3-stretch
 MAINTAINER Darin London <darin.london@duke.edu>
 
-RUN ["mkdir", "-p", "/root/installs"]
-WORKDIR /root/installs
-
-# Node binary
-ENV LATEST_NODE node-v0.12.7-linux-x64
-ENV LATEST_NODE_URL https://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz
-ADD docker/includes/install_node.sh /root/installs/install_node.sh
-RUN ["chmod", "777", "/root/installs/install_node.sh"]
-RUN ["/root/installs/install_node.sh"]
-RUN ["npm","install","-g","bower"]
-
-# ssl certs
-ADD docker/includes/install_ssl_cert.sh /root/installs/install_ssl_cert.sh
-ADD docker/includes/cert_config /root/installs/cert_config
-RUN ["chmod", "u+x", "/root/installs/install_ssl_cert.sh"]
-RUN ["/root/installs/install_ssl_cert.sh"]
+# NodeJS and npm
+## Heroku-16 uses node 10.14. This installs node 10.15
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && apt-get install -y nodejs
 
 #Postgresql client
 RUN /usr/bin/apt-get update && /usr/bin/apt-get install -y postgresql libpq-dev

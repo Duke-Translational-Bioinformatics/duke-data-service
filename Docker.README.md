@@ -303,33 +303,6 @@ or using the -f flags for all docker-compose yml files. Otherwise, services defi
 in the missing docker-compose.yml file will not be shut down and removed, and a warning
 may come up in your output that says containers were 'orphaned'.
 
-docker-compose.circle.yml
----
-This docker-compose yml file is specifically configured for CircleCI. This is to ensure that it works with the version
-of docker-compose that is made available on the CircleCI host machine.
-**Developers should not use this file unless they are troubleshooting a
-failed CircleCI build on the CircleCI machine**
-
-Creating an API_TEST_USER and token
-===
-A rake task, api_test_user:create, has been written to create a
-test user account to use in any test applications.  This creates
-a single specific User (if it does not already exist). Each time it is run,
-it will print a new api_token to STDOUT (even if the User already exists).
-This api_token has an expiry of 5 years from the time the rake task is run.
-Here is how you can create one and capture the token into a bash variable:
-```
-api_token=`docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api-test_user:create`
-```
-You can use this in any code that needs to access the API (see the [workflow](#running-the-workflow)
-for an example).
-If you want to use this in the swagger apiexplorer, launch the /apiexplorer,
-open the javascript console, type
-```
-window.localStorage.api_token='yourtoken'
-```
-and reload the page.
-
 Connecting to an Openstack Swift Object Store
 ===
 Currently, DDS is designed to support a single Openstack Swift object storage,
@@ -416,36 +389,6 @@ or completing an upload, to timeout. You will also need to use this chain to run
 docker-compose down, docker-compose stop, etc:
 ```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml stop swift
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
-```
-
-Running the Workflow
-===
-A bash script, workflow.sh, has been created to test the locally running API using a set of
-files. To run this:
-
-- make sure you set the swift.env to point to the swift.local.env file
-- create a freshly launched application (e.g. the postgres database and swift service
-are completely clean). You can run the following to ensure this:
-```
-rm swift.env
-ln -s swift.local.env swift.env
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
-./launch_application.sh
-```
-- create an api_test_user
-```
-api_token=`docker-compose -f docker-compose.yml -f docker-compose.dev.yml run rake api_test_user:create`
-```
-- run the workflow with the api_token
-```
-˝./workflow/workflow.sh ${api_token}
-```
-
-You will need to clean up after each run to get rid of all of the DDS objects, and Swift
-containers/objects that are created, or the workflow will fail when it tries to create the
-project with an existing name.
-```
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.swift.yml down
 ```
 
@@ -613,7 +556,6 @@ specify how to build an image to host an application. We have created a
 Dockerfile in the Application Root. This Dockerfile:
 * installs required libraries for ruby, rails, node, etc.
 * installs specific versions of ruby and node
-* creates SSL certs
 * installs the postgres client libraries
 * creates /var/www/app and sets this to the default working directory
 * checks out the latest version of the branch of the code from github into /var/www/app
