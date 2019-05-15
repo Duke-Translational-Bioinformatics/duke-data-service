@@ -19,13 +19,11 @@ The Duke Data Service (DDS) provides API supports a multipart upload system to a
    - When DDS processes the chunked upload, the upload's size, chunk order, and chunk MD5s are all verified against what has been uploaded to the storage provider.
      - If any part of the verification fails, the `error_on` and `error_message` statuses will be populated.
      - Once complete, the `is_consistent` status is set to `true`, whether or not verification has failed.
-     - NOTE: The MD5 reported for the overall upload is not verified.
+     - NOTE: The MD5 reported for the entire file is not verified.
 1. **Create a File**
    - `POST /files`
    - The client provides a location within the project's folder hierarchy for the upload.
    - This allows DDS users to navigate to the file for downloading.
-
-It is possible for a client to create a file in the DDS that does not match the original file, but which does not report an inconsistency error, and can be downloaded by the download urls. This would not be discovered until a user downloads the complete file, and compares the MD5, and the size, of the actual file downloaded against the values reported by the upload client.
 
 In the following report, we document a number of scenarios which describe the various ways a client can upload a multipart file, including situations where the uploaded file does not match the actual file the client intended to upload.
 
