@@ -1,8 +1,8 @@
 Gitlab CI
 ---
 
-The Duke Dataservice is making use of GitlabCI to augment the standard
-build and deployment process currently provided  by CircleCI. The
+The Duke Dataservice can make use of GitlabCI to augment the standard
+build and deployment process currently provided by CircleCI. The
 GitlabCI platform allows us to test different processes to monitor the
 quality of our code, such as linting and code coverage, that do easily
 not fit into the CircleCI structure.
@@ -27,13 +27,8 @@ Once the Gitlab Github Mirror project is setup, you should create the following 
 gitlab-ci-runner service account. See [Service Accounts](https://docs.okd.io/latest/dev_guide/service_accounts.html#using-a-service-accounts-credentials-externally) for more information.
 - OPENSHIFT_API_URL: the base url to the Openshift API.
 
-#### Gitlab Runner
-The .gitlab-ci.yml tasks use a tag 'dds' to specify a Specific
-Gitlab Runner. This runner should be [hosted](https://docs.gitlab.com/runner/install/index.html) and [registered](https://docs.gitlab.com/runner/register/index.html) with the
-token from the Gitlab Github mirror project.
-
 #### Openshift
-Openshift is used to host the processes run by GitlabCI. This requires
+Openshift can host the processes run by GitlabCI. This requires
 the following to be created in an Openshift cluster:
 - new project: This should be done by hand, or by the Openshift Administrators.
 - gitlab deployment ssh key secret annotated to be used on any build
