@@ -27,6 +27,15 @@ class DataFile < Container
 
   after_set_parent_attribute :set_project_to_parent_project
   before_save :set_current_file_version_attributes
+  before_save :set_etag, if: :anything_changed?
+
+  def anything_changed?
+    changed? || file_versions.any?(&:changed?)
+  end
+
+  def set_etag
+    self.etag = SecureRandom.hex
+  end
 
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
