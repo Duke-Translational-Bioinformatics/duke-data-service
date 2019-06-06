@@ -12,6 +12,7 @@ class Container < ApplicationRecord
   has_many :tags, as: :taggable
 
   define_model_callbacks :set_parent_attribute
+  before_save :set_etag, if: :changed?
 
   validates :name, presence: true, unless: :is_deleted
 
@@ -60,5 +61,9 @@ class Container < ApplicationRecord
     else
       raise IncompatibleParentException.new("Objects can only be restored to a dds-folder or dds-project.::Perhaps you mistyped the object_kind.")
     end
+  end
+
+  def set_etag
+    self.etag = SecureRandom.hex
   end
 end

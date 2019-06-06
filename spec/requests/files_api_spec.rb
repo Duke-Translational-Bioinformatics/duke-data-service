@@ -282,6 +282,16 @@ describe DDS::V1::FilesAPI do
           let(:expected_auditable_type) { FileVersion }
         end
 
+        context 'with only upload in payload' do
+          let(:payload) {{
+            upload: payload_upload
+          }}
+          it_behaves_like 'an annotate_audits endpoint'
+          it_behaves_like 'an annotate_audits endpoint' do
+            let(:expected_auditable_type) { FileVersion }
+          end
+        end
+
         it_behaves_like 'a software_agent accessible resource' do
           it 'creates a file_version' do
               expect {

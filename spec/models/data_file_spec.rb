@@ -178,6 +178,18 @@ RSpec.describe DataFile, type: :model do
 
           it { expect(subject.upload).to eq different_upload }
           it { expect(subject.current_file_version.upload).to eq different_upload }
+
+          it 'changes updated_at when saved' do
+            expect {
+              expect(subject.save).to be_truthy
+            }.to change { subject.updated_at }
+          end
+
+          it 'creates an audit when saved' do
+            expect {
+              expect(subject.save).to be_truthy
+            }.to change { subject.audits.count }.by(1)
+          end
         end
 
         context 'set #upload to the same upload' do
@@ -414,9 +426,43 @@ RSpec.describe DataFile, type: :model do
     end
   end
 
+  it { is_expected.to respond_to(:set_etag) }
+  describe '#set_etag' do
+    it 'sets the etag to a hex string' do
+      expect {
+        subject.set_etag
+      }.to change { subject.etag }
+      expect(subject.etag).to be_a String
+      expect(subject.etag.length).to eq 32
+    end
+  end
+
+  it { is_expected.to respond_to(:anything_changed?) }
+  describe '#anything_changed?' do
+    before(:example) do
+      expect(subject).to be_persisted
+    end
+    it { expect(subject.anything_changed?).to be_falsey }
+
+    context 'with attribute change' do
+      before(:example) do
+        subject.label = 'foo' + subject.label
+      end
+      it { expect(subject.anything_changed?).to be_truthy }
+    end
+
+    context 'with file_versions change' do
+      before(:example) do
+        subject.build_file_version
+      end
+      it { expect(subject.anything_changed?).to be_truthy }
+    end
+  end
+
   describe 'callbacks' do
     it { is_expected.to callback(:set_project_to_parent_project).after(:set_parent_attribute) }
     it { is_expected.to callback(:set_current_file_version_attributes).before(:save) }
+    it { is_expected.to callback(:set_etag).before(:save).if(:anything_changed?) }
   end
 
   describe '#creator' do
