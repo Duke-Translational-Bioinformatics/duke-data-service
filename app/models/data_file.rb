@@ -33,10 +33,6 @@ class DataFile < Container
     changed? || file_versions.any?(&:changed?)
   end
 
-  def set_etag
-    self.etag = SecureRandom.hex
-  end
-
   validates :project_id, presence: true, immutable: true, unless: :is_deleted
   validates :upload, presence: true, unless: :is_deleted
 
