@@ -428,4 +428,16 @@ RSpec.describe Folder, type: :model do
       }
     end
   end
+
+  it { is_expected.to respond_to(:set_etag) }
+  describe '#set_etag' do
+    it 'sets the etag to a hex string' do
+      expect {
+        subject.set_etag
+      }.to change { subject.etag }
+      expect(subject.etag).to be_a String
+      expect(subject.etag.length).to eq 32
+    end
+    it { is_expected.to callback(:set_etag).before(:save).if(:changed?) }
+  end
 end
