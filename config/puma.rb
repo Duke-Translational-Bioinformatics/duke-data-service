@@ -5,11 +5,7 @@ threads threads_count, threads_count
 preload_app!
 
 rackup      DefaultRackup
-if ENV['LOCALDEV'] && !ENV['NOFORCESSL']
-  bind "ssl://0.0.0.0:3000?key=/etc/pki/tls/private/localhost.key&cert=/etc/pki/tls/certs/localhost.crt&keystore=/var/www/app/config/keystore/keystore.jks&keystore-pass=password"
-else
-  port        ENV['PORT']     || 3000
-end
+port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
 
 on_worker_boot do

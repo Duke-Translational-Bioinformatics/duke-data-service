@@ -12,9 +12,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = ENV['RAILS_MAILER_ERRORS'].present?
   config.active_support.deprecation = :log
   config.active_record.migration_error = :page_load
-  unless ENV['NOFORCESSL'].present?
-    config.force_ssl = true
-  end
+  config.force_ssl = true
 
   # :debug :info :warn :error :fatal :unknown (0-5)
   config.log_level = ENV['RAILS_LOG_LEVEL'] || :debug
