@@ -2,7 +2,7 @@ version: '2'
 services:
   localdev:
     #make sure image matches what the root Dockerfile is FROM
-    image: ruby:2.6.3-stretch
+    image: ruby:2.6.4-stretch
     command: ['echo','setting up localdev']
     volumes:
       - .:/var/www/app
