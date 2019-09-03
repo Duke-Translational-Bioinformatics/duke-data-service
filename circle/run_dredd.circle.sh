@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # cache necessary images
-./docker/circle/cache_docker_image.sh ruby 2.6.3
+./docker/circle/cache_docker_image.sh ruby 2.6.4
 ./docker/circle/cache_docker_image.sh postgres 9.4
 ./docker/circle/cache_docker_image.sh ubuntu 14.04
 ./docker/circle/cache_dredd.sh

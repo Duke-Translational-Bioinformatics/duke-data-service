@@ -1,6 +1,6 @@
 # Heroku-16 is based on Ubuntu 16.4
 # Debian Stretch is the upstream of Ubuntu 16.4
-FROM ruby:2.6.3-stretch
+FROM ruby:2.6.4-stretch
 MAINTAINER Darin London <darin.london@duke.edu>
 
 # NodeJS and npm
