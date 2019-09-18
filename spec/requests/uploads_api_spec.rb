@@ -187,6 +187,20 @@ describe DDS::V1::UploadsAPI do
             let(:new_storage_is_initialized) { false }
             it_behaves_like 'an inconsistent resource'
           end
+
+          context 'when StorageProvider is deprecated' do
+            before(:example) do
+              mocked_storage_provider.is_deprecated = true
+            end
+            it_behaves_like 'a validated resource' do
+              it 'should not persist changes' do
+                expect(resource).to be_persisted
+                expect {
+                  is_expected.to eq(400)
+                }.not_to change{resource_class.count}
+              end
+            end
+          end
         end
       end
     end
@@ -374,6 +388,20 @@ describe DDS::V1::UploadsAPI do
       let(:expected_response_status) { 202 }
       it_behaves_like 'an annotate_audits endpoint' do
         let(:expected_response_status) { 202 }
+      end
+    end
+
+    context 'when StorageProvider is deprecated' do
+      before(:example) do
+        mocked_storage_provider.is_deprecated = true
+      end
+      it_behaves_like 'a validated resource' do
+        it 'should not persist changes' do
+          expect(resource).to be_persisted
+          expect {
+            is_expected.to eq(400)
+          }.not_to change{resource_class.count}
+        end
       end
     end
   end

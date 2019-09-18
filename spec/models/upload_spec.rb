@@ -11,6 +11,7 @@ RSpec.describe Upload, type: :model do
   let(:expected_object_path) { subject.id }
   let(:expected_sub_path) { [subject.storage_container, expected_object_path].join('/')}
   let(:unexpected_exception) { StorageProviderException.new('Unexpected') }
+  let(:deprecated_storage_provider) { FactoryBot.build(:storage_provider, is_deprecated: true) }
 
   it_behaves_like 'an audited model'
   it_behaves_like 'a job_transactionable model'
@@ -69,6 +70,11 @@ RSpec.describe Upload, type: :model do
       is_expected.to allow_value(subject.storage_container).for(:storage_container)
       is_expected.not_to allow_value('a-different-string').for(:storage_container)
         .with_message("Cannot change storage_container.")
+    end
+
+    it 'does not allow deprecated storage providers' do
+      is_expected.not_to allow_value(deprecated_storage_provider).for(:storage_provider)
+        .with_message('cannot be deprecated')
     end
   end
 

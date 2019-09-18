@@ -22,6 +22,7 @@ class Upload < ApplicationRecord
   validates :completed_at, immutable: true, if: :error_at_was
   validates :fingerprints, presence: true, if: :completed_at
   validates :fingerprints, absence: true, unless: :completed_at
+  validate :storage_provider_is_not_deprecated
 
   delegate :url_root, to: :storage_provider
 
@@ -63,6 +64,12 @@ class Upload < ApplicationRecord
         )
         self
       end
+    end
+  end
+
+  def storage_provider_is_not_deprecated
+    if storage_provider&.is_deprecated?
+      errors.add(:storage_provider, "cannot be deprecated")
     end
   end
 
