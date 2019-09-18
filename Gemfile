@@ -79,7 +79,7 @@ group :development, :docker do
 end
 
 group :development, :docker, :test do
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 4.0.0.beta2'
   gem 'rspec-activemodel-mocks'
 end
 
@@ -88,7 +88,6 @@ group :docker, :test do
 end
 
 group :test do
-  gem 'rails-controller-testing'
   gem 'shoulda-matchers', require: false
   gem 'shoulda-callback-matchers', '~> 1.1', '>= 1.1.3'
   gem 'spring-commands-rspec'
