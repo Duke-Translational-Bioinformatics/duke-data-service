@@ -1,4 +1,5 @@
 class FolderFilesResponse
+  include ActiveModel::Model
   include ActiveModel::Serialization
   attr_reader :elastic_response
 
