@@ -20,7 +20,7 @@ shared_context 'creation' do |with_software_agent|
       else
         new_comment = agent_comment
       end
-      creation_audit.update_attributes!(comment: new_comment)
+      creation_audit.update!(comment: new_comment)
     }
   else
     let(:created) { true }
@@ -151,7 +151,7 @@ shared_examples 'a serializer with a serialized audit' do
     before(:each) do
       ApplicationAudit.current_comment = audit_comment
       ApplicationAudit.current_user = auditor
-      resource.update_attributes!(
+      resource.update!(
         update_attribute => update_value,
         :audit_comment => audit_comment
       )
