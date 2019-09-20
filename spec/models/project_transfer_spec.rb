@@ -64,6 +64,6 @@ RSpec.describe ProjectTransfer, type: :model do
 
   describe 'status with enum' do
     it { is_expected.to define_enum_for(:status).
-      with([:pending, :rejected, :accepted, :canceled]) }
+      with_values([:pending, :rejected, :accepted, :canceled]) }
   end
 end
