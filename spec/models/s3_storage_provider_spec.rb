@@ -139,7 +139,7 @@ RSpec.describe S3StorageProvider, type: :model do
 
   describe '#initialize_chunked_upload' do
     let(:cmu_response) { multipart_upload_id }
-    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
     before(:example) do
       allow(subject).to receive(:create_multipart_upload)
     end
@@ -271,7 +271,7 @@ RSpec.describe S3StorageProvider, type: :model do
       ] }
       let(:bucket_name) { chunked_upload.storage_container }
       let(:object_key) { chunked_upload.id }
-      let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+      let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
       let(:content_length) { chunked_upload.size }
       let(:parts) { [
         { etag: "\"#{chunks[0].fingerprint_value}\"", part_number: 1 },
@@ -349,7 +349,7 @@ RSpec.describe S3StorageProvider, type: :model do
 
   describe '#chunk_upload_ready?(chunked_upload)' do
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
-    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
     it { expect(subject.chunk_upload_ready?(chunked_upload)).to eq true }
 
     context 'when upload.multipart_upload_id is nil' do
@@ -362,7 +362,7 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
     let(:bucket_name) { chunk.chunked_upload.storage_container }
     let(:object_key) { chunk.chunked_upload.id }
-    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
     let(:expected_url) { '/' + Faker::Internet.user_name }
@@ -624,7 +624,7 @@ RSpec.describe S3StorageProvider, type: :model do
     let(:bucket_name) { SecureRandom.uuid }
     let(:object_key) { SecureRandom.uuid }
     let(:expected_response) { {
-      content_length: Faker::Number.between(1000, 10000),
+      content_length: Faker::Number.between(from: 1000, to: 10000),
       etag: "\"#{Faker::Crypto.md5}\"",
       metadata: {}
     } }
@@ -661,7 +661,7 @@ RSpec.describe S3StorageProvider, type: :model do
     include_context 'stubbed subject#client'
     let(:bucket_name) { SecureRandom.uuid }
     let(:object_key) { SecureRandom.uuid }
-    let(:expected_upload_id) { Faker::Lorem.characters(88) }
+    let(:expected_upload_id) { Faker::Lorem.characters(number: 88) }
     let(:expected_response) { {
       bucket: bucket_name,
       key: object_key,
@@ -692,7 +692,7 @@ RSpec.describe S3StorageProvider, type: :model do
     include_context 'stubbed subject#client'
     let(:bucket_name) { SecureRandom.uuid }
     let(:object_key) { SecureRandom.uuid }
-    let(:multipart_upload_id) { Faker::Lorem.characters(88) }
+    let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
     let(:parts) { [
       { etag: "\"#{Faker::Crypto.md5}\"", part_number: 1 },
       { etag: "\"#{Faker::Crypto.md5}\"", part_number: 2 }
@@ -778,9 +778,9 @@ RSpec.describe S3StorageProvider, type: :model do
     end
 
     context 'sign :upload_part' do
-      let(:multipart_upload_id) { Faker::Lorem.characters(88) }
-      let(:part_number) { Faker::Number.between(1, 100) }
-      let(:part_size) { Faker::Number.between(1000, 10000) }
+      let(:multipart_upload_id) { Faker::Lorem.characters(number: 88) }
+      let(:part_number) { Faker::Number.between(from: 1, to: 100) }
+      let(:part_size) { Faker::Number.between(from: 1000, to: 10000) }
       let(:expected_url) {
         signer.presigned_url(
           :upload_part,
@@ -800,7 +800,7 @@ RSpec.describe S3StorageProvider, type: :model do
     end
 
     context 'sign :put_object' do
-      let(:object_size) { Faker::Number.between(1000, 10000) }
+      let(:object_size) { Faker::Number.between(from: 1000, to: 10000) }
       let(:expected_url) {
         signer.presigned_url(
           :put_object,

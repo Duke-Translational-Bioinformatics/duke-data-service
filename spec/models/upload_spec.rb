@@ -39,12 +39,12 @@ RSpec.describe Upload, type: :model do
     it { is_expected.not_to validate_presence_of :fingerprint_value }
     it { is_expected.not_to validate_presence_of :fingerprint_algorithm }
 
-    it { is_expected.to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+    it { is_expected.to allow_value(Faker::Time.forward(days: 1)).for(:completed_at) }
     it { is_expected.not_to validate_presence_of :fingerprints }
     it { is_expected.not_to validate_presence_of :multipart_upload_id }
 
     context 'when completed_at is set' do
-      before { subject.completed_at = Faker::Time.forward(1) }
+      before { subject.completed_at = Faker::Time.forward(days: 1) }
       it { is_expected.to validate_presence_of :fingerprints }
     end
 
@@ -56,12 +56,12 @@ RSpec.describe Upload, type: :model do
 
     context 'completed upload' do
       subject { completed_upload }
-      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+      it { is_expected.not_to allow_value(Faker::Time.forward(days: 1)).for(:completed_at) }
     end
 
     context 'upload with error' do
       subject { upload_with_error }
-      it { is_expected.not_to allow_value(Faker::Time.forward(1)).for(:completed_at) }
+      it { is_expected.not_to allow_value(Faker::Time.forward(days: 1)).for(:completed_at) }
     end
 
     it 'expects storage_container to be immutable' do

@@ -25,7 +25,7 @@ RSpec.describe NonChunkedUpload, type: :model do
   context 'with completed_at set' do
     let(:compatible_fingerprint) { FactoryBot.build(:fingerprint, algorithm: subject_storage_provider.fingerprint_algorithm) }
     let(:incompatible_fingerprint) { FactoryBot.build(:fingerprint, algorithm: 'sha256') }
-    before { subject.completed_at = Faker::Time.forward(1) }
+    before { subject.completed_at = Faker::Time.forward(days: 1) }
 
     it { is_expected.to allow_value([compatible_fingerprint]).for(:fingerprints) }
     it { is_expected.not_to allow_value([incompatible_fingerprint]).for(:fingerprints) }

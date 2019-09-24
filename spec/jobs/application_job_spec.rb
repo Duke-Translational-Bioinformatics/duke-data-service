@@ -74,7 +74,7 @@ RSpec.describe ApplicationJob, type: :job do
   context 'child_class' do
     let(:prefix) { Rails.application.config.active_job.queue_name_prefix }
     let(:prefix_delimiter) { Rails.application.config.active_job.queue_name_delimiter }
-    let(:child_class_queue_name) { Faker::Internet.slug(nil, '_') }
+    let(:child_class_queue_name) { Faker::Internet.slug(words: nil, glue: '_') }
     let(:prefixed_queue_name) { "#{prefix}#{prefix_delimiter}#{child_class_queue_name}"}
     # Maxretry queue and exchange names
     let(:error_exchange_name) { prefixed_queue_name + '.dlx' }
