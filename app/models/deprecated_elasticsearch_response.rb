@@ -1,5 +1,6 @@
 class DeprecatedElasticsearchResponse
   @@indexed_models = [DataFile, Folder, Activity]
+  include ActiveModel::Model
   include ActiveModel::Serialization
   attr_reader :results
 

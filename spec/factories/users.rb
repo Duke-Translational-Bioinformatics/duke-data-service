@@ -1,12 +1,12 @@
 FactoryBot.define do
   factory :user do
     etag { SecureRandom.hex }
-    sequence(:username) { |n| "#{Faker::Internet.user_name(nil, ['_'])}_#{n}" }
+    sequence(:username) { |n| "#{ Faker::Internet.user_name(separators: ['_']) }_#{n}" }
     email { Faker::Internet.email }
     display_name { Faker::Name.name }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
-    last_login_at { Faker::Time.backward(14, :evening) }
+    last_login_at { Faker::Time.backward(days: 14, period: :evening) }
 
     trait :delong do
       display_name { 'Mark Randall DeLong' }

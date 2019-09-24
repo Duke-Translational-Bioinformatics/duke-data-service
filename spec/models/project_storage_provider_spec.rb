@@ -26,7 +26,7 @@ RSpec.describe ProjectStorageProvider, type: :model do
   it 'validates uniqueness of storage_provider and project' do
     # intercepting initialize_storage callback to prevent error
     allow_any_instance_of(described_class).to receive(:initialize_storage)
-    is_expected.to validate_uniqueness_of(:storage_provider_id).scoped_to(:project_id)
+    is_expected.to validate_uniqueness_of(:storage_provider_id).scoped_to(:project_id).case_insensitive
   end
 
   it { is_expected.to respond_to(:initialize_storage).with(0).arguments }

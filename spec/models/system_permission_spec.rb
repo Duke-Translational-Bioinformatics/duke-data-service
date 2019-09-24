@@ -18,7 +18,7 @@ RSpec.describe SystemPermission, type: :model do
   describe 'validations' do
     it 'should have a unique user_id' do
       should validate_presence_of(:user_id)
-      should validate_uniqueness_of(:user_id)
+      should validate_uniqueness_of(:user_id).case_insensitive
     end
 
     it 'should have an auth_role_id' do

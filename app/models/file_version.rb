@@ -93,6 +93,6 @@ class FileVersion < ApplicationRecord
   private
 
   def current_version_number
-    data_file.file_versions.maximum(:version_number) || 0
+    data_file&.file_versions&.maximum(:version_number) || 0
   end
 end

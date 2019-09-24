@@ -21,7 +21,7 @@ RSpec.describe MessageLogWorker do
 
   describe '#work_with_params' do
     include_context 'with env_override'
-    let(:message) { {job_info: Faker::Lorem.words(5)} }
+    let(:message) { {job_info: Faker::Lorem.words(number: 5)} }
     let(:routing_key) { Faker::Internet.slug }
     let(:delivery_info) { expected_delivery_info }
     let(:expected_delivery_info) { {

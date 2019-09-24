@@ -82,6 +82,11 @@ RSpec.configure do |config|
     Audited.store.clear
   end
 end
+
+# FactoryBot 5.0.0 Changed: use_parent_strategy now defaults to true, so by default the build strategy will build, rather than create associations
+# Overriding this default until tests/code are changed
+FactoryBot.use_parent_strategy = false
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec

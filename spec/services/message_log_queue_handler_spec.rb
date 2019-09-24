@@ -13,7 +13,7 @@ RSpec.describe MessageLogQueueHandler do
     it { is_expected.to respond_to(:work_duration=).with(1).argument }
     it { expect(subject.work_duration).to eq(default_duration) }
     context 'once set' do
-      let(:limit_value) { Faker::Number.between(1, 10) }
+      let(:limit_value) { Faker::Number.between(from: 1, to: 10) }
       before { subject.work_duration = limit_value }
       it { expect(subject.work_duration).to eq limit_value }
     end
@@ -70,9 +70,9 @@ RSpec.describe MessageLogQueueHandler do
     context 'with messages in message_log queue' do
       let(:queued_messages) {
         [
-          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
-          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_')),
-          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(nil, '_'))
+          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(words: nil, glue: '_')),
+          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(words: nil, glue: '_')),
+          stubbed_message(Faker::Lorem.sentence, Faker::Internet.slug(words: nil, glue: '_'))
         ]
       }
       before(:each) do
@@ -101,7 +101,7 @@ RSpec.describe MessageLogQueueHandler do
           it { expect{subject.index_messages}.to change{message_log_queue.message_count}.by(-queued_messages.length) }
         end
         context 'with custom work_duration' do
-          let(:custom_duration) { Faker::Number.between(1, 10) }
+          let(:custom_duration) { Faker::Number.between(from: 1, to: 10) }
           before(:each) do
             subject.work_duration = custom_duration
             is_expected.to receive(:sleep).with(custom_duration) { sleep(mocked_duration) }

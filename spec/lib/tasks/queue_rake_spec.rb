@@ -3,8 +3,8 @@ require 'rails_helper'
 describe 'queue:message_log:index_messages' do
   include_context "rake"
   let(:message_log_queue_handler) { instance_double(MessageLogQueueHandler) }
-  let(:routing_key) { Faker::Internet.slug(nil, '_') }
-  let(:duration) { Faker::Number.between(1,300) }
+  let(:routing_key) { Faker::Internet.slug(words: nil, glue: '_') }
+  let(:duration) { Faker::Number.between(from: 1, to: 300) }
   let(:expected_output) { /Indexing messages for #{duration} seconds/ }
 
   before(:each) do

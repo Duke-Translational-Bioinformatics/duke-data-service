@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :chunked_upload do
     project
-    sequence(:name) { |n| "#{Faker::Internet.slug(nil, '_')}_#{n}" }
+    sequence(:name) { |n| "#{Faker::Internet.slug(words: nil, glue: '_')}_#{n}" }
     content_type { "text/plain" }
-    size { Faker::Number.number(2) }
+    size { Faker::Number.number(digits: 2) }
     etag { SecureRandom.hex }
     storage_provider
     association :creator, factory: :user

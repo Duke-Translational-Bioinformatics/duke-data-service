@@ -781,7 +781,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
     # build_signed_url parameters
     let(:http_verb) { 'PUT' }
     let(:sub_path) { Faker::Internet.slug }
-    let(:expiry) { Faker::Number.number(10) }
+    let(:expiry) { Faker::Number.number(digits: 10) }
     let(:filename) { 'File Name With Spaces.txt' }
 
     let(:signed_url) { subject.build_signed_url(http_verb, sub_path, expiry) }
@@ -810,7 +810,7 @@ RSpec.describe SwiftStorageProvider, type: :model do
 
     it 'should have temp_url_expires in query' do
       expect(decoded_query.assoc('temp_url_expires')).not_to be_nil
-      expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry)
+      expect(decoded_query.assoc('temp_url_expires').last).to eq(expiry.to_s)
     end
 
     context 'with filename' do

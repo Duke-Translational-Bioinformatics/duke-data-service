@@ -1,4 +1,5 @@
 class ApiToken
+  include ActiveModel::Model
   include ActiveModel::Serialization
 
   def initialize(params = nil)

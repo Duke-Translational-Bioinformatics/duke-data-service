@@ -34,7 +34,7 @@ RSpec.describe AuditSummarySerializer do
   shared_context 'update event' do
     before do
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           "#{update_attribute}": update_value,
           audit_comment:  {"action": update_action}
         )
@@ -53,7 +53,7 @@ RSpec.describe AuditSummarySerializer do
   shared_context 'logical deletion event' do
     before do
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           is_deleted: true,
           audit_comment: {"action": 'DELETE'}
         )
@@ -64,13 +64,13 @@ RSpec.describe AuditSummarySerializer do
   shared_context 'restoration event' do
     before do
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           is_deleted: true,
           audit_comment: {"action": 'DELETE'}
         )
       end
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           is_deleted: false,
           audit_comment: {"endpoint": '/api/v1/trashbin/restore'}
         )
@@ -81,13 +81,13 @@ RSpec.describe AuditSummarySerializer do
   shared_context 'purge event' do
     before do
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           is_deleted: true,
           audit_comment: {"action": 'DELETE'}
         )
       end
       Audited.audit_class.as_user(auditor) do
-        audited_object.update_attributes!(
+        audited_object.update!(
           is_purged: true,
           audit_comment: {"endpoint": '/api/v1/trashbin/purge'}
         )

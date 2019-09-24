@@ -20,7 +20,7 @@ FactoryBot.define do
     end
 
     trait :with_slug do
-      slug { Faker::Internet.slug(nil, '_') }
+      slug { Faker::Internet.slug(words: nil, glue: '_') }
     end
   end
 end

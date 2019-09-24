@@ -9,7 +9,7 @@ module DDS
           {code: 401, message: 'Unauthorized'}
         ]
       end
-      get '/storage_providers', adapter: :json, root: :results do
+      get '/storage_providers', adapter: :json, root: 'results' do
         authenticate!
         StorageProvider.all
       end
