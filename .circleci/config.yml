@@ -283,13 +283,6 @@ workflows:
   build-deploy:
     jobs:
       - build
-      - coverage:
-          context: coverage
-          requires:
-            - build
-      - upload_coverage:
-          requires:
-            - build
       - deploy:
           requires:
             - build
