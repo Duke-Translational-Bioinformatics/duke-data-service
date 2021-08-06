@@ -61,7 +61,7 @@ jobs:
           BUNDLE_RETRY: 3
           BUNDLE_PATH: vendor/bundle
           RAILS_ENV: test
-      - image: circleci/postgres:9.5-alpine
+      - image: circleci/postgres:13.3-alpine
         environment:
           POSTGRES_USER: ubuntu
           POSTGRES_DB: circle_ruby_test
