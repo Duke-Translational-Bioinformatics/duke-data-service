@@ -35,8 +35,8 @@ class SingleBucketS3StorageProvider < StorageProvider
     if upload.is_a? NonChunkedUpload
       presigned_url(
         :put_object,
-        bucket_name: upload.storage_container,
-        object_key: upload.id,
+        bucket_name: bucket_name,
+        object_key: "#{upload.storage_container}/#{upload.id}",
         content_length: upload.size
       ).sub(url_root, '')
     else
@@ -46,7 +46,7 @@ class SingleBucketS3StorageProvider < StorageProvider
 
   def initialize_chunked_upload(upload)
     if upload.is_a? ChunkedUpload
-      resp = create_multipart_upload(upload.project.id, upload.id)
+      resp = create_multipart_upload(bucket_name, "#{upload.storage_container}/#{upload.id}")
       upload.update_attribute(:multipart_upload_id, resp)
     else
       raise "#{upload} is not a ChunkedUpload"
@@ -83,7 +83,7 @@ class SingleBucketS3StorageProvider < StorageProvider
 
   def verify_upload_integrity(upload)
     raise("#{upload} is not a NonChunkedUpload") unless upload.is_a? NonChunkedUpload
-    meta = head_object(upload.storage_container, upload.id) ||
+    meta = head_object(bucket_name, "#{upload.storage_container}/#{upload.id}") ||
       raise(IntegrityException, "NonChunkedUpload not found in object store")
     if meta[:content_length] != upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
@@ -99,22 +99,22 @@ class SingleBucketS3StorageProvider < StorageProvider
     end
     begin
       complete_multipart_upload(
-        upload.storage_container,
-        upload.id,
+        bucket_name,
+        "#{upload.storage_container}/#{upload.id}",
         upload_id: upload.multipart_upload_id,
         parts: parts
       )
     rescue StorageProviderException => e
       raise(IntegrityException, e.message)
     end
-    meta = head_object(upload.storage_container, upload.id)
+    meta = head_object(bucket_name, "#{upload.storage_container}/#{upload.id}")
     unless meta[:content_length] == upload.size
       raise IntegrityException, "reported size does not match size computed by StorageProvider"
     end
   end
 
   def is_complete_chunked_upload?(upload)
-    head_object(upload.storage_container, upload.id)
+    head_object(bucket_name, "#{upload.storage_container}/#{upload.id}")
   end
 
   def chunk_upload_ready?(upload)
@@ -125,8 +125,8 @@ class SingleBucketS3StorageProvider < StorageProvider
     begin
       presigned_url(
         :upload_part,
-        bucket_name: chunk.chunked_upload.storage_container,
-        object_key: chunk.chunked_upload.id,
+        bucket_name: bucket_name,
+        object_key: "#{chunk.chunked_upload.storage_container}/#{chunk.chunked_upload.id}",
         upload_id: chunk.chunked_upload.multipart_upload_id,
         part_number: chunk.number,
         content_length: chunk.size
@@ -138,8 +138,8 @@ class SingleBucketS3StorageProvider < StorageProvider
 
   def download_url(upload, filename=nil)
     params = {
-      bucket_name: upload.storage_container,
-      object_key: upload.id
+      bucket_name: bucket_name,
+      object_key: "#{upload.storage_container}/#{upload.id}"
     }
     params[:response_content_disposition] = 'attachment; filename='+filename if filename
     presigned_url(
@@ -150,7 +150,7 @@ class SingleBucketS3StorageProvider < StorageProvider
 
   def purge(object)
     if object.is_a? Upload
-      delete_object(object.storage_container, object.id)
+      delete_object(bucket_name, "#{object.storage_container}/#{object.id}")
     elsif object.is_a? Chunk
       true
     else

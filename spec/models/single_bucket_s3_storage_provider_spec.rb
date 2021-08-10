@@ -90,8 +90,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#single_file_upload_url(non_chunked_upload)' do
-    let(:bucket_name) { non_chunked_upload.storage_container }
-    let(:object_key) { non_chunked_upload.id }
+    let(:bucket_name) { subject.bucket_name }
+    let(:object_key) { non_chunked_upload.storage_container + '/' + non_chunked_upload.id }
     let(:object_size) { non_chunked_upload.size }
     let(:expected_url) { '/' + Faker::Internet.user_name }
     let(:pu_response) { subject.url_root + expected_url }
@@ -113,6 +113,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#initialize_chunked_upload' do
+    let(:bucket_name) { subject.bucket_name }
+    let(:object_key) { chunked_upload.storage_container + '/' + chunked_upload.id }
     let(:cmu_response) { multipart_upload_id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     before(:example) do
@@ -120,7 +122,7 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
     end
     it 'sets and persists chunked_upload#multipart_upload_id' do
       is_expected.to receive(:create_multipart_upload)
-        .with(chunked_upload.project.id, chunked_upload.id)
+        .with(bucket_name, object_key)
         .and_return(cmu_response)
       expect(chunked_upload.multipart_upload_id).to be_nil
       expect(subject.initialize_chunked_upload(chunked_upload)).to be_truthy
@@ -188,8 +190,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   describe '#verify_upload_integrity' do
     context 'with NonChunkedUpload' do
       let(:fingerprint) { FactoryBot.create(:fingerprint, upload: non_chunked_upload) }
-      let(:bucket_name) { non_chunked_upload.storage_container }
-      let(:object_key) { non_chunked_upload.id }
+      let(:bucket_name) { subject.bucket_name }
+      let(:object_key) { non_chunked_upload.storage_container + '/' + non_chunked_upload.id }
       let(:content_length) { non_chunked_upload.size }
       let(:etag) { fingerprint.value }
       let(:ho_response) { {
@@ -244,8 +246,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
         FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 1),
         FactoryBot.create(:chunk, :skip_validation, chunked_upload: chunked_upload, number: 2),
       ] }
-      let(:bucket_name) { chunked_upload.storage_container }
-      let(:object_key) { chunked_upload.id }
+      let(:bucket_name) { subject.bucket_name }
+      let(:object_key) { chunked_upload.storage_container + '/' + chunked_upload.id }
       let(:multipart_upload_id) { Faker::Lorem.characters(88) }
       let(:content_length) { chunked_upload.size }
       let(:parts) { [
@@ -296,8 +298,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#is_complete_chunked_upload?(chunked_upload)' do
-    let(:bucket_name) { chunked_upload.storage_container }
-    let(:object_key) { chunked_upload.id }
+    let(:bucket_name) { subject.bucket_name }
+    let(:object_key) { chunked_upload.storage_container + '/' + chunked_upload.id }
     let(:content_length) { chunked_upload.size }
     let(:ho_response) { {
       content_length: content_length,
@@ -335,8 +337,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
 
   describe '#chunk_upload_url(chunk)' do
     let(:chunked_upload) { FactoryBot.create(:chunked_upload, :skip_validation, multipart_upload_id: multipart_upload_id) }
-    let(:bucket_name) { chunk.chunked_upload.storage_container }
-    let(:object_key) { chunk.chunked_upload.id }
+    let(:bucket_name) { subject.bucket_name }
+    let(:object_key) { chunk.chunked_upload.storage_container + '/' + chunk.chunked_upload.id }
     let(:multipart_upload_id) { Faker::Lorem.characters(88) }
     let(:part_number) { chunk.number }
     let(:part_size) { chunk.size }
@@ -368,8 +370,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#download_url' do
-    let(:bucket_name) { chunked_upload.storage_container }
-    let(:object_key) { chunked_upload.id }
+    let(:bucket_name) { subject.bucket_name }
+    let(:object_key) { chunked_upload.storage_container + '/' + chunked_upload.id }
     let(:expected_url) { '/' + Faker::Internet.user_name }
     let(:file_name) { Faker::File.file_name }
     let(:pu_response) { subject.url_root + expected_url }
@@ -402,8 +404,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
 
   describe '#purge' do
     context 'chunked_upload' do
-      let(:bucket_name) { chunked_upload.storage_container }
-      let(:object_key) { chunked_upload.id }
+      let(:bucket_name) { subject.bucket_name }
+      let(:object_key) { chunked_upload.storage_container + '/' + chunked_upload.id }
       let(:response) { {} }
       before(:example) do
         expect(subject).to receive(:delete_object)
@@ -419,8 +421,8 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
     end
 
     context 'non_chunked_upload' do
-      let(:bucket_name) { non_chunked_upload.storage_container }
-      let(:object_key) { non_chunked_upload.id }
+      let(:bucket_name) { subject.bucket_name }
+      let(:object_key) { non_chunked_upload.storage_container + '/' + non_chunked_upload.id }
       let(:response) { {} }
       before(:example) do
         expect(subject).to receive(:delete_object)
