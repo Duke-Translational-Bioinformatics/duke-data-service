@@ -65,7 +65,7 @@ jobs:
         environment:
           POSTGRES_USER: ubuntu
           POSTGRES_DB: circle_ruby_test
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: "postgres_pw"
       - image: elasticsearch:5.4.3
         environment:
           ES_JAVA_OPTS: "-Xms512m -Xmx512m"
@@ -145,6 +145,7 @@ jobs:
           mkdir -p config && echo 'test:
             database: circle_ruby_test
             username: ubuntu
+            password: postgres_pw
             pool: 5
             encoding: unicode
             adapter: postgresql
