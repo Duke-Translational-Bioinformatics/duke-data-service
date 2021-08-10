@@ -37,6 +37,7 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   it { is_expected.not_to allow_value(domain).for(:url_root) }
   it { is_expected.to validate_presence_of :service_user }
   it { is_expected.to validate_presence_of :service_pass }
+  it { is_expected.to validate_presence_of :bucket_name }
 
   describe '#minimum_chunk_number' do
     it { expect(subject.minimum_chunk_number).to eq 1 }

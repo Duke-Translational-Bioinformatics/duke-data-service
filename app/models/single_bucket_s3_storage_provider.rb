@@ -2,6 +2,7 @@ class SingleBucketS3StorageProvider < StorageProvider
   validates :url_root, presence: true, format: { with: /\Ahttps?:\/\// }
   validates :service_user, presence: true
   validates :service_pass, presence: true
+  validates :bucket_name, presence: true
 
   S3_PART_MAX_NUMBER = 10_000
   S3_PART_MAX_SIZE = 5_368_709_120 # 5GB
