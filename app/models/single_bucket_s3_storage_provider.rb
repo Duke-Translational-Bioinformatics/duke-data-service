@@ -23,13 +23,12 @@ class SingleBucketS3StorageProvider < StorageProvider
   end
 
   def initialize_project(project)
-    location = create_bucket(project.id)[:location]
-    put_bucket_cors(project.id)
-    location
+    # Nothing to initialize
+    true
   end
 
   def is_initialized?(project)
-    head_bucket(project.id)
+    head_bucket(bucket_name)
   end
 
   def single_file_upload_url(upload)

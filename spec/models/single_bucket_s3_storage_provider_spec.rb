@@ -56,39 +56,13 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#initialize_project' do
-    let(:bucket_location) { "/#{project.id}" }
-    let(:cb_response) { { location: bucket_location } }
-    before(:example) do
-      is_expected.to receive(:create_bucket)
-        .with(project.id) { cb_response }
-    end
-    it 'creates a bucket with the project id' do
-      is_expected.to receive(:put_bucket_cors).with(project.id).and_return({})
-      expect(subject.initialize_project(project)).to eq(bucket_location)
-    end
-
-    context 'when #create_bucket raises exception' do
-      let(:cb_response) { raise StorageProviderException }
-      it 'does not call #put_bucket_cors and raises the exception' do
-        is_expected.not_to receive(:put_bucket_cors)
-        expect { subject.initialize_project(project) }.to raise_error(StorageProviderException)
-      end
-    end
-
-    context 'when #put_bucket_cors raises exception' do
-      before(:example) do
-        is_expected.to receive(:put_bucket_cors)
-          .with(project.id)
-          .and_raise(StorageProviderException)
-      end
-      it { expect { subject.initialize_project(project) }.to raise_error(StorageProviderException) }
-    end
+    it { expect(subject.initialize_project(project)).to eq true }
   end
 
   describe '#is_initialized?(project)' do
     before(:example) do
       is_expected.to receive(:head_bucket)
-        .with(project.id)
+        .with(subject.bucket_name)
         .and_return(head_bucket_response)
     end
     context 'project container exists' do
