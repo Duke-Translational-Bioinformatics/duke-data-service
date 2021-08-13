@@ -31,7 +31,6 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   it_behaves_like 'A StorageProvider implementation'
 
   # Validations
-  it { is_expected.to validate_presence_of :url_root }
   it { is_expected.to allow_value("http://#{domain}").for(:url_root) }
   it { is_expected.to allow_value("https://#{domain}").for(:url_root) }
   it { is_expected.not_to allow_value(domain).for(:url_root) }
@@ -458,13 +457,24 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   # S3 Interface
   it { is_expected.to respond_to(:client).with(0).arguments }
   describe '#client' do
-    let(:uri_parsed_url_root) { URI.parse(subject.url_root) }
     it { expect(subject.client).to be_a Aws::S3::Client }
     it { expect(subject.client.config.region).to eq 'us-east-1' }
     it { expect(subject.client.config.force_path_style).to eq true }
     it { expect(subject.client.config.access_key_id).to eq subject.service_user }
     it { expect(subject.client.config.secret_access_key).to eq subject.service_pass }
-    it { expect(subject.client.config.endpoint).to eq uri_parsed_url_root }
+    context 'with #url_root' do
+      before(:example) { subject.url_root = url_root }
+      context 'set to valid url' do
+        let(:url_root) { FactoryBot.attributes_for(:single_bucket_s3_storage_provider)[:url_root] }
+        it { expect(subject.client.config.endpoint.to_s).to eq url_root }
+        it { expect(subject.url_root).to eq url_root }
+      end
+      context 'set to nil' do
+        let(:url_root) { nil }
+        it { expect(subject.client.config.endpoint).not_to be_nil }
+        it { expect(subject.client.config.endpoint.to_s).to eq subject.url_root }
+      end
+    end
     context 'with #force_path_style' do
       before(:example) { subject.force_path_style = path_style }
       context 'set to true' do
