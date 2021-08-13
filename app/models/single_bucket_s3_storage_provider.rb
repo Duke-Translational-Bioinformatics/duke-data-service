@@ -18,8 +18,7 @@ class SingleBucketS3StorageProvider < StorageProvider
   end
 
   def configure
-    # Nothing to configure
-    true
+    put_bucket_cors(bucket_name)
   end
 
   def is_ready?

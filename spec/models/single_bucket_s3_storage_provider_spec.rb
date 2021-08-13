@@ -51,7 +51,10 @@ RSpec.describe SingleBucketS3StorageProvider, type: :model do
   end
 
   describe '#configure' do
-    it { expect(subject.configure).to eq true }
+    it 'sets CORS on the bucket' do
+      is_expected.to receive(:put_bucket_cors).with(subject.bucket_name)
+      expect { subject.configure }.not_to raise_error
+    end
   end
 
   describe '#initialize_project' do
