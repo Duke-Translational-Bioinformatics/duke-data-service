@@ -177,6 +177,9 @@ describe "storage_provider" do
       end
 
       context 'with required SINGLE BUCKET S3 ENV' do
+        before(:example) do
+          allow_any_instance_of(SingleBucketS3StorageProvider).to receive(:client).and_return(Aws::S3::Client.new(stub_responses: true))
+        end
         let(:storage_provider_attributes) {
           FactoryBot.attributes_for(:single_bucket_s3_storage_provider)
         }
