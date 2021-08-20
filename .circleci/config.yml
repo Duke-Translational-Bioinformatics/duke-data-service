@@ -61,11 +61,11 @@ jobs:
           BUNDLE_RETRY: 3
           BUNDLE_PATH: vendor/bundle
           RAILS_ENV: test
-      - image: circleci/postgres:9.5-alpine
+      - image: circleci/postgres:13.3
         environment:
           POSTGRES_USER: ubuntu
           POSTGRES_DB: circle_ruby_test
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: "postgres_pw"
       - image: elasticsearch:5.4.3
         environment:
           ES_JAVA_OPTS: "-Xms512m -Xmx512m"
@@ -145,6 +145,7 @@ jobs:
           mkdir -p config && echo 'test:
             database: circle_ruby_test
             username: ubuntu
+            password: postgres_pw
             pool: 5
             encoding: unicode
             adapter: postgresql
