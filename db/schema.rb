@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_04_184708) do
+ActiveRecord::Schema.define(version: 2021_08_10_175654) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -292,6 +292,7 @@ ActiveRecord::Schema.define(version: 2019_06_04_184708) do
     t.string "type"
     t.boolean "is_default"
     t.boolean "force_path_style"
+    t.string "bucket_name"
   end
 
   create_table "system_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
