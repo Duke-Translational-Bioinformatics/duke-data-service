@@ -58,12 +58,37 @@ def create_s3_storage_provider
   end
 end
 
+def create_single_bucket_s3_storage_provider
+  if ENV['SINGLE_BUCKET_S3_ACCT']
+    unless SingleBucketS3StorageProvider.where(name: ENV['SINGLE_BUCKET_S3_ACCT']).exists?
+      sp = SingleBucketS3StorageProvider.create(
+        display_name: ENV['SINGLE_BUCKET_S3_DISPLAY_NAME'],
+        description: ENV['SINGLE_BUCKET_S3_DESCRIPTION'],
+        name: ENV['SINGLE_BUCKET_S3_ACCT'],
+        bucket_name: ENV['SINGLE_BUCKET_S3_BUCKET_NAME'],
+        service_user: ENV['SINGLE_BUCKET_S3_USER'],
+        service_pass: ENV['SINGLE_BUCKET_S3_PASS']
+      )
+      if sp.valid?
+        configure_storage_provider(sp)
+      else
+        $stderr.puts "Validation Error: #{ sp.errors.to_json }"
+      end
+    else
+      $stderr.puts "Storage provider '#{ENV['SINGLE_BUCKET_S3_ACCT']}' already exists."
+    end
+  else
+    $stderr.puts "YOU DO NOT HAVE YOUR SINGLE BUCKET S3 ENVIRONMENT VARIABLES SET"
+  end
+end
+
 namespace :storage_provider do
   desc "creates a storage_provider using ENV"
   task create: :environment do
     supported_storage_provider_types = %w(
       swift
       s3
+      single_bucket_s3
     )
     if ENV['STORAGE_PROVIDER_TYPE']
       case ENV['STORAGE_PROVIDER_TYPE'].downcase
@@ -71,6 +96,8 @@ namespace :storage_provider do
         create_swift_storage_provider
       when 's3'
         create_s3_storage_provider
+      when 'single_bucket_s3'
+        create_single_bucket_s3_storage_provider
       else
         $stderr.puts "STORAGE_PROVIDER_TYPE must be one of #{supported_storage_provider_types.join(' ')}"
       end
