@@ -1,4 +1,7 @@
 # duke-data-service
+
+*** This Project is no longer being maintained ***
+
 See the `develop` branch for active commits.
 
 This is an open source project for building a "data service" for researchers that allows them to:
